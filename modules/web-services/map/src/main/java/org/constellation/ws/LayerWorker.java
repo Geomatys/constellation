@@ -190,7 +190,7 @@ public abstract class LayerWorker extends AbstractWorker {
         final Name fullName = layersContainsKey(layerName);
         if (fullName != null) {
             layerRef = namedProxy.get(fullName);
-            if (layerRef == null) throw new CstlServiceException("Unable to find  the Layer named:" + layerName + " in the provider proxy", NO_APPLICABLE_CODE);
+            if (layerRef == null) {throw new CstlServiceException("Unable to find  the Layer named:" + layerName + " in the provider proxy", NO_APPLICABLE_CODE);}
         } else {
             throw new CstlServiceException("Unknow Layer name:" + layerName, LAYER_NOT_DEFINED);
         }

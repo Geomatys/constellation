@@ -147,7 +147,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
                             //a dim range is define, it replace any given style.
                             final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
                             style = STYLE_FACTORY.style(symbol);
-                            return MapBuilder.createCoverageLayer(reader, style, getName().getLocalPart());
+                            return MapBuilder.createCoverageLayer(reader, 0, style, getName().getLocalPart());
                         }
                         break;
                     }
@@ -169,7 +169,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
         }
 
         final String title = getName().getLocalPart();
-        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, title);
+        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, 0, style, title);
         mapLayer.setDescription(STYLE_FACTORY.description(title,title));
 
         //search if we need an elevationmodel for style
@@ -204,31 +204,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
     }
 
     /**
-     * Returns the geographic bounding box for the coverage, or {@code null} if the
-     * coverage does not contain any geographic information.
-     *
-     * @throws DataStoreException
-     */
-    @Override
-    public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
-        final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
-        if (generalGridGeom == null) {
-            LOGGER.log(Level.INFO, "The layer \"{0}\" does not contain a grid geometry information.", name);
-            return null;
-        }
-        try {
-            final Envelope env = generalGridGeom.getEnvelope();
-            return new DefaultGeographicBoundingBox(env);
-        } catch (CancellationException ex) {
-            throw new DataStoreException(ex);
-        } catch (TransformException ex) {
-            throw new DataStoreException(ex);
-        }
-
-    }
-
-    /**
-     * Returns the netive envelope of this layer.
+     * {@inheritDoc}
      */
     @Override
     public Envelope getEnvelope() throws DataStoreException {

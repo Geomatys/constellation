@@ -19,9 +19,7 @@ package org.constellation.ws.embedded;
 
 import java.net.MalformedURLException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Connection;
@@ -41,7 +39,6 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.configuration.ProviderParameters.*;
 
 // Geotoolkit dependencies
-import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.xml.MarshallerPool;
@@ -69,7 +66,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WFSRequestTest extends AbstractTestRequest {
+public class WFSRequestTest extends AbstractGrizzlyServer {
 
     private static boolean datasourceCreated = false;
 
@@ -95,6 +92,10 @@ public class WFSRequestTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initPool() throws JAXBException {
+        initServer(new String[] {"org.constellation.wfs.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"}, null);
+
         EPSG_VERSION = CRS.getVersion("EPSG").toString();
         pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110"   +
             		  ":org.geotoolkit.ogc.xml.v110"  +
@@ -190,46 +191,14 @@ public class WFSRequestTest extends AbstractTestRequest {
         LayerProviderProxy.getInstance().setConfigurator(config);
     }
 
-    /**
-     * Initializes the data directory in unzipping the jar containing the resources
-     * into a temporary directory.
-     *
-     * @return The root output directory where the data are unzipped.
-     * @throws IOException
-     */
-    private static File initDataDirectory() throws IOException {
-        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
-        if (styleResource.indexOf('!') != -1) {
-            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
-        }
-        if (styleResource.startsWith("file:")) {
-            styleResource = styleResource.substring(5);
-        }
-        final File styleJar = new File(styleResource);
-        if (styleJar == null || !styleJar.exists()) {
-            throw new IOException("Unable to find the style folder: "+ styleJar);
-        }
-        if (styleJar.isDirectory()) {
-            return styleJar;
-        }
-        final InputStream in = new FileInputStream(styleJar);
-        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        final File outputDir = new File(tmpDir, "Constellation");
-        if (!outputDir.exists()) {
-            outputDir.mkdir();
-        }
-        IOUtilities.unzip(in, outputDir);
-        in.close();
-        return outputDir;
-    }
-
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
+        //finish();
     }
 
     @Test

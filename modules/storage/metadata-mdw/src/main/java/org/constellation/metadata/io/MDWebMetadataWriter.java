@@ -542,7 +542,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             // 3. the localised values
             final Classe localisedString = mdWriter.getClasse("LocalisedCharacterString", Standard.ISO_19103);
             for (Locale locale : dis.getLocales())  {
-                if (locale == null) continue;
+                if (locale == null) {continue;}
 
                 final Path valuePath = new Path(path, classe.getPropertyByName("textGroup"));
                 final Value value = new Value(valuePath, record, ordinal, localisedString, rootValue, null);
@@ -602,7 +602,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
                     } else if (object.getClass().isEnum()) {
 
-                        codelistElement = Util.getElementNameFromEnum(object);
+                        codelistElement = ReflectionUtilities.getElementNameFromEnum(object);
 
                     } else {
                         LOGGER.log (Level.SEVERE, "{0} is not a codelist!", object.getClass().getName());
@@ -672,8 +672,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             do {
                 for (Property prop: classe.getProperties()) {
                     // TODO remove when fix in MDweb2
-                    if (prop.getName().equals("geographicElement3") ||  prop.getName().equals("geographicElement4"))
+                    if (prop.getName().equals("geographicElement3") ||  prop.getName().equals("geographicElement4")) {
                         continue;
+                    }
 
                     final String propName = specialCorrectionName(prop.getName(), object.getClass());
 

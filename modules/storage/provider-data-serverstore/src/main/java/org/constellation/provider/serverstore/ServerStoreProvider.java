@@ -23,7 +23,7 @@ import org.constellation.provider.*;
 import org.geotoolkit.client.Server;
 import org.geotoolkit.client.ServerFinder;
 import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.storage.DataStoreException;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
@@ -71,8 +71,8 @@ public class ServerStoreProvider extends AbstractLayerProvider{
                 throw new DataStoreException("Could not create server store for parameters : "+factoryconfig);
             }
 
-            if(server instanceof DataStore){
-                names = ((DataStore)server).getNames();
+            if(server instanceof FeatureStore){
+                names = ((FeatureStore)server).getNames();
             }else if(server instanceof CoverageStore){
                 names = ((CoverageStore)server).getNames();
             }else{
@@ -110,8 +110,8 @@ public class ServerStoreProvider extends AbstractLayerProvider{
             return null;
         }
 
-        if(server instanceof DataStore){
-            final DataStore store = (DataStore) server;
+        if(server instanceof FeatureStore){
+            final FeatureStore store = (FeatureStore) server;
             return new DefaultDataStoreLayerDetails(key, store, null);
         }else if(server instanceof CoverageStore){
             final CoverageStore store = (CoverageStore) server;

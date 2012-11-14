@@ -30,6 +30,7 @@ import javax.xml.bind.Unmarshaller;
 
 //Junit dependencies
 import org.constellation.configuration.SOSConfiguration;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -96,7 +97,7 @@ public class GenericConfigurationXMLBindingTest {
         StringWriter sw = new StringWriter();
         marshaller.marshal(config, sw);
 
-        String result =  removeXmlns(sw.toString());
+        String result =  StringUtilities.removeXmlns(sw.toString());
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                + '\n' +
         "<automatic format=\"MDWEB\" >"                                                + '\n' +
@@ -182,7 +183,7 @@ public class GenericConfigurationXMLBindingTest {
         StringWriter sw = new StringWriter();
         marshaller.marshal(sosConfig, sw);
 
-        String result =  removeXmlns(sw.toString());
+        String result =  StringUtilities.removeXmlns(sw.toString());
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"            + '\n' +
         "<ns2:SOSConfiguration >"                                                  + '\n' +
@@ -501,7 +502,7 @@ public class GenericConfigurationXMLBindingTest {
 
         marshaller.marshal(query, sw);
 
-        String result =  removeXmlns(sw.toString());
+        String result =  StringUtilities.removeXmlns(sw.toString());
 
         assertEquals(expResult, result);
     }
@@ -536,14 +537,5 @@ public class GenericConfigurationXMLBindingTest {
         System.out.println(obj);
 
         assertTrue(obj instanceof Node);
-    }
-
-    public static String removeXmlns(String xml) {
-        String s = xml;
-        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
-        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
-        return s;
     }
 }

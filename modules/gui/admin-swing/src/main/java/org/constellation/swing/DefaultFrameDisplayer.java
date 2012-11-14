@@ -34,8 +34,8 @@ import org.geotoolkit.client.ServerFinder;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
-import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreFinder;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.session.Session;
@@ -50,13 +50,14 @@ import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.DefaultDescription;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.RandomStyleBuilder;
 import org.geotoolkit.style.StyleConstants;
-import org.geotoolkit.util.RandomStyleFactory;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -96,7 +97,13 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
             final ServerFactory factory = ServerFinder.getFactoryById(serviceType);
             final ParameterValueGroup params = factory.getParametersDescriptor().createValue();
             params.parameter("url").setValue(new URL(url));
-            final Server server = factory.create(params);
+            params.parameter("security").setValue(cstl.getClientSecurity());
+            try {
+                params.parameter("post").setValue(true);
+            } catch(ParameterNotFoundException ex) {
+                // do nothing if the parameters does not exist
+            }
+            final Server server = factory.open(params);
             display(server);
         } catch (MalformedURLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(),ex);
@@ -150,14 +157,14 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
                 //datastore
             }
 
-            final DataStore dStore = DataStoreFinder.open(storeconfig);
+            final FeatureStore dStore = FeatureStoreFinder.open(storeconfig);
 
             if(dStore != null){
                 Session storeSession = dStore.createSession(true);
 
                 for (Name name : dStore.getNames()) {
                     final FeatureCollection collection = storeSession.getFeatureCollection(QueryBuilder.all(name));
-                    final MutableStyle style = RandomStyleFactory.createRandomVectorStyle(collection);
+                    final MutableStyle style = RandomStyleBuilder.createDefaultVectorStyle(collection.getFeatureType());
                     final MapLayer layer = MapBuilder.createFeatureLayer(collection, style);
                     layer.setName(name.toString());
                     layer.setDescription(new DefaultDescription(new SimpleInternationalString(name.toString()), null));
@@ -187,12 +194,12 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
                 context.layers().add(layer);
             }
 
-        } else if (candidate instanceof DataStore) {
-            final DataStore ds = (DataStore) candidate;
+        } else if (candidate instanceof FeatureStore) {
+            final FeatureStore ds = (FeatureStore) candidate;
             final Session storeSession = ds.createSession(true);
             for (Name n : ds.getNames()) {
                 final FeatureCollection collection = storeSession.getFeatureCollection(QueryBuilder.all(n));
-                final MutableStyle style = RandomStyleFactory.createRandomVectorStyle(collection);
+                final MutableStyle style = RandomStyleBuilder.createDefaultVectorStyle(collection.getFeatureType());
                 final FeatureMapLayer layer = MapBuilder.createFeatureLayer(collection, style);
                 layer.setName(n.toString());
                 layer.setDescription(new DefaultDescription(new SimpleInternationalString(n.toString()), null));

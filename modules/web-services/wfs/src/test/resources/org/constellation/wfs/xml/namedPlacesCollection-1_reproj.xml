@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs">
     <gml:boundedBy>
-        <gml:Envelope srsName="">
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582">
             <gml:lowerCorner>250685.5054980364 -3541133.400790847</gml:lowerCorner>
             <gml:upperCorner>251219.33004435804 -3540716.1861125017</gml:upperCorner>
         </gml:Envelope>
@@ -9,9 +9,9 @@
     <gml:featureMember>
         <gml:NamedPlaces gml:id="NamedPlaces.1">
             <gml:the_geom>
-                <gml:MultiSurface srsName="EPSG:27582">
+                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:7.9:27582">
                     <gml:surfaceMember>
-                        <gml:Polygon srsName="EPSG:27582">
+                        <gml:Polygon srsName="urn:ogc:def:crs:epsg:7.9:27582">
                             <gml:exterior>
                                 <gml:LinearRing>
                                     <gml:posList>251209.63301375887 -3541050.591390987 251219.33004435804 -3540724.176485277 250950.4672208383 -3540716.1861125017 250938.11598495767 -3541131.6245575333 250997.8653774439 -3541133.400790847 251209.63301375887 -3541050.591390987</gml:posList>
@@ -28,9 +28,9 @@
     <gml:featureMember>
         <gml:NamedPlaces gml:id="NamedPlaces.2">
             <gml:the_geom>
-                <gml:MultiSurface srsName="EPSG:27582">
+                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:7.9:27582">
                     <gml:surfaceMember>
-                        <gml:Polygon srsName="EPSG:27582">
+                        <gml:Polygon srsName="urn:ogc:def:crs:epsg:7.9:27582">
                             <gml:exterior>
                                 <gml:LinearRing>
                                     <gml:posList>250685.5054980364 -3541079.5602372596 250760.19190888584 -3541081.7820883235 250763.72267679317 -3540963.0843936754 250689.03702101368 -3540960.862565064 250685.5054980364 -3541079.5602372596</gml:posList>

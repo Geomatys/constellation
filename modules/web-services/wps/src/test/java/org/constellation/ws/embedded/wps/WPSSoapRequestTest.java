@@ -20,7 +20,11 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.JAXBException;
+import org.constellation.wps.ws.soap.WPSService;
+import org.constellation.ws.embedded.AbstractGrizzlyServer;
 import org.geotoolkit.util.StringUtilities;
 
 import org.junit.*;
@@ -31,21 +35,27 @@ import static org.junit.Assume.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WPSSoapRequestTest extends AbstractTestSoapRequest {
-    
+public class WPSSoapRequestTest extends AbstractGrizzlyServer {
+
     private static final String WPS_DEFAULT = "http://localhost:9191/wps/default?";
-    
+
     private static final String WPS_TEST = "http://localhost:9191/wps/test?";
-    
-    
+
+
     @BeforeClass
-    public static void initLayerList() throws JAXBException {
+    public static void initLayerList() throws Exception {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("wps", new WPSService());
+        initServer(new String[] {
+            "org.constellation.wps.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"}, map);
     }
-      
+
     @AfterClass
     public static void finish() {
     }
-    
+
     /**
      */
     @Test
@@ -60,16 +70,16 @@ public class WPSSoapRequestTest extends AbstractTestSoapRequest {
             assumeNoException(ex);
             return;
         }
-        
+
         URLConnection conec = getCapsUrl.openConnection();
-        postRequestFile(conec, "org/constellation/xml/wps/GetCapabilitiesSOAP.xml");
-        
+        postRequestFile(conec, "org/constellation/xml/wps/GetCapabilitiesSOAP.xml", "application/soap+xml");
+
         final String result    = cleanXMlString(getStringResponse(conec));
         final String expResult = cleanXMlString(getStringFromFile("org/constellation/xml/wps/GetCapabilitiesResponseSOAP.xml"));
-        
+
         assertEquals(expResult, result);
     }
-    
+
     /**
      */
     @Test
@@ -83,17 +93,17 @@ public class WPSSoapRequestTest extends AbstractTestSoapRequest {
             assumeNoException(ex);
             return;
         }
-        
+
         URLConnection conec = getCapsUrl.openConnection();
-        postRequestFile(conec, "org/constellation/xml/wps/DescribeProcessSOAP.xml");
-        
+        postRequestFile(conec, "org/constellation/xml/wps/DescribeProcessSOAP.xml", "application/soap+xml");
+
         final String result    = cleanXMlString(getStringResponse(conec));
         final String expResult = cleanXMlString(getStringFromFile("org/constellation/xml/wps/DescribeProcessResponseSOAP.xml"));
-        
+
         assertEquals(expResult, result);
 
     }
-    
+
     /**
      */
     @Test
@@ -107,24 +117,24 @@ public class WPSSoapRequestTest extends AbstractTestSoapRequest {
             assumeNoException(ex);
             return;
         }
-        
+
         URLConnection conec = getCapsUrl.openConnection();
-        postRequestFile(conec, "org/constellation/xml/wps/ExecuteSOAP.xml");
-        
+        postRequestFile(conec, "org/constellation/xml/wps/ExecuteSOAP.xml", "application/soap+xml");
+
         final String result    = cleanXMlString(getStringResponse(conec));
         final String expResult = cleanXMlString(getStringFromFile("org/constellation/xml/wps/ExecuteResponseSOAP.xml"));
-        
+
         assertEquals(expResult, result);
 
     }
-    
+
     private static String cleanXMlString(String s) {
         s = s.substring(s.indexOf('>') + 1);
         s = StringUtilities.removeXmlns(s);
         for (int i = 0; i< 17; i++) {
             s = StringUtilities.removePrefix("ns" + i);
         }
-        
+
         return s;
     }
 }

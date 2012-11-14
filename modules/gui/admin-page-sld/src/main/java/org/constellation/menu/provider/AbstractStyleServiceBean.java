@@ -32,7 +32,7 @@ import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
 import org.mapfaces.facelet.styleeditor.StyleEditionConstants;
@@ -126,7 +126,7 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
     }
     
     private String readXmlSLD(final MutableStyle style) {
-        final XMLUtilities util = new XMLUtilities();
+        final StyleXmlIO util = new StyleXmlIO();
         try {
             final StringWriter sw = new StringWriter();
             util.writeStyle(sw, style, StyledLayerDescriptor.V_1_1_0);
@@ -138,7 +138,7 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
     }
     
     private MutableStyle writeXmlSLD(final String xmlStyle) {
-        final XMLUtilities util = new XMLUtilities();
+        final StyleXmlIO util = new StyleXmlIO();
         try {
             final StringWriter sw = new StringWriter();
             return util.readStyle(new StringReader(xmlStyle), SymbologyEncoding.V_1_1_0);

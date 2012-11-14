@@ -78,6 +78,8 @@ public class Values {
             } else {
                 return null;
             }
+        } else if (result == null){
+            LOGGER.log(Level.WARNING, "there no such variable in the values:{0}", variable);
         }
         return null;
     }
@@ -89,6 +91,8 @@ public class Values {
                 LOGGER.log(Level.WARNING, "retrieving single value for variable:{0} but the is multiple values", variable);
             }
             return result.get(0);
+        } else if (result == null){
+            LOGGER.log(Level.WARNING, "there no such variable in the values:{0}", variable);
         }
         return null;
     }
@@ -103,6 +107,7 @@ public class Values {
         if (values != null) {
             final List<Object> typedResults = values.get(variable);
             if (typedResults == null) {
+                LOGGER.log(Level.WARNING, "there no such variable in the values:{0}", variable);
                 return new ArrayList<String>();
             }
             final List<String> result = new ArrayList<String>(); 
@@ -120,6 +125,7 @@ public class Values {
         if (values != null) {
             final List<Object> typedResults = values.get(variable);
             if (typedResults == null) {
+                LOGGER.log(Level.WARNING, "there no such variable in the values:{0}", variable);
                 return new ArrayList<Object>();
             }
             return typedResults;

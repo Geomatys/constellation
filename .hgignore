@@ -11,3 +11,9 @@ target$
 ^tmp$
 derby.log$ 
 modules/testing/cite/engine/components/*
+
+# Intellij files
+\.iml$
+\.ipr$
+\.iws$
+\.idea$

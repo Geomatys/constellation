@@ -55,13 +55,13 @@ public final class GenericMetadataUtilities {
      * Forbidden constructor.
      */
     private GenericMetadataUtilities() {}
-    
+
     /**
      * A List of date formatter.
      */
-    public static final List<DateFormat> DATE_FORMATS;
+    private static final List<DateFormat> DATE_FORMATS = new ArrayList<DateFormat>();
     static {
-        DATE_FORMATS = new ArrayList<DateFormat>();
+        DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
         DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd"));
         DATE_FORMATS.add(new SimpleDateFormat("yyyy"));
@@ -127,9 +127,11 @@ public final class GenericMetadataUtilities {
         final DefaultCitationDate ciDate = new DefaultCitationDate();
         ciDate.setDateType(type);
         final Date d = parseDate(date);
-        if (d != null)
+        if (d != null) {
             ciDate.setDate(d);
-        else LOGGER.log(Level.FINER, "citation date null: {0}", date);
+        } else {
+            LOGGER.log(Level.FINER, "citation date null: {0}", date);
+        }
         return ciDate;
     }
 
@@ -138,8 +140,7 @@ public final class GenericMetadataUtilities {
      * @param date The date to parse.
      */
     public static Date parseDate(final String date) {
-        if (date == null || date.isEmpty())
-            return null;
+        if (date == null || date.isEmpty()) {return null;}
         int i = 0;
         while (i < DATE_FORMATS.size()) {
             final DateFormat dateFormat = DATE_FORMATS.get(i);
@@ -254,7 +255,7 @@ public final class GenericMetadataUtilities {
             final String southVar, final String northVar, final Values values) {
         final List<GeographicExtent> result = new ArrayList<GeographicExtent>();
         final List<Double[]> coordinates = getCoordinateList(westVar, eastVar, southVar, northVar, values);
-        
+
         final int size = coordinates.size();
         for (int i = 0; i < size; i++) {
             final Double[] coordinate = coordinates.get(i);
@@ -279,7 +280,7 @@ public final class GenericMetadataUtilities {
             final String southVar, final String northVar, final Values values) {
         final List<BoundingBoxType> result = new ArrayList<BoundingBoxType>();
         final List<Double[]> coordinates = getCoordinateList(westVar, eastVar, southVar, northVar, values);
-        
+
         final int size = coordinates.size();
         for (int i = 0; i < size; i++) {
             final Double[] coordinate = coordinates.get(i);

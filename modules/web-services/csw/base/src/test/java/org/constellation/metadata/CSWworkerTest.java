@@ -478,7 +478,7 @@ public class CSWworkerTest {
 
         RegistryPackageType expRpResult =  ((JAXBElement<RegistryPackageType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim3.xml"))).getValue();
 
-        assertEquals(expRpResult, rpResult);
+        ebrimEquals(expRpResult, rpResult);
 
         pool.release(unmarshaller);
     }
@@ -869,6 +869,74 @@ public class CSWworkerTest {
         assertEquals(expCustomResult2, customResult2);
         assertEquals(expCustomResult3, customResult3);
         assertEquals(expCustomResult4, customResult4);
+
+
+        /*
+         *  TEST 8 : getRecords with HITS - DC mode (FULL) - CQL text: identifier LIKE %42292_9s%
+         */
+
+        typeNames             = Arrays.asList(RECORD_QNAME);
+        elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        sortBy                 = null;
+        constraint    = new QueryConstraintType("identifier LIKE '%42292_9s%'", "1.0.0");
+        query = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request = new GetRecordsType("CSW", "2.0.2", ResultType.HITS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
+        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
+        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 0);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+
+        /*
+         *  TEST 8 : getRecords with HITS - DC mode (FULL) - CQL text: identifier LIKE %42292_9s%
+         */
+
+        typeNames             = Arrays.asList(RECORD_QNAME);
+        elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        sortBy                 = null;
+        constraint    = new QueryConstraintType("identifier LIKE '%2292_9s_19900%'", "1.0.0");
+        query = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request = new GetRecordsType("CSW", "2.0.2", ResultType.HITS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
+        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
+        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 0);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+        
+        
+        /*
+         *  TEST 9 : getRecords with HITS - DC mode (FULL) - CQL text: DWITHIN(geometry, POINT(1 2), 10, kilometers)
+         */
+
+        typeNames      = Arrays.asList(RECORD_QNAME);
+        elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        sortBy         = null;
+        constraint    = new QueryConstraintType("DWITHIN(geometry, POINT(1 2), 10, kilometers)", "1.0.0");
+        query = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request = new GetRecordsType("CSW", "2.0.2", ResultType.HITS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
+        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
+        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 0);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 0);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
 
         pool.release(unmarshaller);
     }
@@ -1330,7 +1398,7 @@ public class CSWworkerTest {
 
         boolean exLaunched = false;
         try {
-            result = worker.getDomain(request);
+            worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getLocator(), "parameterName, propertyName");
@@ -1345,7 +1413,7 @@ public class CSWworkerTest {
 
         exLaunched = false;
         try {
-            result = worker.getDomain(request);
+            worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getLocator(), PARAMETERNAME);
@@ -1360,7 +1428,7 @@ public class CSWworkerTest {
 
         exLaunched = false;
         try {
-            result = worker.getDomain(request);
+            worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getLocator(), PARAMETERNAME);
@@ -1375,7 +1443,7 @@ public class CSWworkerTest {
 
         exLaunched = false;
         try {
-            result = worker.getDomain(request);
+            worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getLocator(), PARAMETERNAME);
@@ -1473,7 +1541,7 @@ public class CSWworkerTest {
         // we try to request the deleted metadata
         CstlServiceException exe = null;
         try {
-            GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+            worker.getRecordById(requestGRBI);
         } catch (CstlServiceException ex) {
             exe = ex;
         }
@@ -1881,7 +1949,7 @@ public class CSWworkerTest {
 
         exe = null;
         try {
-            result     = worker.transaction(request);
+            worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
         }
@@ -1922,7 +1990,7 @@ public class CSWworkerTest {
 
         exe = null;
         try {
-            result     = worker.transaction(request);
+            worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
         }
@@ -1968,7 +2036,7 @@ public class CSWworkerTest {
 
         exe = null;
         try {
-            result     = worker.transaction(request);
+            worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
         }
@@ -2182,7 +2250,7 @@ public class CSWworkerTest {
 
         exe = null;
         try {
-            result     = worker.transaction(request);
+            worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
             assertTrue(ex.getMessage(), ex.getMessage().contains("The property: abstract"));
@@ -2206,7 +2274,7 @@ public class CSWworkerTest {
 
         exe = null;
         try {
-            result     = worker.transaction(request);
+            worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
         }

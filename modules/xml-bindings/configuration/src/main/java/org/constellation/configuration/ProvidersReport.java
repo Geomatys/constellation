@@ -31,18 +31,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name ="ProvidersReport")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProvidersReport {
-    
+
     @XmlElement(name = "service")
     private List<ProviderServiceReport> providerServices;
-    
+
     public ProvidersReport() {
-        
+
     }
-    
+
     public ProvidersReport(final List<ProviderServiceReport> services) {
         this.providerServices = services;
     }
-    
+
     /**
      * @return the provider services
      */
@@ -61,16 +61,30 @@ public class ProvidersReport {
     }
 
     /**
-     * @param id of the wanted provider service.
+     * @param type The type (Postgis, shapefile, ...) of the wanted provider service.
      * @return ProviderServiceReport or null
      */
-    public ProviderServiceReport getProviderService(final String id){
+    public ProviderServiceReport getProviderService(final String type){
         for(ProviderServiceReport report : getProviderServices()){
-            if(id.equals(report.getType())){
+            if(type.equals(report.getType())){
                 return report;
             }
         }
         return null;
     }
-    
+
+    /**
+     * @param id of the wanted provider.
+     * @return ProviderReport or null
+     */
+    public ProviderReport getProvider(final String id){
+        for(ProviderServiceReport report : getProviderServices()){
+            final ProviderReport p = report.getProvider(id);
+            if (p !=  null) {
+                return p;
+            }
+        }
+        return null;
+    }
+
 }

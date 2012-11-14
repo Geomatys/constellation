@@ -23,12 +23,14 @@ import java.io.File;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
-import javax.xml.bind.JAXBException;
 import java.net.URLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ServiceReport;
+import org.constellation.sos.ws.soap.SOService;
 import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
@@ -39,10 +41,13 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class ConfigurationRequestTest extends AbstractTestRequest {
+public class ConfigurationRequestTest extends AbstractGrizzlyServer {
 
     @BeforeClass
-    public static void initPool() throws JAXBException {
+    public static void initPool() throws Exception {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("sos", new SOService());
+        initServer(null, map);
         // Get the list of layers
         pool = new MarshallerPool("org.constellation.configuration:"
                                 + "org.constellation.generic.database:"
@@ -53,11 +58,12 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
+        //finish();
     }
 
     private static String getConfigurationURL() {

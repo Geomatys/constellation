@@ -26,6 +26,7 @@ import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -33,8 +34,16 @@ import javax.swing.table.AbstractTableModel;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
 import org.geotoolkit.gui.swing.misc.ActionCell;
+import org.geotoolkit.gui.swing.misc.JOptionDialog;
 import org.geotoolkit.gui.swing.propertyedit.JFeatureOutLine;
+import org.geotoolkit.gui.swing.propertyedit.LayerStylePropertyPanel;
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JAdvancedStylePanel;
+import org.geotoolkit.gui.swing.propertyedit.styleproperty.JClassificationIntervalStylePanel;
+import org.geotoolkit.gui.swing.propertyedit.styleproperty.JClassificationSingleStylePanel;
+import org.geotoolkit.gui.swing.propertyedit.styleproperty.JRasterColorMapStylePanel;
+import org.geotoolkit.gui.swing.propertyedit.styleproperty.JSimpleStylePanel;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
@@ -44,13 +53,14 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
- * Edit a service.
+ * Edit a provider.
  *
  * @author Johann Sorel (geomatys)
  */
 public class JProviderEditPane extends javax.swing.JPanel {
 
     private static final ImageIcon ICON_EDIT =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceEditBlanc.png"));
+    private static final ImageIcon ICON_COPY =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/edit_copy.png"));
     private static final ImageIcon ICON_DELETE = new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceCross.png"));
 
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/constellation/swing/Bundle");
@@ -109,6 +119,8 @@ public class JProviderEditPane extends javax.swing.JPanel {
         final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
         final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage("",
                 ICON_EDIT, Color.BLACK, fontNormal, Color.DARK_GRAY));
+        final ImageIcon copyIcon = new ImageIcon(JServicesPane.createImage("",
+                ICON_COPY, Color.BLACK, fontNormal, Color.DARK_GRAY));
         final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("",
                 ICON_DELETE, Color.WHITE, fontNormal, Color.DARK_GRAY));
 
@@ -125,9 +137,33 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
                 }
             });
+            guiData.getColumn(1).setMaxWidth(40);
+            guiData.getColumn(1).setWidth(40);
+            guiData.getColumn(1).setPreferredWidth(40);
+            
+            guiData.getColumn(2).setCellRenderer(new ActionCell.Renderer(copyIcon));
+            guiData.getColumn(2).setCellEditor(new ActionCell.Editor(copyIcon) {
+                @Override
+                public void actionPerformed(final ActionEvent e, Object value) {
+                    final String styleName = (String) value;
+                    final MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
+                    final String newName = styleName+"(copy)";
+                    style.setName(newName);
+                    server.providers.createStyle(providerReport.getId(), newName, style);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateDataModel();
+                        }
+                    });
+                }
+            });
+            guiData.getColumn(2).setMaxWidth(40);
+            guiData.getColumn(2).setWidth(40);
+            guiData.getColumn(2).setPreferredWidth(40);
 
-            guiData.getColumn(2).setCellRenderer(new ActionCell.Renderer(deleteIcon));
-            guiData.getColumn(2).setCellEditor(new ActionCell.Editor(deleteIcon) {
+            guiData.getColumn(3).setCellRenderer(new ActionCell.Renderer(deleteIcon));
+            guiData.getColumn(3).setCellEditor(new ActionCell.Editor(deleteIcon) {
                 @Override
                 public void actionPerformed(final ActionEvent e, Object value) {
                     final String styleName = (String) value;
@@ -140,6 +176,9 @@ public class JProviderEditPane extends javax.swing.JPanel {
                     });
                 }
             });
+            guiData.getColumn(3).setMaxWidth(40);
+            guiData.getColumn(3).setWidth(40);
+            guiData.getColumn(3).setPreferredWidth(40);
         }
 
         guiData.setTableHeader(null);
@@ -170,28 +209,35 @@ public class JProviderEditPane extends javax.swing.JPanel {
     private void editStyle(MutableStyle style, String styleName,final boolean isNew){
         final String oldName = styleName;
 
-        final JDialog dialog = new JDialog();
         final JPanel pane = new JPanel(new BorderLayout());
         final JLabel lbl = new JLabel(BUNDLE.getString("name"));
         final JTextField textField = new JTextField(styleName);
-        final JAdvancedStylePanel editor = new JAdvancedStylePanel();
-        editor.parse(style);
+        
+        final MapLayer layer = MapBuilder.createEmptyMapLayer();
+        layer.setStyle(style);
 
+        LayerStylePropertyPanel editors = new LayerStylePropertyPanel();
+        editors.addPropertyPanel(new JSimpleStylePanel());
+        editors.addPropertyPanel(new JClassificationSingleStylePanel());
+        editors.addPropertyPanel(new JClassificationIntervalStylePanel());
+        editors.addPropertyPanel(new JRasterColorMapStylePanel());
+        editors.addPropertyPanel(new JAdvancedStylePanel());
+        editors.setTarget(layer);
+        
         final JPanel north = new JPanel(new BorderLayout());
         north.add(BorderLayout.WEST,lbl);
         north.add(BorderLayout.CENTER,textField);
 
         pane.add(BorderLayout.NORTH,north);
-        pane.add(BorderLayout.CENTER,editor);
+        pane.add(BorderLayout.CENTER,editors);
 
+        int res = JOptionDialog.show(null, pane, JOptionPane.OK_CANCEL_OPTION);
+        if(JOptionPane.OK_OPTION != res) return;
+        
+        styleName = textField.getText();
 
-        dialog.setContentPane(pane);
-        dialog.setModal(true);
-        dialog.setSize(800, 600);
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-
-        style = (MutableStyle) editor.create();
+        editors.apply();
+        style = layer.getStyle();
         style.setName(textField.getText());
 
         if(isNew){
@@ -435,7 +481,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
         @Override
         public int getColumnCount() {
-            return (styleType)? 3 : 1;
+            return (styleType)? 4 : 1;
         }
 
         @Override

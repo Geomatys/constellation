@@ -291,7 +291,7 @@ public class LuceneObservationFilter implements ObservationFilter {
     public List<ObservationResult> filterResult() throws CstlServiceException {
         try {
             final SpatialQuery query = new SpatialQuery(luceneRequest.toString());
-            final SortField sf       = new SortField("sampling_time_begin", SortField.STRING, false);
+            final SortField sf       = new SortField("sampling_time_begin", SortField.Type.STRING, false);
             query.setSort(new Sort(sf));
             return searcher.doResultSearch(query);
         } catch(SearchingException ex) {

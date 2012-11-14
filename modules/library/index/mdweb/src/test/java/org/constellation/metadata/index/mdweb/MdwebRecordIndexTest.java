@@ -443,7 +443,7 @@ public class MdwebRecordIndexTest {
          * Test 1 sorted search: all orderBy type ASC
          */
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        SortField sf = new SortField("type_sort", SortField.STRING, false);
+        SortField sf = new SortField("type_sort", SortField.Type.STRING, false);
         spatialQuery.setSort(new Sort(sf));
 
         Set<String> result = indexSearcher.doSearch(spatialQuery);
@@ -468,7 +468,7 @@ public class MdwebRecordIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf           = new SortField("type_sort", SortField.STRING, true);
+        sf           = new SortField("type_sort", SortField.Type.STRING, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
@@ -493,7 +493,7 @@ public class MdwebRecordIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf           = new SortField("identifier_sort", SortField.STRING, false);
+        sf           = new SortField("identifier_sort", SortField.Type.STRING, false);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
@@ -518,7 +518,7 @@ public class MdwebRecordIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf           = new SortField("identifier_sort", SortField.STRING, true);
+        sf           = new SortField("identifier_sort", SortField.Type.STRING, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
@@ -663,7 +663,7 @@ public class MdwebRecordIndexTest {
 
         //The records
         Date d = new Date(120);
-        User inputUser = new User("admin", "adminadmin", null, d, d);
+        User inputUser = new User("admin", null, d, d);
         writer.writeUser(inputUser);
 
         FullRecord f1 = new FullRecord(1, "2345-aa453-ade456", cat, "title1", inputUser, null, null, d, d, null, true, true, FullRecord.TYPE.NORMALRECORD);

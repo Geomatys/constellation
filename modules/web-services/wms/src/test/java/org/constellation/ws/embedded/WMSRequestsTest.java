@@ -27,7 +27,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBException;
-import org.constellation.map.ws.WMSMapDecoration;
+import org.constellation.configuration.WMSPortrayal;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
@@ -54,7 +54,6 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
-import org.geotoolkit.internal.io.IOUtilities;
 
 // JUnit dependencies
 
@@ -74,7 +73,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class WMSRequestsTest extends AbstractTestRequest {
+public class WMSRequestsTest extends AbstractGrizzlyServer {
 
     /**
      * The layer to test.
@@ -126,11 +125,19 @@ public class WMSRequestsTest extends AbstractTestRequest {
     private static final String WMS_GETMAP_GIF =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/gif&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
+    private static final String WMS_GETMAP_GIF_TRANSPARENT =
+    "TrAnSpArEnT=TRUE&CrS=CRS:84&FoRmAt=image%2Fgif&VeRsIoN=1.3.0&HeIgHt=100&WiDtH=200&StYlEs=&LaYeRs=cite%3ALakes&ReQuEsT=GetMap&BbOx=0,-0.0020,0.0040,0";
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
+        initServer(new String[] {
+            "org.constellation.map.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"
+        }, null);
+
         pool = WMSMarshallerPool.getInstance();
 
         final Configurator config = new Configurator() {
@@ -187,7 +194,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         LayerProviderProxy.getInstance().setConfigurator(config);
 
         WorldFileImageReader.Spi.registerDefaults(null);
-        WMSMapDecoration.setEmptyExtension(true);
+        WMSPortrayal.setEmptyExtension(true);
 
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){
@@ -200,38 +207,10 @@ public class WMSRequestsTest extends AbstractTestRequest {
         }
     }
 
-    /**
-     * Initializes the data directory in unzipping the jar containing the resources
-     * into a temporary directory.
-     *
-     * @return The root output directory where the data are unzipped.
-     * @throws IOException
-     */
-    private static File initDataDirectory() throws IOException {
-        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
-        if (styleResource.indexOf('!') != -1) {
-            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
-        }
-        if (styleResource.startsWith("file:")) {
-            styleResource = styleResource.substring(5);
-        }
-        final File styleJar = new File(styleResource);
-        if (styleJar == null || !styleJar.exists()) {
-            throw new IOException("Unable to find the style folder: "+ styleJar);
-        }
-        if (styleJar.isDirectory()) {
-            return styleJar;
-        }
-        final InputStream in = new FileInputStream(styleJar);
-        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        final File outputDir = new File(tmpDir, "Constellation");
-        if (!outputDir.exists()) {
-            outputDir.mkdir();
-        }
-        IOUtilities.unzip(in, outputDir);
-        in.close();
-        return outputDir;
+    @AfterClass
+    public static void shutDown() throws JAXBException {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        //finish();
     }
 
     /**
@@ -304,6 +283,28 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertEquals(100, image.getWidth());
         assertEquals(100,  image.getHeight());
         assertTrue  (ImageTesting.getNumColors(image) > 2);
+    }
+
+    /**
+     * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
+     */
+    @Test
+    public void testWMSGetMapLakeGifransparent() throws IOException {
+                // Creates a valid GetMap url.
+        final URL getMapUrl;
+        try {
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_GIF_TRANSPARENT);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/gif");
+
+        // Test on the returned image.
+        assertEquals(200, image.getWidth());
+        assertEquals(100,  image.getHeight());
     }
 
     /**

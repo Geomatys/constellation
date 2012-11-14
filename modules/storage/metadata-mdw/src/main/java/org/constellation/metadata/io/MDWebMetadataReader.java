@@ -588,17 +588,18 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 //We search the children of the QName
                 for (Value childValue : value.getChildren()) {
                     if (childValue instanceof TextValue) {
-                        if ("localPart".equals(childValue.getPath().getName()))
+                        if ("localPart".equals(childValue.getPath().getName())) {
                             localPart = ((TextValue)childValue).getValue();
-                        else  if ("namespaceURI".equals(childValue.getPath().getName()))
+                        } else if ("namespaceURI".equals(childValue.getPath().getName())) {
                             namespaceURI = ((TextValue)childValue).getValue();
+                        }
                     }
                 }
                 if (localPart != null && namespaceURI != null) {
                     result = ReflectionUtilities.newInstance(classe, namespaceURI, localPart);
                     return result;
                 } else {
-                    LOGGER.severe("The QName is mal-formed");
+                    LOGGER.warning("The QName is mal-formed");
                     return null;
                 }
 
@@ -613,10 +614,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 //We search the children of the QName
                 for (Value childValue : value.getChildren()) {
                     if (childValue instanceof TextValue) {
-                        if (childValue.getPath().getName().equals("value"))
+                        if (childValue.getPath().getName().equals("value")) {
                             intValue = ((TextValue)childValue).getValue();
-                        else  if (childValue.getPath().getName().equals("isInfinite"))
+                        } else if (childValue.getPath().getName().equals("isInfinite")) {
                             isInfinite = ((TextValue)childValue).getValue();
+                        }
                     }
                 }
                 UnlimitedInteger u = null;
@@ -784,8 +786,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         if (field != null) {
                             setFieldToValue(field, attribName, result, param);
                         } else {
-                            LOGGER.warning("no field " + attribName + " in class:" + classe.getName() + '\n'
-                                         + "currentPath:" + path.getId());
+                            LOGGER.warning("no field " + attribName + " in class:" + classe.getName() + "\ncurrentPath:" + path.getId());
                         }
                     }
                 }
@@ -830,10 +831,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         tryAgain = false;
                 }
             } catch (ClassCastException ex) {
-                LOGGER.log(Level.SEVERE, "Exception while putting in geotoolkit metadata.", ex);
+                LOGGER.log(Level.WARNING, "Exception while putting in geotoolkit metadata.", ex);
                 tryAgain = false;
             } catch (UnsupportedOperationException ex) {
-                LOGGER.log(Level.SEVERE, "Unsuported operation Exception while putting in geotoolkit metadata. ",  ex);
+                LOGGER.log(Level.WARNING, "Unsuported operation Exception while putting in geotoolkit metadata. ",  ex);
                 tryAgain = false;
             }
         }
@@ -864,7 +865,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 field.set(result, param);
             }
         } catch (IllegalAccessException ex) {
-            LOGGER.severe("error while setting the parameter:" + param + "\n to the field:" + field + ":" + ex.getMessage());
+            LOGGER.warning("error while setting the parameter:" + param + "\n to the field:" + field + ":" + ex.getMessage());
         } catch (IllegalArgumentException ex) {
             String objectStr = "null";
             if (param != null) {
@@ -874,7 +875,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     objectStr = "(unformattableObject) " + param.getClass().getSimpleName();
                 }
             }
-            LOGGER.severe("IllegalArgumentException:" + ex.getMessage() + '\n'
+            LOGGER.warning("IllegalArgumentException:" + ex.getMessage() + '\n'
                         + "while setting the parameter: " + objectStr + '\n'
                         + "to the field: " + field + ".");
         }
@@ -1012,15 +1013,15 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             //TODO remove this special case
             /*if ("RS_Identifier".equals(className))
                 packageName = "org.geotoolkit.referencing";
-            else*/ if ("MD_ScopeCode".equals(className))
+            else*/ if ("MD_ScopeCode".equals(className)) {
                 packageName = "org.opengis.metadata.maintenance";
-            else if ("SV_ServiceIdentification".equals(className))
+            } else if ("SV_ServiceIdentification".equals(className)) {
                 packageName = "org.geotoolkit.service";
-            else if (className.startsWith("FRA_"))
+            } else if (className.startsWith("FRA_")) {
                 packageName = "org.geotoolkit.metadata.fra";
-            else if ("ReferenceSystemMetadata".equals(className))
+            } else if ("ReferenceSystemMetadata".equals(className)) {
                 packageName = "org.geotoolkit.internal.jaxb.metadata";
-            else if ("Anchor".equals(className)) {
+            } else if ("Anchor".equals(className)) {
                 packageName = "org.geotoolkit.internal.jaxb.gmx";
                 className = "GMX_Anchor";
             } else if ("XLink".equals(className)) {

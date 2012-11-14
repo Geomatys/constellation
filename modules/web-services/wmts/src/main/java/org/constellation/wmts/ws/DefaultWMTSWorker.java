@@ -178,9 +178,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
         // we load the skeleton capabilities
         final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "WMTS");
-
         if (skeletonCapabilities == null) {
-            throw new CstlServiceException("the service was unable to find the metadata for capabilities operation", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
         }
 
         //we enter the information for service identification.
@@ -215,12 +214,14 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 final Layer configlayer = declaredLayers.get(n);
                 final Object origin = details.getOrigin();
                 if(!(origin instanceof CoverageReference)){
-                    //WMTS only handle CoverageRefenrece object
+                    //WMTS only handle CoverageReference object
+                    LOGGER.log(Level.INFO, "Layer {0} has not a coverageReference origin. It will not be included in capabilities", n.getLocalPart());
                     continue;
                 }
                 final CoverageReference ref = (CoverageReference) origin;
                 if(!(ref instanceof PyramidalModel)){
                     //WMTS only handle PyramidalModel
+                    LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", n.getLocalPart());
                     continue;
                 }
 
@@ -275,8 +276,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                             matrix.setMatrixHeight(mosaic.getGridSize().height);
                             matrix.setTileWidth(mosaic.getTileSize().width);
                             matrix.setTileHeight(mosaic.getTileSize().height);
-                            matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getX());
-                            matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getY());
+                            matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getOrdinate(0));
+                            matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getOrdinate(1));
                             tm.add(matrix);
                         }
                         tms.setTileMatrix(tm);
@@ -450,7 +451,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 }
             }
         }
-        
+
         // 2. PARAMETERS NOT USED FOR NOW
         Double elevation =  null;
         Date time        = null;

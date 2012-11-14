@@ -125,6 +125,10 @@
             <artifactId>postgresql</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-go2-style-extension</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

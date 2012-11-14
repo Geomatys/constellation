@@ -100,12 +100,6 @@ public interface WFSWorker extends Worker {
      */
     TransactionResponse transaction(final Transaction t) throws CstlServiceException;
 
-    /**
-     * Return all the feature type that the service support.
-     * @return all the feature type that the service support.
-     */
-    List<FeatureType> getFeatureTypes();
-
     Object getPropertyValue(final GetPropertyValue request) throws CstlServiceException;
 
     CreateStoredQueryResponse createStoredQuery(final CreateStoredQuery request) throws CstlServiceException;

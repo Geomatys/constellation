@@ -122,7 +122,10 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         if (dataDirectory == null) {
             throw new MetadataIoException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
         } else if (!dataDirectory.exists()) {
-            dataDirectory.mkdir();
+            boolean created = dataDirectory.mkdir();
+            if (!created) {
+                throw new MetadataIoException("cause: unable to create the unexisting data directory:" + dataDirectory.getPath(), NO_APPLICABLE_CODE);
+            }
         }
         final String extension = configuration.getParameter("netcdfExtension");
         if (extension != null) {
@@ -135,6 +138,20 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             usePathAsIdentifier = Boolean.valueOf(usePathAsIdentifierValue);
         } else {
             usePathAsIdentifier = false;
+        }
+        if (configuration.getEnableThread() != null && !configuration.getEnableThread().isEmpty()) {
+            final boolean t = Boolean.parseBoolean(configuration.getEnableThread());
+            if (t) {
+                LOGGER.info("parrallele treatment enabled");
+            }
+            setIsThreadEnabled(t);
+        }
+        if (configuration.getEnableCache() != null && !configuration.getEnableCache().isEmpty()) {
+            final boolean c = Boolean.parseBoolean(configuration.getEnableCache());
+            if (!c) {
+                LOGGER.info("cache system have been disabled");
+            }
+            setIsCacheEnabled(c);
         }
     }
 
@@ -151,7 +168,13 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        Object obj = getObjectFromFile(identifier);
+        Object obj = null;
+        if (isCacheEnabled()) {
+            obj = getFromCache(identifier);
+        }
+        if (obj == null) {
+            obj = getObjectFromFile(identifier);
+        }
         if (obj instanceof DefaultMetadata && mode == DUBLINCORE) {
             obj = translateISOtoDC((DefaultMetadata)obj, type, elementName);
         } else if (obj instanceof RecordType && mode == DUBLINCORE) {
@@ -703,20 +726,27 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     }
 
     /**
+     * find recursively the files names used as record identifier.
      *
+     * @param directory
+     * @param parentIdentifierPrefix
+     * @return
+     * @throws MetadataIoException
      */
-    public List<String> getAllIdentifiers(final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
+    private List<String> getAllIdentifiers(final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
         final String identifierPrefix = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
         final List<String> results = new ArrayList<String>();
-        for (File f : directory.listFiles()) {
-            final String fileName = f.getName();
-            if (fileName.endsWith(CURRENT_EXT)) {
-                results.add(computeIdentifier(fileName, identifierPrefix));
-            } else if (f.isDirectory()){
-                results.addAll(getAllIdentifiers(f, identifierPrefix));
-            } else {
-                //do not throw exception just skipping
-                //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
+        if (directory != null && directory.exists()) {
+            for (File f : directory.listFiles()) {
+                final String fileName = f.getName();
+                if (fileName.endsWith(CURRENT_EXT)) {
+                    results.add(computeIdentifier(fileName, identifierPrefix));
+                } else if (f.isDirectory()){
+                    results.addAll(getAllIdentifiers(f, identifierPrefix));
+                } else {
+                    //do not throw exception just skipping
+                    //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
+                }
             }
         }
         return results;

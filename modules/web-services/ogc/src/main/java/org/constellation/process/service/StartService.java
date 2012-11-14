@@ -17,8 +17,6 @@
 package org.constellation.process.service;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.ws.WSEngine;
@@ -28,6 +26,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.parameter.Parameters.value;
 import static org.constellation.process.service.StartServiceDescriptor.*;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.Worker;
 /**
  *
@@ -70,10 +69,8 @@ public final class StartService extends AbstractCstlProcess {
             if (instanceDirectory.isDirectory()) {
                 if (!instanceDirectory.getName().startsWith(".")) {
                     try {
-                        final Class clazz = WSEngine.getServiceWorkerClass(serviceName);
-                        final Constructor constructor = clazz.getConstructor(String.class, File.class);
-
-                        Worker worker = (Worker) constructor.newInstance(instanceDirectory.getName(), instanceDirectory);
+                        final Class clazz   = WSEngine.getServiceWorkerClass(serviceName);
+                        final Worker worker = (Worker) ReflectionUtilities.newInstance(clazz, instanceDirectory.getName(), instanceDirectory);
 
                         if (worker != null) {
                             WSEngine.addServiceInstance(serviceName, identifier, worker);
@@ -83,18 +80,8 @@ public final class StartService extends AbstractCstlProcess {
                         } else {
                             throw new ProcessException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", this, null);
                         }
-                    } catch (NoSuchMethodException ex) {
-                        throw new ProcessException(null, this, ex);
-                    } catch (SecurityException ex) {
-                        throw new ProcessException(null, this, ex);
-                    } catch (InstantiationException ex) {
-                        throw new ProcessException(null, this, ex);
-                    } catch (IllegalAccessException ex) {
-                        throw new ProcessException(null, this, ex);
                     } catch (IllegalArgumentException ex) {
-                        throw new ProcessException(null, this, ex);
-                    } catch (InvocationTargetException ex) {
-                        throw new ProcessException(null, this, ex);
+                        throw new ProcessException(ex.getMessage(), this, ex);
                     }
                 }
             } else {

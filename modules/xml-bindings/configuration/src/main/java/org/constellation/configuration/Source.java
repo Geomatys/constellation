@@ -88,7 +88,7 @@ public class Source {
      * @param loadAll the loadAll to set
      */
     public void setLoadAll(final Boolean loadAll) {
-        if (loadAll == false) {
+        if (loadAll != null && !loadAll) {
             this.include = new LayerList();
         }
         this.loadAll = loadAll;

@@ -19,9 +19,13 @@ package org.constellation.ws.embedded.wps;
 // JUnit dependencies
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.xml.bind.JAXBException;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
+import java.util.HashMap;
+import java.util.Map;
+import org.constellation.wps.ws.soap.WPSService;
+import org.constellation.ws.embedded.AbstractGrizzlyServer;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
@@ -31,19 +35,26 @@ import static org.junit.Assume.*;
  * @author Guilhem Legal (Geomatys)
  * @since 0.9
  */
-public class WPSRequestTest  extends AbstractTestRequest {
+public class WPSRequestTest  extends AbstractGrizzlyServer {
 
     private static final String WPS_GETCAPABILITIES ="request=GetCapabilities&service=WPS&version=1.0.0";
 
     private static final String WPS_GETCAPABILITIES2 ="request=GetCapabilities&service=WpS&version=1.0.0";
 
     @BeforeClass
-    public static void initLayerList() throws JAXBException {
+    public static void initLayerList() throws Exception {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("wps", new WPSService());
+        initServer(new String[] {
+            "org.constellation.wps.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"}, map);
         pool = WPSMarshallerPool.getInstance();
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
+        //finish();
     }
 
     /**

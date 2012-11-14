@@ -265,7 +265,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
                 return cswfactory.getIndexer(config, currentReader, "", currentReader.getAdditionalQueryablePathMap());
 
             } catch (Exception ex) {
-                throw new CstlServiceException("An eception occurs while initializing the indexer!" + '\n' +
+                throw new CstlServiceException("An exception occurs while initializing the indexer!" + '\n' +
                         "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
             }
         } else {

@@ -689,7 +689,10 @@ public class SOSworker extends AbstractWorker {
 
         // we load the skeleton capabilities
         final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "SOS");
-
+        if (skeletonCapabilities == null) {
+            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
+        }
+        
         final Capabilities localCapabilities;
         if (keepCapabilities) {
             localCapabilities = cachedCapabilities;
@@ -1070,9 +1073,10 @@ public class SOSworker extends AbstractWorker {
                 //verify that the station is registred in the DB.
                 final Collection<String> fois = omReader.getFeatureOfInterestNames();
                 for (final String samplingFeatureName : foiRequest.getObjectID()) {
-                    if (!fois.contains(samplingFeatureName))
+                    if (!fois.contains(samplingFeatureName)) {
                         throw new CstlServiceException("the feature of interest "+ samplingFeatureName + " is not registered",
                                                          INVALID_PARAMETER_VALUE, "featureOfInterest");
+                    }
                 }
                 localOmFilter.setFeatureOfInterest(foiRequest.getObjectID());
 
@@ -1090,9 +1094,10 @@ public class SOSworker extends AbstractWorker {
                         } else {
                             for (ReferenceType refStation : off.getFeatureOfInterest()) {
                                 final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation.getHref());
-                                if (station == null)
+                                if (station == null) {
                                     throw new CstlServiceException("the feature of interest is not registered",
                                             INVALID_PARAMETER_VALUE);
+                                }
                                 if (station instanceof SamplingPointType) {
                                     final SamplingPointType sp = (SamplingPointType) station;
                                     if (samplingPointMatchEnvelope(sp, e)) {
@@ -1770,8 +1775,9 @@ public class SOSworker extends AbstractWorker {
                 process = (AbstractSensorML) d.getAny();
             } else {
                 String type = "null";
-                if (d != null && d.getAny() != null)
+                if (d != null && d.getAny() != null) {
                     type = d.getAny().getClass().getName();
+                }
                 throw new CstlServiceException("unexpected type for process: " + type , INVALID_PARAMETER_VALUE, "sensorDescription");
             }
 
@@ -1850,7 +1856,7 @@ public class SOSworker extends AbstractWorker {
         } finally {
             if (!success) {
                smlWriter.abortTransaction();
-               LOGGER.severe("Transaction failed");
+               LOGGER.warning("Transaction failed");
             } else {
                 smlWriter.endTransaction();
             }
@@ -2080,7 +2086,8 @@ public class SOSworker extends AbstractWorker {
                     throw new CstlServiceException("This operation is not take in charge by the Web Service, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
                                                   OPERATION_NOT_SUPPORTED);
                 } else {
-                    throw new CstlServiceException("Unknow time filter operation, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
+                    throw new CstlServiceException("Unknow time filter operation, supported one are: TM_Equals, TM_After, TM_Before, TM_During.\n"
+                                                 + "Another possibility is that the content of your time filter is empty or unrecognized.",
                                                   OPERATION_NOT_SUPPORTED);
                 }
             }
@@ -2128,7 +2135,9 @@ public class SOSworker extends AbstractWorker {
         while (notFound) {
             if (templates.containsKey(templateName + '-' + i)) {
                 i++;
-            } else notFound = false;
+            } else {
+                notFound = false;
+            }
         }
         return i;
     }
@@ -2343,14 +2352,10 @@ public class SOSworker extends AbstractWorker {
      */
     @Override
     public void destroy() {
-        if (smlReader != null)
-            smlReader.destroy();
-        if (smlWriter != null)
-            smlWriter.destroy();
-        if (omReader != null)
-            omReader.destroy();
-        if (omWriter != null)
-            omWriter.destroy();
+        if (smlReader != null) {smlReader.destroy();}
+        if (smlWriter != null) {smlWriter.destroy();}
+        if (omReader != null)  {omReader.destroy();}
+        if (omWriter != null)  {omWriter.destroy();}
         for (Timer t : schreduledTask) {
             t.cancel();
         }

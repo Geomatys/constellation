@@ -23,8 +23,8 @@ import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.DefaultDataStoreLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
-import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreFinder;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.storage.DataStoreException;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
@@ -36,7 +36,7 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public class DataStoreProvider extends AbstractLayerProvider{
 
-    private DataStore store;
+    private FeatureStore store;
     private Set<Name> names;
 
     public DataStoreProvider(ProviderService service, ParameterValueGroup param){
@@ -48,7 +48,7 @@ public class DataStoreProvider extends AbstractLayerProvider{
         super.reload();
         dispose();
 
-        //pameter is a choice of different types
+        //parameter is a choice of different types
         //extract the first one
         ParameterValueGroup param = getSource();
         param = param.groups("choice").get(0);
@@ -67,7 +67,7 @@ public class DataStoreProvider extends AbstractLayerProvider{
         }
         try {
             //create the store
-            store = DataStoreFinder.open(factoryconfig);
+            store = FeatureStoreFinder.open(factoryconfig);
             if(store == null){
                 throw new DataStoreException("Could not create data store for parameters : "+factoryconfig);
             }
@@ -79,6 +79,11 @@ public class DataStoreProvider extends AbstractLayerProvider{
 
     }
 
+    public synchronized FeatureStore getStore() {
+        if(store == null) reload();
+        return store;
+    }
+    
     @Override
     public synchronized void dispose() {
         super.dispose();

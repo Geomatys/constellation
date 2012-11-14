@@ -30,7 +30,7 @@ import javax.imageio.spi.ImageWriterSpi;
 // Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.map.ws.WMSMapDecoration;
+import org.constellation.configuration.WMSPortrayal;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
@@ -65,7 +65,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class WMSAxesOrderTest extends AbstractTestRequest {
+public class WMSAxesOrderTest extends AbstractGrizzlyServer {
 
     /**
      * The layer to test.
@@ -119,6 +119,11 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initLayerList() {
+        initServer(new String[] {
+            "org.constellation.map.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"
+        }, null);
 
         final Configurator config = new Configurator() {
             @Override
@@ -155,7 +160,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
 
 
         WorldFileImageReader.Spi.registerDefaults(null);
-        WMSMapDecoration.setEmptyExtension(true);
+        WMSPortrayal.setEmptyExtension(true);
 
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){
@@ -177,6 +182,19 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
     }
 
     /**
+     * Free some resources.
+     */
+    @AfterClass
+    public static void shutDown() {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        layers = null;
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
+        }
+        //finish();
+    }
+    /**
      * Returns {@code true} if the {@code SST_tests} layer is found in the list of
      * available layers. It means the postgrid database, pointed by the postgrid.xml
      * file in the configuration directory, contains this layer and can then be requested
@@ -189,18 +207,6 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
             }
         }
         return false;
-    }
-
-    /**
-     * Free some resources.
-     */
-    @AfterClass
-    public static void finish() {
-        layers = null;
-        File f = new File("derby.log");
-        if (f.exists()) {
-            f.delete();
-        }
     }
 
     /**

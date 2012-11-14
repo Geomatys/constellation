@@ -682,22 +682,23 @@ public class CSWService extends OGCWebService<CSWworker> {
             namespaces.put("gmd", Namespaces.GMD);
         }
 
-        final String names           = getParameter("TYPENAMES", true);
         final List<QName> typeNames  = new ArrayList<QName>();
-        final StringTokenizer tokens = new StringTokenizer(names, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
+        final String names           = getParameter("TYPENAME", false);
+        if (names != null) {
+            final StringTokenizer tokens = new StringTokenizer(names, ",;");
+                while (tokens.hasMoreTokens()) {
+                    final String token = tokens.nextToken().trim();
 
-                if (token.indexOf(':') != -1) {
-                    final String prefix    = token.substring(0, token.indexOf(':'));
-                    final String localPart = token.substring(token.indexOf(':') + 1);
-                    typeNames.add(new QName(namespaces.get(prefix), localPart, null));
-                } else {
-                     throw new CstlServiceException("The QName " + token + MALFORMED,
-                                                   INVALID_PARAMETER_VALUE, NAMESPACE);
-                }
+                    if (token.indexOf(':') != -1) {
+                        final String prefix    = token.substring(0, token.indexOf(':'));
+                        final String localPart = token.substring(token.indexOf(':') + 1);
+                        typeNames.add(new QName(namespaces.get(prefix), localPart));
+                    } else {
+                         throw new CstlServiceException("The QName " + token + MALFORMED,
+                                                       INVALID_PARAMETER_VALUE, NAMESPACE);
+                    }
+            }
         }
-
 
         return new DescribeRecordType(service,
                                      version,

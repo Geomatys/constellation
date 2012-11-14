@@ -66,7 +66,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class WCSRequestsTest extends AbstractTestRequest {
+public class WCSRequestsTest extends AbstractGrizzlyServer {
 
     /**
      * The layer to test.
@@ -109,6 +109,12 @@ public class WCSRequestsTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
+        initServer(new String[] {
+            "org.constellation.coverage.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"
+        }, null);
+
         pool = WCSMarshallerPool.getInstance();
 
         final Configurator config = new Configurator() {
@@ -156,6 +162,12 @@ public class WCSRequestsTest extends AbstractTestRequest {
         for(String jn : ImageIO.getWriterFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
         }
+    }
+
+    @AfterClass
+    public static void shutDown() throws JAXBException {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        //finish();
     }
 
     /**

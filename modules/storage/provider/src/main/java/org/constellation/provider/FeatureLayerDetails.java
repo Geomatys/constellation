@@ -17,8 +17,7 @@
 
 package org.constellation.provider;
 
-import org.geotoolkit.data.DataStore;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.data.FeatureStore;
 
 /**
  * Layer details for Feature sources.
@@ -33,6 +32,6 @@ public interface FeatureLayerDetails extends LayerDetails{
      *
      * @return FeatureSource<SimpleFeatureType,SimpleFeature>
      */
-    DataStore getStore();
+    FeatureStore getStore();
 
 }

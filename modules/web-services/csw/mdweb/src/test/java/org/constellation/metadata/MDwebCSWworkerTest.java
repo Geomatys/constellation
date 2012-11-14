@@ -91,7 +91,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         worker = new CSWworker(configDir.getName(), configDir);
-        worker.setLogLevel(Level.FINER);
+        //worker.setLogLevel(Level.FINER);
     }
 
     @AfterClass

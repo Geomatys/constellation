@@ -59,7 +59,7 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.sld.xml.GetLegendGraphic;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.util.StringUtilities;
@@ -586,7 +586,7 @@ public class WMSService extends GridWebService<WMSWorker> {
             } catch (FileNotFoundException ex) {
                 throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
             }
-            final XMLUtilities sldparser = new XMLUtilities();
+            final StyleXmlIO sldparser = new StyleXmlIO();
             try {
                 sld = sldparser.readSLD(in,
                         StyledLayerDescriptor.V_1_0_0);

@@ -108,8 +108,9 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      */
     @Override
     public void removeFromCache(final String identifier) {
-        if (cacheEnabled)
+        if (cacheEnabled) {
             metadatas.remove(identifier);
+        }
     }
 
     /**

@@ -68,7 +68,7 @@ public class BoundedCompletionService<V> implements CompletionService<V> {
 
     @Override
     public Future<V> submit(final Callable<V> task)  {
-      if (task == null) throw new IllegalArgumentException();
+      if (task == null) throw new IllegalArgumentException("task can not be null.");
       try {
         final BoundedFuture f = new BoundedFuture(task);
         this.semaphore.acquire(); // waits
@@ -82,7 +82,7 @@ public class BoundedCompletionService<V> implements CompletionService<V> {
 
     @Override
     public Future<V> submit(final Runnable task, final V result) {
-      if (task == null) throw new IllegalArgumentException();
+      if (task == null) throw new IllegalArgumentException("Task can not be null.");
       try {
         final BoundedFuture f = new BoundedFuture(task, result);
         this.semaphore.acquire(); // waits

@@ -22,11 +22,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
-import org.geotoolkit.data.AbstractDataStoreFactory;
-import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreFinder;
-import org.geotoolkit.data.memory.ExtendedDataStore;
-import org.geotoolkit.data.memory.MemoryDataStore;
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.feature.DefaultName;
@@ -39,6 +34,11 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.geotoolkit.data.AbstractFeatureStoreFactory;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.FeatureStoreFinder;
+import org.geotoolkit.data.memory.ExtendedFeatureStore;
+import org.geotoolkit.data.memory.MemoryFeatureStore;
 import static org.geotoolkit.parameter.Parameters.*;
 
 /**
@@ -50,7 +50,7 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
 
 
     private final Set<Name> index = new LinkedHashSet<Name>();
-    private ExtendedDataStore store;
+    private ExtendedFeatureStore store;
     private ParameterValueGroup storeConfig;
 
     public AbstractDataStoreProvider(final ProviderService service,
@@ -67,7 +67,7 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
     /**
      * @return the datastore this provider encapsulate.
      */
-    public ExtendedDataStore getDataStore(){
+    public ExtendedFeatureStore getDataStore(){
         return store;
     }
 
@@ -136,10 +136,10 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         final ParameterValueGroup source = getSource();
         storeConfig = getSourceConfiguration(source, getDatastoreDescriptor());
 
-        final String namespace = value(AbstractDataStoreFactory.NAMESPACE, storeConfig);
-        DataStore candidate = null;
+        final String namespace = value(AbstractFeatureStoreFactory.NAMESPACE, storeConfig);
+        FeatureStore candidate = null;
         try {
-            candidate = DataStoreFinder.open(storeConfig);
+            candidate = FeatureStoreFinder.open(storeConfig);
         } catch (DataStoreException ex) {
             getLogger().log(Level.WARNING, ex.getLocalizedMessage(),ex);
         }
@@ -164,9 +164,9 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
             }
 
             //use an empty datastore
-            candidate = new MemoryDataStore();
+            candidate = new MemoryFeatureStore();
         }
-        store = new ExtendedDataStore(candidate);
+        store = new ExtendedFeatureStore(candidate);
 
         for(final ParameterValueGroup queryLayer : getQueryLayers(source)){
             final String layerName = value(LAYER_NAME_DESCRIPTOR, queryLayer);

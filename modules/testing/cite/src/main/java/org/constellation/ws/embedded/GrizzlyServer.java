@@ -29,7 +29,7 @@ import javax.imageio.ImageIO;
 
 // Constellation dependencies
 import org.constellation.data.CoverageSQLTestCase;
-import org.constellation.map.ws.WMSMapDecoration;
+import org.constellation.configuration.WMSPortrayal;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.Configurator;
@@ -96,7 +96,7 @@ public final class GrizzlyServer {
         CoverageSQLTestCase.init();
 
         WorldFileImageReader.Spi.registerDefaults(null);
-        WMSMapDecoration.setEmptyExtension(true);
+        WMSPortrayal.setEmptyExtension(true);
 
         // Extracts the zip data into a temporary folder
         final File outputDir = initDataDirectory();
@@ -183,7 +183,7 @@ public final class GrizzlyServer {
                     // Defines a PostGis data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs-2");
                     srcconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
                     srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
                     srcconfig.parameter(USER.getName().getCode()).setValue("test");

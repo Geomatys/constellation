@@ -17,9 +17,9 @@
 package org.constellation.process.service;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.process.AbstractProcessTest;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.util.FileUtilities;
@@ -77,9 +77,7 @@ public abstract class ServiceProcessTest extends AbstractProcessTest {
         final File instance = new File(serviceDir, identifier);
 
         try {
-            final Constructor constr = workerClass.getConstructor(String.class, File.class);
-
-            final Worker worker = (Worker)constr.newInstance(identifier, instance);
+            final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier, instance);
             if (worker != null) {
                 WSEngine.addServiceInstance(serviceName, identifier, worker);
             }

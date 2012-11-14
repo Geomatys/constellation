@@ -20,8 +20,6 @@ package org.constellation.metadata.index.mdweb;
 // J2SE dependencies
 import javax.imageio.spi.ServiceRegistry;
 import java.util.Iterator;
-import org.mdweb.model.storage.TextValue;
-import org.mdweb.model.storage.FullRecord;
 import java.io.File;
 import java.sql.Connection;
 import java.util.*;
@@ -33,6 +31,7 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.io.Reader;
 import org.mdweb.model.storage.FullRecord;
 import org.mdweb.io.MD_IOFactory;
+import org.mdweb.model.storage.TextValue;
 
 // Constellation dependencies
 import org.constellation.util.Util;
@@ -161,8 +160,9 @@ public class MdwebIndexTest {
         SpatialQuery spatialQuery = new SpatialQuery("Title:\"90008411.ctd\"", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
@@ -175,13 +175,13 @@ public class MdwebIndexTest {
          /**
          * Test 2 simple search: identifier != 40510_145_19930221211500
          */
-        resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc NOT identifier:\"40510_145_19930221211500\"", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
@@ -210,8 +210,9 @@ public class MdwebIndexTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
@@ -226,8 +227,9 @@ public class MdwebIndexTest {
         spatialQuery = new SpatialQuery("Title:\"92005711.ctd\"", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "SimpleSearch 4:\n{0}", resultReport);
 
@@ -243,14 +245,33 @@ public class MdwebIndexTest {
         spatialQuery = new SpatialQuery("creator:\"IFREMER / IDM/SISMER\"", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "SimpleSearch 5:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("40510_145_19930221211500");
 
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 6 simple search: identifier = 40510_145_19930221211500
+         */
+        spatialQuery = new SpatialQuery("identifier:\"40510_145_19930221211500\"", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("40510_145_19930221211500");
 
         assertEquals(expectedResult, result);
     }
@@ -271,8 +292,9 @@ public class MdwebIndexTest {
         SpatialQuery spatialQuery = new SpatialQuery("CloudCover:{-2147483648 TO 60}", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "numericComparisonSearch 1:\n{0}", resultReport);
 
@@ -289,8 +311,9 @@ public class MdwebIndexTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "numericComparisonSearch 2:\n{0}", resultReport);
 
@@ -307,8 +330,9 @@ public class MdwebIndexTest {
         spatialQuery = new SpatialQuery("CloudCover:[25 TO 2147483648]", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "numericComparisonSearch 3:\n{0}", resultReport);
 
@@ -323,8 +347,9 @@ public class MdwebIndexTest {
         spatialQuery = new SpatialQuery("CloudCover:[210 TO 2147483648]", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "numericComparisonSearch 4:\n{0}", resultReport);
 
@@ -337,8 +362,9 @@ public class MdwebIndexTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "numericComparisonSearch 5:\n{0}", resultReport);
 
@@ -356,8 +382,9 @@ public class MdwebIndexTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "numericComparisonSearch 6:\n{0}", resultReport);
 
@@ -374,8 +401,9 @@ public class MdwebIndexTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "numericComparisonSearch 7:\n{0}", resultReport);
 
@@ -403,8 +431,9 @@ public class MdwebIndexTest {
         SpatialQuery spatialQuery = new SpatialQuery("Title:90008411*", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
@@ -422,8 +451,9 @@ public class MdwebIndexTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
@@ -440,8 +470,9 @@ public class MdwebIndexTest {
         spatialQuery = new SpatialQuery("Title:*.ctd", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "wilCharSearch 3:\n{0}", resultReport);
 
@@ -459,8 +490,9 @@ public class MdwebIndexTest {
         spatialQuery = new SpatialQuery("title:*.ctd", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "wilCharSearch 4:\n{0}", resultReport);
 
@@ -479,8 +511,9 @@ public class MdwebIndexTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
 
@@ -488,6 +521,42 @@ public class MdwebIndexTest {
         expectedResult.add("42292_5p_19900609195600");
 
         //issues here it found
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 6 wildCharSearch: identifier LIKE 40510_145_*
+         */
+        spatialQuery = new SpatialQuery("identifier:40510_145_*", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "wildCharSearch 6:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("40510_145_19930221211500");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 7 wildCharSearch: identifier LIKE *40510_145_*
+         */
+        spatialQuery = new SpatialQuery("identifier:*40510_145_*", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "wildCharSearch 7:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("40510_145_19930221211500");
+
         assertEquals(expectedResult, result);
 
     }
@@ -505,11 +574,12 @@ public class MdwebIndexTest {
         /**
          * Test 1 date search: date after 25/01/2009
          */
-        SpatialQuery spatialQuery = new SpatialQuery("date:{\"20090125\" 30000101}", nullFilter, SerialChainFilter.AND);
+        SpatialQuery spatialQuery = new SpatialQuery("date:{\"20090125000000\" 30000101000000}", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
@@ -524,11 +594,12 @@ public class MdwebIndexTest {
         /**
          * Test 2 date search: TempExtent_begin before 01/01/1985
          */
-        spatialQuery = new SpatialQuery("TempExtent_begin:{00000101 \"19850101\"}", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("TempExtent_begin:{00000101000000 \"19850101000000\"}", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "DateSearch 2:\n{0}", resultReport);
 
@@ -542,11 +613,12 @@ public class MdwebIndexTest {
         /**
          * Test 3 date search: TempExtent_end after 01/01/1991
          */
-        spatialQuery = new SpatialQuery("TempExtent_end:{\"19910101\" 30000101}", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("TempExtent_end:{\"19910101000000\" 30000101000000}", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "DateSearch 3:\n{0}", resultReport);
 
@@ -560,29 +632,31 @@ public class MdwebIndexTest {
         /**
          * Test 4 date search: date = 26/01/2009
          */
-        spatialQuery = new SpatialQuery("date:\"20090126\"", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("date:\"20090126122224\"", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "DateSearch 4:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
-        expectedResult.add("39727_22_19750113062500");
-        expectedResult.add("42292_9s_19900610041000");
+        //expectedResult.add("39727_22_19750113062500"); exclude since date time is handled
+        //expectedResult.add("42292_9s_19900610041000"); exclude since date time is handled
 
         assertEquals(expectedResult, result);
 
         /**
          * Test 5 date search: date LIKE 26/01/200*
          */
-        spatialQuery = new SpatialQuery("date:(200*0126)", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("date:(200*0126*)", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "DateSearch 5:\n{0}", resultReport);
 
@@ -597,11 +671,12 @@ public class MdwebIndexTest {
         /**
          * Test 6 date search: CreationDate between 01/01/1800 and 01/01/2000
          */
-        spatialQuery = new SpatialQuery("CreationDate:[18000101  30000101]CreationDate:[00000101 20000101]", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("CreationDate:[18000101000000  30000101000000]CreationDate:[00000101000000 20000101000000]", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "DateSearch 6:\n{0}", resultReport);
 
@@ -611,6 +686,22 @@ public class MdwebIndexTest {
 
         assertEquals(expectedResult, result);
 
+        /**
+         * Test 7 date time search: CreationDate after 1970-02-04T06:00:00
+         */
+        spatialQuery = new SpatialQuery("CreationDate:[19700204060000  30000101000000]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "DateSearch 7:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("42292_5p_19900609195600");
+
+        assertEquals(expectedResult, result);
 
     }
 
@@ -629,13 +720,14 @@ public class MdwebIndexTest {
          * Test 1 sorted search: all orderBy identifier ASC
          */
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        SortField sf = new SortField("identifier_sort", SortField.STRING, false);
+        SortField sf = new SortField("identifier_sort", SortField.Type.STRING, false);
         spatialQuery.setSort(new Sort(sf));
 
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
@@ -662,13 +754,14 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("identifier_sort", SortField.STRING, true);
+        sf = new SortField("identifier_sort", SortField.Type.STRING, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
@@ -696,13 +789,14 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("Abstract_sort", SortField.STRING, false);
+        sf = new SortField("Abstract_sort", SortField.Type.STRING, false);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
@@ -730,13 +824,14 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("Abstract_sort", SortField.STRING, true);
+        sf = new SortField("Abstract_sort", SortField.Type.STRING, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
@@ -764,13 +859,14 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("CloudCover:[0 TO 2147483648]", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("CloudCover_sort", SortField.STRING, true);
+        sf = new SortField("CloudCover_sort", SortField.Type.STRING, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "SortedSearch 5:\n{0}", resultReport);
 
@@ -789,13 +885,14 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("CloudCover:[0 TO 2147483648]", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("CloudCover_sort", SortField.DOUBLE, true);
+        sf = new SortField("CloudCover_sort", SortField.Type.DOUBLE, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "SortedSearch 5:\n{0}", resultReport);
 
@@ -833,8 +930,9 @@ public class MdwebIndexTest {
 
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
@@ -860,8 +958,9 @@ public class MdwebIndexTest {
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         LOGGER.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
@@ -938,10 +1037,7 @@ public class MdwebIndexTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void deleteDocumentTest() throws Exception {
-        final FullRecord record = indexer.getEntry("CTDF02");
-        assertNotNull(record);
-
+    public void DeleteDocumentTest() throws Exception {
         indexer.removeDocument("CTDF02");
 
         indexSearcher.refresh();
@@ -971,20 +1067,6 @@ public class MdwebIndexTest {
         expectedResult = null;
 
         assertEquals(expectedResult, result);
-
-        // restore the doc and verify that is well indexed
-        indexer.indexDocument(record);
-        indexSearcher.refresh();
-        
-        result = indexSearcher.identifierQuery(identifier);
-
-        LOGGER.log(Level.FINER, "identifier query 3:\n{0}", result);
-
-        expectedResult = "CTDF02";
-
-        assertEquals(expectedResult, result);
-
-
     }
 
     @Test

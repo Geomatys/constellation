@@ -49,7 +49,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class WFSCustomSQLTest extends AbstractTestRequest {
+public class WFSCustomSQLTest extends AbstractGrizzlyServer {
 
      private static final String WFS_DESCRIBE_FEATURE_TYPE_URL =
                "request=DescribeFeatureType"
@@ -64,6 +64,10 @@ public class WFSCustomSQLTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initPool() throws JAXBException {
+        initServer(new String[] {"org.constellation.wfs.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"}, null);
+
         pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110"   +
             		  ":org.geotoolkit.ogc.xml.v110"  +
             		  ":org.geotoolkit.gml.xml.v311"  +
@@ -112,17 +116,16 @@ public class WFSCustomSQLTest extends AbstractTestRequest {
         };
 
         LayerProviderProxy.getInstance().setConfigurator(config);
-
-
-
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
+        //finish();
     }
 
     @Test

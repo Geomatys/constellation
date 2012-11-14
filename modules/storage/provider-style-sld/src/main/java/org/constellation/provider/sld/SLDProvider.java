@@ -37,7 +37,7 @@ import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.MutableUserLayer;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.collection.Cache;
@@ -69,7 +69,7 @@ public class SLDProvider extends AbstractStyleProvider{
         MASKS.add(".sld");
     }
 
-    private final XMLUtilities sldParser = new XMLUtilities();
+    private final StyleXmlIO sldParser = new StyleXmlIO();
     private File folder;
     private final Map<String,File> index = new ConcurrentHashMap<String, File>();
     private final Cache<String,MutableStyle> cache = new Cache<String, MutableStyle>(20, 20, true);
@@ -199,7 +199,7 @@ public class SLDProvider extends AbstractStyleProvider{
             f = new File(folder, key+".xml");
         }
 
-        final XMLUtilities util = new XMLUtilities();
+        final StyleXmlIO util = new StyleXmlIO();
         try {
             util.writeStyle(f, style, StyledLayerDescriptor.V_1_1_0);
             index.put(key, f);

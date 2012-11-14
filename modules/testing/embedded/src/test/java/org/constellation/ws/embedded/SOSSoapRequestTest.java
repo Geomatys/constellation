@@ -20,7 +20,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.JAXBException;
+import org.constellation.sos.ws.soap.SOService;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.util.StringUtilities;
@@ -33,18 +36,22 @@ import static org.junit.Assume.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class SOSSoapRequestTest extends AbstractTestSoapRequest {
-    
+public class SOSSoapRequestTest extends AbstractGrizzlyServer {
+
     private static final String SOS_DEFAULT = "http://localhost:9191/sos/default?";
-    
+
     @BeforeClass
-    public static void initLayerList() throws JAXBException {
+    public static void initLayerList() throws Exception {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("sos", new SOService());
+        initServer(null, map);
     }
-      
+
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
+        //finish();
     }
-    
+
     /**
      */
     @Test
@@ -58,18 +65,18 @@ public class SOSSoapRequestTest extends AbstractTestSoapRequest {
             assumeNoException(ex);
             return;
         }
-        
+
         URLConnection conec = getCapsUrl.openConnection();
-        postRequestFile(conec, "org/constellation/xml/sos/GetCapabilitiesSOAP.xml");
-        
+        postRequestFile(conec, "org/constellation/xml/sos/GetCapabilitiesSOAP.xml", "application/soap+xml");
+
         String result    = getStringResponse(conec);
         String expResult = getStringFromFile("org/constellation/xml/sos/GetCapabilitiesResponseSOAP.xml");
-        
+
         result = cleanXMlString(result);
         expResult = cleanXMlString(expResult);
         assertEquals(expResult, result);
     }
-    
+
     @Test
     public void testSOSGetFeatureOfInterest() throws Exception {
         // Creates a valid GetObservation url.
@@ -78,41 +85,41 @@ public class SOSSoapRequestTest extends AbstractTestSoapRequest {
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
-        postRequestFile(conec, "org/constellation/xml/sos/GetFeatureOfInterestSOAP.xml");
-        
+        postRequestFile(conec, "org/constellation/xml/sos/GetFeatureOfInterestSOAP.xml", "application/soap+xml");
+
         String result    = getStringResponse(conec);
         String expResult = getStringFromFile("org/constellation/xml/sos/GetFeatureOfInterestResponseSOAP.xml");
-        
+
         result = cleanXMlString(result);
         expResult = cleanXMlString(expResult);
-        
+
         System.out.println("result:\n" + result);
-        
+
         assertEquals(expResult, result);
-        
+
         conec = getCapsUrl.openConnection();
-        
-        postRequestFile(conec, "org/constellation/xml/sos/GetFeatureOfInterestSOAP2.xml");
-        
+
+        postRequestFile(conec, "org/constellation/xml/sos/GetFeatureOfInterestSOAP2.xml", "application/soap+xml");
+
         result    = getStringResponse(conec);
         expResult = getStringFromFile("org/constellation/xml/sos/GetFeatureOfInterestResponseSOAP2.xml");
-        
-        
+
+
         result = cleanXMlString(result);
         expResult = cleanXMlString(expResult);
-        
+
         System.out.println("result:\n" + result);
-        
+
         assertEquals(expResult, result);
     }
-    
+
     private static String cleanXMlString(String s) {
         s = s.substring(s.indexOf('>') + 1);
         s = StringUtilities.removeXmlns(s);
         for (int i = 0; i< 17; i++) {
             s = StringUtilities.removePrefix("ns" + i);
         }
-        
+
         return s;
     }
 }

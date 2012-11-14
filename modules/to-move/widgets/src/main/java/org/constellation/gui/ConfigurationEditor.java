@@ -223,7 +223,7 @@ public class ConfigurationEditor extends JPanel {
         this.logger = logger;
         this.configuration = configuration;
         if (configuration == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("Configuration must not be null.");
         }
         sqlList.addListSelectionListener(model);
         sqlList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

@@ -20,6 +20,7 @@ package org.constellation.map.ws;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -35,6 +36,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -44,6 +46,7 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 //Constellation dependencies
 import org.constellation.Cstl;
@@ -67,6 +70,8 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
 import static org.constellation.api.CommonConstants.*;
+import org.constellation.configuration.WMSPortrayal;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.query.wms.WMSQuery.*;
 
 //Geotoolkit dependencies
@@ -94,7 +99,7 @@ import org.geotoolkit.sld.MutableLayerStyle;
 import org.geotoolkit.sld.MutableNamedLayer;
 import org.geotoolkit.sld.MutableNamedStyle;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
@@ -129,12 +134,18 @@ import org.geotoolkit.wms.xml.v130.AuthorityURL;
 import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
+import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.StyledLayerDescriptor;
 import org.opengis.style.Style;
@@ -175,6 +186,14 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         VISITOR_FACTORIES = factories.toArray(new WMSVisitorFactory[factories.size()]);
     }
 
+    /**
+     * AxisDirection name for Lat/Long, Elevation, temporal dimensions.
+     */
+    private static final List<String> COMMONS_DIM = UnmodifiableArrayList.wrap(
+            "NORTH", "EAST", "SOUTH", "WEST",
+            "UP", "DOWN",
+            "FUTURE", "PAST");
+
 
     /**
      * Output responses of a GetCapabilities request.
@@ -182,11 +201,29 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     private final Map<String,AbstractWMSCapabilities> CAPS_RESPONSE =
             Collections.synchronizedMap(new HashMap<String,AbstractWMSCapabilities>());
 
-    private final WMSMapDecoration mapDecoration;
+    private WMSPortrayal mapPortrayal;
 
     public DefaultWMSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WMS);
-        mapDecoration = new WMSMapDecoration(configurationDirectory);
+        
+        mapPortrayal = new WMSPortrayal();
+        
+        final File portrayalFile = new File(configurationDirectory, "WMSPortrayal.xml");
+        if (portrayalFile.exists()) {
+            final MarshallerPool marshallerPool = GenericDatabaseMarshallerPool.getInstance();
+            Unmarshaller unmarchaller = null;
+            try {
+                unmarchaller = marshallerPool.acquireUnmarshaller();
+                mapPortrayal = (WMSPortrayal) unmarchaller.unmarshal(portrayalFile);
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            } finally {
+                if (unmarchaller != null) {
+                    marshallerPool.release(unmarchaller);
+                }
+            }
+        }
+        
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMS worker {0} running", id);
         }
@@ -277,7 +314,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(getCapab.getUpdateSequence());
         if (returnUS) {
-            throw new CstlServiceException("th update sequence paramter is equal to the current", CURRENT_UPDATE_SEQUENCE, "updateSequence");
+            throw new CstlServiceException("the update sequence paramter is equal to the current", CURRENT_UPDATE_SEQUENCE, "updateSequence");
         }
 
         //Build the list of layers
@@ -414,6 +451,73 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
 
             /*
+             * Create dimentions using CRS of the layer native envelope
+             */
+            Envelope nativeEnv;
+            try {
+                nativeEnv = layer.getEnvelope();
+            } catch (DataStoreException exception) {
+                throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
+            }
+
+            if (nativeEnv != null && nativeEnv.getCoordinateReferenceSystem() != null) {
+                final CoordinateReferenceSystem crs = nativeEnv.getCoordinateReferenceSystem();
+                final CoordinateSystem cs = crs.getCoordinateSystem();
+
+                final int nbDim = cs.getDimension();
+
+                for (int i = 0; i < nbDim; i++) {
+                    final CoordinateSystemAxis axis = cs.getAxis(i);
+                    final AxisDirection direction = axis.getDirection();
+
+                    final String directionName = direction.name();
+                    if (!COMMONS_DIM.contains(directionName)) {
+                        final org.opengis.metadata.Identifier axisName = axis.getName();
+
+                        final Unit<?> u = axis.getUnit();
+                        final String unit = (u != null) ? u.toString() : null;
+                        String unitSymbol;
+                        try {
+                            unitSymbol = UnitFormat.getInstance().format(u);
+                        } catch (IllegalArgumentException e) {
+                            // Workaround for one more bug in javax.measure...
+                            unitSymbol = unit;
+                        }
+
+                        final LinkedList<String> valuesList = new LinkedList<String>();
+                        if (axis instanceof DiscreteCoordinateSystemAxis) {
+                            final DiscreteCoordinateSystemAxis direcretAxis = (DiscreteCoordinateSystemAxis) axis;
+                            final int nbOrdiante = direcretAxis.length();
+                            for (int j = 0; j < nbOrdiante; j++) {
+                                valuesList.add(direcretAxis.getOrdinateAt(j).toString());
+                            }
+                        }
+
+                        final StringBuilder values = new StringBuilder();
+                        int index = 0;
+                        for (final String val : valuesList) {
+                            values.append(val);
+                            if (index++ < valuesList.size()-1) {
+                                values.append(",");
+                            }
+                        }
+
+                        final String defaut = !valuesList.isEmpty() ? valuesList.getFirst() : null;
+                        final boolean multipleValues = (valuesList.size() > 1);
+
+                        dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+                            new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName.getCode(), unit,
+                                unitSymbol, defaut, multipleValues, null, null) :
+                            new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName.getCode(), unit,
+                                unitSymbol, defaut, multipleValues, null, null);
+
+                        dimensions.add(dim);
+                    }
+                }
+            }
+
+
+            /*
              * LegendUrl generation
              * TODO: Use a StringBuilder or two
              */
@@ -443,11 +547,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 /*
                  * TODO
                  * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
+                 *
+                 *
+                 * do we have to use the same order as WMS 1.3.0 (SOUTH WEST NORTH EAST) ???
                  */
                 final org.geotoolkit.wms.xml.v111.BoundingBox outputBBox =
                     new org.geotoolkit.wms.xml.v111.BoundingBox("EPSG:4326",
                             inputGeoBox.getWestBoundLongitude(),
-                            inputGeoBox.getSouthBoundLatitude(), inputGeoBox.getEastBoundLongitude(),
+                            inputGeoBox.getSouthBoundLatitude(),
+                            inputGeoBox.getEastBoundLongitude(),
                             inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion);
 
                 // we build The Style part
@@ -487,10 +595,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                  */
                 final org.geotoolkit.wms.xml.v130.BoundingBox outputBBox =
                     new org.geotoolkit.wms.xml.v130.BoundingBox("EPSG:4326",
-                            inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getSouthBoundLatitude(),
-                            inputGeoBox.getEastBoundLongitude(),
-                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0,
+                            inputGeoBox.getWestBoundLongitude(),
+                            inputGeoBox.getNorthBoundLatitude(),
+                            inputGeoBox.getEastBoundLongitude(), 0.0, 0.0,
                             queryVersion);
 
                 // we build a Style Object
@@ -674,7 +782,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return null;
         }
         org.geotoolkit.wms.xml.v111.OnlineResource or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
-        final LegendTemplate lt = mapDecoration.getDefaultLegendTemplate();
+        final LegendTemplate lt = mapPortrayal.getDefaultLegendTemplate();
         final Dimension dimension;
         try {
             dimension = layerDetails.getPreferredLegendSize(lt, ms);
@@ -693,7 +801,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 dimension.width, dimension.height);
 
         String styleName = ms.getName();
-        if (!styleName.isEmpty() && styleName.startsWith("${")) {
+        if (styleName != null && !styleName.isEmpty() && styleName.startsWith("${")) {
             final DataReference dataRef = new DataReference(styleName);
             styleName = dataRef.getLayerId().getLocalPart();
         }
@@ -733,9 +841,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 } else {
                     ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
                 }
-                
-                final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
-                styles.add(wmsStyle);
+                if (ms != null) {
+                    final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
+                    styles.add(wmsStyle);
+                }
             }
             if (!styles.isEmpty()) {
                 outputLayer130.setStyle(styles);
@@ -807,7 +916,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return null;
         }
         org.geotoolkit.wms.xml.v130.OnlineResource or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
-        final LegendTemplate lt = mapDecoration.getDefaultLegendTemplate();
+        final LegendTemplate lt = mapPortrayal.getDefaultLegendTemplate();
         final Dimension dimension;
         try {
             dimension = layerDetails.getPreferredLegendSize(lt, ms);
@@ -826,7 +935,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 dimension.width, dimension.height);
 
         String styleName = ms.getName();
-        if (!styleName.isEmpty() && styleName.startsWith("${")) {
+        if (styleName != null && !styleName.isEmpty() && styleName.startsWith("${")) {
             final DataReference dataRef = new DataReference(styleName);
             styleName = dataRef.getLayerId().getLocalPart();
         }
@@ -837,7 +946,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     /**
      * Return the value of a point in a map.
      *
-     * @param gfi The {@linkplain GetFeatureInfo get feature info} request.
+     * @param getFI The {@linkplain GetFeatureInfo get feature info} request.
      * @return text, HTML , XML or GML code.
      *
      * @throws CstlServiceException
@@ -1002,7 +1111,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             MutableStyle ms = null;
             // If a sld file is given, extracts the style from it.
             if (sld != null && !sld.isEmpty()) {
-                final XMLUtilities utils = new XMLUtilities();
+                final StyleXmlIO utils = new StyleXmlIO();
                 final MutableStyledLayerDescriptor mutableSLD;
 
                 try {
@@ -1056,7 +1165,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     ms = null;
                 }
             }
-            image = layer.getLegendGraphic(dims, mapDecoration.getDefaultLegendTemplate(), ms, rule, scale);
+            image = layer.getLegendGraphic(dims, mapPortrayal.getDefaultLegendTemplate(), ms, rule, scale);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex);
         }
@@ -1115,15 +1224,20 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
         final SceneDef sdef = new SceneDef();
-        sdef.extensions().add(mapDecoration.getExtension());
-        final Hints hints = mapDecoration.getHints();
+        sdef.extensions().add(mapPortrayal.getExtension());
+        final Hints hints = mapPortrayal.getHints();
         if (hints != null) {
+            /*
+             * HACK we set anti-aliasing to false for gif
+             */
+            if ("image/gif".equals(getMap.getFormat())) {
+                hints.put(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
+            }
             sdef.getHints().putAll(hints);
         }
 
         try {
             final MapContext context = MapBuilder.createContext();
-            final Map<Name,Layer> layersContext = getLayers();
 
             for (int i = 0; i < layerRefs.size(); i++) {
                 final LayerDetails layerRef = layerRefs.get(i);
@@ -1185,7 +1299,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         // 4. IMAGE
         final String mime = getMap.getFormat();
-        final OutputDef odef = mapDecoration.getOutputDef(mime);
+        final OutputDef odef = mapPortrayal.getOutputDef(mime);
 
         try {
             //force longitude first
@@ -1198,7 +1312,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         final PortrayalResponse response = new PortrayalResponse(cdef, sdef, vdef, odef);
 
-        if(!mapDecoration.writeInStream()){
+        if(!mapPortrayal.isCoverageWriter()){
             try {
                 response.prepareNow();
             } catch (PortrayalException ex) {
@@ -1300,13 +1414,13 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     private void applyLayerFilters(final MapContext context){
         final Map<Name,Layer> layersContext = getLayers();
-        
+
         for(MapLayer layer : context.layers()){
             if (layer instanceof FeatureMapLayer) {
                 final FeatureMapLayer fml = (FeatureMapLayer)layer;
                 final Layer layerContext = layersContext.get(fml.getCollection().getFeatureType().getName());
                 if (layerContext.getFilter() != null) {
-                    final XMLUtilities xmlUtil = new XMLUtilities();
+                    final StyleXmlIO xmlUtil = new StyleXmlIO();
                     Filter filterGt = Filter.INCLUDE;
                     try {
                         filterGt = xmlUtil.getTransformer110().visitFilter(layerContext.getFilter());
@@ -1317,9 +1431,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             }
         }
-        
+
     }
-    
+
     /**
      * Overriden from AbstractWorker because the behaviour is different when the request updateSequence
      * is equal to the current.

@@ -124,6 +124,7 @@ public abstract class AbstractWorker implements Worker {
      * return the current service URL.
      * @return
      */
+    @Override
     public synchronized String getServiceUrl(){
         return serviceUrl;
     }
@@ -193,8 +194,12 @@ public abstract class AbstractWorker implements Worker {
                 // If the file is not present in the configuration directory, take the one in resource.
                 if (f == null || !f.exists()) {
                     final InputStream in = getClass().getResourceAsStream(fileName);
-                    response = unmarshaller.unmarshal(in);
-                    in.close();
+                    if (in != null) {
+                        response = unmarshaller.unmarshal(in);
+                        in.close();
+                    } else {
+                        LOGGER.info("unable to find static capabilities from resource:" + fileName);
+                    }
                 } else {
                     response = unmarshaller.unmarshal(f);
                 }

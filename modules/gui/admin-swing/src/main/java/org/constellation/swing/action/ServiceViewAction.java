@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import org.constellation.configuration.Instance;
+import org.constellation.security.ActionPermissions;
 import org.constellation.swing.LayerRowModel;
 
 /**
@@ -30,7 +31,7 @@ import org.constellation.swing.LayerRowModel;
 public class ServiceViewAction extends Action {
 
     public ServiceViewAction() {
-        super("view");
+        super(ActionPermissions.VIEW_SERVICE);
     }
 
     @Override

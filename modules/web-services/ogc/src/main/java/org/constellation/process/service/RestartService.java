@@ -17,8 +17,6 @@
 package org.constellation.process.service;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.configuration.ConfigDirectory;
@@ -30,6 +28,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.parameter.Parameters.value;
 import static org.constellation.process.service.RestartServiceDescriptor.*;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessFinder;
 import org.opengis.util.NoSuchIdentifierException;
@@ -80,7 +79,7 @@ public final class RestartService extends AbstractCstlProcess {
                         final ParameterValueGroup input = StartServiceDescriptor.INPUT_DESC.createValue();
                         input.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
                         input.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-                        
+
                         startDesc.createProcess(input).call(); // try to start
                     } catch (NoSuchIdentifierException ex) {
                         throw new ProcessException("There is no instance of " + identifier, this, null);
@@ -117,9 +116,7 @@ public final class RestartService extends AbstractCstlProcess {
             if (instanceDirectory.isDirectory()) {
                 if (!instanceDirectory.getName().startsWith(".")) {
                     try {
-                        final Constructor constructor = clazz.getConstructor(String.class, File.class);
-
-                        final Worker worker = (Worker) constructor.newInstance(instanceDirectory.getName(), instanceDirectory);
+                        final Worker worker = (Worker) ReflectionUtilities.newInstance(clazz, instanceDirectory.getName(), instanceDirectory);
 
                         if (worker != null) {
                             WSEngine.addServiceInstance(serviceName, identifier, worker);
@@ -129,18 +126,8 @@ public final class RestartService extends AbstractCstlProcess {
                         } else {
                             throw new ProcessException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", this, null);
                         }
-                    } catch (NoSuchMethodException ex) {
-                        throw new ProcessException(null, this, ex);
-                    } catch (SecurityException ex) {
-                        throw new ProcessException(null, this, ex);
-                    } catch (InstantiationException ex) {
-                        throw new ProcessException(null, this, ex);
-                    } catch (IllegalAccessException ex) {
-                        throw new ProcessException(null, this, ex);
                     } catch (IllegalArgumentException ex) {
-                        throw new ProcessException(null, this, ex);
-                    } catch (InvocationTargetException ex) {
-                        throw new ProcessException(null, this, ex);
+                        throw new ProcessException(ex.getMessage(), this, ex);
                     }
                 }
             } else {
@@ -161,27 +148,15 @@ public final class RestartService extends AbstractCstlProcess {
                     final String instanceID = instanceDir.getName();
                     if (!instanceID.startsWith(".")) {
                         try {
-                            final Constructor constructor = clazz.getConstructor(String.class, File.class);
-
-                            final Worker worker = (Worker) constructor.newInstance(instanceID, instanceDir);
+                            final Worker worker = (Worker)  ReflectionUtilities.newInstance(clazz, instanceID, instanceDir);
 
                             if (worker != null) {
                                 workersMap.put(instanceID, worker);
                             } else {
                                 throw new ProcessException("The instance " + instanceID + " can be started, maybe there is no configuration directory with this name.", this, null);
                             }
-                        } catch (NoSuchMethodException ex) {
-                            throw new ProcessException(null, this, ex);
-                        } catch (SecurityException ex) {
-                            throw new ProcessException(null, this, ex);
-                        } catch (InstantiationException ex) {
-                            throw new ProcessException(null, this, ex);
-                        } catch (IllegalAccessException ex) {
-                            throw new ProcessException(null, this, ex);
                         } catch (IllegalArgumentException ex) {
-                            throw new ProcessException(null, this, ex);
-                        } catch (InvocationTargetException ex) {
-                            throw new ProcessException(null, this, ex);
+                            throw new ProcessException(ex.getMessage(), this, ex);
                         }
                     }
                 } else {

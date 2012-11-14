@@ -707,7 +707,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
         // We unmarshall the static capabilities document.
         final WCSCapabilitiesType staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
-
+        if (staticCapabilities == null) {
+            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
+        }
+        
         if (requestedSection == null || "/WCS_Capabilities/Capability".equals(requestedSection) || "/".equals(requestedSection))
         {
             //we update the url in the static part.

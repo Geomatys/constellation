@@ -21,8 +21,6 @@ package org.constellation.ws.rs;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -46,6 +44,7 @@ import org.constellation.process.service.DeleteServiceDescriptor;
 import org.constellation.process.service.RestartServiceDescriptor;
 import org.constellation.process.service.StartServiceDescriptor;
 import org.constellation.process.service.StopServiceDescriptor;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.security.SecurityManager;
@@ -181,16 +180,16 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             } else {
                 LOGGER.log(Level.INFO, "The service configuration directory: {0} does not exist or is not a directory, creating new one.", serviceDirectory.getPath());
                 if (!serviceDirectory.mkdir()) {
-                    LOGGER.log(Level.SEVERE, "The service was unable to create the directory.{0}", serviceDirectory.getPath());
+                    LOGGER.log(Level.WARNING, "The service was unable to create the directory.{0}", serviceDirectory.getPath());
                 } else {
                     return serviceDirectory;
                 }
             }
         } else {
             if (configDirectory == null) {
-                LOGGER.severe("The service was unable to find a config directory.");
+                LOGGER.warning("The service was unable to find a config directory.");
             } else {
-                LOGGER.log(Level.SEVERE, "The configuration directory: {0} does not exist or is not a directory.", configDirectory.getPath());
+                LOGGER.log(Level.WARNING, "The configuration directory: {0} does not exist or is not a directory.", configDirectory.getPath());
             }
         }
         return null;
@@ -212,9 +211,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                         org.geotoolkit.process.Process proc = desc.createProcess(inputs);
                         proc.call();
                     } catch (NoSuchIdentifierException ex) {
-                        LOGGER.log(Level.SEVERE, "StartService process is unreachable.");
+                        LOGGER.log(Level.WARNING, "StartService process is unreachable.");
                     } catch (ProcessException ex) {
-                        LOGGER.log(Level.SEVERE, ex.getLocalizedMessage());
+                        LOGGER.log(Level.WARNING, "Error while starting all instances", ex);
                     }
                 }
             }
@@ -234,7 +233,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 }
                 return newWorker;
             } else {
-                LOGGER.log(Level.SEVERE, "The instance directory: {0} does not exist or is not a directory.", instanceDirectory.getPath());
+                LOGGER.log(Level.WARNING, "The instance directory: {0} does not exist or is not a directory.", instanceDirectory.getPath());
             }
         }
         return null;
@@ -247,27 +246,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @return
      */
     private Worker createWorker(final File instanceDirectory) {
-        try {
-            final Class clazz = getWorkerClass();
-            final Constructor constructor = clazz.getConstructor(String.class, File.class);
-
-            Worker worker = (Worker) constructor.newInstance(instanceDirectory.getName(), instanceDirectory);
-            return worker;
-
-        } catch (InstantiationException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (NoSuchMethodException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
-        return  null;
+        return (Worker) ReflectionUtilities.newInstance(getWorkerClass(), instanceDirectory.getName(), instanceDirectory);
     }
 
     /**
@@ -655,8 +634,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             }
 
         } catch (IOException ex) {
-            LOGGER.severe("IO exception while uploading file");
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            LOGGER.log(Level.SEVERE, "IO exception while uploading file", ex);
             launchException("error while uploading the file", NO_APPLICABLE_CODE.name(), null);
             // should never happen
             return null;

@@ -159,6 +159,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-datastore</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.constellation.testing</groupId>
       <artifactId>cstl-test-embedded</artifactId>
       <version>${project.version}</version>

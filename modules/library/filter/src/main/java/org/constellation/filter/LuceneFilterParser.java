@@ -17,12 +17,13 @@
 package org.constellation.filter;
 
 // J2SE dependencies
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
@@ -51,12 +52,17 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * A parser for filter 1.1.0 and CQL 2.0
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  */
 public class LuceneFilterParser extends FilterParser {
 
     private static final String DEFAULT_FIELD = "metafile:doc";
+
+    private static final DateFormat LUCENE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+    static {
+        LUCENE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     /**
      * {@inheritDoc}
@@ -66,7 +72,7 @@ public class LuceneFilterParser extends FilterParser {
         final Filter nullFilter = null;
         return new SpatialQuery(DEFAULT_FIELD, nullFilter, SerialChainFilter.AND);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -74,26 +80,26 @@ public class LuceneFilterParser extends FilterParser {
     protected SpatialQuery getQuery(final FilterType filter, final Map<String, QName> variables, final Map<String, String> prefixs) throws FilterParserException {
 
         SpatialQuery response = null;
-        if (filter != null) { 
+        if (filter != null) {
             // we treat logical Operators like AND, OR, ...
             if (filter.getLogicOps() != null) {
                 response = treatLogicalOperator(filter.getLogicOps());
-            
-            // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
+
+            // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...
             } else if (filter.getComparisonOps() != null) {
                 response = new SpatialQuery(treatComparisonOperator(filter.getComparisonOps().getValue()), null, SerialChainFilter.AND);
-                
-            // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
+
+            // we treat spatial constraint : BBOX, Beyond, Overlaps, ...
             } else if (filter.getSpatialOps() != null) {
                 response = new SpatialQuery("", treatSpatialOperator(filter.getSpatialOps()), SerialChainFilter.AND);
-                
+
             } else if (filter.getId() != null) {
                 response = new SpatialQuery(treatIDOperator(filter.getId()), null, SerialChainFilter.AND);
-            }  
+            }
         }
         return response;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -108,81 +114,81 @@ public class LuceneFilterParser extends FilterParser {
         if (logicOps instanceof BinaryLogicOpType) {
             final BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
             queryBuilder.append('(');
-            
-            // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...   
+
+            // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...
             for (JAXBElement<? extends ComparisonOpsType> jb: binary.getComparisonOps()) {
-            
+
                 queryBuilder.append(treatComparisonOperator(jb.getValue()));
                 queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
             }
-            
+
             // we treat logical Operators like AND, OR, ...
             for (JAXBElement<? extends LogicOpsType> jb: binary.getLogicOps()) {
-            
+
                 boolean writeOperator = true;
-                
+
                 final SpatialQuery sq  = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
                 final String subQuery  = sq.getQuery();
                 final Filter subFilter = sq.getSpatialFilter();
-                    
-                //if the sub spatial query contains both term search and spatial search we create a subQuery 
+
+                //if the sub spatial query contains both term search and spatial search we create a subQuery
                 if ((subFilter != null && !subQuery.equals(DEFAULT_FIELD))
                     || !sq.getSubQueries().isEmpty()
                     || (sq.getLogicalOperator() == SerialChainFilter.NOT && sq.getSpatialFilter() == null)) {
                     subQueries.add(sq);
                     writeOperator = false;
                 } else {
-                        
+
                     if (subQuery.isEmpty()) {
                         writeOperator = false;
                     } else  {
                         queryBuilder.append(subQuery);
                     }
-                    if (subFilter != null)
+                    if (subFilter != null) {
                         filters.add(subFilter);
+                    }
                 }
-               
+
                 if (writeOperator) {
                     queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
-                } else {
-                    writeOperator = true;
                 }
             }
-            
-            // we treat spatial constraint : BBOX, Beyond, Overlaps, ...   
+
+            // we treat spatial constraint : BBOX, Beyond, Overlaps, ...
             for (JAXBElement<? extends SpatialOpsType> jb: binary.getSpatialOps()) {
-                
-                //for the spatial filter we don't need to write into the lucene query 
+
+                //for the spatial filter we don't need to write into the lucene query
                 filters.add(treatSpatialOperator((JAXBElement<? extends SpatialOpsType>)jb));
             }
-                
+
           // we remove the last Operator and add a ') '
           final int pos = queryBuilder.length()- (operator.length() + 2);
-          if (pos > 0)
+          if (pos > 0) {
             queryBuilder.delete(queryBuilder.length()- (operator.length() + 2), queryBuilder.length());
-          
+          }
+
           queryBuilder.append(')');
-                
+
         } else if (logicOps instanceof UnaryLogicOpType) {
             final UnaryLogicOpType unary = (UnaryLogicOpType) logicOps;
-                       
-                        
-            // we treat comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
+
+
+            // we treat comparison operator: PropertyIsLike, IsNull, IsBetween, ...
             if (unary.getComparisonOps() != null) {
                 queryBuilder.append(treatComparisonOperator(unary.getComparisonOps().getValue()));
-                
-            // we treat spatial constraint : BBOX, Beyond, Overlaps, ...        
+
+            // we treat spatial constraint : BBOX, Beyond, Overlaps, ...
             } else if (unary.getSpatialOps() != null) {
-                
+
                 filters.add(treatSpatialOperator(unary.getSpatialOps()));
-                
-                
+
+
              // we treat logical Operators like AND, OR, ...
             } else if (unary.getLogicOps() != null) {
                 final SpatialQuery sq  = treatLogicalOperator(unary.getLogicOps());
                 final String subQuery  = sq.getQuery();
                 final Filter subFilter = sq.getSpatialFilter();
-                    
+
                 if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals(DEFAULT_FIELD)) ||
                     (sq.getLogicalOperator() == SerialChainFilter.NOT)) {
                     subQueries.add(sq);
@@ -198,7 +204,7 @@ public class LuceneFilterParser extends FilterParser {
                 }
             }
         }
-        
+
         String query = queryBuilder.toString();
         if ("()".equals(query)) {
             query = "";
@@ -254,7 +260,7 @@ public class LuceneFilterParser extends FilterParser {
         } else if ("<=".equals(operator) || "<".equals(operator)) {
             final String lowerBound;
             if (isDate) {
-                lowerBound = "00000101 \"";
+                lowerBound = "00000101000000 \"";
             } else if (isNumber){
                 lowerBound = "-2147483648 TO ";
             } else {
@@ -268,13 +274,13 @@ public class LuceneFilterParser extends FilterParser {
         } else if (">=".equals(operator) || ">".equals(operator)) {
             final String upperBound;
             if (isDate) {
-                upperBound = "\" 30000101";
+                upperBound = "\" 30000101000000";
             } else if (isNumber){
                 upperBound = " TO 2147483648";
             } else {
                 upperBound = "\" z";
             }
-            
+
             if (isNumber) {
                 response.append(open).append(literal).append(upperBound).append(close);
             } else {
@@ -299,7 +305,9 @@ public class LuceneFilterParser extends FilterParser {
     @Override
     protected String extractDateValue(final String literal) throws FilterParserException {
         try {
-            return toLuceneDate(TemporalUtilities.parseDate(literal));
+            synchronized(LUCENE_DATE_FORMAT) {
+                return LUCENE_DATE_FORMAT.format(TemporalUtilities.parseDate(literal));
+            }
         } catch (ParseException ex) {
             throw new FilterParserException(PARSE_ERROR_MSG + literal,
                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
@@ -326,32 +334,4 @@ public class LuceneFilterParser extends FilterParser {
         }
         return s;
     }
-
-    /**
-     * Build a Lucene representation of a date.
-     * 
-     * @param date
-     * @return
-     */
-    private static String toLuceneDate(final Date date){
-        final Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        final StringBuilder sb = new StringBuilder();
-        sb.append(String.valueOf(c.get(Calendar.YEAR)));
-
-        final int month = c.get(Calendar.MONTH)+1;
-        if(month < 10){
-            sb.append('0');
-        }
-        sb.append(month);
-
-        final int day = c.get(Calendar.DAY_OF_MONTH);
-        if(day < 10){
-            sb.append('0');
-        }
-        sb.append(day);
-        
-        return sb.toString();
-    }
-
 }

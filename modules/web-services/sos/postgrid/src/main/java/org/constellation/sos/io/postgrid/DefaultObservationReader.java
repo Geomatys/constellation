@@ -145,7 +145,7 @@ public class DefaultObservationReader implements ObservationReader {
             final Connection c = omDatabase.getDataSource(true).getConnection();
             c.close();
             //omDatabase.setProperty(ConfigurationKey.READONLY, "false");
-            
+
             //we build the database table frequently used.
             obsTable     = omDatabase.getTable(ObservationTable.class);
             measTable    = omDatabase.getTable(MeasurementTable.class);
@@ -155,7 +155,7 @@ public class DefaultObservationReader implements ObservationReader {
 
         } catch (SQLException ex) {
             throw new CstlServiceException("SQL Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        } 
+        }
     }
 
     /**
@@ -230,7 +230,7 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
-        } 
+        }
     }
 
     /**
@@ -251,7 +251,7 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
-        } 
+        }
     }
 
     /**
@@ -267,9 +267,9 @@ public class DefaultObservationReader implements ObservationReader {
             } catch (NoSuchRecordException ex) {
             //we let continue to look if it is a phenomenon (simple)
             }
-            if (cphen != null)
+            if (cphen != null) {
                 return cphen;
-            
+            }
             final PhenomenonTable phenomenonTable = omDatabase.getTable(PhenomenonTable.class);
             return (PhenomenonType) phenomenonTable.getEntry(phenomenonName);
 
@@ -398,7 +398,7 @@ public class DefaultObservationReader implements ObservationReader {
                 final Integer id = Integer.parseInt(identifier);
                 return resTable.getEntry(id);
             }
-            
+
         } catch (CatalogException ex) {
             throw new CstlServiceException("Catalog exception while getting the results: " + ex.getMessage(),
                     NO_APPLICABLE_CODE, "getResult");
@@ -497,7 +497,7 @@ public class DefaultObservationReader implements ObservationReader {
     public List<String> getEventTime() throws CstlServiceException {
         String ret = null;
         try {
-            
+
             final Timestamp t = specialTable.getMinTimeOffering();
             if (t != null) {
                 ret = t.toString();

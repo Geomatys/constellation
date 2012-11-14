@@ -21,7 +21,6 @@ import javax.sql.DataSource;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
@@ -285,8 +284,9 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
     private Object applyElementSet(final Object result, ElementSetType type, final List<QName> elementName) {
 
-         if (type == null)
+         if (type == null) {
             type = ElementSetType.FULL;
+         }
 
         // then we apply the elementSet/elementName filter
 
@@ -326,14 +326,13 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                     final Method getter = ReflectionUtilities.getGetterFromName(qn.getLocalPart(), recordClass);
                     final Object param  = ReflectionUtilities.invokeMethod(result, getter);
 
-                    Method setter = null;
                     if (param != null) {
                         currentMethodType   = "set";
                         Class paramClass = param.getClass();
                         if (paramClass.equals(ArrayList.class)) {
                             paramClass = List.class;
                         }
-                        setter = ReflectionUtilities.getSetterFromName(qn.getLocalPart(), paramClass, recordClass);
+                        final Method setter = ReflectionUtilities.getSetterFromName(qn.getLocalPart(), paramClass, recordClass);
 
                         if (setter != null) {
                             ReflectionUtilities.invokeMethod(setter, filtredResult, param);
@@ -375,8 +374,9 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
             } else {
                 String objType = "null";
-                if (obj != null)
+                if (obj != null) {
                     objType = obj.getClass().getName();
+                }
 
                 throw new IllegalArgumentException("Unexpected type in getRecordFromMDRecord. waiting for AbstractRecordType, got: " + objType);
             }

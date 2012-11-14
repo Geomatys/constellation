@@ -259,8 +259,11 @@ public class WPSService extends OGCWebService<WPSWorker> {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected Response processExceptionResponse(CstlServiceException ex, ServiceDef serviceDef) {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
         logException(ex);
 
         // SEND THE HTTP RESPONSE
