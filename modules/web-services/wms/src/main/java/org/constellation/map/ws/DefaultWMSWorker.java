@@ -134,6 +134,7 @@ import org.geotoolkit.wms.xml.v130.AuthorityURL;
 import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
@@ -995,7 +996,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // 2. VIEW
         Envelope refEnv;
         try {
-            refEnv = GO2Utilities.combine(getFI.getEnvelope2D(), new Date[]{getFI.getTime(), getFI.getTime()}, new Double[]{getFI.getElevation(), getFI.getElevation()});
+            refEnv = ReferencingUtilities.combine(getFI.getEnvelope2D(), new Date[]{getFI.getTime(), getFI.getTime()}, new Double[]{getFI.getElevation(), getFI.getElevation()});
         } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }
@@ -1276,7 +1277,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 getMap.getEnvelope2D().getLowerCorner().getOrdinate(1) > getMap.getEnvelope2D().getUpperCorner().getOrdinate(1)) {
                 throw new CstlServiceException("BBOX parameter minimum is greater than the maximum", INVALID_PARAMETER_VALUE, KEY_BBOX.toLowerCase());
             }
-            refEnv = GO2Utilities.combine(getMap.getEnvelope2D(), new Date[]{getMap.getTime(), getMap.getTime()}, new Double[]{getMap.getElevation(), getMap.getElevation()});
+            refEnv = ReferencingUtilities.combine(getMap.getEnvelope2D(), new Date[]{getMap.getTime(), getMap.getTime()}, new Double[]{getMap.getElevation(), getMap.getElevation()});
         } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }

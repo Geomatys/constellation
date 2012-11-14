@@ -265,7 +265,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
                         final double[] scales = pr.getScales();
                         for(int i=0; i<scales.length; i++){
-                            final GridMosaic mosaic = pr.getMosaic(i);
+                            final GridMosaic mosaic = pr.getMosaics(i).iterator().next();
                             double scale = mosaic.getScale();
                             //convert scale in the strange WMTS scale denominator
                             scale = WMTSUtilities.toScaleDenominator(pr.getCoordinateReferenceSystem(), scale);
@@ -523,8 +523,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 throw new CstlServiceException("Undefined matrixSet:" + matrixSetName + " for layer:" + layerName, INVALID_PARAMETER_VALUE, "tilematrixset");
             }
             GridMosaic mosaic = null;
-            for(int i=0;i<pyramid.getScales().length;i++){
-                final GridMosaic gm = pyramid.getMosaic(i);
+            for(GridMosaic gm : pyramid.getMosaics()){
                 if(gm.getId().equals(level)){
                     mosaic = gm;
                     break;
