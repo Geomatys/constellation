@@ -180,6 +180,11 @@ public interface ObservationFilter {
     boolean isBoundedObservation();
 
     /**
+     * Return true if template are filled with a default period when there is no eventTime suplied.
+     */
+    boolean isDefaultTemplateTime();
+    
+    /**
      * Set the global level for information message.
      *
      * @param logLevel

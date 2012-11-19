@@ -450,4 +450,9 @@ public class DefaultObservationFilter implements ObservationFilter {
     public void setOffering(final ObservationOfferingType offering) throws CstlServiceException {
         // not used in this implementations
     }
+    
+    @Override
+    public boolean isDefaultTemplateTime() {
+        return true;
+    }
 }

@@ -1264,6 +1264,11 @@ public class SOSworker extends AbstractWorker {
 
                     final String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
                     final ObservationType temporaryTemplate = ((ObservationType) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
+                    
+                    // Remove the default templateTime
+                    if (!localOmFilter.isDefaultTemplateTime() && templateTime == null) {
+                        temporaryTemplate.setSamplingTime(null);
+                    }
                     templates.put(temporaryTemplateId, temporaryTemplate);
 
                     // we launch a timer which will destroy the template in one hours

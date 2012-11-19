@@ -113,8 +113,7 @@ public class WPSUtils {
      */
     public static LanguageStringType buildProcessTitle(final ProcessDescriptor processDesc) {
         ArgumentChecks.ensureNonNull("processDesc", processDesc);
-        final String title = capitalizeFirstLetter(processDesc.getIdentifier().getAuthority().getTitle().toString()).getValue() + " : "
-                + capitalizeFirstLetter(processDesc.getIdentifier().getCode()).getValue();
+        final String title = capitalizeFirstLetter(processDesc.getIdentifier().getCode()).getValue();
         return new LanguageStringType(title);
     }
 
