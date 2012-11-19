@@ -382,4 +382,9 @@ public class LuceneObservationFilter implements ObservationFilter {
     public void setTimeFirst() throws CstlServiceException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public boolean isDefaultTemplateTime() {
+        return true;
+    }
 }

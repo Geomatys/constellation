@@ -243,4 +243,9 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
         c.setAutoCommit(false);
         return c;
     }
+    
+    @Override
+    public boolean isDefaultTemplateTime() {
+        return true;
+    }
 }
