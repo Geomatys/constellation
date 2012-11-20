@@ -62,9 +62,14 @@ public abstract class GenericReader  {
     private String mainStatement;
     
     /**
-     * A list of precompiled SQL request returning single and multiple values.
+     * A Map of the SQL request for the variable the contains.
      */
-    private final Map<String, List<String>> statements = new HashMap<String, List<String>>();
+    private final Map<String, List<String>> varStatements = new HashMap<String, List<String>>();
+    
+    /**
+     * A Map of the named SQL request .
+     */
+    private final Map<String, String> queryStatements = new HashMap<String, String>();
 
     /**
      * A flag indicating if the JDBC driver support several specific operation
@@ -108,6 +113,12 @@ public abstract class GenericReader  {
      * Used to avoid to search for an unexistant statement each time.
      */
     private final List<String> unboundedVariable = new ArrayList<String>();
+    
+    /**
+     * A list of unbounded query.
+     * Used to avoid to search for an unexistant statement each time.
+     */
+    private final List<String> unboundedQueries = new ArrayList<String>();
 
     /**
      * Build a new generic Reader.
@@ -163,7 +174,8 @@ public abstract class GenericReader  {
      * @throws java.sql.SQLException
      */
     private void initStatement() throws SQLException {
-        statements.clear();
+        varStatements.clear();
+        queryStatements.clear();
         final Queries queries = configuration.getQueries();
         if (queries != null) {
 
@@ -181,7 +193,8 @@ public abstract class GenericReader  {
             for (Query query : allQueries) {
                 final List<String> varNames        = query.getVarNames();
                 final String textQuery             = query.buildSQLQuery(staticParameters);
-                statements.put(textQuery, varNames);
+                varStatements.put(textQuery, varNames);
+                queryStatements.put(query.getName(),textQuery);
             }
         } else {
             LOGGER.warning("The configuration file is probably malformed, there is no queries part.");
@@ -271,23 +284,39 @@ public abstract class GenericReader  {
     }
 
     /**
-     * Load all the data for the specified Identifier from the database.
+     * Load all the data for the specified variable from the database.
      * @param identifier
      */
     protected Values loadData(final String variable) throws MetadataIoException {
         return loadData(Arrays.asList(variable), new ArrayList<String>());
     }
+    
+    /**
+     * Load all the data for the specified query from the database.
+     * @param identifier
+     */
+    protected Values loadQuery(final String query) throws MetadataIoException {
+        return loadQuery(Arrays.asList(query), new ArrayList<String>());
+    }
 
     /**
-     * Load all the data for the specified Identifier from the database.
+     * Load all the data for the specified variables from the database.
      * @param identifier
      */
     protected Values loadData(final String variable, final String parameter) throws MetadataIoException {
         return loadData(Arrays.asList(variable), Arrays.asList(parameter));
     }
+    
+    /**
+     * Load all the data for the specified query from the database.
+     * @param identifier
+     */
+    protected Values loadQuery(final String query, final String parameter) throws MetadataIoException {
+        return loadQuery(Arrays.asList(query), Arrays.asList(parameter));
+    }
 
     /**
-     * Load all the data for the specified Identifier from the database.
+     * Load all the data for the specified variables from the database.
      * @param identifier
      */
     protected Values loadData(final List<String> variables, final String parameter) throws MetadataIoException {
@@ -295,11 +324,27 @@ public abstract class GenericReader  {
     }
 
     /**
-     * Load all the data for the specified Identifier from the database.
+     * Load all the data for the specified queries from the database.
+     * @param identifier
+     */
+    protected Values loadQuery(final List<String> queries, final String parameter) throws MetadataIoException {
+        return loadQuery(queries, Arrays.asList(parameter));
+    }
+    
+    /**
+     * Load all the data for the specified variable from the database.
      * @param identifier
      */
     protected Values loadData(final String variable, final List<String> parameter) throws MetadataIoException {
         return loadData(Arrays.asList(variable), parameter);
+    }
+    
+     /**
+     * Load all the data for the specified query from the database.
+     * @param identifier
+     */
+    protected Values loadQuery(final String query, final List<String> parameter) throws MetadataIoException {
+        return loadQuery(Arrays.asList(query), parameter);
     }
 
     /**
@@ -309,7 +354,51 @@ public abstract class GenericReader  {
     protected Values loadData(final List<String> variables) throws MetadataIoException {
         return loadData(variables, new ArrayList<String>());
     }
+    
+    /**
+     * Load all the data for the specified queries from the database.
+     * @param identifier
+     */
+    protected Values loadQuery(final List<String> queries) throws MetadataIoException {
+        return loadData(queries, new ArrayList<String>());
+    }
 
+    /**
+     * Load all the data for the specified queries from the database.
+     *
+     * @param identifier
+     */
+    protected Values loadQuery(final List<String> queries, final List<String> parameters) throws MetadataIoException {
+        final Set<String> subStmts = new HashSet<String>();
+        final Values staticValues = new Values();
+        for (String query : queries) {
+            if (unboundedQueries.contains(query)) {continue;}
+            
+            final String stmt = queryStatements.get(query);
+            if (stmt != null) {
+                if (!subStmts.contains(stmt)) {
+                    subStmts.add(stmt);
+                }
+            } else {
+                unboundedQueries.add(query);
+                LOGGER.log(Level.WARNING, "no statement found for query name: {0}", query);
+            }
+        }
+        // if there is only static parameters
+        if (subStmts.isEmpty()) {
+            return staticValues;
+        }
+        final Values values;
+        if (debugMode) {
+            values = debugLoading(parameters);
+        } else {
+            values = loading(parameters, subStmts);
+        }
+        //we add the static value to the result
+        values.mergedValues(staticValues);
+        return values;
+    }
+    
     /**
      * Load all the data for the specified Identifier from the database.
      *
@@ -320,7 +409,7 @@ public abstract class GenericReader  {
         final Set<String> subStmts = new HashSet<String>();
         final Values staticValues = new Values();
         for (String var : variables) {
-            if (unboundedVariable.contains(var)) continue;
+            if (unboundedVariable.contains(var)) {continue;}
             
             final String stmt = getStatementFromVar(var);
             if (stmt != null) {
@@ -379,6 +468,7 @@ public abstract class GenericReader  {
         //we extract the single values
         for (String sql : subStmts) {
             String phase = "connecting";
+            final List<String> varList = varStatements.get(sql);
             try {
                 final Connection connection  = datasource.getConnection();
                 phase = "preparing";
@@ -386,7 +476,7 @@ public abstract class GenericReader  {
                 phase = "filling params";
                 fillStatement(stmt, parameters);
                 phase = "executing";
-                fillValues(stmt, sql, statements.get(sql), values);
+                fillValues(stmt, sql, varList, values);
                 stmt.close();
                 connection.close();
             } catch (SQLException ex) {
@@ -400,9 +490,9 @@ public abstract class GenericReader  {
                     LOGGER.log(Level.WARNING, "detected a connection lost:{0}", ex.getMessage());
                     reloadConnection();
                 }
-                logError(phase, statements.get(sql), ex, sql);
+                logError(phase, varList, ex, sql);
             } catch (IllegalArgumentException ex) {
-                logError(phase, statements.get(sql), ex, sql);
+                logError(phase, varList, ex, sql);
             }
         }
         return values;
@@ -504,15 +594,14 @@ public abstract class GenericReader  {
      * @return
      */
     private String getStatementFromVar(final String varName) {
-        for (String stmt : statements.keySet()) {
-            final List<String> vars = statements.get(stmt);
-            if (vars.contains(varName)) {
-                return stmt;
+        for (Entry<String, List<String>> stmtEntry : varStatements.entrySet()) {
+            if (stmtEntry.getValue().contains(varName)) {
+                return stmtEntry.getKey();
             }
         }
         return null;
     }
-
+    
      /**
      * Log the list of variables involved in a query which launch a SQL exception.
      * (debugging purpose).
@@ -584,7 +673,8 @@ public abstract class GenericReader  {
      */
     public void destroy() {
         LOGGER.info("destroying generic reader");
-        statements.clear();
+        varStatements.clear();
+        queryStatements.clear();
         // do nothing anymore
     }
 }
