@@ -160,7 +160,7 @@ public class WPSProcessListener implements ProcessListener{
     /**
      * @return the current time in an XMLGregorianCalendar.
      */
-    private static XMLGregorianCalendar getCurrentXMLGregorianCalendar(){
+    public static XMLGregorianCalendar getCurrentXMLGregorianCalendar(){
         XMLGregorianCalendar xcal = null;
         try {
             final GregorianCalendar c = new GregorianCalendar();
