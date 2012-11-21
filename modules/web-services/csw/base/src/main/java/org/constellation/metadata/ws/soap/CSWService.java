@@ -124,7 +124,7 @@ public class CSWService extends OGCWebService<CSWworker>{
             LOGGER.info("received SOAP getCapabilities request");
             final CSWworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.getCapabilities(requestCapabilities);
+            return (Capabilities) worker.getCapabilities(requestCapabilities);
 
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), requestCapabilities.getVersion().toString());
