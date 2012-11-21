@@ -59,7 +59,7 @@ import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.v202.AcknowledgementType;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.csw.xml.v202.BriefRecordType;
-import org.geotoolkit.csw.xml.v202.Capabilities;
+import org.geotoolkit.csw.xml.AbstractCapabilities;
 import org.geotoolkit.csw.xml.v202.DeleteType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordType;
@@ -165,7 +165,7 @@ public class CSWworkerTest {
          *  TEST 1 : minimal getCapabilities
          */
         GetCapabilitiesType request = new GetCapabilitiesType("CSW");
-        Capabilities result = worker.getCapabilities(request);
+        AbstractCapabilities result = worker.getCapabilities(request);
 
         assertTrue(result.getVersion().equals("2.0.2"));
         assertTrue(result.getFilterCapabilities() != null);

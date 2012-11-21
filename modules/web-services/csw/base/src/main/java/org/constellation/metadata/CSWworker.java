@@ -82,11 +82,9 @@ import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.DeleteType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
-import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.csw.xml.v202.HarvestResponseType;
 import org.geotoolkit.csw.xml.v202.InsertType;
 import org.geotoolkit.csw.xml.v202.QueryType;
-import org.geotoolkit.csw.xml.v202.SearchResultsType;
 import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionSummaryType;
 import org.geotoolkit.csw.xml.v202.UpdateType;
@@ -98,14 +96,13 @@ import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.ogc.xml.SortBy;
 import org.geotoolkit.ogc.xml.v110.FilterCapabilities;
-import org.geotoolkit.ogc.xml.v110.SortByType;
-import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.Sections;
-import org.geotoolkit.ows.xml.v100.DomainType;
-import org.geotoolkit.ows.xml.v100.Operation;
-import org.geotoolkit.ows.xml.v100.OperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractDomain;
+import org.geotoolkit.ows.xml.AbstractOperation;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ServiceIdentification;
 import org.geotoolkit.ows.xml.v100.ServiceProvider;
@@ -510,7 +507,7 @@ public class CSWworker extends AbstractWorker {
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
-    public Capabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
+    public AbstractCapabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
         LOGGER.log(logLevel, "getCapabilities request processing\n");
         final long startTime = System.currentTimeMillis();
@@ -558,10 +555,10 @@ public class CSWworker extends AbstractWorker {
         }
 
         //we prepare the response document
-        ServiceIdentification si = null;
-        ServiceProvider       sp = null;
-        OperationsMetadata    om = null;
-        FilterCapabilities    fc = null;
+        ServiceIdentification si      = null;
+        ServiceProvider       sp      = null;
+        AbstractOperationsMetadata om = null;
+        FilterCapabilities    fc      = null;
 
         Sections sections = requestCapabilities.getSections();
         if (sections == null) {
@@ -602,28 +599,28 @@ public class CSWworker extends AbstractWorker {
                 om.updateURL(getServiceUrl());
 
                 // we add the cascaded services (if there is some)
-                final DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");
+                final AbstractDomain cascadedCSW  = om.getConstraint("FederatedCatalogues");
                 if (cascadedCSW == null) {
                     if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
-                        final DomainType fedCata = new DomainType("FederatedCatalogues", cascadedCSWservers);
-                        om.getConstraint().add(fedCata);
+                        final AbstractDomain fedCata = CswXmlFactory.createDomain("2.0.2","FederatedCatalogues", cascadedCSWservers);
+                        om.addConstraint(fedCata);
                     }
                 } else {
                     if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
                         cascadedCSW.setValue(cascadedCSWservers);
                     } else {
-                        om.removeConstraint(cascadedCSW);
+                        om.removeConstraint("FederatedCatalogues");
                     }
                 }
 
                 // we update the operation parameters
-                final Operation gr = om.getOperation("GetRecords");
+                final AbstractOperation gr = om.getOperation("GetRecords");
                 if (gr != null) {
-                    final DomainType os = gr.getParameter(OUTPUT_SCHEMA);
+                    final AbstractDomain os = gr.getParameter(OUTPUT_SCHEMA);
                     if (os != null) {
                         os.setValue(acceptedResourceType);
                     }
-                    final DomainType tn = gr.getParameter(TYPENAMES);
+                    final AbstractDomain tn = gr.getParameter(TYPENAMES);
                     if (tn != null) {
                         final List<String> values = new ArrayList<String>();
                         for (QName qn : supportedTypeNames) {
@@ -633,7 +630,7 @@ public class CSWworker extends AbstractWorker {
                     }
 
                     //we update the ISO queryable elements :
-                    final DomainType isoQueryable = gr.getConstraint("SupportedISOQueryables");
+                    final AbstractDomain isoQueryable = gr.getConstraint("SupportedISOQueryables");
                     if (isoQueryable != null) {
                         final List<String> values = new ArrayList<String>();
                         for (String name : ISO_QUERYABLE.keySet() ) {
@@ -642,7 +639,7 @@ public class CSWworker extends AbstractWorker {
                         isoQueryable.setValue(values);
                     }
                     //we update the DC queryable elements :
-                    final DomainType dcQueryable = gr.getConstraint("SupportedDublinCoreQueryables");
+                    final AbstractDomain dcQueryable = gr.getConstraint("SupportedDublinCoreQueryables");
                     if (dcQueryable != null) {
                         final List<String> values = new ArrayList<String>();
                         for (String name : DUBLIN_CORE_QUERYABLE.keySet() ) {
@@ -652,7 +649,7 @@ public class CSWworker extends AbstractWorker {
                     }
 
                     //we update the reader's additional queryable elements :
-                    final DomainType additionalQueryable = gr.getConstraint("AdditionalQueryables");
+                    final AbstractDomain additionalQueryable = gr.getConstraint("AdditionalQueryables");
                     if (additionalQueryable != null) {
                         final List<String> values = new ArrayList<String>();
                         for (QName name : mdReader.getAdditionalQueryableQName()) {
@@ -668,17 +665,17 @@ public class CSWworker extends AbstractWorker {
                     }
                 }
 
-                final Operation grbi = om.getOperation("GetRecordById");
+                final AbstractOperation grbi = om.getOperation("GetRecordById");
                 if (grbi != null) {
-                    final DomainType os = grbi.getParameter(OUTPUT_SCHEMA);
+                    final AbstractDomain os = grbi.getParameter(OUTPUT_SCHEMA);
                     if (os != null) {
                         os.setValue(acceptedResourceType);
                     }
                 }
 
-                final Operation dr = om.getOperation("DescribeRecord");
+                final AbstractOperation dr = om.getOperation("DescribeRecord");
                 if (dr != null) {
-                    final DomainType tn = dr.getParameter("TypeName");
+                    final AbstractDomain tn = dr.getParameter("TypeName");
                     if (tn != null) {
                         final List<String> values = new ArrayList<String>();
                         for (QName qn : supportedTypeNames) {
@@ -686,7 +683,7 @@ public class CSWworker extends AbstractWorker {
                         }
                         tn.setValue(values);
                     }
-                    final DomainType sl = dr.getParameter("SchemaLanguage");
+                    final AbstractDomain sl = dr.getParameter("SchemaLanguage");
                     if (sl != null) {
                         sl.setValue(supportedSchemaLanguage);
                     }
@@ -707,7 +704,7 @@ public class CSWworker extends AbstractWorker {
         }
 
 
-        final Capabilities c = new Capabilities(si, sp, om, CSW_202_VERSION, null, fc);
+        final AbstractCapabilities c = CswXmlFactory.createCapabilities("2.0.2", si, sp, om, null, fc);
 
         LOGGER.log(logLevel, "GetCapabilities request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return c;
@@ -725,9 +722,6 @@ public class CSWworker extends AbstractWorker {
         LOGGER.log(logLevel, "GetRecords request processing\n");
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
-
-        //we prepare the response
-        GetRecordsResponseType response;
 
         final String id = request.getRequestId();
 
@@ -756,7 +750,7 @@ public class CSWworker extends AbstractWorker {
         }
 
         //We initialize (and verify) the principal attribute of the query
-        QueryType query;
+        Query query;
         List<QName> typeNames;
         final Map<String, QName> variables = new HashMap<String, QName>();
         final Map<String, String> prefixs  = new HashMap<String, String>();
@@ -823,7 +817,7 @@ public class CSWworker extends AbstractWorker {
             set = null;
         }
 
-        SearchResultsType searchResults = null;
+        SearchResults searchResults = null;
 
         //we get the maxRecords wanted and start position
         final Integer maxRecord = request.getMaxRecords();
@@ -868,9 +862,9 @@ public class CSWworker extends AbstractWorker {
             }
 
             //we look for a sorting request (for now only one sort is used)
-            final SortByType sortBy = query.getSortBy();
+            final SortBy sortBy = query.getSortBy();
             if (sortBy != null && sortBy.getSortProperty().size() > 0) {
-                final SortPropertyType first = sortBy.getSortProperty().get(0);
+                final org.opengis.filter.sort.SortBy first = sortBy.getSortProperty().get(0);
                 if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().isEmpty()) {
                     throw new CstlServiceException("A SortBy filter must specify a propertyName.",
                                                   NO_APPLICABLE_CODE);
@@ -949,7 +943,7 @@ public class CSWworker extends AbstractWorker {
 
         // we return only the number of result matching
         if (resultType.equals(ResultType.HITS)) {
-            searchResults = new SearchResultsType(id, (ElementSetType)set, nbResults, nextRecord);
+            searchResults = CswXmlFactory.createSearchResults("2.0.2", id, set, nbResults, nextRecord);
 
         // we return a list of Record
         } else if (resultType.equals(ResultType.RESULTS)) {
@@ -989,18 +983,22 @@ public class CSWworker extends AbstractWorker {
             }
 
             if (mode == DUBLINCORE) {
-                searchResults = new SearchResultsType(id,
-                                                      (ElementSetType)set,
+                searchResults = CswXmlFactory.createSearchResults("2.0.2",
+                                                      id,
+                                                      set,
                                                       totalMatched,
                                                       abstractRecords,
+                                                      null,
                                                       abstractRecords.size(),
                                                       nextRecord);
             } else {
-                searchResults = new SearchResultsType(id,
-                                                      (ElementSetType) set,
+                searchResults = CswXmlFactory.createSearchResults("2.0.2",
+                                                      id,
+                                                      set,
                                                       totalMatched,
-                                                      records.size(),
+                                                      null,
                                                       records,
+                                                      records.size(),
                                                       nextRecord);
             }
 
@@ -1015,7 +1013,7 @@ public class CSWworker extends AbstractWorker {
             }
         }
 
-        response = new GetRecordsResponseType(id, System.currentTimeMillis(), request.getVersion().toString(), searchResults);
+        GetRecordsResponse response = CswXmlFactory.createGetRecordsResponse(request.getVersion().toString(), id, System.currentTimeMillis(), searchResults);
         LOGGER.log(logLevel, "GetRecords request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
@@ -1296,9 +1294,9 @@ public class CSWworker extends AbstractWorker {
                     
                     final String operationName = token.substring(0, pointLocation);
                     final String parameter     = token.substring(pointLocation + 1);
-                    final Operation o          = skeletonCapabilities.getOperationsMetadata().getOperation(operationName);
+                    final AbstractOperation o  = skeletonCapabilities.getOperationsMetadata().getOperation(operationName);
                     if (o != null) {
-                        final DomainType param = o.getParameterIgnoreCase(parameter);
+                        final AbstractDomain param = o.getParameterIgnoreCase(parameter);
                         QName type;
                         if ("GetCapabilities".equals(operationName)) {
                             type = CAPABILITIES_QNAME;
