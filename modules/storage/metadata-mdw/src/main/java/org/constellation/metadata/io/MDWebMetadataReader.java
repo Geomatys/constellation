@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -43,7 +42,6 @@ import org.constellation.generic.database.BDD;
 import org.constellation.util.ReflectionUtilities;
 
 // MDWeb dependencies
-import org.constellation.util.Util;
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.Path;
@@ -71,7 +69,6 @@ import org.geotoolkit.xml.IdentifierSpace;
 import org.geotoolkit.xml.XLink;
 
 // GeoAPI dependencies
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.IdentifiedObject;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
@@ -270,24 +267,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                                       "org.geotoolkit.metadata.iso.quality", "org.geotoolkit.metadata.iso.spatial",
                                                                       "org.geotoolkit.metadata.iso.lineage", "org.geotoolkit.metadata.iso.content",
                                                                       "org.opengis.metadata.acquisition", "org.opengis.metadata.content");
-        // we add the extra binding extracted from a properties file
-        try {
-            final InputStream extraIn = Util.getResourceAsStream("org/constellation/metadata/io/extra-package.properties");
-            if (extraIn != null) {
-                final Properties extraProperties = new Properties();
-                extraProperties.load(extraIn);
-                extraIn.close();
-                for (Entry<Object, Object> entry : extraProperties.entrySet()) {
-                    final String standardName = (String) entry.getKey();
-                    List<String> packageList  = StringUtilities.toStringList((String) entry.getValue());
-                    packageList               = FileUtilities.searchSubPackage(packageList.toArray(new String[packageList.size()]));
-                    extraPackage.put(standardName, packageList);
-                }
-            } else {
-                LOGGER.warning("Unable to find the extra-package properties file");
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "IO exception while reading extra package properties for MDW meta reader", ex);
+        // we add the extra binding
+        final Iterator<ExtraMappingFactory> ite = ServiceRegistry.lookupProviders(ExtraMappingFactory.class);
+        while (ite.hasNext()) {
+            final ExtraMappingFactory currentFactory = ite.next();
+            extraPackage.putAll(currentFactory.getExtraPackage());
         }
     }
 
