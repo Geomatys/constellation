@@ -58,10 +58,7 @@ import org.geotoolkit.process.ProcessingRegistry;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.util.converter.ObjectConverter;
 import org.geotoolkit.wps.converters.WPSConvertersUtils;
-import org.geotoolkit.wps.converters.outputs.complex.AbstractComplexOutputConverter;
-import org.geotoolkit.wps.converters.outputs.references.AbstractReferenceOutputConverter;
 import org.geotoolkit.wps.io.WPSIO;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
@@ -606,7 +603,7 @@ public class WPSWorker extends AbstractWorker {
              throw new CstlServiceException("Set the storeExecuteResponse to true if you want to see status in response documents.", INVALID_PARAMETER_VALUE, "storeExecuteResponse");
         }
 
-        final StatusType status = new StatusType();
+        StatusType status = new StatusType();
         LOGGER.log(Level.INFO, "Process Execute : {0}", request.getIdentifier().getValue());
         //Find the process
         final ProcessDescriptor processDesc = WPSUtils.getProcessDescriptor(request.getIdentifier().getValue());
@@ -708,6 +705,7 @@ public class WPSWorker extends AbstractWorker {
             response.setVersion(WPS_1_0_0);
             response.setLang(WPS_LANG);
             response.setServiceInstance(getServiceUrl() + "SERVICE=WPS&REQUEST=GetCapabilities");
+            response.setStatus(status);
 
             //Give a bief process description into the execute response
             response.setProcess(WPSUtils.generateProcessBrief(processDesc));
@@ -726,7 +724,6 @@ public class WPSWorker extends AbstractWorker {
                 ////////
                 // DOC Async
                 ////////
-                response.setStatus(status);
                 process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0, getServiceUrl(), temporaryFolderPath));
                 WPSService.getExecutor().submit(process);
 
@@ -754,7 +751,10 @@ public class WPSWorker extends AbstractWorker {
                 final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
                 fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, getServiceUrl(), temporaryFolderPath);
                 response.setProcessOutputs(outputs);
-
+                status = new StatusType();
+                status.setCreationTime(WPSProcessListener.getCurrentXMLGregorianCalendar());
+                status.setProcessSucceeded("Process complet.");
+                response.setStatus(status);
             }
 
             if (respDoc.isStoreExecuteResponse()) {
