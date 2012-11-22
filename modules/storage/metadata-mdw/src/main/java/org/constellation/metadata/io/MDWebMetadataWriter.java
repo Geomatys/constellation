@@ -19,8 +19,6 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -41,7 +39,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.util.Util;
 
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription;
@@ -289,42 +286,39 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
         // we add the extra binding extracted from a properties file
         try {
-            final InputStream extraIn = Util.getResourceAsStream("org/constellation/metadata/io/extra-standard.properties");
-            if (extraIn != null) {
-                final Properties extraProperties = new Properties();
-                extraProperties.load(extraIn);
-                extraIn.close();
-                for (Entry<Object, Object> entry : extraProperties.entrySet()) {
-                    String mainStandardName = (String) entry.getKey();
-                    mainStandardName = mainStandardName.replace('_', ' ');
-                    final Standard newMainStandard = mdWriter.getStandard(mainStandardName);
-                    if (newMainStandard == null) {
-                        LOGGER.log(Level.WARNING, "Unable to find the extra main standard:{0}", mainStandardName);
-                        continue;
-                    }
-                    final List<String> standardList  = StringUtilities.toStringList((String) entry.getValue());
-                    final List<Standard> standards   = new ArrayList<Standard>();
-                    for (String standardName : standardList) {
-                        Standard standard = mdWriter.getStandard(standardName);
-                        if (standard == null) {
-                            LOGGER.log(Level.FINER, "Unable to find the extra standard:{0}", standardName);
-                        } else {
-                            standards.add(standard);
-                        }
-                    }
-                    if (standardMapping.containsKey(newMainStandard)) {
-                        final List<Standard> previousStandards = standardMapping.get(newMainStandard);
-                        previousStandards.addAll(standards);
-                        standardMapping.put(newMainStandard, previousStandards);
+            final Map<String, List<String>> extraStandard = new HashMap<String, List<String>>();
+            final Iterator<ExtraMappingFactory> ite = ServiceRegistry.lookupProviders(ExtraMappingFactory.class);
+            while (ite.hasNext()) {
+                final ExtraMappingFactory currentFactory = ite.next();
+                extraStandard.putAll(currentFactory.getExtraStandard());
+            }
+                
+            for (Entry<String, List<String>> entry : extraStandard.entrySet()) {
+                final String mainStandardName = entry.getKey();
+                final Standard newMainStandard = mdWriter.getStandard(mainStandardName);
+                if (newMainStandard == null) {
+                    LOGGER.log(Level.WARNING, "Unable to find the extra main standard:{0}", mainStandardName);
+                    continue;
+                }
+                final List<String> standardList  = entry.getValue();
+                final List<Standard> standards   = new ArrayList<Standard>();
+                for (String standardName : standardList) {
+                    Standard standard = mdWriter.getStandard(standardName);
+                    if (standard == null) {
+                        LOGGER.log(Level.FINER, "Unable to find the extra standard:{0}", standardName);
                     } else {
-                        standardMapping.put(newMainStandard, standards);
+                        standards.add(standard);
                     }
                 }
-            } else {
-                LOGGER.warning("Unable to find the extra-standard properties file");
+                if (standardMapping.containsKey(newMainStandard)) {
+                    final List<Standard> previousStandards = standardMapping.get(newMainStandard);
+                    previousStandards.addAll(standards);
+                    standardMapping.put(newMainStandard, previousStandards);
+                } else {
+                    standardMapping.put(newMainStandard, standards);
+                }
             }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "IO exception while reading extra standard properties for MDW meta writer", ex);
+
         } catch (MD_IOException ex) {
             LOGGER.log(Level.WARNING, "MD_IO exception while reading extra standard properties for MDW meta writer", ex);
         }
