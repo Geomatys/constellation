@@ -134,7 +134,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         try {
             // Handle an empty request by sending a basic web page.
             if ((null == objectRequest) && (0 == uriContext.getQueryParameters().size())) {
-                return Response.ok(getIndexPage(), MimeType.TEXT_HTML).build();
+                return Response.ok(getIndexPage(worker.getId()), MimeType.TEXT_HTML).build();
             }
 
             String request = "";
@@ -692,7 +692,7 @@ public class WCSService extends GridWebService<WCSWorker> {
     /**
      * Get an html page for the root resource.
      */
-    private String getIndexPage(){
+    private String getIndexPage(final String instance){
     	return  "<html>\n" +
     		"  <title>Constellation WCS</title>\n" +
     		"  <body>\n" +
@@ -702,7 +702,7 @@ public class WCSService extends GridWebService<WCSWorker> {
     		"      In order to access this service, you must form a valid request.\n" +
     		"    </p\n" +
     		"    <p>\n" +
-    		"      Try using a <a href=\"" + getUriContext().getBaseUri() + "wcs"
+    		"      Try using a <a href=\"" + getUriContext().getBaseUri() + "wcs/" + instance
     		                             + "?service=WCS&version=1.0.0&request=GetCapabilities&version=1.0.0\""
     		                             + ">Get Capabilities</a> request to obtain the 'Capabilities'<br>\n" +
     		"      document which describes the resources available on this server.\n" +
