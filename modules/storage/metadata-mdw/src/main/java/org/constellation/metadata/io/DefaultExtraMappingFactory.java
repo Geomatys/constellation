@@ -39,7 +39,7 @@ public class DefaultExtraMappingFactory implements ExtraMappingFactory {
     @Override
     public Map<String, List<String>> getExtraStandard() {
         final Map<String, List<String>> extraStandard = new HashMap<String, List<String>>();
-        extraStandard.put("ISO_19115", Arrays.asList("NATSDI","GEONETCAB","CNES"));// TODO move to subProject code
+        extraStandard.put("ISO 19115", Arrays.asList("NATSDI","GEONETCAB","CNES"));// TODO move to subProject code
         return extraStandard;
     }
 
