@@ -37,7 +37,6 @@ import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 // Apache Lucene dependencies
@@ -77,19 +76,6 @@ import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
-import org.geotoolkit.csw.xml.v202.AcknowledgementType;
-import org.geotoolkit.csw.xml.v202.Capabilities;
-import org.geotoolkit.csw.xml.v202.DeleteType;
-import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
-import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
-import org.geotoolkit.csw.xml.v202.HarvestResponseType;
-import org.geotoolkit.csw.xml.v202.InsertType;
-import org.geotoolkit.csw.xml.v202.QueryType;
-import org.geotoolkit.csw.xml.v202.TransactionResponseType;
-import org.geotoolkit.csw.xml.v202.TransactionSummaryType;
-import org.geotoolkit.csw.xml.v202.UpdateType;
-import org.geotoolkit.csw.xml.v202.SchemaComponentType;
-import org.geotoolkit.csw.xml.v202.EchoedRequestType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
@@ -97,15 +83,14 @@ import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.ogc.xml.SortBy;
-import org.geotoolkit.ogc.xml.v110.FilterCapabilities;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.AbstractDomain;
 import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.geotoolkit.ows.xml.v100.ServiceIdentification;
-import org.geotoolkit.ows.xml.v100.ServiceProvider;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.xml.MarshallerPool;
@@ -117,6 +102,7 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // GeoAPI dependencies
 import org.opengis.filter.sort.SortOrder;
+import org.opengis.filter.capability.FilterCapabilities;
 import org.opengis.util.CodeList;
 
 
@@ -531,7 +517,7 @@ public class CSWworker extends AbstractWorker {
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
         if (returnUS) {
-            return new Capabilities("2.0.2", getCurrentUpdateSequence());
+            return CswXmlFactory.createCapabilities("2.0.2", getCurrentUpdateSequence());
         }
 
         /*
@@ -549,16 +535,16 @@ public class CSWworker extends AbstractWorker {
         */
 
         // we load the skeleton capabilities
-        final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
+        final AbstractCapabilities skeletonCapabilities = (AbstractCapabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
         if (skeletonCapabilities == null) {
             throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
         }
 
         //we prepare the response document
-        ServiceIdentification si      = null;
-        ServiceProvider       sp      = null;
-        AbstractOperationsMetadata om = null;
-        FilterCapabilities    fc      = null;
+        AbstractServiceIdentification si = null;
+        AbstractServiceProvider       sp = null;
+        AbstractOperationsMetadata om    = null;
+        FilterCapabilities    fc         = null;
 
         Sections sections = requestCapabilities.getSections();
         if (sections == null) {
@@ -723,6 +709,7 @@ public class CSWworker extends AbstractWorker {
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
 
+        final String version = request.getVersion().toString();
         final String id = request.getRequestId();
 
         // we initialize the output format of the response
@@ -755,7 +742,7 @@ public class CSWworker extends AbstractWorker {
         final Map<String, QName> variables = new HashMap<String, QName>();
         final Map<String, String> prefixs  = new HashMap<String, String>();
         if (request.getAbstractQuery() != null) {
-            query = (QueryType)request.getAbstractQuery();
+            query = (Query)request.getAbstractQuery();
             typeNames =  query.getTypeNames();
             if (typeNames == null || typeNames.isEmpty()) {
                 throw new CstlServiceException("The query must specify at least typeName.",
@@ -948,8 +935,8 @@ public class CSWworker extends AbstractWorker {
         // we return a list of Record
         } else if (resultType.equals(ResultType.RESULTS)) {
 
-            final List<AbstractRecordType> abstractRecords = new ArrayList<AbstractRecordType>();
-            final List<Object> records                     = new ArrayList<Object>();
+            final List<AbstractRecord> abstractRecords = new ArrayList<AbstractRecord>();
+            final List<Object> records                 = new ArrayList<Object>();
             try {
                 for (int i = startPos -1; i < max; i++) {
                     final Object obj = mdReader.getMetadata(results[i], mode, set, elementName);
@@ -958,7 +945,7 @@ public class CSWworker extends AbstractWorker {
 
                     } else if (obj != null) {
                         if (mode == DUBLINCORE) {
-                            abstractRecords.add((AbstractRecordType)obj);
+                            abstractRecords.add((AbstractRecord)obj);
                         } else {
                             records.add(obj);
                         }
@@ -976,7 +963,7 @@ public class CSWworker extends AbstractWorker {
 
                 final Object additionalResult = distributedResults.additionalResults.get(i);
                 if (mode == DUBLINCORE) {
-                    abstractRecords.add((AbstractRecordType) additionalResult);
+                    abstractRecords.add((AbstractRecord) additionalResult);
                 } else {
                     records.add(additionalResult);
                 }
@@ -1004,13 +991,7 @@ public class CSWworker extends AbstractWorker {
 
             //we return an Acknowledgement if the request is valid.
         } else if (resultType.equals(ResultType.VALIDATE)) {
-            try {
-                return new AcknowledgementType(id, new EchoedRequestType(request), System.currentTimeMillis());
-
-            } catch(DatatypeConfigurationException ex) {
-                throw new CstlServiceException("DataTypeConfiguration exception while creating acknowledgment response",
-                                               NO_APPLICABLE_CODE);
-            }
+            return CswXmlFactory.createAcknowledgement(version, id, request, System.currentTimeMillis());
         }
 
         GetRecordsResponse response = CswXmlFactory.createGetRecordsResponse(request.getVersion().toString(), id, System.currentTimeMillis(), searchResults);
@@ -1066,6 +1047,8 @@ public class CSWworker extends AbstractWorker {
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
 
+        final String version = request.getVersion().toString();
+        
         // we initialize the output format of the response
         initializeOutputFormat(request);
 
@@ -1091,10 +1074,10 @@ public class CSWworker extends AbstractWorker {
         }
 
         //we begin to build the result
-        GetRecordByIdResponseType response;
-        final List<String> unexistingID        = new ArrayList<String>();
-        final List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
-        final List<Object> otherRecords        = new ArrayList<Object>();
+        GetRecordByIdResponse response;
+        final List<String> unexistingID    = new ArrayList<String>();
+        final List<AbstractRecord> records = new ArrayList<AbstractRecord>();
+        final List<Object> otherRecords    = new ArrayList<Object>();
 
         final Class expectedType;
         final int mode;
@@ -1156,7 +1139,7 @@ public class CSWworker extends AbstractWorker {
             throwUnexistingIdentifierException(unexistingID);
         }
 
-        response = new GetRecordByIdResponseType(records, otherRecords);
+        response = CswXmlFactory.createGetRecordByIdResponse(version, records, otherRecords);
         LOGGER.log(logLevel, "GetRecordById request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
@@ -1192,7 +1175,7 @@ public class CSWworker extends AbstractWorker {
      * @param request
      * @return
      */
-    public DescribeRecordResponseType describeRecord(final DescribeRecord request) throws CstlServiceException{
+    public DescribeRecordResponse describeRecord(final DescribeRecord request) throws CstlServiceException{
         LOGGER.log(logLevel, "DescribeRecords request processing\n");
         final long startTime = System.currentTimeMillis();
 
@@ -1201,6 +1184,8 @@ public class CSWworker extends AbstractWorker {
         // we initialize the output format of the response
         initializeOutputFormat(request);
 
+        final String version = request.getVersion().toString();
+        
         // we initialize the type names
         List<QName> typeNames = (List<QName>)request.getTypeName();
         if (typeNames == null || typeNames.isEmpty()) {
@@ -1222,34 +1207,34 @@ public class CSWworker extends AbstractWorker {
                                            "\nsupported ones are:\n" + supportedList,
                                           INVALID_PARAMETER_VALUE, "schemaLanguage");
         }
-        final List<SchemaComponentType> components   = new ArrayList<SchemaComponentType>();
+        final List<SchemaComponent> components   = new ArrayList<SchemaComponent>();
 
         if (typeNames.contains(RECORD_QNAME)) {
             final Object object = schemas.get(RECORD_QNAME);
-            final SchemaComponentType component = new SchemaComponentType(Namespaces.CSW_202, schemaLanguage, object);
+            final SchemaComponent component = CswXmlFactory.createSchemaComponent(version, Namespaces.CSW_202, schemaLanguage, object);
             components.add(component);
         }
 
         if (typeNames.contains(METADATA_QNAME)) {
             final Object object = schemas.get(METADATA_QNAME);
-            final SchemaComponentType component = new SchemaComponentType(Namespaces.GMD, schemaLanguage, object);
+            final SchemaComponent component = CswXmlFactory.createSchemaComponent(version, Namespaces.GMD, schemaLanguage, object);
             components.add(component);
         }
 
         if (containsOneOfEbrim30(typeNames)) {
             final Object object = schemas.get(EXTRINSIC_OBJECT_QNAME);
-            final SchemaComponentType component = new SchemaComponentType(EBRIM_30, schemaLanguage, object);
+            final SchemaComponent component = CswXmlFactory.createSchemaComponent(version, EBRIM_30, schemaLanguage, object);
             components.add(component);
         }
 
         if (containsOneOfEbrim25(typeNames)) {
             final Object object = schemas.get(EXTRINSIC_OBJECT_25_QNAME);
-            final SchemaComponentType component = new SchemaComponentType(EBRIM_25, schemaLanguage, object);
+            final SchemaComponent component = CswXmlFactory.createSchemaComponent(version, EBRIM_25, schemaLanguage, object);
             components.add(component);
         }
 
         LOGGER.log(logLevel, "DescribeRecords request processed in {0} ms", (System.currentTimeMillis() - startTime));
-        return new DescribeRecordResponseType(components);
+        return CswXmlFactory.createDescribeRecordResponse(version, components);
     }
 
     /**
@@ -1287,7 +1272,7 @@ public class CSWworker extends AbstractWorker {
                 if (pointLocation != -1) {
 
                     // we load the skeleton capabilities
-                    final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
+                    final AbstractCapabilities skeletonCapabilities = (AbstractCapabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
                     if (skeletonCapabilities == null) {
                         throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
                     }
@@ -1350,7 +1335,7 @@ public class CSWworker extends AbstractWorker {
      * @param request
      * @return
      */
-    public TransactionResponseType transaction(final Transaction request) throws CstlServiceException {
+    public TransactionResponse transaction(final Transaction request) throws CstlServiceException {
         return transaction(request, false);
     }
 
@@ -1361,7 +1346,7 @@ public class CSWworker extends AbstractWorker {
      * @param javaCall use this flag to pass the shiro security whan using the worker in a non web context.
      * @return
      */
-    public TransactionResponseType transaction(final Transaction request, final boolean javaCall) throws CstlServiceException {
+    public TransactionResponse transaction(final Transaction request, final boolean javaCall) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
 
         if (profile == DISCOVERY) {
@@ -1373,6 +1358,9 @@ public class CSWworker extends AbstractWorker {
         }
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
+        
+        final String version = request.getVersion().toString();
+        
         // we prepare the report
         int totalInserted       = 0;
         int totalUpdated        = 0;
@@ -1381,8 +1369,8 @@ public class CSWworker extends AbstractWorker {
 
         final List<Object> transactions = request.getInsertOrUpdateOrDelete();
         for (Object transaction: transactions) {
-            if (transaction instanceof InsertType) {
-                final InsertType insertRequest = (InsertType)transaction;
+            if (transaction instanceof Insert) {
+                final Insert insertRequest = (Insert)transaction;
 
                 for (Object record : insertRequest.getAny()) {
 
@@ -1402,9 +1390,9 @@ public class CSWworker extends AbstractWorker {
                     }
                 }
 
-            } else if (transaction instanceof DeleteType) {
+            } else if (transaction instanceof Delete) {
                 if (mdWriter.deleteSupported()) {
-                    final DeleteType deleteRequest = (DeleteType)transaction;
+                    final Delete deleteRequest = (Delete)transaction;
                     //String dataType = deleteRequest.getTypeName();
                     if (deleteRequest.getConstraint() == null) {
                         throw new CstlServiceException("A constraint must be specified.",
@@ -1444,9 +1432,9 @@ public class CSWworker extends AbstractWorker {
                 }
 
 
-            } else if (transaction instanceof UpdateType) {
+            } else if (transaction instanceof Update) {
                 if (mdWriter.updateSupported()) {
-                    final UpdateType updateRequest = (UpdateType) transaction;
+                    final Update updateRequest = (Update) transaction;
                     if (updateRequest.getConstraint() == null) {
                         throw new CstlServiceException("A constraint must be specified.",
                                 MISSING_PARAMETER_VALUE, "constraint");
@@ -1514,11 +1502,9 @@ public class CSWworker extends AbstractWorker {
                         NO_APPLICABLE_CODE);
             }
         }
-        final TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
-                                                                          totalUpdated,
-                                                                          totalDeleted,
-                                                                          requestID);
-        final TransactionResponseType response = new TransactionResponseType(summary, null, request.getVersion().toString());
+        final TransactionSummary summary = CswXmlFactory.createTransactionSummary(version, totalInserted, totalUpdated, totalDeleted, requestID);
+        
+        final TransactionResponse response = CswXmlFactory.createTransactionResponse(version, summary, null);
         LOGGER.log(logLevel, "Transaction request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
@@ -1529,7 +1515,7 @@ public class CSWworker extends AbstractWorker {
      * @param request
      * @return
      */
-    public HarvestResponseType harvest(final Harvest request) throws CstlServiceException {
+    public HarvestResponse harvest(final Harvest request) throws CstlServiceException {
         LOGGER.log(logLevel, "Harvest request processing\n");
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
@@ -1539,7 +1525,9 @@ public class CSWworker extends AbstractWorker {
             throw new UnauthorizedException("You must be authentified to perform a harvest request.");
         }
         verifyBaseRequest(request);
-        HarvestResponseType response;
+        final String version = request.getVersion().toString();
+        
+        HarvestResponse response;
         // we prepare the report
         final int totalInserted;
         final int totalUpdated;
@@ -1583,18 +1571,15 @@ public class CSWworker extends AbstractWorker {
                         totalUpdated  = results[1];
                         totalDeleted  = results[2];
                     }
-                    final TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
-                                                                                      totalUpdated,
-                                                                                      totalDeleted,
-                                                                                      null);
-                    final TransactionResponseType transactionResponse = new TransactionResponseType(summary, null, request.getVersion().toString());
-                    response = new HarvestResponseType(transactionResponse);
+                    final TransactionSummary summary = CswXmlFactory.createTransactionSummary(version, totalInserted, totalUpdated, totalDeleted, null);
+                    final TransactionResponse transactionResponse = CswXmlFactory.createTransactionResponse(version, summary, null);
+                    response = CswXmlFactory.createHarvestResponse(version, transactionResponse);
 
                 //mode asynchronous
                 } else {
 
-                    final AcknowledgementType acknowledgement = new AcknowledgementType(null, new EchoedRequestType(request), System.currentTimeMillis());
-                    response = new HarvestResponseType(acknowledgement);
+                    final Acknowledgement acknowledgement = CswXmlFactory.createAcknowledgement(version, null, request, System.currentTimeMillis());
+                    response = CswXmlFactory.createHarvestResponse(version, acknowledgement);
                     long period = 0;
                     if (request.getHarvestInterval() != null) {
                         period = request.getHarvestInterval().getTimeInMillis(new Date(System.currentTimeMillis()));
@@ -1616,9 +1601,6 @@ public class CSWworker extends AbstractWorker {
             } catch (IOException ex) {
                 throw new CstlServiceException("The service can't open the connection to the source",
                                               INVALID_PARAMETER_VALUE, SOURCE);
-            } catch (DatatypeConfigurationException ex) {
-                throw new CstlServiceException("The service has made an error of timestamp",
-                                              INVALID_PARAMETER_VALUE);
             }
 
         } else {

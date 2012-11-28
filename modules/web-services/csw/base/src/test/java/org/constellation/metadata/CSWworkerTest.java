@@ -60,8 +60,9 @@ import org.geotoolkit.csw.xml.v202.AcknowledgementType;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.AbstractCapabilities;
+import org.geotoolkit.csw.xml.DescribeRecordResponse;
+import org.geotoolkit.csw.xml.TransactionResponse;
 import org.geotoolkit.csw.xml.v202.DeleteType;
-import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ElementSetNameType;
@@ -79,7 +80,6 @@ import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
-import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
 import org.geotoolkit.csw.xml.v202.UpdateType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
@@ -1482,7 +1482,7 @@ public class CSWworkerTest {
          * Test 2 : good request with no schema language
          */
         request = new DescribeRecordType("CSW", "2.0.2", Arrays.asList(RECORD_QNAME, METADATA_QNAME), "text/xml", null);
-        DescribeRecordResponseType result = worker.describeRecord(request);
+        DescribeRecordResponse result = worker.describeRecord(request);
 
         assertEquals(result.getSchemaComponent().size(), 2);
         assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), Namespaces.CSW_202);
@@ -1534,7 +1534,7 @@ public class CSWworkerTest {
         DeleteType delete = new DeleteType(null, constraint);
         TransactionType request = new TransactionType("CSW", "2.0.2", delete);
 
-        TransactionResponseType result = worker.transaction(request);
+        TransactionResponse result = worker.transaction(request);
 
         assertEquals(result.getTransactionSummary().getTotalDeleted(), 1);
 
@@ -1570,7 +1570,7 @@ public class CSWworkerTest {
 
         InsertType insert       = new InsertType(ExpResult1);
         TransactionType request = new TransactionType("CSW", "2.0.2", insert);
-        TransactionResponseType result  = worker.transaction(request);
+        TransactionResponse result  = worker.transaction(request);
 
         assertEquals(result.getTransactionSummary().getTotalInserted(), 1);
 
@@ -1634,7 +1634,7 @@ public class CSWworkerTest {
         QueryConstraintType constraint  = new QueryConstraintType("identifier='42292_5p_19900609195600'", "1.1.0");
         UpdateType update               = new UpdateType(replacement, constraint);
         TransactionType request         = new TransactionType("CSW", "2.0.2", update);
-        TransactionResponseType result  = worker.transaction(request);
+        TransactionResponse result      = worker.transaction(request);
 
         assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
 

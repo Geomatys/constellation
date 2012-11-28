@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 //geotoolkit dependencies
-import org.geotoolkit.csw.xml.v202.RecordPropertyType;
+import org.geotoolkit.csw.xml.RecordProperty;
 
 /**
  * An interface adding the method update to the metadataWriter interface for CSW.
@@ -35,7 +35,7 @@ public interface CSWMetadataWriter extends MetadataWriter {
      * @param metadataID The identifier of the metadata to Replace.
      * @param properties A List of property-value to replace in the specified metadata.
      */
-    boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException;
+    boolean updateMetadata(String metadataID, List<? extends RecordProperty> properties) throws MetadataIoException;
 
     /**
      * Set the global level of log.
