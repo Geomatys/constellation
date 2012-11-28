@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
+import java.util.Arrays;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -61,7 +62,10 @@ import org.constellation.ws.WSEngine;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWResponse;
+import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.DescribeRecord;
+import org.geotoolkit.csw.xml.DistributedSearch;
+import org.geotoolkit.csw.xml.ElementSetName;
 import org.geotoolkit.csw.xml.GetCapabilities;
 import org.geotoolkit.csw.xml.GetDomain;
 import org.geotoolkit.csw.xml.GetRecordById;
@@ -69,29 +73,23 @@ import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.csw.xml.Transaction;
 import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.v202.DescribeRecordType;
-import org.geotoolkit.csw.xml.v202.DistributedSearchType;
-import org.geotoolkit.csw.xml.v202.ElementSetNameType;
-import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
-import org.geotoolkit.csw.xml.v202.GetDomainType;
-import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
-import org.geotoolkit.csw.xml.v202.GetRecordsType;
-import org.geotoolkit.csw.xml.v202.HarvestType;
-import org.geotoolkit.csw.xml.v202.QueryConstraintType;
-import org.geotoolkit.csw.xml.v202.QueryType;
+import org.geotoolkit.csw.xml.Harvest;
+import org.geotoolkit.csw.xml.Query;
+import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
-import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
-import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
+import org.geotoolkit.ows.xml.AcceptFormats;
+import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.xml.Namespaces;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.util.StringUtilities;
 
 /**
@@ -206,9 +204,9 @@ public class CSWService extends OGCWebService<CSWworker> {
                     return Response.ok(worker.transaction( (Transaction)request), worker.getOutputFormat()).build();
                 }
 
-                if (request instanceof HarvestType) {
+                if (request instanceof Harvest) {
 
-                    return Response.ok(worker.harvest((HarvestType)request), worker.getOutputFormat()).build();
+                    return Response.ok(worker.harvest((Harvest)request), worker.getOutputFormat()).build();
                 }
 
                 throw new CstlServiceException("The operation " +  request.getClass().getName() + " is not supported by the service",
@@ -360,18 +358,20 @@ public class CSWService extends OGCWebService<CSWworker> {
      */
     private GetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
 
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        
         String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
-        AcceptVersionsType versions;
+        final AcceptVersions versions;
         if (version != null) {
             if (version.indexOf(',') != -1) {
                 version = version.substring(0, version.indexOf(','));
             }
-            versions = new AcceptVersionsType(version);
+            versions = CswXmlFactory.buildAcceptVersion(version, Arrays.asList(version));
         } else {
-             versions = new AcceptVersionsType("2.0.2");
+            versions = CswXmlFactory.buildAcceptVersion(version, Arrays.asList("2.0.2"));
         }
 
-        final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
+        final AcceptFormats formats = CswXmlFactory.buildAcceptFormat(version, Arrays.asList(getParameter(ACCEPT_FORMATS_PARAMETER, false)));
 
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
@@ -394,20 +394,15 @@ public class CSWService extends OGCWebService<CSWworker> {
             //if there is no requested Sections we add all the sections
             requestedSections = SectionsType.getExistingSections();
         }
-        final SectionsType sections     = new SectionsType(requestedSections);
-        return new GetCapabilitiesType(versions,
-                                       sections,
-                                       formats,
-                                       updateSequence,
-                                       getParameter(SERVICE_PARAMETER, true));
-
+        final Sections sections = CswXmlFactory.buildSections(version, requestedSections);
+        return CswXmlFactory.createGetCapabilities(version, versions, sections, formats, updateSequence, service);
     }
 
 
     /**
      * Build a new GetRecords request object with the url parameters
      */
-    private GetRecordsType createNewGetRecordsRequest() throws CstlServiceException {
+    private GetRecordsRequest createNewGetRecordsRequest() throws CstlServiceException {
 
         final String version    = getParameter(VERSION_PARAMETER, true);
         final String service    = getParameter(SERVICE_PARAMETER, true);
@@ -501,6 +496,7 @@ public class CSWService extends OGCWebService<CSWworker> {
                                                 INVALID_PARAMETER_VALUE, "ElementSetName");
             }
         }
+        final ElementSetName setName = CswXmlFactory.createElementSetName(version, elementSet);
 
         //we get the list of sort by object
         final String sort                  = getParameter("SORTBY", false);
@@ -533,8 +529,8 @@ public class CSWService extends OGCWebService<CSWworker> {
         /*
          * here we build the constraint object
          */
-        final String constLanguage     = getParameter("CONSTRAINTLANGUAGE", false);
-        QueryConstraintType constraint = null;
+        final String constLanguage = getParameter("CONSTRAINTLANGUAGE", false);
+        QueryConstraint constraint = null;
         if (constLanguage != null) {
             final String languageVersion  = getParameter("CONSTRAINT_LANGUAGE_VERSION", true);
 
@@ -544,15 +540,14 @@ public class CSWService extends OGCWebService<CSWworker> {
                 if (constraintObject == null) {
                     constraintObject = "AnyText LIKE '%%'";
                 }
-                constraint = new QueryConstraintType(constraintObject, languageVersion);
+                constraint = CswXmlFactory.createQueryConstraint(version, constraintObject, languageVersion);
 
             } else if (constLanguage.equalsIgnoreCase("FILTER")) {
                 final Object constraintObject = getComplexParameter("CONSTRAINT", false);
                 if (constraintObject == null) {
-                    //final PropertyIsLikeType filter = new PropertyIsLikeType(new PropertyNameType("AnyText"), "%%", "%", "?", "\\");
-                    //constraintObject = new FilterType(filter);
+                    // do nothing
                 } else if (constraintObject instanceof FilterType){
-                    constraint = new QueryConstraintType((FilterType)constraintObject, languageVersion);
+                    constraint = CswXmlFactory.createQueryConstraint(version, (FilterType)constraintObject, languageVersion);
                 } else {
                     throw new CstlServiceException("The filter type is not supported:" + constraintObject.getClass().getName(),
                                                  INVALID_PARAMETER_VALUE, "Constraint");
@@ -564,16 +559,13 @@ public class CSWService extends OGCWebService<CSWworker> {
             }
         }
 
-        final QueryType query = new QueryType(typeNames,
-                                        new ElementSetNameType(elementSet),
-                                        sortBy,
-                                        constraint);
-
+        final Query query = CswXmlFactory.createQuery(version, typeNames, setName, sortBy, constraint);
+        
         /*
          * here we build a optionnal ditributed search object
          */
         final String distrib = getParameter("DISTRIBUTEDSEARCH", false);
-        DistributedSearchType distribSearch = null;
+        DistributedSearch distribSearch = null;
         if (distrib != null && distrib.equalsIgnoreCase("true")) {
             final String count = getParameter("HOPCOUNT", false);
             Integer hopCount   = 2;
@@ -585,29 +577,19 @@ public class CSWService extends OGCWebService<CSWworker> {
                                                   INVALID_PARAMETER_VALUE, "HopCount");
                 }
             }
-            distribSearch = new DistributedSearchType(hopCount);
+            distribSearch = CswXmlFactory.createDistributedSearch(version, hopCount);
         }
 
         // TODO not implemented yet
         // String handler = getParameter("RESPONSEHANDLER", false);
 
-        return new GetRecordsType(service,
-                                  version,
-                                  resultType,
-                                  requestID,
-                                  outputFormat,
-                                  outputSchema,
-                                  startPosition,
-                                  maxRecords,
-                                  query,
-                                  distribSearch);
-
+        return CswXmlFactory.createGetRecord(version, service, resultType, requestID, outputFormat, outputSchema, startPosition, maxRecords, query, distribSearch);
     }
 
     /**
      * Build a new GetRecordById request object with the url parameters
      */
-    private GetRecordByIdType createNewGetRecordByIdRequest() throws CstlServiceException {
+    private GetRecordById createNewGetRecordByIdRequest() throws CstlServiceException {
 
         final String version    = getParameter(VERSION_PARAMETER, true);
         final String service    = getParameter(SERVICE_PARAMETER, true);
@@ -624,6 +606,7 @@ public class CSWService extends OGCWebService<CSWworker> {
                                              INVALID_PARAMETER_VALUE, "ElementSetName");
             }
         }
+        final ElementSetName setName = CswXmlFactory.createElementSetName(version, elementSet);
 
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
@@ -643,20 +626,13 @@ public class CSWService extends OGCWebService<CSWworker> {
             id.add(token);
         }
 
-        return new GetRecordByIdType(service,
-                                     version,
-                                     new ElementSetNameType(elementSet),
-                                     outputFormat,
-                                     outputSchema,
-                                     id);
-
-
+        return CswXmlFactory.createGetRecordById(version, service, setName, outputFormat, outputSchema, id);
     }
 
     /**
      * Build a new DescribeRecord request object with the url parameters
      */
-    private DescribeRecordType createNewDescribeRecordRequest() throws CstlServiceException {
+    private DescribeRecord createNewDescribeRecordRequest() throws CstlServiceException {
 
         final String version    = getParameter(VERSION_PARAMETER, true);
         final String service    = getParameter(SERVICE_PARAMETER, true);
@@ -700,19 +676,13 @@ public class CSWService extends OGCWebService<CSWworker> {
             }
         }
 
-        return new DescribeRecordType(service,
-                                     version,
-                                     typeNames,
-                                     outputFormat,
-                                     schemaLanguage);
-
-
+        return CswXmlFactory.createDescribeRecord(version, service, typeNames, outputFormat, schemaLanguage);
     }
 
     /**
      * Build a new GetDomain request object with the url parameters
      */
-    private GetDomainType createNewGetDomainRequest() throws CstlServiceException {
+    private GetDomain createNewGetDomainRequest() throws CstlServiceException {
 
         final String version    = getParameter(VERSION_PARAMETER, true);
         final String service    = getParameter(SERVICE_PARAMETER, true);
@@ -725,14 +695,13 @@ public class CSWService extends OGCWebService<CSWworker> {
             throw new CstlServiceException("One of propertyName or parameterName must be null",
                                           INVALID_PARAMETER_VALUE, "parameterName");
         }
-
-        return new GetDomainType(service, version, propertyName, parameterName);
+        return CswXmlFactory.createGetDomain(version, service, propertyName, parameterName);
     }
 
     /**
      * Build a new GetDomain request object with the url parameters
      */
-    private HarvestType createNewHarvestRequest() throws CstlServiceException {
+    private Harvest createNewHarvestRequest() throws CstlServiceException {
 
         final String version      = getParameter(VERSION_PARAMETER, true);
         final String service      = getParameter(SERVICE_PARAMETER, true);
@@ -754,13 +723,6 @@ public class CSWService extends OGCWebService<CSWworker> {
                                               INVALID_PARAMETER_VALUE, "HarvestInsterval");
             }
         }
-
-        return new HarvestType(service,
-                               version,
-                               source,
-                               resourceType,
-                               resourceFormat,
-                               handler,
-                               harvestInterval);
+        return CswXmlFactory.createHarvest(version, service, source, resourceType, resourceFormat, handler, harvestInterval);
     }
 }

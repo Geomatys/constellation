@@ -73,6 +73,7 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.wcs.xml.WCSMarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.wcs.xml.WCSXmlFactory;
 
 
 /**
@@ -372,16 +373,16 @@ public class WCSService extends GridWebService<WCSWorker> {
     private DescribeCoverage adaptKvpDescribeCoverageRequest() throws CstlServiceException {
         final String strVersion = getParameter(KEY_VERSION, true);
         isVersionSupported(strVersion);
-        final ServiceDef serviceDef = getVersionFromNumber(strVersion);
-
-        if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {
-            return new org.geotoolkit.wcs.xml.v100.DescribeCoverageType(getParameter(KEY_COVERAGE, true));
-        } else if (serviceDef.equals(ServiceDef.WCS_1_1_1)) {
-            return new org.geotoolkit.wcs.xml.v111.DescribeCoverageType(getParameter(KEY_IDENTIFIER, true));
+        final String coverage;
+        if ("1.0.0".equals(strVersion)) {
+            coverage = getParameter(KEY_COVERAGE, true);
+        } else if ("1.1.1".equals(strVersion)) {
+            coverage = getParameter(KEY_IDENTIFIER, true);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
+        return WCSXmlFactory.createDescribeCoverage(strVersion, coverage);
     }
 
     /**
