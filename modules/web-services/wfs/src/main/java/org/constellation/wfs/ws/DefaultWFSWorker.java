@@ -60,13 +60,11 @@ import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.memory.GenericReprojectFeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.factory.HintsPending;
 import org.geotoolkit.feature.FeatureTypeUtilities;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.Utils;
-import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
@@ -102,7 +100,6 @@ import org.geotoolkit.wfs.xml.StoredQueries;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.ResultTypeType;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
-import org.geotoolkit.wfs.xml.WFSXmlFactory;
 import org.geotoolkit.wfs.xml.TransactionResponse;
 import org.geotoolkit.wfs.xml.Transaction;
 import org.geotoolkit.wfs.xml.Query;
@@ -119,6 +116,7 @@ import org.geotoolkit.wfs.xml.UpdateElement;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v200.PropertyName;
 
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
@@ -175,8 +173,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     private ServiceDef actingVersion = ServiceDef.WFS_1_1_0;
 
     private boolean multipleVersionActivated = true;
-
-    private static final WFSXmlFactory xmlFactory = new WFSXmlFactory();
 
     private List<StoredQueryDescription> storedQueries = new ArrayList<StoredQueryDescription>();
 
@@ -294,7 +290,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
         if (returnUS) {
-            return xmlFactory.buildWFSCapabilities(currentVersion, getCurrentUpdateSequence());
+            return buildWFSCapabilities(currentVersion, getCurrentUpdateSequence());
         }
 
         FeatureTypeList ftl              = null;
@@ -304,7 +300,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final FilterCapabilities fc;
 
         if (request.getSections() == null || request.containsSection("featureTypeList")) {
-            ftl = xmlFactory.buildFeatureTypeList(currentVersion);
+            ftl = buildFeatureTypeList(currentVersion);
 
             /*
              *  layer providers
@@ -337,7 +333,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         } else {
                             title = fld.getName().getLocalPart();
                         }
-                        ftt = xmlFactory.buildFeatureType(
+                        ftt = buildFeatureType(
                                 currentVersion,
                                 Utils.getQnameFromName(layerName),
                                 title,
@@ -398,7 +394,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         } else {
             fc = WFSConstants.FILTER_CAPABILITIES_V110;
         }
-        final WFSCapabilities result = xmlFactory.buildWFSCapabilities(currentVersion, si, sp, om, ftl, fc);
+        final WFSCapabilities result = buildWFSCapabilities(currentVersion, si, sp, om, ftl, fc);
 
         LOGGER.log(logLevel, "GetCapabilities treated in {0}ms", (System.currentTimeMillis() - start));
         return result;
@@ -753,7 +749,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             featureCollection = FeatureStoreUtilities.collection("collection-1", null);
         }
         if (request.getResultType() == ResultTypeType.HITS) {
-            return xmlFactory.buildFeatureCollection(currentVersion, "collection-1", featureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+            return buildFeatureCollection(currentVersion, "collection-1", featureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
         }
         LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
         return new FeatureCollectionWrapper(featureCollection, schemaLocations, gmlVersion, currentVersion);
@@ -860,7 +856,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
         LOGGER.log(logLevel, "GetPropertyValue request processed in {0} ms", (System.currentTimeMillis() - startTime));
         if (request.getResultType() == ResultTypeType.HITS) {
-            return xmlFactory.buildValueCollection(currentVersion, featureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+            return buildValueCollection(currentVersion, featureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
         }
         return new ValueCollectionWrapper(featureCollection, request.getValueReference(), "3.2.1");
     }
@@ -1165,7 +1161,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
         }
 
-        final TransactionResponse response = xmlFactory.buildTransactionResponse(currentVersion,
+        final TransactionResponse response = buildTransactionResponse(currentVersion,
                                                                                  totalInserted,
                                                                                  totalUpdated,
                                                                                  totalDeleted,
@@ -1362,14 +1358,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (!CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), epsg4326)) {
                     env = CRS.transform(env, epsg4326);
                 }
-                return xmlFactory.buildBBOX(version,
+                return buildBBOX(version,
                        "urn:ogc:def:crs:OGC:2:84",
                        env.getMinimum(0),
                        env.getMinimum(1),
                        env.getMaximum(0),
                        env.getMaximum(1));
             } else {
-                return xmlFactory.buildBBOX(version,"urn:ogc:def:crs:OGC:2:84", -180, -90, 180, 90);
+                return buildBBOX(version,"urn:ogc:def:crs:OGC:2:84", -180, -90, 180, 90);
             }
 
         } catch (DataStoreException ex) {
@@ -1529,7 +1525,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
         final String currentVersion              = actingVersion.version.toString();
 
-        final ListStoredQueriesResponse response = xmlFactory.buildListStoredQueriesResponse(currentVersion, storedQueries);
+        final ListStoredQueriesResponse response = buildListStoredQueriesResponse(currentVersion, storedQueries);
         LOGGER.log(logLevel, "ListStoredQueries request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
 
@@ -1551,7 +1547,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
             }
         }
-        final DescribeStoredQueriesResponse response = xmlFactory.buildDescribeStoredQueriesResponse(currentVersion, storedQueryList);
+        final DescribeStoredQueriesResponse response = buildDescribeStoredQueriesResponse(currentVersion, storedQueryList);
         LOGGER.log(logLevel, "DescribeStoredQueries request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
@@ -1567,7 +1563,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         storedQueries.addAll(request.getStoredQueryDefinition());
         storedQueries();
 
-        final CreateStoredQueryResponse response = xmlFactory.buildCreateStoredQueryResponse(currentVersion, "OK");
+        final CreateStoredQueryResponse response = buildCreateStoredQueryResponse(currentVersion, "OK");
         LOGGER.log(logLevel, "CreateStoredQuery request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
@@ -1593,7 +1589,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         }
         storedQueries();
 
-        final DropStoredQueryResponse response = xmlFactory.buildDropStoredQueryResponse(currentVersion, "OK");
+        final DropStoredQueryResponse response = buildDropStoredQueryResponse(currentVersion, "OK");
         LOGGER.log(logLevel, "dropStoredQuery request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
