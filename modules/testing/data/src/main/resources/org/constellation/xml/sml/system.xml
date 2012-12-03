@@ -162,7 +162,7 @@
                 <Document>
                     <gml:description>Fiche descriptive de la station</gml:description>
                     <format>text/html</format>
-                    <onlineResource xlink:href="http://ades.eaufrance.fr/FichePtEau.aspx?code=10972X0137/PONT"/>
+                    <onlineResource xlink:href="Well Test"/>
                 </Document>
             </documentation>
             <spatialReferenceFrame>

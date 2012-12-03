@@ -58,10 +58,12 @@ import org.geotoolkit.gml.xml.v321.DirectPositionType;
 import org.geotoolkit.gml.xml.v321.EnvelopeType;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.ogc.xml.v200.AndType;
 import org.geotoolkit.ogc.xml.v200.BBOXType;
 import org.geotoolkit.ogc.xml.v200.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v200.FilterType;
 import org.geotoolkit.ogc.xml.v200.LiteralType;
+import org.geotoolkit.ogc.xml.v200.LogicOpsType;
 import org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v200.SortByType;
 import org.geotoolkit.ogc.xml.v200.SortOrderType;
@@ -820,10 +822,10 @@ public class WFS2WorkerTest {
 
         //System.out.println(writer.toString());
         domCompare(expectedResult, writer.toString());
+
         /**
          * Test 3 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
          */
-
         queries = new ArrayList<QueryType>();
         query   = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("http://www.opengis.net/sml/1.0", "keywords"))));
@@ -845,6 +847,254 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-2v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
+        domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 4 : query on typeName sml:System filter on name = 'Piezometer Test'
+         */
+        ComparisonOpsType pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), "name", Boolean.TRUE);
+        FilterType filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-4v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 5 : same test xpath style
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), "/name", Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-4v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 6 : query on typeName sml:System filter on input name = 'height' (xpath style)
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), "/inputs/input/name", Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 7 : query on typeName sml:System with bad xpath NOT WORKING
+        
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), "/inputs/inputation/namein", Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+         */
+        
+        /**
+         * Test 8 : query on typeName sml:System filter on input name = 'height' (xpath style) prefixed with featureType name
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), "{http://www.opengis.net/sml/1.0}System/inputs/input/name", Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+        
+         /**
+         * Test 8 : query on typeName sml:System aliased as "a" filter on input name = 'height' (xpath style) prefixed with featureType name
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), "a/inputs/input/name", Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+        query.setAliases(Arrays.asList("a"));
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+    }
+    
+     /**
+     * test the feature marshall
+     *
+     */
+    @Ignore
+    public void getFeatureSelfJoinTest() throws Exception {
+
+        /**
+         * Test 1 : query on typeName sml:System
+         */
+
+        ComparisonOpsType pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), "a/name", Boolean.TRUE);
+        PropertyIsEqualToType pe2 = new PropertyIsEqualToType();
+        pe2.addValueReference("a/smlref");
+        pe2.addValueReference("b/name");
+        LogicOpsType le           = new AndType(pe1, pe2);
+        FilterType filter         = new FilterType(le);
+
+        List<QueryType> queries = new ArrayList<QueryType>();
+        QueryType selfJoinQuery = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System"), new QName("http://www.opengis.net/sml/1.0", "System")), null);
+        selfJoinQuery.getAliases().add("a");
+        selfJoinQuery.getAliases().add("b");
+        queries.add(selfJoinQuery);
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+
+        Object result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollectionSelfJoin.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        //System.out.println("RESULT:" + writer.toString());
+        domCompare(expectedResult, writer.toString());
+    }
+    
+    /**
+     * test the feature marshall
+     *
+     */
+    @Ignore
+    public void getFeatureJoinTest() throws Exception {
+
+        /**
+         * Test 1 : query on typeName sml:System
+         */
+
+        ComparisonOpsType pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), "{http://www.opengis.net/sml/1.0}System/name", Boolean.TRUE);
+        PropertyIsEqualToType pe2 = new PropertyIsEqualToType();
+        pe2.addValueReference("{http://www.opengis.net/sml/1.0}System/smlref");
+        pe2.addValueReference("{http://www.opengis.net/sml/1.0}System/name");
+        LogicOpsType le           = new AndType(pe1, pe2);
+        FilterType filter         = new FilterType(le);
+
+        List<QueryType> queries = new ArrayList<QueryType>();
+        QueryType selfJoinQuery = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System"), new QName("http://www.opengis.net/sml/1.0", "System")), null);
+        selfJoinQuery.getAliases().add("a");
+        selfJoinQuery.getAliases().add("b");
+        queries.add(selfJoinQuery);
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+
+        Object result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollectionSelfJoin.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        //System.out.println("RESULT:" + writer.toString());
         domCompare(expectedResult, writer.toString());
     }
 

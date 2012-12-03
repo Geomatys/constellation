@@ -642,6 +642,142 @@ public class WFSWorkerTest {
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 4 : query on typeName sml:System filter on name = 'Piezometer Test'
+         */
+        ComparisonOpsType pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), new PropertyNameType("name"), Boolean.TRUE);
+        FilterType filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.1.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-4.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 5 : same test xpath style
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), new PropertyNameType("/name"), Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.1.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-4.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 6 : query on typeName sml:System filter on input name = 'height' (xpath style)
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), new PropertyNameType("/inputs/input/name"), Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.1.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 7 : query on typeName sml:System with bad xpath NOT WORKING
+        
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), new PropertyNameType("/inputs/inputation/namein"), Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.1.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+         */
+        
+        /**
+         * Test 8 : query on typeName sml:System filter on input name = 'height' (xpath style) prefixed with featureType name
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), new PropertyNameType("{http://www.opengis.net/sml/1.0}System/inputs/input/name"), Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.1.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
     }
 
     /**

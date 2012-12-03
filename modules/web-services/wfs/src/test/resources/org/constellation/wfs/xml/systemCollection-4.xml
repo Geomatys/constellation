@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:sml="http://www.opengis.net/sml/1.0">
+    <gml:boundedBy>
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326">
+            <gml:lowerCorner>42.387988622819975 -4.14498462789604</gml:lowerCorner>
+            <gml:upperCorner>42.387988622819975 -4.14498462789604</gml:upperCorner>
+        </gml:Envelope>
+    </gml:boundedBy>
+    <gml:featureMember>
+        <sml:System gml:id="12">
+            <gml:description>information about the piezometer</gml:description>
+            <gml:name>Piezometer Test</gml:name>
+            <sml:keywords>
+                <sml:KeywordList>
+                    <sml:keyword>piezometer</sml:keyword>
+                    <sml:keyword>geosciences</sml:keyword>
+                    <sml:keyword>point d'eau</sml:keyword>
+                </sml:KeywordList>
+            </sml:keywords>
+            <sml:location>
+                <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326">
+                    <gml:pos srsDimension="2" srsName="EPSG:4326">42.387988622819975 -4.14498462789604</gml:pos>
+                </gml:Point>
+            </sml:location>
+            <sml:phenomenons>time</sml:phenomenons>
+            <sml:phenomenons>depth</sml:phenomenons>
+            <sml:phenomenons>validity</sml:phenomenons>
+            <sml:smltype>System</sml:smltype>
+            <sml:smlref>Well Test</sml:smlref>
+            <sml:inputs>
+                <sml:InputList>
+                    <sml:input>
+                        <sml:Input>
+                            <gml:name>level</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+                        </sml:Input>
+                    </sml:input>
+                </sml:InputList>
+            </sml:inputs>
+            <sml:outputs>
+                <sml:OutputList>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>time</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:observationTime</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>depth</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:OGC:depth</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>validity</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:BRGM:validity</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                </sml:OutputList>
+            </sml:outputs>
+            <sml:producer name="BRGM">BLAISE Marion (BRGM)</sml:producer>
+        </sml:System>
+    </gml:featureMember>
+</wfs:FeatureCollection>

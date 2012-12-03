@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -637,10 +636,16 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         for (final Query query : queries) {
 
             final List<QName> typeNames;
+            final Map<String, QName> aliases = new HashMap<String, QName>();
             if (featureId != null && query.getTypeNames().isEmpty()) {
                 typeNames = Utils.getQNameListFromNameSet(layers.keySet());
             } else {
                 typeNames = query.getTypeNames();
+                if (!query.getAliases().isEmpty()) {
+                    for (int i = 0; i < typeNames.size() && i < query.getAliases().size(); i++) {
+                        aliases.put(query.getAliases().get(i), typeNames.get(i));
+                    }
+                }
             }
 
             //decode filter-----------------------------------------------------
@@ -691,10 +696,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 queryBuilder.setProperties(verifyPropertyNames(typeName, ft, requestPropNames));
                 queryBuilder.setTypeName(ft.getName());
                 queryBuilder.setHints(new Hints(HintsPending.FEATURE_HIDE_ID_PROPERTY, Boolean.TRUE));
-                queryBuilder.setFilter(fillFilterCrs(ft, filter));
+                queryBuilder.setFilter(fillFilterCrs(ft, filter, aliases));
 
                 // we verify that all the properties contained in the filter are known by the feature type.
-                verifyFilterProperty(ft, filter);
+                verifyFilterProperty(ft, filter, aliases);
 
 
                 FeatureCollection collection = layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery());
@@ -709,7 +714,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                 collection = GenericReprojectFeatureIterator.wrap(collection, CRS.decode(defaultCRS));
                             }
                         } catch (FactoryException ex) {
-                            Logger.getLogger(DefaultWFSWorker.class.getName()).log(Level.WARNING, ex.getMessage(), ex);
+                            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
                         }
                     }
 
@@ -773,10 +778,16 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         for (final Query query : queries) {
 
             final List<QName> typeNames;
+            final Map<String, QName> aliases = new HashMap<String, QName>();
             if (query.getTypeNames().isEmpty()) {
                 typeNames = Utils.getQNameListFromNameSet(layers.keySet());
             } else {
                 typeNames = query.getTypeNames();
+                if (!query.getAliases().isEmpty()) {
+                    for (int i = 0; i < typeNames.size() && i < query.getAliases().size(); i++) {
+                        aliases.put(query.getAliases().get(i), typeNames.get(i));
+                    }
+                }
             }
 
             //decode filter-----------------------------------------------------
@@ -822,13 +833,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
                 // we ensure that the property names are contained in the feature type and add the mandatory attribute to the list
                 queryBuilder.setProperties(verifyPropertyNames(typeName, ft, requestPropNames));
-                queryBuilder.setFilter(fillFilterCrs(ft, filter));
+                queryBuilder.setFilter(fillFilterCrs(ft, filter, aliases));
 
                 queryBuilder.setTypeName(ft.getName());
                 queryBuilder.setHints(new Hints(HintsPending.FEATURE_HIDE_ID_PROPERTY, Boolean.TRUE));
 
                 // we verify that all the properties contained in the filter are known by the feature type.
-                verifyFilterProperty(ft, filter);
+                verifyFilterProperty(ft, filter, aliases);
 
                 collections.add(layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery()));
 
@@ -1037,11 +1048,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
 
                     // we verify that all the properties contained in the filter are known by the feature type.
-                    verifyFilterProperty(ft, filter);
+                    verifyFilterProperty(ft, filter, null);
 
                     // we extract the number of feature deleted
                     final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
-                    queryBuilder.setFilter(fillFilterCrs(ft, filter));
+                    queryBuilder.setFilter(fillFilterCrs(ft, filter, null));
                     totalDeleted = totalDeleted + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
                     layer.getStore().removeFeatures(layer.getName(), filter);
@@ -1137,11 +1148,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     }
 
                     // we verify that all the properties contained in the filter are known by the feature type.
-                    verifyFilterProperty(ft, filter);
+                    verifyFilterProperty(ft, filter, null);
 
                     // we extract the number of feature update
                     final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
-                    queryBuilder.setFilter(fillFilterCrs(ft, filter));
+                    queryBuilder.setFilter(fillFilterCrs(ft, filter, null));
                     totalUpdated = totalUpdated + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
                     layer.getStore().updateFeatures(layer.getName(), filter, values);
@@ -1300,7 +1311,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      *
      * @throws CstlServiceException if one of the propertyName in the filter is not present in the featureType.
      */
-    private void verifyFilterProperty(final FeatureType ft, final Filter filter) throws CstlServiceException {
+    private void verifyFilterProperty(final FeatureType ft, final Filter filter, final Map<String, QName> aliases) throws CstlServiceException {
         final Collection<String> filterProperties = (Collection<String>) filter.accept(ListingPropertyVisitor.VISITOR, null);
         if (filterProperties != null) {
             for (String filterProperty : filterProperties) {
@@ -1309,6 +1320,19 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     //this property in an id property, we won't find it in the feature type
                     //but it always exist on the features
                     continue;
+                }
+                
+                // look to remove featureType prefix
+                final String ftName = ft.getName().toString();
+                if (filterProperty.startsWith(ftName)) {
+                    filterProperty = filterProperty.substring(ftName.length());
+                }
+                if (aliases != null) {
+                    for (String entry : aliases.keySet()) {
+                        if (filterProperty.startsWith(entry + "/")) {
+                            filterProperty =  filterProperty.substring(entry.length());
+                        }
+                    }
                 }
                 final PropertyAccessor pa = Accessors.getAccessor(Feature.class, filterProperty, null);
                 if (pa == null || pa.get(ft, filterProperty, null) == null) {
@@ -1325,12 +1349,15 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     /**
      * Ensure crs is set on all geometric elements and with correct crs.
      */
-    private Filter fillFilterCrs(FeatureType ft, Filter filter){
+    private Filter fillFilterCrs(FeatureType ft, Filter filter, final Map<String, QName> aliases){
         try {
             final String defaultCRS = getCRSCode(ft);
             final CoordinateReferenceSystem exposedCrs = CRS.decode(defaultCRS);
             final CoordinateReferenceSystem trueCrs = ft.getCoordinateReferenceSystem();
 
+            filter = (Filter) filter.accept(new AliasFilterVisitor(aliases), null);
+            filter = (Filter) filter.accept(new UnprefixerFilterVisitor(ft), null);
+            
             if(CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)){
                 return filter;
             }else{
@@ -1492,9 +1519,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         for (final Name name : layers.keySet()) {
             final LayerDetails layer = namedProxy.get(name);
             if (!(layer instanceof FeatureLayerDetails)) {continue;}
-
-
-
             try {
                 //fix feature type to define the exposed crs : true EPSG axis order
                 final FeatureType baseType = getFeatureTypeFromLayer((FeatureLayerDetails)layer);

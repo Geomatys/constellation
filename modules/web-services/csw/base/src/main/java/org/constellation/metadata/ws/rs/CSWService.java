@@ -360,19 +360,21 @@ public class CSWService extends OGCWebService<CSWworker> {
 
         final String service = getParameter(SERVICE_PARAMETER, true);
         
-        String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
+        String acceptVersion = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
         final AcceptVersions versions;
-        if (version != null) {
-            if (version.indexOf(',') != -1) {
-                version = version.substring(0, version.indexOf(','));
+        final String version;
+        if (acceptVersion != null) {
+            if (acceptVersion.indexOf(',') != -1) {
+                acceptVersion = acceptVersion.substring(0, acceptVersion.indexOf(','));
             }
-            versions = CswXmlFactory.buildAcceptVersion(version, Arrays.asList(version));
+            version = acceptVersion;
+            versions = CswXmlFactory.buildAcceptVersion(version, Arrays.asList(acceptVersion));
         } else {
+            version = "2.0.2";
             versions = CswXmlFactory.buildAcceptVersion(version, Arrays.asList("2.0.2"));
         }
 
         final AcceptFormats formats = CswXmlFactory.buildAcceptFormat(version, Arrays.asList(getParameter(ACCEPT_FORMATS_PARAMETER, false)));
-
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
         //We transform the String of sections in a list.

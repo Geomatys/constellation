@@ -26,7 +26,7 @@
             <sml:phenomenons>depth</sml:phenomenons>
             <sml:phenomenons>validity</sml:phenomenons>
             <sml:smltype>System</sml:smltype>
-            <sml:smlref>http://ades.eaufrance.fr/FichePtEau.aspx?code=10972X0137/PONT</sml:smlref>
+            <sml:smlref>Well Test</sml:smlref>
             <sml:inputs>
                 <sml:InputList>
                     <sml:input>
@@ -143,8 +143,8 @@
                 <sml:InputList>
                     <sml:input>
                         <sml:Input>
-                            <gml:name>level</gml:name>
-                            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+                            <gml:name>height</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:OGC:height</gml:description>
                         </sml:Input>
                     </sml:input>
                 </sml:InputList>
