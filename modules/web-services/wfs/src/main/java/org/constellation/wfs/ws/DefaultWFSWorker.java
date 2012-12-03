@@ -696,7 +696,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 queryBuilder.setProperties(verifyPropertyNames(typeName, ft, requestPropNames));
                 queryBuilder.setTypeName(ft.getName());
                 queryBuilder.setHints(new Hints(HintsPending.FEATURE_HIDE_ID_PROPERTY, Boolean.TRUE));
-                queryBuilder.setFilter(fillFilterCrs(ft, filter, aliases));
+                queryBuilder.setFilter(processFilter(ft, filter, aliases));
 
                 // we verify that all the properties contained in the filter are known by the feature type.
                 verifyFilterProperty(ft, filter, aliases);
@@ -833,7 +833,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
                 // we ensure that the property names are contained in the feature type and add the mandatory attribute to the list
                 queryBuilder.setProperties(verifyPropertyNames(typeName, ft, requestPropNames));
-                queryBuilder.setFilter(fillFilterCrs(ft, filter, aliases));
+                queryBuilder.setFilter(processFilter(ft, filter, aliases));
 
                 queryBuilder.setTypeName(ft.getName());
                 queryBuilder.setHints(new Hints(HintsPending.FEATURE_HIDE_ID_PROPERTY, Boolean.TRUE));
@@ -1052,7 +1052,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                     // we extract the number of feature deleted
                     final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
-                    queryBuilder.setFilter(fillFilterCrs(ft, filter, null));
+                    queryBuilder.setFilter(processFilter(ft, filter, null));
                     totalDeleted = totalDeleted + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
                     layer.getStore().removeFeatures(layer.getName(), filter);
@@ -1152,7 +1152,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                     // we extract the number of feature update
                     final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
-                    queryBuilder.setFilter(fillFilterCrs(ft, filter, null));
+                    queryBuilder.setFilter(processFilter(ft, filter, null));
                     totalUpdated = totalUpdated + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
                     layer.getStore().updateFeatures(layer.getName(), filter, values);
@@ -1348,8 +1348,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     /**
      * Ensure crs is set on all geometric elements and with correct crs.
+     * replace Aliases by correct feature type names.
+     * remove feature type name prefixing propertyName.
      */
-    private Filter fillFilterCrs(FeatureType ft, Filter filter, final Map<String, QName> aliases){
+    private Filter processFilter(final FeatureType ft, Filter filter, final Map<String, QName> aliases){
         try {
             final String defaultCRS = getCRSCode(ft);
             final CoordinateReferenceSystem exposedCrs = CRS.decode(defaultCRS);
@@ -1358,9 +1360,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             filter = (Filter) filter.accept(new AliasFilterVisitor(aliases), null);
             filter = (Filter) filter.accept(new UnprefixerFilterVisitor(ft), null);
             
-            if(CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)){
+            if (CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)) {
                 return filter;
-            }else{
+            } else {
                 filter = (Filter) filter.accept(FillCrsVisitor.VISITOR, exposedCrs);
                 filter = (Filter) filter.accept(new CrsAdjustFilterVisitor(exposedCrs, trueCrs), null);
 
