@@ -36,6 +36,8 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wms.xml.WMSResponse;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
+import org.geotoolkit.wms.xml.v130.WMSCapabilities;
+import org.geotoolkit.xml.MarshallerPool;
 
 /**
  *
@@ -60,8 +62,8 @@ public class WMSResponseWriter<T extends WMSResponse> implements MessageBodyWrit
     @Override
     public void writeTo(final T t, Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         Marshaller m = null;
+        MarshallerPool pool = null;
         try {
-            m = WMSMarshallerPool.getInstance().acquireMarshaller();
             //workaround because 1.1.1 is defined with a DTD rather than an XSD
             if (t instanceof WMT_MS_Capabilities) {
                 final String enc = "UTF8";
@@ -78,16 +80,26 @@ public class WMSResponseWriter<T extends WMSResponse> implements MessageBodyWrit
                 } catch (IOException ex) {
                     throw new JAXBException(ex);
                 }
+                pool = WMSMarshallerPool.getInstance();
+                m = pool.acquireMarshaller();
                 m.setProperty(Marshaller.JAXB_FRAGMENT, true);
                 m.marshal(t, swCaps);
+                
+            } else if (t instanceof WMSCapabilities){
+                pool = WMSMarshallerPool.getInstance130();
+                m = pool.acquireMarshaller();
+                m.marshal(t, out);
+                
             } else {
+                pool = WMSMarshallerPool.getInstance();
+                m = pool.acquireMarshaller();
                 m.marshal(t, out);
             } 
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the WMS response", ex);
         } finally {
-            if (m != null) {
-                 WMSMarshallerPool.getInstance().release(m);
+            if (pool != null && m != null) {
+                 pool.release(m);
             }
         }
     }
