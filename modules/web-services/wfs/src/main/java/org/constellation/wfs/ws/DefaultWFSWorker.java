@@ -166,11 +166,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         DEFAULT_CRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
     }
 
-    /**
-     * The current version of the service.
-     */
-    private ServiceDef actingVersion = ServiceDef.WFS_1_1_0;
-
     private boolean multipleVersionActivated = true;
 
     private List<StoredQueryDescription> storedQueries = new ArrayList<StoredQueryDescription>();
@@ -278,7 +273,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         // we verify the base attribute
         isWorking();
         verifyBaseRequest(request, false, true);
-        final String currentVersion = actingVersion.version.toString();
+        final String currentVersion = request.getVersion().toString();
 
 
         final WFSCapabilities inCapabilities = (WFSCapabilities) getStaticCapabilitiesObject(currentVersion, "WFS");
@@ -435,7 +430,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         // we verify the base attribute
         isWorking();
         verifyBaseRequest(request, false, false);
-        final String currentVersion = actingVersion.version.toString();
+        final String currentVersion = request.getVersion().toString();
 
         final String gmlVersion;
         if ("2.0.0".equals(currentVersion)) {
@@ -620,7 +615,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, false, false);
 
-        final String currentVersion                = actingVersion.version.toString();
+        final String currentVersion                = request.getVersion().toString();
         final String featureId                     = request.getFeatureId();
         final int maxFeatures                      = request.getCount();
         final Integer startIndex                   = request.getStartIndex();
@@ -768,7 +763,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, true, false);
 
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
-        final String currentVersion                = actingVersion.version.toString();
+        final String currentVersion                = request.getVersion().toString();
         final Map<Name,Layer> layers               = getLayers();
         final List<? extends Query> queries        = extractStoredQueries(request);
         final Integer maxFeatures                  = request.getCount();
@@ -914,7 +909,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, true, false);
 
         // we prepare the report
-        final String currentVersion                = actingVersion.version.toString();
+        final String currentVersion                = request.getVersion().toString();
         int totalInserted                          = 0;
         int totalUpdated                           = 0;
         int totalDeleted                           = 0;
@@ -1487,9 +1482,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             if (request.getVersion() != null) {
                 if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1") ||
                         request.getVersion().toString().isEmpty()  || request.getVersion().toString().equals("1.0.0") ) { // hack for openScale accept 1.0.0
-                    this.actingVersion = ServiceDef.WFS_1_1_0;
+                    request.setVersion(ServiceDef.WFS_1_1_0.version.toString());
                 } else if (multipleVersionActivated && (request.getVersion().toString().equals("2.0.0") || request.getVersion().toString().equals("2.0"))) {
-                    this.actingVersion = ServiceDef.WFS_2_0_0;
+                    request.setVersion(ServiceDef.WFS_2_0_0.version.toString());
 
                 } else {
                     CodeList code;
@@ -1504,7 +1499,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (versionMandatory) {
                     throw new CstlServiceException("version must be specified!", MISSING_PARAMETER_VALUE, "version");
                 } else {
-                    this.actingVersion = ServiceDef.WFS_1_1_0;
+                    request.setVersion(ServiceDef.WFS_1_1_0.version.toString());
                 }
             }
          } else {
@@ -1549,7 +1544,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, true, false);
 
-        final String currentVersion              = actingVersion.version.toString();
+        final String currentVersion = request.getVersion().toString();
 
         final ListStoredQueriesResponse response = buildListStoredQueriesResponse(currentVersion, storedQueries);
         LOGGER.log(logLevel, "ListStoredQueries request processed in {0} ms", (System.currentTimeMillis() - startTime));
@@ -1565,7 +1560,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, true, false);
 
         final List<StoredQueryDescription> storedQueryList = new ArrayList<StoredQueryDescription>();
-        final String currentVersion              = actingVersion.version.toString();
+        final String currentVersion = request.getVersion().toString();
         for (String id : request.getStoredQueryId()) {
             for (StoredQueryDescription description : storedQueries) {
                 if (description.getId().equals(id)) {
@@ -1584,7 +1579,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final long startTime = System.currentTimeMillis();
         isWorking();
         verifyBaseRequest(request, true, false);
-        final String currentVersion  = actingVersion.version.toString();
+        final String currentVersion  = request.getVersion().toString();
 
         storedQueries.addAll(request.getStoredQueryDefinition());
         storedQueries();
@@ -1600,7 +1595,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final long startTime = System.currentTimeMillis();
         isWorking();
         verifyBaseRequest(request, true, false);
-        final String currentVersion  = actingVersion.version.toString();
+        final String currentVersion  = request.getVersion().toString();
 
         StoredQueryDescription candidate = null;
         for (StoredQueryDescription sq : storedQueries) {

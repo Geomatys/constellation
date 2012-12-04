@@ -199,11 +199,6 @@ public class CSWworker extends AbstractWorker {
     private int profile;
 
     /**
-     * The current version of the service.
-     */
-    private ServiceDef actingVersion = ServiceDef.CSW_2_0_2;
-
-    /**
      * Build a new CSW worker with the specified configuration directory
      *
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
@@ -1249,8 +1244,10 @@ public class CSWworker extends AbstractWorker {
         LOGGER.log(logLevel, "GetDomain request processing\n");
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
+        final String currentVersion = request.getVersion().toString();
+        
         // we prepare the response
-        List<DomainValues> responseList = new ArrayList<DomainValues>();
+       final  List<DomainValues> responseList;
 
         final String parameterName = request.getParameterName();
         final String propertyName  = request.getPropertyName();
@@ -1265,6 +1262,7 @@ public class CSWworker extends AbstractWorker {
          * "parameterName" return metadata about the service itself.
          */
         if (parameterName != null) {
+            responseList = new ArrayList<DomainValues>();
             final StringTokenizer tokens = new StringTokenizer(parameterName, ",");
             while (tokens.hasMoreTokens()) {
                 final String token      = tokens.nextToken().trim();
@@ -1289,7 +1287,7 @@ public class CSWworker extends AbstractWorker {
                             type = RECORD_QNAME;
                         }
                         if (param != null) {
-                            final DomainValues value = CswXmlFactory.getDomainValues(actingVersion.version.toString(), token, null, param.getValue(), type);
+                            final DomainValues value = CswXmlFactory.getDomainValues(currentVersion, token, null, param.getValue(), type);
                             responseList.add(value);
                         } else {
                             throw new CstlServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
@@ -1326,7 +1324,7 @@ public class CSWworker extends AbstractWorker {
         }
         LOGGER.log(logLevel, "GetDomain request processed in {0} ms", (System.currentTimeMillis() - startTime));
 
-        return CswXmlFactory.getDomainResponse(actingVersion.version.toString(), responseList);
+        return CswXmlFactory.getDomainResponse(currentVersion, responseList);
     }
 
     /**
@@ -1660,9 +1658,9 @@ public class CSWworker extends AbstractWorker {
                  * TODO remove this
                  */
                 if (request.getVersion().toString().equals(CSW_202_VERSION)) {
-                    this.actingVersion = ServiceDef.CSW_2_0_2;
+                    request.setVersion(ServiceDef.CSW_2_0_2.version.toString());
                 } else if (request.getVersion().toString().equals("2.0.0") && (request instanceof GetDomain)) {
-                    this.actingVersion = ServiceDef.CSW_2_0_0;
+                    request.setVersion(ServiceDef.CSW_2_0_0.version.toString());
 
                 } else {
                     throw new CstlServiceException("version must be \"2.0.2\"!", VERSION_NEGOTIATION_FAILED, "version");

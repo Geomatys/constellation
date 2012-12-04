@@ -964,6 +964,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
+    @Override
     public Object getCoverage(final GetCoverage request) throws CstlServiceException {
         isWorking();
         final String inputVersion = request.getVersion().toString();

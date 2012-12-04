@@ -25,7 +25,6 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.Cstl;
