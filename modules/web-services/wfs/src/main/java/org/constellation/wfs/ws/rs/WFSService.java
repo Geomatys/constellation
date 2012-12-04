@@ -369,9 +369,10 @@ public class WFSService extends GridWebService<WFSWorker> {
     private GetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
         String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
 
-        // TODO determine the best version
-        String currentVersion = "1.1.0";
-
+        String currentVersion = getParameter(VERSION_PARAMETER, false);
+        if (currentVersion == null) {
+            currentVersion = "2.0.0";
+        }
 
         final List<String> versions = new ArrayList<String>();
         if (version != null) {
@@ -380,7 +381,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             }
             versions.add(version);
         } else {
-            versions.add("1.1.0");
+            versions.add(currentVersion);
         }
         final AcceptVersions acceptVersions = buildAcceptVersion(currentVersion, versions);
 
