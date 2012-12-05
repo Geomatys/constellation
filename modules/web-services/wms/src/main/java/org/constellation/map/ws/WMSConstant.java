@@ -19,7 +19,6 @@ package org.constellation.map.ws;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import net.jcip.annotations.Immutable;
 import org.geotoolkit.wms.xml.v111.DescribeLayer;
