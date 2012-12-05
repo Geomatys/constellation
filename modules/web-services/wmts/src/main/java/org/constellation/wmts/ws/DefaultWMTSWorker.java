@@ -18,8 +18,6 @@ package org.constellation.wmts.ws;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.ParseException;
 import java.util.*;
@@ -32,7 +30,6 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.Layer;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.wmts.visitor.CSVGraphicVisitor;
 import org.constellation.wmts.visitor.GMLGraphicVisitor;
@@ -103,13 +100,6 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMTS worker {0} running", id);
         }
-        //listen to changes on the providers to clear the getcapabilities cache
-        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                refreshUpdateSequence();
-            }
-        });
     }
 
     @Override
@@ -163,7 +153,6 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         }
 
         //we prepare the response document
-        Capabilities c           = null;
         ServiceIdentification si = null;
         ServiceProvider       sp = null;
         OperationsMetadata    om = null;
@@ -209,7 +198,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             final Map<Name,Layer> declaredLayers = getLayers();
 
             for(final Name n : declaredLayers.keySet()){
-                final LayerDetails details = LayerProviderProxy.getInstance().get(n);
+                final LayerDetails details = getLayerReference(n);
                 final Layer configlayer = declaredLayers.get(n);
                 final Object origin = details.getOrigin();
                 if(!(origin instanceof CoverageReference)){
@@ -306,7 +295,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             themes = new ArrayList<Themes>();
         }
 
-        c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
+        final Capabilities c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
 
         LOGGER.log(logLevel, "getCapabilities processed in {0}ms.\n", (System.currentTimeMillis() - start));
         return c;
@@ -335,7 +324,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         //       -- create the rendering parameter Map
         Double elevation =  null;
         Date time        = null;
-        List<DimensionNameValue> dimensions = getTile.getDimensionNameValue();
+        final List<DimensionNameValue> dimensions = getTile.getDimensionNameValue();
         for (DimensionNameValue dimension : dimensions) {
             if (dimension.getName().equalsIgnoreCase("elevation")) {
                 try {
@@ -491,8 +480,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
 
         try{
-            final LayerDetails details = LayerProviderProxy.getInstance().get(layerName);
-
+            final LayerDetails details = getLayerReference(layerName);
             if(details == null){
                 throw new CstlServiceException("No layer for name : " + layerName , INVALID_PARAMETER_VALUE, "layerName");
             }
@@ -570,5 +558,10 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      */
     @Override
     public void destroy() {
+    }
+    
+    @Override
+    protected void clearCapabilitiesCache() {
+        // no cach in this implementation
     }
 }

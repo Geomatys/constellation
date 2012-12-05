@@ -22,8 +22,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
@@ -62,7 +60,6 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.util.DataReference;
@@ -209,15 +206,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final File portrayalFile = new File(configurationDirectory, "WMSPortrayal.xml");
         if (portrayalFile.exists()) {
             final MarshallerPool marshallerPool = GenericDatabaseMarshallerPool.getInstance();
-            Unmarshaller unmarchaller = null;
+            Unmarshaller unmarshaller = null;
             try {
-                unmarchaller = marshallerPool.acquireUnmarshaller();
-                mapPortrayal = (WMSPortrayal) unmarchaller.unmarshal(portrayalFile);
+                unmarshaller = marshallerPool.acquireUnmarshaller();
+                mapPortrayal = (WMSPortrayal) unmarshaller.unmarshal(portrayalFile);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             } finally {
-                if (unmarchaller != null) {
-                    marshallerPool.release(unmarchaller);
+                if (unmarshaller != null) {
+                    marshallerPool.release(unmarshaller);
                 }
             }
         }
@@ -225,16 +222,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMS worker {0} running", id);
         }
-
-        //listen to changes on the providers to clear the getcapabilities cache
-        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                refreshUpdateSequence();
-                CAPS_RESPONSE.clear();
-            }
-        });
-
     }
 
     @Override
@@ -317,11 +304,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         //Build the list of layers
         final List<AbstractLayer> outputLayers = new ArrayList<AbstractLayer>();
-        final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
         final Map<Name,Layer> layers = getLayers();
 
         for (Name name : layers.keySet()) {
-            final LayerDetails layer = namedProxy.get(name);
+            final LayerDetails layer = getLayerReference(name);
             final Layer configLayer  = layers.get(name);
 
             if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
@@ -1270,5 +1256,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (!CAPS_RESPONSE.isEmpty()) {
             CAPS_RESPONSE.clear();
         }
+    }
+    
+    @Override
+    protected void clearCapabilitiesCache() {
+        CAPS_RESPONSE.clear();
     }
 }

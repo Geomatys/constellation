@@ -20,8 +20,6 @@ package org.constellation.wfs.ws;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -39,7 +37,6 @@ import org.constellation.configuration.FormatURL;
 import org.constellation.configuration.Layer;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProviderProxy;
 import org.constellation.util.NameComparator;
 import org.constellation.util.QNameComparator;
 import org.constellation.ws.CstlServiceException;
@@ -176,14 +173,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             LOGGER.log(Level.INFO, "WFS worker {0} running", id);
         }
 
-        //listen to changes on the providers to clear the getcapabilities cache
-        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                refreshUpdateSequence();
-            }
-        });
-
         final String multiVersProp = getProperty("multipleVersion");
         if (multiVersProp != null) {
             multipleVersionActivated = Boolean.parseBoolean(multiVersProp);
@@ -299,12 +288,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             /*
              *  layer providers
              */
-            final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
-            final Map<Name,Layer> layers        = getLayers();
-            final List<Name> layerNames         = new ArrayList<Name>(layers.keySet());
+            final Map<Name,Layer> layers = getLayers();
+            final List<Name> layerNames  = new ArrayList<Name>(layers.keySet());
             Collections.sort(layerNames, new NameComparator());
             for (final Name layerName : layerNames) {
-                final LayerDetails layer = namedProxy.get(layerName);
+                final LayerDetails layer = getLayerReference(layerName);
                 final Layer configLayer  = layers.get(layerName);
 
                 if (layer instanceof FeatureLayerDetails) {
@@ -439,7 +427,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             gmlVersion = "3.1.1";
         }
         final JAXBFeatureTypeWriter writer  = new JAXBFeatureTypeWriter(gmlVersion);
-        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
         final List<QName> names             = request.getTypeName();
         final List<FeatureType> types       = new ArrayList<FeatureType>();
         final Map<Name,Layer> layers = getLayers();
@@ -447,7 +434,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (names.isEmpty()) {
             //search all types
             for (final Name name : layers.keySet()) {
-                final LayerDetails layer = namedProxy.get(name);
+                final LayerDetails layer = getLayerReference(name);
                 if (!(layer instanceof FeatureLayerDetails)) {continue;}
 
                 try {
@@ -466,8 +453,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (layersContainsKey(n) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + name);
                 }
-
-                final LayerDetails layer = namedProxy.get(n);
+                final LayerDetails layer = getLayerReference(n);
 
                 if(!(layer instanceof FeatureLayerDetails)) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + name);
@@ -913,7 +899,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         int totalInserted                          = 0;
         int totalUpdated                           = 0;
         int totalDeleted                           = 0;
-        final LayerProviderProxy namedProxy        = LayerProviderProxy.getInstance();
         final List<Object> transactions            = request.getTransactionAction();
         final Map<String, String> inserted         = new LinkedHashMap<String, String>();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
@@ -999,7 +984,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     if (layersContainsKey(typeName) == null) {
                         throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                     }
-                    final FeatureLayerDetails layer = (FeatureLayerDetails) namedProxy.get(typeName);
+                    final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(typeName);
                     try {
                         final CoordinateReferenceSystem trueCrs = layer.getStore().getFeatureType(typeName).getCoordinateReferenceSystem();
                         if(trueCrs != null && !CRS.equalsIgnoreMetadata(trueCrs, featureCollection.getFeatureType().getCoordinateReferenceSystem())){
@@ -1038,7 +1023,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (layersContainsKey(typeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
-                final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(typeName);
+                final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(typeName);
                 try {
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
 
@@ -1082,7 +1067,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (layersContainsKey(typeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
-                final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(typeName);
+                final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(typeName);
                 try {
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
                     if (ft == null) {
@@ -1507,14 +1492,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
          }
     }
 
-    private List<FeatureType> getFeatureTypes() {
+    private List<FeatureType> getFeatureTypes() throws CstlServiceException {
         final List<FeatureType> types       = new ArrayList<FeatureType>();
-        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
         final Map<Name,Layer> layers        = getLayers();
 
         //search all types
         for (final Name name : layers.keySet()) {
-            final LayerDetails layer = namedProxy.get(name);
+            final LayerDetails layer = getLayerReference(name);
             if (!(layer instanceof FeatureLayerDetails)) {continue;}
             try {
                 //fix feature type to define the exposed crs : true EPSG axis order
@@ -1613,5 +1597,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final DropStoredQueryResponse response = buildDropStoredQueryResponse(currentVersion, "OK");
         LOGGER.log(logLevel, "dropStoredQuery request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
+    }
+    
+    @Override
+    protected void clearCapabilitiesCache() {
+        // no cach in this implementation
     }
 }

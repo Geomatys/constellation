@@ -50,7 +50,6 @@ import org.constellation.util.StyleUtils;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.configuration.Layer;
-import org.constellation.provider.LayerProviderProxy;
 import org.constellation.ws.LayerWorker;
 import static org.constellation.query.Query.*;
 import static org.constellation.coverage.ws.WCSConstant.*;
@@ -195,23 +194,13 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     /**
      * Output responses of a GetCapabilities request.
      */
-    private static final Map<String,GetCapabilitiesResponse> CAPS_RESPONSE =
-            new HashMap<String,GetCapabilitiesResponse>();
+    private static final Map<String,GetCapabilitiesResponse> CAPS_RESPONSE = new HashMap<String,GetCapabilitiesResponse>();
 
     public DefaultWCSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WCS);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WCS worker {0} running", id);
         }
-
-        //listen to changes on the providers to clear the getcapabilities cache
-        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                refreshUpdateSequence();
-                CAPS_RESPONSE.clear();
-            }
-        });
     }
 
     /**
@@ -1221,5 +1210,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         if (!CAPS_RESPONSE.isEmpty()) {
             CAPS_RESPONSE.clear();
         }
+    }
+
+    @Override
+    protected void clearCapabilitiesCache() {
+        CAPS_RESPONSE.clear();
     }
 }

@@ -16,6 +16,8 @@
  */
 package org.constellation.ws;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import org.constellation.configuration.Language;
 import org.constellation.ws.security.SimplePDP;
 import org.constellation.ServiceDef.Specification;
@@ -115,6 +117,15 @@ public abstract class LayerWorker extends AbstractWorker {
 
         layerContext    = candidate;
         defaultLanguage = defaultLanguageCandidate;
+        
+        //listen to changes on the providers to clear the getcapabilities cache
+        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                refreshUpdateSequence();
+                clearCapabilitiesCache();
+            }
+        });
     }
 
     /**
@@ -264,4 +275,6 @@ public abstract class LayerWorker extends AbstractWorker {
         }
         return null;
     }
+    
+    protected abstract void clearCapabilitiesCache();
 }
