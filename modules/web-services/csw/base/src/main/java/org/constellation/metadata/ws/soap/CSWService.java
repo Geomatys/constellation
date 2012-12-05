@@ -192,7 +192,7 @@ public class CSWService extends OGCWebService<CSWworker>{
             LOGGER.info("received SOAP describeRecord request");
             final CSWworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.describeRecord(requestDescribeRecord);
+            return (DescribeRecordResponseType) worker.describeRecord(requestDescribeRecord);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                            requestDescribeRecord.getVersion());
@@ -209,7 +209,7 @@ public class CSWService extends OGCWebService<CSWworker>{
             LOGGER.info("received SOAP harvest request");
             final CSWworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.harvest(requestHarvest);
+            return (HarvestResponseType) worker.harvest(requestHarvest);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                            requestHarvest.getVersion());
@@ -226,7 +226,7 @@ public class CSWService extends OGCWebService<CSWworker>{
             LOGGER.info("received SOAP transaction request");
             final CSWworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.transaction(requestTransaction);
+            return (TransactionResponseType) worker.transaction(requestTransaction);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                            requestTransaction.getVersion());

@@ -180,7 +180,7 @@
                         <gmd:EX_TemporalExtent>
                             <gmd:extent>
                                 <gml:TimeInstant gml:id="extent">
-                                    <gml:timePosition>2005-09-22T02:00:00.000+02:00</gml:timePosition>
+                                    <gml:timePosition>2005-09-22T00:00:00.000+02:00</gml:timePosition>
                                 </gml:TimeInstant>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>

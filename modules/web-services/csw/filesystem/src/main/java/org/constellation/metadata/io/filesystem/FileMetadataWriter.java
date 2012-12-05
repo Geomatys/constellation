@@ -36,7 +36,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //geotoolkit dependencies
-import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.lucene.index.AbstractIndexer;
@@ -51,6 +50,7 @@ import org.constellation.metadata.io.AbstractCSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.csw.xml.RecordProperty;
 
 // GeoApi dependencies
 import org.geotoolkit.temporal.object.TemporalUtilities;
@@ -180,8 +180,9 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     @Override
     public boolean replaceMetadata(final String metadataID, final Object any) throws MetadataIoException {
         final boolean succeed = deleteMetadata(metadataID);
-        if (!succeed)
+        if (!succeed) {
             return false;
+        }
         return storeMetadata(any);
     }
 
@@ -195,9 +196,9 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean updateMetadata(final String metadataID, final List<RecordPropertyType> properties) throws MetadataIoException {
+    public boolean updateMetadata(final String metadataID, final List<? extends RecordProperty> properties) throws MetadataIoException {
         final Object metadata = getObjectFromFile(metadataID);
-        for (RecordPropertyType property : properties) {
+        for (RecordProperty property : properties) {
             String xpath = property.getName();
             // we remove the first / before the type declaration
             if (xpath.startsWith("/")) {
