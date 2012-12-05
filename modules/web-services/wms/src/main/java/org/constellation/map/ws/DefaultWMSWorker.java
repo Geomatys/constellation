@@ -199,8 +199,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     /**
      * Output responses of a GetCapabilities request.
      */
-    private final Map<String,AbstractWMSCapabilities> CAPS_RESPONSE =
-            Collections.synchronizedMap(new HashMap<String,AbstractWMSCapabilities>());
+    private final Map<String,AbstractWMSCapabilities> CAPS_RESPONSE = Collections.synchronizedMap(new HashMap<String,AbstractWMSCapabilities>());
 
     private WMSPortrayal mapPortrayal;
 

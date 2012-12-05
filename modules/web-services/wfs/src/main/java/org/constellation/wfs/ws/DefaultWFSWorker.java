@@ -180,6 +180,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     private List<StoredQueryDescription> storedQueries = new ArrayList<StoredQueryDescription>();
 
+    private final Map<String, WFSCapabilities> CAPS_RESPONSE = Collections.synchronizedMap(new HashMap<String,WFSCapabilities>());
+    
     public DefaultWFSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WFS);
         if (isStarted) {
@@ -191,6 +193,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 refreshUpdateSequence();
+                CAPS_RESPONSE.clear();
             }
         });
 
@@ -285,16 +288,20 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, false, true);
         final String currentVersion = actingVersion.version.toString();
 
-
-        final WFSCapabilities inCapabilities = (WFSCapabilities) getStaticCapabilitiesObject(currentVersion, "WFS");
-        if (inCapabilities == null) {
-            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-        }
-
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
         if (returnUS) {
             return xmlFactory.buildWFSCapabilities(currentVersion, getCurrentUpdateSequence());
+        }
+        
+        final String keyCache = getId() + currentVersion;
+        if (CAPS_RESPONSE.containsKey(keyCache)) {
+            return CAPS_RESPONSE.get(keyCache);
+        }
+
+        final WFSCapabilities inCapabilities = (WFSCapabilities) getStaticCapabilitiesObject(currentVersion, "WFS");
+        if (inCapabilities == null) {
+            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
         }
 
         FeatureTypeList ftl              = null;
@@ -323,8 +330,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     try {
                         type  = getFeatureTypeFromLayer(fld);
                     } catch (DataStoreException ex) {
-                        LOGGER.severe("error while getting featureType for:" + fld.getName() +
-                                "\ncause:" + ex.getMessage());
+                        LOGGER.log(Level.WARNING, "Error while getting featureType for:{0}\ncause:{1}", new Object[]{fld.getName(), ex.getMessage()});
                         continue;
                     }
                     final org.geotoolkit.wfs.xml.FeatureType ftt;
@@ -400,6 +406,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         }
         final WFSCapabilities result = xmlFactory.buildWFSCapabilities(currentVersion, si, sp, om, ftl, fc);
 
+        CAPS_RESPONSE.put(keyCache, inCapabilities);
         LOGGER.log(logLevel, "GetCapabilities treated in {0}ms", (System.currentTimeMillis() - start));
         return result;
     }
@@ -1513,13 +1520,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         return types;
     }
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void destroy() {
-    }
-
     @Override
     public ListStoredQueriesResponse listStoredQueries(final ListStoredQueries request) throws CstlServiceException {
         LOGGER.log(logLevel, "ListStoredQueries request processing\n");
@@ -1596,5 +1596,15 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final DropStoredQueryResponse response = xmlFactory.buildDropStoredQueryResponse(currentVersion, "OK");
         LOGGER.log(logLevel, "dropStoredQuery request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void destroy() {
+        if (!CAPS_RESPONSE.isEmpty()) {
+            CAPS_RESPONSE.clear();
+        }
     }
 }
