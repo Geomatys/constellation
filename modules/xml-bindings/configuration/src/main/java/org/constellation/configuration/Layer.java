@@ -154,8 +154,10 @@ public class Layer {
         return alias;
     }
 
-    public void setAlias(String alias) {
-        if (alias != null) alias =  alias.trim().replaceAll(" ", "_");
+    public final void setAlias(String alias) {
+        if (alias != null) {
+            alias =  alias.trim().replaceAll(" ", "_");
+        }
         this.alias = alias;
     }
 

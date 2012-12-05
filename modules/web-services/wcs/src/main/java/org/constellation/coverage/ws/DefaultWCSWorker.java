@@ -38,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.Cstl;
@@ -69,10 +67,7 @@ import org.geotoolkit.gml.xml.v311.CodeListType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.map.MapContext;
-import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
-import org.geotoolkit.ows.xml.v110.KeywordsType;
-import org.geotoolkit.ows.xml.v110.LanguageStringType;
 import org.geotoolkit.ows.xml.v110.OperationsMetadata;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.ows.xml.v110.ServiceIdentification;
@@ -96,10 +91,7 @@ import org.geotoolkit.wcs.xml.v100.CoverageDescription;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
 import org.geotoolkit.wcs.xml.v100.DomainSetType;
-import org.geotoolkit.wcs.xml.v100.GetCoverageType;
-import org.geotoolkit.wcs.xml.v100.Keywords;
 import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
-import org.geotoolkit.wcs.xml.v100.RangeSet;
 import org.geotoolkit.wcs.xml.v100.RangeSetType;
 import org.geotoolkit.wcs.xml.v100.SupportedCRSsType;
 import org.geotoolkit.wcs.xml.v100.SupportedFormatsType;
@@ -115,7 +107,6 @@ import org.geotoolkit.wcs.xml.v111.CoverageDescriptions;
 import org.geotoolkit.wcs.xml.v111.CoverageDomainType;
 import org.geotoolkit.wcs.xml.v111.CoverageSummaryType;
 import org.geotoolkit.wcs.xml.v111.FieldType;
-import org.geotoolkit.wcs.xml.v111.InterpolationMethodType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
 import org.geotoolkit.wcs.xml.v111.RangeType;
 import org.geotoolkit.xml.MarshallerPool;
@@ -123,11 +114,12 @@ import org.geotoolkit.wcs.xml.v100.InterpolationMethod;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.gml.xml.v311.RectifiedGridType;
 import org.geotoolkit.gml.xml.v311.GridType;
-import org.geotoolkit.ows.xml.v110.MetadataType;
-import org.geotoolkit.wcs.xml.v100.MetadataLinkType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.ows.xml.AcceptFormats;
+import org.geotoolkit.ows.xml.Sections;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 
 // GeoAPI dependencies
 import org.opengis.geometry.Envelope;
@@ -252,14 +244,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                            MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
         }
 
-        if (version.equals(ServiceDef.WCS_1_0_0.version.toString()) &&
-            request instanceof org.geotoolkit.wcs.xml.v100.DescribeCoverageType)
-        {
-            return describeCoverage100((org.geotoolkit.wcs.xml.v100.DescribeCoverageType) request);
-        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString()) &&
-                   request instanceof org.geotoolkit.wcs.xml.v111.DescribeCoverageType)
-        {
-            return describeCoverage111((org.geotoolkit.wcs.xml.v111.DescribeCoverageType) request);
+        if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
+            return describeCoverage100(request);
+        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
+            return describeCoverage111(request);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
                     "is not handled.", NO_APPLICABLE_CODE, KEY_VERSION.toLowerCase());
@@ -275,16 +263,16 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private DescribeCoverageResponse describeCoverage100(final org.geotoolkit.wcs.xml.v100.DescribeCoverageType request)
+    private DescribeCoverageResponse describeCoverage100(final DescribeCoverage request)
             throws CstlServiceException {
 
-        if (request.getCoverage().isEmpty()) {
+        if (request.getIdentifier().isEmpty()) {
             throw new CstlServiceException("The parameter COVERAGE must be specified.",
                     MISSING_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
         }
 
         final List<CoverageOfferingType> coverageOfferings = new ArrayList<CoverageOfferingType>();
-        for (String coverage : request.getCoverage()) {
+        for (String coverage : request.getIdentifier()) {
             final Name tmpName = parseCoverageName(coverage);
             final LayerDetails layerRef = getLayerReference(tmpName);
             if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
@@ -340,7 +328,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 throw new CstlServiceException("The geographic bbox for the layer is null !",
                         NO_APPLICABLE_CODE);
             }
-            final Keywords keywords = new Keywords(ServiceDef.Specification.WCS.toString(), coverageName);
+            final List<String> keywords = Arrays.asList(ServiceDef.Specification.WCS.toString(), coverageName);
 
             /*
              * Spatial metadata
@@ -388,26 +376,20 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
-            final org.geotoolkit.wcs.xml.v100.TimeSequenceType temporalDomain;
-            if (dates == null || dates.isEmpty()) {
-                temporalDomain = null;
-            } else {
-                final List<Object> times = new ArrayList<Object>();
+            final List<Object> times = new ArrayList<Object>();
+            if (dates != null && !dates.isEmpty()) {
                 final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 for (Date d : dates) {
                     times.add(new TimePositionType(df.format(d)));
                 }
-                temporalDomain = new org.geotoolkit.wcs.xml.v100.TimeSequenceType(times);
             }
-            final DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
+            final DomainSetType domainSet = new DomainSetType(spatialDomain, times);
             //TODO complete
-            final RangeSetType rangeSetT = new RangeSetType(null, coverageName,
-                    coverageName, null, null, null, null);
-            final RangeSet rangeSet = new RangeSet(rangeSetT);
+            final RangeSetType rangeSet   = new RangeSetType(null, coverageName, coverageName, null, null, null, null);
             //supported CRS
-            final SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
-            supCRS.addNativeCRSs(new CodeListType(nativeEnvelope.getSrsName()));
+            final SupportedCRSsType supCRS = new SupportedCRSsType("EPSG:4326");
+            supCRS.addNativeCRSs(nativeEnvelope.getSrsName());
 
             // supported formats
             String nativeFormat = coverageRef.getImageFormat();
@@ -464,10 +446,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private DescribeCoverageResponse describeCoverage111(
-            final org.geotoolkit.wcs.xml.v111.DescribeCoverageType request)
-                            throws CstlServiceException
-    {
+    private DescribeCoverageResponse describeCoverage111(final DescribeCoverage request) throws CstlServiceException {
         if (request.getIdentifier().isEmpty()) {
             throw new CstlServiceException("The parameter IDENTIFIER must be specified",
                     MISSING_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
@@ -513,15 +492,13 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_BOUNDINGBOX.toLowerCase());
             }
-            final List<JAXBElement<? extends BoundingBoxType>> bboxs =
-                    new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+            WGS84BoundingBoxType outputBBox = null;
             if (inputGeoBox != null) {
-                final WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
+                outputBBox = new WGS84BoundingBoxType(
                         inputGeoBox.getWestBoundLongitude(),
                         inputGeoBox.getSouthBoundLatitude(),
                         inputGeoBox.getEastBoundLongitude(),
                         inputGeoBox.getNorthBoundLatitude());
-                bboxs.add(owsFactory.createWGS84BoundingBox(outputBBox));
             }
             /*
              * Spatial metadata
@@ -529,7 +506,6 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             final BoundingBoxType nativeEnvelope;
             try {
                 nativeEnvelope = new BoundingBoxType(coverageRef.getEnvelope());
-                bboxs.add(owsFactory.createBoundingBox(nativeEnvelope));
             } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
@@ -548,17 +524,12 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
             // spatial metadata
             final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
-                    new org.geotoolkit.wcs.xml.v111.SpatialDomainType(bboxs, grid, null, null, null);
-
+                    new org.geotoolkit.wcs.xml.v111.SpatialDomainType(outputBBox,nativeEnvelope, grid, null, null, null);
 
             //general metadata
-            final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
-            title.add(new LanguageStringType(coverageName));
-            final List<LanguageStringType> abstractt = new ArrayList<LanguageStringType>();
-            abstractt.add(new LanguageStringType(StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks())));
-            final List<KeywordsType> keywords = new ArrayList<KeywordsType>();
-            keywords.add(new KeywordsType(new LanguageStringType(ServiceDef.Specification.WCS.toString()),
-                    new LanguageStringType(coverageName)));
+            final String title     = coverageName;
+            final String abstractt = StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks());
+            final List<String> keywords = Arrays.asList(ServiceDef.Specification.WCS.toString(), coverageName);
 
             // temporal metadata
             final List<Object> times = new ArrayList<Object>();
@@ -573,18 +544,11 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             for (Date d : dates) {
                 times.add(new TimePositionType(df.format(d)));
             }
-            final org.geotoolkit.wcs.xml.v111.TimeSequenceType temporalDomain =
-                    new org.geotoolkit.wcs.xml.v111.TimeSequenceType(times);
 
-            final CoverageDomainType domain = new CoverageDomainType(spatial, temporalDomain);
+            final CoverageDomainType domain = new CoverageDomainType(spatial, times);
 
             //supported interpolations
-            final List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
-            for (org.geotoolkit.wcs.xml.v111.InterpolationMethod inte : SUPPORTED_INTERPOLATIONS_V111) {
-                intList.add(new InterpolationMethodType(inte.value(), null));
-            }
-            final InterpolationMethods interpolations = new InterpolationMethods(intList
-                    , org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
+            final InterpolationMethods interpolations = new InterpolationMethods(SUPPORTED_INTERPOLATIONS_V111 , org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
             final RangeType range = new RangeType(new FieldType(StringUtilities.cleanSpecialCharacter(coverageRef.getThematic()),
                     null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
 
@@ -646,16 +610,11 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
         final String format;
         final GetCapabilitiesResponse response;
-        if (version.equals(ServiceDef.WCS_1_0_0.version.toString()) &&
-            request instanceof org.geotoolkit.wcs.xml.v100.GetCapabilitiesType)
-        {
-            response = getCapabilities100((org.geotoolkit.wcs.xml.v100.GetCapabilitiesType) request);
-        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString()) &&
-                   request instanceof org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)
-        {
+        if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
+            response = getCapabilities100(request);
+        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
             // if the user have specified one format accepted (only one for now != spec)
-            final AcceptFormatsType formats =
-                    ((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)request).getAcceptFormats();
+            final AcceptFormats formats = request.getAcceptFormats();
             if (formats == null || formats.getOutputFormat().isEmpty()) {
                 format = MimeType.TEXT_XML;
             } else {
@@ -666,7 +625,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 }
             }
 
-            response = getCapabilities111((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType) request);
+            response = getCapabilities111(request);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
@@ -686,16 +645,16 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private GetCapabilitiesResponse getCapabilities100(final org.geotoolkit.wcs.xml.v100.GetCapabilitiesType request)
-            throws CstlServiceException {
+    private GetCapabilitiesResponse getCapabilities100(final GetCapabilities request) throws CstlServiceException {
         /*
          * In WCS 1.0.0 the user can request only one section
          * ( or all by omitting the parameter section)
          */
-        final String section = request.getSection();
+        final Sections sections = request.getSections();
         String requestedSection = null;
         boolean contentMeta = false;
-        if (section != null) {
+        if (sections != null && !sections.getSection().isEmpty()) {
+            final String section = sections.getSection().get(0);
             if (SectionsType.getExistingSections(ServiceDef.WCS_1_0_0.version.toString()).contains(section)) {
                 requestedSection = section;
             } else {
@@ -740,12 +699,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
         final ContentMetadata contentMetadata;
         final List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
-        final org.geotoolkit.wcs.xml.v100.ObjectFactory wcs100Factory = new org.geotoolkit.wcs.xml.v100.ObjectFactory();
-        final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
         final Map<Name,Layer> layers = getLayers();
         try {
             for (Name name : layers.keySet()) {
-                final LayerDetails layer = namedProxy.get(name);
+                final LayerDetails layer = getLayerReference(name);
                 final Layer configLayer  = layers.get(name);
 
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
@@ -767,9 +724,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                         layerName = fullLayerName.getLocalPart();
                     }
                 }
-
-                co.addRest(wcs100Factory.createName(layerName));
-                co.addRest(wcs100Factory.createLabel(layerName));
+                co.setName(layerName);
+                co.setLabel(layerName);
 
                 final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
                 if (inputGeoBox == null) {
@@ -792,8 +748,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     final Date lastDate = dates.last();
                     final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
                     df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    outputBBox.getTimePosition().add(new TimePositionType(df.format(firstDate)));
-                    outputBBox.getTimePosition().add(new TimePositionType(df.format(lastDate)));
+                    outputBBox.addTimePosition(df.format(firstDate), df.format(lastDate));
                 }
                 co.setLonLatEnvelope(outputBBox);
 
@@ -807,10 +762,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     co.setDescription(configLayer.getAbstrac());
                  }
                  if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-                    co.setKeywords(new Keywords(configLayer.getKeywords()));
+                    co.setKeywords(configLayer.getKeywords());
                  }
                  if (configLayer.getMetadataURL() != null && configLayer.getMetadataURL().getOnlineResource() != null) {
-                     co.setMetadataLink(Arrays.asList(new MetadataLinkType(configLayer.getMetadataURL().getOnlineResource().getValue())));
+                     co.setMetadataLink(configLayer.getMetadataURL().getOnlineResource().getValue());
                  }
                 offBrief.add(co);
             }
@@ -822,9 +777,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         // The ContentMetadata has finally been filled, we can now return the response.
         if (contentMeta) {
             contentMetadata.setVersion(ServiceDef.WCS_1_0_0.version.toString());
-            final WCSCapabilitiesType response = new WCSCapabilitiesType(contentMetadata);
-            response.setUpdateSequence(getCurrentUpdateSequence());
-            return new WCSCapabilitiesType(contentMetadata);
+            return new WCSCapabilitiesType(contentMetadata, getCurrentUpdateSequence());
         } else {
             responsev100.setContentMetadata(contentMetadata);
             responsev100.setUpdateSequence(getCurrentUpdateSequence());
@@ -841,7 +794,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private Capabilities getCapabilities111(final org.geotoolkit.wcs.xml.v111.GetCapabilitiesType request)
+    private Capabilities getCapabilities111(final GetCapabilities request)
                                 throws CstlServiceException {
         // First we try to extract only the requested section.
         List<String> requestedSections =
@@ -885,15 +838,11 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
         // Generate the Contents part of the GetCapabilities.
         final Contents contents;
-        final List<CoverageSummaryType>        summary                = new ArrayList<CoverageSummaryType>();
-        final org.geotoolkit.wcs.xml.v111.ObjectFactory wcs111Factory = new org.geotoolkit.wcs.xml.v111.ObjectFactory();
-        final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory    = new org.geotoolkit.ows.xml.v110.ObjectFactory();
-
-        final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
+        final List<CoverageSummaryType> summary = new ArrayList<CoverageSummaryType>();
         final Map<Name,Layer> layers = getLayers();
         try {
             for (Name name : layers.keySet()) {
-                final LayerDetails layer = namedProxy.get(name);
+                final LayerDetails layer = getLayerReference(name);
                 final Layer configLayer  = layers.get(name);
 
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
@@ -903,12 +852,9 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     continue;
                 }
                 final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
-                final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
-                title.add(new LanguageStringType(coverageLayer.getName().getLocalPart()));
-                final List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
-                remark.add(new LanguageStringType(StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks())));
-
-                final CoverageSummaryType cs = new CoverageSummaryType(title, remark);
+                final String identifier = coverageLayer.getName().getLocalPart();
+                final String title      = coverageLayer.getName().getLocalPart();
+                final String remark     = StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks());
 
                 final GeographicBoundingBox inputGeoBox = coverageLayer.getGeographicBoundingBox();
                 if (inputGeoBox == null) {
@@ -922,9 +868,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                         inputGeoBox.getSouthBoundLatitude(),
                         inputGeoBox.getEastBoundLongitude(),
                         inputGeoBox.getNorthBoundLatitude());
-                cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
-                cs.addRest(wcs111Factory.createIdentifier(coverageLayer.getName().getLocalPart()));
 
+                final CoverageSummaryType cs = new CoverageSummaryType(identifier, title, remark, outputBBox);
                 /*
                  * coverage brief customisation
                  */
@@ -935,10 +880,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     cs.setAbstract(configLayer.getAbstrac());
                  }
                  if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-                    cs.setKeywords(Arrays.asList(new KeywordsType(configLayer.getKeywords())));
+                    cs.setKeywordValues(configLayer.getKeywords());
                  }
                  if (configLayer.getMetadataURL() != null && configLayer.getMetadataURL().getOnlineResource() != null) {
-                    cs.setMetadata(new MetadataType(configLayer.getMetadataURL().getOnlineResource().getValue()));
+                    cs.setMetadata(configLayer.getMetadataURL().getOnlineResource().getValue());
                  }
                 summary.add(cs);
             }
@@ -1004,15 +949,13 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         CoverageLayerDetails layerRef = (CoverageLayerDetails) tmplayerRef;
 
         // we verify the interpolation method even if we don't use it
-        if (request instanceof GetCoverageType) {
-            final String interpolationSt = ((GetCoverageType)request).getInterpolationMethod();
-            if (interpolationSt != null) {
-                final InterpolationMethod interpolation = InterpolationMethod.fromValue(interpolationSt);
-                if (interpolation == null || !SUPPORTED_INTERPOLATIONS_V100.contains(interpolation)) {
-                    throw new CstlServiceException("Unsupported interpolation: " + interpolationSt, INVALID_PARAMETER_VALUE, KEY_INTERPOLATION.toLowerCase());
-                }
+        if (request.getInterpolationMethod() != null) {
+            final InterpolationMethod interpolation = (InterpolationMethod)request.getInterpolationMethod();
+            if (!SUPPORTED_INTERPOLATIONS_V100.contains(interpolation)) {
+                throw new CstlServiceException("Unsupported interpolation: " + request.getInterpolationMethod(), INVALID_PARAMETER_VALUE, KEY_INTERPOLATION.toLowerCase());
             }
         }
+        
 
         Envelope envelope;
         try {
