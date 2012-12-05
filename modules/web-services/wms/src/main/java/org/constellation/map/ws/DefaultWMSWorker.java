@@ -77,7 +77,6 @@ import static org.constellation.query.wms.WMSQuery.*;
 //Geotoolkit dependencies
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.OutputDef;
@@ -111,14 +110,10 @@ import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.PeriodUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
+import org.geotoolkit.wms.xml.AbstractLegendURL;
+import org.geotoolkit.wms.xml.AbstractOnlineResource;
 import org.geotoolkit.wms.xml.v111.Request;
-import org.geotoolkit.wms.xml.v130.Keyword;
-import org.geotoolkit.wms.xml.v130.DataURL;
 import org.geotoolkit.wms.xml.v130.Capability;
-import org.geotoolkit.wms.xml.v130.MetadataURL;
-import org.geotoolkit.wms.xml.v130.Identifier;
-import org.geotoolkit.wms.xml.v130.KeywordList;
-import org.geotoolkit.wms.xml.v130.LogoURL;
 import org.geotoolkit.wms.xml.AbstractDimension;
 import org.geotoolkit.wms.xml.AbstractLayer;
 import org.geotoolkit.wms.xml.AbstractRequest;
@@ -129,14 +124,15 @@ import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
 import org.geotoolkit.wms.xml.DescribeLayer;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
-import org.geotoolkit.wms.xml.v130.Attribution;
-import org.geotoolkit.wms.xml.v130.AuthorityURL;
 import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
 import org.geotoolkit.xml.MarshallerPool;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
+
+import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.wms.xml.AbstractLogoURL;
 
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
@@ -560,33 +556,31 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                             inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion);
 
                 // we build The Style part
-                org.geotoolkit.wms.xml.v111.OnlineResource or =
-                        new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
-
                 final List<String> stylesName = layer.getFavoriteStyles();
-                final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
+                final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<org.geotoolkit.wms.xml.Style>();
                 if (stylesName != null && !stylesName.isEmpty()) {
                     // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
                     for (String styleName : stylesName) {
                         final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
-                        final org.geotoolkit.wms.xml.v111.Style style = convertMutableStyleToWmsStyle111(ms, layer, legendUrlPng, legendUrlGif);
+                        final org.geotoolkit.wms.xml.Style style = convertMutableStyleToWmsStyle("1.1.1",ms, layer, legendUrlPng, legendUrlGif);
                         styles.add(style);
                     }
                 }
 
                 final LatLonBoundingBox bbox = new LatLonBoundingBox(inputGeoBox);
-                final org.geotoolkit.wms.xml.v111.Layer outputLayer111;
+                
+                final String _abstract;
+                final String keyword;
                 if (layer instanceof CoverageLayerDetails) {
                     final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
-                    outputLayer111 = new org.geotoolkit.wms.xml.v111.Layer(layerName,
-                            StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks()),
-                            StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()), DEFAULT_CRS,
-                            bbox, outputBBox, queryable, dimensions, styles);
+                    _abstract = StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks());
+                    keyword   = StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic());
                 } else {
-                    outputLayer111 = new org.geotoolkit.wms.xml.v111.Layer(layerName,
-                            "Vector data", "Vector data", DEFAULT_CRS, bbox,
-                            outputBBox, queryable, dimensions, styles);
+                    _abstract = "Vector data";
+                    keyword   = "Vector data";
                 }
+                final AbstractLayer outputLayer111 = createLayer("1.1.1", layerName, _abstract, keyword, DEFAULT_CRS,
+                            bbox, outputBBox, queryable, dimensions, styles);
 
                 outputLayer = customizeLayer111(outputLayer111, configLayer, layer, legendUrlPng, legendUrlGif);
             } else {
@@ -603,33 +597,31 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                             queryVersion);
 
                 // we build a Style Object
-                org.geotoolkit.wms.xml.v130.OnlineResource or =
-                        new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
-
                 final List<String> stylesName = layer.getFavoriteStyles();
-                final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
+                final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<org.geotoolkit.wms.xml.Style>();
                 if (stylesName != null && !stylesName.isEmpty()) {
                     // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
                     for (String styleName : stylesName) {
                         final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
-                        final org.geotoolkit.wms.xml.v130.Style style = convertMutableStyleToWmsStyle130(ms, layer, legendUrlPng, legendUrlGif);
+                        final org.geotoolkit.wms.xml.Style style = convertMutableStyleToWmsStyle("1.3.0", ms, layer, legendUrlPng, legendUrlGif);
                         styles.add(style);
                     }
                 }
 
                 final EXGeographicBoundingBox bbox = new EXGeographicBoundingBox(inputGeoBox);
-                final org.geotoolkit.wms.xml.v130.Layer outputLayer130;
+                final String _abstract;
+                final String keyword;
                 if (layer instanceof CoverageLayerDetails) {
                     final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
-                    outputLayer130 = new org.geotoolkit.wms.xml.v130.Layer(layerName,
-                            StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks()),
-                            StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()), DEFAULT_CRS,
-                            bbox, outputBBox, queryable, dimensions, styles);
+                    _abstract = StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks());
+                    keyword   = StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic());
                 } else {
-                    outputLayer130 = new org.geotoolkit.wms.xml.v130.Layer(layerName,
-                            "Vector data", "Vector data", DEFAULT_CRS, bbox,
-                            outputBBox, queryable, dimensions, styles);
+                    _abstract = "Vector data";
+                    keyword   = "Vector data";
                 }
+                final AbstractLayer outputLayer130 = createLayer("1.3.0", layerName,_abstract,keyword, DEFAULT_CRS,
+                            bbox, outputBBox, queryable, dimensions, styles);
+                
                 outputLayer = customizeLayer130(outputLayer130, configLayer, layer, legendUrlPng, legendUrlGif);
             }
             outputLayers.add(outputLayer);
@@ -684,7 +676,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @param configLayer
      * @return
      */
-    private org.geotoolkit.wms.xml.v111.Layer customizeLayer111(final org.geotoolkit.wms.xml.v111.Layer outputLayer111, final Layer configLayer,
+    private AbstractLayer customizeLayer111(final AbstractLayer outputLayer111, final Layer configLayer,
             final LayerDetails layerDetails, final String legendUrlPng, final String legendUrlGif)
     {
         if (configLayer == null) {
@@ -693,7 +685,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (configLayer.getStyles() != null && !configLayer.getStyles().isEmpty()) {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
-            final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
+            final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<org.geotoolkit.wms.xml.Style>();
             for (String styl : configLayer.getStyles()) {
                 final MutableStyle ms;
                 if (styl.startsWith("${")) {
@@ -710,11 +702,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
                 }
 
-                final org.geotoolkit.wms.xml.v111.Style wmsStyle = convertMutableStyleToWmsStyle111(ms, layerDetails, legendUrlPng, legendUrlGif);
+                final org.geotoolkit.wms.xml.Style wmsStyle = convertMutableStyleToWmsStyle("1.1.1", ms, layerDetails, legendUrlPng, legendUrlGif);
                 styles.add(wmsStyle);
             }
             if (!styles.isEmpty()) {
-                outputLayer111.setStyle(styles);
+                outputLayer111.updateStyle(styles);
             }
         }
         if (configLayer.getTitle() != null) {
@@ -724,44 +716,40 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             outputLayer111.setAbstract(configLayer.getAbstrac());
         }
         if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-            final List<org.geotoolkit.wms.xml.v111.Keyword> keywords = new ArrayList<org.geotoolkit.wms.xml.v111.Keyword>();
-            for (String kw : configLayer.getKeywords()) {
-                keywords.add(new org.geotoolkit.wms.xml.v111.Keyword(kw));
-            }
-            outputLayer111.setKeywordList(new org.geotoolkit.wms.xml.v111.KeywordList(keywords));
+            outputLayer111.setKeywordList(configLayer.getKeywords());
         }
         if (configLayer.getMetadataURL() != null) {
             final FormatURL metadataURL = configLayer.getMetadataURL();
-            outputLayer111.setMetadataURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.MetadataURL(metadataURL.getFormat(),
-                    metadataURL.getOnlineResource().getHref(),
-                    metadataURL.getType())));
+            outputLayer111.setMetadataURL(metadataURL.getFormat(),
+                                          metadataURL.getOnlineResource().getHref(),
+                                          metadataURL.getType());
         }
         if (configLayer.getDataURL() != null) {
             final FormatURL dataURL = configLayer.getDataURL();
-            outputLayer111.setDataURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.DataURL(dataURL.getFormat(),
-                    dataURL.getOnlineResource().getHref())));
+            outputLayer111.setDataURL(dataURL.getFormat(),
+                                      dataURL.getOnlineResource().getHref());
         }
         if (configLayer.getAuthorityURL() != null) {
             final FormatURL authorityURL = configLayer.getAuthorityURL();
-            outputLayer111.setAuthorityURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.AuthorityURL(authorityURL.getName(),
-                    authorityURL.getOnlineResource().getHref())));
+            outputLayer111.setAuthorityURL(authorityURL.getName(),
+                                           authorityURL.getOnlineResource().getHref());
         }
         if (configLayer.getIdentifier() != null) {
             final Reference identifier = configLayer.getIdentifier();
-            outputLayer111.setIdentifier(Arrays.asList(new org.geotoolkit.wms.xml.v111.Identifier(identifier.getValue(), identifier.getAuthority())));
+            outputLayer111.setIdentifier(identifier.getAuthority(), identifier.getValue());
         }
         if (configLayer.getAttribution() != null) {
             final AttributionType attribution = configLayer.getAttribution();
             final FormatURL fUrl = attribution.getLogoURL();
-            final org.geotoolkit.wms.xml.v111.LogoURL logoUrl;
+            final AbstractLogoURL logoUrl;
             if (fUrl != null) {
-                logoUrl = new org.geotoolkit.wms.xml.v111.LogoURL(fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
+                logoUrl = createLogoURL("1.1.1",fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
             } else {
                 logoUrl = null;
             }
-            outputLayer111.setAttribution(new org.geotoolkit.wms.xml.v111.Attribution(attribution.getTitle(),
-                    attribution.getOnlineResource().getHref(),
-                    logoUrl));
+            outputLayer111.setAttribution(attribution.getTitle(),
+                                          attribution.getOnlineResource().getHref(),
+                                          logoUrl);
         }
         if (configLayer.getOpaque() != null) {
             int opaque = 0;
@@ -771,18 +759,18 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             outputLayer111.setOpaque(opaque);
         }
         if (!configLayer.getCrs().isEmpty()) {
-            outputLayer111.setSrs(configLayer.getCrs());
+            outputLayer111.setCrs(configLayer.getCrs());
         }
         return outputLayer111;
     }
 
-    private org.geotoolkit.wms.xml.v111.Style convertMutableStyleToWmsStyle111(final MutableStyle ms, final LayerDetails layerDetails,
+    private org.geotoolkit.wms.xml.Style convertMutableStyleToWmsStyle(final String currentVersion, final MutableStyle ms, final LayerDetails layerDetails,
             final String legendUrlPng, final String legendUrlGif)
     {
         if (layerDetails == null) {
             return null;
         }
-        org.geotoolkit.wms.xml.v111.OnlineResource or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
+        AbstractOnlineResource or = createOnlineResource(currentVersion, legendUrlPng);
         final LegendTemplate lt = mapPortrayal.getDefaultLegendTemplate();
         final Dimension dimension;
         try {
@@ -792,22 +780,17 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return null;
         }
 
-        final org.geotoolkit.wms.xml.v111.LegendURL legendURL1 =
-                new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_PNG, or,
-                dimension.width, dimension.height);
+        final AbstractLegendURL legendURL1 = createLegendURL(currentVersion, MimeType.IMAGE_PNG, or, dimension.width, dimension.height);
 
-        or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlGif);
-        final org.geotoolkit.wms.xml.v111.LegendURL legendURL2 =
-                new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_GIF, or,
-                dimension.width, dimension.height);
+        or = createOnlineResource(currentVersion, legendUrlGif);
+        final AbstractLegendURL legendURL2 = createLegendURL(currentVersion, MimeType.IMAGE_GIF, or, dimension.width, dimension.height);
 
         String styleName = ms.getName();
         if (styleName != null && !styleName.isEmpty() && styleName.startsWith("${")) {
             final DataReference dataRef = new DataReference(styleName);
             styleName = dataRef.getLayerId().getLocalPart();
         }
-        return new org.geotoolkit.wms.xml.v111.Style(
-                styleName, styleName, null, null, null, legendURL1, legendURL2);
+        return createStyle(currentVersion, styleName, styleName, null, legendURL1, legendURL2);
     }
 
     /**
@@ -817,7 +800,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @param configLayer
      * @return
      */
-    private org.geotoolkit.wms.xml.v130.Layer customizeLayer130(final org.geotoolkit.wms.xml.v130.Layer outputLayer130, final Layer configLayer,
+    private AbstractLayer customizeLayer130(final AbstractLayer outputLayer130, final Layer configLayer,
             final LayerDetails layerDetails, final String legendUrlPng, final String legendUrlGif)
     {
         if (configLayer == null) {
@@ -826,7 +809,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (configLayer.getStyles() != null && !configLayer.getStyles().isEmpty()) {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
-            final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
+            final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<org.geotoolkit.wms.xml.Style>();
             for (String styl : configLayer.getStyles()) {
                 MutableStyle ms = null;
                 if (styl.startsWith("${")) {
@@ -843,12 +826,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
                 }
                 if (ms != null) {
-                    final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
+                    final org.geotoolkit.wms.xml.Style wmsStyle = convertMutableStyleToWmsStyle("1.3.0", ms, layerDetails, legendUrlPng, legendUrlGif);
                     styles.add(wmsStyle);
                 }
             }
             if (!styles.isEmpty()) {
-                outputLayer130.setStyle(styles);
+                outputLayer130.updateStyle(styles);
             }
         }
         if (configLayer.getTitle() != null) {
@@ -858,44 +841,40 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             outputLayer130.setAbstract(configLayer.getAbstrac());
         }
         if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-            final List<Keyword> keywords = new ArrayList<Keyword>();
-            for (String kw : configLayer.getKeywords()) {
-                keywords.add(new Keyword(kw));
-            }
-            outputLayer130.setKeywordList(new KeywordList(keywords));
+            outputLayer130.setKeywordList(configLayer.getKeywords());
         }
         if (configLayer.getMetadataURL() != null) {
             final FormatURL metadataURL = configLayer.getMetadataURL();
-            outputLayer130.setMetadataURL(Arrays.asList(new MetadataURL(metadataURL.getFormat(),
-                    metadataURL.getOnlineResource().getHref(),
-                    metadataURL.getType())));
+            outputLayer130.setMetadataURL(metadataURL.getFormat(),
+                                          metadataURL.getOnlineResource().getHref(),
+                                          metadataURL.getType());
         }
         if (configLayer.getDataURL() != null) {
             final FormatURL dataURL = configLayer.getDataURL();
-            outputLayer130.setDataURL(Arrays.asList(new DataURL(dataURL.getFormat(),
-                    dataURL.getOnlineResource().getHref())));
+            outputLayer130.setDataURL(dataURL.getFormat(),
+                                      dataURL.getOnlineResource().getHref());
         }
         if (configLayer.getAuthorityURL() != null) {
             final FormatURL authorityURL = configLayer.getAuthorityURL();
-            outputLayer130.setAuthorityURL(Arrays.asList(new AuthorityURL(authorityURL.getName(),
-                    authorityURL.getOnlineResource().getHref())));
+            outputLayer130.setAuthorityURL(authorityURL.getName(),
+                                           authorityURL.getOnlineResource().getHref());
         }
         if (configLayer.getIdentifier() != null) {
             final Reference identifier = configLayer.getIdentifier();
-            outputLayer130.setIdentifier(Arrays.asList(new Identifier(identifier.getValue(), identifier.getAuthority())));
+            outputLayer130.setIdentifier(identifier.getAuthority(), identifier.getValue());
         }
         if (configLayer.getAttribution() != null) {
             final AttributionType attribution = configLayer.getAttribution();
             final FormatURL fUrl = attribution.getLogoURL();
-            final LogoURL logoUrl;
+            final AbstractLogoURL logoUrl;
             if (fUrl != null) {
-                logoUrl = new LogoURL(fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
+                logoUrl = createLogoURL("1.3.0", fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
             } else {
                 logoUrl = null;
             }
-            outputLayer130.setAttribution(new Attribution(attribution.getTitle(),
-                    attribution.getOnlineResource().getHref(),
-                    logoUrl));
+            outputLayer130.setAttribution(attribution.getTitle(),
+                                          attribution.getOnlineResource().getHref(),
+                                          logoUrl);
         }
         if (configLayer.getOpaque() != null) {
             int opaque = 0;
@@ -908,40 +887,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             outputLayer130.setCrs(configLayer.getCrs());
         }
         return outputLayer130;
-    }
-
-    private org.geotoolkit.wms.xml.v130.Style convertMutableStyleToWmsStyle130(final MutableStyle ms, final LayerDetails layerDetails,
-            final String legendUrlPng, final String legendUrlGif)
-    {
-        if (layerDetails == null) {
-            return null;
-        }
-        org.geotoolkit.wms.xml.v130.OnlineResource or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
-        final LegendTemplate lt = mapPortrayal.getDefaultLegendTemplate();
-        final Dimension dimension;
-        try {
-            dimension = layerDetails.getPreferredLegendSize(lt, ms);
-        } catch (PortrayalException ex) {
-            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-            return null;
-        }
-
-        final org.geotoolkit.wms.xml.v130.LegendURL legendURL1 =
-                new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_PNG, or,
-                dimension.width, dimension.height);
-
-        or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlGif);
-        final org.geotoolkit.wms.xml.v130.LegendURL legendURL2 =
-                new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_GIF, or,
-                dimension.width, dimension.height);
-
-        String styleName = ms.getName();
-        if (styleName != null && !styleName.isEmpty() && styleName.startsWith("${")) {
-            final DataReference dataRef = new DataReference(styleName);
-            styleName = dataRef.getLayerId().getLocalPart();
-        }
-        return new org.geotoolkit.wms.xml.v130.Style(
-                styleName, styleName, null, null, null, legendURL1, legendURL2);
     }
 
     /**
@@ -1041,7 +986,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         GetFeatureInfoVisitor visitor = null;
         for(final WMSVisitorFactory vf : VISITOR_FACTORIES){
             visitor = vf.createVisitor(getFI, layerRefs, infoFormat);
-            if(visitor != null) break;
+            if(visitor != null) {break;}
         }
 
         if(visitor == null) {
