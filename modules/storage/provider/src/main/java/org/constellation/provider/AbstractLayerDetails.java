@@ -41,6 +41,7 @@ import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.style.Style;
@@ -267,7 +268,13 @@ public abstract class AbstractLayerDetails implements LayerDetails{
     @Override
     public final GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
         try {
-            return new DefaultGeographicBoundingBox(getEnvelope());
+            final Envelope env = getEnvelope();
+            if (env != null) {
+                return new DefaultGeographicBoundingBox(env);
+            } else {
+                LOGGER.warning("Null boundingBox for Layer:" + name + ". Returning World BBOX");
+                return DefaultGeographicBoundingBox.WORLD;
+            }
         } catch (TransformException ex) {
             throw new DataStoreException(ex);
         }
