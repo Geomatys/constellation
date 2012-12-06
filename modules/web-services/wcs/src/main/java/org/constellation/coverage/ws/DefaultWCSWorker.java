@@ -24,8 +24,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -45,7 +43,6 @@ import org.constellation.ServiceDef;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.StyleProviderProxy;
 import org.constellation.util.StyleUtils;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -190,11 +187,6 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             SUPPORTED_FORMATS_100.add(new CodeListType("matrix"));
             SUPPORTED_FORMATS_100.add(new CodeListType("ascii-grid"));
      }
-
-    /**
-     * Output responses of a GetCapabilities request.
-     */
-    private static final Map<String,GetCapabilitiesResponse> CAPS_RESPONSE = new HashMap<String,GetCapabilitiesResponse>();
 
     public DefaultWCSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WCS);
@@ -592,9 +584,9 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         }
 
         // If the getCapabilities response is in cache, we just return it.
-        final String keyCache = getId() + version;
-        if (CAPS_RESPONSE.containsKey(keyCache)) {
-            return CAPS_RESPONSE.get(keyCache);
+        final Object cachedCapabilities = getCapabilitiesFromCache(version, null);
+        if (cachedCapabilities != null) {
+            return (GetCapabilitiesResponse) cachedCapabilities;
         }
 
         final String format;
@@ -620,7 +612,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
 
-        CAPS_RESPONSE.put(keyCache, response);
+        putCapabilitiesInCache(version, null, response);
         return response;
     }
 
@@ -1110,7 +1102,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             final MutableStyle style;
             if (!styleNames.isEmpty()) {
                 final String styleName = styleNames.get(0);
-                final MutableStyle incomingStyle = StyleProviderProxy.getInstance().get(styleName);
+                final MutableStyle incomingStyle = getStyle(styleName);
                 style = StyleUtils.filterStyle(incomingStyle, request.getRangeSubset());
             } else {
                 style = null;
@@ -1200,20 +1192,5 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         } else {
             return returnUpdateSequenceDocument(updateSequence);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void destroy() {
-        if (!CAPS_RESPONSE.isEmpty()) {
-            CAPS_RESPONSE.clear();
-        }
-    }
-
-    @Override
-    protected void clearCapabilitiesCache() {
-        CAPS_RESPONSE.clear();
     }
 }

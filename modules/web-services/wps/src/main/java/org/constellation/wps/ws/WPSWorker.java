@@ -224,6 +224,7 @@ public class WPSWorker extends AbstractWorker {
 
     @Override
     public void destroy() {
+        super.destroy();
         //Delete recursuvly temporary directory.
         WPSUtils.deleteTempFileOrDirectory(new File(temporaryFolderPath));
     }
@@ -268,48 +269,41 @@ public class WPSWorker extends AbstractWorker {
 
         //if versionAccepted parameted is not define return the last getCapabilities
         if (versionsAccepted == null || versionSupported) {
-            return getCapabilities100((org.geotoolkit.wps.xml.v100.GetCapabilities) request);
+            //set the current updateSequence parameter
+            final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
+            if (returnUS) {
+                return new WPSCapabilitiesType("1.0.0", getCurrentUpdateSequence());
+            }
+            
+            final Object cachedCapabilities = getCapabilitiesFromCache("1.0.0", null);
+            if (cachedCapabilities != null) {
+                return (WPSCapabilitiesType) cachedCapabilities;
+            }
+
+            // We unmarshall the static capabilities document.
+            final WPSCapabilitiesType staticCapabilities = (WPSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WPS_1_0_0.version.toString(), ServiceDef.Specification.WPS.toString());
+            if (staticCapabilities == null) {
+                throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
+            }
+
+            staticCapabilities.getOperationsMetadata().updateURL(getServiceUrl());
+
+            final ProcessOfferings offering = new ProcessOfferings();
+
+            for (final ProcessDescriptor procDesc : ProcessDescriptorList) {
+                if (WPSUtils.isSupportedProcess(procDesc)) {
+                    offering.getProcess().add(WPSUtils.generateProcessBrief(procDesc));
+                }
+            }
+
+            staticCapabilities.setProcessOfferings(offering);
+            staticCapabilities.setUpdateSequence(getCurrentUpdateSequence());
+            putCapabilitiesInCache("1.0.0", null, staticCapabilities);
+            return staticCapabilities;
         } else {
             throw new CstlServiceException("The specified " + ACCEPT_VERSIONS_PARAMETER + " numbers are not handled by the service.",
                     VERSION_NEGOTIATION_FAILED, ACCEPT_VERSIONS_PARAMETER.toLowerCase());
         }
-
-    }
-
-    /**
-     * GetCapabilities request for WPS 1.0.0.
-     *
-     * @param request
-     * @return
-     * @throws CstlServiceException
-     */
-    private WPSCapabilitiesType getCapabilities100(final GetCapabilities request) throws CstlServiceException {
-
-        //set the current updateSequence parameter
-        final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
-        if (returnUS) {
-            return new WPSCapabilitiesType("1.0.0", getCurrentUpdateSequence());
-        }
-
-        // We unmarshall the static capabilities document.
-        final WPSCapabilitiesType staticCapabilities = (WPSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WPS_1_0_0.version.toString(), ServiceDef.Specification.WPS.toString());
-        if (staticCapabilities == null) {
-            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-        }
-
-        staticCapabilities.getOperationsMetadata().updateURL(getServiceUrl());
-
-        final ProcessOfferings offering = new ProcessOfferings();
-
-        for (final ProcessDescriptor procDesc : ProcessDescriptorList) {
-            if (WPSUtils.isSupportedProcess(procDesc)) {
-                offering.getProcess().add(WPSUtils.generateProcessBrief(procDesc));
-            }
-        }
-
-        staticCapabilities.setProcessOfferings(offering);
-        staticCapabilities.setUpdateSequence(getCurrentUpdateSequence());
-        return staticCapabilities;
     }
 
     //////////////////////////////////////////////////////////////////////

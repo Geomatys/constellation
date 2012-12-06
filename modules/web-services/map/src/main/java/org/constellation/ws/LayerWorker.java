@@ -38,8 +38,10 @@ import org.constellation.configuration.Source;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.StyleProviderProxy;
 import org.opengis.feature.type.Name;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.style.MutableStyle;
 
 /**
  * A super class for all the web service worker dealing with layers (WMS, WCS, WMTS, WFS, ...)
@@ -245,8 +247,41 @@ public abstract class LayerWorker extends AbstractWorker {
         }
         return name;
     }
+    
+    protected static MutableStyle getStyle(final String styleName) throws CstlServiceException {
+        final MutableStyle style;
+        if (styleName != null && !styleName.isEmpty()) {
+            //try to grab the style if provided
+            //a style has been given for this layer, try to use it
+            style = StyleProviderProxy.getInstance().get(styleName);
+            if (style == null) {
+                throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
+            }
+        } else {
+            //no defined styles, use the favorite one, let the layer get it himself.
+            style = null;
+        }
+        return style;
+    }
+    
+    protected static MutableStyle getStyleByIdentifier(final String styleName) throws CstlServiceException {
+        final MutableStyle style;
+        if (styleName != null && !styleName.isEmpty()) {
+            //try to grab the style if provided
+            //a style has been given for this layer, try to use it
+            style = StyleProviderProxy.getInstance().getByIdentifier(styleName);
+            if (style == null) {
+                throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
+            }
+        } else {
+            //no defined styles, use the favorite one, let the layer get it himself.
+            style = null;
+        }
+        return style;
+    }
 
-    public Layer getMainLayer() {
+    
+    protected Layer getMainLayer() {
         if (layerContext == null) {
             return null;
         }
@@ -275,6 +310,4 @@ public abstract class LayerWorker extends AbstractWorker {
         }
         return null;
     }
-    
-    protected abstract void clearCapabilitiesCache();
 }

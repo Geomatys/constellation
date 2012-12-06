@@ -283,7 +283,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * if the flag keepCapabilities is set to true, this attribute will be fill with the reponse of a getCapabilities.
      */
-    private static Capabilities cachedCapabilities;
+    private Capabilities cachedCapabilities;
 
     private boolean alwaysFeatureCollection;
 
@@ -2357,6 +2357,7 @@ public class SOSworker extends AbstractWorker {
      */
     @Override
     public void destroy() {
+        super.destroy();
         if (smlReader != null) {smlReader.destroy();}
         if (smlWriter != null) {smlWriter.destroy();}
         if (omReader != null)  {omReader.destroy();}

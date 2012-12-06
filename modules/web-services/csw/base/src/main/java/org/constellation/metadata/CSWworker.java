@@ -514,6 +514,11 @@ public class CSWworker extends AbstractWorker {
         if (returnUS) {
             return CswXmlFactory.createCapabilities("2.0.2", getCurrentUpdateSequence());
         }
+        
+        final Object cachedCapabilities = getCapabilitiesFromCache("2.0.2", null);
+        if (cachedCapabilities != null) {
+            return (AbstractCapabilities) cachedCapabilities;
+        }
 
         /*
          final AcceptFormats formats = requestCapabilities.getAcceptFormats();
@@ -684,9 +689,9 @@ public class CSWworker extends AbstractWorker {
             fc = skeletonCapabilities.getFilterCapabilities();
         }
 
-
         final AbstractCapabilities c = CswXmlFactory.createCapabilities("2.0.2", si, sp, om, null, fc);
 
+        putCapabilitiesInCache("1.0.0", null, c);
         LOGGER.log(logLevel, "GetCapabilities request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return c;
     }
@@ -1736,6 +1741,7 @@ public class CSWworker extends AbstractWorker {
      */
     @Override
     public void destroy() {
+        super.destroy();
         if (mdReader != null) {
             mdReader.destroy();
         }

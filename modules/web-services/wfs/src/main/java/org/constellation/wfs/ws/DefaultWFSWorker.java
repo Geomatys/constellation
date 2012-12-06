@@ -167,8 +167,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     private List<StoredQueryDescription> storedQueries = new ArrayList<StoredQueryDescription>();
 
-    private final Map<String, WFSCapabilities> CAPS_RESPONSE = Collections.synchronizedMap(new HashMap<String,WFSCapabilities>());
-    
     public DefaultWFSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WFS);
         if (isStarted) {
@@ -272,9 +270,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             return buildWFSCapabilities(currentVersion, getCurrentUpdateSequence());
         }
         
-        final String keyCache = getId() + currentVersion;
-        if (CAPS_RESPONSE.containsKey(keyCache)) {
-            return CAPS_RESPONSE.get(keyCache);
+        final Object cachedCapabilities = getCapabilitiesFromCache(currentVersion, null);
+        if (cachedCapabilities != null) {
+            return (WFSCapabilities) cachedCapabilities;
         }
 
         final WFSCapabilities inCapabilities = (WFSCapabilities) getStaticCapabilitiesObject(currentVersion, "WFS");
@@ -382,7 +380,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             fc = WFSConstants.FILTER_CAPABILITIES_V110;
         }
         final WFSCapabilities result = buildWFSCapabilities(currentVersion, si, sp, om, ftl, fc);
-        CAPS_RESPONSE.put(keyCache, inCapabilities);
+        putCapabilitiesInCache(currentVersion, null, result);
         LOGGER.log(logLevel, "GetCapabilities treated in {0}ms", (System.currentTimeMillis() - start));
         return result;
     }
@@ -1595,20 +1593,5 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final DropStoredQueryResponse response = buildDropStoredQueryResponse(currentVersion, "OK");
         LOGGER.log(logLevel, "dropStoredQuery request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
-    }
-    
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void destroy() {
-        if (!CAPS_RESPONSE.isEmpty()) {
-            CAPS_RESPONSE.clear();
-        }
-    }
-    
-    @Override
-    protected void clearCapabilitiesCache() {
-        CAPS_RESPONSE.clear();
     }
 }

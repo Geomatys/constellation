@@ -30,7 +30,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,7 +59,6 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.StyleProviderProxy;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
@@ -189,12 +187,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             "UP", "DOWN",
             "FUTURE", "PAST");
 
-
-    /**
-     * Output responses of a GetCapabilities request.
-     */
-    private final Map<String,AbstractWMSCapabilities> CAPS_RESPONSE = Collections.synchronizedMap(new HashMap<String,AbstractWMSCapabilities>());
-
     private WMSPortrayal mapPortrayal;
 
     public DefaultWMSWorker(String id, File configurationDirectory) {
@@ -275,9 +267,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             currentLanguage = null;
         }
 
-        final String keyCache = getId() + queryVersion + '-' + currentLanguage;
-        if (CAPS_RESPONSE.containsKey(keyCache)) {
-            return CAPS_RESPONSE.get(keyCache);
+        final Object cachedCapabilities = getCapabilitiesFromCache(queryVersion, currentLanguage);
+        if (cachedCapabilities != null) {
+            return (AbstractWMSCapabilities) cachedCapabilities;
         }
 
         final AbstractWMSCapabilities inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS", currentLanguage);
@@ -552,7 +544,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             if (stylesName != null && !stylesName.isEmpty()) {
                 // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
                 for (String styleName : stylesName) {
-                    final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
+                    final MutableStyle ms = getStyle(styleName);
                     final org.geotoolkit.wms.xml.Style style = convertMutableStyleToWmsStyle("1.3.0", ms, layer, legendUrlPng, legendUrlGif);
                     styles.add(style);
                 }
@@ -599,7 +591,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
 
         }
-        CAPS_RESPONSE.put(keyCache, inCapabilities);
+        putCapabilitiesInCache(queryVersion, currentLanguage, inCapabilities);
         return inCapabilities;
     }
 
@@ -611,7 +603,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @return
      */
     private AbstractLayer customizeLayer(final String version, final AbstractLayer outputLayer, final Layer configLayer,
-            final LayerDetails layerDetails, final String legendUrlPng, final String legendUrlGif)
+            final LayerDetails layerDetails, final String legendUrlPng, final String legendUrlGif) throws CstlServiceException
     {
         if (configLayer == null) {
             return outputLayer;
@@ -633,7 +625,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     }
                     ms = StyleUtilities.copy(style);
                 } else {
-                    ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
+                    ms = getStyleByIdentifier(styl);
                 }
                 if (ms != null) {
                     styles.add(convertMutableStyleToWmsStyle(version, ms, layerDetails, legendUrlPng, legendUrlGif));
@@ -941,10 +933,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final String styleId = defaultStyleRefs.get(0);
                     if (styleId.startsWith("${")) {
                         final DataReference styleRef = new DataReference(styleId);
-                        ms = (styleRef == null || styleRef.getLayerId() == null) ? null :
-                                StyleProviderProxy.getInstance().get(styleRef.getLayerId().getLocalPart());
+                        ms = (styleRef == null || styleRef.getLayerId() == null) ? null : getStyle(styleRef.getLayerId().getLocalPart());
                     } else {
-                        ms = StyleProviderProxy.getInstance().getByIdentifier(styleId);
+                        ms = getStyleByIdentifier(styleId);
                     }
                 } else {
                     ms = null;
@@ -1112,7 +1103,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         return response;
     }
 
-    private static MutableStyle extractStyle(final Name layerName, final StyledLayerDescriptor sld){
+    private static MutableStyle extractStyle(final Name layerName, final StyledLayerDescriptor sld) throws CstlServiceException{
         if(sld == null){
             throw new IllegalArgumentException("SLD should not be null");
         }
@@ -1137,7 +1128,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     if (mls instanceof MutableNamedStyle) {
                         final MutableNamedStyle mns = (MutableNamedStyle) mls;
                         final String namedStyle = mns.getName();
-                        return StyleProviderProxy.getInstance().get(namedStyle);
+                        return getStyle(namedStyle);
                     } else if (mls instanceof MutableStyle) {
                         return (MutableStyle) mls;
                     }
@@ -1169,7 +1160,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
                 final String namedStyle = styleNames.get(i);
-                style = StyleProviderProxy.getInstance().get(namedStyle);
+                style = getStyle(namedStyle);
                 if (style == null) {
                     throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
                 }
@@ -1183,10 +1174,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final String styleId = defaultStyleRefs.get(0);
                     if (styleId.startsWith("${")) {
                         final DataReference styleRef = new DataReference(styleId);
-                        style = (styleRef == null || styleRef.getLayerId() == null) ? null :
-                                StyleProviderProxy.getInstance().get(styleRef.getLayerId().getLocalPart());
+                        style = (styleRef == null || styleRef.getLayerId() == null) ? null : getStyle(styleRef.getLayerId().getLocalPart());
                     } else {
-                        style = StyleProviderProxy.getInstance().getByIdentifier(styleId);
+                        style = getStyleByIdentifier(styleId);
                     }
                 } else {
                     style = null;
@@ -1245,20 +1235,5 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             throw new CstlServiceException("The update sequence must be an integer", ex, INVALID_PARAMETER_VALUE, "updateSequence");
         }
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void destroy() {
-        if (!CAPS_RESPONSE.isEmpty()) {
-            CAPS_RESPONSE.clear();
-        }
-    }
-    
-    @Override
-    protected void clearCapabilitiesCache() {
-        CAPS_RESPONSE.clear();
     }
 }

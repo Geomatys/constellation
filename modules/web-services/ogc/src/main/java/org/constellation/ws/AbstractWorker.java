@@ -20,8 +20,12 @@ package org.constellation.ws;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,8 +91,13 @@ public abstract class AbstractWorker implements Worker {
     /**
      * A map containing the Capabilities Object already loaded from file.
      */
-    private final Map<String,Object> capabilities = new HashMap<String,Object>();
+    private final Map<String,Object> capabilities = Collections.synchronizedMap(new HashMap<String,Object>());
 
+    /**
+     * Output responses of a GetCapabilities request.
+     */
+    private static final Map<String,Object> CAPS_RESPONSE = new HashMap<String, Object>();
+    
     /**
      * The identifier of the worker.
      */
@@ -198,7 +207,7 @@ public abstract class AbstractWorker implements Worker {
                         response = unmarshaller.unmarshal(in);
                         in.close();
                     } else {
-                        LOGGER.info("unable to find static capabilities from resource:" + fileName);
+                        LOGGER.log(Level.INFO, "unable to find static capabilities from resource:{0}", fileName);
                     }
                 } else {
                     response = unmarshaller.unmarshal(f);
@@ -293,5 +302,45 @@ public abstract class AbstractWorker implements Worker {
         } catch(NumberFormatException ex) {
             throw new CstlServiceException("The update sequence must be an integer", ex, OWSExceptionCode.INVALID_PARAMETER_VALUE, "updateSequence");
         }
+    }
+    
+    /**
+     * Return a cached capabilities response.
+     * 
+     * @param version
+     * @return r
+     */
+    protected Object getCapabilitiesFromCache(final String version, final String language) {
+        final String keyCache = specification.name() + '-' + id + '-' + version + '-' + language;
+        return CAPS_RESPONSE.get(keyCache);
+    }
+    
+    /**
+     * Add the capabilities object to the cache.
+     * 
+     * @param version
+     * @param language
+     * @param capabilities 
+     */
+    protected void putCapabilitiesInCache(final String version, final String language, final Object capabilities) {
+        final String keyCache = specification.name() + '-' + id + '-' + version + '-';
+        CAPS_RESPONSE.put(keyCache, capabilities);
+    }
+    
+    protected void clearCapabilitiesCache() {
+        final List<String> toClear = new ArrayList<String>();;
+        for (String key: CAPS_RESPONSE.keySet()) {
+            if (key.startsWith(specification.name() + '-')) {
+                toClear.add(key);
+            }
+        }
+        for (String key : toClear) {
+            CAPS_RESPONSE.remove(key);
+        }
+    }
+    
+    @Override
+    public void destroy() {
+        clearCapabilitiesCache();
     }
 }

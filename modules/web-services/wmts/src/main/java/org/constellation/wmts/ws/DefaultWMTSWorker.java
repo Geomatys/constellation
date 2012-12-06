@@ -138,6 +138,12 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             return new Capabilities("1.0.0", getCurrentUpdateSequence());
         }
 
+        // If the getCapabilities response is in cache, we just return it.
+        final Object cachedCapabilities = getCapabilitiesFromCache("1.0.0", null);
+        if (cachedCapabilities != null) {
+            return (Capabilities) cachedCapabilities;
+        }
+        
         final AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
         if (formats != null && formats.getOutputFormat().size() > 0 ) {
             boolean found = false;
@@ -297,6 +303,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
         final Capabilities c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
 
+        putCapabilitiesInCache("1.0.0", null, c);
         LOGGER.log(logLevel, "getCapabilities processed in {0}ms.\n", (System.currentTimeMillis() - start));
         return c;
 
@@ -318,9 +325,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         Coverage c = null;
 
         // build an equivalent style List
-        final String styleName = getTile.getStyle();
-
-        final MutableStyle style        = getStyle(styleName);
+        final String styleName   = getTile.getStyle();
+        final MutableStyle style = getStyle(styleName);
         //       -- create the rendering parameter Map
         Double elevation =  null;
         Date time        = null;
@@ -535,33 +541,5 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             throw new CstlServiceException("Unexpected error : " + ex.getMessage(), ex , NO_APPLICABLE_CODE);
         }
 
-    }
-
-    private static MutableStyle getStyle(final String styleName) throws CstlServiceException {
-        final MutableStyle style;
-        if (styleName != null && !styleName.isEmpty()) {
-            //try to grab the style if provided
-            //a style has been given for this layer, try to use it
-            style = StyleProviderProxy.getInstance().get(styleName);
-            if (style == null) {
-                throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
-            }
-        } else {
-            //no defined styles, use the favorite one, let the layer get it himself.
-            style = null;
-        }
-        return style;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void destroy() {
-    }
-    
-    @Override
-    protected void clearCapabilitiesCache() {
-        // no cach in this implementation
     }
 }
