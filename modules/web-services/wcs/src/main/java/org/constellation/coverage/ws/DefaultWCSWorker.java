@@ -661,22 +661,17 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 if (!layer.isQueryable(ServiceDef.Query.WCS_ALL)) {
                     continue;
                 }
-                final CoverageOfferingBriefType co = new CoverageOfferingBriefType();
                 final Name fullLayerName = layer.getName();
                 final String layerName;
                 if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
                     layerName = configLayer.getAlias().trim().replaceAll(" ", "_");
                 } else {
-
                     if (fullLayerName.getNamespaceURI() != null && !fullLayerName.getNamespaceURI().isEmpty()) {
                         layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
                     } else {
                         layerName = fullLayerName.getLocalPart();
                     }
                 }
-                co.setName(layerName);
-                co.setLabel(layerName);
-
                 final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
                 if (inputGeoBox == null) {
                     // The coverage does not contain geometric information, we do not want this coverage
@@ -700,8 +695,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     df.setTimeZone(TimeZone.getTimeZone("UTC"));
                     outputBBox.addTimePosition(df.format(firstDate), df.format(lastDate));
                 }
-                co.setLonLatEnvelope(outputBBox);
 
+                final CoverageOfferingBriefType co = new CoverageOfferingBriefType(null, layerName, layerName, null, outputBBox, new ArrayList<String>());
                 /*
                  * coverage brief customisation
                  */
@@ -802,7 +797,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         }
         return new Capabilities(si, sp, om, "1.1.1", getCurrentUpdateSequence(), contents);
     }
-
+    
 
     /**
      * Get the coverage values for a specific coverage specified.
