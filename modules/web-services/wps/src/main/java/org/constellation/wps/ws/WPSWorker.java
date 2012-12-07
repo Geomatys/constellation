@@ -283,9 +283,6 @@ public class WPSWorker extends AbstractWorker {
 
             // We unmarshall the static capabilities document.
             final WPSCapabilitiesType staticCapabilities = (WPSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WPS_1_0_0.version.toString(), ServiceDef.Specification.WPS.toString());
-            if (staticCapabilities == null) {
-                throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-            }
 
             final ServiceIdentification si = staticCapabilities.getServiceIdentification();
             final ServiceProvider sp       = staticCapabilities.getServiceProvider();

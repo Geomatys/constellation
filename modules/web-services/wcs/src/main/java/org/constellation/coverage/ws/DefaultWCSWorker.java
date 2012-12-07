@@ -599,9 +599,6 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         
         // We unmarshall the static capabilities document.
         final GetCapabilitiesResponse staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(version, "WCS");
-        if (staticCapabilities == null) {
-            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-        }
 
         final String format;
         final GetCapabilitiesResponse response;

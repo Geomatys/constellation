@@ -328,7 +328,7 @@ public class SOSworker extends AbstractWorker {
             this.keepCapabilities      = configuration.isKeepCapabilities();
 
             if (keepCapabilities) {
-                cacheCapabilities(configurationDirectory);
+                loadCachedCapabilities(configurationDirectory);
             }
 
             // the file who record the map between phisycal ID and DB ID.
@@ -492,7 +492,7 @@ public class SOSworker extends AbstractWorker {
      * @param type
      * @return
      */
-    private OMFactory getOMFactory(DataSourceType type) {
+    private OMFactory getOMFactory(final DataSourceType type) {
         final Iterator<OMFactory> ite = ServiceRegistry.lookupProviders(OMFactory.class);
         while (ite.hasNext()) {
             OMFactory currentFactory = ite.next();
@@ -509,7 +509,7 @@ public class SOSworker extends AbstractWorker {
      * @param type
      * @return
      */
-    private SMLFactory getSMLFactory(DataSourceType type) {
+    private SMLFactory getSMLFactory(final DataSourceType type) {
         final Iterator<SMLFactory> ite = ServiceRegistry.lookupProviders(SMLFactory.class);
         while (ite.hasNext()) {
             SMLFactory currentFactory = ite.next();
@@ -571,7 +571,7 @@ public class SOSworker extends AbstractWorker {
      * @param configurationDirectory
      * @throws JAXBException
      */
-    private void cacheCapabilities(final File configurationDirectory) throws JAXBException {
+    private void loadCachedCapabilities(final File configurationDirectory) throws JAXBException {
         //we fill the cachedCapabilities if we have to
         LOGGER.info("adding capabilities document in cache");
         Unmarshaller capaUM = null;
@@ -689,9 +689,7 @@ public class SOSworker extends AbstractWorker {
 
         // we load the skeleton capabilities
         final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "SOS");
-        if (skeletonCapabilities == null) {
-            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-        }
+
         final Capabilities localCapabilities;
         if (keepCapabilities) {
             localCapabilities = loadedCapabilities;

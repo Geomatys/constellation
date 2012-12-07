@@ -165,9 +165,6 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         
         // we load the skeleton capabilities 
         final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "WMTS");
-        if (skeletonCapabilities == null) {
-            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-        }
         
          //we prepare the response document
         final ServiceIdentification si = skeletonCapabilities.getServiceIdentification();

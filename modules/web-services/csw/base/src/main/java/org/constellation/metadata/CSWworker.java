@@ -545,9 +545,6 @@ public class CSWworker extends AbstractWorker {
 
         // we load the skeleton capabilities
         final AbstractCapabilities skeletonCapabilities = (AbstractCapabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
-        if (skeletonCapabilities == null) {
-            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-        }
 
         //we prepare the response document
         final AbstractServiceIdentification si = skeletonCapabilities.getServiceIdentification();

@@ -283,9 +283,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         }
 
         final WFSCapabilities inCapabilities = (WFSCapabilities) getStaticCapabilitiesObject(currentVersion, "WFS");
-        if (inCapabilities == null) {
-            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-        }
 
         final FeatureTypeList ftl = buildFeatureTypeList(currentVersion);
         /*

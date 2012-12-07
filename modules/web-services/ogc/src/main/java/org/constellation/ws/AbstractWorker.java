@@ -207,21 +207,21 @@ public abstract class AbstractWorker implements Worker {
                         response = unmarshaller.unmarshal(in);
                         in.close();
                     } else {
-                        LOGGER.log(Level.INFO, "unable to find static capabilities from resource:{0}", fileName);
+                        throw new CstlServiceException("Unable to find the capabilities skeleton from resource:" + fileName, OWSExceptionCode.NO_APPLICABLE_CODE);
                     }
                 } else {
                     response = unmarshaller.unmarshal(f);
                 }
 
-                if(response instanceof JAXBElement){
+                if (response instanceof JAXBElement) {
                     response = ((JAXBElement)response).getValue();
                 }
 
                 capabilities.put(fileName, response);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "Unable to close the skeleton capabilities input stream.", ex);
+                throw new CstlServiceException("Unable to close the skeleton capabilities input stream.", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                throw new CstlServiceException("JAXb exception while unmarshaling static capabilities file", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
+                throw new CstlServiceException("JAXB exception while unmarshaling static capabilities file", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
                     getMarshallerPool().release(unmarshaller);
