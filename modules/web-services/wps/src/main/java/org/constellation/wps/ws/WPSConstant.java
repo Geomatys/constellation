@@ -16,6 +16,15 @@
  */
 package org.constellation.wps.ws;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.geotoolkit.ows.xml.v110.DCP;
+import org.geotoolkit.ows.xml.v110.DomainType;
+import org.geotoolkit.ows.xml.v110.HTTP;
+import org.geotoolkit.ows.xml.v110.Operation;
+import org.geotoolkit.ows.xml.v110.OperationsMetadata;
+import org.geotoolkit.ows.xml.v110.RequestMethodType;
+
 
 /**
  *  WPS Constants
@@ -65,4 +74,39 @@ public final class WPSConstant {
      * Temprary directory name used for store responses.
      */
     public static final String TEMP_FOLDER = "/wps/output" ;
+    
+    public static final OperationsMetadata OPERATIONS_METADATA;
+    static {
+        final List<DCP> getAndPost = new ArrayList<DCP>();
+        getAndPost.add(new DCP(new HTTP(new RequestMethodType("somURL"), new RequestMethodType("someURL"))));
+
+        final List<DCP> onlyPost = new ArrayList<DCP>();
+        onlyPost.add(new DCP(new HTTP(null, new RequestMethodType("someURL"))));
+
+        final List<Operation> operations = new ArrayList<Operation>();
+
+        final List<DomainType> gcParameters = new ArrayList<DomainType>();
+        gcParameters.add(new DomainType("service", "WPS"));
+        gcParameters.add(new DomainType("Acceptversions", "1.0.0"));
+        gcParameters.add(new DomainType("AcceptFormats", "text/xml"));
+        final Operation getCapabilities = new Operation(getAndPost, gcParameters, null, null, "GetCapabilities");
+        operations.add(getCapabilities);
+
+        final List<DomainType> dpParameters = new ArrayList<DomainType>();
+        dpParameters.add(new DomainType("service", "WPS"));
+        dpParameters.add(new DomainType("version", "1.0.0"));
+        final Operation describeProcess = new Operation(getAndPost, dpParameters, null, null, "DescribeProcess");
+        operations.add(describeProcess);
+
+        final List<DomainType> eParameters = new ArrayList<DomainType>();
+        eParameters.add(new DomainType("service", "WPS"));
+        eParameters.add(new DomainType("version", "1.0.0"));
+        final Operation execute = new Operation(onlyPost, eParameters, null, null, "Execute");
+        operations.add(execute);
+
+        final List<DomainType> constraints = new ArrayList<DomainType>();
+        constraints.add(new DomainType("PostEncoding", "XML"));
+
+        OPERATIONS_METADATA = new OperationsMetadata(operations, null, constraints, null);
+    }
 }

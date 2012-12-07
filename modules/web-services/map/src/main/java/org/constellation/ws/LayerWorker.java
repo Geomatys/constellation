@@ -136,7 +136,7 @@ public abstract class LayerWorker extends AbstractWorker {
      */
     protected Map<Name, Layer> getLayers(){
         if (layerContext == null) {
-            return null;
+            return new HashMap<Name, Layer>();
         }
         final LayerProviderProxy namedProxy  = LayerProviderProxy.getInstance();
         final Map<Name, Layer> layers = new HashMap<Name, Layer>();

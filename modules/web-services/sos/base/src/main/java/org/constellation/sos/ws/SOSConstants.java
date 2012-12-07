@@ -17,13 +17,14 @@
 
 package org.constellation.sos.ws;
 
+import java.util.ArrayList;
 import org.opengis.filter.capability.Operator;
 import java.util.Arrays;
+import java.util.List;
 import javax.xml.namespace.QName;
 import net.jcip.annotations.Immutable;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorsType;
-import org.geotoolkit.ogc.xml.v110.FunctionNameType;
 import org.geotoolkit.ogc.xml.v110.GeometryOperandsType;
 import org.geotoolkit.ogc.xml.v110.IdCapabilitiesType;
 import org.geotoolkit.ogc.xml.v110.ScalarCapabilitiesType;
@@ -39,6 +40,15 @@ import org.geotoolkit.sos.xml.v100.FilterCapabilities;
 import org.opengis.filter.capability.SpatialOperator;
 
 import static org.geotoolkit.gml.xml.v311.ObjectFactory.*;
+import org.geotoolkit.ows.xml.v110.AllowedValues;
+import org.geotoolkit.ows.xml.v110.AnyValue;
+import org.geotoolkit.ows.xml.v110.DCP;
+import org.geotoolkit.ows.xml.v110.DomainType;
+import org.geotoolkit.ows.xml.v110.HTTP;
+import org.geotoolkit.ows.xml.v110.Operation;
+import org.geotoolkit.ows.xml.v110.OperationsMetadata;
+import org.geotoolkit.ows.xml.v110.RangeType;
+import org.geotoolkit.ows.xml.v110.RequestMethodType;
 
 /**
  *
@@ -122,6 +132,94 @@ public final class SOSConstants {
         
         final IdCapabilitiesType id = new IdCapabilitiesType(true, true);
         SOS_FILTER_CAPABILITIES.setIdCapabilities(id);
+    }
+    
+    public static final OperationsMetadata OPERATIONS_METADATA;
+    static {
+        final List<DCP> getAndPost = new ArrayList<DCP>();
+        getAndPost.add(new DCP(new HTTP(new RequestMethodType("somURL"), new RequestMethodType("someURL"))));
+
+        final List<DCP> onlyPost = new ArrayList<DCP>();
+        onlyPost.add(new DCP(new HTTP(null, new RequestMethodType("someURL"))));
+
+        final List<Operation> operations = new ArrayList<Operation>();
+
+        final List<DomainType> gcParameters = new ArrayList<DomainType>();
+        gcParameters.add(new DomainType("service", "SOS"));
+        gcParameters.add(new DomainType("Acceptversions", "1.0.0"));
+        gcParameters.add(new DomainType("Sections", Arrays.asList("ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities", "All")));
+        gcParameters.add(new DomainType("AcceptFormats", "text/xml"));
+        
+        final Operation getCapabilities = new Operation(getAndPost, gcParameters, null, null, "GetCapabilities");
+        operations.add(getCapabilities);
+
+        final List<DomainType> rsParameters = new ArrayList<DomainType>();
+        rsParameters.add(new DomainType("version", "1.0.0"));
+        rsParameters.add(new DomainType("service", "SOS"));
+        
+        final Operation registerSensor = new Operation(onlyPost, rsParameters, null, null, "RegisterSensor");
+        operations.add(registerSensor);
+        
+        final List<DomainType> grParameters = new ArrayList<DomainType>();
+        grParameters.add(new DomainType("version", "1.0.0"));
+        grParameters.add(new DomainType("service", "SOS"));
+        
+        final Operation getResult = new Operation(onlyPost, grParameters, null, null, "GetResult");
+        operations.add(getResult);
+        
+        final List<DomainType> goParameters = new ArrayList<DomainType>();
+        goParameters.add(new DomainType("version", "1.0.0"));
+        goParameters.add(new DomainType("service", "SOS"));
+        goParameters.add(new DomainType("srsName", new AnyValue()));
+        goParameters.add(new DomainType("offering", "offering-AllSensor"));
+        goParameters.add(new DomainType("eventTime", new AllowedValues(new RangeType("now", "now"))));
+        goParameters.add(new DomainType("procedure", "toUpdate"));
+        goParameters.add(new DomainType("observedProperty", "toUpdate"));
+        goParameters.add(new DomainType("featureOfInterest", "toUpdate"));
+        goParameters.add(new DomainType("result", new AnyValue()));
+        goParameters.add(new DomainType("responseFormat", "text/xml; subtype=\"om/1.0.0\""));
+        goParameters.add(new DomainType("resultModel", "om:Observation"));
+        goParameters.add(new DomainType("responseMode", Arrays.asList("resultTemplate","inline")));
+        
+        final Operation getObservation = new Operation(onlyPost, goParameters, null, null, "GetObservation");
+        operations.add(getObservation);
+        
+        final List<DomainType> ioParameters = new ArrayList<DomainType>();
+        ioParameters.add(new DomainType("version", "1.0.0"));
+        ioParameters.add(new DomainType("service", "SOS"));
+        
+        final Operation insertObservation = new Operation(onlyPost, ioParameters, null, null, "InsertObservation");
+        operations.add(insertObservation);
+        
+        final List<DomainType> gfParameters = new ArrayList<DomainType>();
+        gfParameters.add(new DomainType("featureOfInterestId", "toUpdate"));
+        gfParameters.add(new DomainType("version", "1.0.0"));
+        gfParameters.add(new DomainType("service", "SOS"));
+        
+        final Operation getFeatureOfInterest = new Operation(getAndPost, gfParameters, null, null, "GetFeatureOfInterest");
+        operations.add(getFeatureOfInterest);
+        
+        final List<DomainType> gftParameters = new ArrayList<DomainType>();
+        gftParameters.add(new DomainType("featureOfInterestId", "toUpdate"));
+        gftParameters.add(new DomainType("version", "1.0.0"));
+        gftParameters.add(new DomainType("service", "SOS"));
+        
+        final Operation getFeatureOfInterestTime = new Operation(onlyPost, gftParameters, null, null, "GetFeatureOfInterestTime");
+        operations.add(getFeatureOfInterestTime);
+        
+        final List<DomainType> dsParameters = new ArrayList<DomainType>();
+        dsParameters.add(new DomainType("version", "1.0.0"));
+        dsParameters.add(new DomainType("service", "SOS"));
+        dsParameters.add(new DomainType("outputFormat", "text/xml;subtype=\"sensorML/1.0.0\""));
+        dsParameters.add(new DomainType("procedure", "toUpdate"));
+        
+        final Operation describeSensor = new Operation(getAndPost, dsParameters, null, null, "DescribeSensor");
+        operations.add(describeSensor);
+        
+        final List<DomainType> constraints = new ArrayList<DomainType>();
+        constraints.add(new DomainType("PostEncoding", "XML"));
+        
+        OPERATIONS_METADATA = new OperationsMetadata(operations, null, constraints, null);
     }
 }
 

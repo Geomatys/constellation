@@ -49,7 +49,6 @@ import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 
 
 /**
@@ -70,15 +69,16 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testGetCapabilities() throws JAXBException, CstlServiceException {
-        final GetCapabilities request = new GetCapabilitiesType(null, null);
-        final GetCapabilitiesResponse response = WORKER.getCapabilities(request);
+        GetCapabilities request = new GetCapabilitiesType(null, null);
+        GetCapabilitiesResponse response = WORKER.getCapabilities(request);
 
         assertNotNull(response);
         assertTrue(response instanceof WCSCapabilitiesType);
-        final WCSCapabilitiesType getCaps = (WCSCapabilitiesType) response;
+        WCSCapabilitiesType getCaps = (WCSCapabilitiesType) response;
 
         
         // Verifies that the test layer is present into the GetCapabilities response.
+        boolean find = false;
         final List<CoverageOfferingBriefType> offerings = getCaps.getContentMetadata().getCoverageOfferingBrief();
         assertFalse(offerings.isEmpty());
         for (CoverageOfferingBriefType offering : offerings) {
@@ -86,12 +86,35 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
                 if (string.getName().getLocalPart().equalsIgnoreCase("name") &&
                     string.getValue().equals(LAYER_TEST))
                 {
-                    return;
+                    find = true;
                 }
             }
         }
         // Not found in the list of coverage offerings, there is a mistake here.
-        fail("Unable to find the layer "+ LAYER_TEST +" in the GetCapabilities document.");
+        if (!find) {
+            fail("Unable to find the layer "+ LAYER_TEST +" in the GetCapabilities document.");
+        }
+        
+        request = new GetCapabilitiesType("/WCS_Capabilities/Capability", null);
+        getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
+        
+        assertNotNull(getCaps.getCapability());
+        assertNull(getCaps.getContentMetadata());
+        assertNull(getCaps.getService());
+        
+        request = new GetCapabilitiesType("/WCS_Capabilities/Service", null);
+        getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
+        
+        assertNull(getCaps.getCapability());
+        assertNull(getCaps.getContentMetadata());
+        assertNotNull(getCaps.getService());
+        
+        request = new GetCapabilitiesType("/WCS_Capabilities/ContentMetadata", null);
+        getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
+        
+        assertNull(getCaps.getCapability());
+        assertNotNull(getCaps.getContentMetadata());
+        assertNull(getCaps.getService());
     }
 
     /**

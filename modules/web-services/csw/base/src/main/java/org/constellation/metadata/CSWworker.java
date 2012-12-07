@@ -99,6 +99,7 @@ import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 
 // GeoAPI dependencies
 import org.opengis.filter.sort.SortOrder;
@@ -509,20 +510,29 @@ public class CSWworker extends AbstractWorker {
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
+        
+        Sections sections = requestCapabilities.getSections();
+        if (sections == null) {
+            sections = new SectionsType(ALL);
+        }
+        //according to CITE test a GetCapabilities must always return Filter_Capabilities
+        if (!sections.containsSection(FILTER_CAPABILITIES) || sections.containsSection(ALL)) {
+            sections.add(FILTER_CAPABILITIES);
+        }
+        
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
         if (returnUS) {
             return CswXmlFactory.createCapabilities("2.0.2", getCurrentUpdateSequence());
         }
         
-        final Object cachedCapabilities = getCapabilitiesFromCache("2.0.2", null);
+        final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache("2.0.2", null);
         if (cachedCapabilities != null) {
-            return (AbstractCapabilities) cachedCapabilities;
+            return (AbstractCapabilities) cachedCapabilities.applySections(sections);
         }
 
         /*
          final AcceptFormats formats = requestCapabilities.getAcceptFormats();
-
 
          if (formats != null && formats.getOutputFormat().size() > 0 && !formats.getOutputFormat().contains(MimeType.TEXT_XML)) {
 
@@ -530,7 +540,6 @@ public class CSWworker extends AbstractWorker {
              throw new OWSWebServiceException("accepted format : text/xml",
                                              INVALID_PARAMETER_VALUE, "acceptFormats",
                                              version);
-
         }
         */
 
@@ -541,159 +550,122 @@ public class CSWworker extends AbstractWorker {
         }
 
         //we prepare the response document
-        AbstractServiceIdentification si = null;
-        AbstractServiceProvider       sp = null;
-        AbstractOperationsMetadata om    = null;
-        FilterCapabilities    fc         = null;
-
-        Sections sections = requestCapabilities.getSections();
-        if (sections == null) {
-            sections = new SectionsType(ALL);
+        final AbstractServiceIdentification si = skeletonCapabilities.getServiceIdentification();
+        final AbstractServiceProvider       sp = skeletonCapabilities.getServiceProvider();
+        final FilterCapabilities            fc = CSW_FILTER_CAPABILITIES;
+        final AbstractOperationsMetadata   om  = CSWConstants.OPERATIONS_METADATA.clone();
+        
+        // we remove the operation not supported in this profile (transactional/discovery)
+        if (profile == DISCOVERY) {
+            om.removeOperation("Harvest");
+            om.removeOperation("Transaction");
         }
 
-        //according to CITE test a GetCapabilities must always return Filter_Capabilities
-        if (!sections.containsSection(FILTER_CAPABILITIES) || sections.containsSection(ALL)) {
-            sections.add(FILTER_CAPABILITIES);
-        }
+        // we update the URL
+        om.updateURL(getServiceUrl());
 
-        //we enter the information for service identification.
-        if (sections.containsSection("ServiceIdentification") || sections.containsSection(ALL)) {
-
-            si = skeletonCapabilities.getServiceIdentification();
-        }
-
-        //we enter the information for service provider.
-        if (sections.containsSection("ServiceProvider") || sections.containsSection(ALL)) {
-
-            sp = skeletonCapabilities.getServiceProvider();
-        }
-
-        //we enter the operation Metadata
-        if (sections.containsSection("OperationsMetadata") || sections.containsSection(ALL)) {
-
-            om = skeletonCapabilities.getOperationsMetadata();
-
-            if (om != null) {
-
-                // we remove the operation not supported in this profile (transactional/discovery)
-                if (profile == DISCOVERY) {
-                    om.removeOperation("Harvest");
-                    om.removeOperation("Transaction");
-                }
-
-                // we update the URL
-                om.updateURL(getServiceUrl());
-
-                // we add the cascaded services (if there is some)
-                final AbstractDomain cascadedCSW  = om.getConstraint("FederatedCatalogues");
-                if (cascadedCSW == null) {
-                    if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
-                        final AbstractDomain fedCata = CswXmlFactory.createDomain("2.0.2","FederatedCatalogues", cascadedCSWservers);
-                        om.addConstraint(fedCata);
-                    }
-                } else {
-                    if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
-                        cascadedCSW.setValue(cascadedCSWservers);
-                    } else {
-                        om.removeConstraint("FederatedCatalogues");
-                    }
-                }
-
-                // we update the operation parameters
-                final AbstractOperation gr = om.getOperation("GetRecords");
-                if (gr != null) {
-                    final AbstractDomain os = gr.getParameter(OUTPUT_SCHEMA);
-                    if (os != null) {
-                        os.setValue(acceptedResourceType);
-                    }
-                    final AbstractDomain tn = gr.getParameter(TYPENAMES);
-                    if (tn != null) {
-                        final List<String> values = new ArrayList<String>();
-                        for (QName qn : supportedTypeNames) {
-                            values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
-                        }
-                        tn.setValue(values);
-                    }
-
-                    //we update the ISO queryable elements :
-                    final AbstractDomain isoQueryable = gr.getConstraint("SupportedISOQueryables");
-                    if (isoQueryable != null) {
-                        final List<String> values = new ArrayList<String>();
-                        for (String name : ISO_QUERYABLE.keySet() ) {
-                            values.add("apiso:" + name);
-                        }
-                        isoQueryable.setValue(values);
-                    }
-                    //we update the DC queryable elements :
-                    final AbstractDomain dcQueryable = gr.getConstraint("SupportedDublinCoreQueryables");
-                    if (dcQueryable != null) {
-                        final List<String> values = new ArrayList<String>();
-                        for (String name : DUBLIN_CORE_QUERYABLE.keySet() ) {
-                            values.add("dc:" + name);
-                        }
-                        dcQueryable.setValue(values);
-                    }
-
-                    //we update the reader's additional queryable elements :
-                    final AbstractDomain additionalQueryable = gr.getConstraint("AdditionalQueryables");
-                    if (additionalQueryable != null) {
-                        final List<String> values = new ArrayList<String>();
-                        for (QName name : mdReader.getAdditionalQueryableQName()) {
-                            // allow to redefine the mapping in reader implementation
-                            if (!ISO_QUERYABLE.containsKey(name.getLocalPart()) &&
-                                !DUBLIN_CORE_QUERYABLE.containsKey(name.getLocalPart())) {
-                                values.add(name.getPrefix() + ':' + name.getLocalPart());
-                            }
-                        }
-                        if (values.size() > 0) {
-                            additionalQueryable.setValue(values);
-                        }
-                    }
-                }
-
-                final AbstractOperation grbi = om.getOperation("GetRecordById");
-                if (grbi != null) {
-                    final AbstractDomain os = grbi.getParameter(OUTPUT_SCHEMA);
-                    if (os != null) {
-                        os.setValue(acceptedResourceType);
-                    }
-                }
-
-                final AbstractOperation dr = om.getOperation("DescribeRecord");
-                if (dr != null) {
-                    final AbstractDomain tn = dr.getParameter("TypeName");
-                    if (tn != null) {
-                        final List<String> values = new ArrayList<String>();
-                        for (QName qn : supportedTypeNames) {
-                            values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
-                        }
-                        tn.setValue(values);
-                    }
-                    final AbstractDomain sl = dr.getParameter("SchemaLanguage");
-                    if (sl != null) {
-                        sl.setValue(supportedSchemaLanguage);
-                    }
-                }
-
-                //we add the INSPIRE extend capabilties
-                final InspireCapabilitiesType inspireCapa = new InspireCapabilitiesType(Arrays.asList("FRA", "ENG"));
-                final MultiLingualCapabilities m          = new MultiLingualCapabilities();
-                m.setMultiLingualCapabilities(inspireCapa);
-                om.setExtendedCapabilities(m);
+        // we add the cascaded services (if there is some)
+        final AbstractDomain cascadedCSW  = om.getConstraint("FederatedCatalogues");
+        if (cascadedCSW == null) {
+            if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
+                final AbstractDomain fedCata = CswXmlFactory.createDomain("2.0.2","FederatedCatalogues", cascadedCSWservers);
+                om.addConstraint(fedCata);
+            }
+        } else {
+            if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
+                cascadedCSW.setValue(cascadedCSWservers);
+            } else {
+                om.removeConstraint("FederatedCatalogues");
             }
         }
 
-        //we enter the information filter capablities.
-        if (sections.containsSection(FILTER_CAPABILITIES) || sections.containsSection(ALL)) {
+        // we update the operation parameters
+        final AbstractOperation gr = om.getOperation("GetRecords");
+        if (gr != null) {
+            final AbstractDomain os = gr.getParameter(OUTPUT_SCHEMA);
+            if (os != null) {
+                os.setValue(acceptedResourceType);
+            }
+            final AbstractDomain tn = gr.getParameter(TYPENAMES);
+            if (tn != null) {
+                final List<String> values = new ArrayList<String>();
+                for (QName qn : supportedTypeNames) {
+                    values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
+                }
+                tn.setValue(values);
+            }
 
-            fc = skeletonCapabilities.getFilterCapabilities();
+            //we update the ISO queryable elements :
+            final AbstractDomain isoQueryable = gr.getConstraint("SupportedISOQueryables");
+            if (isoQueryable != null) {
+                final List<String> values = new ArrayList<String>();
+                for (String name : ISO_QUERYABLE.keySet() ) {
+                    values.add("apiso:" + name);
+                }
+                isoQueryable.setValue(values);
+            }
+            //we update the DC queryable elements :
+            final AbstractDomain dcQueryable = gr.getConstraint("SupportedDublinCoreQueryables");
+            if (dcQueryable != null) {
+                final List<String> values = new ArrayList<String>();
+                for (String name : DUBLIN_CORE_QUERYABLE.keySet() ) {
+                    values.add("dc:" + name);
+                }
+                dcQueryable.setValue(values);
+            }
+
+            //we update the reader's additional queryable elements :
+            final AbstractDomain additionalQueryable = gr.getConstraint("AdditionalQueryables");
+            if (additionalQueryable != null) {
+                final List<String> values = new ArrayList<String>();
+                for (QName name : mdReader.getAdditionalQueryableQName()) {
+                    // allow to redefine the mapping in reader implementation
+                    if (!ISO_QUERYABLE.containsKey(name.getLocalPart()) &&
+                        !DUBLIN_CORE_QUERYABLE.containsKey(name.getLocalPart())) {
+                        values.add(name.getPrefix() + ':' + name.getLocalPart());
+                    }
+                }
+                if (values.size() > 0) {
+                    additionalQueryable.setValue(values);
+                }
+            }
         }
+
+        final AbstractOperation grbi = om.getOperation("GetRecordById");
+        if (grbi != null) {
+            final AbstractDomain os = grbi.getParameter(OUTPUT_SCHEMA);
+            if (os != null) {
+                os.setValue(acceptedResourceType);
+            }
+        }
+
+        final AbstractOperation dr = om.getOperation("DescribeRecord");
+        if (dr != null) {
+            final AbstractDomain tn = dr.getParameter("TypeName");
+            if (tn != null) {
+                final List<String> values = new ArrayList<String>();
+                for (QName qn : supportedTypeNames) {
+                    values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
+                }
+                tn.setValue(values);
+            }
+            final AbstractDomain sl = dr.getParameter("SchemaLanguage");
+            if (sl != null) {
+                sl.setValue(supportedSchemaLanguage);
+            }
+        }
+
+        //we add the INSPIRE extend capabilties
+        final InspireCapabilitiesType inspireCapa = new InspireCapabilitiesType(Arrays.asList("FRA", "ENG"));
+        final MultiLingualCapabilities m          = new MultiLingualCapabilities();
+        m.setMultiLingualCapabilities(inspireCapa);
+        om.setExtendedCapabilities(m);
 
         final AbstractCapabilities c = CswXmlFactory.createCapabilities("2.0.2", si, sp, om, null, fc);
 
-        putCapabilitiesInCache("1.0.0", null, c);
+        putCapabilitiesInCache("2.0.2", null, c);
         LOGGER.log(logLevel, "GetCapabilities request processed in {0} ms", (System.currentTimeMillis() - startTime));
-        return c;
+        return (AbstractCapabilities) c.applySections(sections);
     }
 
     /**
@@ -1274,15 +1246,9 @@ public class CSWworker extends AbstractWorker {
                 final int pointLocation = token.indexOf('.');
                 if (pointLocation != -1) {
 
-                    // we load the skeleton capabilities
-                    final AbstractCapabilities skeletonCapabilities = (AbstractCapabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
-                    if (skeletonCapabilities == null) {
-                        throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-                    }
-                    
                     final String operationName = token.substring(0, pointLocation);
                     final String parameter     = token.substring(pointLocation + 1);
-                    final AbstractOperation o  = skeletonCapabilities.getOperationsMetadata().getOperation(operationName);
+                    final AbstractOperation o  = OPERATIONS_METADATA.getOperation(operationName);
                     if (o != null) {
                         final AbstractDomain param = o.getParameterIgnoreCase(parameter);
                         QName type;

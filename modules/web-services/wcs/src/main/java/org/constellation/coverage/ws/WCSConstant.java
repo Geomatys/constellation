@@ -30,7 +30,7 @@ import org.geotoolkit.wcs.xml.v100.DCPTypeType;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Post;
 import org.geotoolkit.wcs.xml.v100.OnlineResourceType;
-import org.geotoolkit.wcs.xml.v100.WCSCapabilityType.Request;
+import org.geotoolkit.wcs.xml.v100.Request;
 
 /**
  *  WCS Constants

@@ -478,45 +478,15 @@ public class WPSUtils {
         final String tmpDirPath = getTempDirectoryPath();
         final File tmpDir       = new File(tmpDirPath);
         if (tmpDir.isDirectory()) {
-            LOGGER.log(Level.INFO, "Temporary storage directory already created at : " + tmpDir);
+            LOGGER.log(Level.INFO, "Temporary storage directory already created at : {0}", tmpDir);
             return true;
         }
         
         boolean success = tmpDir.mkdirs();
         if (success) {
-            LOGGER.log(Level.INFO, "Temporary storage directory created at : " + tmpDir);
+            LOGGER.log(Level.INFO, "Temporary storage directory created at : {0}", tmpDir);
         } else {
-            LOGGER.log(Level.WARNING, "Temporary storage directory can't be created at : " + tmpDir);
-        }
-        return success;
-    }
-
-    /**
-     * Delete a file. If the file is a directory, the method will recursivly delete all files before.
-     *
-     * @deprecated use the methods from geotk FileUtilities
-     * 
-     * @param file
-     * @return {@code true} if success, {@code false} if failed.
-     */
-    @Deprecated
-    public static boolean deleteTempFileOrDirectory(final File file) {
-        //directory case.
-        if (file.isDirectory()) {
-            String[] children = file.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteTempFileOrDirectory(new File(file, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-
-        boolean success = file.delete();
-        if (success) {
-            LOGGER.log(Level.INFO, "Temporary file " + file.getAbsolutePath() + " deleted.");
-        } else {
-            LOGGER.log(Level.WARNING, "Temporary file " + file.getAbsolutePath() + " can't be deleted.");
+            LOGGER.log(Level.WARNING, "Temporary storage directory can't be created at : {0}", tmpDir);
         }
         return success;
     }

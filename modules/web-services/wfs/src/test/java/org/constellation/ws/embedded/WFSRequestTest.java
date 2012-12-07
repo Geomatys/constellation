@@ -71,7 +71,6 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     private static boolean datasourceCreated = false;
 
     private static final String WFS_GETCAPABILITIES_URL = "request=GetCapabilities&version=1.1.0&service=WFS";
-    private static final String WFS_GETCAPABILITIES_URL2 = "request=GetCapabilities&version=1.1.0&service=WFS";
 
     private static final String WFS_GETFEATURE_URL = "request=getFeature&service=WFS&version=1.1.0&"
             + "typename=sa:SamplingPoint&namespace=xmlns(sa=http://www.opengis.net/sampling/1.0)&"
@@ -225,7 +224,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?", currentUrl);
 
         try {
-            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test?" + WFS_GETCAPABILITIES_URL2);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test?" + WFS_GETCAPABILITIES_URL);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;

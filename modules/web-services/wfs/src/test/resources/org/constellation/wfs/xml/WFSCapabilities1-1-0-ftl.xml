@@ -169,7 +169,7 @@
         <wfs:FeatureType>
             <wfs:Name xmlns:sampling="http://www.opengis.net/sampling/1.0">sampling:SamplingPoint</wfs:Name>
             <wfs:Title>SamplingPoint</wfs:Title>
-            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">

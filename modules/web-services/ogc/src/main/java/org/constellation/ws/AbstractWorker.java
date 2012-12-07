@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +34,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.security.SimplePDP;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.logging.Logging;
@@ -96,7 +96,7 @@ public abstract class AbstractWorker implements Worker {
     /**
      * Output responses of a GetCapabilities request.
      */
-    private static final Map<String,Object> CAPS_RESPONSE = new HashMap<String, Object>();
+    private static final Map<String,AbstractCapabilitiesCore> CAPS_RESPONSE = new HashMap<String, AbstractCapabilitiesCore>();
     
     /**
      * The identifier of the worker.
@@ -310,7 +310,7 @@ public abstract class AbstractWorker implements Worker {
      * @param version
      * @return r
      */
-    protected Object getCapabilitiesFromCache(final String version, final String language) {
+    protected AbstractCapabilitiesCore getCapabilitiesFromCache(final String version, final String language) {
         final String keyCache = specification.name() + '-' + id + '-' + version + '-' + language;
         return CAPS_RESPONSE.get(keyCache);
     }
@@ -322,13 +322,13 @@ public abstract class AbstractWorker implements Worker {
      * @param language
      * @param capabilities 
      */
-    protected void putCapabilitiesInCache(final String version, final String language, final Object capabilities) {
-        final String keyCache = specification.name() + '-' + id + '-' + version + '-';
+    protected void putCapabilitiesInCache(final String version, final String language, final AbstractCapabilitiesCore capabilities) {
+        final String keyCache = specification.name() + '-' + id + '-' + version + '-' + language;
         CAPS_RESPONSE.put(keyCache, capabilities);
     }
     
     protected void clearCapabilitiesCache() {
-        final List<String> toClear = new ArrayList<String>();;
+        final List<String> toClear = new ArrayList<String>();
         for (String key: CAPS_RESPONSE.keySet()) {
             if (key.startsWith(specification.name() + '-')) {
                 toClear.add(key);

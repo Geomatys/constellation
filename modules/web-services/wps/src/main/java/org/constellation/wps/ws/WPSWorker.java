@@ -57,6 +57,7 @@ import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessingRegistry;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.ArgumentChecks;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.wps.converters.WPSConvertersUtils;
 import org.geotoolkit.wps.io.WPSIO;
@@ -133,7 +134,7 @@ public class WPSWorker extends AbstractWorker {
                     } else {
                         startError = "The process context File does not contain a ProcessContext object";
                         isStarted = false;
-                        LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError);
+                        LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
                     }
                 } catch (JAXBException ex) {
                     startError = "JAXBExeception while unmarshalling the process context File";
@@ -226,7 +227,7 @@ public class WPSWorker extends AbstractWorker {
     public void destroy() {
         super.destroy();
         //Delete recursuvly temporary directory.
-        WPSUtils.deleteTempFileOrDirectory(new File(temporaryFolderPath));
+        FileUtilities.deleteDirectory(new File(temporaryFolderPath));
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -286,7 +287,10 @@ public class WPSWorker extends AbstractWorker {
                 throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
             }
 
-            staticCapabilities.getOperationsMetadata().updateURL(getServiceUrl());
+            final ServiceIdentification si = staticCapabilities.getServiceIdentification();
+            final ServiceProvider sp       = staticCapabilities.getServiceProvider();
+            final OperationsMetadata om    = WPSConstant.OPERATIONS_METADATA.clone();
+            om.updateURL(getServiceUrl());
 
             final ProcessOfferings offering = new ProcessOfferings();
 
@@ -295,11 +299,11 @@ public class WPSWorker extends AbstractWorker {
                     offering.getProcess().add(WPSUtils.generateProcessBrief(procDesc));
                 }
             }
-
-            staticCapabilities.setProcessOfferings(offering);
-            staticCapabilities.setUpdateSequence(getCurrentUpdateSequence());
-            putCapabilitiesInCache("1.0.0", null, staticCapabilities);
-            return staticCapabilities;
+            final Languages languages = new Languages("en-EN", Arrays.asList("en-EN"));
+           
+            final WPSCapabilitiesType response = new WPSCapabilitiesType(si, sp, om, "1.0.0", getCurrentUpdateSequence(), offering, languages, null);
+            putCapabilitiesInCache("1.0.0", null, response);
+            return response;
         } else {
             throw new CstlServiceException("The specified " + ACCEPT_VERSIONS_PARAMETER + " numbers are not handled by the service.",
                     VERSION_NEGOTIATION_FAILED, ACCEPT_VERSIONS_PARAMETER.toLowerCase());

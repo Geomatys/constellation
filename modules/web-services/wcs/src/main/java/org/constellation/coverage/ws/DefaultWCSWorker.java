@@ -93,8 +93,7 @@ import org.geotoolkit.wcs.xml.v100.SupportedCRSsType;
 import org.geotoolkit.wcs.xml.v100.SupportedFormatsType;
 import org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
-import org.geotoolkit.wcs.xml.v100.WCSCapabilityType;
-import org.geotoolkit.wcs.xml.v100.WCSCapabilityType.Request;
+import org.geotoolkit.wcs.xml.v100.Request;
 import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.geotoolkit.wcs.xml.v111.Capabilities;
 import org.geotoolkit.wcs.xml.v111.Contents;
@@ -112,9 +111,11 @@ import org.geotoolkit.gml.xml.v311.RectifiedGridType;
 import org.geotoolkit.gml.xml.v311.GridType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.Sections;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.wcs.xml.WCSXmlFactory;
 
 
 // GeoAPI dependencies
@@ -465,8 +466,6 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
                         coverageName + "\".", INVALID_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
             }
-            final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory =
-                    new org.geotoolkit.ows.xml.v110.ObjectFactory();
             final GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = coverageRef.getGeographicBoundingBox();
@@ -576,23 +575,38 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence(), version);
         if (returnUS) {
-            if (version.equals("1.0.0")) {
-                return new WCSCapabilitiesType(getCurrentUpdateSequence());
-            } else {
-                return new Capabilities(version, getCurrentUpdateSequence());
+            return WCSXmlFactory.createCapabilitiesResponse(version, getCurrentUpdateSequence());
+        }
+        
+        /*
+         * In WCS 1.0.0 the user can request only one section
+         * ( or all by omitting the parameter section)
+         */
+        final Sections sections = request.getSections();
+        if (sections != null && !sections.getSection().isEmpty()) {
+            for (String sec : sections.getSection()) {
+                if (!SectionsType.getExistingSections(version).contains(sec)) {
+                    throw new CstlServiceException("This sections " + sec + " is not allowed", INVALID_PARAMETER_VALUE, KEY_SECTION.toLowerCase());
+                }
             }
         }
-
+        
         // If the getCapabilities response is in cache, we just return it.
-        final Object cachedCapabilities = getCapabilitiesFromCache(version, null);
+        final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache(version, null);
         if (cachedCapabilities != null) {
-            return (GetCapabilitiesResponse) cachedCapabilities;
+            return (GetCapabilitiesResponse) cachedCapabilities.applySections(sections);
+        }
+        
+        // We unmarshall the static capabilities document.
+        final GetCapabilitiesResponse staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(version, "WCS");
+        if (staticCapabilities == null) {
+            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
         }
 
         final String format;
         final GetCapabilitiesResponse response;
         if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
-            response = getCapabilities100(request);
+            response = getCapabilities100((WCSCapabilitiesType)staticCapabilities);
         } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
             // if the user have specified one format accepted (only one for now != spec)
             final AcceptFormats formats = request.getAcceptFormats();
@@ -606,14 +620,14 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 }
             }
 
-            response = getCapabilities111(request);
+            response = getCapabilities111((Capabilities)staticCapabilities);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
 
         putCapabilitiesInCache(version, null, response);
-        return response;
+        return (GetCapabilitiesResponse) response.applySections(sections);
     }
 
     /**
@@ -626,58 +640,16 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private GetCapabilitiesResponse getCapabilities100(final GetCapabilities request) throws CstlServiceException {
-        /*
-         * In WCS 1.0.0 the user can request only one section
-         * ( or all by omitting the parameter section)
-         */
-        final Sections sections = request.getSections();
-        String requestedSection = null;
-        boolean contentMeta = false;
-        if (sections != null && !sections.getSection().isEmpty()) {
-            final String section = sections.getSection().get(0);
-            if (SectionsType.getExistingSections(ServiceDef.WCS_1_0_0.version.toString()).contains(section)) {
-                requestedSection = section;
-            } else {
-                throw new CstlServiceException("The section " + section + " does not exist",
-                        INVALID_PARAMETER_VALUE, KEY_SECTION.toLowerCase());
-            }
-            contentMeta = "/WCS_Capabilities/ContentMetadata".equals(requestedSection);
-        }
-
-        // We unmarshall the static capabilities document.
-        final WCSCapabilitiesType staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
-        if (staticCapabilities == null) {
-            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-        }
+    private GetCapabilitiesResponse getCapabilities100(final WCSCapabilitiesType staticCapabilities) throws CstlServiceException {
         
-        if (requestedSection == null || "/WCS_Capabilities/Capability".equals(requestedSection) || "/".equals(requestedSection))
-        {
-            //we update the url in the static part.
-            final Request req = new Request(WCSConstant.REQUEST_100);
-            final String url  = getServiceUrl() + "SERVICE=WCS&";
-            req.updateURL(url);
-            staticCapabilities.getCapability().setRequest(req);
-        }
-
-        final WCSCapabilitiesType responsev100;
-        if (requestedSection == null || contentMeta || "/".equals(requestedSection)) {
-            responsev100 = staticCapabilities;
-        } else {
-            if ("/WCS_Capabilities/Capability".equals(requestedSection)) {
-                final WCSCapabilityType getStaticCapa = staticCapabilities.getCapability();
-                getStaticCapa.setVersion(ServiceDef.WCS_1_0_0.version.toString());
-                return new WCSCapabilitiesType(getStaticCapa);
-            } else if ("/WCS_Capabilities/Service".equals(requestedSection)) {
-                final org.geotoolkit.wcs.xml.v100.ServiceType getStaticService = staticCapabilities.getService();
-                getStaticService.setVersion(ServiceDef.WCS_1_0_0.version.toString());
-                return new WCSCapabilitiesType(getStaticService);
-            } else {
-                throw new CstlServiceException("Not a valid section requested: " + requestedSection,
-                        INVALID_PARAMETER_VALUE, KEY_SECTION.toLowerCase());
-            }
-        }
-
+        //we update the url in the static part.
+        final Request req = WCSConstant.REQUEST_100.clone();
+        final String url  = getServiceUrl() + "SERVICE=WCS&";
+        req.updateURL(url);
+        staticCapabilities.getCapability().setRequest(req);
+        
+        final org.geotoolkit.wcs.xml.v100.WCSCapabilityType ca = staticCapabilities.getCapability();
+        final org.geotoolkit.wcs.xml.v100.ServiceType service  = staticCapabilities.getService();
         final ContentMetadata contentMetadata;
         final List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
         final Map<Name,Layer> layers = getLayers();
@@ -754,16 +726,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         } catch (DataStoreException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
-
-        // The ContentMetadata has finally been filled, we can now return the response.
-        if (contentMeta) {
-            contentMetadata.setVersion(ServiceDef.WCS_1_0_0.version.toString());
-            return new WCSCapabilitiesType(contentMetadata, getCurrentUpdateSequence());
-        } else {
-            responsev100.setContentMetadata(contentMetadata);
-            responsev100.setUpdateSequence(getCurrentUpdateSequence());
-            return responsev100;
-        }
+        return new WCSCapabilitiesType(service, ca, contentMetadata, getCurrentUpdateSequence());
     }
 
     /**
@@ -775,48 +738,15 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private Capabilities getCapabilities111(final GetCapabilities request)
-                                throws CstlServiceException {
-        // First we try to extract only the requested section.
-        List<String> requestedSections =
-                SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
+    private Capabilities getCapabilities111(final Capabilities staticCapabilities) throws CstlServiceException {
+       
 
-        if (request.getSections() != null && request.getSections().getSection().size() > 0) {
-            requestedSections = request.getSections().getSection();
-            for (String sec : requestedSections) {
-                if (!SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString()).contains(sec)) {
-                    throw new CstlServiceException("This sections " + sec + " is not allowed",
-                            INVALID_PARAMETER_VALUE, KEY_SECTION.toLowerCase());
-                }
-            }
-        }
-
-        // We unmarshall the static capabilities document.
-        final Capabilities staticCapabilities = (Capabilities) getStaticCapabilitiesObject(ServiceDef.WCS_1_1_1.version.toString(), ServiceDef.Specification.WCS.toString());
-
-        ServiceIdentification si = null;
-        ServiceProvider sp       = null;
-        OperationsMetadata om    = null;
-        final String all         = "All";
-        //we add the static sections if the are included in the requested sections
-        if (requestedSections.contains("ServiceProvider") || requestedSections.contains(all)) {
-            sp = staticCapabilities.getServiceProvider();
-        }
-        if (requestedSections.contains("ServiceIdentification") || requestedSections.contains(all)) {
-            si = staticCapabilities.getServiceIdentification();
-        }
-        if (requestedSections.contains("OperationsMetadata") || requestedSections.contains(all)) {
-            om = new OperationsMetadata(WCSConstant.OPERATIONS_METADATA_111);
-            //we update the url in the static part.
-            om.updateURL(getServiceUrl());
-        }
-        final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), getCurrentUpdateSequence(), null);
-
-        // if the user does not request the contents section we can return the result.
-        if (!requestedSections.contains("Contents") && !requestedSections.contains(all)) {
-            return responsev111;
-        }
-
+        final ServiceIdentification si = staticCapabilities.getServiceIdentification();
+        final ServiceProvider sp       = staticCapabilities.getServiceProvider();
+        final OperationsMetadata om    = WCSConstant.OPERATIONS_METADATA_111.clone();
+        //we update the url in the static part.
+        om.updateURL(getServiceUrl());
+            
         // Generate the Contents part of the GetCapabilities.
         final Contents contents;
         final List<CoverageSummaryType> summary = new ArrayList<CoverageSummaryType>();
@@ -873,10 +803,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         } catch (DataStoreException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
-
-        // Finally set the contents and return the full response.
-        responsev111.setContents(contents);
-        return responsev111;
+        return new Capabilities(si, sp, om, "1.1.1", getCurrentUpdateSequence(), contents);
     }
 
 

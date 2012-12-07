@@ -182,16 +182,30 @@ public class WFSWorkerTest {
     public void getCapabilitiesTest() throws Exception {
         final Marshaller marshaller = pool.acquireMarshaller();
 
-        GetCapabilitiesType request = new GetCapabilitiesType("WFS");
+        AcceptVersionsType acceptVersion = new AcceptVersionsType("1.1.0");
+        SectionsType sections       = new SectionsType("featureTypeList");
+        GetCapabilitiesType request = new GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
+
         WFSCapabilities result = worker.getCapabilities(request);
 
+
         StringWriter sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        domCompare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml"),
+                sw.toString());
+
+        
+        request = new GetCapabilitiesType("WFS");
+        result = worker.getCapabilities(request);
+
+        sw = new StringWriter();
         marshaller.marshal(result, sw);
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml"),
                 sw.toString());
 
-        AcceptVersionsType acceptVersion = new AcceptVersionsType("2.3.0");
+        acceptVersion = new AcceptVersionsType("2.3.0");
         request = new GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
 
         try {
@@ -221,20 +235,6 @@ public class WFSWorkerTest {
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "service");
         }
-
-
-        acceptVersion = new AcceptVersionsType("1.1.0");
-        SectionsType sections = new SectionsType("featureTypeList");
-        request       = new GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
-
-        result = worker.getCapabilities(request);
-
-
-        sw = new StringWriter();
-        marshaller.marshal(result, sw);
-        domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml"),
-                sw.toString());
 
         acceptVersion = new AcceptVersionsType("1.1.0");
         sections      = new SectionsType("operationsMetadata");

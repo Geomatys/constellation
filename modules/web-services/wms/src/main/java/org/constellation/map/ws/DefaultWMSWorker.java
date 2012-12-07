@@ -107,7 +107,6 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.wms.xml.AbstractLegendURL;
 import org.geotoolkit.wms.xml.AbstractOnlineResource;
-import org.geotoolkit.wms.xml.v111.Request;
 import org.geotoolkit.wms.xml.v130.Capability;
 import org.geotoolkit.wms.xml.AbstractDimension;
 import org.geotoolkit.wms.xml.AbstractLayer;
@@ -277,10 +276,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final AbstractRequest request;
         final List<String> exceptionFormats;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
-            request          = new Request(WMSConstant.createRequest111(GFI_MIME_TYPES));
+            request          = WMSConstant.createRequest111(GFI_MIME_TYPES).clone();
             exceptionFormats = WMSConstant.EXCEPTION_111;
         } else {
-            request          = new org.geotoolkit.wms.xml.v130.Request(WMSConstant.createRequest130(GFI_MIME_TYPES));
+            request          = WMSConstant.createRequest130(GFI_MIME_TYPES).clone();
             exceptionFormats = WMSConstant.EXCEPTION_130;
         }
         request.updateURL(getServiceUrl());

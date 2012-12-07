@@ -124,6 +124,7 @@ import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.sampling.xml.v100.ObjectFactory;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
@@ -283,7 +284,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * if the flag keepCapabilities is set to true, this attribute will be fill with the reponse of a getCapabilities.
      */
-    private Capabilities cachedCapabilities;
+    private Capabilities loadedCapabilities;
 
     private boolean alwaysFeatureCollection;
 
@@ -583,7 +584,7 @@ public class SOSworker extends AbstractWorker {
                     object = ((JAXBElement)object).getValue();
                 }
                 if (object instanceof Capabilities) {
-                    cachedCapabilities = (Capabilities) object;
+                    loadedCapabilities = (Capabilities) object;
                 } else {
                     LOGGER.severe("cached capabilities file does not contains Capablities object.");
                 }
@@ -674,17 +675,16 @@ public class SOSworker extends AbstractWorker {
         if (returnUS) {
             return new Capabilities("1.0.0", getCurrentUpdateSequence());
         }
-
-        //we prepare the different parts response document
-        ServiceIdentification si = null;
-        ServiceProvider       sp = null;
-        OperationsMetadata    om = null;
-        FilterCapabilities    fc = null;
-        Contents            cont = null;
-
+        
         SectionsType sections = requestCapabilities.getSections();
         if (sections == null) {
             sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
+        }
+        
+        // If the getCapabilities response is in cache, we just return it.
+        final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache("1.0.0", null);
+        if (cachedCapabilities != null) {
+            return (Capabilities) cachedCapabilities.applySections(sections);
         }
 
         // we load the skeleton capabilities
@@ -692,132 +692,112 @@ public class SOSworker extends AbstractWorker {
         if (skeletonCapabilities == null) {
             throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
         }
-        
         final Capabilities localCapabilities;
         if (keepCapabilities) {
-            localCapabilities = cachedCapabilities;
+            localCapabilities = loadedCapabilities;
         } else {
             localCapabilities = skeletonCapabilities;
         }
 
-        //we enter the information for service identification.
-        if (sections.containsSection("ServiceIdentification") || sections.containsSection(ALL)) {
+        //we prepare the different parts response document
+        final ServiceIdentification si = localCapabilities.getServiceIdentification();
+        final ServiceProvider       sp = localCapabilities.getServiceProvider();
+        final FilterCapabilities    fc = SOS_FILTER_CAPABILITIES;
+        final OperationsMetadata    om = OPERATIONS_METADATA.clone();
 
-            si = localCapabilities.getServiceIdentification();
+        //we remove the operation not supported in this profile (transactional/discovery)
+        if (profile == DISCOVERY) {
+            om.removeOperation("InsertObservation");
+            om.removeOperation("RegisterSensor");
         }
+        //we update the URL
+        om.updateURL(getServiceUrl());
 
-        //we enter the information for service provider.
-        if (sections.containsSection("ServiceProvider") || sections.containsSection(ALL)) {
+        if (!keepCapabilities) {
 
-            sp = localCapabilities.getServiceProvider();
-        }
+            //we update the parameter in operation metadata.
+            final Operation go = om.getOperation("GetObservation");
 
-        //we enter the operation Metadata
-        if (sections.containsSection("OperationsMetadata") || sections.containsSection(ALL)) {
+            // the list of offering names
+            go.updateParameter(OFFERING, omReader.getOfferingNames());
 
-           om = localCapabilities.getOperationsMetadata();
-
-           //we remove the operation not supported in this profile (transactional/discovery)
-           if (profile == DISCOVERY) {
-                om.removeOperation("InsertObservation");
-                om.removeOperation("RegisterSensor");
+            // the event time range
+            final List<String> eventTime = omReader.getEventTime();
+            if (eventTime != null && eventTime.size() == 1) {
+                final RangeType range = new RangeType(eventTime.get(0), "now");
+                go.updateParameter(EVENT_TIME, range);
+            } else if (eventTime != null && eventTime.size() == 2) {
+                final RangeType range = new RangeType(eventTime.get(0), eventTime.get(1));
+                go.updateParameter(EVENT_TIME, range);
             }
 
-            //we update the URL
-            om.updateURL(getServiceUrl());
+            //the process list
+            final Collection<String> procNames = omReader.getProcedureNames();
+            go.updateParameter(PROCEDURE, procNames);
 
-           if (!keepCapabilities) {
+            //the phenomenon list
+            go.updateParameter("observedProperty", omReader.getPhenomenonNames());
 
-               //we update the parameter in operation metadata.
-               final Operation go = om.getOperation("GetObservation");
+            //the feature of interest list
+            Collection<String> foiNames = omReader.getFeatureOfInterestNames();
+            go.updateParameter("featureOfInterest", foiNames);
 
-               // the list of offering names
-               go.updateParameter(OFFERING, omReader.getOfferingNames());
-
-               // the event time range
-               final List<String> eventTime = omReader.getEventTime();
-               if (eventTime != null && eventTime.size() == 1) {
-                   final RangeType range = new RangeType(eventTime.get(0), "now");
-                   go.updateParameter(EVENT_TIME, range);
-               } else if (eventTime != null && eventTime.size() == 2) {
-                   final RangeType range = new RangeType(eventTime.get(0), eventTime.get(1));
-                   go.updateParameter(EVENT_TIME, range);
-               }
-
-               //the process list
-               final Collection<String> procNames = omReader.getProcedureNames();
-               go.updateParameter(PROCEDURE, procNames);
-
-               //the phenomenon list
-               go.updateParameter("observedProperty", omReader.getPhenomenonNames());
-
-               //the feature of interest list
-               Collection<String> foiNames = omReader.getFeatureOfInterestNames();
-               go.updateParameter("featureOfInterest", foiNames);
-
-               // the different responseMode available
-               final List<String> arm = new ArrayList<String>();
-               for (ResponseModeType rm: acceptedResponseMode) {
-                   arm.add(rm.value());
-               }
-               go.updateParameter(RESPONSE_MODE, arm);
-
-               // the different responseFormat available
-               go.updateParameter("responseFormat", acceptedResponseFormat);
-
-               // the result filtrable part
-               final List<String> queryableResultProperties = omFilter.supportedQueryableResultProperties();
-               if (queryableResultProperties != null && !queryableResultProperties.isEmpty()) {
-                go.updateParameter("result", queryableResultProperties);
-               }
-
-               /**
-                * Because sometimes there is some sensor that are queryable in DescribeSensor but not in GetObservation
-                */
-               final Operation ds = om.getOperation("DescribeSensor");
-               if (smlReader != null) {
-                   final List<String> sensorNames = new ArrayList<String>(smlReader.getSensorNames());
-                   Collections.sort(sensorNames);
-                   ds.updateParameter(PROCEDURE, sensorNames);
-               } else {
-                   ds.updateParameter(PROCEDURE, procNames);
-               }
-
-               ds.updateParameter("outputFormat", ACCEPTED_SENSORML_FORMATS);
-
-               final Operation gfoi = om.getOperation("GetFeatureOfInterest");
-               if (gfoi != null) {
-                   //the feature of interest list
-                   gfoi.updateParameter("featureOfInterestId", foiNames);
-               }
-
-               final Operation gfoit = om.getOperation("GetFeatureOfInterestTime");
-               if (gfoit != null) {
-                   //the feature of interest list
-                   gfoit.updateParameter("featureOfInterestId", foiNames);
-               }
+            // the different responseMode available
+            final List<String> arm = new ArrayList<String>();
+            for (ResponseModeType rm: acceptedResponseMode) {
+                arm.add(rm.value());
             }
-        }
+            go.updateParameter(RESPONSE_MODE, arm);
 
-        //we enter the information filter capablities.
-        if (sections.containsSection("Filter_Capabilities") || sections.containsSection(ALL)) {
+            // the different responseFormat available
+            go.updateParameter("responseFormat", acceptedResponseFormat);
 
-            fc = SOS_FILTER_CAPABILITIES;
-        }
+            // the result filtrable part
+            final List<String> queryableResultProperties = omFilter.supportedQueryableResultProperties();
+            if (queryableResultProperties != null && !queryableResultProperties.isEmpty()) {
+             go.updateParameter("result", queryableResultProperties);
+            }
 
-        if (sections.containsSection("Contents") || sections.containsSection(ALL)) {
-            if (keepCapabilities) {
-                cont = cachedCapabilities.getContents();
+            /**
+             * Because sometimes there is some sensor that are queryable in DescribeSensor but not in GetObservation
+             */
+            final Operation ds = om.getOperation("DescribeSensor");
+            if (smlReader != null) {
+                final List<String> sensorNames = new ArrayList<String>(smlReader.getSensorNames());
+                Collections.sort(sensorNames);
+                ds.updateParameter(PROCEDURE, sensorNames);
             } else {
-                // we add the list of observation ofeerings
-                final ObservationOfferingList ool = new ObservationOfferingList(omReader.getObservationOfferings());
-                cont = new Contents(ool);
+                ds.updateParameter(PROCEDURE, procNames);
+            }
+
+            ds.updateParameter("outputFormat", ACCEPTED_SENSORML_FORMATS);
+
+            final Operation gfoi = om.getOperation("GetFeatureOfInterest");
+            if (gfoi != null) {
+                //the feature of interest list
+                gfoi.updateParameter("featureOfInterestId", foiNames);
+            }
+
+            final Operation gfoit = om.getOperation("GetFeatureOfInterestTime");
+            if (gfoit != null) {
+                //the feature of interest list
+                gfoit.updateParameter("featureOfInterestId", foiNames);
             }
         }
-        // we build and normalize the document
-        Capabilities c = normalizeDocument(new Capabilities(si, sp, om, VERSION, null, fc, cont));
 
+        final Contents cont;
+        if (keepCapabilities) {
+            cont = loadedCapabilities.getContents();
+        } else {
+            // we add the list of observation ofeerings
+            final ObservationOfferingList ool = new ObservationOfferingList(omReader.getObservationOfferings());
+            cont = new Contents(ool);
+        }
+        
+        // we build and normalize the document
+        final Capabilities c = normalizeDocument(new Capabilities(si, sp, om, VERSION, getCurrentUpdateSequence(), fc, cont));
         LOGGER.log(logLevel, "getCapabilities processed in {0} ms.\n", (System.currentTimeMillis() - start));
+        putCapabilitiesInCache("1.0.0", null, c);
         return c;
     }
 

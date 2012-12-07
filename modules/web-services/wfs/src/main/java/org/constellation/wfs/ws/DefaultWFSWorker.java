@@ -81,6 +81,7 @@ import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.ogc.xml.XMLFilter;
 import org.geotoolkit.ogc.xml.XMLLiteral;
 import org.geotoolkit.ogc.xml.v200.BBOXType;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesBase;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
@@ -114,6 +115,7 @@ import org.geotoolkit.wfs.xml.v200.PropertyName;
 
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
 import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
@@ -270,9 +272,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             return buildWFSCapabilities(currentVersion, getCurrentUpdateSequence());
         }
         
-        final Object cachedCapabilities = getCapabilitiesFromCache(currentVersion, null);
+        Sections sections = request.getSections();
+        if (sections == null) {
+            sections = buildSections(currentVersion, Arrays.asList("All"));
+        }
+        
+        final AbstractCapabilitiesBase cachedCapabilities = (WFSCapabilities) getCapabilitiesFromCache(currentVersion, null);
         if (cachedCapabilities != null) {
-            return (WFSCapabilities) cachedCapabilities;
+            return (WFSCapabilities) cachedCapabilities.applySections(sections);
         }
 
         final WFSCapabilities inCapabilities = (WFSCapabilities) getStaticCapabilitiesObject(currentVersion, "WFS");
@@ -280,100 +287,83 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
         }
 
-        FeatureTypeList ftl              = null;
-        AbstractOperationsMetadata om    = null;
-        AbstractServiceProvider sp       = null;
-        AbstractServiceIdentification si = null;
-        final FilterCapabilities fc;
+        final FeatureTypeList ftl = buildFeatureTypeList(currentVersion);
+        /*
+         *  layer providers
+         */
+        final Map<Name,Layer> layers = getLayers();
+        final List<Name> layerNames  = new ArrayList<Name>(layers.keySet());
+        Collections.sort(layerNames, new NameComparator());
+        for (final Name layerName : layerNames) {
+            final LayerDetails layer = getLayerReference(layerName);
+            final Layer configLayer  = layers.get(layerName);
 
-        if (request.getSections() == null || request.containsSection("featureTypeList")) {
-            ftl = buildFeatureTypeList(currentVersion);
-
-            /*
-             *  layer providers
-             */
-            final Map<Name,Layer> layers = getLayers();
-            final List<Name> layerNames  = new ArrayList<Name>(layers.keySet());
-            Collections.sort(layerNames, new NameComparator());
-            for (final Name layerName : layerNames) {
-                final LayerDetails layer = getLayerReference(layerName);
-                final Layer configLayer  = layers.get(layerName);
-
-                if (layer instanceof FeatureLayerDetails) {
-                    final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
-                    final FeatureType type;
-                    try {
-                        type  = getFeatureTypeFromLayer(fld);
-                    } catch (DataStoreException ex) {
-                        LOGGER.log(Level.WARNING, "Error while getting featureType for:{0}\ncause:{1}", new Object[]{fld.getName(), ex.getMessage()});
-                        continue;
-                    }
-                    final org.geotoolkit.wfs.xml.FeatureType ftt;
-                    try {
-
-                        final String defaultCRS = getCRSCode(type);
-                        final String title;
-                        if (configLayer.getTitle() != null) {
-                            title = configLayer.getTitle();
-                        } else {
-                            title = fld.getName().getLocalPart();
-                        }
-                        ftt = buildFeatureType(
-                                currentVersion,
-                                Utils.getQnameFromName(layerName),
-                                title,
-                                defaultCRS,
-                                DEFAULT_CRS,
-                                toBBox(fld.getStore(), fld.getName(), currentVersion));
-
-                        /*
-                         * we apply the layer customization
-                         */
-                        ftt.setAbstract(configLayer.getAbstrac());
-                        if (!configLayer.getKeywords().isEmpty()) {
-                            ftt.addKeywords(configLayer.getKeywords());
-                        }
-                        FormatURL metadataURL = configLayer.getMetadataURL();
-                        if (metadataURL != null) {
-                            ftt.addMetadataURL(metadataURL.getOnlineResource().getValue(),
-                                               metadataURL.getType(),
-                                               metadataURL.getFormat());
-                        }
-                        if (!configLayer.getCrs().isEmpty()) {
-                            ftt.setOtherCRS(configLayer.getCrs());
-                        }
-
-                        // we add the feature type description to the list
-                        ftl.addFeatureType(ftt);
-                    } catch (FactoryException ex) {
-                        Logging.unexpectedException(LOGGER, ex);
-                    }
-
-                } else {
-                    LOGGER.log(Level.WARNING, "The layer:{0} is not a feature layer", layerName);
+            if (layer instanceof FeatureLayerDetails) {
+                final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
+                final FeatureType type;
+                try {
+                    type  = getFeatureTypeFromLayer(fld);
+                } catch (DataStoreException ex) {
+                    LOGGER.log(Level.WARNING, "Error while getting featureType for:{0}\ncause:{1}", new Object[]{fld.getName(), ex.getMessage()});
+                    continue;
                 }
-            }
-        }
-        //todo ...etc...--------------------------------------------------------
+                final org.geotoolkit.wfs.xml.FeatureType ftt;
+                try {
 
-        if (request.getSections() == null || request.containsSection("operationsMetadata")) {
-            if (currentVersion.equals("2.0.0")) {
-                om =  OPERATIONS_METADATA_V200;
+                    final String defaultCRS = getCRSCode(type);
+                    final String title;
+                    if (configLayer.getTitle() != null) {
+                        title = configLayer.getTitle();
+                    } else {
+                        title = fld.getName().getLocalPart();
+                    }
+                    ftt = buildFeatureType(
+                            currentVersion,
+                            Utils.getQnameFromName(layerName),
+                            title,
+                            defaultCRS,
+                            DEFAULT_CRS,
+                            toBBox(fld.getStore(), fld.getName(), currentVersion));
+
+                    /*
+                     * we apply the layer customization
+                     */
+                    ftt.setAbstract(configLayer.getAbstrac());
+                    if (!configLayer.getKeywords().isEmpty()) {
+                        ftt.addKeywords(configLayer.getKeywords());
+                    }
+                    FormatURL metadataURL = configLayer.getMetadataURL();
+                    if (metadataURL != null) {
+                        ftt.addMetadataURL(metadataURL.getOnlineResource().getValue(),
+                                           metadataURL.getType(),
+                                           metadataURL.getFormat());
+                    }
+                    if (!configLayer.getCrs().isEmpty()) {
+                        ftt.setOtherCRS(configLayer.getCrs());
+                    }
+
+                    // we add the feature type description to the list
+                    ftl.addFeatureType(ftt);
+                } catch (FactoryException ex) {
+                    Logging.unexpectedException(LOGGER, ex);
+                }
+
             } else {
-                om = OPERATIONS_METADATA_V110;
-            }
-            final String url = getServiceUrl();
-            if (url != null) {
-                om.updateURL(url);
+                LOGGER.log(Level.WARNING, "The layer:{0} is not a feature layer", layerName);
             }
         }
-        if (request.getSections() == null || request.containsSection("serviceProvider")) {
-            sp = inCapabilities.getServiceProvider();
+        
+        final AbstractOperationsMetadata om;
+        if (currentVersion.equals("2.0.0")) {
+            om = OPERATIONS_METADATA_V200.clone();
+        } else {
+            om = OPERATIONS_METADATA_V110.clone();
         }
-        if (request.getSections() == null || request.containsSection("serviceIdentification")) {
-            si = inCapabilities.getServiceIdentification();
-        }
-
+        om.updateURL(getServiceUrl());
+            
+        final AbstractServiceProvider sp       = inCapabilities.getServiceProvider();
+        final AbstractServiceIdentification si = inCapabilities.getServiceIdentification();
+        final FilterCapabilities fc;
         if (currentVersion.equals("2.0.0")) {
             fc = WFSConstants.FILTER_CAPABILITIES_V200;
         } else {
@@ -382,7 +372,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final WFSCapabilities result = buildWFSCapabilities(currentVersion, si, sp, om, ftl, fc);
         putCapabilitiesInCache(currentVersion, null, result);
         LOGGER.log(logLevel, "GetCapabilities treated in {0}ms", (System.currentTimeMillis() - start));
-        return result;
+        return (WFSCapabilities) result.applySections(sections);
     }
 
     private String getCRSCode(FeatureType type) throws FactoryException{
