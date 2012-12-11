@@ -29,9 +29,6 @@ import org.geotoolkit.gml.xml.AbstractGML;
 import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 
-// GeoAPI dependencies
-import org.opengis.feature.type.FeatureType;
-
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -105,4 +102,6 @@ public interface WFSWorker extends Worker {
     CreateStoredQueryResponse createStoredQuery(final CreateStoredQuery request) throws CstlServiceException;
 
     DropStoredQueryResponse dropStoredQuery(final DropStoredQuery request) throws CstlServiceException;
+    
+    List<String> getParameterForStoredQuery(final String queryId);
 }

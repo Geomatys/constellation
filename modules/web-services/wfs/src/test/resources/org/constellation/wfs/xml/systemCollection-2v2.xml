@@ -6,7 +6,7 @@
             <gml:upperCorner>43.46788242438395 -4.14498462789604</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
-    <gml:featureMember>
+    <wfs:member>
         <sml:System gml:id="12">
             <gml:name>Piezometer Test</gml:name>
             <sml:keywords>
@@ -25,8 +25,8 @@
             <sml:phenomenons>depth</sml:phenomenons>
             <sml:phenomenons>validity</sml:phenomenons>
         </sml:System>
-    </gml:featureMember>
-    <gml:featureMember>
+    </wfs:member>
+    <wfs:member>
         <sml:System gml:id="14">
             <gml:name>Well Test</gml:name>
             <sml:keywords>
@@ -45,8 +45,8 @@
             <sml:phenomenons>depth</sml:phenomenons>
             <sml:phenomenons>validity</sml:phenomenons>
         </sml:System>
-    </gml:featureMember>
-    <gml:featureMember>
+    </wfs:member>
+    <wfs:member>
         <sml:System gml:id="16">
             <gml:name>Plot Test</gml:name>
             <sml:keywords>
@@ -65,5 +65,5 @@
             <sml:phenomenons>depth</sml:phenomenons>
             <sml:phenomenons>validity</sml:phenomenons>
         </sml:System>
-    </gml:featureMember>
+    </wfs:member>
 </wfs:FeatureCollection>

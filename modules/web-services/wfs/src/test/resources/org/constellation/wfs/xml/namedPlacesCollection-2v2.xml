@@ -6,7 +6,7 @@
             <gml:upperCorner>0.0025 -6.0E-4</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
-    <gml:featureMember>
+    <wfs:member>
         <gml:NamedPlaces gml:id="NamedPlaces.2">
             <gml:the_geom>
                 <ns3:MultiSurface srsName="urn:ogc:def:crs:epsg:4326" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -24,5 +24,5 @@
             <gml:FID>118</gml:FID>
             <gml:NAME>Goose Island</gml:NAME>
         </gml:NamedPlaces>
-    </gml:featureMember>
+    </wfs:member>
 </wfs:FeatureCollection>

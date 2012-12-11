@@ -139,34 +139,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     }
 
     /**
-     * Initialize the basic attributes of a web serviceType.
-     * the worker Map here is fill by the subClasse, this is not the best behavior.
-     * This constructor is here to keep compatibility with old version.
-     *
-     * @param supportedVersions A list of the supported version of this serviceType.
-     *                          The first version specified <strong>MUST</strong> be the highest
-     *                          one, the best one.
-     * @param workers A map of worker id / worker.
-     */
-    @Deprecated
-    public OGCWebService(Map<String, W> workersMap, final ServiceDef... supportedVersions) {
-        super();
-
-        if (supportedVersions == null || supportedVersions.length == 0 ||
-                (supportedVersions.length == 1 && supportedVersions[0] == null)){
-            throw new IllegalArgumentException("It is compulsory for a web service to have " +
-                    "at least one version specified.");
-        }
-        serviceName = supportedVersions[0].specification.name();
-        LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
-        WSEngine.registerService(serviceName, "REST", getWorkerClass());
-
-        //guarantee it will not be modified
-        this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
-        WSEngine.setServiceInstances(serviceName, (Map<String, Worker>)workersMap);
-    }
-
-    /**
      * Return the dedicated Web-service configuration directory.
      *
      * @return
@@ -174,7 +146,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     protected File getServiceDirectory() {
         final File configDirectory   = ConfigDirectory.getConfigDirectory();
         if (configDirectory != null && configDirectory.isDirectory()) {
-            final File serviceDirectory = new File(configDirectory, supportedVersions.get(0).specification.name());
+            final File serviceDirectory = new File(configDirectory, serviceName);
             if (serviceDirectory.isDirectory()) {
                 return serviceDirectory;
             } else {
@@ -859,7 +831,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     @Override
     public void destroy() {
         super.destroy();
-        LOGGER.log(Level.INFO, "Shutting down the REST {0} service facade.", supportedVersions.get(0).specification.name());
+        LOGGER.log(Level.INFO, "Shutting down the REST {0} service facade.", serviceName);
         WSEngine.destroyInstances(serviceName);
     }
 

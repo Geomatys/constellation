@@ -6,7 +6,7 @@
             <gml:upperCorner>65400.0 1731368.0</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
-    <gml:featureMember>
+    <wfs:member>
         <sampling:SamplingPoint gml:id="station-005">
             <gml:description>bouée ds le rhone</gml:description>
             <gml:name>44499X4517-TRUC</gml:name>
@@ -17,8 +17,8 @@
                 </gml:Point>
             </sampling:position>
         </sampling:SamplingPoint>
-    </gml:featureMember>
-    <gml:featureMember>
+    </wfs:member>
+    <wfs:member>
         <sampling:SamplingPoint gml:id="station-001">
             <gml:description>Point d'eau BSSS</gml:description>
             <gml:name>10972X0137-PONT</gml:name>
@@ -29,5 +29,5 @@
                 </ns3:Point>
             </sampling:position>
         </sampling:SamplingPoint>
-    </gml:featureMember>
+    </wfs:member>
 </wfs:FeatureCollection>

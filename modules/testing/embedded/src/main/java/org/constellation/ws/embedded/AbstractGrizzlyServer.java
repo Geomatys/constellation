@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
@@ -301,7 +302,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         wr.flush();
     }
 
-    protected static Object unmarshallResponse(URLConnection conec) throws JAXBException, IOException {
+    protected static Object unmarshallResponse(final URLConnection conec) throws JAXBException, IOException {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(conec.getInputStream());
 
@@ -313,9 +314,17 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         return obj;
     }
 
-    protected static Object unmarshallResponse(URL conec) throws JAXBException, IOException {
+    protected static Object unmarshallResponse(final URL url) throws JAXBException, IOException {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(conec.openStream());
+        final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        
+        InputStream is;
+        if (conn.getResponseCode() == 200) {
+            is = conn.getInputStream();
+        } else {
+            is = conn.getErrorStream();
+        }
+        Object obj = unmarshaller.unmarshal(is);
 
         pool.release(unmarshaller);
 

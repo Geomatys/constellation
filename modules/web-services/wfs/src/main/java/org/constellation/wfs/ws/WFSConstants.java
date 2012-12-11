@@ -33,6 +33,7 @@ import org.geotoolkit.ogc.xml.v110.ScalarCapabilitiesType;
 import org.geotoolkit.ogc.xml.v110.SpatialCapabilitiesType;
 import org.geotoolkit.ogc.xml.v110.SpatialOperatorType;
 import org.geotoolkit.ogc.xml.v110.SpatialOperatorsType;
+import org.geotoolkit.ogc.xml.v200.ConformanceType;
 import org.geotoolkit.ogc.xml.v200.FilterType;
 import org.geotoolkit.ogc.xml.v200.LiteralType;
 import org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType;
@@ -47,6 +48,7 @@ import org.geotoolkit.ows.xml.v100.HTTP;
 import org.geotoolkit.ows.xml.v100.Operation;
 import org.geotoolkit.ows.xml.v100.RequestMethodType;
 import org.geotoolkit.ows.xml.v110.AllowedValues;
+import org.geotoolkit.ows.xml.v110.NoValues;
 import org.geotoolkit.ows.xml.v110.ValueType;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
 import org.geotoolkit.wfs.xml.v200.ParameterExpressionType;
@@ -89,7 +91,7 @@ public final class WFSConstants {
      */
     public final static MediaType GML_3_1_1 = new MediaType("text", "xml; subtype=gml/3.1.1");
 
-    public final static MediaType GML_3_2_1 = new MediaType("text", "xml; subtype=gml/3.2.1");
+    public final static MediaType GML_3_2_1 = new MediaType("application", "gml+xml; version=3.2");
 
     public static final FilterCapabilities FILTER_CAPABILITIES_V110;
     static {
@@ -144,15 +146,15 @@ public final class WFSConstants {
         operandList.add(new QName("http://www.opengis.net/gml/3.2", "Polygon"));
         final org.geotoolkit.ogc.xml.v200.GeometryOperandsType operands = new org.geotoolkit.ogc.xml.v200.GeometryOperandsType(operandList);
         final SpatialOperator[] operatorList = new SpatialOperator[10];
-        operatorList[0] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("DISJOINT", null);
-        operatorList[1] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("EQUALS", null);
-        operatorList[2] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("D_WITHIN", null);
-        operatorList[3] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("BEYOND", null);
-        operatorList[4] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("INTERSECTS", null);
-        operatorList[5] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("TOUCHES", null);
-        operatorList[6] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("CROSSES", null);
-        operatorList[7] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("CONTAINS", null);
-        operatorList[8] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("OVERLAPS", null);
+        operatorList[0] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Disjoint", null);
+        operatorList[1] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Equals", null);
+        operatorList[2] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("DWithin", null);
+        operatorList[3] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Beyond", null);
+        operatorList[4] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Intersects", null);
+        operatorList[5] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Touches", null);
+        operatorList[6] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Crosses", null);
+        operatorList[7] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Contains", null);
+        operatorList[8] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Overlaps", null);
         operatorList[9] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("BBOX", null);
 
         final org.geotoolkit.ogc.xml.v200.SpatialOperatorsType spatialOperators = new org.geotoolkit.ogc.xml.v200.SpatialOperatorsType(operatorList);
@@ -162,9 +164,9 @@ public final class WFSConstants {
         compaOperatorList[0] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsBetween");
         compaOperatorList[1] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsEqualTo");
         compaOperatorList[2] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsGreaterThan");
-        compaOperatorList[3] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsGReaterThanEqualTo");
+        compaOperatorList[3] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsGreaterThanOrEqualTo");
         compaOperatorList[4] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsLessThan");
-        compaOperatorList[5] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsLessThanEqualTo");
+        compaOperatorList[5] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsLessThanOrEqualTo");
         compaOperatorList[6] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsLike");
         compaOperatorList[7] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsNotEqualTo");
         compaOperatorList[8] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsNull");
@@ -174,8 +176,22 @@ public final class WFSConstants {
 
         final ResourceIdentifierType iden = new ResourceIdentifierType(new QName("http://www.opengis.net/fes/2.0", "ResourceId"));
         final org.geotoolkit.ogc.xml.v200.IdCapabilitiesType idCapabilities = new org.geotoolkit.ogc.xml.v200.IdCapabilitiesType(iden);
-        FILTER_CAPABILITIES_V200 = new org.geotoolkit.ogc.xml.v200.FilterCapabilities(scalarCapabilities, spatialCapabilties, idCapabilities);
-
+        
+        final List<org.geotoolkit.ows.xml.v110.DomainType> constraints = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsQuery",             new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsAdHocQuery",        new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsFunctions",         new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsMinStandardFilter", new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsStandardFilter",    new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsMinSpatialFilter",  new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsSpatialFilter",     new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsMinTemporalFilter", new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsTemporalFilter",    new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsVersionNav",        new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsSorting",           new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsExtendedOperators", new NoValues(), new ValueType("FALSE")));
+        final org.geotoolkit.ogc.xml.v200.ConformanceType conformance = new ConformanceType(constraints);
+        FILTER_CAPABILITIES_V200 = new org.geotoolkit.ogc.xml.v200.FilterCapabilities(scalarCapabilities, spatialCapabilties, idCapabilities, conformance);
     }
 
     public static final AbstractOperationsMetadata OPERATIONS_METADATA_V110;
@@ -308,20 +324,21 @@ public final class WFSConstants {
         parameters.add(new org.geotoolkit.ows.xml.v110.DomainType("version", new AllowedValues(Arrays.asList("2.0.0", "1.1.0"))));
         
         final List<AbstractDomain> constraints = new ArrayList<AbstractDomain>();
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsBasicWFS", new ValueType("TRUE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsTransactionalWFS", new ValueType("TRUE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsLockingWFS", new ValueType("FALSE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("KVPEncoding", new ValueType("TRUE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("XMLEncoding", new ValueType("TRUE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("SOAPEncoding", new ValueType("FALSE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsInheritance", new ValueType("FALSE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsRemoteResolve", new ValueType("FALSE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsResultPaging", new ValueType("TRUE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsStandardJoins", new ValueType("FALSE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsSpatialJoins", new ValueType("FALSE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsTemporalJoins", new ValueType("FALSE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsFeatureVersioning", new ValueType("FALSE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ManageStoredQueries", new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsSimpleWFS",         new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsBasicWFS",          new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsTransactionalWFS",  new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsLockingWFS",        new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("KVPEncoding",                 new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("XMLEncoding",                 new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("SOAPEncoding",                new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsInheritance",       new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsRemoteResolve",     new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsResultPaging",      new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsStandardJoins",     new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsSpatialJoins",      new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsTemporalJoins",     new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsFeatureVersioning", new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ManageStoredQueries",         new NoValues(), new ValueType("TRUE")));
 
         OPERATIONS_METADATA_V200 = OWSXmlFactory.buildOperationsMetadata("1.1.0", operations, parameters, constraints, null);
     }
@@ -335,12 +352,12 @@ public final class WFSConstants {
     public static final ParameterExpressionType IDENTIFIER_PARAM;
     static {
         IDENTIFIER_PARAM = new ParameterExpressionType("id", "id Parameter", "A parameter on the id of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
-        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$@id"), "@id", true);
+        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$id"), "@id", true);
         IDENTIFIER_FILTER = new FilterType(pis);
         final QueryType query = new QueryType(IDENTIFIER_FILTER, null, "2.0.0");
         final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, null);
         final ObjectFactory factory = new ObjectFactory();
         queryEx.getContent().add(factory.createQuery(query));
-        IDENTIFIER_STORED_QUERY = new StoredQueryDescriptionType("identifierQuery", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
+        IDENTIFIER_STORED_QUERY = new StoredQueryDescriptionType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
     }
 }

@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 // Constellation dependencies
 import javax.xml.stream.XMLStreamException;
 import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Version;
 import org.constellation.configuration.FormatURL;
 import org.constellation.configuration.Layer;
 import org.constellation.provider.FeatureLayerDetails;
@@ -85,6 +86,7 @@ import org.geotoolkit.ows.xml.AbstractCapabilitiesBase;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.wfs.xml.GetPropertyValue;
 import org.geotoolkit.wfs.xml.DescribeFeatureType;
 import org.geotoolkit.wfs.xml.DescribeStoredQueries;
@@ -168,6 +170,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     private boolean multipleVersionActivated = true;
 
     private List<StoredQueryDescription> storedQueries = new ArrayList<StoredQueryDescription>();
+    
+    /*
+     * @Todo move to AbstractWorker
+     */
+    private List<Version> supportedVersion = Arrays.asList(ServiceDef.WFS_1_1_0.version, ServiceDef.WFS_2_0_0.version);
 
     public DefaultWFSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WFS);
@@ -212,7 +219,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         // we verify if the identifier query is loaded (if not we load it)
        boolean found = false;
        for (StoredQueryDescription squery : storedQueries) {
-           if ("identifierQuery".equals(squery.getId())) {
+           if ("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById".equals(squery.getId())) {
                found = true;
                break;
            }
@@ -224,7 +231,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
            final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, typeNames);
            final ObjectFactory factory = new ObjectFactory();
            queryEx.getContent().add(factory.createQuery(query));
-           final StoredQueryDescriptionType idQ = new StoredQueryDescriptionType("identifierQuery", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
+           final StoredQueryDescriptionType idQ = new StoredQueryDescriptionType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
            storedQueries.add(idQ);
        }
     }
@@ -261,6 +268,24 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public WFSCapabilities getCapabilities(final GetCapabilities request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetCapabilities request proccesing");
         final long start = System.currentTimeMillis();
+        
+        //choose the best version from acceptVersion
+        final AcceptVersions versions = request.getAcceptVersions();
+        if (versions != null) {
+            Version max = null;
+            for (String v : versions.getVersion()) {
+                final Version vv = new Version(v);
+                if (supportedVersion.contains(vv)) {
+                    if (max == null || vv.compareTo(max) > 1) {
+                        max = vv;
+                    }
+                }
+            }
+            if (max != null) {
+                request.setVersion(max.toString());
+            }
+        }
+        
         // we verify the base attribute
         isWorking();
         verifyBaseRequest(request, false, true);
@@ -667,10 +692,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 queryBuilder.setProperties(verifyPropertyNames(typeName, ft, requestPropNames));
                 queryBuilder.setTypeName(ft.getName());
                 queryBuilder.setHints(new Hints(HintsPending.FEATURE_HIDE_ID_PROPERTY, Boolean.TRUE));
-                queryBuilder.setFilter(processFilter(ft, filter, aliases));
+                final Filter cleanFilter = processFilter(ft, filter, aliases);
+                queryBuilder.setFilter(cleanFilter);
 
                 // we verify that all the properties contained in the filter are known by the feature type.
-                verifyFilterProperty(ft, filter, aliases);
+                verifyFilterProperty(ft, cleanFilter, aliases);
 
 
                 FeatureCollection collection = layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery());
@@ -1329,14 +1355,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
             filter = (Filter) filter.accept(new AliasFilterVisitor(aliases), null);
             filter = (Filter) filter.accept(new UnprefixerFilterVisitor(ft), null);
+            filter = (Filter) filter.accept(new GMLNamespaceVisitor(), null);
             
-            if (CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)) {
-                return filter;
-            } else {
+            if (!CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)) {
                 filter = (Filter) filter.accept(FillCrsVisitor.VISITOR, exposedCrs);
                 filter = (Filter) filter.accept(new CrsAdjustFilterVisitor(exposedCrs, trueCrs), null);
-
-                return filter;
             }
 
         } catch (FactoryException ex) {
@@ -1525,15 +1548,20 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final long startTime = System.currentTimeMillis();
         isWorking();
         verifyBaseRequest(request, true, false);
-
-        final List<StoredQueryDescription> storedQueryList = new ArrayList<StoredQueryDescription>();
         final String currentVersion = request.getVersion().toString();
-        for (String id : request.getStoredQueryId()) {
-            for (StoredQueryDescription description : storedQueries) {
-                if (description.getId().equals(id)) {
-                    storedQueryList.add(description);
+        
+        final List<StoredQueryDescription> storedQueryList;
+        if (request.getStoredQueryId() != null && !request.getStoredQueryId().isEmpty()) {
+            storedQueryList = new ArrayList<StoredQueryDescription>();
+            for (String id : request.getStoredQueryId()) {
+                for (StoredQueryDescription description : storedQueries) {
+                    if (description.getId().equals(id)) {
+                        storedQueryList.add(description);
+                    }
                 }
             }
+        } else {
+            storedQueryList = storedQueries;
         }
         final DescribeStoredQueriesResponse response = buildDescribeStoredQueriesResponse(currentVersion, storedQueryList);
         LOGGER.log(logLevel, "DescribeStoredQueries request processed in {0} ms", (System.currentTimeMillis() - startTime));
@@ -1580,5 +1608,16 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final DropStoredQueryResponse response = buildDropStoredQueryResponse(currentVersion, "OK");
         LOGGER.log(logLevel, "dropStoredQuery request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
+    }
+
+    @Override
+    public List<String> getParameterForStoredQuery(final String queryId) {
+        final List<String> results = new ArrayList<String>();
+        for (StoredQueryDescription description : storedQueries) {
+            if (description.getId().equals(queryId)) {
+                results.addAll(description.getParameterNames());
+            }
+        }
+        return results;
     }
 }

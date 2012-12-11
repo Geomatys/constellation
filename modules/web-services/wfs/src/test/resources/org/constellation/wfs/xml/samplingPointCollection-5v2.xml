@@ -6,7 +6,7 @@
             <gml:upperCorner>70800.0 2567987.0</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
-    <gml:featureMember>
+    <wfs:member>
         <sampling:SamplingPoint gml:id="station-001">
             <gml:name>10972X0137-PONT</gml:name>
             <sampling:position>
@@ -15,8 +15,8 @@
                 </ns3:Point>
             </sampling:position>
         </sampling:SamplingPoint>
-    </gml:featureMember>
-    <gml:featureMember>
+    </wfs:member>
+    <wfs:member>
         <sampling:SamplingPoint gml:id="station-002">
             <gml:name>10972X0137-PLOUF</gml:name>
             <sampling:position>
@@ -25,8 +25,8 @@
                 </ns3:Point>
             </sampling:position>
         </sampling:SamplingPoint>
-    </gml:featureMember>
-    <gml:featureMember>
+    </wfs:member>
+    <wfs:member>
         <sampling:SamplingPoint gml:id="station-003">
             <gml:name>66685X4587-WARP</gml:name>
             <sampling:position>
@@ -35,8 +35,8 @@
                 </gml:Point>
             </sampling:position>
         </sampling:SamplingPoint>
-    </gml:featureMember>
-    <gml:featureMember>
+    </wfs:member>
+    <wfs:member>
         <sampling:SamplingPoint gml:id="station-004">
             <gml:name>99917X9856-FRAG</gml:name>
             <sampling:position>
@@ -45,8 +45,8 @@
                 </gml:Point>
             </sampling:position>
         </sampling:SamplingPoint>
-    </gml:featureMember>
-    <gml:featureMember>
+    </wfs:member>
+    <wfs:member>
         <sampling:SamplingPoint gml:id="station-005">
             <gml:name>44499X4517-TRUC</gml:name>
             <sampling:position>
@@ -55,5 +55,5 @@
                 </gml:Point>
             </sampling:position>
         </sampling:SamplingPoint>
-    </gml:featureMember>
+    </wfs:member>
 </wfs:FeatureCollection>

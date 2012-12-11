@@ -6,7 +6,7 @@
             <gml:upperCorner>42.47639603324944 -4.156073981277588</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
-    <gml:featureMember>
+    <wfs:member>
         <sml:System gml:id="16">
             <gml:description>Flotting plot</gml:description>
             <gml:name>Plot Test</gml:name>
@@ -61,5 +61,5 @@
             </sml:outputs>
             <sml:producer name="COnservatoire de france">Alfred Musset</sml:producer>
         </sml:System>
-    </gml:featureMember>
+    </wfs:member>
 </wfs:FeatureCollection>
