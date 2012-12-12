@@ -159,9 +159,15 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         }
     }
 
-    protected static String getStringResponse(URLConnection conec) throws UnsupportedEncodingException, IOException {
+    protected static String getStringResponse(final URLConnection conec) throws UnsupportedEncodingException, IOException {
+        InputStream is;
+        if (((HttpURLConnection)conec).getResponseCode() == 200) {
+            is = conec.getInputStream();
+        } else {
+            is = ((HttpURLConnection)conec).getErrorStream();
+        }
         final StringWriter sw     = new StringWriter();
-        final BufferedReader in   = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
+        final BufferedReader in   = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         char [] buffer = new char[1024];
         int size;
         while ((size = in.read(buffer, 0, 1024)) > 0) {

@@ -171,11 +171,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     private List<StoredQueryDescription> storedQueries = new ArrayList<StoredQueryDescription>();
     
-    /*
-     * @Todo move to AbstractWorker
-     */
-    private List<Version> supportedVersion = Arrays.asList(ServiceDef.WFS_1_1_0.version, ServiceDef.WFS_2_0_0.version);
-
     public DefaultWFSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WFS);
         if (isStarted) {
@@ -186,6 +181,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (multiVersProp != null) {
             multipleVersionActivated = Boolean.parseBoolean(multiVersProp);
             LOGGER.log(Level.INFO, "Multiple version activated:{0}", multipleVersionActivated);
+            if (multipleVersionActivated) {
+                setSupportedVersion(ServiceDef.WFS_2_0_0, ServiceDef.WFS_1_1_0);
+            } else {
+                setSupportedVersion(ServiceDef.WFS_1_1_0);
+            }
+        } else {
+            setSupportedVersion(ServiceDef.WFS_2_0_0, ServiceDef.WFS_1_1_0);
         }
 
         // loading stored queries
@@ -217,14 +219,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
         }
         // we verify if the identifier query is loaded (if not we load it)
-       boolean found = false;
+       boolean foundID = false;
        for (StoredQueryDescription squery : storedQueries) {
            if ("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById".equals(squery.getId())) {
-               found = true;
+               foundID = true;
                break;
            }
        }
-       if (!found) {
+       if (!foundID) {
            final List<QName> typeNames = Utils.getQNameListFromNameSet(getLayers().keySet());
            Collections.sort(typeNames, new QNameComparator());
            final QueryType query = new QueryType(IDENTIFIER_FILTER, typeNames, "2.0.0");
@@ -234,6 +236,26 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
            final StoredQueryDescriptionType idQ = new StoredQueryDescriptionType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
            storedQueries.add(idQ);
        }
+       
+        // we verify if the type query is loaded (if not we load it)
+       boolean foundT = false;
+       for (StoredQueryDescription squery : storedQueries) {
+           if ("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType".equals(squery.getId())) {
+               foundT = true;
+               break;
+           }
+       }
+       if (!foundT) {
+           final List<QName> typeNames = new ArrayList<QName>();
+           typeNames.add(new QName("$typeName"));
+           final QueryType query = new QueryType(null, typeNames, "2.0.0");
+           final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, typeNames);
+           final ObjectFactory factory = new ObjectFactory();
+           queryEx.getContent().add(factory.createQuery(query));
+           final StoredQueryDescriptionType idQ = new StoredQueryDescriptionType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", "By type query" , "filter on feature type", TYPE_PARAM, queryEx);
+           storedQueries.add(idQ);
+       }
+       
     }
 
     private void storedQueries() {
@@ -275,7 +297,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             Version max = null;
             for (String v : versions.getVersion()) {
                 final Version vv = new Version(v);
-                if (supportedVersion.contains(vv)) {
+                if (isSupportedVersion(v)) {
                     if (max == null || vv.compareTo(max) > 1) {
                         max = vv;
                     }
@@ -526,7 +548,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         }
                         if (content instanceof Query) {
                             final Query query = (Query)content;
-                            applyParameterOnQuery(query.getFilter(), parameters);
+                            applyParameterOnQuery(query, parameters);
                             ((List)queries).add(query);
                         } else {
                             throw new CstlServiceException("unexpected query object: " + content, INVALID_PARAMETER_VALUE, "storedQuery");
@@ -617,7 +639,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, false, false);
 
         final String currentVersion                = request.getVersion().toString();
-        final String featureId                     = request.getFeatureId();
         final int maxFeatures                      = request.getCount();
         final Integer startIndex                   = request.getStartIndex();
         final List<FeatureCollection> collections  = new ArrayList<FeatureCollection>();
@@ -633,7 +654,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
             final List<QName> typeNames;
             final Map<String, QName> aliases = new HashMap<String, QName>();
-            if (featureId != null && query.getTypeNames().isEmpty()) {
+            if (query.getTypeNames().isEmpty()) {
                 typeNames = Utils.getQNameListFromNameSet(layers.keySet());
             } else {
                 typeNames = query.getTypeNames();
@@ -645,7 +666,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
 
             //decode filter-----------------------------------------------------
-            final Filter filter = extractJAXBFilter(featureId, query.getFilter(), Filter.INCLUDE, namespaceMapping, currentVersion);
+            final Filter filter = extractJAXBFilter(query.getFilter(), Filter.INCLUDE, namespaceMapping, currentVersion);
 
             //decode crs--------------------------------------------------------
             final CoordinateReferenceSystem queryCRS = extractCRS(query.getSrsName());
@@ -788,7 +809,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
 
             //decode filter-----------------------------------------------------
-            final Filter filter = extractJAXBFilter(null, query.getFilter(), Filter.INCLUDE, namespaceMapping, currentVersion);
+            final Filter filter = extractJAXBFilter(query.getFilter(), Filter.INCLUDE, namespaceMapping, currentVersion);
 
             //decode crs--------------------------------------------------------
             final CoordinateReferenceSystem crs = extractCRS(query.getSrsName());
@@ -1225,29 +1246,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         return temp;
     }
 
-    private Filter extractJAXBFilter(final String featureId,final Filter jaxbFilter, final Filter defaultFilter, final Map<String, String> namespaceMapping, final String currentVersion) throws CstlServiceException {
-        if (featureId == null) {
-            return extractJAXBFilter(jaxbFilter, Filter.INCLUDE, namespaceMapping, currentVersion);
-        } else {
-            return extractJAXBFilter(featureId, namespaceMapping, currentVersion);
-        }
-    }
-
-    /**
-     * Extract an OGC filter usable by the dataStore from the request filter
-     * unmarshalled by JAXB.
-     *
-     * @param jaxbFilter an OGC JAXB filter.
-     * @return An OGC filter
-     * @throws CstlServiceException
-     */
-    private Filter extractJAXBFilter(final String featureId, final Map<String, String> namespaceMapping, final String currentVersion) throws CstlServiceException {
-        if ("2.0.0".equals(currentVersion)) {
-            return extractJAXBFilter(new org.geotoolkit.ogc.xml.v200.FilterType(new org.geotoolkit.ogc.xml.v200.ResourceIdType(featureId)), Filter.INCLUDE, namespaceMapping, currentVersion);
-        } else {
-            return extractJAXBFilter(new org.geotoolkit.ogc.xml.v110.FilterType(new org.geotoolkit.ogc.xml.v110.FeatureIdType(featureId)), Filter.INCLUDE, namespaceMapping, currentVersion);
-        }
-    }
     /**
      * Extract an OGC filter usable by the dataStore from the request filter
      * unmarshalled by JAXB.
@@ -1399,7 +1397,27 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         }
     }
 
-    private static void applyParameterOnQuery(final Filter filter, final List<? extends Parameter> parameters) throws CstlServiceException {
+    private static void applyParameterOnQuery(final Query query, final List<? extends Parameter> parameters) throws CstlServiceException {
+        applyParameterOnFilter(query.getFilter(), parameters);
+        final List<QName> toRemove = new ArrayList<QName>();
+        final List<QName> toAdd    = new ArrayList<QName>();
+        for (QName q : query.getTypeNames()) {
+            for (Parameter param : parameters) {
+                if (q.getLocalPart().indexOf("$" +  param.getName()) != -1) {
+                    toRemove.add(q);
+                    if (!param.getContent().isEmpty() && param.getContent().get(0) instanceof QName) {
+                        toAdd.add((QName)param.getContent().get(0));
+                    } else {
+                        LOGGER.warning("bad type or empty parameter content");
+                    }
+                }
+            }
+        }
+        query.getTypeNames().removeAll(toRemove);
+        query.getTypeNames().addAll(toAdd);
+    }
+    
+    private static void applyParameterOnFilter(final Filter filter, final List<? extends Parameter> parameters) throws CstlServiceException {
         if (filter instanceof XMLFilter) {
             final Object filterObject = ((XMLFilter)filter).getFilterObject();
 
@@ -1449,13 +1467,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             } else if (filterObject instanceof BinaryLogicOperator) {
                 final BinaryLogicOperator binary = (BinaryLogicOperator) filterObject;
                 for (Filter child : binary.getChildren()) {
-                    applyParameterOnQuery(child, parameters);
+                    applyParameterOnFilter(child, parameters);
                 }
             } else {
                 throw new CstlServiceException("Unimplemented filter implementation:" + filterObject.getClass().getName(), NO_APPLICABLE_CODE);
             }
-        } else {
-            throw new CstlServiceException("Expected filter implementation", NO_APPLICABLE_CODE);
+        } else if (filter != null){
+            throw new CstlServiceException("UnExpected filter implementation", NO_APPLICABLE_CODE);
         }
     }
 
@@ -1611,11 +1629,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     @Override
-    public List<String> getParameterForStoredQuery(final String queryId) {
-        final List<String> results = new ArrayList<String>();
+    public List<ParameterExpression> getParameterForStoredQuery(final String queryId) {
+        final List<ParameterExpression> results = new ArrayList<ParameterExpression>();
         for (StoredQueryDescription description : storedQueries) {
             if (description.getId().equals(queryId)) {
-                results.addAll(description.getParameterNames());
+                results.addAll(description.getParameter());
             }
         }
         return results;

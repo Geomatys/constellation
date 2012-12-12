@@ -100,7 +100,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     /**
      * The supported supportedVersions supported by this web serviceType.
      * avoid modification after instantiation.
+     * @deprecated move to abstract worker
      */
+    @Deprecated
     private final UnmodifiableArrayList<ServiceDef> supportedVersions;
 
     final String serviceName;
@@ -665,7 +667,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * <p>
      * If the version is not accepted we send an exception.
      * </p>
+     * @Deprecated move to abstractWorker
      */
+    @Deprecated
     protected void isVersionSupported(final String versionNumber) throws CstlServiceException {
         if (getVersionFromNumber(versionNumber) == null) {
             final StringBuilder messageb = new StringBuilder("The parameter ");
@@ -674,7 +678,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             }
             messageb.delete(messageb.length()-4, messageb.length()-1);
             messageb.append(" must be specified");
-            throw new CstlServiceException(messageb.toString(), VERSION_NEGOTIATION_FAILED);
+            throw new CstlServiceException(messageb.toString(), VERSION_NEGOTIATION_FAILED, "version");
         }
     }
 
@@ -705,7 +709,14 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      */
     @Override
     protected Response launchException(final String message, String codeName, final String locator) {
-        final ServiceDef mainVersion = supportedVersions.get(0);
+        final String serviceID = getSafeParameter("serviceId");
+        final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
+        final ServiceDef mainVersion;
+        if (worker != null) {
+            mainVersion = worker.getBestVersion(null);
+        } else {
+            mainVersion = supportedVersions.get(0);
+        }
         if (mainVersion.owsCompliant) {
             codeName = StringUtilities.transformCodeName(codeName);
         }
@@ -736,7 +747,10 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      *
      * @param number the version number.
      * @return
+     * 
+     * @deprecated use Worker.getVersionFromNumber()
      */
+    @Deprecated
     protected ServiceDef getVersionFromNumber(final String number) {
         for (ServiceDef v : supportedVersions) {
             if (v.version.toString().equals(number)){
@@ -752,7 +766,10 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      *
      * @param number the version number.
      * @return
+     * 
+     * @deprecated use Worker.getVersionFromNumber()
      */
+    @Deprecated
     protected ServiceDef getVersionFromNumber(final Version number) {
         if (number != null) {
             for (ServiceDef v : supportedVersions) {
@@ -770,7 +787,10 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param number A version number, which will be compared to the ones specified.
      *               Can be {@code null}, in this case the best version specified is just returned.
      * @return The best version (the highest one) specified for this web service.
+     * 
+     * @deprecated move to AbstractWorker
      */
+    @Deprecated
     protected ServiceDef getBestVersion(final String number) {
         for (ServiceDef v : supportedVersions) {
             if (v.version.toString().equals(number)){

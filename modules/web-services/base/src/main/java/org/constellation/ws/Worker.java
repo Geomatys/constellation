@@ -18,6 +18,8 @@
 package org.constellation.ws;
 
 import java.util.logging.Level;
+import org.constellation.ServiceDef;
+import org.geotoolkit.util.Version;
 
 /**
  * Generic definition of a worker.
@@ -73,4 +75,23 @@ public interface Worker {
      * @return String
      */
     String getServiceUrl();
+    
+    /**
+     * Return a Version Object from the version number.
+     * if the version number is not correct return the default version.
+     *
+     * @param number the version number.
+     * @return
+     */
+    ServiceDef getVersionFromNumber(final Version number);
+    
+    /**
+     * If the requested version number is not available we choose the best version to return.
+     *
+     * @param number A version number, which will be compared to the ones specified.
+     *               Can be {@code null}, in this case the best version specified is just returned.
+     * @return The best version (the highest one) specified for this web service.
+     * 
+     */
+    ServiceDef getBestVersion(final String number);
 }

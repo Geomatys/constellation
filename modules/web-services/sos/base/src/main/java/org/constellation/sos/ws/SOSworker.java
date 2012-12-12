@@ -293,8 +293,8 @@ public class SOSworker extends AbstractWorker {
      */
     public SOSworker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.SOS);
-
-        isStarted                      = true;
+        setSupportedVersion(ServiceDef.SOS_1_0_0);
+        isStarted = true;
         final SOSConfiguration configuration;
 
         // Database configuration

@@ -33,7 +33,7 @@
             </fes:Constraint>
             <fes:Constraint name="ImplementsAdHocQuery">
                 <ns9:NoValues/>
-                <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
             </fes:Constraint>
             <fes:Constraint name="ImplementsFunctions">
                 <ns9:NoValues/>

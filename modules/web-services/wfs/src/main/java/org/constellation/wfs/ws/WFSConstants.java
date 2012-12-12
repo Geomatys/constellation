@@ -179,7 +179,7 @@ public final class WFSConstants {
         
         final List<org.geotoolkit.ows.xml.v110.DomainType> constraints = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsQuery",             new NoValues(), new ValueType("TRUE")));
-        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsAdHocQuery",        new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsAdHocQuery",        new NoValues(), new ValueType("TRUE")));
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsFunctions",         new NoValues(), new ValueType("FALSE")));
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsMinStandardFilter", new NoValues(), new ValueType("TRUE")));
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsStandardFilter",    new NoValues(), new ValueType("TRUE")));
@@ -264,7 +264,7 @@ public final class WFSConstants {
         operations.add(getCapabilities);
 
         final List<org.geotoolkit.ows.xml.v110.DomainType> dfParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
-        dfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("outputFormat", "text/xml; subtype=gml/3.1.1"));
+        dfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("outputFormat", "application/gml+xml; version=3.2"));
         dfParameters.add(serviceDomain);
         dfParameters.add(versionDomain);
         org.geotoolkit.ows.xml.v110.Operation describeFeatureType = new org.geotoolkit.ows.xml.v110.Operation(dcps, dfParameters, null, null, "DescribeFeatureType");
@@ -272,7 +272,7 @@ public final class WFSConstants {
 
         final List<org.geotoolkit.ows.xml.v110.DomainType> gfParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
         gfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("resultType", new AllowedValues(Arrays.asList("results","hits"))));
-        gfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("outputFormat", "text/xml; subtype=gml/3.1.1"));
+        gfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("outputFormat", "application/gml+xml; version=3.2"));
         gfParameters.add(serviceDomain);
         gfParameters.add(versionDomain);
 
@@ -282,7 +282,7 @@ public final class WFSConstants {
         operations.add(getFeature);
 
         final List<org.geotoolkit.ows.xml.v110.DomainType> tParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
-        tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("inputFormat", "text/xml; subtype=gml/3.1.1"));
+        tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("inputFormat", "application/gml+xml; version=3.2"));
         tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("idgen", new AllowedValues(Arrays.asList("GenerateNew","UseExisting","ReplaceDuplicate"))));
         tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("releaseAction", new AllowedValues(Arrays.asList("ALL", "SOME"))));
         tParameters.add(serviceDomain);
@@ -321,7 +321,7 @@ public final class WFSConstants {
         operations.add(dropStoredQuery);
 
         final List<AbstractDomain> parameters = new ArrayList<AbstractDomain>();
-        parameters.add(new org.geotoolkit.ows.xml.v110.DomainType("version", new AllowedValues(Arrays.asList("2.0.0", "1.1.0"))));
+        parameters.add(new org.geotoolkit.ows.xml.v110.DomainType("version", new AllowedValues(Arrays.asList("2.0.0"))));
         
         final List<AbstractDomain> constraints = new ArrayList<AbstractDomain>();
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsSimpleWFS",         new NoValues(), new ValueType("TRUE")));
@@ -350,7 +350,9 @@ public final class WFSConstants {
     public static final StoredQueryDescriptionType IDENTIFIER_STORED_QUERY;
     public static final FilterType IDENTIFIER_FILTER;
     public static final ParameterExpressionType IDENTIFIER_PARAM;
+    public static final ParameterExpressionType TYPE_PARAM;
     static {
+        TYPE_PARAM = new ParameterExpressionType("typeName", "type Parameter", "A parameter on the identifier of the featureType", new QName("http://www.w3.org/2001/XMLSchema", "QName", "xs"));
         IDENTIFIER_PARAM = new ParameterExpressionType("id", "id Parameter", "A parameter on the id of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
         final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$id"), "@id", true);
         IDENTIFIER_FILTER = new FilterType(pis);

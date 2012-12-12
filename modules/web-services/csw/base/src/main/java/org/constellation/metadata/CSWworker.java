@@ -217,6 +217,7 @@ public class CSWworker extends AbstractWorker {
      */
     public CSWworker(final String serviceID, final File configDir, Automatic configuration) {
         super(serviceID, configDir, ServiceDef.Specification.CSW);
+        setSupportedVersion(ServiceDef.CSW_2_0_2);
         isStarted = true;
         try {
             //we look if the configuration have been specified

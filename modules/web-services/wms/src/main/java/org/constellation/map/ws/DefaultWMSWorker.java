@@ -190,7 +190,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     public DefaultWMSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WMS);
-        
+        setSupportedVersion(ServiceDef.WMS_1_3_0, ServiceDef.WMS_1_0_0);
         mapPortrayal = new WMSPortrayal();
         
         final File portrayalFile = new File(configurationDirectory, "WMSPortrayal.xml");

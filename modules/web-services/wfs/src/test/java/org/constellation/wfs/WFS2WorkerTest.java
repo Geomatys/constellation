@@ -827,7 +827,6 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        //System.out.println(writer.toString());
         domCompare(expectedResult, writer.toString());
 
         /**
@@ -1059,7 +1058,6 @@ public class WFS2WorkerTest {
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollectionSelfJoin.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        //System.out.println("RESULT:" + writer.toString());
         domCompare(expectedResult, writer.toString());
     }
     
@@ -1101,7 +1099,6 @@ public class WFS2WorkerTest {
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollectionSelfJoin.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        //System.out.println("RESULT:" + writer.toString());
         domCompare(expectedResult, writer.toString());
     }
 
@@ -1538,9 +1535,10 @@ public class WFS2WorkerTest {
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName("$typeName"))));
         final ListStoredQueriesResponseType expResult = new ListStoredQueriesResponseType(items);
 
-        assertEquals(2, result.getStoredQuery().size());
+        assertEquals(3, result.getStoredQuery().size());
         for (int i = 0; i < result.getStoredQuery().size(); i++) {
             final StoredQueryListItemType expIt = items.get(i);
             final StoredQueryListItemType resIt = result.getStoredQuery().get(i);
@@ -1637,11 +1635,12 @@ public class WFS2WorkerTest {
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery",     Arrays.asList(new Title("Name query")),     Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName("$typeName"))));
         items.add(new StoredQueryListItemType("geomQuery",     Arrays.asList(new Title("Geom query")),     Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges"))));
         items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
 
-        assertEquals(4, resultlsq.getStoredQuery().size());
+        assertEquals(5, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1658,7 +1657,7 @@ public class WFS2WorkerTest {
         resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
 
-        assertEquals(4, resultlsq.getStoredQuery().size());
+        assertEquals(5, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1687,10 +1686,11 @@ public class WFS2WorkerTest {
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName("$typeName"))));
         items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
 
-        assertEquals(3, resultlsq.getStoredQuery().size());
+        assertEquals(4, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1707,10 +1707,36 @@ public class WFS2WorkerTest {
         resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
 
-        assertEquals(3, resultlsq.getStoredQuery().size());
+        assertEquals(4, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
+    }
+    
+    @Test
+    public void getFeatureOMFeatureIdTest() throws Exception {
+
+        /**
+         * Test 1 : query on typeName samplingPoint with name parameter
+         */
+        final FilterType filter = new org.geotoolkit.ogc.xml.v200.FilterType(new org.geotoolkit.ogc.xml.v200.ResourceIdType("station-001"));
+        final QueryType query = new QueryType(filter, null, "2.0.0");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, Arrays.asList(query), ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        
+        Object result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
     }
 
     @Test
@@ -1742,7 +1768,7 @@ public class WFS2WorkerTest {
         domCompare(expectedResult, writer.toString());
         
         /**
-         * Test 1 : query on typeName samplingPoint with id parameter
+         * Test 2 : query on typeName samplingPoint with id parameter
          */
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         params = new ArrayList<ParameterType>();
@@ -1789,6 +1815,30 @@ public class WFS2WorkerTest {
         featureWriter.write((FeatureCollection)result,writer);
 
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-8v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 4 : query with typeName parameter
+         */
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        params = new ArrayList<ParameterType>();
+        params.add(new ParameterType("typeName", new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")));
+        query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", null, params);
+        request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         domCompare(expectedResult, writer.toString());

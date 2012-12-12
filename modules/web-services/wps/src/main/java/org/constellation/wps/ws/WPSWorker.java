@@ -120,6 +120,7 @@ public class WPSWorker extends AbstractWorker {
      */
     public WPSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WPS);
+        setSupportedVersion(ServiceDef.WPS_1_0_0);
         ProcessContext candidate = null;
         if (configurationDirectory != null) {
             final File lcFile = new File(configurationDirectory, "processContext.xml");

@@ -31,12 +31,15 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.ServiceDef;
 
 import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 
 import org.geotoolkit.ows.xml.OWSExceptionCode;
+import org.geotoolkit.util.Version;
+import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -107,6 +110,8 @@ public abstract class AbstractWorker implements Worker {
      * The specification for this worker.
      */
     private final Specification specification;
+    
+    protected UnmodifiableArrayList<ServiceDef> supportedVersions;
 
     /**
      * A Policy Decision Point (PDP) if some security constraints have been defined.
@@ -121,6 +126,69 @@ public abstract class AbstractWorker implements Worker {
         this.specification = specification;
     }
 
+    protected void setSupportedVersion(final ServiceDef... supportedVersions) {
+         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
+    }
+    
+    protected boolean isSupportedVersion(final String version) {
+        final ServiceDef.Version vv = new ServiceDef.Version(version);
+        for (ServiceDef sd : supportedVersions) {
+            if (sd.version.equals(vv)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Return a Version Object from the version number.
+     * if the version number is not correct return the default version.
+     *
+     * @param number the version number.
+     * @return
+     */
+    @Override
+    public ServiceDef getVersionFromNumber(final Version number) {
+        if (number != null) {
+            for (ServiceDef v : supportedVersions) {
+                if (v.version.toString().equals(number.toString())){
+                    return v;
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * If the requested version number is not available we choose the best version to return.
+     *
+     * @param number A version number, which will be compared to the ones specified.
+     *               Can be {@code null}, in this case the best version specified is just returned.
+     * @return The best version (the highest one) specified for this web service.
+     * 
+     */
+    @Override
+    public ServiceDef getBestVersion(final String number) {
+        for (ServiceDef v : supportedVersions) {
+            if (v.version.toString().equals(number)){
+                return v;
+            }
+        }
+        final ServiceDef firstSpecifiedVersion = supportedVersions.get(0);
+        if (number == null || number.isEmpty()) {
+            return firstSpecifiedVersion;
+        }
+        final ServiceDef.Version wrongVersion = new ServiceDef.Version(number);
+        if (wrongVersion.compareTo(firstSpecifiedVersion.version) > 0) {
+            return firstSpecifiedVersion;
+        } else {
+            if (wrongVersion.compareTo(supportedVersions.get(supportedVersions.size() - 1).version) < 0) {
+                return supportedVersions.get(supportedVersions.size() - 1);
+            }
+        }
+        return firstSpecifiedVersion;
+    }
+    
     /**
      * {@inheritDoc }
      */

@@ -64,10 +64,12 @@ import org.constellation.ws.UnauthorizedException;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wfs.ws.WFSConstants.*;
+import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.client.util.RequestsUtilities;
+import org.geotoolkit.ogc.xml.FilterXmlFactory;
 import org.geotoolkit.ogc.xml.SortBy;
 import org.geotoolkit.ogc.xml.XMLFilter;
 import org.geotoolkit.ows.xml.AcceptFormats;
@@ -146,6 +148,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             // if the request is not an xml request we fill the request parameter.
             final RequestBase request;
             if (objectRequest == null) {
+                version = getVersionFromNumber(getParameter(VERSION_PARAMETER, false)); // needed if exception is launch before request build
                 request = adaptQuery(getParameter(REQUEST_PARAMETER, true), worker);
             } else if (objectRequest instanceof RequestBase) {
                 request = (RequestBase) objectRequest;
@@ -153,7 +156,7 @@ public class WFSService extends GridWebService<WFSWorker> {
                 throw new CstlServiceException("The operation " + objectRequest.getClass().getName() + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
             }
-            version = getVersionFromNumber(request.getVersion());
+            version = worker.getVersionFromNumber(request.getVersion());
 
             if (request instanceof GetCapabilities) {
                 final GetCapabilities model = (GetCapabilities) request;
@@ -169,7 +172,8 @@ public class WFSService extends GridWebService<WFSWorker> {
                 final MediaType outputFormat;
                 if (requestOutputFormat == null || requestOutputFormat.equals("text/xml; subtype=gml/3.1.1")) {
                     outputFormat = GML_3_1_1;
-                } else if (requestOutputFormat.equals("text/xml; subtype=gml/3.2.1") || requestOutputFormat.equals("text/xml; subtype=gml/3.2")) {
+                } else if (requestOutputFormat.equals("text/xml; subtype=gml/3.2.1") || requestOutputFormat.equals("text/xml; subtype=gml/3.2")||
+                           requestOutputFormat.equals("application/gml+xml; version=3.2")) {
                     outputFormat = GML_3_2_1;
                 } else {
                     outputFormat = MediaType.valueOf(requestOutputFormat);
@@ -246,10 +250,17 @@ public class WFSService extends GridWebService<WFSWorker> {
                                           INVALID_PARAMETER_VALUE, "request");
 
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, version);
+            return processExceptionResponse(ex, version, worker);
         }
     }
 
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker w) {
+        if (serviceDef == null) {
+            serviceDef = w.getBestVersion(null);
+        }
+        return processExceptionResponse(ex, serviceDef);
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -358,7 +369,7 @@ public class WFSService extends GridWebService<WFSWorker> {
 
     private RequestBase adaptQuery(final String request, final WFSWorker worker) throws CstlServiceException {
         if (STR_GETCAPABILITIES.equalsIgnoreCase(request)) {
-            return createNewGetCapabilitiesRequest();
+            return createNewGetCapabilitiesRequest(worker);
         } else if (STR_DESCRIBEFEATURETYPE.equalsIgnoreCase(request)) {
             return createNewDescribeFeatureTypeRequest();
         } else if (STR_GETFEATURE.equalsIgnoreCase(request)) {
@@ -400,12 +411,12 @@ public class WFSService extends GridWebService<WFSWorker> {
         return buildDecribeFeatureType(version, service, handle, typeNames, outputFormat);
     }
 
-    private GetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
+    private GetCapabilities createNewGetCapabilitiesRequest(final Worker worker) throws CstlServiceException {
         String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
 
         String currentVersion = getParameter(VERSION_PARAMETER, false);
         if (currentVersion == null) {
-            currentVersion = "2.0.0";
+            currentVersion = worker.getBestVersion(null).version.toString();
         }
         isVersionSupported(currentVersion);
 
@@ -469,11 +480,9 @@ public class WFSService extends GridWebService<WFSWorker> {
         final String version = getParameter(VERSION_PARAMETER, true);
         isVersionSupported(version);
         final String handle  = getParameter(HANDLE,  false);
-        String outputFormat  = getParameter("outputFormat", false);
+        final String outputFormat  = getParameter("outputFormat", false);
 
-        if (outputFormat == null) {
-            outputFormat = "text/xml; subtype=gml/3.1.1";
-        }
+        
         final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
 
@@ -505,11 +514,26 @@ public class WFSService extends GridWebService<WFSWorker> {
         if (storedQuery != null) {
             // extract stored query params
             mandatory = false;
-            final List<String> paramNames = worker.getParameterForStoredQuery(storedQuery);
-            for (String paramName : paramNames) {
-                final String paramValue = getParameter(paramName, false);
+            final List<ParameterExpression> params = worker.getParameterForStoredQuery(storedQuery);
+            for (ParameterExpression param : params) {
+                final String paramValue = getParameter(param.getName(), false);
                 if (paramValue != null) {
-                    parameters.add(buildParameter(version, paramName, paramValue));
+                    // TODO handle different type
+                    final Object obj;
+                    if (param.getType().getLocalPart().equals("QName")) {
+                        final int separator = paramValue.indexOf(':');
+                        if (separator != -1) {
+                            final String prefix    = paramValue.substring(0, separator);
+                            final String namespac  = mapping.get(prefix);
+                            final String localPart = paramValue.substring(separator + 1);
+                            obj = new QName(namespac, localPart);
+                        } else {
+                            obj = new QName(paramValue);
+                        }
+                    } else {
+                        obj = paramValue;
+                    }
+                    parameters.add(buildParameter(version, param.getName(), obj));
                 }
             }
         }
@@ -560,11 +584,12 @@ public class WFSService extends GridWebService<WFSWorker> {
         }
 
         if (featureId != null) {
-            final Query query = buildQuery(version, null, typeNames, featureVersion, srsName, sortBy, propertyNames);
-            return buildGetFeature(version, service, handle, maxFeature, featureId, query, resultType, outputFormat);
+            final XMLFilter filter = FilterXmlFactory.buildFeatureIDFilter(version, featureId);
+            final Query query = buildQuery(version, filter, typeNames, featureVersion, srsName, sortBy, propertyNames);
+            return buildGetFeature(version, service, handle, maxFeature, query, resultType, outputFormat);
         } else if (storedQuery != null) {
             final StoredQuery query = buildStoredQuery(version, storedQuery, handle, parameters);
-            return buildGetFeature(version, service, handle, maxFeature, null, query, resultType, outputFormat);
+            return buildGetFeature(version, service, handle, maxFeature, query, resultType, outputFormat);
         }
 
         final Object xmlFilter  = getComplexParameter(FILTER, false);
@@ -606,7 +631,7 @@ public class WFSService extends GridWebService<WFSWorker> {
 
         try {
             final Query query   = buildQuery(version, filter, typeNames, featureVersion, srsName, sortBy, propertyNames);
-            final GetFeature gf = buildGetFeature(version, service, handle, maxFeature, null, query, resultType, outputFormat);
+            final GetFeature gf = buildGetFeature(version, service, handle, maxFeature, query, resultType, outputFormat);
             gf.setPrefixMapping(prefixMapping);
             return gf;
         } catch (IllegalArgumentException ex) {
@@ -629,13 +654,10 @@ public class WFSService extends GridWebService<WFSWorker> {
         final String service = getParameter(SERVICE_PARAMETER, true);
         final String version = getParameter(VERSION_PARAMETER, true);
         final String handle  = getParameter(HANDLE,  false);
-        String outputFormat  = getParameter("outputFormat", false);
+        final String outputFormat  = getParameter("outputFormat", false);
 
         isVersionSupported(version);
-
-        if (outputFormat == null) {
-            outputFormat = "text/xml; subtype=gml/3.1.1";
-        }
+        
         final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
 

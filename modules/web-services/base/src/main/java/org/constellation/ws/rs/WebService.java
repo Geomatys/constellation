@@ -531,6 +531,15 @@ public abstract class WebService {
             }
         }
     }
+    
+    protected String getSafeParameter(final String parameterName) {
+        final List<String> values = getParameter(parameterName);
+        if (values == null) {
+            return null;
+        } else {
+            return values.get(0);
+        }
+    }
 
     /**
      * Return a map of parameters put in the query.
