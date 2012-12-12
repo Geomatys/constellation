@@ -190,6 +190,8 @@ public final class WFSConstants {
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsVersionNav",        new NoValues(), new ValueType("FALSE")));
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsSorting",           new NoValues(), new ValueType("TRUE")));
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsExtendedOperators", new NoValues(), new ValueType("FALSE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsResourceId",        new NoValues(), new ValueType("TRUE")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsMinimumXPath",      new NoValues(), new ValueType("TRUE")));
         final org.geotoolkit.ogc.xml.v200.ConformanceType conformance = new ConformanceType(constraints);
         FILTER_CAPABILITIES_V200 = new org.geotoolkit.ogc.xml.v200.FilterCapabilities(scalarCapabilities, spatialCapabilties, idCapabilities, conformance);
     }

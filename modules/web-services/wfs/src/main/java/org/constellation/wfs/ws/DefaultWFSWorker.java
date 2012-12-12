@@ -189,6 +189,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         } else {
             setSupportedVersion(ServiceDef.WFS_2_0_0, ServiceDef.WFS_1_1_0);
         }
+        
+        // TODO move to AbstractWorker
+        final String ts = getProperty("transactionSecurized");
+        if (ts != null && !ts.isEmpty()) {
+            transactionSecurized = Boolean.parseBoolean(ts);
+        }
 
         // loading stored queries
        loadStoredQueries();
@@ -488,12 +494,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                 final Name n = Utils.getNameFromQname(name);
                 if (layersContainsKey(n) == null) {
-                    throw new CstlServiceException(UNKNOW_TYPENAME + name);
+                    throw new CstlServiceException(UNKNOW_TYPENAME + name, INVALID_PARAMETER_VALUE, "typenames");
                 }
                 final LayerDetails layer = getLayerReference(n);
 
                 if(!(layer instanceof FeatureLayerDetails)) {
-                    throw new CstlServiceException(UNKNOW_TYPENAME + name);
+                    throw new CstlServiceException(UNKNOW_TYPENAME + name, INVALID_PARAMETER_VALUE, "typenames");
                 }
 
                 try {
@@ -695,7 +701,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                 final Name fullTypeName = Utils.getNameFromQname(typeName);
                 if (layersContainsKey(fullTypeName) == null) {
-                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE);
+                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typenames");
                 }
                 final LayerDetails layerD = getLayerReference(fullTypeName);
 
@@ -835,7 +841,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                 final Name fullTypeName = Utils.getNameFromQname(typeName);
                 if (layersContainsKey(fullTypeName) == null) {
-                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE);
+                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typenames");
                 }
                 final LayerDetails layerD = getLayerReference(fullTypeName);
 
@@ -1058,7 +1064,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                 final Name typeName = Utils.getNameFromQname(deleteRequest.getTypeName());
                 if (layersContainsKey(typeName) == null) {
-                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
+                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typename");
                 }
                 final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(typeName);
                 try {
@@ -1102,7 +1108,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                 final Name typeName = Utils.getNameFromQname(updateRequest.getTypeName());
                 if (layersContainsKey(typeName) == null) {
-                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
+                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typename");
                 }
                 final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(typeName);
                 try {

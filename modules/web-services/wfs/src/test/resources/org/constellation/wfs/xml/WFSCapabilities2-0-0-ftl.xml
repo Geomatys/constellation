@@ -250,6 +250,14 @@
                 <ns9:NoValues/>
                 <ns9:DefaultValue>FALSE</ns9:DefaultValue>
             </fes:Constraint>
+            <fes:Constraint name="ImplementsResourceId">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsMinimumXPath">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
         </fes:Conformance>
         <fes:Id_Capabilities>
             <fes:ResourceIdentifier name="fes:ResourceId"/>
