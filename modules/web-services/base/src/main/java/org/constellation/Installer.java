@@ -45,9 +45,9 @@ public final class Installer implements ServletContextListener{
 
             //Initialize geotoolkit
             Installation.allowSystemPreferences = false;
+            ImageIO.scanForPlugins();
             Setup.initialize(null);
 
-            ImageIO.scanForPlugins();
             try {
                 Class.forName("javax.media.jai.JAI");
             } catch (ClassNotFoundException ex) {
