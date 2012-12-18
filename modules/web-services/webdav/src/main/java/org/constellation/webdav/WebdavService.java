@@ -44,6 +44,9 @@ public final class WebdavService implements ResourceFactory {
             return null;
         }
         final String instanceName = getInstanceName(url);
+        if (instanceName == null) {
+            return null; 
+        }
         final WebdavWorker currentWorker = workersMap.get(instanceName);
         if (currentWorker != null) {
             return currentWorker.getResource(host, url);
@@ -101,6 +104,9 @@ public final class WebdavService implements ResourceFactory {
 
     private String getInstanceName(final String url) {
         final int i = url.indexOf(contextPath);
+        if (url.endsWith(contextPath) || url.endsWith(contextPath+"/")) {
+            return null;
+        }
         String s = url.substring(i + contextPath.length() + 1);
         if (s.isEmpty()) {
             return null;
