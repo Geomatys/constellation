@@ -192,8 +192,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         pos.add(new DirectPositionType(180.0, 90.0));
         final EnvelopeType envelope = new EnvelopeType(pos, "CRS:84");
         final DomainSubsetType domain = new DomainSubsetType(null, new SpatialSubsetType(envelope, grid));
-        final GetCoverage request = new GetCoverageType(
-                LAYER_TEST, domain, null, null, new OutputType(MimeType.IMAGE_PNG, "CRS:84"));
+        GetCoverage request = new GetCoverageType(LAYER_TEST, domain, null, null, new OutputType(MimeType.IMAGE_PNG, "CRS:84"));
 
         // Finally execute the request on the worker.
         final RenderedImage image = (RenderedImage) WORKER.getCoverage(request);
@@ -204,5 +203,15 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         // TODO: the image should have indexed colors. Find the origin of the conversion from
         //       indexed color to RGB (int values).
 //        assertEquals(Commons.checksum(image), 3183786073L);
+        
+        
+        request = new GetCoverageType(LAYER_TEST, domain, null, "WCS_INTERPLATION_METHOD_INVALID", new OutputType(MimeType.IMAGE_PNG, "CRS:84"));
+        boolean exLaunched = false;
+        try {
+            WORKER.getCoverage(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+        }
+        assertTrue(exLaunched);
     }
 }

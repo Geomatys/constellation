@@ -473,7 +473,7 @@ public final class MetadataUtilities {
         assertEquals(expResult.getReferenceSystemInfo().size(), result.getReferenceSystemInfo().size());
         if (expResult.getReferenceSystemInfo().iterator().hasNext()) {
             if (expResult.getReferenceSystemInfo().iterator().next() != null) {
-                if (expResult.getReferenceSystemInfo().iterator().next().getName() != null) {
+                if (expResult.getReferenceSystemInfo().iterator().next().getName() != null && result.getReferenceSystemInfo().iterator().next().getName() != null) {
                     assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getAuthority(), result.getReferenceSystemInfo().iterator().next().getName().getAuthority());
                     assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getCodeSpace(), result.getReferenceSystemInfo().iterator().next().getName().getCodeSpace());
                 }

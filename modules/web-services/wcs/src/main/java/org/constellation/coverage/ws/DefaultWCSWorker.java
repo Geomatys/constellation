@@ -850,11 +850,15 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         CoverageLayerDetails layerRef = (CoverageLayerDetails) tmplayerRef;
 
         // we verify the interpolation method even if we don't use it
-        if (request.getInterpolationMethod() != null) {
-            final InterpolationMethod interpolation = (InterpolationMethod)request.getInterpolationMethod();
-            if (!SUPPORTED_INTERPOLATIONS_V100.contains(interpolation)) {
-                throw new CstlServiceException("Unsupported interpolation: " + request.getInterpolationMethod(), INVALID_PARAMETER_VALUE, KEY_INTERPOLATION.toLowerCase());
+        try {
+            if (request.getInterpolationMethod() != null) {
+                final InterpolationMethod interpolation = (InterpolationMethod)request.getInterpolationMethod();
+                if (!SUPPORTED_INTERPOLATIONS_V100.contains(interpolation)) {
+                    throw new CstlServiceException("Unsupported interpolation: " + request.getInterpolationMethod(), INVALID_PARAMETER_VALUE, KEY_INTERPOLATION.toLowerCase());
+                }
             }
+        } catch (IllegalArgumentException ex) {
+            throw new CstlServiceException(ex.getMessage(), INVALID_PARAMETER_VALUE, KEY_INTERPOLATION.toLowerCase());
         }
         
 
