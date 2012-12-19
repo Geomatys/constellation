@@ -357,6 +357,7 @@ public class CSWService extends OGCWebService<CSWworker> {
                 acceptVersion = acceptVersion.substring(0, acceptVersion.indexOf(','));
             }
             version = acceptVersion;
+            isVersionSupported(version);
             versions = CswXmlFactory.buildAcceptVersion(version, Arrays.asList(acceptVersion));
         } else {
             version = "2.0.2";

@@ -164,7 +164,7 @@ public abstract class CSWConstants {
         final List<DomainType> drParameters = new ArrayList<DomainType>();
         drParameters.add(new DomainType("Version", "2.0.2"));
         drParameters.add(new DomainType("Service", "CSW"));
-        drParameters.add(new DomainType("TypeNames", Arrays.asList("gmd:MD_Metadata", "csw:Record")));
+        drParameters.add(new DomainType("TypeName", Arrays.asList("gmd:MD_Metadata", "csw:Record")));
         drParameters.add(new DomainType("SchemaLanguage", Arrays.asList("http://www.w3.org/XML/Schema", "XMLSCHEMA")));
         drParameters.add(new DomainType("outputFormat", Arrays.asList("text/xml", "application/xml")));
         
@@ -245,7 +245,8 @@ public abstract class CSWConstants {
         compOps[7] = ComparisonOperatorType.LIKE;
         compOps[8] = ComparisonOperatorType.NULL_CHECK;
         final ComparisonOperatorsType compOp = new ComparisonOperatorsType(compOps);
-        final ScalarCapabilitiesType scalar = new ScalarCapabilitiesType(compOp, null, false);
+        final ScalarCapabilitiesType scalar = new ScalarCapabilitiesType(compOp, null, true);
+        
         CSW_FILTER_CAPABILITIES.setScalarCapabilities(scalar);
 
         final IdCapabilitiesType id = new IdCapabilitiesType(false, true);
