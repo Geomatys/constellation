@@ -122,7 +122,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * A flag indicating that we don't want to add the metadata to the index.
      */
-    private final boolean noIndexation;
+    protected final boolean noIndexation;
 
     private final Map<Standard, List<Standard>> standardMapping = new HashMap<Standard, List<Standard>>();
 
@@ -1312,6 +1312,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     public RecordSet getMdRecordSet() {
         return mdRecordSet;
+    }
+
+    /**
+     * @return the defaultUser
+     */
+    public User getDefaultUser() {
+        return defaultUser;
     }
 
     protected static final class MixedPath {
