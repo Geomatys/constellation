@@ -52,6 +52,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         Connection con = ds.getConnection();
 
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+        sr.setEncoding("UTF-8");
         sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
 

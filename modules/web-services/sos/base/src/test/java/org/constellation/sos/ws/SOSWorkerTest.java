@@ -17,6 +17,7 @@
 
 package org.constellation.sos.ws;
 
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -1417,8 +1418,8 @@ public class SOSWorkerTest {
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
         ObservationCollectionType result = (ObservationCollectionType) worker.getObservation(request);
-
-        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-8.xml"));
+        java.io.Reader ioReader = new InputStreamReader(Util.getResourceAsStream("org/constellation/sos/observationTemplate-8.xml"), "UTF-8");
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(ioReader);
 
         ObservationType expResult = (ObservationType)obj.getValue();
 
