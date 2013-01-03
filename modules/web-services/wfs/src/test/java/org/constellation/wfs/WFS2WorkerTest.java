@@ -35,6 +35,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
@@ -51,7 +52,9 @@ import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.om.OMDataStoreFactory;
 import org.geotoolkit.data.sml.SMLDataStoreFactory;
+import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamValueCollectionWriter;
 import org.geotoolkit.gml.xml.v321.DirectPositionType;
@@ -65,6 +68,7 @@ import org.geotoolkit.ogc.xml.v200.FilterType;
 import org.geotoolkit.ogc.xml.v200.LiteralType;
 import org.geotoolkit.ogc.xml.v200.LogicOpsType;
 import org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType;
+import org.geotoolkit.ogc.xml.v200.ResourceIdType;
 import org.geotoolkit.ogc.xml.v200.SortByType;
 import org.geotoolkit.ogc.xml.v200.SortOrderType;
 import org.geotoolkit.ogc.xml.v200.SortPropertyType;
@@ -73,7 +77,18 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.geotoolkit.wfs.xml.*;
+import org.geotoolkit.wfs.xml.AllSomeType;
+import org.geotoolkit.wfs.xml.CreateStoredQueryResponse;
+import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.DropStoredQueryResponse;
+import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.ResultTypeType;
+import org.geotoolkit.wfs.xml.StoredQueries;
+import org.geotoolkit.wfs.xml.StoredQueryDescription;
+import org.geotoolkit.wfs.xml.TransactionResponse;
+import org.geotoolkit.wfs.xml.ValueCollection;
+import org.geotoolkit.wfs.xml.WFSCapabilities;
+import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v200.*;
 import org.geotoolkit.wfs.xml.v200.Title;
 import org.geotoolkit.xml.MarshallerPool;
@@ -81,10 +96,15 @@ import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
-import org.junit.*;
-import static org.junit.Assert.*;
+
+import org.opengis.feature.Feature;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+
+import org.junit.*;
+import static org.junit.Assert.*;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 
 
 /**
@@ -1408,8 +1428,8 @@ public class WFS2WorkerTest {
 
         TransactionResponse result = worker.transaction(request);
 
-        TransactionSummaryType sum = new TransactionSummaryType(0, 1, 0);
-        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, "2.0.0");
+        TransactionSummaryType sum = new TransactionSummaryType(0, 1, 0, 0);
+        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, null, "2.0.0");
 
         assertEquals(ExpResult, result);
 
@@ -1436,6 +1456,55 @@ public class WFS2WorkerTest {
 
     }
 
+    @Test
+    public void TransactionReplaceTest() throws Exception {
+        /**
+         * Test 1 : transaction replace for Feature type NamedPlaces
+         */
+        final Name typeName = new DefaultName("http://www.opengis.net/gml/3.2", "NamedPlaces");
+        final FeatureType ft = ((FeatureLayerDetails) LayerProviderProxy.getInstance().get(typeName)).getStore().getFeatureType(typeName);
+        final JAXPStreamFeatureReader fr = new JAXPStreamFeatureReader(ft);
+        fr.getProperties().put(JAXPStreamFeatureReader.BINDING_PACKAGE, "GML");
+        final Feature feature = (Feature) fr.read(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlaces.xml"));
+        
+        PropertyIsEqualToType pe = new PropertyIsEqualToType(new LiteralType("Goose Island"), "NAME", Boolean.TRUE);
+        FilterType filter        = new FilterType(pe);
+        TransactionType request  = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new ReplaceType(null, filter, feature, "application/gml+xml; version=3.2", null));
+
+
+        TransactionResponse result = worker.transaction(request);
+
+        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 0, 1);
+        final List<CreatedOrModifiedFeatureType> r = new ArrayList<CreatedOrModifiedFeatureType>();
+        r.add(new CreatedOrModifiedFeatureType(new ResourceIdType("NamedPlaces.2"), null));
+        ActionResultsType replaced = new ActionResultsType(r);
+        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, replaced, "2.0.0");
+
+        assertEquals(ExpResult, result);
+
+        /**
+         * we verify that the feature have been updated
+         */
+         List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+
+        Object resultGF = worker.getFeature(requestGF);
+
+        assertTrue(resultGF instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
+        resultGF = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)resultGF,writer);
+
+        domCompare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-4v2.xml"),
+                writer.toString());
+
+    }
+    
     @Test
     public void TransactionDeleteTest() throws Exception {
 
@@ -1468,8 +1537,8 @@ public class WFS2WorkerTest {
 
         TransactionResponse result = worker.transaction(request);
 
-        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 1);
-        TransactionResponseType expresult = new TransactionResponseType(sum, null, null, "2.0.0");
+        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 1, 0);
+        TransactionResponseType expresult = new TransactionResponseType(sum, null, null, null,"2.0.0");
 
         assertEquals(expresult, result);
 

@@ -942,8 +942,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         int totalInserted                          = 0;
         int totalUpdated                           = 0;
         int totalDeleted                           = 0;
+        int totalReplaced                          = 0;
         final List<Object> transactions            = request.getTransactionAction();
         final Map<String, String> inserted         = new LinkedHashMap<String, String>();
+        final Map<String, String> replaced         = new LinkedHashMap<String, String>();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
         final JAXPStreamFeatureReader featureReader= new JAXPStreamFeatureReader(getFeatureTypes());
 
@@ -1184,6 +1186,112 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
 
 
+            } else if (transaction instanceof ReplaceElement) {
+                
+                final ReplaceElement replaceRequest = (ReplaceElement) transaction;
+                final String handle = replaceRequest.getHandle();
+                
+                // we verify the input format
+                if (replaceRequest.getInputFormat() != null && !(replaceRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1")
+                                                            ||   replaceRequest.getInputFormat().equals("application/gml+xml; version=3.2"))) {
+                    throw new CstlServiceException("This only input format supported are: text/xml; subtype=gml/3.1.1 and application/gml+xml; version=3.2",
+                            INVALID_PARAMETER_VALUE, "inputFormat");
+                }
+
+                //decode filter-----------------------------------------------------
+                final Filter filter = extractJAXBFilter(replaceRequest.getFilter(),Filter.EXCLUDE, namespaceMapping, currentVersion);
+
+                //decode crs--------------------------------------------------------
+                final CoordinateReferenceSystem crs = extractCRS(replaceRequest.getSrsName());
+                
+                // extract replacement feature 
+                Object featureObject = replaceRequest.getFeature();
+                if (featureObject instanceof JAXBElement) {
+                    featureObject = ((JAXBElement) featureObject).getValue();
+                }
+                try {
+                    if (featureObject instanceof Node) {
+
+                        featureObject = featureReader.read(featureObject);
+
+                    } else if (featureObject instanceof FeatureCollectionType) {
+                        final FeatureCollectionType xmlCollection = (FeatureCollectionType) featureObject;
+                        final String id = xmlCollection.getId();
+                        final List<Feature> features = new ArrayList<Feature>();
+                        FeatureType ft = null;
+                        for (FeaturePropertyType fprop : xmlCollection.getFeatureMember()) {
+                            Feature feat = (Feature) featureReader.read(fprop.getUnknowFeature());
+                            ft = feat.getType();
+                            features.add(feat);
+                        }
+                        final FeatureCollection collection = FeatureStoreUtilities.collection(id, ft);
+                        collection.addAll(features);
+                        featureObject = collection;
+                    }
+                } catch (IllegalArgumentException ex) {
+                    throw new CstlServiceException(ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
+                } catch (IOException ex) {
+                    throw new CstlServiceException(ex);
+                } catch (XMLStreamException ex) {
+                    throw new CstlServiceException(ex);
+                }
+                final Name typeName;
+                FeatureCollection featureCollection;
+
+                if (featureObject instanceof Feature) {
+                    final Feature feature = (Feature) featureObject;
+                    typeName = feature.getType().getName();
+                    featureCollection = FeatureStoreUtilities.collection(feature);
+                } else if (featureObject instanceof FeatureCollection) {
+                    featureCollection = (FeatureCollection) featureObject;
+                    typeName = ((FeatureCollection) featureCollection).getFeatureType().getName();
+                } else {
+                    final String featureType;
+                    if (featureObject == null) {
+                        featureType = "null";
+                    } else {
+                        if (featureObject instanceof JAXBElement) {
+                            featureType = "JAXBElement<" + ((JAXBElement) featureObject).getValue().getClass().getName() + ">";
+                        } else {
+                            featureType = featureObject.getClass().getName();
+                        }
+                    }
+                    throw new CstlServiceException("Unexpected replacement object:" + featureType);
+                }
+                        
+                if (layersContainsKey(typeName) == null) {
+                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
+                }
+                
+                try {
+                    final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(typeName);
+                    final FeatureType ft = getFeatureTypeFromLayer(layer);
+
+                    // we extract the number of feature to replace
+                    final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
+                    queryBuilder.setFilter(processFilter(ft, filter, null));
+                    totalReplaced = totalReplaced + (int) layer.getStore().getCount(queryBuilder.buildQuery());
+
+                    // first remove the feature to replace
+                    layer.getStore().removeFeatures(layer.getName(), filter);
+
+                    // then add the new one
+                    final CoordinateReferenceSystem trueCrs = layer.getStore().getFeatureType(typeName).getCoordinateReferenceSystem();
+                    if(trueCrs != null && !CRS.equalsIgnoreMetadata(trueCrs, featureCollection.getFeatureType().getCoordinateReferenceSystem())){
+                        featureCollection = GenericReprojectFeatureIterator.wrap(featureCollection, trueCrs);
+                    }
+
+                    final List<FeatureId> features = layer.getStore().addFeatures(typeName, featureCollection);
+
+                    for (FeatureId fid : features) {
+                        replaced.put(fid.getID(), handle);// get the id of the replaced feature
+                        LOGGER.log(Level.FINER, "fid inserted: {0} total:{1}", new Object[]{fid, totalInserted});
+                    }
+
+                } catch (DataStoreException ex) {
+                    throw new CstlServiceException(ex);
+                }
+                
             } else {
                 String className = " null object";
                 if (transaction != null) {
@@ -1196,10 +1304,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         }
 
         final TransactionResponse response = buildTransactionResponse(currentVersion,
-                                                                                 totalInserted,
-                                                                                 totalUpdated,
-                                                                                 totalDeleted,
-                                                                                 inserted);
+                                                                      totalInserted,
+                                                                      totalUpdated,
+                                                                      totalDeleted,
+                                                                      totalReplaced,
+                                                                      inserted,
+                                                                      replaced);
         LOGGER.log(logLevel, "Transaction request processed in {0} ms", (System.currentTimeMillis() - startTime));
 
         return response;

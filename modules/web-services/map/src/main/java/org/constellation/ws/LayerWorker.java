@@ -24,6 +24,7 @@ import org.constellation.ServiceDef.Specification;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -183,7 +184,7 @@ public abstract class LayerWorker extends AbstractWorker {
      * @return a list of LayerDetails
      * @throws CstlServiceException
      */
-    protected List<LayerDetails> getLayerReferences(final List<Name> layerNames) throws CstlServiceException {
+    protected List<LayerDetails> getLayerReferences(final Collection<Name> layerNames) throws CstlServiceException {
         final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
         for (Name layerName : layerNames) {
             layerRefs.add(getLayerReference(layerName));
