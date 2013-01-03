@@ -160,6 +160,7 @@ public class GenericindexTest {
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        expectedResult.add("meta_NaN_id");
 
 
         assertEquals(expectedResult, result);
@@ -280,7 +281,6 @@ public class GenericindexTest {
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
-
 
         assertEquals(expectedResult, result);
 
@@ -667,6 +667,7 @@ public class GenericindexTest {
         expectedResult.add("CTDF02");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         assertEquals(expectedResult, result);
 
@@ -688,6 +689,7 @@ public class GenericindexTest {
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("CTDF02");
@@ -719,6 +721,7 @@ public class GenericindexTest {
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("CTDF02");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
@@ -751,6 +754,7 @@ public class GenericindexTest {
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("CTDF02");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
@@ -872,7 +876,7 @@ public class GenericindexTest {
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-
+        expectedResult.add("meta_NaN_id");
         assertEquals("CRS URN are not working", expectedResult, result);
     }
 
@@ -1053,6 +1057,9 @@ public class GenericindexTest {
         result.add(obj);
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/imageMetadata.xml"));
+        result.add(obj);
+        
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/metaNan.xml"));
         result.add(obj);
 
         CSWMarshallerPool.getInstance().release(unmarshaller);
