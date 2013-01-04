@@ -607,7 +607,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         String xmlResult    = getStringResponse(conec);
         String xmlExpResult = getStringFromFile("org/constellation/xml/namedPlacesCollection-1.xml");
         xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
-
+        
         assertEquals(xmlExpResult, xmlResult);
     }
     

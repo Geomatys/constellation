@@ -644,6 +644,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, false, false);
 
+        long nbMatched                             = 0;
         final String currentVersion                = request.getVersion().toString();
         final int maxFeatures                      = request.getCount();
         final Integer startIndex                   = request.getStartIndex();
@@ -690,9 +691,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             if (!sortBys.isEmpty()) {
                 queryBuilder.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
             }
-            if (maxFeatures != 0){
-                queryBuilder.setMaxFeatures(maxFeatures);
-            }
             if (startIndex != 0){
                 queryBuilder.setStartIndex(startIndex);
             }
@@ -725,8 +723,18 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 // we verify that all the properties contained in the filter are known by the feature type.
                 verifyFilterProperty(ft, cleanFilter, aliases);
 
-
+                if (maxFeatures != 0){
+                    queryBuilder.setMaxFeatures(maxFeatures);
+                }
                 FeatureCollection collection = layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery());
+                // look for matching count
+                queryBuilder.setMaxFeatures(null);
+                try {
+                    nbMatched = nbMatched +  layer.getStore().createSession(false).getCount(queryBuilder.buildQuery());
+                } catch (DataStoreException ex) {
+                    throw new CstlServiceException(ex);
+                }
+                 
                 if (!collection.isEmpty()) {
                     if(queryCRS == null){
                         try {
@@ -781,7 +789,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             return buildFeatureCollection(currentVersion, "collection-1", featureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
         }
         LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
-        return new FeatureCollectionWrapper(featureCollection, schemaLocations, gmlVersion, currentVersion);
+        return new FeatureCollectionWrapper(featureCollection, schemaLocations, gmlVersion, currentVersion, (int)nbMatched);
     }
 
     @Override
@@ -940,17 +948,18 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, true, false);
 
         // we prepare the report
-        final String currentVersion                = request.getVersion().toString();
-        int totalInserted                          = 0;
-        int totalUpdated                           = 0;
-        int totalDeleted                           = 0;
-        int totalReplaced                          = 0;
-        final List<Object> transactions            = request.getTransactionAction();
-        final Map<String, String> inserted         = new LinkedHashMap<String, String>();
-        final Map<String, String> replaced         = new LinkedHashMap<String, String>();
-        final Map<String, String> namespaceMapping = request.getPrefixMapping();
-        final JAXPStreamFeatureReader featureReader= new JAXPStreamFeatureReader(getFeatureTypes());
-
+        final String currentVersion                 = request.getVersion().toString();
+        int totalInserted                           = 0;
+        int totalUpdated                            = 0;
+        int totalDeleted                            = 0;
+        int totalReplaced                           = 0;
+        final List<Object> transactions             = request.getTransactionAction();
+        final Map<String, String> inserted          = new LinkedHashMap<String, String>();
+        final Map<String, String> replaced          = new LinkedHashMap<String, String>();
+        final Map<String, String> namespaceMapping  = request.getPrefixMapping();
+        final JAXPStreamFeatureReader featureReader = new JAXPStreamFeatureReader(getFeatureTypes());
+        featureReader.getProperties().put(JAXPStreamFeatureReader.BINDING_PACKAGE, "GML");
+        
         for (Object transaction: transactions) {
 
             /**

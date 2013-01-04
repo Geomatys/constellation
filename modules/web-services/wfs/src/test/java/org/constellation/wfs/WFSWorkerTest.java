@@ -896,22 +896,20 @@ public class WFSWorkerTest {
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        try {
-            result = worker.getFeature(request);
-            assertTrue(result instanceof FeatureCollectionWrapper);
-            wrapper = (FeatureCollectionWrapper) result;
-            result = wrapper.getFeatureCollection();
+        result = worker.getFeature(request);
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
 
-            writer = new StringWriter();
-            featureWriter.write((FeatureCollection)result,writer);
-            String xmlResult = writer.toString();
-            fail("Should have raised an error.");
-        } catch (FeatureStoreRuntimeException ex) {
-            //ok
-        }
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+        domCompare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-5.xml"),
+                writer.toString());
+        
 
         /**
-         * Test 7 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
+         * Test 7 : query on typeName NamedPlaces with ASC sortBy on NAME property (not supported)
          */
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
@@ -919,19 +917,17 @@ public class WFSWorkerTest {
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        try {
-            result = worker.getFeature(request);
-            assertTrue(result instanceof FeatureCollectionWrapper);
-            wrapper = (FeatureCollectionWrapper) result;
-            result = wrapper.getFeatureCollection();
+        result = worker.getFeature(request);
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
 
-            writer = new StringWriter();
-            featureWriter.write((FeatureCollection)result,writer);
-            String xmlResult = writer.toString();
-            fail("Should have raised an error.");
-        } catch (FeatureStoreRuntimeException ex) {
-            //ok
-        }
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+        domCompare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
+                writer.toString());
+        
 
     }
 

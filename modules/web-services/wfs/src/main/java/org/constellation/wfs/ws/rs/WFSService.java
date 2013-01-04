@@ -107,7 +107,7 @@ public class WFSService extends GridWebService<WFSWorker> {
      */
     public WFSService() {
         super(ServiceDef.WFS_2_0_0, ServiceDef.WFS_1_1_0);
-
+        //setPostRequestLog(true);
         try {
             final MarshallerPool pool = new MarshallerPool(
                            "org.geotoolkit.wfs.xml.v110"   +

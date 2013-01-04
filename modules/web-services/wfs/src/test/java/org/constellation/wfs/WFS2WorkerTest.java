@@ -408,7 +408,7 @@ public class WFS2WorkerTest {
         assertEquals("3.2.1", wrapper.getGmlVersion());
 
         StringWriter writer = new StringWriter();
-        featureWriter.write((FeatureCollection)result,writer);
+        featureWriter.write((FeatureCollection)result,writer, 5);
 
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
@@ -1244,23 +1244,23 @@ public class WFS2WorkerTest {
         queries.add(query);
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
-        try {
-            result = worker.getFeature(request);
-            assertTrue(result instanceof FeatureCollectionWrapper);
-            wrapper = (FeatureCollectionWrapper) result;
-            result = wrapper.getFeatureCollection();
-            assertEquals("3.2.1", wrapper.getGmlVersion());
+        
+        result = worker.getFeature(request);
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
 
-            writer = new StringWriter();
-            featureWriter.write((FeatureCollection)result,writer);
-            String xmlResult = writer.toString();
-            fail("Should have raised an error.");
-        } catch (FeatureStoreRuntimeException ex) {
-            //ok
-        }
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+        domCompare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-5v2.xml"),
+                writer.toString());
+            
+        
 
         /**
-         * Test 7 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
+         * Test 7 : query on typeName NamedPlaces with ASC sortBy on NAME property (not supported)
          */
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null);
@@ -1268,21 +1268,18 @@ public class WFS2WorkerTest {
         queries.add(query);
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
-        try {
-            result = worker.getFeature(request);
+        result = worker.getFeature(request);
 
-            assertTrue(result instanceof FeatureCollectionWrapper);
-            wrapper = (FeatureCollectionWrapper) result;
-            result = wrapper.getFeatureCollection();
-            assertEquals("3.2.1", wrapper.getGmlVersion());
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
 
-            writer = new StringWriter();
-            featureWriter.write((FeatureCollection)result,writer);
-            String xmlResult = writer.toString();
-            fail("Should have raised an error.");
-        } catch (FeatureStoreRuntimeException ex) {
-            //ok
-        }
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+        domCompare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1v2.xml"),
+                writer.toString());
 
     }
 
