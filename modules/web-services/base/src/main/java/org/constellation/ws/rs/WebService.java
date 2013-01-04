@@ -45,6 +45,7 @@ import javax.ws.rs.POST;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -168,6 +169,11 @@ public abstract class WebService {
      * instead of the parameters map.
      */
     private boolean fullRequestLog = false;
+    
+    /**
+     * If this flag is set the method logParameters() will marshall the entire request in the logs.
+     */
+    private boolean postRequestLog = false;
 
     /**
      * If this flag is set r false the method logParameters() will write nothing in the logs
@@ -337,6 +343,7 @@ public abstract class WebService {
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
+            Marshaller marshaller     = null;
             final MarshallerPool pool;
             // we look for a configuration query
             final List<String> serviceId = getParameter("serviceId");
@@ -348,6 +355,7 @@ public abstract class WebService {
 
             try {
                 unmarshaller = pool.acquireUnmarshaller();
+                marshaller   = pool.acquireMarshaller();
                 if (requestValidationActivated) {
                     try {
                         final SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -360,6 +368,9 @@ public abstract class WebService {
                     }
                 }
                 request = unmarshallRequest(unmarshaller, is);
+                if (postRequestLog) {
+                    marshaller.marshal(request, System.out);
+                }
             } catch (JAXBException e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg == null) {
@@ -383,6 +394,9 @@ public abstract class WebService {
             } finally {
                 if (unmarshaller != null)  {
                     pool.release(unmarshaller);
+                }
+                if (marshaller != null)  {
+                    pool.release(marshaller);
                 }
             }
 
@@ -498,8 +512,7 @@ public abstract class WebService {
      * @return the parameter, or {@code null} if not specified and not mandatory.
      * @throw CstlServiceException
      */
-    protected String getParameter(final String parameterName, final boolean mandatory)
-                                                           throws CstlServiceException {
+    protected String getParameter(final String parameterName, final boolean mandatory) throws CstlServiceException {
 
         final List<String> values = getParameter(parameterName);
         if (values == null) {
@@ -637,8 +650,22 @@ public abstract class WebService {
     /**
      * @param fullRequestLog the fullRequestLog to set
      */
-    public void setFullRequestLog(boolean fullRequestLog) {
+    public void setFullRequestLog(final boolean fullRequestLog) {
         this.fullRequestLog = fullRequestLog;
+    }
+    
+    /**
+     * @return the postRequestLog
+     */
+    public boolean isPostRequestLog() {
+        return postRequestLog;
+    }
+
+    /**
+     * @param postRequestLog the postRequestLog to set
+     */
+    public void setPostRequestLog(final boolean postRequestLog) {
+        this.postRequestLog = postRequestLog;
     }
 
     /**
@@ -651,7 +678,7 @@ public abstract class WebService {
     /**
      * @param printRequestParameter the printRequestParameter to set
      */
-    public void setPrintRequestParameter(boolean printRequestParameter) {
+    public void setPrintRequestParameter(final boolean printRequestParameter) {
         this.printRequestParameter = printRequestParameter;
     }
 
@@ -662,7 +689,7 @@ public abstract class WebService {
      *
      * @param mainXsdPath The URL to the xsd.
      */
-    public void activateRequestValidation(String mainXsdPath) {
+    public void activateRequestValidation(final String mainXsdPath) {
         this.mainXsdPath                = mainXsdPath;
         this.requestValidationActivated = true;
     }
