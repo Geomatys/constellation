@@ -855,15 +855,17 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 }
+                final Filter cleanFilter = processFilter(ft, filter, aliases);
+                
                 // we ensure that the property names are contained in the feature type and add the mandatory attribute to the list
                 queryBuilder.setProperties(verifyPropertyNames(typeName, ft, requestPropNames));
-                queryBuilder.setFilter(processFilter(ft, filter, aliases));
+                queryBuilder.setFilter(cleanFilter);
 
                 queryBuilder.setTypeName(ft.getName());
                 queryBuilder.setHints(new Hints(HintsPending.FEATURE_HIDE_ID_PROPERTY, Boolean.TRUE));
 
                 // we verify that all the properties contained in the filter are known by the feature type.
-                verifyFilterProperty(ft, filter, aliases);
+                verifyFilterProperty(ft, cleanFilter, aliases);
 
                 collections.add(layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery()));
 
@@ -1072,12 +1074,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 try {
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
 
+                    final Filter cleanFilter = processFilter(ft, filter, null);
                     // we verify that all the properties contained in the filter are known by the feature type.
-                    verifyFilterProperty(ft, filter, null);
+                    verifyFilterProperty(ft, cleanFilter, null);
 
                     // we extract the number of feature deleted
                     final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
-                    queryBuilder.setFilter(processFilter(ft, filter, null));
+                    queryBuilder.setFilter(cleanFilter);
                     totalDeleted = totalDeleted + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
                     layer.getStore().removeFeatures(layer.getName(), filter);
@@ -1172,12 +1175,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                     }
 
+                    final Filter cleanFilter = processFilter(ft, filter, null);
                     // we verify that all the properties contained in the filter are known by the feature type.
-                    verifyFilterProperty(ft, filter, null);
+                    verifyFilterProperty(ft, cleanFilter, null);
 
                     // we extract the number of feature update
                     final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
-                    queryBuilder.setFilter(processFilter(ft, filter, null));
+                    queryBuilder.setFilter(cleanFilter);
                     totalUpdated = totalUpdated + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
                     layer.getStore().updateFeatures(layer.getName(), filter, values);

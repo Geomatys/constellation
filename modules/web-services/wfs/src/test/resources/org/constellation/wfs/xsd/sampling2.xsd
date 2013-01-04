@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xsd:schema elementFormDefault="qualified" targetNamespace="http://www.opengis.net/sampling/1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:sampling="http://www.opengis.net/sampling/1.0">
     <xsd:import schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd" namespace="http://www.opengis.net/gml/3.2"/>
-    <xsd:element name="SamplingPoint" type="sampling:SamplingPointType" />
+    <xsd:element name="SamplingPoint" type="sampling:SamplingPointType" substitutionGroup="gml:AbstractFeature"/>
     <xsd:complexType name="SamplingPointType">
         <xsd:complexContent>
-            <xsd:extension base="gml:_Feature" >
+            <xsd:extension base="gml:AbstractFeatureType" >
                 <xsd:sequence>
                     <xsd:element name="description" maxOccurs="1" minOccurs="0" type="xsd:string"/>
                     <xsd:element name="name" maxOccurs="unbounded" minOccurs="1" type="xsd:string"/>
