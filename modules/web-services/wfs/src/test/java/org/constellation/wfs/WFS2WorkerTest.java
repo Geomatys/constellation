@@ -1918,7 +1918,7 @@ public class WFS2WorkerTest {
         GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         ObjectFactory factory = new ObjectFactory();
         List<ParameterType> params = new ArrayList<ParameterType>();
-        params.add(new ParameterType("@id", "station-001"));
+        params.add(new ParameterType("id", "station-001"));
         StoredQueryType query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", null, params);
         request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
 

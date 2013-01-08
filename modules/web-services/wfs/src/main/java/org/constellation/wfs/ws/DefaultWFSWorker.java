@@ -553,7 +553,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                             content = ((JAXBElement)content).getValue();
                         }
                         if (content instanceof Query) {
-                            final Query query = (Query)content;
+                            final Query query = WFSXmlFactory.cloneQuery((Query)content);
                             applyParameterOnQuery(query, parameters);
                             ((List)queries).add(query);
                         } else {
