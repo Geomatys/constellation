@@ -1035,7 +1035,7 @@ public class WFSWorkerTest {
             worker.transaction(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getExceptionCode(), INVALID_VALUE);
             assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: whatever");
         }
 

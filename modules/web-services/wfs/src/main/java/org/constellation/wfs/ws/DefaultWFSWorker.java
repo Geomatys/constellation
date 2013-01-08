@@ -253,7 +253,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
        }
        if (!foundT) {
            final List<QName> typeNames = new ArrayList<QName>();
-           typeNames.add(new QName("$typeName"));
+           //typeNames.add(new QName("$typeName")); not XML valid (CITE TEST)
            final QueryType query = new QueryType(null, typeNames, "2.0.0");
            final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, typeNames);
            final ObjectFactory factory = new ObjectFactory();
@@ -799,6 +799,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, true, false);
 
+        final String valueReference                = request.getValueReference();
+        if (valueReference == null) {
+            throw new CstlServiceException("ValueReference must be specified", MISSING_PARAMETER_VALUE, "valueReference");
+        } else if (valueReference.isEmpty()) {
+            throw new CstlServiceException("ValueReference must not be empty", INVALID_PARAMETER_VALUE, "valueReference");
+        }
+        
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
         final String currentVersion                = request.getVersion().toString();
         final Map<Name,Layer> layers               = getLayers();
@@ -1007,7 +1014,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                             featureObject = collection;
                         }
                     } catch (IllegalArgumentException ex) {
-                        throw new CstlServiceException(ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
+                        throw new CstlServiceException(ex.getMessage(), ex, INVALID_VALUE);
                     } catch (IOException ex) {
                         throw new CstlServiceException(ex);
                     } catch (XMLStreamException ex) {
@@ -1138,7 +1145,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         final String updatePropertyName = updateProperty.getLocalName();
                         final PropertyAccessor pa = Accessors.getAccessor(Feature.class, updatePropertyName, null);
                         if (pa == null || pa.get(ft, updatePropertyName, null) == null) {
-                            throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyName, INVALID_PARAMETER_VALUE);
+                            throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyName, INVALID_VALUE);
                         }
                         final PropertyType propertyType = ft.getDescriptor(updatePropertyName).getType();
 
@@ -1530,14 +1537,22 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         applyParameterOnFilter(query.getFilter(), parameters);
         final List<QName> toRemove = new ArrayList<QName>();
         final List<QName> toAdd    = new ArrayList<QName>();
-        for (QName q : query.getTypeNames()) {
+        if (query.getTypeNames().isEmpty()) {
             for (Parameter param : parameters) {
-                if (q.getLocalPart().indexOf("$" +  param.getName()) != -1) {
-                    toRemove.add(q);
-                    if (!param.getContent().isEmpty() && param.getContent().get(0) instanceof QName) {
-                        toAdd.add((QName)param.getContent().get(0));
-                    } else {
-                        LOGGER.warning("bad type or empty parameter content");
+                if (!param.getContent().isEmpty() && param.getContent().get(0) instanceof QName && param.getName().equalsIgnoreCase("typeName")) {
+                    toAdd.add((QName)param.getContent().get(0));
+                }
+            }
+        } else {
+            for (QName q : query.getTypeNames()) {
+                for (Parameter param : parameters) {
+                    if (q.getLocalPart().indexOf("$" +  param.getName()) != -1) {
+                        toRemove.add(q);
+                        if (!param.getContent().isEmpty() && param.getContent().get(0) instanceof QName) {
+                            toAdd.add((QName)param.getContent().get(0));
+                        } else {
+                            LOGGER.warning("bad type or empty parameter content");
+                        }
                     }
                 }
             }

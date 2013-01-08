@@ -523,7 +523,7 @@ public abstract class WebService {
             return null;
         } else {
             final String value = values.get(0);
-            if ((value == null || value.isEmpty()) && mandatory) {
+            if (value == null && mandatory) {
                 /* For the STYLE/STYLES parameters, they are mandatory in the GetMap request.
                  * Nevertheless we do not know what to put in for raster, that's why for these
                  * parameters we will just return the value, even if it is empty.
@@ -532,11 +532,11 @@ public abstract class WebService {
                  * should be applied.
                  *
                  * todo: fix the style parameter.
-                 */
+                 *
                 if (parameterName.equalsIgnoreCase("STYLE") ||
                     parameterName.equalsIgnoreCase("STYLES")) {
                     return value;
-                }
+                }*/
                 throw new CstlServiceException("The parameter " + parameterName + " should have a value",
                         MISSING_PARAMETER_VALUE, parameterName.toLowerCase());
             } else {

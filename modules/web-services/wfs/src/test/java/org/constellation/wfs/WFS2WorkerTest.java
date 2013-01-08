@@ -48,7 +48,6 @@ import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.om.OMDataStoreFactory;
 import org.geotoolkit.data.sml.SMLDataStoreFactory;
@@ -684,8 +683,7 @@ public class WFS2WorkerTest {
          */
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         String valueReference = "sampledFeature";
-        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
-        request.setValueReference(valueReference);
+        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1", valueReference);
 
         Object result = worker.getPropertyValue(request);
 
@@ -731,6 +729,21 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.ValueCollectionOM2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
         domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 4 : empty value reference
+         */
+        valueReference = "";
+        request.setValueReference(valueReference);
+        
+        boolean exLaunched = false;
+        try {
+            worker.getPropertyValue(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+        }
+        
+        assertTrue(exLaunched);
     }
 
     /**
@@ -745,8 +758,7 @@ public class WFS2WorkerTest {
          */
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
         String valueReference = "inputs";
-        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
-        request.setValueReference(valueReference);
+        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1", valueReference);
 
         Object result = worker.getPropertyValue(request);
 
@@ -1386,7 +1398,7 @@ public class WFS2WorkerTest {
             worker.transaction(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getExceptionCode(), INVALID_VALUE);
             assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml/3.2}Bridges does not has such a property: whatever");
         }
 
@@ -1601,7 +1613,7 @@ public class WFS2WorkerTest {
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
-        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName("$typeName"))));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
         final ListStoredQueriesResponseType expResult = new ListStoredQueriesResponseType(items);
 
         assertEquals(3, result.getStoredQuery().size());
@@ -1701,12 +1713,18 @@ public class WFS2WorkerTest {
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery",     Arrays.asList(new Title("Name query")),     Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
-        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName("$typeName"))));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
         items.add(new StoredQueryListItemType("geomQuery",     Arrays.asList(new Title("Geom query")),     Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges"))));
         items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
 
         assertEquals(5, resultlsq.getStoredQuery().size());
+        for (int i = 0; i < resultlsq.getStoredQuery().size(); i++) {
+            assertEquals(expResultlsq.getStoredQuery().get(i).getId(), resultlsq.getStoredQuery().get(i).getId());
+            assertEquals(expResultlsq.getStoredQuery().get(i).getReturnFeatureType(), resultlsq.getStoredQuery().get(i).getReturnFeatureType());
+            assertEquals(expResultlsq.getStoredQuery().get(i).getTitle(), resultlsq.getStoredQuery().get(i).getTitle());
+            assertEquals(expResultlsq.getStoredQuery().get(i), resultlsq.getStoredQuery().get(i));
+        }
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1752,11 +1770,17 @@ public class WFS2WorkerTest {
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
-        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName("$typeName"))));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
         items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
 
         assertEquals(4, resultlsq.getStoredQuery().size());
+        for (int i = 0; i < resultlsq.getStoredQuery().size(); i++) {
+            assertEquals(expResultlsq.getStoredQuery().get(i).getId(), resultlsq.getStoredQuery().get(i).getId());
+            assertEquals(expResultlsq.getStoredQuery().get(i).getReturnFeatureType(), resultlsq.getStoredQuery().get(i).getReturnFeatureType());
+            assertEquals(expResultlsq.getStoredQuery().get(i).getTitle(), resultlsq.getStoredQuery().get(i).getTitle());
+            assertEquals(expResultlsq.getStoredQuery().get(i), resultlsq.getStoredQuery().get(i));
+        }
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 

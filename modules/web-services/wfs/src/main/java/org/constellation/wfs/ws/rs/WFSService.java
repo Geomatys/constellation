@@ -107,7 +107,7 @@ public class WFSService extends GridWebService<WFSWorker> {
      */
     public WFSService() {
         super(ServiceDef.WFS_2_0_0, ServiceDef.WFS_1_1_0);
-        setPostRequestLog(true);
+        //setPostRequestLog(true);
         try {
             final MarshallerPool pool = new MarshallerPool(
                            "org.geotoolkit.wfs.xml.v110"   +
@@ -667,6 +667,8 @@ public class WFSService extends GridWebService<WFSWorker> {
             resultType = ResultTypeType.fromValue(result.toLowerCase());
         }
 
+        final String valueReference = getParameter("valueReference", true);
+        
         final String featureVersion = getParameter("featureVersion", false);
 
         String featureId;
@@ -721,7 +723,7 @@ public class WFSService extends GridWebService<WFSWorker> {
 
         final String propertyNameParam = getParameter("propertyName", false);
         final List<String> propertyNames = new ArrayList<String>();
-        if (propertyNameParam != null) {
+        if (propertyNameParam != null && !propertyNameParam.isEmpty()) {
             final StringTokenizer tokens = new StringTokenizer(propertyNameParam, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
@@ -731,7 +733,7 @@ public class WFSService extends GridWebService<WFSWorker> {
 
         if (featureId != null) {
             final Query query = buildQuery(version, null, typeNames, featureVersion, srsName, sortBy, propertyNames);
-            return buildGetPropertyValue(version, service, handle, maxFeature, featureId, query, resultType, outputFormat);
+            return buildGetPropertyValue(version, service, handle, maxFeature, featureId, query, resultType, outputFormat, valueReference);
         }
 
         final Object xmlFilter  = getComplexParameter(FILTER, false);
@@ -772,7 +774,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         }
 
         final Query query   = buildQuery(version, filter, typeNames, featureVersion, srsName, sortBy, propertyNames);
-        final GetPropertyValue gf = buildGetPropertyValue(version, service, handle, maxFeature, null, query, resultType, outputFormat);
+        final GetPropertyValue gf = buildGetPropertyValue(version, service, handle, maxFeature, null, query, resultType, outputFormat, valueReference);
         gf.setPrefixMapping(prefixMapping);
         return gf;
     }
