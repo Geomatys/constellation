@@ -24,7 +24,9 @@ import java.io.StringWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -1251,6 +1253,23 @@ public class WFSWorkerTest {
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "inputFormat");
         }
+    }
+    
+    @Test
+    public void schemaLocationTest() throws Exception {
+        List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
+        GetFeatureType requestGF = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        Object resultGF = worker.getFeature(requestGF);
+
+        assertTrue(resultGF instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
+        
+        final Map<String, String> expResult = new HashMap<String, String>();
+        expResult.put("http://www.opengis.net/gml", "http://geomatys.com/constellation/WS/wfs/default?request=DescribeFeatureType&version=1.1.0&service=WFS&namespace=xmlns(ns1=http://www.opengis.net/gml)&typename=ns1:NamedPlaces");
+        assertEquals(wrapper.getSchemaLocations(), expResult);
+        
     }
 
     private static void initFeatureSource() throws Exception {

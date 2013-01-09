@@ -589,18 +589,27 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         return requestPropNames;
     }
 
-    private void putSchemaLocation(final QName typeName, final Map<String, String> schemaLocations) {
+    private void putSchemaLocation(final QName typeName, final Map<String, String> schemaLocations, final String version) {
         final String namespace = typeName.getNamespaceURI();
         if (schemaLocations.containsKey(namespace)) {
             LOGGER.severe("TODO multiple typeName schemaLocation");
 
         } else {
-            final String prefix = typeName.getPrefix();
+            String prefix = typeName.getPrefix();
+            if (prefix == null || prefix.isEmpty()) {
+                prefix = "ns1";
+            }
             final String url    = getServiceUrl();
             if (getServiceUrl() != null) {
-                String describeRequest = url + "request=DescribeFeatureType&version=1.1.0&service=WFS";
+                String describeRequest = url + "request=DescribeFeatureType&version=" + version + "&service=WFS";
                 describeRequest        = describeRequest + "&namespace=xmlns(" + prefix + "=" + namespace + ")";
-                describeRequest        = describeRequest + "&Typename=" + prefix + ':' + typeName.getLocalPart();
+                final String tnParameter;
+                if (version.equals("2.0.0")) {
+                    tnParameter = "typenames";
+                } else {
+                    tnParameter = "typename";
+                }
+                describeRequest        = describeRequest + "&" + tnParameter + "=" + prefix + ':' + typeName.getLocalPart();
                 schemaLocations.put(namespace, describeRequest);
             }
         }
@@ -713,8 +722,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 }
+                
+                // suplied typeName can be imcomplete (no namespace)
+                final QName realName = Utils.getQnameFromName(ft.getName());
+                        
                 // we ensure that the property names are contained in the feature type and add the mandatory attribute to the list
-                queryBuilder.setProperties(verifyPropertyNames(typeName, ft, requestPropNames));
+                queryBuilder.setProperties(verifyPropertyNames(realName, ft, requestPropNames));
                 queryBuilder.setTypeName(ft.getName());
                 queryBuilder.setHints(new Hints(HintsPending.FEATURE_HIDE_ID_PROPERTY, Boolean.TRUE));
                 final Filter cleanFilter = processFilter(ft, filter, aliases);
@@ -752,7 +765,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                     collections.add(collection);
                     // we write The SchemaLocation
-                    putSchemaLocation(typeName, schemaLocations);
+                    putSchemaLocation(realName, schemaLocations, currentVersion);
                 }
             }
         }
@@ -885,7 +898,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 collections.add(layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery()));
 
                 // we write The SchemaLocation
-                putSchemaLocation(typeName, schemaLocations);
+                putSchemaLocation(typeName, schemaLocations, currentVersion);
             }
         }
 

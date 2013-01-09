@@ -657,8 +657,6 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         // Creates a valid GetCapabilities url.
         final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?");
 
-        
-
          /**
          * Test 1 : query on typeName samplingPoint with HITS
          */
