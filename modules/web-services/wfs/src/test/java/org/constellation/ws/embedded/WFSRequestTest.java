@@ -398,6 +398,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/samplingPointCollection-3v2.xml");
 
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
         assertEquals(xmlExpResult, xmlResult);
     }
 
@@ -481,6 +482,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         String xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-1.xml");
 
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         assertEquals(xmlExpResult, xmlResult);
 
         // for a POST request
@@ -521,6 +524,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
         xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-2.xml");
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -562,6 +566,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         xmlResult    = getStringResponse(conec);
         xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-3.xml");
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -607,6 +612,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         String xmlResult    = getStringResponse(conec);
         String xmlExpResult = getStringFromFile("org/constellation/xml/namedPlacesCollection-1.xml");
         xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
         
         assertEquals(xmlExpResult, xmlResult);
     }

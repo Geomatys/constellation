@@ -43,7 +43,6 @@ import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.om.OMDataStoreFactory;
 import org.geotoolkit.data.sml.SMLDataStoreFactory;
@@ -336,7 +335,11 @@ public class WFSWorkerTest {
 
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
-        domCompare(expectedResult, writer.toString());
+        
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 2 : query on typeName samplingPoint whith HITS result type
@@ -372,7 +375,10 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
 
         /**
@@ -396,7 +402,10 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 5 : query on typeName samplingPoint whith a filter xpath //gml:name = 10972X0137-PONT
@@ -419,7 +428,10 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 6 : query on typeName samplingPoint whith a spatial filter BBOX
@@ -442,7 +454,10 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-8.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 7 : query on typeName samplingPoint whith a spatial filter BBOX () with no namespace
@@ -465,7 +480,10 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-8.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
 
         /**
@@ -487,10 +505,13 @@ public class WFSWorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
 
         /**
@@ -511,10 +532,13 @@ public class WFSWorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+        
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
 
-        domCompare(expectedResult, writer.toString());
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 10 : query on typeName samplingPoint whith HITS result type
@@ -591,8 +615,10 @@ public class WFSWorkerTest {
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        //System.out.println(writer.toString());
-        domCompare(expectedResult, writer.toString());
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 2 : query on typeName sml:System avec srsName = EPSG:4326
@@ -616,7 +642,10 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
         
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
         /**
          * Test 3 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
          */
@@ -641,7 +670,10 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
         
         /**
          * Test 4 : query on typeName sml:System filter on name = 'Piezometer Test'
@@ -668,7 +700,10 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-4.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
         
         /**
          * Test 5 : same test xpath style
@@ -695,7 +730,10 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-4.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
         
         /**
          * Test 6 : query on typeName sml:System filter on input name = 'height' (xpath style)
@@ -722,7 +760,10 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
         
         /**
          * Test 7 : query on typeName sml:System with bad xpath NOT WORKING
@@ -776,8 +817,11 @@ public class WFSWorkerTest {
 
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+        
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
 
-        domCompare(expectedResult, writer.toString());
+        domCompare(expectedResult, sresult);
     }
 
     /**
@@ -804,9 +848,12 @@ public class WFSWorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"),
-                writer.toString());
+                sresult);
 
         /**
          * Test 2 : query on typeName bridges with propertyName = {FID}
@@ -826,9 +873,12 @@ public class WFSWorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection-2.xml"),
-                writer.toString());
+                sresult);
 
         /**
          * Test 3 : query on typeName NamedPlaces
@@ -847,9 +897,12 @@ public class WFSWorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
-                writer.toString());
+                sresult);
 
         /**
          * Test 4 : query on typeName NamedPlaces with resultType = HITS
@@ -882,9 +935,12 @@ public class WFSWorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1_reproj.xml"),
-                writer.toString());
+                sresult);
 
         /**
          * Test 6 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
@@ -903,9 +959,13 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
+        
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-5.xml"),
-                writer.toString());
+                sresult);
         
 
         /**
@@ -924,9 +984,13 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
+        
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
-                writer.toString());
+                sresult);
         
 
     }
@@ -1095,9 +1159,12 @@ public class WFSWorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3.xml"),
-                writer.toString());
+                sresult);
 
     }
 
@@ -1154,9 +1221,12 @@ public class WFSWorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
-         domCompare(
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2.xml"),
-                writer.toString());
+                sresult);
     }
     /**
      *
