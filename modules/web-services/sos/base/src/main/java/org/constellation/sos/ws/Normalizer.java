@@ -30,7 +30,7 @@ import org.geotoolkit.observation.xml.v100.MeasurementType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
-import org.geotoolkit.sos.xml.v100.Capabilities;
+import org.geotoolkit.sos.xml.Capabilities;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.swe.xml.AbstractEncodingProperty;
 import org.geotoolkit.swe.xml.DataArray;
@@ -55,6 +55,14 @@ public final class Normalizer {
 
     private Normalizer() {}
     
+    public static Capabilities normalizeDocument(final Capabilities capa){
+        if (capa instanceof org.geotoolkit.sos.xml.v100.Capabilities) {
+            return normalizeDocumentv100((org.geotoolkit.sos.xml.v100.Capabilities)capa);
+        } else {
+            return capa; // no necessary in SOS 2
+        }
+    }
+    
     /**
      * Normalize the capabilities document by replacing the double by reference
      *
@@ -62,7 +70,7 @@ public final class Normalizer {
      *
      * @return a normalized document
      */
-    public static Capabilities normalizeDocument(final Capabilities capa){
+    private static Capabilities normalizeDocumentv100(final org.geotoolkit.sos.xml.v100.Capabilities capa){
         final List<PhenomenonPropertyType> alreadySee = new ArrayList<PhenomenonPropertyType>();
         if (capa.getContents() != null) {
             for (ObservationOfferingType off: capa.getContents().getObservationOfferingList().getObservationOffering()) {
@@ -198,10 +206,11 @@ public final class Normalizer {
             } else if (observation.getResult() instanceof MeasureType) {
                 // do nothing
             } else {
-                if (observation.getResult() != null)
+                if (observation.getResult() != null) {
                     LOGGER.log(Level.WARNING, "NormalizeDocument: Class not recognized for result:{0}", observation.getResult().getClass().getSimpleName());
-                else
+                } else {
                     LOGGER.warning("NormalizeDocument: The result is null");
+                }
             }
         }
         return collection;

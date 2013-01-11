@@ -69,6 +69,7 @@ import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.ObservationOffering;
 
 
 /**
@@ -177,8 +178,8 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOfferingType> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
-        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
+        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName));
         }
@@ -189,7 +190,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException {
+    public ObservationOffering getObservationOffering(final String offeringName) throws CstlServiceException {
         try {
             return offTable.getEntry(offeringName);
         } catch (NoSuchRecordException ex) {
@@ -208,9 +209,9 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOfferingType> getObservationOfferings() throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings() throws CstlServiceException {
         try {
-            final List<ObservationOfferingType> loo = new ArrayList<ObservationOfferingType>();
+            final List<ObservationOffering> loo = new ArrayList<ObservationOffering>();
             final Set<ObservationOfferingType> set  = offTable.getEntries();
             loo.addAll(set);
             return loo;

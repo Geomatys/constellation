@@ -36,7 +36,7 @@ import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.sos.xml.v100.Capabilities;
+import org.geotoolkit.sos.xml.Capabilities;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
@@ -166,9 +166,8 @@ public class SOSWorkerTest {
         assertTrue(result.getServiceProvider() != null);
 
         assertTrue(result.getContents() != null);
-        assertTrue(result.getContents().getObservationOfferingList() != null);
-        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering() != null);
-        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering().size() == 1);
+        assertTrue(result.getContents().getOfferings() != null);
+        assertTrue(result.getContents().getOfferings().size() == 1);
 
         /*
          *  TEST 2 : full get capabilities
@@ -186,9 +185,8 @@ public class SOSWorkerTest {
         assertTrue(result.getServiceIdentification() != null);
         assertTrue(result.getServiceProvider() != null);
         assertTrue(result.getContents() != null);
-        assertTrue(result.getContents().getObservationOfferingList() != null);
-        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering() != null);
-        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering().size() == 1);
+        assertTrue(result.getContents().getOfferings() != null);
+        assertTrue(result.getContents().getOfferings().size() == 1);
         assertTrue(result != null);
 
         /*
@@ -261,9 +259,8 @@ public class SOSWorkerTest {
         assertTrue(result.getServiceIdentification() == null);
         assertTrue(result.getServiceProvider() == null);
         assertTrue(result.getContents() != null);
-        assertTrue(result.getContents().getObservationOfferingList() != null);
-        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering() != null);
-        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering().size() == 1);
+        assertTrue(result.getContents().getOfferings() != null);
+        assertTrue(result.getContents().getOfferings().size() == 1);
         assertTrue(result != null);
 
     }

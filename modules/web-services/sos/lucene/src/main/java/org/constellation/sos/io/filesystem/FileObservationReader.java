@@ -41,7 +41,6 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.v101.AnyResultType;
@@ -49,6 +48,7 @@ import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.ObservationOffering;
 
 /**
  *
@@ -124,8 +124,8 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOfferingType> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
-        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
+        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName));
         }
@@ -136,15 +136,15 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException {
+    public ObservationOffering getObservationOffering(final String offeringName) throws CstlServiceException {
         final File offeringFile = new File(offeringDirectory, offeringName + FILE_EXTENSION);
         if (offeringFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 final Object obj = unmarshaller.unmarshal(offeringFile);
-                if (obj instanceof ObservationOfferingType) {
-                    return (ObservationOfferingType) obj;
+                if (obj instanceof ObservationOffering) {
+                    return (ObservationOffering) obj;
                 }
                 throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
@@ -162,16 +162,16 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOfferingType> getObservationOfferings() throws CstlServiceException {
-        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+    public List<ObservationOffering> getObservationOfferings() throws CstlServiceException {
+        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
         if (offeringDirectory.exists()) {
             for (File offeringFile: offeringDirectory.listFiles()) {
                 Unmarshaller unmarshaller = null;
                 try {
                     unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                     final Object obj = unmarshaller.unmarshal(offeringFile);
-                    if (obj instanceof ObservationOfferingType) {
-                        offerings.add((ObservationOfferingType) obj);
+                    if (obj instanceof ObservationOffering) {
+                        offerings.add((ObservationOffering) obj);
                     } else {
                         throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
                     }

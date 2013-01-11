@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import javax.xml.namespace.QName;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
+import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.opengis.observation.Observation;
 
@@ -51,7 +51,7 @@ public interface ObservationFilter {
      * @param procedures
      * @param off
      */
-    void setProcedure(List<String> procedures, List<ObservationOfferingType> offerings) throws CstlServiceException;
+    void setProcedure(List<String> procedures, List<ObservationOffering> offerings) throws CstlServiceException;
 
     /**
      * Add some phenomenon filter to the request.
@@ -132,7 +132,7 @@ public interface ObservationFilter {
      * @param offering
      * @throws org.constellation.ws.CstlServiceException
      */
-    void setOfferings(final List<ObservationOfferingType> offerings) throws CstlServiceException;
+    void setOfferings(final List<ObservationOffering> offerings) throws CstlServiceException;
             
     /**
      * Add a filter on the result for the specified property.

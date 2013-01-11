@@ -42,15 +42,14 @@ import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
-import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.util.logging.Logging;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.ObservationOffering;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -165,7 +164,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(final List<String> procedures, final List<ObservationOfferingType> offerings) {
+    public void setProcedure(final List<String> procedures, final List<ObservationOffering> offerings) {
         sqlRequest.append(" ( ");
         if (!procedures.isEmpty()) {
 
@@ -180,9 +179,9 @@ public class DefaultObservationFilter implements ObservationFilter {
             }
         } else {
             //if is not specified we use all the process of the offering
-            for (ObservationOfferingType off : offerings) {
-                for (ReferenceType proc : off.getProcedure()) {
-                    sqlRequest.append(" \"procedure\"='").append(proc.getHref()).append("' OR ");
+            for (ObservationOffering off : offerings) {
+                for (String proc : off.getProcedures()) {
+                    sqlRequest.append(" \"procedure\"='").append(proc).append("' OR ");
                 }
             }
         }
@@ -449,7 +448,7 @@ public class DefaultObservationFilter implements ObservationFilter {
     }
 
     @Override
-    public void setOfferings(final List<ObservationOfferingType> offerings) throws CstlServiceException {
+    public void setOfferings(final List<ObservationOffering> offerings) throws CstlServiceException {
         // not used in this implementations
     }
     

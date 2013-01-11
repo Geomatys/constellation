@@ -77,23 +77,25 @@ import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
-import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
-import org.geotoolkit.ows.xml.v110.Operation;
-import org.geotoolkit.ows.xml.v110.OperationsMetadata;
-import org.geotoolkit.ows.xml.v110.RangeType;
+import org.geotoolkit.ows.xml.AcceptFormats;
+import org.geotoolkit.ows.xml.AcceptVersions;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
+import org.geotoolkit.ows.xml.AbstractOperation;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.Range;
+import org.geotoolkit.ows.xml.RequestBase;
+import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.ows.xml.v110.ServiceIdentification;
-import org.geotoolkit.ows.xml.v110.ServiceProvider;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.sos.xml.v100.Capabilities;
-import org.geotoolkit.sos.xml.v100.Contents;
-import org.geotoolkit.sos.xml.v100.Contents.ObservationOfferingList;
-import org.geotoolkit.sos.xml.v100.DescribeSensor;
-import org.geotoolkit.sos.xml.v100.GetCapabilities;
+import org.geotoolkit.sos.xml.Capabilities;
+import org.geotoolkit.sos.xml.Contents;
+import org.geotoolkit.sos.xml.GetCapabilities;
+import org.geotoolkit.sos.xml.GetObservation;
+import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
-import org.geotoolkit.sos.xml.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.GetResultResponse;
 import org.geotoolkit.sos.xml.v100.InsertObservation;
@@ -125,7 +127,6 @@ import org.geotoolkit.ogc.xml.v110.TimeAfterType;
 import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v110.TimeDuringType;
 import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
-import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.sampling.xml.v100.ObjectFactory;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
@@ -140,13 +141,16 @@ import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.swes.xml.DescribeSensor;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.temporal.object.TemporalUtilities;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.ows.xml.RequestBase;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsEqualTo;
@@ -652,14 +656,14 @@ public class SOSworker extends AbstractWorker {
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
-    public Capabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
+    public Capabilities getCapabilities(final GetCapabilities request) throws CstlServiceException {
         isWorking();
         LOGGER.log(logLevel, "getCapabilities request processing\n");
         final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
-        if (requestCapabilities.getService() != null) {
-            if (!requestCapabilities.getService().equals(SOS)) {
+        if (request.getService() != null) {
+            if (!request.getService().equals(SOS)) {
                 throw new CstlServiceException("service must be \"SOS\"!",
                                                  INVALID_PARAMETER_VALUE, SERVICE_PARAMETER);
             }
@@ -667,14 +671,18 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("Service must be specified!",
                                              MISSING_PARAMETER_VALUE, SERVICE_PARAMETER);
         }
-        final AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
+        final AcceptVersions versions = request.getAcceptVersions();
         if (versions != null) {
             if (!versions.getVersion().contains(VERSION)){
-                 throw new CstlServiceException("version available : 1.0.0",
+                 throw new CstlServiceException("version available : 1.0.0, 2.0.0",
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
-        }
-        final AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
+        } 
+        request.setVersion(VERSION); // TODO v 2.0.0
+        
+        final String currentVersion = request.getVersion().toString();
+        
+        final AcceptFormats formats = request.getAcceptFormats();
         if (formats != null && formats.getOutputFormat().size() > 0 ) {
             boolean found = false;
             for (String form: formats.getOutputFormat()) {
@@ -693,12 +701,12 @@ public class SOSworker extends AbstractWorker {
         }
 
         //set the current updateSequence parameter
-        final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
+        final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
         if (returnUS) {
-            return new Capabilities("1.0.0", getCurrentUpdateSequence());
+            return buildCapabilities(currentVersion, getCurrentUpdateSequence());
         }
         
-        SectionsType sections = requestCapabilities.getSections();
+        Sections sections = request.getSections();
         if (sections == null) {
             sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
         }
@@ -720,10 +728,10 @@ public class SOSworker extends AbstractWorker {
         }
 
         //we prepare the different parts response document
-        final ServiceIdentification si = localCapabilities.getServiceIdentification();
-        final ServiceProvider       sp = localCapabilities.getServiceProvider();
-        final FilterCapabilities    fc = SOS_FILTER_CAPABILITIES;
-        final OperationsMetadata    om = OPERATIONS_METADATA.clone();
+        final AbstractServiceIdentification si = localCapabilities.getServiceIdentification();
+        final AbstractServiceProvider       sp = localCapabilities.getServiceProvider();
+        final FilterCapabilities            fc = SOS_FILTER_CAPABILITIES;
+        final AbstractOperationsMetadata    om = OPERATIONS_METADATA.clone();
 
         //we remove the operation not supported in this profile (transactional/discovery)
         if (profile == DISCOVERY) {
@@ -736,7 +744,7 @@ public class SOSworker extends AbstractWorker {
         if (!keepCapabilities) {
 
             //we update the parameter in operation metadata.
-            final Operation go = om.getOperation("GetObservation");
+            final AbstractOperation go = om.getOperation("GetObservation");
 
             // the list of offering names
             go.updateParameter(OFFERING, omReader.getOfferingNames());
@@ -744,10 +752,10 @@ public class SOSworker extends AbstractWorker {
             // the event time range
             final List<String> eventTime = omReader.getEventTime();
             if (eventTime != null && eventTime.size() == 1) {
-                final RangeType range = new RangeType(eventTime.get(0), "now");
+                final Range range = buildRange(currentVersion, eventTime.get(0), "now");
                 go.updateParameter(EVENT_TIME, range);
             } else if (eventTime != null && eventTime.size() == 2) {
-                final RangeType range = new RangeType(eventTime.get(0), eventTime.get(1));
+                final Range range = buildRange(currentVersion, eventTime.get(0), eventTime.get(1));
                 go.updateParameter(EVENT_TIME, range);
             }
 
@@ -781,7 +789,7 @@ public class SOSworker extends AbstractWorker {
             /**
              * Because sometimes there is some sensor that are queryable in DescribeSensor but not in GetObservation
              */
-            final Operation ds = om.getOperation("DescribeSensor");
+            final AbstractOperation ds = om.getOperation("DescribeSensor");
             if (smlReader != null) {
                 final List<String> sensorNames = new ArrayList<String>(smlReader.getSensorNames());
                 Collections.sort(sensorNames);
@@ -792,13 +800,13 @@ public class SOSworker extends AbstractWorker {
 
             ds.updateParameter("outputFormat", ACCEPTED_SENSORML_FORMATS);
 
-            final Operation gfoi = om.getOperation("GetFeatureOfInterest");
+            final AbstractOperation gfoi = om.getOperation("GetFeatureOfInterest");
             if (gfoi != null) {
                 //the feature of interest list
                 gfoi.updateParameter("featureOfInterestId", foiNames);
             }
 
-            final Operation gfoit = om.getOperation("GetFeatureOfInterestTime");
+            final AbstractOperation gfoit = om.getOperation("GetFeatureOfInterestTime");
             if (gfoit != null) {
                 //the feature of interest list
                 gfoit.updateParameter("featureOfInterestId", foiNames);
@@ -810,12 +818,12 @@ public class SOSworker extends AbstractWorker {
             cont = loadedCapabilities.getContents();
         } else {
             // we add the list of observation ofeerings
-            final ObservationOfferingList ool = new ObservationOfferingList(omReader.getObservationOfferings());
-            cont = new Contents(ool);
+            cont = buildContents(currentVersion, omReader.getObservationOfferings());
         }
         
         // we build and normalize the document
-        final Capabilities c = normalizeDocument(new Capabilities(si, sp, om, VERSION, getCurrentUpdateSequence(), fc, cont));
+        final Capabilities temp = buildCapabilities(currentVersion, si, sp, om, getCurrentUpdateSequence(), fc, cont);
+        final Capabilities c    = normalizeDocument(temp);
         LOGGER.log(logLevel, "getCapabilities processed in {0} ms.\n", (System.currentTimeMillis() - start));
         putCapabilitiesInCache("1.0.0", null, c);
         return (Capabilities) c.applySections(sections);
@@ -959,13 +967,13 @@ public class SOSworker extends AbstractWorker {
         }
 
         //we verify that there is an offering (mandatory in 1.0.0, optional in 2.0.0)
-        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
         final List<String> offeringNames = requestObservation.getOfferings();
         if (currentVersion.equals("1.0.0") && (offeringNames == null || offeringNames.isEmpty())) {
             throw new CstlServiceException("Offering must be specify!", MISSING_PARAMETER_VALUE, OFFERING);
         } else {
             for (String offeringName : offeringNames) {
-                final ObservationOfferingType offering = omReader.getObservationOffering(offeringName);
+                final ObservationOffering offering = omReader.getObservationOffering(offeringName);
                 if (offering == null) {
                     throw new CstlServiceException("This offering is not registered in the service", INVALID_PARAMETER_VALUE, OFFERING);
                 }
@@ -976,7 +984,7 @@ public class SOSworker extends AbstractWorker {
 
         //we verify that the srsName (if there is one) is advertised in the offering
         if (requestObservation.getSrsName() != null) {
-            for (ObservationOfferingType off : offerings) {
+            for (ObservationOffering off : offerings) {
                 if (!off.getSrsName().contains(requestObservation.getSrsName())) {
                     final StringBuilder availableSrs = new StringBuilder();
                     for (String s : off.getSrsName()) {
@@ -991,7 +999,7 @@ public class SOSworker extends AbstractWorker {
 
         //we verify that the resultModel (if there is one) is advertised in the offering
         if (requestObservation.getResultModel() != null) {
-            for (ObservationOfferingType off : offerings) {
+            for (ObservationOffering off : offerings) {
                 if (!off.getResultModel().contains(requestObservation.getResultModel())) {
                     final StringBuilder availableRM = new StringBuilder();
                     for (QName s : off.getResultModel()) {
@@ -1018,8 +1026,8 @@ public class SOSworker extends AbstractWorker {
                             INVALID_PARAMETER_VALUE, PROCEDURE);
                 }
                 boolean found = false;
-                for (ObservationOfferingType off : offerings) {
-                    if (!found && off.getProcedure().contains(proc)) {
+                for (ObservationOffering off : offerings) {
+                    if (!found && off.getProcedures().contains(proc.getHref())) {
                         found = true;
                     }
                 }
@@ -1103,10 +1111,11 @@ public class SOSworker extends AbstractWorker {
                     if (localOmFilter.isBoundedObservation()) {
                         localOmFilter.setBoundingBox(e);
                     } else {
-                        for (ObservationOfferingType off : offerings) {
+                        for (ObservationOffering off : offerings) {
                     
-                            for (ReferenceType refStation : off.getFeatureOfInterest()) {
-                                final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation.getHref());
+                            for (String refStation : off.getFeatureOfInterestIds()) {
+                                // TODO for SOS 2.0 use observed area
+                                final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation);
                                 if (station == null) {
                                     throw new CstlServiceException("the feature of interest is not registered",
                                             INVALID_PARAMETER_VALUE);
@@ -1739,12 +1748,13 @@ public class SOSworker extends AbstractWorker {
         if (e != null && e.isCompleteEnvelope2D()) {
 
             final List<SamplingFeature> matchingFeatureOfInterest = new ArrayList<SamplingFeature>();
-            final List<ObservationOfferingType> offerings        = omReader.getObservationOfferings();
-            for (ObservationOfferingType off : offerings) {
-                for (ReferenceType refStation : off.getFeatureOfInterest()) {
-                    final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation.getHref());
+            final List<ObservationOffering> offerings             = omReader.getObservationOfferings();
+            for (ObservationOffering off : offerings) {
+                // TODO for SOS 2.0 use observed area
+                for (String refStation : off.getFeatureOfInterestIds()) {
+                    final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation);
                     if (station == null) {
-                        LOGGER.log(Level.WARNING, "the feature of interest is not registered:{0}", refStation.getHref());
+                        LOGGER.log(Level.WARNING, "the feature of interest is not registered:{0}", refStation);
                         continue;
                     }
                     if (station instanceof SamplingPointType) {
@@ -2176,8 +2186,8 @@ public class SOSworker extends AbstractWorker {
 
         // for each network we create (or update) an offering
         for (String networkName : networkNames) {
-            final String offeringName               = "offering-" + networkName;
-            final ObservationOfferingType offering = omReader.getObservationOffering(offeringName);
+            final String offeringName          = "offering-" + networkName;
+            final ObservationOffering offering = omReader.getObservationOffering(offeringName);
 
             if (offering != null) {
                 updateOffering(offering, template);
@@ -2189,7 +2199,7 @@ public class SOSworker extends AbstractWorker {
         /*
          * then  we add the sensor to the global offering containing all the sensor
          */
-        final ObservationOfferingType offering = omReader.getObservationOffering("offering-allSensor");
+        final ObservationOffering offering = omReader.getObservationOffering("offering-allSensor");
         if (offering != null) {
             updateOffering(offering, template);
         } else {
@@ -2205,12 +2215,12 @@ public class SOSworker extends AbstractWorker {
      *
      * @throws CstlServiceException If the service does not succeed to update the offering in the datasource.
      */
-    private void updateOffering(final ObservationOfferingType offering, final Observation template) throws CstlServiceException {
+    private void updateOffering(final ObservationOffering offering, final Observation template) throws CstlServiceException {
 
         //we add the new sensor to the offering
         OfferingProcedureType offProc = null;
         ReferenceType ref = omReader.getReference(((ProcessType) template.getProcedure()).getHref());
-        if (!offering.getProcedure().contains(ref)) {
+        if (!offering.getProcedures().contains(ref.getHref())) {
             if (ref == null) {
                 ref = new ReferenceType(null, ((ProcessType) template.getProcedure()).getHref());
             }
@@ -2219,7 +2229,7 @@ public class SOSworker extends AbstractWorker {
 
         //we add the phenomenon to the offering
         OfferingPhenomenonType offPheno = null;
-        if (template.getObservedProperty() != null && !offering.getObservedProperty().contains(template.getObservedProperty())) {
+        if (template.getObservedProperty() != null && !offering.getObservedProperties().contains(getPhenomenonId(template))) {
             offPheno = new OfferingPhenomenonType(offering.getId(), (PhenomenonType) template.getObservedProperty());
         }
 
@@ -2227,7 +2237,7 @@ public class SOSworker extends AbstractWorker {
         OfferingSamplingFeatureType offSF = null;
         if (template.getFeatureOfInterest() != null) {
             ref = omReader.getReference(((SamplingFeatureType) template.getFeatureOfInterest()).getId());
-            if (!offering.getFeatureOfInterest().contains(ref)) {
+            if (!offering.getFeatureOfInterestIds().contains(ref.getHref())) {
                 if (ref == null) {
                     ref = new ReferenceType(null, ((SamplingFeatureType) template.getFeatureOfInterest()).getId());
                 }
@@ -2238,6 +2248,25 @@ public class SOSworker extends AbstractWorker {
     }
 
 
+    /**
+     * will be removed when Phenomenon interface qil have a getId() method
+     * 
+     * @param phen
+     * @return
+     * @deprecated
+     */
+    @Deprecated
+    private String getPhenomenonId(final Observation obs) {
+        if (obs instanceof org.geotoolkit.observation.xml.v100.ObservationType) {
+            final org.geotoolkit.observation.xml.v100.ObservationType obs100 = (org.geotoolkit.observation.xml.v100.ObservationType)obs;
+            return ((org.geotoolkit.swe.xml.v101.PhenomenonType)obs100.getObservedProperty()).getId();
+        } else if (obs instanceof org.geotoolkit.observation.xml.v200.OMObservationType) {
+            final org.geotoolkit.observation.xml.v200.OMObservationType obs200 = (org.geotoolkit.observation.xml.v200.OMObservationType)obs;
+            return obs200.getObservedProperty().getHref();
+        } else {
+            throw new IllegalArgumentException("Unexpected observation class:" + obs.getClass().getName());
+        }
+    }
     /**
      * Create a new Offering with the specified observation template
      *

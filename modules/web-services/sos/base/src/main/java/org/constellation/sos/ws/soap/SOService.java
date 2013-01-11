@@ -30,7 +30,6 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 import javax.xml.ws.BindingType;
-import javax.xml.ws.ResponseWrapper;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
@@ -110,7 +109,7 @@ public class SOService extends OGCWebService<SOSworker> {
             final SOSworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
 
-            return worker.getCapabilities(requestCapabilities);
+            return (Capabilities) worker.getCapabilities(requestCapabilities);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());

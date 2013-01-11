@@ -64,6 +64,7 @@ import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.ObservationOffering;
 
 
 /**
@@ -175,8 +176,8 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOfferingType> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
-        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
+        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName));
         }
@@ -187,7 +188,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException {
+    public ObservationOffering getObservationOffering(final String offeringName) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18", "var46"), offeringName);
 
@@ -276,10 +277,10 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOfferingType> getObservationOfferings() throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings() throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList(VAR01));
-            final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+            final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
             final List<String> offeringNames = values.getVariables(VAR01);
             for (String offeringName : offeringNames) {
                 offerings.add(getObservationOffering(offeringName));

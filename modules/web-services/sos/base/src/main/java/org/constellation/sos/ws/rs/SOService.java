@@ -56,8 +56,8 @@ import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
-import org.geotoolkit.sos.xml.v100.GetCapabilities;
-import org.geotoolkit.sos.xml.v100.GetObservation;
+import org.geotoolkit.sos.xml.GetCapabilities;
+import org.geotoolkit.sos.xml.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
@@ -68,6 +68,7 @@ import org.geotoolkit.sos.xml.SOSResponseWrapper;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 
 /**
  *
@@ -317,6 +318,7 @@ public class SOService extends OGCWebService<SOSworker> {
      */
     private GetCapabilities createNewGetCapabilities() throws CstlServiceException {
 
+        final String currentVersion;
         String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
         AcceptVersionsType versions;
         if (version != null) {
@@ -324,8 +326,10 @@ public class SOService extends OGCWebService<SOSworker> {
                 version = version.substring(0, version.indexOf(','));
             }
             versions = new AcceptVersionsType(version);
+            currentVersion = "2.0.0";
         } else {
             versions = new AcceptVersionsType("1.0.0");
+            currentVersion = "1.1.0";
         }
 
         final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
@@ -352,7 +356,8 @@ public class SOService extends OGCWebService<SOSworker> {
             requestedSections = SectionsType.getExistingSections("1.1.1");
         }
         final SectionsType sections     = new SectionsType(requestedSections);
-        return new GetCapabilities(versions,
+        return buildGetCapabilities(currentVersion,
+                                   versions,
                                    sections,
                                    formats,
                                    updateSequence,
