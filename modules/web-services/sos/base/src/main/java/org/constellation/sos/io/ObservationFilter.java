@@ -51,7 +51,7 @@ public interface ObservationFilter {
      * @param procedures
      * @param off
      */
-    void setProcedure(List<String> procedures, ObservationOfferingType off) throws CstlServiceException;
+    void setProcedure(List<String> procedures, List<ObservationOfferingType> offerings) throws CstlServiceException;
 
     /**
      * Add some phenomenon filter to the request.
@@ -132,7 +132,7 @@ public interface ObservationFilter {
      * @param offering
      * @throws org.constellation.ws.CstlServiceException
      */
-    void setOffering(final ObservationOfferingType offering) throws CstlServiceException;
+    void setOfferings(final List<ObservationOfferingType> offerings) throws CstlServiceException;
             
     /**
      * Add a filter on the result for the specified property.

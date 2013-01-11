@@ -90,18 +90,16 @@ import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.Contents;
 import org.geotoolkit.sos.xml.v100.Contents.ObservationOfferingList;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
-import org.geotoolkit.sos.xml.v100.EventTime;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
-import org.geotoolkit.sos.xml.v100.GetObservation;
+import org.geotoolkit.sos.xml.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.GetResultResponse;
 import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.InsertObservationResponse;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
-import org.geotoolkit.sos.xml.v100.RequestBaseType;
 import org.geotoolkit.sos.xml.v100.FilterCapabilities;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ObservationTemplate;
@@ -121,9 +119,12 @@ import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
-import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
+import org.geotoolkit.ogc.xml.v110.TimeAfterType;
+import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
+import org.geotoolkit.ogc.xml.v110.TimeDuringType;
+import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.sampling.xml.v100.ObjectFactory;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
@@ -144,7 +145,28 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.RequestBase;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
+import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.temporal.After;
+import org.opengis.filter.temporal.Before;
+import org.opengis.filter.temporal.Begins;
+import org.opengis.filter.temporal.BegunBy;
+import org.opengis.filter.temporal.During;
+import org.opengis.filter.temporal.EndedBy;
+import org.opengis.filter.temporal.Ends;
+import org.opengis.filter.temporal.Meets;
+import org.opengis.filter.temporal.OverlappedBy;
+import org.opengis.filter.temporal.TContains;
+import org.opengis.filter.temporal.TEquals;
+import org.opengis.filter.temporal.TOverlaps;
 
 
 /**
@@ -859,6 +881,8 @@ public class SOSworker extends AbstractWorker {
         //we verify the base request attribute
         verifyBaseRequest(requestObservation);
 
+        final String currentVersion = requestObservation.getVersion().toString();
+        
         // we clone the filter for this request
         final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
 
@@ -934,43 +958,48 @@ public class SOSworker extends AbstractWorker {
                                              OPERATION_NOT_SUPPORTED, RESPONSE_MODE);
         }
 
-        ObservationOfferingType off;
-        //we verify that there is an offering
-        if (requestObservation.getOffering() == null) {
-            throw new CstlServiceException("Offering must be specify!",
-                                             MISSING_PARAMETER_VALUE, OFFERING);
+        //we verify that there is an offering (mandatory in 1.0.0, optional in 2.0.0)
+        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+        final List<String> offeringNames = requestObservation.getOfferings();
+        if (currentVersion.equals("1.0.0") && (offeringNames == null || offeringNames.isEmpty())) {
+            throw new CstlServiceException("Offering must be specify!", MISSING_PARAMETER_VALUE, OFFERING);
         } else {
-            off = omReader.getObservationOffering(requestObservation.getOffering());
-            if (off == null) {
-                throw new CstlServiceException("This offering is not registered in the service",
-                                              INVALID_PARAMETER_VALUE, OFFERING);
+            for (String offeringName : offeringNames) {
+                final ObservationOfferingType offering = omReader.getObservationOffering(offeringName);
+                if (offering == null) {
+                    throw new CstlServiceException("This offering is not registered in the service", INVALID_PARAMETER_VALUE, OFFERING);
+                }
+                offerings.add(offering);
             }
         }
-        localOmFilter.setOffering(off);
+        localOmFilter.setOfferings(offerings);
 
         //we verify that the srsName (if there is one) is advertised in the offering
         if (requestObservation.getSrsName() != null) {
-            if (!off.getSrsName().contains(requestObservation.getSrsName())) {
-                final StringBuilder availableSrs = new StringBuilder();
-                for (String s : off.getSrsName()) {
-                    availableSrs.append(s).append('\n');
+            for (ObservationOfferingType off : offerings) {
+                if (!off.getSrsName().contains(requestObservation.getSrsName())) {
+                    final StringBuilder availableSrs = new StringBuilder();
+                    for (String s : off.getSrsName()) {
+                        availableSrs.append(s).append('\n');
+                    }
+                    throw new CstlServiceException("This srs name is not advertised in the offering.\n" +
+                                                   "Available srs name are:\n" + availableSrs.toString(),
+                                                    INVALID_PARAMETER_VALUE, "srsName");
                 }
-                throw new CstlServiceException("This srs name is not advertised in the offering.\n" +
-                                               "Available srs name are:\n" + availableSrs.toString(),
-                                                INVALID_PARAMETER_VALUE, "srsName");
             }
         }
 
         //we verify that the resultModel (if there is one) is advertised in the offering
         if (requestObservation.getResultModel() != null) {
-            if (!off.getResultModel().contains(requestObservation.getResultModel())) {
-                final StringBuilder availableRM = new StringBuilder();
-                for (QName s : off.getResultModel()) {
-                    availableRM.append(s).append('\n');
+            for (ObservationOfferingType off : offerings) {
+                if (!off.getResultModel().contains(requestObservation.getResultModel())) {
+                    final StringBuilder availableRM = new StringBuilder();
+                    for (QName s : off.getResultModel()) {
+                        availableRM.append(s).append('\n');
+                    }
+                    throw new CstlServiceException("This result model is not advertised in the offering:" + requestObservation.getResultModel() + '\n' +
+                                                   "Available result model for this offering are:", INVALID_PARAMETER_VALUE, "resultModel");
                 }
-                throw new CstlServiceException("This result model is not advertised in the offering:" + requestObservation.getResultModel() + '\n' +
-                                               "Available result model for this offering are:",
-                                                INVALID_PARAMETER_VALUE, "resultModel");
             }
         }
 
@@ -988,9 +1017,14 @@ public class SOSworker extends AbstractWorker {
                     throw new CstlServiceException(" this process is not registred in the table",
                             INVALID_PARAMETER_VALUE, PROCEDURE);
                 }
-                if (!off.getProcedure().contains(proc)) {
-                    throw new CstlServiceException(" this process is not registred in the offering",
-                            INVALID_PARAMETER_VALUE, PROCEDURE);
+                boolean found = false;
+                for (ObservationOfferingType off : offerings) {
+                    if (!found && off.getProcedure().contains(proc)) {
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    throw new CstlServiceException(" this process is not registred in the offerings", INVALID_PARAMETER_VALUE, PROCEDURE);
                 }
             } else {
                 //if there is only one proccess null we return error (we'll see)
@@ -1000,7 +1034,7 @@ public class SOSworker extends AbstractWorker {
                 }
             }
         }
-        localOmFilter.setProcedure(procedures, off);
+        localOmFilter.setProcedure(procedures, offerings);
 
         //we get the list of phenomenon
         //TODO verifier que les pheno appartiennent a l'offering
@@ -1038,38 +1072,39 @@ public class SOSworker extends AbstractWorker {
 
 
         //we treat the time restriction
-        final List<EventTime> times = requestObservation.getEventTime();
+        final List<Filter> times = requestObservation.getTemporalFilter();
         final AbstractTimeGeometricPrimitiveType templateTime = treatEventTimeRequest(times, template, localOmFilter);
 
         //we treat the restriction on the feature of interest
-        if (requestObservation.getFeatureOfInterest() != null) {
-            final GetObservation.FeatureOfInterest foiRequest = requestObservation.getFeatureOfInterest();
 
-            // if the request is a list of station
-            if (!foiRequest.getObjectID().isEmpty()) {
+        // if the request is a list of station
+        if (!requestObservation.getFeatureIds().isEmpty()) {
 
-                //verify that the station is registred in the DB.
-                final Collection<String> fois = omReader.getFeatureOfInterestNames();
-                for (final String samplingFeatureName : foiRequest.getObjectID()) {
-                    if (!fois.contains(samplingFeatureName)) {
-                        throw new CstlServiceException("the feature of interest "+ samplingFeatureName + " is not registered",
-                                                         INVALID_PARAMETER_VALUE, "featureOfInterest");
-                    }
+            //verify that the station is registred in the DB.
+            final Collection<String> fois = omReader.getFeatureOfInterestNames();
+            for (final String samplingFeatureName : requestObservation.getFeatureIds()) {
+                if (!fois.contains(samplingFeatureName)) {
+                    throw new CstlServiceException("the feature of interest "+ samplingFeatureName + " is not registered",
+                                                     INVALID_PARAMETER_VALUE, "featureOfInterest");
                 }
-                localOmFilter.setFeatureOfInterest(foiRequest.getObjectID());
+            }
+            localOmFilter.setFeatureOfInterest(requestObservation.getFeatureIds());
+        }
+        
+        // if the request is a spatial operator
+        if (requestObservation.getSpatialFilter() != null) {
+            // for a BBOX Spatial ops
+            if (requestObservation.getSpatialFilter() instanceof BBOX) {
+                final EnvelopeType e = getEnvelopeFromBBOX((BBOX)requestObservation.getSpatialFilter());
 
-            // if the request is a spatial operator
-            } else {
-                // for a BBOX Spatial ops
-                if (foiRequest.getBBOX() != null) {
-                    final EnvelopeType e = foiRequest.getBBOX().getEnvelope();
-
-                    if (e != null && e.isCompleteEnvelope2D()) {
-                        boolean add = false;
-                        final List<String> matchingFeatureOfInterest = new ArrayList<String>();
-                        if (localOmFilter.isBoundedObservation()) {
-                            localOmFilter.setBoundingBox(e);
-                        } else {
+                if (e != null && e.isCompleteEnvelope2D()) {
+                    boolean add = false;
+                    final List<String> matchingFeatureOfInterest = new ArrayList<String>();
+                    if (localOmFilter.isBoundedObservation()) {
+                        localOmFilter.setBoundingBox(e);
+                    } else {
+                        for (ObservationOfferingType off : offerings) {
+                    
                             for (ReferenceType refStation : off.getFeatureOfInterest()) {
                                 final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation.getHref());
                                 if (station == null) {
@@ -1116,73 +1151,74 @@ public class SOSworker extends AbstractWorker {
                                     LOGGER.log(Level.WARNING, "unknow implementation:{0}", station.getClass().getName());
                                 }
                             }
-                            if (add) {
-                                localOmFilter.setFeatureOfInterest(matchingFeatureOfInterest);
-                            // if there is no matching FOI we must return an empty result
-                            } else {
-                                return new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");
-                            }
                         }
-
-                    } else {
-                        throw new CstlServiceException("the envelope is not build correctly", INVALID_PARAMETER_VALUE);
+                        if (add) {
+                            localOmFilter.setFeatureOfInterest(matchingFeatureOfInterest);
+                        // if there is no matching FOI we must return an empty result
+                        } else {
+                            return new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");
+                        }
                     }
-                } else {
-                    throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED);
-                }
-            }
 
+                } else {
+                    throw new CstlServiceException("the envelope is not build correctly", INVALID_PARAMETER_VALUE);
+                }
+            } else {
+                throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED);
+            }
         }
 
+
         //TODO we treat the restriction on the result
-        if (requestObservation.getResult() != null) {
-            final GetObservation.Result result = requestObservation.getResult();
+        if (requestObservation.getComparisonFilter() != null) {
 
+            final Filter filter = requestObservation.getComparisonFilter();
+            
             //we treat the different operation
-            if (result.getPropertyIsLessThan() != null) {
+            if (filter instanceof PropertyIsLessThan) {
 
-                final String propertyName  = result.getPropertyIsLessThan().getPropertyName();
-                final LiteralType literal  = result.getPropertyIsLessThan().getLiteral() ;
-                if (literal == null || propertyName == null || propertyName.isEmpty()) {
+                final Expression propertyName  = ((PropertyIsLessThan)filter).getExpression1();
+                final Expression literal       = ((PropertyIsLessThan)filter).getExpression2();
+                if (literal == null || propertyName == null) {
                     throw new CstlServiceException(" to use the operation Less Than you must specify the propertyName and the litteral",
                                                   MISSING_PARAMETER_VALUE, "lessThan");
                 }
 
 
-            } else if (result.getPropertyIsGreaterThan() != null) {
+            } else if (filter instanceof PropertyIsGreaterThan) {
 
-                final String propertyName  = result.getPropertyIsGreaterThan().getPropertyName();
-                final LiteralType literal  = result.getPropertyIsGreaterThan().getLiteral();
-                if (propertyName == null || propertyName.isEmpty() || literal == null) {
+                final Expression propertyName  = ((PropertyIsGreaterThan)filter).getExpression1();
+                final Expression literal       = ((PropertyIsGreaterThan)filter).getExpression2();
+                if (propertyName == null || literal == null) {
                     throw new CstlServiceException(" to use the operation Greater Than you must specify the propertyName and the litteral",
                                                  MISSING_PARAMETER_VALUE, "greaterThan");
                 }
 
-            } else if (result.getPropertyIsEqualTo() != null) {
+            } else if (filter instanceof PropertyIsEqualTo) {
 
-                final String propertyName  = result.getPropertyIsEqualTo().getPropertyName();
-                final LiteralType literal  = result.getPropertyIsEqualTo().getLiteral();
-                if (propertyName == null || propertyName.isEmpty() || literal == null) {
+                final Expression propertyName  = ((PropertyIsEqualTo)filter).getExpression1();
+                final Expression literal       = ((PropertyIsEqualTo)filter).getExpression2();
+                if (propertyName == null || literal == null) {
                      throw new CstlServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
                                                    INVALID_PARAMETER_VALUE, "propertyIsEqualTo"); // cite test
                 }
                 if (!localOmFilter.supportedQueryableResultProperties().isEmpty()) {
-                    localOmFilter.setResultEquals(propertyName, literal.getStringValue());
+                    localOmFilter.setResultEquals(propertyName.toString(), literal.toString());
                 }
 
-            } else if (result.getPropertyIsLike() != null) {
+            } else if (filter instanceof PropertyIsLike) {
                 throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED, "propertyIsLike");
 
-            } else if (result.getPropertyIsBetween() != null) {
+            } else if (filter instanceof PropertyIsBetween) {
 
-                if (result.getPropertyIsBetween().getPropertyName() == null) {
+                if (((PropertyIsBetween)filter).getExpression() == null) {
                     throw new CstlServiceException("To use the operation Between you must specify the propertyName and the litteral",
                                                   MISSING_PARAMETER_VALUE, "propertyIsBetween");
                 }
 
-                final String propertyName       = result.getPropertyIsBetween().getPropertyName();
-                final LiteralType lowerLiteral  = result.getPropertyIsBetween().getLowerBoundary().getLiteral();
-                final LiteralType upperLiteral  = result.getPropertyIsBetween().getUpperBoundary().getLiteral();
+                final String propertyName       = ((PropertyIsBetween)filter).getExpression().toString();
+                final LiteralType lowerLiteral  = (LiteralType) ((PropertyIsBetween)filter).getLowerBoundary();
+                final LiteralType upperLiteral  = (LiteralType) ((PropertyIsBetween)filter).getUpperBoundary();
 
                 if (propertyName == null || propertyName.isEmpty() || lowerLiteral == null || upperLiteral == null) {
                         throw new CstlServiceException("This property name, lower and upper literal must be specify",
@@ -1313,6 +1349,12 @@ public class SOSworker extends AbstractWorker {
         LOGGER.log(Level.WARNING, " the feature of interest {0} does not have proper position", sp.getId());
         return false;
     }
+    
+    private EnvelopeType getEnvelopeFromBBOX(final BBOX bbox) {
+        final DirectPositionType lowerCorner = new DirectPositionType(bbox.getMinX(), bbox.getMinY());
+        final DirectPositionType upperCorner = new DirectPositionType(bbox.getMaxX(), bbox.getMaxY());
+        return new EnvelopeType(null, lowerCorner, upperCorner, bbox.getSRS());
+    }
 
     /**
      * Web service operation
@@ -1351,7 +1393,7 @@ public class SOSworker extends AbstractWorker {
         localOmFilter.initFilterGetResult(template, resultModel);
 
         //we treat the time constraint
-        final List<EventTime> times = requestResult.getEventTime();
+        final List<Filter> times = requestResult.getTemporalFilter();
 
         /**
          * The template time :
@@ -1360,30 +1402,26 @@ public class SOSworker extends AbstractWorker {
         // case TEquals with time instant
         if (template.getSamplingTime() instanceof TimeInstantType) {
            final TimeInstantType ti           = (TimeInstantType) template.getSamplingTime();
-           final BinaryTemporalOpType equals  = new BinaryTemporalOpType(ti);
-           final EventTime e                  = new EventTime(equals);
-           times.add(e);
+           final TimeEqualsType equals         = new TimeEqualsType(null, ti);
+           times.add(equals);
 
         } else if (template.getSamplingTime() instanceof TimePeriodType) {
             final TimePeriodType tp = (TimePeriodType) template.getSamplingTime();
 
             //case TBefore
             if (tp.getBeginPosition().equals(new TimePositionType(TimeIndeterminateValueType.BEFORE))) {
-                final BinaryTemporalOpType before  = new BinaryTemporalOpType(new TimeInstantType(tp.getEndPosition()));
-                final EventTime e                  = new EventTime(null, before, null);
-                times.add(e);
+                final TimeBeforeType before  = new TimeBeforeType(null, new TimeInstantType(tp.getEndPosition()));
+                times.add(before);
 
             //case TAfter
             } else if (tp.getEndPosition().equals(new TimePositionType(TimeIndeterminateValueType.NOW))) {
-                final BinaryTemporalOpType after  = new BinaryTemporalOpType(new TimeInstantType(tp.getBeginPosition()));
-                final EventTime e                  = new EventTime(after, null, null);
-                times.add(e);
+                final TimeAfterType after  = new TimeAfterType(null, new TimeInstantType(tp.getBeginPosition()));
+                times.add(after);
 
             //case TDuring/TEquals  (here the sense of T_Equals with timePeriod is lost but not very usefull)
             } else {
-                final BinaryTemporalOpType during  = new BinaryTemporalOpType(tp);
-                final EventTime e                  = new EventTime(null, null, during);
-                times.add(e);
+                final TimeDuringType during  = new TimeDuringType(null, tp);
+                times.add(during);
             }
         }
 
@@ -1427,7 +1465,7 @@ public class SOSworker extends AbstractWorker {
         return response;
     }
 
-    private String getResultValues(final Timestamp tBegin, final Timestamp tEnd, final DataArray array, final List<EventTime> eventTimes) throws CstlServiceException {
+    private String getResultValues(final Timestamp tBegin, final Timestamp tEnd, final DataArray array, final List<Filter> eventTimes) throws CstlServiceException {
         String values;
 
         //for multiple observations we parse the brut values (if we got a time constraint)
@@ -1435,11 +1473,12 @@ public class SOSworker extends AbstractWorker {
 
             values = array.getValues();
 
-            for (EventTime bound: eventTimes) {
+            for (Filter bound: eventTimes) {
                 LOGGER.log(Level.FINER, " Values: {0}", values);
-                if (bound.getTEquals() != null) {
-                    if (bound.getTEquals().getRest().get(0) instanceof TimeInstantType) {
-                        final TimeInstantType ti    = (TimeInstantType) bound.getTEquals().getRest().get(0);
+                if (bound instanceof TEquals) {
+                    final TEquals filter = (TEquals) bound;
+                    if (filter.getExpression2() instanceof TimeInstantType) {
+                        final TimeInstantType ti    = (TimeInstantType) filter.getExpression2();
                         final Timestamp boundEquals = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
 
                         LOGGER.finer("TE case 1");
@@ -1448,8 +1487,9 @@ public class SOSworker extends AbstractWorker {
 
                     }
 
-                } else if (bound.getTAfter()  != null) {
-                    final TimeInstantType ti   = (TimeInstantType) bound.getTAfter().getRest().get(0);
+                } else if (bound instanceof After) {
+                    final After filter = (After) bound;
+                    final TimeInstantType ti   = (TimeInstantType) filter.getExpression2();
                     final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
 
                     // case 1 the period overlaps the bound
@@ -1459,8 +1499,9 @@ public class SOSworker extends AbstractWorker {
 
                     }
 
-                } else if (bound.getTBefore() != null) {
-                    final TimeInstantType ti = (TimeInstantType) bound.getTBefore().getRest().get(0);
+                } else if (bound instanceof Before) {
+                    final Before filter = (Before) bound;
+                    final TimeInstantType ti = (TimeInstantType) filter.getExpression2();
                     final Timestamp boundEnd = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
 
                     // case 1 the period overlaps the bound
@@ -1470,9 +1511,9 @@ public class SOSworker extends AbstractWorker {
 
                     }
 
-                } else if (bound.getTDuring() != null) {
-
-                    final TimePeriodType tp = (TimePeriodType) bound.getTDuring().getRest().get(0);
+                } else if (bound instanceof During) {
+                    final During filter = (During) bound;
+                    final TimePeriodType tp = (TimePeriodType)filter.getExpression2();
                     final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(tp.getBeginPosition()));
                     final Timestamp boundEnd   = Timestamp.valueOf(getTimeValue(tp.getEndPosition()));
 
@@ -1945,127 +1986,116 @@ public class SOSworker extends AbstractWorker {
      *
      * @return true if there is no errors in the time constraint else return false.
      */
-    private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(final List<EventTime> times, final boolean template, final ObservationFilter localOmFilter) throws CstlServiceException {
+    private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(final List<Filter> times, final boolean template, final ObservationFilter localOmFilter) throws CstlServiceException {
 
         //In template mode  his method return a temporal Object.
         AbstractTimeGeometricPrimitiveType templateTime = null;
 
         if (!times.isEmpty()) {
 
-            for (EventTime time: times) {
+            for (Filter time: times) {
 
                 // The operation Time Equals
-                if (time.getTEquals() != null) {
+                if (time instanceof TEquals) {
+                    final TEquals filter = (TEquals) time;
+                    
+                    // we get the property name (not used for now)
+                    //String propertyName = time.getTEquals().getPropertyName();
+                    final Object timeFilter   = filter.getExpression2();
 
-                    if (!time.getTEquals().getRest().isEmpty()) {
-                        // we get the property name (not used for now)
-                        //String propertyName = time.getTEquals().getPropertyName();
-                        final Object timeFilter   = time.getTEquals().getRest().get(0);
-
-                        // look for "latest" or "getFirst" filter (52N compatibility)
-                        if (timeFilter instanceof TimeInstantType){
-                            final TimeInstantType ti = (TimeInstantType) timeFilter;
-                            if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("latest")) {
-                                if (!template) {
-                                    localOmFilter.setTimeLatest();
-                                    continue;
-                                } else {
-                                    LOGGER.warning("latest time are not handled with template mode");
-                                }
-                            }
-                            if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("getFirst")) {
-                                if (!template) {
-                                    localOmFilter.setTimeFirst();
-                                    continue;
-                                } else {
-                                    LOGGER.warning("getFirst time are not handled with template mode");
-                                }
+                    // look for "latest" or "getFirst" filter (52N compatibility)
+                    if (timeFilter instanceof TimeInstantType){
+                        final TimeInstantType ti = (TimeInstantType) timeFilter;
+                        if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("latest")) {
+                            if (!template) {
+                                localOmFilter.setTimeLatest();
+                                continue;
+                            } else {
+                                LOGGER.warning("latest time are not handled with template mode");
                             }
                         }
-
-                        if (!template) {
-                            localOmFilter.setTimeEquals(timeFilter);
-
-                        } else if (timeFilter instanceof TimePeriodType || timeFilter instanceof TimeInstantType) {
-                            templateTime = (AbstractTimeGeometricPrimitiveType) timeFilter;
-
-                        } else {
-                            throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
+                        if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("getFirst")) {
+                            if (!template) {
+                                localOmFilter.setTimeFirst();
+                                continue;
+                            } else {
+                                LOGGER.warning("getFirst time are not handled with template mode");
+                            }
                         }
-                    } else {
-                        throw new CstlServiceException("TM_Equals filter content is empty!",
-                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
+
+                    if (!template) {
+                        localOmFilter.setTimeEquals(timeFilter);
+
+                    } else if (timeFilter instanceof TimePeriodType || timeFilter instanceof TimeInstantType) {
+                        templateTime = (AbstractTimeGeometricPrimitiveType) timeFilter;
+
+                    } else {
+                        throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
+                    }
+                    
 
                 // The operation Time before
-                } else if (time.getTBefore() != null) {
+                } else if (time instanceof Before) {
+                    final Before filter = (Before) time;
+                    
+                    // we get the property name (not used for now)
+                    // String propertyName = time.getTBefore().getPropertyName();
+                    final Object timeFilter   = filter.getExpression2();
 
-                    if (!time.getTBefore().getRest().isEmpty()) {
-                        // we get the property name (not used for now)
-                        // String propertyName = time.getTBefore().getPropertyName();
-                        final Object timeFilter   = time.getTBefore().getRest().get(0);
-
-                        if (!template) {
-                            localOmFilter.setTimeBefore(timeFilter);
-                        } else if (timeFilter instanceof TimeInstantType) {
-                            final TimeInstantType ti = (TimeInstantType)timeFilter;
-                            templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
-                        } else {
-                            throw new CstlServiceException("TM_Before operation require timeInstant!",
-                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
-                        }
+                    if (!template) {
+                        localOmFilter.setTimeBefore(timeFilter);
+                    } else if (timeFilter instanceof TimeInstantType) {
+                        final TimeInstantType ti = (TimeInstantType)timeFilter;
+                        templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
                     } else {
-                        throw new CstlServiceException("TM_Before filter content is empty!",
-                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
+                        throw new CstlServiceException("TM_Before operation require timeInstant!",
+                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
+                    
 
                 // The operation Time after
-                } else if (time.getTAfter() != null) {
+                } else if (time instanceof After) {
+                    final After filter = (After) time;
+                    
+                    // we get the property name (not used for now)
+                    //String propertyName = time.getTAfter().getPropertyName();
+                    final Object timeFilter   = filter.getExpression2();
 
-                    if (!time.getTAfter().getRest().isEmpty()) {
-                        // we get the property name (not used for now)
-                        //String propertyName = time.getTAfter().getPropertyName();
-                        final Object timeFilter   = time.getTAfter().getRest().get(0);
+                    if (!template) {
+                        localOmFilter.setTimeAfter(timeFilter);
+                    } else if (timeFilter instanceof TimeInstantType) {
+                        final TimeInstantType ti = (TimeInstantType)timeFilter;
+                        templateTime = new TimePeriodType(ti.getTimePosition());
 
-                        if (!template) {
-                            localOmFilter.setTimeAfter(timeFilter);
-                        } else if (timeFilter instanceof TimeInstantType) {
-                            final TimeInstantType ti = (TimeInstantType)timeFilter;
-                            templateTime = new TimePeriodType(ti.getTimePosition());
-
-                        } else {
-                           throw new CstlServiceException("TM_After operation require timeInstant!",
-                                                         INVALID_PARAMETER_VALUE, EVENT_TIME);
-                        }
                     } else {
-                        throw new CstlServiceException("TM_After filter content is empty!",
-                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
+                       throw new CstlServiceException("TM_After operation require timeInstant!",
+                                                     INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
+                    
 
                 // The time during operation
-                } else if (time.getTDuring() != null) {
-                    if (!time.getTDuring().getRest().isEmpty()) {
-                        // we get the property name (not used for now)
-                        //String propertyName = time.getTDuring().getPropertyName();
-                        final Object timeFilter   = time.getTDuring().getRest().get(0);
+                } else if (time instanceof During) {
+                    final During filter = (During) time;
+                    
+                    // we get the property name (not used for now)
+                    //String propertyName = time.getTDuring().getPropertyName();
+                    final Object timeFilter   = filter.getExpression2();
 
-                        if (!template) {
-                            localOmFilter.setTimeDuring(timeFilter);
-                        }
-                        if (timeFilter instanceof TimePeriodType) {
-                            templateTime = (TimePeriodType)timeFilter;
-
-                        } else {
-                            throw new CstlServiceException("TM_During operation require TimePeriod!",
-                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
-                        }
-                    } else {
-                        throw new CstlServiceException("TM_During filter content is empty!",
-                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
+                    if (!template) {
+                        localOmFilter.setTimeDuring(timeFilter);
                     }
-                } else if (time.getTBegins() != null || time.getTBegunBy() != null || time.getTContains() != null ||time.getTEndedBy() != null || time.getTEnds() != null || time.getTMeets() != null
-                           || time.getTOveralps() != null || time.getTOverlappedBy() != null) {
+                    if (timeFilter instanceof TimePeriodType) {
+                        templateTime = (TimePeriodType)timeFilter;
+
+                    } else {
+                        throw new CstlServiceException("TM_During operation require TimePeriod!",
+                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
+                    }
+                    
+                } else if (time instanceof Begins|| time instanceof BegunBy || time instanceof TContains ||time instanceof EndedBy || time instanceof Ends || time instanceof Meets
+                           || time instanceof TOverlaps|| time instanceof OverlappedBy) {
                     throw new CstlServiceException("This operation is not take in charge by the Web Service, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
                                                   OPERATION_NOT_SUPPORTED);
                 } else {
@@ -2083,7 +2113,7 @@ public class SOSworker extends AbstractWorker {
     /**
      *  Verify that the bases request attributes are correct.
      */
-    private void verifyBaseRequest(final RequestBaseType request) throws CstlServiceException {
+    private void verifyBaseRequest(final RequestBase request) throws CstlServiceException {
         isWorking();
         if (request != null) {
             if (request.getService() != null) {

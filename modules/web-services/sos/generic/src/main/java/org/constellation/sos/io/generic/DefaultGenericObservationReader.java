@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
@@ -145,7 +146,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             int id = Integer.parseInt(values.getVariable("var05"));
 
             values = loadData(Arrays.asList("var44"), observationIdBase + id);
-            String continues = null;
+            String continues;
             do {
                 id++;
                 continues = values.getVariable("var44");
@@ -174,7 +175,19 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public ObservationOfferingType getObservationOffering(String offeringName) throws CstlServiceException {
+    public List<ObservationOfferingType> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
+        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+        for (String offeringName : offeringNames) {
+            offerings.add(getObservationOffering(offeringName));
+        }
+        return offerings;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18", "var46"), offeringName);
 
@@ -188,8 +201,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             // event time
             TimePeriodType time;
             String offeringBegin = values.getVariable("var08");
-            if (offeringBegin != null)
+            if (offeringBegin != null) {
                 offeringBegin    = offeringBegin.replace(' ', 'T');
+            }
             String offeringEnd   = values.getVariable("var09");
             if (offeringEnd != null) {
                 offeringEnd          = offeringEnd.replace(' ', 'T');
@@ -319,7 +333,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             try {
                 srsDimension       = Integer.parseInt(dimension);
             } catch (NumberFormatException ex) {
-                LOGGER.severe("unable to parse the srs dimension: " + dimension);
+                LOGGER.log(Level.SEVERE, "unable to parse the srs dimension: {0}", dimension);
             }
             final List<Double> coordinates = getCoordinates(samplingFeatureId);
             final DirectPositionType pos = new DirectPositionType(srsName, srsDimension, coordinates);

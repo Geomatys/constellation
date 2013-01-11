@@ -50,11 +50,20 @@ public interface ObservationReader {
     /**
      * Return The offering with the specified name.
      *
-     * @param offeringName The identifiers of the offering
+     * @param offeringName The identifier of the offering
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
     ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException;
+    
+    /**
+     * Return The offerings for the specified names.
+     *
+     * @param offeringNames The identifiers of the offerings
+     * @return
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    List<ObservationOfferingType> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException;
 
     /**
      * Return a list of all the offerings.

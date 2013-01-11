@@ -177,6 +177,18 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
+    public List<ObservationOfferingType> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
+        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+        for (String offeringName : offeringNames) {
+            offerings.add(getObservationOffering(offeringName));
+        }
+        return offerings;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException {
         try {
             return offTable.getEntry(offeringName);

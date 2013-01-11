@@ -47,7 +47,6 @@ import org.geotoolkit.observation.xml.v100.MeasurementType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
-import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
@@ -70,6 +69,10 @@ import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.geotoolkit.ogc.xml.v110.TimeAfterType;
+import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
+import org.geotoolkit.ogc.xml.v110.TimeDuringType;
+import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.opengis.observation.sampling.SamplingPoint;
@@ -139,7 +142,7 @@ public class SOSWorkerTest {
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "acceptFormats");
         }
-
+        assertTrue(exLaunched);
     }
 
     /**
@@ -421,7 +424,7 @@ public class SOSWorkerTest {
          */
         List<EventTime> times = new ArrayList<EventTime>();
         TimePeriodType period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
-        BinaryTemporalOpType filter = new BinaryTemporalOpType(period);
+        TimeEqualsType filter = new TimeEqualsType(null, period);
         EventTime equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
@@ -453,7 +456,7 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
-        filter = new BinaryTemporalOpType(period);
+        filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
@@ -485,7 +488,7 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
-        filter = new BinaryTemporalOpType(period);
+        filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
@@ -517,7 +520,7 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
-        filter = new BinaryTemporalOpType(period);
+        filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
@@ -549,7 +552,7 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
-        filter = new BinaryTemporalOpType(period);
+        filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
@@ -582,7 +585,7 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
-        filter = new BinaryTemporalOpType(period);
+        filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
@@ -613,7 +616,7 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
-        filter = new BinaryTemporalOpType(period);
+        filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
@@ -868,8 +871,8 @@ public class SOSWorkerTest {
          */
         List<EventTime> times = new ArrayList<EventTime>();
         TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
-        BinaryTemporalOpType filter = new BinaryTemporalOpType(instant);
-        EventTime before            = new EventTime(null, filter, null);
+        TimeBeforeType filter   = new TimeBeforeType(null, instant);
+        EventTime before        = new EventTime(null, filter, null);
         times.add(before);
         request  = new GetObservation("1.0.0",
                                       "offering-allSensor",
@@ -893,7 +896,8 @@ public class SOSWorkerTest {
          *          + Time filter TAFter
          */
         times = new ArrayList<EventTime>();
-        EventTime after            = new EventTime(filter,null, null);
+        TimeAfterType afilter   = new TimeAfterType(null, instant);
+        EventTime after         = new EventTime(afilter,null, null);
         times.add(after);
         request  = new GetObservation("1.0.0",
                                       "offering-allSensor",
@@ -920,9 +924,9 @@ public class SOSWorkerTest {
          *          + Time filter TDuring
          */
         times = new ArrayList<EventTime>();
-        TimePeriodType period = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T08:00:00.0"));
-        filter = new BinaryTemporalOpType(period);
-        EventTime during = new EventTime(null, null, filter);
+        TimePeriodType period  = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T08:00:00.0"));
+        TimeDuringType dfilter = new TimeDuringType(null, period);
+        EventTime during       = new EventTime(null, null, dfilter);
         times.add(during);
         request  = new GetObservation("1.0.0",
                                       "offering-allSensor",
@@ -950,8 +954,8 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
-        filter = new BinaryTemporalOpType(period);
-        EventTime equals = new EventTime(filter);
+        TimeEqualsType efilter = new TimeEqualsType(null, period);
+        EventTime equals = new EventTime(efilter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
                                       "offering-allSensor",
@@ -1027,8 +1031,8 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
-        filter = new BinaryTemporalOpType(period);
-        equals = new EventTime(filter);
+        efilter = new TimeEqualsType(null, period);
+        equals = new EventTime(efilter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
                                       "offering-allSensor",
@@ -1078,8 +1082,8 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T17:58:00.0"));
-        filter = new BinaryTemporalOpType(instant);
-        after = new EventTime(filter,null, null);
+        afilter = new TimeAfterType(null, instant);
+        after = new EventTime(afilter,null, null);
         times.add(after);
         request  = new GetObservation("1.0.0",
                                       "offering-allSensor",
@@ -1130,8 +1134,8 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T17:58:00.0"));
-        filter = new BinaryTemporalOpType(instant);
-        before = new EventTime(null, filter, null);
+        TimeBeforeType bfilter = new TimeBeforeType(null, instant);
+        before = new EventTime(null, bfilter, null);
         times.add(before);
         request  = new GetObservation("1.0.0",
                                       "offering-allSensor",
@@ -1665,8 +1669,8 @@ public class SOSWorkerTest {
          */
         List<EventTime> times = new ArrayList<EventTime>();
         TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T05:00:00.0"));
-        BinaryTemporalOpType filter = new BinaryTemporalOpType(instant);
-        EventTime before = new EventTime(null, filter, null);
+        TimeBeforeType bfilter = new TimeBeforeType(null, instant);
+        EventTime before = new EventTime(null, bfilter, null);
         times.add(before);
         GOrequest  = new GetObservation("1.0.0",
                                         "offering-allSensor",
@@ -1734,8 +1738,8 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
-        filter = new BinaryTemporalOpType(instant);
-        EventTime after = new EventTime(filter, null, null);
+        TimeAfterType afilter = new TimeAfterType(null, instant);
+        EventTime after = new EventTime(afilter, null, null);
         times.add(after);
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
@@ -1755,8 +1759,8 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T04:00:00.0"));
-        filter = new BinaryTemporalOpType(instant);
-        EventTime before2 = new EventTime(null, filter, null);
+        bfilter = new TimeBeforeType(null, instant);
+        EventTime before2 = new EventTime(null, bfilter, null);
         times.add(before2);
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
@@ -1776,8 +1780,8 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T03:59:00.0"));
-        filter = new BinaryTemporalOpType(instant);
-        EventTime equals = new EventTime(filter);
+        TimeEqualsType efilter = new TimeEqualsType(null, instant);
+        EventTime equals = new EventTime(efilter);
         times.add(equals);
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
@@ -1797,8 +1801,8 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T04:00:00.0"));
-        filter = new BinaryTemporalOpType(period);
-        EventTime during = new EventTime(null, null, filter);
+        TimeDuringType dfilter = new TimeDuringType(null, period);
+        EventTime during = new EventTime(null, null, dfilter);
         times.add(during);
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
@@ -1820,8 +1824,8 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T19:00:00.0"));
-        filter = new BinaryTemporalOpType(instant);
-        after = new EventTime(filter, null, null);
+        afilter = new TimeAfterType(null, instant);
+        after = new EventTime(afilter, null, null);
         times.add(after);
         GOrequest  = new GetObservation("1.0.0",
                                         "offering-allSensor",
@@ -1891,8 +1895,8 @@ public class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.0"));
-        filter = new BinaryTemporalOpType(instant);
-        equals = new EventTime(filter);
+        efilter = new TimeEqualsType(null, instant);
+        equals = new EventTime(efilter);
         times.add(equals);
         GOrequest  = new GetObservation("1.0.0",
                                         "offering-allSensor",

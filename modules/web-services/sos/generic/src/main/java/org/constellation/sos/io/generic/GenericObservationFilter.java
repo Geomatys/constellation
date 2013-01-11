@@ -124,7 +124,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(final List<String> procedures, final ObservationOfferingType off) {
+    public void setProcedure(final List<String> procedures, final List<ObservationOfferingType> offerings) {
         if (!procedures.isEmpty()) {
             for (String s : procedures) {
                 if (s != null) {
@@ -139,10 +139,12 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             }
         } else {
             //if is not specified we use all the process of the offering
-            for (ReferenceType proc : off.getProcedure()) {
-                 final Where where = configurationQuery.getWhere(PROCEDURE);
-                 where.replaceVariable(PROCEDURE, proc.getHref(), true);
-                 currentQuery.addWhere(where);
+            for (ObservationOfferingType off : offerings) {
+                for (ReferenceType proc : off.getProcedure()) {
+                     final Where where = configurationQuery.getWhere(PROCEDURE);
+                     where.replaceVariable(PROCEDURE, proc.getHref(), true);
+                     currentQuery.addWhere(where);
+                }
             }
         }
     }
@@ -271,7 +273,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setOffering(final ObservationOfferingType offering) throws CstlServiceException {
+    public void setOfferings(final List<ObservationOfferingType> offerings) throws CstlServiceException {
         // not used in this implementations
     }
     

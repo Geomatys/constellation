@@ -112,7 +112,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(final List<String> procedures, final ObservationOfferingType off) {
+    public void setProcedure(final List<String> procedures, final List<ObservationOfferingType> offerings) {
         luceneRequest.append(" ( ");
         if (!procedures.isEmpty()) {
 
@@ -127,8 +127,10 @@ public class LuceneObservationFilter implements ObservationFilter {
             }
         } else {
             //if is not specified we use all the process of the offering
-            for (ReferenceType proc : off.getProcedure()) {
-                luceneRequest.append(" procedure:\"").append(proc.getHref()).append("\" OR ");
+            for (ObservationOfferingType off : offerings) {
+                for (ReferenceType proc : off.getProcedure()) {
+                    luceneRequest.append(" procedure:\"").append(proc.getHref()).append("\" OR ");
+                }
             }
         }
         luceneRequest.delete(luceneRequest.length() - 3, luceneRequest.length());
@@ -280,7 +282,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setOffering(final ObservationOfferingType offering) throws CstlServiceException {
+    public void setOfferings(final List<ObservationOfferingType> offerings) throws CstlServiceException {
         // not used in this implementations
     }
     

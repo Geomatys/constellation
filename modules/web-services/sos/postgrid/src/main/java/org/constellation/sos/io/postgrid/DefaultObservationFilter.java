@@ -165,7 +165,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(final List<String> procedures, final ObservationOfferingType off) {
+    public void setProcedure(final List<String> procedures, final List<ObservationOfferingType> offerings) {
         sqlRequest.append(" ( ");
         if (!procedures.isEmpty()) {
 
@@ -180,8 +180,10 @@ public class DefaultObservationFilter implements ObservationFilter {
             }
         } else {
             //if is not specified we use all the process of the offering
-            for (ReferenceType proc : off.getProcedure()) {
-                sqlRequest.append(" \"procedure\"='").append(proc.getHref()).append("' OR ");
+            for (ObservationOfferingType off : offerings) {
+                for (ReferenceType proc : off.getProcedure()) {
+                    sqlRequest.append(" \"procedure\"='").append(proc.getHref()).append("' OR ");
+                }
             }
         }
         sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
@@ -447,7 +449,7 @@ public class DefaultObservationFilter implements ObservationFilter {
     }
 
     @Override
-    public void setOffering(final ObservationOfferingType offering) throws CstlServiceException {
+    public void setOfferings(final List<ObservationOfferingType> offerings) throws CstlServiceException {
         // not used in this implementations
     }
     

@@ -124,6 +124,18 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
+    public List<ObservationOfferingType> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
+        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+        for (String offeringName : offeringNames) {
+            offerings.add(getObservationOffering(offeringName));
+        }
+        return offerings;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException {
         final File offeringFile = new File(offeringDirectory, offeringName + FILE_EXTENSION);
         if (offeringFile.exists()) {
