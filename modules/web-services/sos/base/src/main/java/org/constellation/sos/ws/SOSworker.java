@@ -78,7 +78,6 @@ import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.ows.xml.AcceptFormats;
-import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
@@ -102,7 +101,7 @@ import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.InsertObservationResponse;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
-import org.geotoolkit.sos.xml.v100.FilterCapabilities;
+import org.geotoolkit.sos.xml.FilterCapabilities;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ObservationTemplate;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
@@ -171,6 +170,7 @@ import org.opengis.filter.temporal.OverlappedBy;
 import org.opengis.filter.temporal.TContains;
 import org.opengis.filter.temporal.TEquals;
 import org.opengis.filter.temporal.TOverlaps;
+import org.opengis.util.CodeList;
 
 
 /**
@@ -662,23 +662,7 @@ public class SOSworker extends AbstractWorker {
         final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
-        if (request.getService() != null) {
-            if (!request.getService().equals(SOS)) {
-                throw new CstlServiceException("service must be \"SOS\"!",
-                                                 INVALID_PARAMETER_VALUE, SERVICE_PARAMETER);
-            }
-        } else {
-            throw new CstlServiceException("Service must be specified!",
-                                             MISSING_PARAMETER_VALUE, SERVICE_PARAMETER);
-        }
-        final AcceptVersions versions = request.getAcceptVersions();
-        if (versions != null) {
-            if (!versions.getVersion().contains(VERSION)){
-                 throw new CstlServiceException("version available : 1.0.0, 2.0.0",
-                                             VERSION_NEGOTIATION_FAILED, "acceptVersion");
-            }
-        } 
-        request.setVersion(VERSION); // TODO v 2.0.0
+        verifyBaseRequest(request, false, true);
         
         final String currentVersion = request.getVersion().toString();
         
@@ -712,13 +696,13 @@ public class SOSworker extends AbstractWorker {
         }
         
         // If the getCapabilities response is in cache, we just return it.
-        final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache("1.0.0", null);
+        final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache(currentVersion, null);
         if (cachedCapabilities != null) {
             return (Capabilities) cachedCapabilities.applySections(sections);
         }
 
         // we load the skeleton capabilities
-        final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "SOS");
+        final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject(currentVersion, "SOS");
 
         final Capabilities localCapabilities;
         if (keepCapabilities) {
@@ -730,7 +714,12 @@ public class SOSworker extends AbstractWorker {
         //we prepare the different parts response document
         final AbstractServiceIdentification si = localCapabilities.getServiceIdentification();
         final AbstractServiceProvider       sp = localCapabilities.getServiceProvider();
-        final FilterCapabilities            fc = SOS_FILTER_CAPABILITIES;
+        final FilterCapabilities fc;
+        if (currentVersion.equals("2.0.0")) {
+            fc = SOSConstants.SOS_FILTER_CAPABILITIES_V200;
+        } else {
+            fc = SOSConstants.SOS_FILTER_CAPABILITIES_V100;
+        }
         final AbstractOperationsMetadata    om = OPERATIONS_METADATA.clone();
 
         //we remove the operation not supported in this profile (transactional/discovery)
@@ -747,7 +736,7 @@ public class SOSworker extends AbstractWorker {
             final AbstractOperation go = om.getOperation("GetObservation");
 
             // the list of offering names
-            go.updateParameter(OFFERING, omReader.getOfferingNames());
+            go.updateParameter(OFFERING, omReader.getOfferingNames(currentVersion));
 
             // the event time range
             final List<String> eventTime = omReader.getEventTime();
@@ -818,7 +807,7 @@ public class SOSworker extends AbstractWorker {
             cont = loadedCapabilities.getContents();
         } else {
             // we add the list of observation ofeerings
-            cont = buildContents(currentVersion, omReader.getObservationOfferings());
+            cont = buildContents(currentVersion, omReader.getObservationOfferings(currentVersion));
         }
         
         // we build and normalize the document
@@ -839,7 +828,7 @@ public class SOSworker extends AbstractWorker {
         final long start = System.currentTimeMillis();
 
         // we get the form
-        verifyBaseRequest(requestDescSensor);
+        verifyBaseRequest(requestDescSensor, true, false);
 
         //we verify that the output format is good.
         final String out = requestDescSensor.getOutputFormat();
@@ -887,7 +876,7 @@ public class SOSworker extends AbstractWorker {
         final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
-        verifyBaseRequest(requestObservation);
+        verifyBaseRequest(requestObservation, true, false);
 
         final String currentVersion = requestObservation.getVersion().toString();
         
@@ -973,7 +962,7 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("Offering must be specify!", MISSING_PARAMETER_VALUE, OFFERING);
         } else {
             for (String offeringName : offeringNames) {
-                final ObservationOffering offering = omReader.getObservationOffering(offeringName);
+                final ObservationOffering offering = omReader.getObservationOffering(offeringName, currentVersion);
                 if (offering == null) {
                     throw new CstlServiceException("This offering is not registered in the service", INVALID_PARAMETER_VALUE, OFFERING);
                 }
@@ -1373,7 +1362,7 @@ public class SOSworker extends AbstractWorker {
         final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
-        verifyBaseRequest(requestResult);
+        verifyBaseRequest(requestResult, true, false);
 
         // we clone the filter for this request
         final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
@@ -1618,10 +1607,11 @@ public class SOSworker extends AbstractWorker {
     }
 
     public AbstractFeatureType getFeatureOfInterest(final GetFeatureOfInterest request) throws CstlServiceException {
-        verifyBaseRequest(request);
+        verifyBaseRequest(request, true, false);
         LOGGER.log(logLevel, "GetFeatureOfInterest request processing\n");
         final long start = System.currentTimeMillis();
-
+        final String currentVersion = request.getVersion().toString();
+        
         // if there is no filter we throw an exception
         if (request.getEventTime().isEmpty() && request.getFeatureOfInterestId().isEmpty() && request.getLocation() == null) {
             throw new CstlServiceException("You must choose a filter parameter: eventTime, featureId or location", MISSING_PARAMETER_VALUE);
@@ -1670,7 +1660,7 @@ public class SOSworker extends AbstractWorker {
         if (request.getLocation() != null && request.getLocation().getSpatialOps() != null) {
             final SpatialOpsType spatialFilter = request.getLocation().getSpatialOps().getValue();
             if (spatialFilter instanceof BBOXType) {
-                final List<SamplingFeature> results = spatialFiltering((BBOXType) spatialFilter);
+                final List<SamplingFeature> results = spatialFiltering((BBOXType) spatialFilter, currentVersion);
 
                 // we return a single result
                 if (results.size() == 1) {
@@ -1702,7 +1692,7 @@ public class SOSworker extends AbstractWorker {
     public AbstractTimePrimitiveType getFeatureOfInterestTime(final GetFeatureOfInterestTime request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetFeatureOfInterestTime request processing\n");
         final long start = System.currentTimeMillis();
-        verifyBaseRequest(request);
+        verifyBaseRequest(request, true, false);
 
         final AbstractTimePrimitiveType result;
         final String fid = request.getFeatureOfInterestId();
@@ -1743,12 +1733,12 @@ public class SOSworker extends AbstractWorker {
         }
     }
 
-    private List<SamplingFeature> spatialFiltering(final BBOXType bbox) throws CstlServiceException {
+    private List<SamplingFeature> spatialFiltering(final BBOXType bbox, final String currentVersion) throws CstlServiceException {
         final EnvelopeType e = bbox.getEnvelope();
         if (e != null && e.isCompleteEnvelope2D()) {
 
             final List<SamplingFeature> matchingFeatureOfInterest = new ArrayList<SamplingFeature>();
-            final List<ObservationOffering> offerings             = omReader.getObservationOfferings();
+            final List<ObservationOffering> offerings             = omReader.getObservationOfferings(currentVersion);
             for (ObservationOffering off : offerings) {
                 // TODO for SOS 2.0 use observed area
                 for (String refStation : off.getFeatureOfInterestIds()) {
@@ -1782,7 +1772,7 @@ public class SOSworker extends AbstractWorker {
      * @param requestRegSensor A request containing a SensorML File describing a Sensor,
      *                         and an observation template for this sensor.
      */
-    public RegisterSensorResponse registerSensor(final RegisterSensor requestRegSensor) throws CstlServiceException {
+    public RegisterSensorResponse registerSensor(final RegisterSensor request) throws CstlServiceException {
         if (profile == DISCOVERY) {
             throw new CstlServiceException("The operation registerSensor is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
@@ -1792,9 +1782,10 @@ public class SOSworker extends AbstractWorker {
         }
         LOGGER.log(logLevel, "registerSensor request processing\n");
         final long start = System.currentTimeMillis();
-
+        final String currentVersion = request.getVersion().toString();
+        
         //we verify the base request attribute
-        verifyBaseRequest(requestRegSensor);
+        verifyBaseRequest(request, true, false);
 
         boolean success = false;
         String id = "";
@@ -1803,7 +1794,7 @@ public class SOSworker extends AbstractWorker {
             smlWriter.startTransaction();
 
             //we get the SensorML file who describe the Sensor to insert.
-            final RegisterSensor.SensorDescription d = requestRegSensor.getSensorDescription();
+            final RegisterSensor.SensorDescription d = request.getSensorDescription();
             AbstractSensorML process;
             if (d != null && d.getAny() instanceof AbstractSensorML) {
                 process = (AbstractSensorML) d.getAny();
@@ -1816,7 +1807,7 @@ public class SOSworker extends AbstractWorker {
             }
 
             //we get the observation template provided with the sensor description.
-            final ObservationTemplate temp = requestRegSensor.getObservationTemplate();
+            final ObservationTemplate temp = request.getObservationTemplate();
             ObservationType obs           = null;
             if (temp != null) {
                 obs = temp.getObservation();
@@ -1878,7 +1869,7 @@ public class SOSworker extends AbstractWorker {
                 LOGGER.finer(obs.toString());
                 //we write the observation template in the O&M database
                 omWriter.writeObservation(obs);
-                addSensorToOffering(process, obs);
+                addSensorToOffering(process, obs, currentVersion);
             } else {
                 LOGGER.warning("unable to record Sensor template and location in O&M datasource: no O&M writer");
             }
@@ -1919,7 +1910,7 @@ public class SOSworker extends AbstractWorker {
         final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
-        verifyBaseRequest(requestInsObs);
+        verifyBaseRequest(requestInsObs, true, false);
 
         String id = "";
         //we get the id of the sensor and we create a sensor object
@@ -2123,7 +2114,7 @@ public class SOSworker extends AbstractWorker {
     /**
      *  Verify that the bases request attributes are correct.
      */
-    private void verifyBaseRequest(final RequestBase request) throws CstlServiceException {
+    private void verifyBaseRequest(final RequestBase request, final boolean versionMandatory, final boolean getCapabilities) throws CstlServiceException {
         isWorking();
         if (request != null) {
             if (request.getService() != null) {
@@ -2134,11 +2125,29 @@ public class SOSworker extends AbstractWorker {
                 throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, SERVICE_PARAMETER);
             }
             if (request.getVersion()!= null) {
-                if (!request.getVersion().toString().equals(VERSION)) {
-                    throw new CstlServiceException("version must be \"1.0.0\"!", VERSION_NEGOTIATION_FAILED);
+                
+                if (request.getVersion().toString().equals("1.0.0")) {
+                    request.setVersion("1.0.0");
+                } else if (request.getVersion().toString().equals("2.0.0")) {
+                    request.setVersion("2.0.0");
+                } else {
+                    final CodeList code;
+                    final String locator;
+                    if (getCapabilities) {
+                        code = VERSION_NEGOTIATION_FAILED;
+                        locator = "acceptVersion";
+                    } else {
+                        code = INVALID_PARAMETER_VALUE;
+                        locator = "version";
+                    }
+                    throw new CstlServiceException("version must be \"1.0.0\" or \"2.0.0\"!", code, locator);
                 }
             } else {
-                throw new CstlServiceException("version must be specified!", MISSING_PARAMETER_VALUE, "version");
+                if (versionMandatory) {
+                    throw new CstlServiceException("version must be specified!", MISSING_PARAMETER_VALUE, "version");
+                } else {
+                    request.setVersion("1.0.0");
+                }
             }
          } else {
             throw new CstlServiceException("The request is null!", NO_APPLICABLE_CODE);
@@ -2174,7 +2183,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @throws CstlServiceException If an error occurs during the the storage of offering in the datasource.
      */
-    private void addSensorToOffering(final AbstractSensorML sensor, final Observation template) throws CstlServiceException {
+    private void addSensorToOffering(final AbstractSensorML sensor, final Observation template, final String version) throws CstlServiceException {
 
         //we search which are the networks binded to this sensor
         final List<String> networkNames = getNetworkNames(sensor);
@@ -2187,7 +2196,7 @@ public class SOSworker extends AbstractWorker {
         // for each network we create (or update) an offering
         for (String networkName : networkNames) {
             final String offeringName          = "offering-" + networkName;
-            final ObservationOffering offering = omReader.getObservationOffering(offeringName);
+            final ObservationOffering offering = omReader.getObservationOffering(offeringName, version);
 
             if (offering != null) {
                 updateOffering(offering, template);
@@ -2199,7 +2208,7 @@ public class SOSworker extends AbstractWorker {
         /*
          * then  we add the sensor to the global offering containing all the sensor
          */
-        final ObservationOffering offering = omReader.getObservationOffering("offering-allSensor");
+        final ObservationOffering offering = omReader.getObservationOffering("offering-allSensor", version);
         if (offering != null) {
             updateOffering(offering, template);
         } else {

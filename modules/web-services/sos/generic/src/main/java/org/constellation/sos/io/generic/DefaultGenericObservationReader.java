@@ -36,6 +36,7 @@ import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.geotoolkit.gml.xml.GMLXmlFactory;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
@@ -65,6 +66,7 @@ import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.ObservationOffering;
+import org.opengis.temporal.Period;
 
 
 /**
@@ -89,7 +91,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<String> getOfferingNames() throws CstlServiceException {
+    public List<String> getOfferingNames(final String version) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList(VAR01));
             return values.getVariables(VAR01);
@@ -176,10 +178,10 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
         final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
         for (String offeringName : offeringNames) {
-            offerings.add(getObservationOffering(offeringName));
+            offerings.add(getObservationOffering(offeringName, version));
         }
         return offerings;
     }
@@ -188,7 +190,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public ObservationOffering getObservationOffering(final String offeringName) throws CstlServiceException {
+    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18", "var46"), offeringName);
 
@@ -199,8 +201,14 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             
             final List<String> srsName = values.getVariables("var07");
 
+            final String gmlVersion;
+            if (version.equals("2.0.0")) {
+                gmlVersion = "3.2.1";
+            } else {
+                gmlVersion = "3.1.1";
+            }
             // event time
-            TimePeriodType time;
+            Period time;
             String offeringBegin = values.getVariable("var08");
             if (offeringBegin != null) {
                 offeringBegin    = offeringBegin.replace(' ', 'T');
@@ -208,10 +216,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             String offeringEnd   = values.getVariable("var09");
             if (offeringEnd != null) {
                 offeringEnd          = offeringEnd.replace(' ', 'T');
-                time  = new TimePeriodType(offeringBegin, offeringEnd);
-            } else {
-                time  = new TimePeriodType(offeringBegin);
             }
+            time  = GMLXmlFactory.createTimePeriod(gmlVersion, offeringBegin, offeringEnd);
+            
 
 
             // procedure
@@ -219,8 +226,18 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             for (String procedureName : values.getVariables("var10")) {
                 procedures.add(new ReferenceType(null, procedureName));
             }
+            final String singleProcedure;
+            if (version.equals("2.0.0") && procedures.size() > 1) {
+                LOGGER.warning("multiple procedure unsuported in V2.0.0");
+                singleProcedure = procedures.get(0).getHref();
+            } else if (version.equals("2.0.0") && procedures.size() == 1) {
+                singleProcedure = procedures.get(0).getHref();
+            } else {
+                singleProcedure = null;
+            }
 
             // phenomenon
+            final List<String> observedPropertiesv200             = new ArrayList<String>();
             final List<PhenomenonPropertyType> observedProperties = new ArrayList<PhenomenonPropertyType>();
             for (String phenomenonId : values.getVariables("var12")) {
                 if (phenomenonId!= null && !phenomenonId.isEmpty()) {
@@ -236,38 +253,59 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                                                                                        null,
                                                                                        components);
                     observedProperties.add(new PhenomenonPropertyType(phenomenon));
+                    observedPropertiesv200.add(phenomenonId);
                 }
             }
             for (String phenomenonId : values.getVariables("var11")) {
                 if (phenomenonId != null && !phenomenonId.isEmpty()) {
                     final PhenomenonType phenomenon = getPhenomenon(phenomenonId);
                     observedProperties.add(new PhenomenonPropertyType(phenomenon));
+                    observedPropertiesv200.add(phenomenonId);
                 }
             }
 
             // feature of interest
             final List<ReferenceType> fois = new ArrayList<ReferenceType>();
+            final List<String> foisV200    = new ArrayList<String>();
             for (String foiID : values.getVariables("var18")) {
                 fois.add(new ReferenceType(null, foiID));
+                foisV200.add(foiID);
             }
 
             //static part
-            final List<String> responseFormat = Arrays.asList(MimeType.APPLICATION_XML);
-            final List<QName> resultModel     = Arrays.asList(OBSERVATION_QNAME);
+            final List<String> responseFormat  = Arrays.asList(MimeType.APPLICATION_XML);
+            final List<QName> resultModel      = Arrays.asList(OBSERVATION_QNAME);
+            final List<String> resultModelV200 = Arrays.asList(OBSERVATION_MODEL);
             final List<ResponseModeType> responseMode = Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
-            return new ObservationOfferingType(offeringName,
-                                                offeringName,
-                                                null,
-                                                null,
-                                                null,
-                                                srsName,
-                                                time,
-                                                procedures,
-                                                observedProperties,
-                                                fois,
-                                                responseFormat,
-                                                resultModel,
-                                                responseMode);
+            if (version.equals("1.0.0")) {
+                return new ObservationOfferingType(offeringName,
+                                                   offeringName,
+                                                   null,
+                                                   null,
+                                                   null,
+                                                   srsName,
+                                                   (org.geotoolkit.gml.xml.v311.TimePeriodType)time,
+                                                   procedures,
+                                                   observedProperties,
+                                                   fois,
+                                                   responseFormat,
+                                                   resultModel,
+                                                   responseMode);
+            } else if (version.equals("2.0.0")) {
+                return new org.geotoolkit.sos.xml.v200.ObservationOfferingType(
+                                                   offeringName,
+                                                   offeringName,
+                                                   null,
+                                                   null,
+                                                   (org.geotoolkit.gml.xml.v321.TimePeriodType) time,
+                                                   singleProcedure,
+                                                   observedPropertiesv200,
+                                                   foisV200,
+                                                   responseFormat,
+                                                   resultModelV200);
+            } else {
+                throw new CstlServiceException("Unsupported version:" + version);
+            }
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
@@ -277,13 +315,13 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings() throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList(VAR01));
             final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
             final List<String> offeringNames = values.getVariables(VAR01);
             for (String offeringName : offeringNames) {
-                offerings.add(getObservationOffering(offeringName));
+                offerings.add(getObservationOffering(offeringName, version));
             }
             return offerings;
         } catch (MetadataIoException ex) {

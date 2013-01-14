@@ -108,13 +108,16 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Collection<String> getOfferingNames() throws CstlServiceException {
+    public Collection<String> getOfferingNames(final String version) throws CstlServiceException {
         final List<String> offeringNames = new ArrayList<String>();
-        if (offeringDirectory.exists()) {
-            for (File offeringFile: offeringDirectory.listFiles()) {
-                String offeringName = offeringFile.getName();
-                offeringName = offeringName.substring(0, offeringName.indexOf(FILE_EXTENSION));
-                offeringNames.add(offeringName);
+        if (offeringDirectory.isDirectory()) {
+            final File offeringVersionDir = new File(observationDirectory, version);
+            if (offeringVersionDir.isDirectory()) {
+                for (File offeringFile: offeringVersionDir.listFiles()) {
+                    String offeringName = offeringFile.getName();
+                    offeringName = offeringName.substring(0, offeringName.indexOf(FILE_EXTENSION));
+                    offeringNames.add(offeringName);
+                }
             }
         }
         return offeringNames;
@@ -124,10 +127,10 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
         final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
         for (String offeringName : offeringNames) {
-            offerings.add(getObservationOffering(offeringName));
+            offerings.add(getObservationOffering(offeringName, version));
         }
         return offerings;
     }
@@ -136,24 +139,29 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationOffering getObservationOffering(final String offeringName) throws CstlServiceException {
-        final File offeringFile = new File(offeringDirectory, offeringName + FILE_EXTENSION);
-        if (offeringFile.exists()) {
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(offeringFile);
-                if (obj instanceof ObservationOffering) {
-                    return (ObservationOffering) obj;
-                }
-                throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
-            } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + offeringFile, ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (unmarshaller != null) {
-                    MARSHALLER_POOL.release(unmarshaller);
+    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
+        final File offeringVersionDir = new File(offeringDirectory, version); 
+        if (offeringVersionDir.isDirectory()) {
+            final File offeringFile = new File(offeringVersionDir, offeringName + FILE_EXTENSION);
+            if (offeringFile.exists()) {
+                Unmarshaller unmarshaller = null;
+                try {
+                    unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
+                    final Object obj = unmarshaller.unmarshal(offeringFile);
+                    if (obj instanceof ObservationOffering) {
+                        return (ObservationOffering) obj;
+                    }
+                    throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
+                } catch (JAXBException ex) {
+                    throw new CstlServiceException("Unable to unmarshall The file " + offeringFile, ex, NO_APPLICABLE_CODE);
+                } finally {
+                    if (unmarshaller != null) {
+                        MARSHALLER_POOL.release(unmarshaller);
+                    }
                 }
             }
+        } else {
+            throw new CstlServiceException("Unsuported version:" + version);
         }
         return null;
     }
@@ -162,30 +170,38 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings() throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
         final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
         if (offeringDirectory.exists()) {
-            for (File offeringFile: offeringDirectory.listFiles()) {
-                Unmarshaller unmarshaller = null;
-                try {
-                    unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
-                    final Object obj = unmarshaller.unmarshal(offeringFile);
-                    if (obj instanceof ObservationOffering) {
-                        offerings.add((ObservationOffering) obj);
-                    } else {
-                        throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
-                    }
-                } catch (JAXBException ex) {
-                    String msg = ex.getMessage();
-                    if (msg == null && ex.getCause() != null) {
-                        msg = ex.getCause().getMessage();
-                    }
-                    LOGGER.warning("Unable to unmarshall The file " + offeringFile + " cause:" + msg);
-                } finally {
-                    if (unmarshaller != null) {
-                        MARSHALLER_POOL.release(unmarshaller);
+            final File offeringVersionDir = new File(offeringDirectory, version); 
+            if (offeringVersionDir.isDirectory()) {
+                for (File offeringFile: offeringVersionDir.listFiles()) {
+                    Unmarshaller unmarshaller = null;
+                    try {
+                        unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
+                        Object obj = unmarshaller.unmarshal(offeringFile);
+                        if (obj instanceof JAXBElement) {
+                            obj = ((JAXBElement)obj).getValue();
+                        }
+                        if (obj instanceof ObservationOffering) {
+                            offerings.add((ObservationOffering) obj);
+                        } else {
+                            throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
+                        }
+                    } catch (JAXBException ex) {
+                        String msg = ex.getMessage();
+                        if (msg == null && ex.getCause() != null) {
+                            msg = ex.getCause().getMessage();
+                        }
+                        LOGGER.warning("Unable to unmarshall The file " + offeringFile + " cause:" + msg);
+                    } finally {
+                        if (unmarshaller != null) {
+                            MARSHALLER_POOL.release(unmarshaller);
+                        }
                     }
                 }
+            } else {
+                throw new CstlServiceException("Unsuported version:" + version);
             }
         }
         return offerings;

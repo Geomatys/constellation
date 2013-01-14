@@ -39,7 +39,7 @@ import org.junit.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileSystemSOSWorkerTest extends SOSWorkerTest {
+public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
 
     private static final File configDir = new File("LUCSOSWorkerTest");;
 
@@ -57,7 +57,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             //we write the data files
             File offeringDirectory = new File(configDir, "offerings");
             offeringDirectory.mkdir();
-            
+             
             File offeringV100Directory = new File(offeringDirectory, "1.0.0");
             offeringV100Directory.mkdir();
             writeDataFile(offeringV100Directory, "v100/offering-1.xml", "offering-allSensor");
@@ -65,6 +65,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             File offeringV200Directory = new File(offeringDirectory, "2.0.0");
             offeringV200Directory.mkdir();
             writeDataFile(offeringV200Directory, "v200/offering-1.xml", "offering-allSensor");
+
 
             File phenomenonDirectory = new File(configDir, "phenomenons");
             phenomenonDirectory.mkdir();
@@ -194,94 +195,6 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
     public void getCapabilitiesTest() throws Exception {
         super.getCapabilitiesTest();
 
-    }
-
-    /**
-     * Tests the GetObservation method
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Override
-    public void GetObservationErrorTest() throws Exception {
-        super.GetObservationErrorTest();
-    }
-
-    /**
-     * Tests the GetObservation method
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Override
-    public void GetObservationTest() throws Exception {
-        super.GetObservationTest();
-    }
-
-    /**
-     * Tests the GetObservation method
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Override
-    public void GetObservationSamplingCurveTest() throws Exception {
-        super.GetObservationSamplingCurveTest();
-    }
-
-    /**
-     * Tests the GetResult method
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Override
-    public void GetResultErrorTest() throws Exception {
-        super.GetResultErrorTest();
-    }
-
-    /**
-     * Tests the GetResult method
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Override
-    public void GetResultTest() throws Exception {
-        super.GetResultTest();
-    }
-
-    /**
-     * Tests the RegisterSensor method
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Override
-    public void insertObservationTest() throws Exception {
-        super.insertObservationTest();
-    }
-
-    /**
-     * Tests the GetFeatureOfInterest method
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Override
-    public void GetFeatureOfInterestErrorTest() throws Exception {
-        super.GetFeatureOfInterestErrorTest();
-    }
-
-    /**
-     * Tests the GetFeatureOfInterest method
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Override
-    public void GetFeatureOfInterestTest() throws Exception {
-        super.GetFeatureOfInterestTest();
     }
 
     /**

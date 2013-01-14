@@ -113,7 +113,7 @@ public class SOSWorkerTest {
         /**
          *  TEST 1 : get capabilities with wrong version (waiting for an exception)
          */
-        AcceptVersionsType acceptVersions = new AcceptVersionsType("2.0.0");
+        AcceptVersionsType acceptVersions = new AcceptVersionsType("3.0.0");
         SectionsType sections             = new SectionsType("All");
         AcceptFormatsType acceptFormats   = new AcceptFormatsType(MimeType.TEXT_XML);
         GetCapabilities request           = new GetCapabilities(acceptVersions, sections, acceptFormats, null, "SOS");
@@ -375,7 +375,7 @@ public class SOSWorkerTest {
                                                      null,
                                                      null,
                                                      null,
-                                                     "text/xml;subtype=\"om/2.0.0\"",
+                                                     "text/xml;subtype=\"om/3.0.0\"",
                                                      OBSERVATION_QNAME,
                                                      ResponseModeType.INLINE,
                                                      null);
@@ -1535,13 +1535,13 @@ public class SOSWorkerTest {
          * Test 1: bad version number + null template ID
          */
         String templateId = null;
-        GetResult request = new GetResult(templateId, null, "2.0.0");
+        GetResult request = new GetResult(templateId, null, "3.0.0");
         boolean exLaunched = false;
         try {
             worker.getResult(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getExceptionCode(), VERSION_NEGOTIATION_FAILED);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
         assertTrue(exLaunched);
 

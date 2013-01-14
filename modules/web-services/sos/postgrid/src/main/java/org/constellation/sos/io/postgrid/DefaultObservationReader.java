@@ -163,7 +163,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> getOfferingNames() throws CstlServiceException {
+    public Set<String> getOfferingNames(final String version) throws CstlServiceException {
         try {
             return offTable.getIdentifiers();
         } catch (SQLException ex) {
@@ -178,10 +178,10 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
         final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
         for (String offeringName : offeringNames) {
-            offerings.add(getObservationOffering(offeringName));
+            offerings.add(getObservationOffering(offeringName, version));
         }
         return offerings;
     }
@@ -190,7 +190,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationOffering getObservationOffering(final String offeringName) throws CstlServiceException {
+    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
         try {
             return offTable.getEntry(offeringName);
         } catch (NoSuchRecordException ex) {
@@ -209,7 +209,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings() throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
         try {
             final List<ObservationOffering> loo = new ArrayList<ObservationOffering>();
             final Set<ObservationOfferingType> set  = offTable.getEntries();
@@ -242,7 +242,6 @@ public class DefaultObservationReader implements ObservationReader {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
-
         }
     }
 

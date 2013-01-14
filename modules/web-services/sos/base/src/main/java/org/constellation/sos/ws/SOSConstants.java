@@ -60,7 +60,6 @@ public final class SOSConstants {
     private SOSConstants() {}
 
     public static final String SOS = "SOS";
-    public static final String VERSION = "1.0.0";
     public static final String ALL = "All";
     public static final String OFFERING = "offering";
     public static final String EVENT_TIME = "eventTime";
@@ -77,13 +76,15 @@ public final class SOSConstants {
      * The base Qname for complex observation.
      */
     public static final QName OBSERVATION_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
+    
+    public static final String OBSERVATION_MODEL = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation";
 
     /**
      * The base Qname for measurement observation.
      */
     public static final QName MEASUREMENT_QNAME = new QName("http://www.opengis.net/om/1.0", "Measurement", "om");
     
-    public static final FilterCapabilities SOS_FILTER_CAPABILITIES = new FilterCapabilities();
+    public static final FilterCapabilities SOS_FILTER_CAPABILITIES_V100 = new FilterCapabilities();
     
     static {
         final GeometryOperandsType geom = new GeometryOperandsType(Arrays.asList(_Envelope_QNAME));
@@ -91,7 +92,7 @@ public final class SOSConstants {
         spaOps[0] = new SpatialOperatorType("BBOX", null);
         final SpatialOperatorsType spaOp = new SpatialOperatorsType(spaOps);
         final SpatialCapabilitiesType  spatial = new SpatialCapabilitiesType(geom, spaOp);
-        SOS_FILTER_CAPABILITIES.setSpatialCapabilities(spatial);
+        SOS_FILTER_CAPABILITIES_V100.setSpatialCapabilities(spatial);
         
         final TemporalCapabilitiesType temporal = new TemporalCapabilitiesType();
         final TemporalOperandsType temp = new TemporalOperandsType();
@@ -115,7 +116,7 @@ public final class SOSConstants {
         
         temporal.setTemporalOperators(tempOp);
         
-        SOS_FILTER_CAPABILITIES.setTemporalCapabilities(temporal);
+        SOS_FILTER_CAPABILITIES_V100.setTemporalCapabilities(temporal);
         
         final Operator[] compOps = new Operator[8];
         compOps[0] = ComparisonOperatorType.BETWEEN;
@@ -128,10 +129,61 @@ public final class SOSConstants {
         compOps[7] = ComparisonOperatorType.LIKE;
         final ComparisonOperatorsType compOp = new ComparisonOperatorsType(compOps);
         final ScalarCapabilitiesType scalar = new ScalarCapabilitiesType(compOp, null, false);
-        SOS_FILTER_CAPABILITIES.setScalarCapabilities(scalar);
+        SOS_FILTER_CAPABILITIES_V100.setScalarCapabilities(scalar);
         
         final IdCapabilitiesType id = new IdCapabilitiesType(true, true);
-        SOS_FILTER_CAPABILITIES.setIdCapabilities(id);
+        SOS_FILTER_CAPABILITIES_V100.setIdCapabilities(id);
+    }
+    
+    public static final org.geotoolkit.sos.xml.v200.FilterCapabilities SOS_FILTER_CAPABILITIES_V200 = new org.geotoolkit.sos.xml.v200.FilterCapabilities();
+    
+    static {
+                
+        final org.geotoolkit.ogc.xml.v200.GeometryOperandsType geom = new org.geotoolkit.ogc.xml.v200.GeometryOperandsType(Arrays.asList(_Envelope_QNAME));
+        final SpatialOperator[] spaOps = new SpatialOperator[1];
+        spaOps[0] = new SpatialOperatorType("BBOX", null);
+        final org.geotoolkit.ogc.xml.v200.SpatialOperatorsType spaOp = new org.geotoolkit.ogc.xml.v200.SpatialOperatorsType(spaOps);
+        final org.geotoolkit.ogc.xml.v200.SpatialCapabilitiesType  spatial = new org.geotoolkit.ogc.xml.v200.SpatialCapabilitiesType(geom, spaOp);
+        
+        final org.geotoolkit.ogc.xml.v200.TemporalCapabilitiesType temporal = new org.geotoolkit.ogc.xml.v200.TemporalCapabilitiesType();
+        final org.geotoolkit.ogc.xml.v200.TemporalOperandsType temp = new org.geotoolkit.ogc.xml.v200.TemporalOperandsType(Arrays.asList(_TimeInstant_QNAME, _TimePeriod_QNAME));
+        temporal.setTemporalOperands(temp);
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorsType tempOp = new org.geotoolkit.ogc.xml.v200.TemporalOperatorsType();
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType td = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType();
+        td.setName("TM_DURING");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType te = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType();
+        te.setName("TM_EQUALS");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType ta = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType();
+        ta.setName("TM_AFTER");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType tb = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType();
+        tb.setName("TM_BEFORE");
+        
+        tempOp.getTemporalOperator().add(td);
+        tempOp.getTemporalOperator().add(te);
+        tempOp.getTemporalOperator().add(ta);
+        tempOp.getTemporalOperator().add(tb);
+        
+        temporal.setTemporalOperators(tempOp);
+        
+        
+        
+        final Operator[] compaOperatorList = new Operator[9];
+        compaOperatorList[0] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsBetween");
+        compaOperatorList[1] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsEqualTo");
+        compaOperatorList[2] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsGreaterThan");
+        compaOperatorList[3] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsGreaterThanOrEqualTo");
+        compaOperatorList[4] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsLessThan");
+        compaOperatorList[5] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsLessThanOrEqualTo");
+        compaOperatorList[6] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsLike");
+        compaOperatorList[7] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsNotEqualTo");
+        compaOperatorList[8] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsNull");
+
+        final org.geotoolkit.ogc.xml.v200.ComparisonOperatorsType comparisons = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorsType(compaOperatorList);
+        final org.geotoolkit.ogc.xml.v200.ScalarCapabilitiesType scalarCapabilities = new org.geotoolkit.ogc.xml.v200.ScalarCapabilitiesType(comparisons, true);
+        
+        
+        final org.geotoolkit.ogc.xml.v200.FilterCapabilities capa = new org.geotoolkit.ogc.xml.v200.FilterCapabilities(scalarCapabilities, spatial, temporal, null);
+        SOS_FILTER_CAPABILITIES_V200.setFilterCapabilities(capa);
     }
     
     public static final OperationsMetadata OPERATIONS_METADATA;

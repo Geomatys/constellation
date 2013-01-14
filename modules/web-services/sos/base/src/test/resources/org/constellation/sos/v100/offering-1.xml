@@ -22,7 +22,6 @@
     <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:8"/>
     <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:9"/>
     <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:10"/>
-
     <sos:observedProperty>
         <swe:CompositePhenomenon dimension="2" gml:id="depth-temperature">
             <gml:name>urn:ogc:def:phenomenon:GEOM:resultComponents</gml:name>
@@ -39,7 +38,6 @@
                     <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
                 </swe:Phenomenon>
             </swe:component>
-
         </swe:CompositePhenomenon>
     </sos:observedProperty>
     <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:depth"/>

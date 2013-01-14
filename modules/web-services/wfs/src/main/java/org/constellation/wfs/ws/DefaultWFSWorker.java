@@ -315,7 +315,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         }
         
         // we verify the base attribute
-        isWorking();
         verifyBaseRequest(request, false, true);
         final String currentVersion = request.getVersion().toString();
 
@@ -459,7 +458,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final long start = System.currentTimeMillis();
 
         // we verify the base attribute
-        isWorking();
         verifyBaseRequest(request, false, false);
         final String currentVersion = request.getVersion().toString();
 
@@ -650,7 +648,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final long start = System.currentTimeMillis();
 
         // we verify the base attribute
-        isWorking();
         verifyBaseRequest(request, false, false);
 
         long nbMatched                             = 0;
@@ -809,7 +806,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public Object getPropertyValue(final GetPropertyValue request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetPropertyValue request processing\n");
         final long startTime = System.currentTimeMillis();
-        isWorking();
         verifyBaseRequest(request, true, false);
 
         final String valueReference                = request.getValueReference();
@@ -961,7 +957,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public TransactionResponse transaction(final Transaction request) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
         final long startTime = System.currentTimeMillis();
-        isWorking();
         if (transactionSecurized && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform an registerSensor request.");
         }
@@ -1640,6 +1635,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * @param request an object request with the base attribute (all except GetCapabilities request);
      */
     private void verifyBaseRequest(final RequestBase request, final boolean versionMandatory, final boolean getCapabilities) throws CstlServiceException {
+        isWorking();
         if (request != null) {
             if (request.getService() != null) {
                 if (request.getService().isEmpty()) {
@@ -1660,13 +1656,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     request.setVersion(ServiceDef.WFS_2_0_0.version.toString());
 
                 } else {
-                    CodeList code;
+                    final CodeList code;
                     if (getCapabilities) {
                         code = VERSION_NEGOTIATION_FAILED;
                     } else {
                         code = INVALID_PARAMETER_VALUE;
                     }
-                    throw new CstlServiceException("version must be \"1.1.0\"!", code, "version");
+                    throw new CstlServiceException("version must be \"1.1.0\" or \"2.0.0\"!", code, "version");
                 }
             } else {
                 if (versionMandatory) {
@@ -1706,7 +1702,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public ListStoredQueriesResponse listStoredQueries(final ListStoredQueries request) throws CstlServiceException {
         LOGGER.log(logLevel, "ListStoredQueries request processing\n");
         final long startTime = System.currentTimeMillis();
-        isWorking();
         verifyBaseRequest(request, true, false);
 
         final String currentVersion = request.getVersion().toString();
@@ -1721,7 +1716,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public DescribeStoredQueriesResponse describeStoredQueries(final DescribeStoredQueries request) throws CstlServiceException {
         LOGGER.log(logLevel, "DescribeStoredQueries request processing\n");
         final long startTime = System.currentTimeMillis();
-        isWorking();
         verifyBaseRequest(request, true, false);
         final String currentVersion = request.getVersion().toString();
         
@@ -1747,7 +1741,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public CreateStoredQueryResponse createStoredQuery(final CreateStoredQuery request) throws CstlServiceException {
         LOGGER.log(logLevel, "CreateStoredQuery request processing\n");
         final long startTime = System.currentTimeMillis();
-        isWorking();
         verifyBaseRequest(request, true, false);
         final String currentVersion  = request.getVersion().toString();
 
@@ -1763,7 +1756,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public DropStoredQueryResponse dropStoredQuery(final DropStoredQuery request) throws CstlServiceException {
         LOGGER.log(logLevel, "dropStoredQuery request processing\n");
         final long startTime = System.currentTimeMillis();
-        isWorking();
         verifyBaseRequest(request, true, false);
         final String currentVersion  = request.getVersion().toString();
 

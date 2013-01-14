@@ -45,7 +45,7 @@ public interface ObservationReader {
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    Collection<String> getOfferingNames() throws CstlServiceException;
+    Collection<String> getOfferingNames(final String version) throws CstlServiceException;
 
     /**
      * Return The offering with the specified name.
@@ -54,7 +54,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    ObservationOffering getObservationOffering(final String offeringName) throws CstlServiceException;
+    ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException;
     
     /**
      * Return The offerings for the specified names.
@@ -63,14 +63,14 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    List<ObservationOffering> getObservationOfferings(final List<String> offeringNames) throws CstlServiceException;
+    List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException;
 
     /**
      * Return a list of all the offerings.
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    List<ObservationOffering> getObservationOfferings() throws CstlServiceException;
+    List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException;
 
     /**
      * Return a list of the sensor identifiers.
