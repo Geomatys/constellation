@@ -61,6 +61,7 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.gml.xml.v321.EnvelopeType;
 import org.geotoolkit.observation.xml.v100.MeasurementType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
@@ -192,7 +193,12 @@ public class DefaultObservationReader implements ObservationReader {
     @Override
     public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
         try {
-            return offTable.getEntry(offeringName);
+            final ObservationOfferingType off =  offTable.getEntry(offeringName);
+            if (version.equals("2.0.0")) {
+                return offeringToV200(version, off);
+            } else {
+                return off;
+            }
         } catch (NoSuchRecordException ex) {
             return null;
         } catch (CatalogException ex) {
@@ -204,6 +210,42 @@ public class DefaultObservationReader implements ObservationReader {
                                              NO_APPLICABLE_CODE);
         }
     }
+    
+    private ObservationOffering offeringToV200(final String version, final ObservationOfferingType off) {
+        final EnvelopeType env;
+                if (off.getBoundedBy() != null && off.getBoundedBy().getEnvelope() != null) {
+                    env = new EnvelopeType(off.getBoundedBy().getEnvelope());
+                } else {
+                    env = null;
+                }
+                final org.geotoolkit.gml.xml.v321.TimePeriodType period;
+                if (off.getTime() != null) {
+                    final TimePeriodType pv100 = (TimePeriodType) off.getTime();
+                    period = new org.geotoolkit.gml.xml.v321.TimePeriodType(pv100.getBeginPosition().getValue(), pv100.getEndPosition().getValue());
+                } else {
+                    period = null;
+                }
+                final String singleProcedure;
+                if (version.equals("2.0.0") && off.getProcedures().size() > 1) {
+                    LOGGER.warning("multiple procedure unsuported in V2.0.0");
+                    singleProcedure = off.getProcedures().get(0);
+                } else if (version.equals("2.0.0") && off.getProcedures().size() == 1) {
+                    singleProcedure = off.getProcedures().get(0);
+                } else {
+                    singleProcedure = null;
+                }
+                return new org.geotoolkit.sos.xml.v200.ObservationOfferingType(
+                                                   off.getId(),
+                                                   off.getName(),
+                                                   off.getDescription(),
+                                                   env,
+                                                   period,
+                                                   singleProcedure,
+                                                   off.getObservedProperties(),
+                                                   off.getFeatureOfInterestIds(),
+                                                   off.getResponseFormat(),
+                                                   Arrays.asList("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation"));
+    }
 
     /**
      * {@inheritDoc}
@@ -213,7 +255,14 @@ public class DefaultObservationReader implements ObservationReader {
         try {
             final List<ObservationOffering> loo = new ArrayList<ObservationOffering>();
             final Set<ObservationOfferingType> set  = offTable.getEntries();
-            loo.addAll(set);
+            if (version.equals("2.0.0")) {
+                for (ObservationOfferingType off : set) {
+                    loo.add(offeringToV200(version, off));
+                }
+            } else {
+                
+                loo.addAll(set);
+            }
             return loo;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);

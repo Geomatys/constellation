@@ -204,7 +204,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             sampling.add(c.getComponent());
          }
          TimePositionType beginPosition = null;
-         TimePositionType endPosition   = null;
+         final TimePositionType endPosition;
 
          if (results.getTimestamp(indexOf(query.eventTimeBegin)) != null) {
             final Timestamp begin =  results.getTimestamp(indexOf(query.eventTimeBegin));
@@ -368,20 +368,20 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
                 release(lc, statement);
 
                 // we insert the response mode
-                if (off.getResponseMode() != null && off.getResponseMode().size() != 0){
+                if (off.getResponseMode() != null && !off.getResponseMode().isEmpty()){
                     for (ResponseModeType mode:off.getResponseMode()) {
                         getResponseModes().getIdentifier(new OfferingResponseModeType(off.getId(), mode));
                     }
                 }
                 // on insere la liste de station qui a effectué cette observation
-                if (off.getFeatureOfInterest() != null && off.getFeatureOfInterest().size() != 0) {
+                if (off.getFeatureOfInterest() != null && !off.getFeatureOfInterest().isEmpty()) {
                     for (ReferenceType station:off.getFeatureOfInterest()) {
                         getStations().getIdentifier(new OfferingSamplingFeatureType(off.getId(), station));
                     }
                 }
 
                 // on insere les phenomene observé
-                if(off.getObservedProperty() != null && off.getObservedProperty().size() != 0){
+                if(off.getObservedProperty() != null && !off.getObservedProperty().isEmpty()){
                     for (PhenomenonType pheno: off.getObservedProperty()){
                         getPhenomenons().getIdentifier(new OfferingPhenomenonType(off.getId(), pheno));
                     }

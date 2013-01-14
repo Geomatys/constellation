@@ -31,7 +31,14 @@ import org.geotoolkit.sos.xml.Capabilities;
 import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.swes.xml.v200.DescribeSensorType;
+
+import static org.constellation.sos.ws.SOSConstants.*;
+import org.constellation.test.utils.MetadataUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+import org.geotoolkit.sml.xml.v100.SensorML;
 
 
 // JUnit dependencies
@@ -223,7 +230,99 @@ public class SOS2WorkerTest {
     }
 
 
+    /**
+     * Tests the DescribeSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void DescribeSensorErrorTest() throws Exception {
+
+         /**
+         * Test 1 bad outputFormat
+         */
+        boolean exLaunched = false;
+        DescribeSensorType request  = new DescribeSensorType("2.0.0", "SOS", "urn:ogc:object:sensor:GEOM:1", "http://www.flipouse.net/sensorml/1.0.1");
+        try {
+            worker.describeSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "outputFormat");
+        }
+        assertTrue(exLaunched);
+
+        /**
+         * Test 2 missing outputFormat
+         */
+        exLaunched = false;
+        request  = new DescribeSensorType("2.0.0", "SOS", "urn:ogc:object:sensor:GEOM:1", null);
+        try {
+            worker.describeSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "outputFormat");
+        }
+        assertTrue(exLaunched);
+
+        /**
+         * Test 3 missing sensorID
+         */
+        exLaunched = false;
+        request  = new DescribeSensorType("2.0.0", "SOS", null, "http://www.opengis.net/sensorml/1.0.1");
+        try {
+            worker.describeSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), PROCEDURE);
+        }
+        assertTrue(exLaunched);
+
+    }
     
+    /**
+     * Tests the DescribeSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void DescribeSensorTest() throws Exception {
+        Unmarshaller unmarshaller = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
+
+
+        /**
+         * Test 1 system sensor
+         */
+        DescribeSensorType request  = new DescribeSensorType("2.0.0", "SOS", "urn:ogc:object:sensor:GEOM:1", "http://www.opengis.net/sensorml/1.0.0");
+        AbstractSensorML absResult = (AbstractSensorML) worker.describeSensor(request);
+
+        AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
+
+        assertTrue(absResult instanceof SensorML);
+        assertTrue(absExpResult instanceof SensorML);
+        SensorML result = (SensorML) absResult;
+        SensorML expResult = (SensorML) absExpResult;
+
+        MetadataUtilities.systemSMLEquals(expResult, result);
+
+        /**
+         * Test 2 component sensor
+         */
+        request  = new DescribeSensorType("2.0.0", "SOS", "urn:ogc:object:sensor:GEOM:2", "http://www.opengis.net/sensorml/1.0.0");
+        absResult = (AbstractSensorML) worker.describeSensor(request);
+
+        absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
+
+        assertTrue(absResult instanceof SensorML);
+        assertTrue(absExpResult instanceof SensorML);
+        result = (SensorML) absResult;
+        expResult = (SensorML) absExpResult;
+
+        MetadataUtilities.componentEquals(expResult, result);
+
+        SensorMLMarshallerPool.getInstance().release(unmarshaller);
+    }
+
     /**
      * Tests the destroy method
      *

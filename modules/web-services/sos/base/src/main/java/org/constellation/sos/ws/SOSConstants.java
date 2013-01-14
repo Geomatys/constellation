@@ -69,8 +69,10 @@ public final class SOSConstants {
     public static final String RESPONSE_MODE = "responseMode";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String NOT_SUPPORTED = "This operation is not take in charge by the Web Service";
-    public static final String SENSORML_100_FORMAT = "text/xml;subtype=\"sensorML/1.0.0\"";
-    public static final String SENSORML_101_FORMAT = "text/xml;subtype=\"sensorML/1.0.1\"";
+    public static final String SENSORML_100_FORMAT_V100 = "text/xml;subtype=\"sensorML/1.0.0\"";
+    public static final String SENSORML_101_FORMAT_V100 = "text/xml;subtype=\"sensorML/1.0.1\"";
+    public static final String SENSORML_100_FORMAT_V200 = "http://www.opengis.net/sensorml/1.0.0";
+    public static final String SENSORML_101_FORMAT_V200 = "http://www.opengis.net/sensorml/1.0.1";
 
     /**
      * The base Qname for complex observation.

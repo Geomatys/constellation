@@ -240,10 +240,12 @@ public class SOSworker extends AbstractWorker {
     /**
      * A list of supported SensorML version
      */
-    private static final List<String> ACCEPTED_SENSORML_FORMATS;
+    private static final Map<String, List<String>> ACCEPTED_SENSORML_FORMATS = new HashMap<String, List<String>>();
     static {
-        ACCEPTED_SENSORML_FORMATS = Arrays.asList(SENSORML_100_FORMAT,
-                                                  SENSORML_101_FORMAT);
+        ACCEPTED_SENSORML_FORMATS.put("1.0.0", Arrays.asList(SENSORML_100_FORMAT_V100,
+                                                             SENSORML_101_FORMAT_V100));
+        ACCEPTED_SENSORML_FORMATS.put("2.0.0", Arrays.asList(SENSORML_100_FORMAT_V200,
+                                                             SENSORML_101_FORMAT_V200));
     }
 
     /**
@@ -772,7 +774,7 @@ public class SOSworker extends AbstractWorker {
             // the result filtrable part
             final List<String> queryableResultProperties = omFilter.supportedQueryableResultProperties();
             if (queryableResultProperties != null && !queryableResultProperties.isEmpty()) {
-             go.updateParameter("result", queryableResultProperties);
+                go.updateParameter("result", queryableResultProperties);
             }
 
             /**
@@ -787,7 +789,7 @@ public class SOSworker extends AbstractWorker {
                 ds.updateParameter(PROCEDURE, procNames);
             }
 
-            ds.updateParameter("outputFormat", ACCEPTED_SENSORML_FORMATS);
+            ds.updateParameter("outputFormat", ACCEPTED_SENSORML_FORMATS.get(currentVersion));
 
             final AbstractOperation gfoi = om.getOperation("GetFeatureOfInterest");
             if (gfoi != null) {
@@ -823,33 +825,34 @@ public class SOSworker extends AbstractWorker {
      *
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
-    public AbstractSensorML describeSensor(final DescribeSensor requestDescSensor) throws CstlServiceException  {
+    public AbstractSensorML describeSensor(final DescribeSensor request) throws CstlServiceException  {
         LOGGER.log(logLevel, "DescribeSensor request processing\n");
         final long start = System.currentTimeMillis();
 
         // we get the form
-        verifyBaseRequest(requestDescSensor, true, false);
+        verifyBaseRequest(request, true, false);
+        final String currentVersion = request.getVersion().toString();
 
         //we verify that the output format is good.
-        final String out = requestDescSensor.getOutputFormat();
+        final String out = request.getOutputFormat();
         if (out != null) {
-            if (!StringUtilities.containsIgnoreCase(ACCEPTED_SENSORML_FORMATS, requestDescSensor.getOutputFormat())) {
+            if (!StringUtilities.containsIgnoreCase(ACCEPTED_SENSORML_FORMATS.get(currentVersion), request.getOutputFormat())) {
                 final StringBuilder msg = new StringBuilder("Accepted values for outputFormat:");
-                for (String s : ACCEPTED_SENSORML_FORMATS) {
+                for (String s : ACCEPTED_SENSORML_FORMATS.get(currentVersion)) {
                     msg.append('\n').append(s);
                 }
                 throw new CstlServiceException(msg.toString(), INVALID_PARAMETER_VALUE, "outputFormat");
             }
         } else {
             final StringBuilder msg = new StringBuilder("output format must be specify, accepted value are:");
-            for (String s : ACCEPTED_SENSORML_FORMATS) {
+            for (String s : ACCEPTED_SENSORML_FORMATS.get(currentVersion)) {
                 msg.append('\n').append(s);
             }
             throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, "outputFormat");
         }
 
         // we verify that we have a sensor ID.
-        final String sensorId = requestDescSensor.getProcedure();
+        final String sensorId = request.getProcedure();
         if (sensorId == null) {
             throw new CstlServiceException("You must specify the sensor ID!",
                                          MISSING_PARAMETER_VALUE, PROCEDURE);
@@ -857,7 +860,8 @@ public class SOSworker extends AbstractWorker {
 
 
         AbstractSensorML result = smlReader.getSensor(sensorId);
-        if (result instanceof SensorML && out.equalsIgnoreCase(SENSORML_101_FORMAT)) {
+        if (result instanceof SensorML && 
+            out.equalsIgnoreCase(SENSORML_101_FORMAT_V100) || out.equalsIgnoreCase(SENSORML_101_FORMAT_V200)) {
             result = SmlFactory.convertTo101((SensorML)result);
         }
 
