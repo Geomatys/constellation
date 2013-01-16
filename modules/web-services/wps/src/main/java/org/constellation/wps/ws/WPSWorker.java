@@ -1057,10 +1057,8 @@ public class WPSWorker extends AbstractWorker {
                     status.setProcessSucceeded("Process completed.");
                 }
 
-                // add status if requested
-                if (useStatus) {
-                    response.setStatus(status);
-                }
+                // add status
+                response.setStatus(status);
             }
 
             //Delete input temporary files
