@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 import org.geotoolkit.gml.xml.v311.BoundingShapeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
@@ -115,13 +116,14 @@ public final class Utils {
      * @param sensor
      * @return
      */
-    public static DirectPositionType getSensorPosition(final AbstractSensorML sensor) {
+    public static DirectPosition getSensorPosition(final AbstractSensorML sensor) {
         if (sensor.getMember().size() == 1) {
             if (sensor.getMember().get(0).getRealProcess() instanceof AbstractDerivableComponent) {
                 final AbstractDerivableComponent component = (AbstractDerivableComponent) sensor.getMember().get(0).getRealProcess();
                 if (component.getSMLLocation() != null && component.getSMLLocation().getPoint() != null &&
-                    component.getSMLLocation().getPoint() != null && component.getSMLLocation().getPoint().getPos() != null)
+                    component.getSMLLocation().getPoint() != null && component.getSMLLocation().getPoint().getPos() != null) {
                 return component.getSMLLocation().getPoint().getPos();
+                }
             }
         }
         LOGGER.severe("there is no piezo location");
@@ -155,10 +157,11 @@ public final class Utils {
              } 
           } else {
             String locator;
-            if (time == null)
+            if (time == null) {
                 locator = "Timeposition";
-            else
+            } else {
                 locator = "TimePosition value";
+            }
             throw new  CstlServiceException("bad format of time, " + locator + " mustn't be null",
                                               MISSING_PARAMETER_VALUE, "eventTime");
           }
@@ -195,10 +198,11 @@ public final class Utils {
             return value;
           } else {
             String locator;
-            if (time == null)
+            if (time == null) {
                 locator = "Timeposition";
-            else
+            } else {
                 locator = "TimePosition value";
+            }
             throw new  CstlServiceException("bad format of time, " + locator + " mustn't be null",
                                               MISSING_PARAMETER_VALUE, "eventTime");
           }

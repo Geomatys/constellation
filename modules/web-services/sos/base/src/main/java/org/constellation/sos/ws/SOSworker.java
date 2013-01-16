@@ -73,7 +73,7 @@ import org.opengis.observation.sampling.SamplingFeature;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
+import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
@@ -109,6 +109,7 @@ import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
@@ -1862,7 +1863,7 @@ public class SOSworker extends AbstractWorker {
             recordMapping(id, phyId);
 
             // and we record the position of the piezometer
-            final DirectPositionType position = getSensorPosition(process);
+            final DirectPosition position = getSensorPosition(process);
             if (omWriter != null) {
                 omWriter.recordProcedureLocation(phyId, position);
 
@@ -2032,7 +2033,7 @@ public class SOSworker extends AbstractWorker {
                     if (!template) {
                         localOmFilter.setTimeEquals(timeFilter);
 
-                    } else if (timeFilter instanceof TimePeriodType || timeFilter instanceof TimeInstantType) {
+                    } else if (timeFilter instanceof AbstractTimeGeometricPrimitiveType) {
                         templateTime = (AbstractTimeGeometricPrimitiveType) timeFilter;
 
                     } else {
@@ -2231,33 +2232,30 @@ public class SOSworker extends AbstractWorker {
     private void updateOffering(final ObservationOffering offering, final Observation template) throws CstlServiceException {
 
         //we add the new sensor to the offering
-        OfferingProcedureType offProc = null;
+        String offProc = null;
         ReferenceType ref = omReader.getReference(((ProcessType) template.getProcedure()).getHref());
         if (!offering.getProcedures().contains(ref.getHref())) {
             if (ref == null) {
                 ref = new ReferenceType(null, ((ProcessType) template.getProcedure()).getHref());
             }
-            offProc = new OfferingProcedureType(offering.getId(), ref);
+            offProc = ref.getHref();
         }
 
         //we add the phenomenon to the offering
-        OfferingPhenomenonType offPheno = null;
+        PhenomenonType offPheno = null;
         if (template.getObservedProperty() != null && !offering.getObservedProperties().contains(getPhenomenonId(template))) {
-            offPheno = new OfferingPhenomenonType(offering.getId(), (PhenomenonType) template.getObservedProperty());
+            offPheno = (PhenomenonType) template.getObservedProperty();
         }
 
         // we add the feature of interest (station) to the offering
-        OfferingSamplingFeatureType offSF = null;
+        String offSF = null;
         if (template.getFeatureOfInterest() != null) {
             ref = omReader.getReference(((SamplingFeatureType) template.getFeatureOfInterest()).getId());
             if (!offering.getFeatureOfInterestIds().contains(ref.getHref())) {
-                if (ref == null) {
-                    ref = new ReferenceType(null, ((SamplingFeatureType) template.getFeatureOfInterest()).getId());
-                }
-                offSF = new OfferingSamplingFeatureType(offering.getId(), ref);
+                offSF = ((SamplingFeatureType) template.getFeatureOfInterest()).getId();
             }
         }
-        omWriter.updateOffering(offProc, offPheno, offSF);
+        omWriter.updateOffering(offering.getId(), offProc, offPheno, offSF);
     }
 
 

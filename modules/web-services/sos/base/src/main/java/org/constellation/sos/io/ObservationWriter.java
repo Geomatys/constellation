@@ -20,12 +20,12 @@ package org.constellation.sos.io;
 // constellation dependencies
 import org.constellation.ws.CstlServiceException;
 
+// geotoolkit dependencies
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.gml.xml.DirectPosition;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
+
 // GeoAPI dependencies
-import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
-import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
-import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
-import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Observation;
 
@@ -64,7 +64,7 @@ public interface ObservationWriter {
      * @return
      * @throws CstlServiceException
      */
-    String writeOffering(final ObservationOfferingType offering) throws CstlServiceException;
+    String writeOffering(final ObservationOffering offering) throws CstlServiceException;
 
     /**
      * Update an offering after the add of a new Observation.
@@ -76,8 +76,7 @@ public interface ObservationWriter {
      *
      * @throws CstlServiceException
      */
-    void updateOffering(final OfferingProcedureType offProc, final OfferingPhenomenonType offPheno,
-            final OfferingSamplingFeatureType offSF) throws CstlServiceException;
+    void updateOffering(final String offeringID, final String offProc, final PhenomenonType offPheno, final String offSF) throws CstlServiceException;
 
     /**
      * Refresh the cached offerings.
@@ -91,7 +90,7 @@ public interface ObservationWriter {
      * @param position The GML position of the sensor.
      * @throws CstlServiceException
      */
-    void recordProcedureLocation(final String physicalID, final DirectPositionType position) throws CstlServiceException;
+    void recordProcedureLocation(final String physicalID, final DirectPosition position) throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.

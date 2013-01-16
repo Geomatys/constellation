@@ -27,6 +27,7 @@ import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
@@ -137,7 +138,7 @@ public class UtilsTest {
     public void getSensorPositionTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
-        DirectPositionType result = Utils.getSensorPosition(sensor);
+        DirectPosition result = Utils.getSensorPosition(sensor);
         DirectPositionType expResult = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, Arrays.asList(65400.0,1731368.0));
 
         assertEquals(expResult, result);

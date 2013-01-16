@@ -33,23 +33,20 @@ import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.lucene.LuceneObservationIndexer;
 import org.constellation.ws.CstlServiceException;
 
+
 // Geotoolkit dependencies
-import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
+import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
-import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
-import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
-import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
+import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.util.logging.Logging;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
-
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Observation;
 
@@ -240,20 +237,20 @@ public class FileObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeOffering(final ObservationOfferingType offering) throws CstlServiceException {
+    public String writeOffering(final ObservationOffering offering) throws CstlServiceException {
         Marshaller marshaller = null;
         try {
             marshaller = MARSHALLER_POOL.acquireMarshaller();
             if (!offeringDirectory.exists()) {
                 offeringDirectory.mkdir();
             }
-            final File offeringFile = new File(offeringDirectory, offering.getName() + FILE_EXTENSION);
+            final File offeringFile = new File(offeringDirectory, offering.getId() + FILE_EXTENSION);
             final boolean created = offeringFile.createNewFile();
             if (!created) {
                 throw new CstlServiceException("unable to create an offering file.", NO_APPLICABLE_CODE);
             }
             marshaller.marshal(offering, offeringFile);
-            return offering.getName();
+            return offering.getId();
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB exception while marshalling the offering file.", ex, NO_APPLICABLE_CODE);
         } catch (IOException ex) {
@@ -269,7 +266,7 @@ public class FileObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(final OfferingProcedureType offProc, final OfferingPhenomenonType offPheno, final OfferingSamplingFeatureType offSF) throws CstlServiceException {
+    public void updateOffering(final String offId, final String offProc, final PhenomenonType offPheno, final String offSF) throws CstlServiceException {
         // TODO
     }
 
@@ -285,7 +282,7 @@ public class FileObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void recordProcedureLocation(final String physicalID, final DirectPositionType position) throws CstlServiceException {
+    public void recordProcedureLocation(final String physicalID, final DirectPosition position) throws CstlServiceException {
         // do nothing
     }
 

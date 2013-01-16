@@ -255,7 +255,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                                  "org.geotoolkit.metadata.fra", "org.geotoolkit.util", "org.geotoolkit.xml");
         this.sensorMLPackage    = FileUtilities.searchSubPackage("org.geotoolkit.sml.xml.v100");
         this.swePackage         = FileUtilities.searchSubPackage("org.geotoolkit.swe.xml.v100");
-        this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311");
+        this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311","org.geotoolkit.gml.xml");
 
         this.opengisPackage     = FileUtilities.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                                "org.opengis.service", "org.opengis.feature.catalog");
