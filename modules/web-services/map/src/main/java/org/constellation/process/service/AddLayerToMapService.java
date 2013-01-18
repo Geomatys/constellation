@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2012, Geomatys
+ *    (C) 2012 - 2013, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,10 +24,12 @@ import static org.constellation.process.service.AddLayerToMapServiceDescriptor.*
 import static org.constellation.process.service.MapProcessUtils.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.xml.namespace.QName;
+import org.constellation.configuration.DimensionDefinition;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
@@ -48,6 +50,7 @@ import org.opengis.util.NoSuchIdentifierException;
  * Process that add a new layer layerContext from a webMapService configuration.
  *
  * @author Quentin Boileau (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
 public class AddLayerToMapService extends AbstractProcess {
 
@@ -57,7 +60,7 @@ public class AddLayerToMapService extends AbstractProcess {
 
     @Override
     protected void execute() throws ProcessException {
-        
+
         final ProcessDescriptor getServiceConfProcess;
         final ProcessDescriptor setServiceConfProcess;
         final ProcessDescriptor restartServiceProcess;
@@ -68,11 +71,12 @@ public class AddLayerToMapService extends AbstractProcess {
         } catch (NoSuchIdentifierException ex) {
             throw new ProcessException("Can't find GetConfig or SetConfig process.", this, ex);
         }
-        
+
         final DataReference layerRef        = value(LAYER_REF, inputParameters);
         final String layerAlias             = value(LAYER_ALIAS, inputParameters);
         final DataReference layerStyleRef   = value(LAYER_STYLE, inputParameters);
         final Filter layerFilter            = value(LAYER_FILTER, inputParameters);
+        final String layerDimension         = value(LAYER_DIMENSION, inputParameters);
         final String serviceType            = value(SERVICE_TYPE, inputParameters);
         final String serviceInstance        = value(SERVICE_INSTANCE, inputParameters);
 
@@ -91,7 +95,7 @@ public class AddLayerToMapService extends AbstractProcess {
         if (layerAlias != null && layerAlias.isEmpty()) {
             throw new ProcessException("Layer alias can't be empty string.", this, null);
         }
-        
+
         final LayerContext layerContext = getServiceConfig(serviceType, serviceInstance, getServiceConfProcess);
 
         //extract provider identifier and layer name
@@ -108,6 +112,15 @@ public class AddLayerToMapService extends AbstractProcess {
             final StyleXmlIO xmlUtilities = new StyleXmlIO();
             final FilterType filterType = xmlUtilities.getTransformerXMLv110().visit(layerFilter);
             newLayer.setFilter(filterType);
+        }
+
+        //add extra dimension
+        if (layerDimension != null && !layerDimension.isEmpty()) {
+            final DimensionDefinition dimensionDef = new DimensionDefinition();
+            dimensionDef.setCrs(layerDimension);
+            dimensionDef.setLower(layerDimension);
+            dimensionDef.setUpper(layerDimension);
+            newLayer.setDimensions(Collections.singletonList(dimensionDef));
         }
 
         //add style if exist
@@ -204,13 +217,13 @@ public class AddLayerToMapService extends AbstractProcess {
             layerContext.getLayers().add(newSource);
 
         }
-        
+
         //Save configuration
         setServiceConfig(serviceType, serviceInstance, setServiceConfProcess, layerContext);
-        
+
         //Restart service
         restartService(serviceType, serviceInstance, restartServiceProcess);
-        
+
         //output
         getOrCreate(OUT_LAYER_CTX, outputParameters).setValue(layerContext);
 
@@ -238,7 +251,7 @@ public class AddLayerToMapService extends AbstractProcess {
 
     /**
      * Call GetConfigMapService process to get the service LayerContext.
-     * 
+     *
      * @param serviceType
      * @param serviceInstance
      * @param processDesc
@@ -256,7 +269,7 @@ public class AddLayerToMapService extends AbstractProcess {
             throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\").", this, null);
         }
     }
-    
+
     /**
      * Update service configuration.
      * @param serviceType
@@ -266,7 +279,7 @@ public class AddLayerToMapService extends AbstractProcess {
      * @throws ProcessException if serviceType is not handled or if instance is not found.
      */
     private void setServiceConfig(final String serviceType, final String serviceInstance, final ProcessDescriptor processDesc, final LayerContext context) throws ProcessException {
-        
+
         if (SUPPORTED_SERVICE_TYPE.contains(serviceType)) {
             final ParameterValueGroup in = processDesc.getInputDescriptor().createValue();
             in.parameter(SetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
@@ -277,7 +290,7 @@ public class AddLayerToMapService extends AbstractProcess {
             throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\").", this, null);
         }
     }
-    
+
     /**
      * Restart service.
      * @param serviceType
@@ -286,7 +299,7 @@ public class AddLayerToMapService extends AbstractProcess {
      * @throws ProcessException if serviceType is not handled or if instance is not found.
      */
     private void restartService(final String serviceType, final String serviceInstance, final ProcessDescriptor processDesc) throws ProcessException {
-        
+
         if (SUPPORTED_SERVICE_TYPE.contains(serviceType)) {
             final ParameterValueGroup in = processDesc.getInputDescriptor().createValue();
             in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);

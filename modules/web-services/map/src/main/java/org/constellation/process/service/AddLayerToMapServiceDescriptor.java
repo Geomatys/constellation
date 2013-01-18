@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2012, Geomatys
+ *    (C) 2012 - 2013, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -42,11 +42,12 @@ import org.opengis.util.InternationalString;
  * - layer_filter : CQL filter for the layer
  * - service_type : service type where layer will be published like (WMS, WFS, WMTS, WCS)
  * - service_instance : service instance name where layer will be published.
- * 
- * Outputs : 
+ *
+ * Outputs :
  * - layer_context : result service configuration.
- * 
+ *
  * @author Quentin Boileau (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
 public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
 
@@ -59,10 +60,11 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
     private static final String LAYER_ALIAS_PARAM_REMARKS_KEY       = "service.add_layer.layerAlias";
     private static final String LAYER_STYLE_PARAM_REMARKS_KEY       = "service.add_layer.layerStyleRef";
     private static final String LAYER_FILTER_PARAM_REMARKS_KEY      = "service.add_layer.layerFilter";
+    private static final String LAYER_DIMENSION_PARAM_REMARKS_KEY   = "service.add_layer.layerDimension";
     private static final String SERVICE_TYPE_PARAM_REMARKS_KEY      = "service.add_layer.serviceType";
     private static final String SERVICE_INSTANCE_PARAM_REMARKS_KEY  = "service.add_layer.serviceInstance";
     private static final String OUT_LAYER_CTX_PARAM_REMARKS_KEY     = "service.add_layer.outLayerContext";
-    
+
     /*
      * Name and description
      */
@@ -101,6 +103,11 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<Filter> LAYER_FILTER =
             new DefaultParameterDescriptor(LAYER_FILTER_PARAM_NAME, LAYER_FILTER_PARAM_REMARKS, Filter.class, null, false);
 
+    public static final String LAYER_DIMENSION_PARAM_NAME = "layer_dimension";
+    public static final InternationalString LAYER_DIMENSION_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, LAYER_DIMENSION_PARAM_REMARKS_KEY);
+    public static final ParameterDescriptor<String> LAYER_DIMENSION =
+            new DefaultParameterDescriptor(LAYER_DIMENSION_PARAM_NAME, LAYER_DIMENSION_PARAM_REMARKS, String.class, null, false);
+
     /*
      * Service Type
      */
@@ -109,7 +116,7 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
     private static final String[] SERVICE_TYPE_VALID_VALUES = SUPPORTED_SERVICE_TYPE.toArray(new String[SUPPORTED_SERVICE_TYPE.size()]);
     public static final ParameterDescriptor<String> SERVICE_TYPE =
             new ExtendedParameterDescriptor<String>(SERVICE_TYPE_PARAM_NAME, SERVICE_TYPE_PARAM_REMARKS, String.class, SERVICE_TYPE_VALID_VALUES, "WMS", null, null, null, true, null);
-    
+
     /*
      * Service insance name
      */
@@ -121,7 +128,7 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
      /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{LAYER_REF, SERVICE_TYPE, SERVICE_INSTANCE, LAYER_ALIAS, LAYER_STYLE, LAYER_FILTER});
+            new GeneralParameterDescriptor[]{LAYER_REF, SERVICE_TYPE, SERVICE_INSTANCE, LAYER_ALIAS, LAYER_STYLE, LAYER_FILTER, LAYER_DIMENSION});
 
     /*
      * Output Layer context

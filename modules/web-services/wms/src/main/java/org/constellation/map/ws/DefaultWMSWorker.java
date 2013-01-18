@@ -30,15 +30,20 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
@@ -65,9 +70,12 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
 import static org.constellation.api.CommonConstants.*;
+import org.constellation.configuration.DimensionDefinition
 import org.constellation.configuration.WMSPortrayal;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.query.wms.WMSQuery.*;
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
 
 //Geotoolkit dependencies
 import org.geotoolkit.data.query.QueryBuilder;
@@ -120,7 +128,14 @@ import org.geotoolkit.wms.xml.DescribeLayer;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.referencing.ReferencingUtilities;
+import org.geotoolkit.referencing.crs.AbstractSingleCRS;
+import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
+import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
+import org.geotoolkit.referencing.cs.AbstractCS;
+import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
+import org.geotoolkit.referencing.datum.AbstractDatum;
+import org.geotoolkit.util.Range;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
@@ -132,6 +147,7 @@ import org.geotoolkit.wms.xml.AbstractLogoURL;
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Expression;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -191,8 +207,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     public DefaultWMSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WMS);
         setSupportedVersion(ServiceDef.WMS_1_3_0, ServiceDef.WMS_1_0_0);
+
         mapPortrayal = new WMSPortrayal();
-        
+
         final File portrayalFile = new File(configurationDirectory, "WMSPortrayal.xml");
         if (portrayalFile.exists()) {
             final MarshallerPool marshallerPool = GenericDatabaseMarshallerPool.getInstance();
@@ -208,7 +225,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             }
         }
-        
+
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMS worker {0} running", id);
         }
@@ -476,6 +493,59 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             }
 
+            // Verify extra dimensions
+            if(!configLayer.getDimensions().isEmpty()){
+                try {
+                    final MapItem mi = layer.getMapLayer(null, null);
+                    applyLayerFiltersAndDims(mi);
+
+                    if(mi instanceof FeatureMapLayer){
+                        final FeatureMapLayer fml = (FeatureMapLayer) mi;
+                        for(FeatureMapLayer.DimensionDef ddef : fml.getExtraDimensions()){
+                            final Collection<Range> collRefs = fml.getDimensionRange(ddef);
+                            // Transform it to a set in order to filter same values
+                            final Set<Range> refs = new HashSet<Range>();
+                            for (Range ref : collRefs) {
+                                refs.add(ref);
+                            }
+
+                            final StringBuilder values = new StringBuilder();
+                            int index = 0;
+                            for (final Range val : refs) {
+                                values.append(val.getMinValue());
+                                if(val.getMinValue().compareTo(val.getMaxValue()) != 0){
+                                    values.append('-');
+                                    values.append(val.getMaxValue());
+                                }
+                                if (index++ < refs.size()-1) {
+                                    values.append(",");
+                                }
+                            }
+
+                            final boolean multipleValues = (refs.size() > 1);
+                            final String unitSymbol = ddef.getCrs().getCoordinateSystem().getAxis(0).getUnit().toString();
+                            final String unit = unitSymbol;
+                            final String axisName = ddef.getCrs().getCoordinateSystem().getAxis(0).getName().getCode();
+                            final String defaut = "";
+
+                            dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+                                new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName, unit,
+                                    unitSymbol, defaut, multipleValues, null, null) :
+                                new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName, unit,
+                                    unitSymbol, defaut, multipleValues, null, null);
+
+                            dimensions.add(dim);
+                        }
+                    }
+
+                } catch (PortrayalException ex) {
+                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
+                    break;
+                } catch (DataStoreException ex) {
+                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
+                    break;
+                }
+            }
 
             /*
              * LegendUrl generation
@@ -763,7 +833,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
             sdef.setContext(context);
             //apply layercontext filters
-            applyLayerFilters(context);
+            applyLayerFiltersAndDims(context);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
@@ -1032,7 +1102,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 context.items().add(mapLayer);
             }
             //apply layercontext filters
-            applyLayerFilters(context);
+            applyLayerFiltersAndDims(context);
 
             sdef.setContext(context);
         } catch (PortrayalException ex) {
@@ -1186,24 +1256,54 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         return styles;
     }
 
-    private void applyLayerFilters(final MapContext context){
+    private void applyLayerFiltersAndDims(final MapItem item){
         final Map<Name,Layer> layersContext = getLayers();
 
-        for(MapLayer layer : context.layers()){
-            if (layer instanceof FeatureMapLayer) {
-                final FeatureMapLayer fml = (FeatureMapLayer)layer;
-                final Layer layerContext = layersContext.get(fml.getCollection().getFeatureType().getName());
-                if (layerContext.getFilter() != null) {
-                    final StyleXmlIO xmlUtil = new StyleXmlIO();
-                    Filter filterGt = Filter.INCLUDE;
-                    try {
-                        filterGt = xmlUtil.getTransformer110().visitFilter(layerContext.getFilter());
-                    } catch (FactoryException e) {
-                        LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+        if(item instanceof FeatureMapLayer){
+            final FeatureMapLayer fml = (FeatureMapLayer)item;
+            final Layer layerContext = layersContext.get(fml.getCollection().getFeatureType().getName());
+            if (layerContext.getFilter() != null) {
+                final StyleXmlIO xmlUtil = new StyleXmlIO();
+                Filter filterGt = Filter.INCLUDE;
+                try {
+                    filterGt = xmlUtil.getTransformer110().visitFilter(layerContext.getFilter());
+                } catch (FactoryException e) {
+                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                }
+                fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filterGt));
+            }
+
+            for(DimensionDefinition ddef : layerContext.getDimensions()){
+
+                try {
+                    final String crsname = ddef.getCrs();
+                    final Expression lower = CQL.parseExpression(ddef.getLower());
+                    final Expression upper = CQL.parseExpression(ddef.getUpper());
+                    final CoordinateReferenceSystem crs;
+
+                    if("elevation".equalsIgnoreCase(crsname)){
+                        crs = DefaultVerticalCRS.ELLIPSOIDAL_HEIGHT;
+                    }else if("temporal".equalsIgnoreCase(crsname)){
+                        crs = DefaultTemporalCRS.JAVA;
+                    }else{
+                        final AbstractDatum customDatum = new AbstractDatum(Collections.singletonMap("name", crsname));
+                        final CoordinateSystemAxis csAxis = new DefaultCoordinateSystemAxis(crsname, "u", AxisDirection.valueOf(crsname), Unit.ONE);
+                        final AbstractCS customCs = new AbstractCS(Collections.singletonMap("name", crsname), csAxis);
+                        crs = new AbstractSingleCRS(Collections.singletonMap("name", crsname), customDatum, customCs);
                     }
-                    fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filterGt));
+
+                    final FeatureMapLayer.DimensionDef fdef = new FeatureMapLayer.DimensionDef(crs, lower, upper);
+                    fml.getExtraDimensions().add(fdef);
+
+                } catch (CQLException ex) {
+                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+
+        }
+
+        for(MapItem layer : item.items()){
+            applyLayerFiltersAndDims(layer);
         }
 
     }
