@@ -70,7 +70,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
 import static org.constellation.api.CommonConstants.*;
-import org.constellation.configuration.DimensionDefinition
+import org.constellation.configuration.DimensionDefinition;
 import org.constellation.configuration.WMSPortrayal;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.query.wms.WMSQuery.*;
@@ -364,6 +364,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             /*
              * Dimension: the available date
              */
+            AbstractDimension dim;
             SortedSet<Date> dates;
             try {
                 dates = layer.getAvailableTimes();
@@ -376,7 +377,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 final PeriodUtilities periodFormatter = new PeriodUtilities(df);
                 final String defaut = df.format(dates.last());
-                final AbstractDimension dim = createDimension(queryVersion, "time", "ISO8601", defaut, periodFormatter.getDatesRespresentation(dates));
+                dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+                    new org.geotoolkit.wms.xml.v111.Dimension("time", "ISO8601", defaut, null) :
+                    new org.geotoolkit.wms.xml.v130.Dimension("time", "ISO8601", defaut, null);
+                dim.setValue(periodFormatter.getDatesRespresentation(dates));
                 dimensions.add(dim);
             }
 
@@ -392,6 +396,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
             if (elevations != null && !(elevations.isEmpty())) {
                 final String defaut = elevations.first().toString();
+                dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+                    new org.geotoolkit.wms.xml.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
+                    new org.geotoolkit.wms.xml.v130.Dimension("elevation", "EPSG:5030", defaut, null);
                 final StringBuilder elevs = new StringBuilder();
                 for (final Iterator<Number> it = elevations.iterator(); it.hasNext();) {
                     final Number n = it.next();
@@ -400,7 +407,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         elevs.append(',');
                     }
                 }
-                final AbstractDimension dim = createDimension(queryVersion, "elevation", "EPSG:5030", defaut, elevs.toString());
+                dim.setValue(elevs.toString());
                 dimensions.add(dim);
             }
 
@@ -426,7 +433,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     // Workaround for one more bug in javax.measure...
                     unitSymbol = unit;
                 }
-                final AbstractDimension dim = createDimension(queryVersion, minRange + "," + maxRange, "dim_range", unit,
+                dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+                    new org.geotoolkit.wms.xml.v111.Dimension(minRange + "," + maxRange, "dim_range", unit,
+                                                              unitSymbol, defaut, null, null, null) :
+                    new org.geotoolkit.wms.xml.v130.Dimension(minRange + "," + maxRange, "dim_range", unit,
                                                               unitSymbol, defaut, null, null, null);
                 dimensions.add(dim);
             }
@@ -486,8 +496,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         final String defaut = !valuesList.isEmpty() ? valuesList.getFirst() : null;
                         final boolean multipleValues = (valuesList.size() > 1);
 
-                        final AbstractDimension dim = createDimension(queryVersion, values.toString(), axisName.getCode(), unit,
+                        dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+                            new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName.getCode(), unit,
+                                unitSymbol, defaut, multipleValues, null, null) :
+                            new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName.getCode(), unit,
                                 unitSymbol, defaut, multipleValues, null, null);
+
                         dimensions.add(dim);
                     }
                 }
@@ -579,7 +593,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 _abstract = "Vector data";
                 keyword   = "Vector data";
             }
-                
+
             final AbstractBoundingBox outputBBox;
             if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
                 /*
@@ -621,7 +635,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             final AbstractGeographicBoundingBox bbox = createGeographicBoundingBox(queryVersion, inputGeoBox);
             final AbstractLayer outputLayerO = createLayer(queryVersion, layerName,_abstract,keyword, DEFAULT_CRS,
                             bbox, outputBBox, queryable, dimensions, styles);
-                
+
             final AbstractLayer outputLayer = customizeLayer(queryVersion, outputLayerO, configLayer, layer, legendUrlPng, legendUrlGif);
             outputLayers.add(outputLayer);
         }
@@ -630,7 +644,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final AbstractLayer mainLayer = customizeLayer(queryVersion, createLayer(queryVersion, "Constellation Web Map Layer",
                     "description of the service(need to be fill)", DEFAULT_CRS,
                     createGeographicBoundingBox(queryVersion, -180.0, -90.0, 180.0, 90.0), outputLayers), getMainLayer(), null, null, null);
-            
+
         inCapabilities.getCapability().setLayer(mainLayer);
 
 
