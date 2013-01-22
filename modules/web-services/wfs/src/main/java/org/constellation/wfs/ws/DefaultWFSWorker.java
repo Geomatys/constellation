@@ -1573,7 +1573,18 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (filter instanceof XMLFilter) {
             final Object filterObject = ((XMLFilter)filter).getFilterObject();
 
-            if (filterObject instanceof BinarySpatialOperator) {
+             if (filterObject instanceof BBOXType) {
+                final BBOXType bb = (BBOXType) filterObject;
+                if (bb.getAny() != null && bb.getAny() instanceof String) {
+                    String s = (String)bb.getAny();
+                    for (Parameter param : parameters) {
+                        if (s.indexOf('$' + param.getName()) != -1) {
+                            bb.setAny(param.getContent().get(0));
+                        }
+                    }
+                }
+
+            } else if (filterObject instanceof BinarySpatialOperator) {
                 final BinarySpatialOperator binary = (BinarySpatialOperator) filterObject;
                 if (binary.getExpression2() != null && binary.getExpression2() instanceof XMLLiteral) {
                     final XMLLiteral lit = (XMLLiteral) binary.getExpression2();
@@ -1586,17 +1597,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         }
                         lit.getContent().clear();
                         lit.setContent(s);
-                    }
-                }
-
-            } else if (filterObject instanceof BBOXType) {
-                final BBOXType bb = (BBOXType) filterObject;
-                if (bb.getAny() != null && bb.getAny() instanceof String) {
-                    String s = (String)bb.getAny();
-                    for (Parameter param : parameters) {
-                        if (s.indexOf('$' + param.getName()) != -1) {
-                            bb.setAny(param.getContent().get(0));
-                        }
                     }
                 }
 
