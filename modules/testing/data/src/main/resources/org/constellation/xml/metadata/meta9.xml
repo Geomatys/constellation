@@ -4,6 +4,7 @@
                  xmlns:fra="http://www.cnig.gouv.fr/2005/fra"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                 xmlns:gts="http://www.isotc211.org/2005/gts"
                  xmlns:xlink="http://www.w3.org/1999/xlink"
                  xmlns:gml="http://www.opengis.net/gml">
     <gmd:fileIdentifier>
@@ -270,6 +271,16 @@
                     </gmd:role>
                 </gmd:CI_ResponsibleParty>
             </gmd:pointOfContact>
+            <gmd:resourceMaintenance>
+                <gmd:MD_MaintenanceInformation>
+                    <gmd:maintenanceAndUpdateFrequency>
+                        <gmd:MD_MaintenanceFrequencyCode codeListValue="quarterly" codeList="MD_MaintenanceFrequencyCode">quarterly</gmd:MD_MaintenanceFrequencyCode>
+                    </gmd:maintenanceAndUpdateFrequency>
+                    <gmd:userDefinedMaintenanceFrequency>
+                        <gts:TM_PeriodDuration>P1Y2M3DT10H</gts:TM_PeriodDuration>
+                    </gmd:userDefinedMaintenanceFrequency>
+                </gmd:MD_MaintenanceInformation>
+            </gmd:resourceMaintenance>
             <gmd:descriptiveKeywords>
                 <gmd:MD_Keywords>
                     <gmd:keyword>

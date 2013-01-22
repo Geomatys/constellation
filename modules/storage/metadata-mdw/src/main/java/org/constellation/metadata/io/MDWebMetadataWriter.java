@@ -251,6 +251,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         availableStandards.add(Standard.ISO_19103);
         availableStandards.add(Standard.ISO_19119);
         availableStandards.add(Standard.ISO_19110);
+        availableStandards.add(Standard.MDWEB);
 
         standardMapping.put(Standard.ISO_19115, availableStandards);
 
@@ -908,7 +909,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             String name = className;
             int nameType = 0;
-            while (nameType < 2) {
+            while (nameType < 3) {
 
                 LOGGER.finer("searching: " + standard.getName() + ':' + name);
                 result = mdWriter.getClasse(name, standard);
@@ -925,8 +926,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         nameType = 1;
                         break;
                     }
-                    default:
+                    case 1: {
+                        name = "TM_" + className;
                         nameType = 2;
+                        break;
+                    }
+                    default:
+                        nameType = 3;
                         break;
                 }
             }

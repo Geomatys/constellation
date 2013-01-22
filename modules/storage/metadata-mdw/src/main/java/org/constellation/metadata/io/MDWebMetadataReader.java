@@ -145,6 +145,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * A list of package containing the Ebrim V2.5 implementation
      */
     private List<String> ebrimV25Package;
+    
+    /**
+     * A list of package containing various implementation
+     */
+    private List<String> otherPackage;
 
     /**
      * A List of the already see object for the current metadata read
@@ -267,6 +272,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                                       "org.geotoolkit.metadata.iso.quality", "org.geotoolkit.metadata.iso.spatial",
                                                                       "org.geotoolkit.metadata.iso.lineage", "org.geotoolkit.metadata.iso.content",
                                                                       "org.opengis.metadata.acquisition", "org.opengis.metadata.content");
+        this.otherPackage       = FileUtilities.searchSubPackage("org.geotoolkit.gts.xml");
         // we add the extra binding
         final Iterator<ExtraMappingFactory> ite = ServiceRegistry.lookupProviders(ExtraMappingFactory.class);
         while (ite.hasNext()) {
@@ -939,6 +945,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         } else if ("ISO 19115-2".equals(standardName)) {
             packagesName.addAll(geotkAcquisitionPackage);
+        
+        } else if ("MDWEB".equals(standardName)) {
+            packagesName.addAll(otherPackage);
 
         } else if (extraPackage.containsKey(standardName)) {
             packagesName.addAll(extraPackage.get(standardName));
