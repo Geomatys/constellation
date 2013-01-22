@@ -18,12 +18,13 @@
 package org.constellation.sos.io;
 
 // constellation dependencies
+import java.util.List;
 import org.constellation.ws.CstlServiceException;
 
 // geotoolkit dependencies
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.gml.xml.DirectPosition;
-import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.swes.xml.ObservationTemplate;
 
 // GeoAPI dependencies
 import org.opengis.observation.Measurement;
@@ -35,6 +36,17 @@ import org.opengis.observation.Observation;
  */
 public interface ObservationWriter {
 
+    /**
+     * Write a new Observation template into the database
+     *
+     * @param template An O&M observation
+     *
+     * @return The new identifiers of the observation
+     *
+     * @throws CstlServiceException
+     */
+    String writeObservationTemplate(final ObservationTemplate template) throws CstlServiceException;
+    
     /**
      * Write a new Observation into the database
      *
@@ -76,7 +88,7 @@ public interface ObservationWriter {
      *
      * @throws CstlServiceException
      */
-    void updateOffering(final String offeringID, final String offProc, final PhenomenonType offPheno, final String offSF) throws CstlServiceException;
+    void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException;
 
     /**
      * Refresh the cached offerings.

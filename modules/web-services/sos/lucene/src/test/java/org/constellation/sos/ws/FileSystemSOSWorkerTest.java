@@ -95,6 +95,29 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             writeDataFile(observationTemplatesDirectory, "observationTemplate-7.xml", "urn:ogc:object:observation:template:GEOM:7");
             writeDataFile(observationTemplatesDirectory, "observationTemplate-8.xml", "urn:ogc:object:observation:template:GEOM:8");
 
+            File sensorDirectory = new File(configDir, "sensors");
+            sensorDirectory.mkdir();
+            File sensor1         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:1.xml");
+            sensor1.createNewFile();
+            File sensor2         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:2.xml");
+            sensor2.createNewFile();
+            File sensor3         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:3.xml");
+            sensor3.createNewFile();
+            File sensor4         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:4.xml");
+            sensor4.createNewFile();
+            File sensor5         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:5.xml");
+            sensor5.createNewFile();
+            File sensor6         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:6.xml");
+            sensor6.createNewFile();
+            File sensor7         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:7.xml");
+            sensor7.createNewFile();
+            File sensor8         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:8.xml");
+            sensor8.createNewFile();
+            File sensor9         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:9.xml");
+            sensor9.createNewFile();
+            File sensor10        = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:10.xml");
+            sensor10.createNewFile();
+            
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic SMLConfiguration = new Automatic();

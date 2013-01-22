@@ -38,7 +38,6 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
@@ -380,8 +379,17 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ReferenceType getReference(final String href) throws CstlServiceException {
-        return new ReferenceType(null, href);
+    public boolean existProcedure(final String href) throws CstlServiceException {
+        if (sensorDirectory.exists()) {
+            for (File sensorFile: sensorDirectory.listFiles()) {
+                String sensorName = sensorFile.getName();
+                sensorName = sensorName.substring(0, sensorName.indexOf(FILE_EXTENSION));
+                if (sensorName.equals(href)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

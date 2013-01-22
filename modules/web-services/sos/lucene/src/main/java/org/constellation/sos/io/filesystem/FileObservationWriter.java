@@ -20,6 +20,7 @@ package org.constellation.sos.io.filesystem;
 // J2SE dependencies
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +46,7 @@ import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.util.logging.Logging;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.swes.xml.ObservationTemplate;
 
 // GeoAPI dependencies
 import org.opengis.observation.Measurement;
@@ -110,6 +112,43 @@ public class FileObservationWriter implements ObservationWriter {
 
     }
 
+    @Override
+    public String writeObservationTemplate(final ObservationTemplate template) throws CstlServiceException {
+        final Observation observation = template.getObservation();
+        if (observation == null) {
+            return null;
+        }
+        Marshaller marshaller = null;
+        try {
+            marshaller = MARSHALLER_POOL.acquireMarshaller();
+            final File observationFile = new File(observationTemplateDirectory, observation.getName() + FILE_EXTENSION);
+            
+            if (observationFile.exists()) {
+                final boolean created      = observationFile.createNewFile();
+                if (!created) {
+                    throw new CstlServiceException("unable to create an observation file.", NO_APPLICABLE_CODE);
+                }
+            } else {
+                LOGGER.log(Level.WARNING, "we overwrite the file:{0}", observationFile.getPath());
+            }
+            
+            marshaller.marshal(observation, observationFile);
+            writePhenomenon((PhenomenonType) observation.getObservedProperty());
+            if (observation.getFeatureOfInterest() !=  null) {
+                writeFeatureOfInterest((SamplingFeatureType) observation.getFeatureOfInterest());
+            }
+            indexer.indexDocument((ObservationType) observation);
+            return observation.getName();
+        } catch (JAXBException ex) {
+            throw new CstlServiceException("JAXB exception while marshalling the observation file.", ex, NO_APPLICABLE_CODE);
+        } catch (IOException ex) {
+            throw new CstlServiceException("IO exception while marshalling the observation file.", ex, NO_APPLICABLE_CODE);
+        } finally {
+            if (marshaller != null) {
+                MARSHALLER_POOL.release(marshaller);
+            }
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -266,7 +305,7 @@ public class FileObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(final String offId, final String offProc, final PhenomenonType offPheno, final String offSF) throws CstlServiceException {
+    public void updateOffering(final String offId, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException {
         // TODO
     }
 

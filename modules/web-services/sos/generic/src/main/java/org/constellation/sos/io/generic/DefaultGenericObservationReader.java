@@ -511,7 +511,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public AbstractTimePrimitiveType getFeatureOfInterestTime(String samplingFeatureName) throws CstlServiceException {
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException {
         throw new CstlServiceException("The Default generic implementation of SOS does not support GetFeatureofInterestTime");
     }
 
@@ -519,9 +519,14 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public ReferenceType getReference(String href) throws CstlServiceException {
-        //TODO
-        return new ReferenceType(null, href);
+    public boolean existProcedure(final String href) throws CstlServiceException {
+        try {
+            final Values values = loadData(Arrays.asList("var02"));
+            final List<String>  procedureNames = values.getVariables("var02");
+            return procedureNames.contains(href);
+        } catch (MetadataIoException ex) {
+            throw new CstlServiceException(ex);
+        }
     }
 
     /**

@@ -477,7 +477,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ReferenceType getReference(final String href) throws CstlServiceException {
+    public boolean existProcedure(final String href) throws CstlServiceException {
         try {
             final Set<ReferenceType> references = refTable.getEntries();
             if (references != null) {
@@ -485,21 +485,19 @@ public class DefaultObservationReader implements ObservationReader {
                 while (it.hasNext()) {
                     final ReferenceType ref = it.next();
                     if (ref != null && ref.getHref() != null && ref.getHref().equals(href)) {
-                        return ref;
+                        return true;
                     }
                 }
             }
-            return null;
+            return false;
 
         } catch (NoSuchRecordException ex) {
             LOGGER.info("NoSuchRecordException in getReferences");
-            return null;
-
+            return false;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                 NO_APPLICABLE_CODE);
-
         }
     }
 

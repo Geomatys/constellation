@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Connection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +48,7 @@ import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.swes.xml.ObservationTemplate;
 
 // GeoAPI dependencies
 import org.opengis.observation.Measurement;
@@ -129,6 +131,17 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
+    public String writeObservationTemplate(final ObservationTemplate template) throws CstlServiceException {
+        if (template.getObservation() != null) {
+            return writeObservation(template.getObservation());
+        }
+        return null;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String writeObservation(final Observation observation) throws CstlServiceException {
         try {
             if (observation instanceof MeasurementType && measTable != null) {
@@ -181,7 +194,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(final String offeringId, final String offProc, final PhenomenonType offPheno, final String offSF) throws CstlServiceException {
+    public void updateOffering(final String offeringId, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException {
         try {
             if (offProc != null) {
                 final ReferenceType ref = new ReferenceType(null, offProc);
@@ -189,8 +202,11 @@ public class DefaultObservationWriter implements ObservationWriter {
                 offTable.getProcedures().getIdentifier(offProcedure);
             }
             if (offPheno != null) {
-                final OfferingPhenomenonType offPhenomenon = new OfferingPhenomenonType(offeringId, offPheno);
-                offTable.getPhenomenons().getIdentifier(offPhenomenon);
+                for (String phenId : offPheno) {
+                    final PhenomenonType pheno = new PhenomenonType(phenId, null);
+                    final OfferingPhenomenonType offPhenomenon = new OfferingPhenomenonType(offeringId, pheno);
+                    offTable.getPhenomenons().getIdentifier(offPhenomenon);
+                }
             }
             if (offSF != null) {
                 final ReferenceType ref = new ReferenceType(null, offSF);

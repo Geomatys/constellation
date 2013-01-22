@@ -146,7 +146,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    ReferenceType getReference(final String href) throws CstlServiceException;
+    boolean existProcedure(final String href) throws CstlServiceException;
     
     /**
      * Create a new identifier for an observation.
