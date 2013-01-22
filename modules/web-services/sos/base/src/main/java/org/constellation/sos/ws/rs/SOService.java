@@ -329,7 +329,7 @@ public class SOService extends OGCWebService<SOSworker> {
             currentVersion = "2.0.0";
         } else {
             versions = new AcceptVersionsType("1.0.0");
-            currentVersion = "1.1.0";
+            currentVersion = "1.0.0";
         }
 
         final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
