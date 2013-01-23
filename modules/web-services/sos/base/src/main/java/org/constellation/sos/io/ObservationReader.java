@@ -27,9 +27,8 @@ import org.constellation.ws.CstlServiceException;
 
 // GeoAPI
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
-import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.opengis.observation.Observation;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;

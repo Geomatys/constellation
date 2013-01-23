@@ -209,7 +209,7 @@ public class SOService extends OGCWebService<SOSworker> {
             LOGGER.info("received SOAP getResult request");
             final SOSworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.getResult(requestResult);
+            return (GetResultResponse) worker.getResult(requestResult);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
@@ -231,7 +231,7 @@ public class SOService extends OGCWebService<SOSworker> {
             LOGGER.info("received SOAP registerSensor request");
             final SOSworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.registerSensor(requestRegSensor);
+            return (RegisterSensorResponse) worker.registerSensor(requestRegSensor);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());

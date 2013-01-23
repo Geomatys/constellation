@@ -40,7 +40,7 @@ import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.v101.AnyResultType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;

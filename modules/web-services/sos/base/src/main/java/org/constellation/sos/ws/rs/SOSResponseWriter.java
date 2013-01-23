@@ -32,7 +32,7 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.sos.xml.SOSResponse;
+import org.geotoolkit.swes.xml.SOSResponse;
 import org.geotoolkit.sos.xml.SOSResponseWrapper;
 import org.geotoolkit.util.logging.Logging;
 

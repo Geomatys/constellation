@@ -23,9 +23,9 @@ import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.opengis.observation.Observation;
 
 /**
@@ -124,7 +124,7 @@ public interface ObservationFilter {
      * @param e
      * @throws org.constellation.ws.CstlServiceException
      */
-    void setBoundingBox(EnvelopeType e) throws CstlServiceException;
+    void setBoundingBox(Envelope e) throws CstlServiceException;
 
     /**
      * Set the offering for the current request

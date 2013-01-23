@@ -65,7 +65,6 @@ import static org.constellation.sos.ws.Normalizer.*;
 // Geotoolkit dependencies
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
-import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
@@ -89,22 +88,20 @@ import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
 import org.geotoolkit.sos.xml.v100.GetResult;
-import org.geotoolkit.sos.xml.v100.GetResultResponse;
+import org.geotoolkit.sos.xml.GetResultResponse;
 import org.geotoolkit.sos.xml.InsertObservation;
 import org.geotoolkit.sos.xml.InsertObservationResponse;
-import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.geotoolkit.sos.xml.FilterCapabilities;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
-import org.geotoolkit.swes.xml.ObservationTemplate;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.gml.xml.DirectPosition;
+import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.FeatureCollectionType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
-import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
@@ -131,13 +128,15 @@ import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swes.xml.DescribeSensor;
 import org.geotoolkit.swes.xml.InsertSensor;
+import org.geotoolkit.swes.xml.ObservationTemplate;
+import org.geotoolkit.swes.xml.InsertSensorResponse;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
+import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 
 // GeoAPI dependencies
@@ -168,6 +167,7 @@ import org.opengis.filter.temporal.TEquals;
 import org.opengis.filter.temporal.TOverlaps;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.ObservationCollection;
+import org.opengis.observation.sampling.SamplingPoint;
 import org.opengis.util.CodeList;
 
 
@@ -1092,7 +1092,7 @@ public class SOSworker extends AbstractWorker {
         if (requestObservation.getSpatialFilter() != null) {
             // for a BBOX Spatial ops
             if (requestObservation.getSpatialFilter() instanceof BBOX) {
-                final EnvelopeType e = getEnvelopeFromBBOX((BBOX)requestObservation.getSpatialFilter());
+                final Envelope e = getEnvelopeFromBBOX(currentVersion, (BBOX)requestObservation.getSpatialFilter());
 
                 if (e != null && e.isCompleteEnvelope2D()) {
                     boolean add = false;
@@ -1109,13 +1109,13 @@ public class SOSworker extends AbstractWorker {
                                     throw new CstlServiceException("the feature of interest is not registered",
                                             INVALID_PARAMETER_VALUE);
                                 }
-                                if (station instanceof SamplingPointType) {
-                                    final SamplingPointType sp = (SamplingPointType) station;
+                                if (station instanceof SamplingPoint) {
+                                    final SamplingPoint sp = (SamplingPoint) station;
                                     if (samplingPointMatchEnvelope(sp, e)) {
-                                        matchingFeatureOfInterest.add(sp.getId());
+                                        matchingFeatureOfInterest.add(getIDFromObject(sp));
                                         add = true;
                                     } else {
-                                        LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", sp.getId());
+                                        LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", getIDFromObject(sp));
                                     }
 
                                 } else if (station instanceof SamplingCurveType) {
@@ -1332,11 +1332,11 @@ public class SOSworker extends AbstractWorker {
      * @param e An envelope (2D).
      * @return True if the sampling point is strictly inside the specified envelope.
      */
-    private boolean samplingPointMatchEnvelope(final SamplingPointType sp, final EnvelopeType e) {
-        if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
+    private boolean samplingPointMatchEnvelope(final SamplingPoint sp, final Envelope e) {
+        if (sp.getPosition() != null && sp.getPosition().getDirectPosition() != null) {
 
-            final double stationX = sp.getPosition().getPos().getValue().get(0);
-            final double stationY = sp.getPosition().getPos().getValue().get(1);
+            final double stationX = sp.getPosition().getDirectPosition().getOrdinate(0);
+            final double stationY = sp.getPosition().getDirectPosition().getOrdinate(1);
             final double minx     = e.getLowerCorner().getValue().get(0);
             final double maxx     = e.getUpperCorner().getValue().get(0);
             final double miny     = e.getLowerCorner().getValue().get(1);
@@ -1345,32 +1345,31 @@ public class SOSworker extends AbstractWorker {
             // we look if the station if contained in the BBOX
             return stationX < maxx && stationX > minx && stationY < maxy && stationY > miny;
         }
-        LOGGER.log(Level.WARNING, " the feature of interest {0} does not have proper position", sp.getId());
+        LOGGER.log(Level.WARNING, " the feature of interest does not have proper position");
         return false;
     }
     
-    private EnvelopeType getEnvelopeFromBBOX(final BBOX bbox) {
-        final DirectPositionType lowerCorner = new DirectPositionType(bbox.getMinX(), bbox.getMinY());
-        final DirectPositionType upperCorner = new DirectPositionType(bbox.getMaxX(), bbox.getMaxY());
-        return new EnvelopeType(null, lowerCorner, upperCorner, bbox.getSRS());
+    private Envelope getEnvelopeFromBBOX(final String version, final BBOX bbox) {
+        return buildEnvelope(version, bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), bbox.getSRS());
     }
 
     /**
      * Web service operation
      */
-    public GetResultResponse getResult(final GetResult requestResult) throws CstlServiceException {
+    public GetResultResponse getResult(final GetResult request) throws CstlServiceException {
         LOGGER.log(logLevel, "getResult request processing\n");
         final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
-        verifyBaseRequest(requestResult, true, false);
-
+        verifyBaseRequest(request, true, false);
+        final String currentVersion = request.getVersion().toString();
+        
         // we clone the filter for this request
         final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
 
         Observation template = null;
-        if (requestResult.getObservationTemplateId() != null) {
-            final String id = requestResult.getObservationTemplateId();
+        if (request.getObservationTemplateId() != null) {
+            final String id = request.getObservationTemplateId();
             template = templates.get(id);
             if (template == null) {
                 throw new CstlServiceException("this template does not exist or is no longer usable",
@@ -1392,7 +1391,7 @@ public class SOSworker extends AbstractWorker {
         localOmFilter.initFilterGetResult(template, resultModel);
 
         //we treat the time constraint
-        final List<Filter> times = requestResult.getTemporalFilter();
+        final List<Filter> times = request.getTemporalFilter();
 
         /**
          * The template time :
@@ -1401,7 +1400,7 @@ public class SOSworker extends AbstractWorker {
         // case TEquals with time instant
         if (template.getSamplingTime() instanceof TimeInstantType) {
            final TimeInstantType ti           = (TimeInstantType) template.getSamplingTime();
-           final TimeEqualsType equals         = new TimeEqualsType(null, ti);
+           final TimeEqualsType equals        = new TimeEqualsType(null, ti);
            times.add(equals);
 
         } else if (template.getSamplingTime() instanceof TimePeriodType) {
@@ -1458,8 +1457,7 @@ public class SOSworker extends AbstractWorker {
             values = datablock.toString();
         }
         final String url = getServiceUrl().substring(0, getServiceUrl().length() -1);
-        final GetResultResponse.Result r = new GetResultResponse.Result(values, url + '/' + requestResult.getObservationTemplateId());
-        final GetResultResponse response = new GetResultResponse(r);
+        final GetResultResponse response = buildGetResultResponse(currentVersion, values, url + '/' + request.getObservationTemplateId());
         LOGGER.log(logLevel, "GetResult processed in {0} ms", (System.currentTimeMillis() - start));
         return response;
     }
@@ -1748,12 +1746,12 @@ public class SOSworker extends AbstractWorker {
                         LOGGER.log(Level.WARNING, "the feature of interest is not registered:{0}", refStation);
                         continue;
                     }
-                    if (station instanceof SamplingPointType) {
-                        final SamplingPointType sp = (SamplingPointType) station;
+                    if (station instanceof SamplingPoint) {
+                        final SamplingPoint sp = (SamplingPoint) station;
                         if (samplingPointMatchEnvelope(sp, e)) {
                             matchingFeatureOfInterest.add(sp);
                         } else {
-                            LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", sp.getId());
+                            LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", getIDFromObject(sp));
                         }
                     } else {
                         LOGGER.log(Level.WARNING, "unknow implementation:{0}", station.getClass().getName());
@@ -1773,7 +1771,7 @@ public class SOSworker extends AbstractWorker {
      * @param requestRegSensor A request containing a SensorML File describing a Sensor,
      *                         and an observation template for this sensor.
      */
-    public RegisterSensorResponse registerSensor(final InsertSensor request) throws CstlServiceException {
+    public InsertSensorResponse registerSensor(final InsertSensor request) throws CstlServiceException {
         if (profile == DISCOVERY) {
             throw new CstlServiceException("The operation registerSensor is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
@@ -1878,7 +1876,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         LOGGER.log(logLevel, "registerSensor processed in {0}ms", (System.currentTimeMillis() - start));
-        return new RegisterSensorResponse(id);
+        return buildInsertSensorResponse(currentVersion, id, null);
     }
 
     /**
@@ -2267,7 +2265,7 @@ public class SOSworker extends AbstractWorker {
         final TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
 
         //we add the template process
-        final ReferenceType process = new ReferenceType(null, template.getProcedure());
+        final String process = template.getProcedure();
 
         //we add the template phenomenon
         final PhenomenonType phenomenon;
@@ -2278,12 +2276,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         //we add the template feature of interest
-        final ReferenceType station;
-        if (template.getFeatureOfInterest() != null) {
-            station = new ReferenceType(null, template.getFeatureOfInterest());
-        } else {
-            station = null;
-        }
+        final String featureOfInterest = template.getFeatureOfInterest();
 
         //we create a list of accepted responseMode (fixed)
         final List<ResponseModeType> responses = Arrays.asList(RESULT_TEMPLATE, INLINE);
@@ -2304,7 +2297,7 @@ public class SOSworker extends AbstractWorker {
                                             time,
                                             process,
                                             phenomenon,
-                                            station,
+                                            featureOfInterest,
                                             offeringOutputFormat,
                                             resultModel,
                                             responses));

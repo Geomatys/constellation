@@ -20,10 +20,12 @@ package org.constellation.sos.ws;
 import java.util.Date;
 import org.geotoolkit.temporal.object.ISODateParser;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
@@ -350,5 +352,15 @@ public final class Utils {
             currentIndex++;
         }
         return currentIndex;
+    }
+    
+    public static String getIDFromObject(final Object obj) {
+        if (obj != null) {
+            final Method idGetter = ReflectionUtilities.getGetterFromName("id", obj.getClass());
+            if (idGetter != null) {
+                return (String) ReflectionUtilities.invokeMethod(obj, idGetter);
+            }
+        }
+        return null;
     }
 }

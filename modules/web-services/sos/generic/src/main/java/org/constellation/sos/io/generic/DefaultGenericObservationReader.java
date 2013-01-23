@@ -40,7 +40,7 @@ import org.geotoolkit.gml.xml.GMLXmlFactory;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.AbstractDataComponentType;
 import org.geotoolkit.swe.xml.v101.AnyResultType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;

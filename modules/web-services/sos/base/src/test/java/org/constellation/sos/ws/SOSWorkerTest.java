@@ -60,8 +60,7 @@ import org.geotoolkit.sos.xml.v100.GetResultResponse;
 import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.ObservationTemplate;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
-import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
@@ -75,6 +74,7 @@ import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v110.TimeDuringType;
 import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.swes.xml.InsertSensorResponse;
 
 import org.opengis.observation.sampling.SamplingPoint;
 
@@ -1649,7 +1649,7 @@ public class SOSWorkerTest {
          */
         String templateId = "urn:ogc:object:observation:template:GEOM:3-0";
         GetResult request = new GetResult(templateId, null, "1.0.0");
-        GetResultResponse result = worker.getResult(request);
+        GetResultResponse result = (GetResultResponse) worker.getResult(request);
 
         String value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@2007-05-01T05:59:00,6.560@@2007-05-01T06:59:00,6.560@@" + '\n' +
                        "2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@" + '\n' +
@@ -1721,7 +1721,7 @@ public class SOSWorkerTest {
          */
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
         request = new GetResult(templateId, null, "1.0.0");
-        result = worker.getResult(request);
+        result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@" + '\n';
         expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
@@ -1742,7 +1742,7 @@ public class SOSWorkerTest {
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
         request = new GetResult(templateId, times, "1.0.0");
-        result = worker.getResult(request);
+        result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@" + '\n';
         expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
@@ -1763,7 +1763,7 @@ public class SOSWorkerTest {
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
         request = new GetResult(templateId, times, "1.0.0");
-        result = worker.getResult(request);
+        result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@" + '\n';
         expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
@@ -1784,7 +1784,7 @@ public class SOSWorkerTest {
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
         request = new GetResult(templateId, times, "1.0.0");
-        result = worker.getResult(request);
+        result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.560@@" + '\n';
         expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
@@ -1805,7 +1805,7 @@ public class SOSWorkerTest {
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
         request = new GetResult(templateId, times, "1.0.0");
-        result = worker.getResult(request);
+        result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.560@@" + '\n';
         expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
@@ -1877,7 +1877,7 @@ public class SOSWorkerTest {
          */
         templateId = "urn:ogc:object:observation:template:GEOM:3-2";
         request = new GetResult(templateId, null, "1.0.0");
-        result = worker.getResult(request);
+        result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@" + '\n';
         expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
@@ -1946,7 +1946,7 @@ public class SOSWorkerTest {
          */
         templateId = "urn:ogc:object:observation:template:GEOM:3-3";
         request = new GetResult(templateId, null, "1.0.0");
-        result = worker.getResult(request);
+        result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T20:59:00,6.550@@" + '\n';
         expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
@@ -2005,7 +2005,7 @@ public class SOSWorkerTest {
 
         String templateId = "urn:ogc:object:observation:template:GEOM:3-0";
         GetResult GRrequest = new GetResult(templateId, null, "1.0.0");
-        GetResultResponse result = worker.getResult(GRrequest);
+        GetResultResponse result = (GetResultResponse) worker.getResult(GRrequest);
 
         String value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@2007-05-01T05:59:00,6.560@@2007-05-01T06:59:00,6.560@@" + '\n' +
                        "2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@" + '\n' +
@@ -2087,9 +2087,9 @@ public class SOSWorkerTest {
 
         RegisterSensor request = new RegisterSensor("1.0.0", sensorDescription, new ObservationTemplate(obsTemplate));
 
-        RegisterSensorResponse response = worker.registerSensor(request);
+        InsertSensorResponse response = worker.registerSensor(request);
 
-        assertEquals("urn:ogc:object:sensor:GEOM:6", response.getAssignedSensorId());
+        assertEquals("urn:ogc:object:sensor:GEOM:6", response.getAssignedProcedure());
 
         /**
          * we verify that the sensor is well registered

@@ -133,7 +133,7 @@ public class SOService extends OGCWebService<SOSworker> {
                 }
                 Object marshalled;
                 if (response instanceof ObservationCollectionType) {
-                    marshalled = new SOSResponseWrapper((ObservationCollectionType) response);
+                    marshalled = new SOSResponseWrapper(response);
                 } else if (response instanceof String) {
                     marshalled = (String) response;
                 } else {

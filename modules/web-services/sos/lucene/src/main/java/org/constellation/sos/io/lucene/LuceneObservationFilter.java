@@ -40,7 +40,7 @@ import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.observation.xml.v100.ProcessType;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.ObservationOffering;
 
