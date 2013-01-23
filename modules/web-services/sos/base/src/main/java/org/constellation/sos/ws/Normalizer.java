@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.observation.xml.v100.MeasureType;
 import org.geotoolkit.observation.xml.v100.MeasurementType;
@@ -31,6 +32,7 @@ import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.sos.xml.Capabilities;
+import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.swe.xml.AbstractEncodingProperty;
 import org.geotoolkit.swe.xml.DataArray;
@@ -42,6 +44,7 @@ import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.observation.Observation;
+import org.opengis.observation.ObservationCollection;
 
 /**
  * Static methods use to create valid XML file, by setting object into referenceMode.
@@ -103,7 +106,7 @@ public final class Normalizer {
      *
      * @return a collection
      */
-    public static ObservationCollectionType regroupObservation(final ObservationCollectionType collection){
+    public static ObservationCollection regroupObservation(final String version, final Envelope bounds, final ObservationCollection collection){
         final List<Observation> members = collection.getMember();
         final Map<String, ObservationType> merged = new HashMap<String, ObservationType>();
         for (Observation obs : members) {
@@ -134,11 +137,11 @@ public final class Normalizer {
             }
         }
 
-        final ObservationCollectionType result = new ObservationCollectionType();
+        final List<Observation> obervations = new ArrayList<Observation>();
         for (ObservationType entry: merged.values()) {
-            result.add(entry);
+            obervations.add(entry);
         }
-        return result;
+        return SOSXmlFactory.buildObservationCollection(version, "collection-1", bounds, obervations);
     }
 
     /**
@@ -148,7 +151,7 @@ public final class Normalizer {
      *
      * @return a normalized document
      */
-    public static ObservationCollectionType normalizeDocument(final ObservationCollectionType collection) {
+    public static ObservationCollection normalizeDocument(final ObservationCollection collection) {
         //first if the collection is empty
         if (collection.getMember().isEmpty()) {
             return new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");

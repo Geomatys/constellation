@@ -32,7 +32,6 @@ import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
@@ -236,13 +235,13 @@ public final class Utils {
      * @param collection
      * @return
      */
-    public static EnvelopeType getCollectionBound(final ObservationCollectionType collection, final String srsName) {
+    public static EnvelopeType getCollectionBound(final List<Observation> observations, final String srsName) {
         double minx = Double.MAX_VALUE;
         double miny = Double.MAX_VALUE;
         double maxx = -Double.MAX_VALUE;
         double maxy = -Double.MAX_VALUE;
 
-        for (Observation observation: collection.getMember()) {
+        for (Observation observation: observations) {
             final FeaturePropertyType featureProp = ((ObservationType)observation).getPropertyFeatureOfInterest();
 
             if (featureProp != null && featureProp.getAbstractFeature() != null) {

@@ -91,7 +91,7 @@ import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.GetResultResponse;
 import org.geotoolkit.sos.xml.InsertObservation;
-import org.geotoolkit.sos.xml.v100.InsertObservationResponse;
+import org.geotoolkit.sos.xml.InsertObservationResponse;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.geotoolkit.sos.xml.FilterCapabilities;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
@@ -167,6 +167,7 @@ import org.opengis.filter.temporal.TContains;
 import org.opengis.filter.temporal.TEquals;
 import org.opengis.filter.temporal.TOverlaps;
 import org.opengis.observation.Measurement;
+import org.opengis.observation.ObservationCollection;
 import org.opengis.util.CodeList;
 
 
@@ -182,7 +183,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * A list of temporary ObservationTemplate
      */
-    private final Map<String, ObservationType> templates = new HashMap<String, ObservationType>();
+    private final Map<String, Observation> templates = new HashMap<String, Observation>();
 
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
@@ -1230,8 +1231,6 @@ public class SOSworker extends AbstractWorker {
         Object response;
         if (!outOfBand) {
 
-            ObservationCollectionType ocResponse = new ObservationCollectionType();
-
             /*
              * here we can have 2 different behaviour :
              *
@@ -1270,6 +1269,7 @@ public class SOSworker extends AbstractWorker {
                 }
             }
 
+            final List<Observation> observations = new ArrayList<Observation>();
             for (Observation o : matchingResult) {
                 if (template) {
 
@@ -1290,26 +1290,28 @@ public class SOSworker extends AbstractWorker {
                     t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
                     schreduledTask.add(t);
 
-                    ocResponse.add(temporaryTemplate);
+                    observations.add(temporaryTemplate);
                 } else {
-                    ocResponse.add((ObservationType) o);
+                    observations.add((ObservationType) o);
                 }
             }
-            ocResponse = regroupObservation(ocResponse);
-            ocResponse.setId("collection-1");
+
             // this is a little hack for cite test dummy srsName comparaison
             String srsName = "urn:ogc:def:crs:EPSG::4326";
             if ("EPSG:4326".equals(requestObservation.getSrsName())) {
                 srsName ="EPSG:4326";
             }
+            final EnvelopeType envelope;
             if (computedBounds == null) {
-                ocResponse.setBoundedBy(getCollectionBound(ocResponse, srsName));
+                envelope = getCollectionBound(observations, srsName);
             } else {
                 LOGGER.log(Level.FINER, "Using computed bounds:{0}", computedBounds);
-                ocResponse.setBoundedBy(computedBounds);
+                envelope = computedBounds;
             }
+            ObservationCollection ocResponse = buildObservationCollection(currentVersion, "collection-1", envelope, observations);
+            ocResponse = regroupObservation(currentVersion, envelope, ocResponse);
             ocResponse = normalizeDocument(ocResponse);
-            response = ocResponse;
+            response   = ocResponse;
         } else {
             String sReponse = "";
             if (localOmFilter instanceof ObservationFilterReader) {
@@ -1366,7 +1368,7 @@ public class SOSworker extends AbstractWorker {
         // we clone the filter for this request
         final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
 
-        ObservationType template = null;
+        Observation template = null;
         if (requestResult.getObservationTemplateId() != null) {
             final String id = requestResult.getObservationTemplateId();
             template = templates.get(id);
@@ -1781,10 +1783,10 @@ public class SOSworker extends AbstractWorker {
         }
         LOGGER.log(logLevel, "registerSensor request processing\n");
         final long start = System.currentTimeMillis();
-        final String currentVersion = request.getVersion().toString();
         
         //we verify the base request attribute
         verifyBaseRequest(request, true, false);
+        final String currentVersion = request.getVersion().toString();
 
         boolean success = false;
         String id = "";
@@ -1885,7 +1887,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.
      */
-    public InsertObservationResponse insertObservation(final InsertObservation requestInsObs) throws CstlServiceException {
+    public InsertObservationResponse insertObservation(final InsertObservation request) throws CstlServiceException {
         if (profile == DISCOVERY) {
             throw new CstlServiceException("The operation insertObservation is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
@@ -1898,11 +1900,11 @@ public class SOSworker extends AbstractWorker {
         final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
-        verifyBaseRequest(requestInsObs, true, false);
-
-        String id = "";
+        verifyBaseRequest(request, true, false);
+        final String currentVersion = request.getVersion().toString();
+        
         //we get the id of the sensor and we create a sensor object
-        final String sensorId = requestInsObs.getAssignedSensorId();
+        final String sensorId = request.getAssignedSensorId();
         String num = null;
         if (sensorId.startsWith(sensorIdBase)) {
             num = sensorId.substring(sensorIdBase.length());
@@ -1912,7 +1914,8 @@ public class SOSworker extends AbstractWorker {
         }
 
         //we get the observation and we assign to it the sensor
-        final List<? extends Observation> observations = requestInsObs.getObservations();
+        final List<String> ids = new ArrayList<String>();
+        final List<? extends Observation> observations = request.getObservations();
         for (Observation observation : observations) {
             final AbstractObservation obs = (AbstractObservation) observation;
             if (obs != null) {
@@ -1941,6 +1944,7 @@ public class SOSworker extends AbstractWorker {
             }
 
             //we record the observation in the O&M database
+           final String id;
            if (obs instanceof Measurement) {
                id = omWriter.writeMeasurement((Measurement)obs);
                LOGGER.log(logLevel, "new Measurement inserted: id = " + id + " for the sensor " + ((ProcessType)obs.getProcedure()).getName());
@@ -1961,12 +1965,13 @@ public class SOSworker extends AbstractWorker {
                     throw new CstlServiceException(" The observation doesn't match with the template of the sensor",
                                                   INVALID_PARAMETER_VALUE, "samplingTime");
                 }
-            }
+           }
+           ids.add(id);
         }
 
         LOGGER.log(logLevel, "insertObservation processed in {0} ms", (System.currentTimeMillis() - start));
         omFilter.refresh();
-        return new InsertObservationResponse(id);
+        return buildInsertObservationResponse(currentVersion, ids);
     }
 
     /**

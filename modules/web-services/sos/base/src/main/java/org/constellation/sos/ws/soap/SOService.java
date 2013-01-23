@@ -252,7 +252,7 @@ public class SOService extends OGCWebService<SOSworker> {
             LOGGER.info("received SOAP insertObservation request");
             final SOSworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.insertObservation(requestInsObs);
+            return (InsertObservationResponse) worker.insertObservation(requestInsObs);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
