@@ -90,7 +90,7 @@ import org.geotoolkit.sos.xml.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.GetResultResponse;
-import org.geotoolkit.sos.xml.v100.InsertObservation;
+import org.geotoolkit.sos.xml.InsertObservation;
 import org.geotoolkit.sos.xml.v100.InsertObservationResponse;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.geotoolkit.sos.xml.FilterCapabilities;
@@ -105,6 +105,7 @@ import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.FeatureCollectionType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
+import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
@@ -129,6 +130,7 @@ import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swes.xml.DescribeSensor;
+import org.geotoolkit.swes.xml.InsertSensor;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
@@ -137,7 +139,6 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
-import org.geotoolkit.swes.xml.InsertSensor;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -1909,55 +1910,57 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The sensor identifier is not valid it must start with " + sensorIdBase,
                                          INVALID_PARAMETER_VALUE, "assignedSensorId");
         }
-        final ProcessType proc = new ProcessType(sensorId);
 
         //we get the observation and we assign to it the sensor
-        final ObservationType obs = requestInsObs.getObservation();
-        if (obs != null) {
-            obs.setProcedure(proc);
-            obs.setName(omReader.getNewObservationId());
-            LOGGER.log(Level.FINER, "samplingTime received: {0}", obs.getSamplingTime());
-            LOGGER.log(Level.FINER, "template received:\n{0}", obs.toString());
-        } else {
-            throw new CstlServiceException("The observation template must be specified",
-                                             MISSING_PARAMETER_VALUE, OBSERVATION_TEMPLATE);
-        }
+        final List<? extends Observation> observations = requestInsObs.getObservations();
+        for (Observation observation : observations) {
+            final AbstractObservation obs = (AbstractObservation) observation;
+            if (obs != null) {
+                obs.setProcedure(sensorId);
+                obs.setName(omReader.getNewObservationId());
+                LOGGER.log(Level.FINER, "samplingTime received: {0}", obs.getSamplingTime());
+                LOGGER.log(Level.FINER, "template received:\n{0}", obs.toString());
+            } else {
+                throw new CstlServiceException("The observation template must be specified",
+                                                 MISSING_PARAMETER_VALUE, OBSERVATION_TEMPLATE);
+            }
 
-        // Debug part
-        if (verifySynchronization) {
-            if (obs.getSamplingTime() instanceof TimeInstantType) {
-               final TimeInstantType timeInstant = (TimeInstantType) obs.getSamplingTime();
-                try {
-                    final ISODateParser parser = new ISODateParser();
-                    final Date d = parser.parseToDate(timeInstant.getTimePosition().getValue());
-                    final long t = System.currentTimeMillis() - d.getTime();
-                    LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + TemporalUtilities.durationToString(t) + ')');
-                } catch (IllegalArgumentException ex) {
-                    LOGGER.warning("unable to parse the samplingTime");
+            // Debug part
+            if (verifySynchronization) {
+                if (obs.getSamplingTime() instanceof TimeInstantType) {
+                   final TimeInstantType timeInstant = (TimeInstantType) obs.getSamplingTime();
+                    try {
+                        final ISODateParser parser = new ISODateParser();
+                        final Date d = parser.parseToDate(timeInstant.getTimePosition().getValue());
+                        final long t = System.currentTimeMillis() - d.getTime();
+                        LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + TemporalUtilities.durationToString(t) + ')');
+                    } catch (IllegalArgumentException ex) {
+                        LOGGER.warning("unable to parse the samplingTime");
+                    }
                 }
             }
-        }
 
-        //we record the observation in the O&M database
-       if (obs instanceof Measurement) {
-           id = omWriter.writeMeasurement((Measurement)obs);
-           LOGGER.log(logLevel, "new Measurement inserted: id = " + id + " for the sensor " + ((ProcessType)obs.getProcedure()).getName());
-        } else {
-
-            //in first we verify that the observation is conform to the template
-            final ObservationType template = (ObservationType) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME);
-            //if the observation to insert match the template we can insert it in the OM db
-            if (obs.matchTemplate(template)) {
-                if (obs.getSamplingTime() != null && obs.getResult() != null) {
-                    id = omWriter.writeObservation(obs);
-                    LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + ((ProcessType)obs.getProcedure()).getName());
-                } else {
-                    throw new CstlServiceException("The observation sampling time and the result must be specify",
-                                                  MISSING_PARAMETER_VALUE, "samplingTime");
-                }
+            //we record the observation in the O&M database
+           if (obs instanceof Measurement) {
+               id = omWriter.writeMeasurement((Measurement)obs);
+               LOGGER.log(logLevel, "new Measurement inserted: id = " + id + " for the sensor " + ((ProcessType)obs.getProcedure()).getName());
             } else {
-                throw new CstlServiceException(" The observation doesn't match with the template of the sensor",
-                                              INVALID_PARAMETER_VALUE, "samplingTime");
+
+                //in first we verify that the observation is conform to the template
+                final Observation template = (Observation) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME);
+                //if the observation to insert match the template we can insert it in the OM db
+                if (obs.matchTemplate(template)) {
+                    if (obs.getSamplingTime() != null && obs.getResult() != null) {
+                        id = omWriter.writeObservation(obs);
+                        LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + ((ProcessType)obs.getProcedure()).getName());
+                    } else {
+                        throw new CstlServiceException("The observation sampling time and the result must be specify",
+                                                      MISSING_PARAMETER_VALUE, "samplingTime");
+                    }
+                } else {
+                    throw new CstlServiceException(" The observation doesn't match with the template of the sensor",
+                                                  INVALID_PARAMETER_VALUE, "samplingTime");
+                }
             }
         }
 

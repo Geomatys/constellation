@@ -69,6 +69,7 @@ import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.ogc.xml.v110.TimeAfterType;
 import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v110.TimeDuringType;
@@ -2051,7 +2052,7 @@ public class SOSWorkerTest {
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-6.xml"));
         ObservationType obsTemplate = (ObservationType)obj.getValue();
 
-        obsTemplate.setProcedure(null);
+        obsTemplate.setProcedure((ProcessType)null);
         request = new RegisterSensor("1.0.0", sensorDescription, new ObservationTemplate(obsTemplate));
         exLaunched = false;
         try {
