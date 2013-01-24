@@ -28,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.DirectPosition;
+import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
@@ -275,7 +276,7 @@ public class UtilsTest {
         observations.add(obs2);
         observations.add(obs3);
 
-        EnvelopeType result = Utils.getCollectionBound(observations, "urn:ogc:def:crs:EPSG::4326");
+        Envelope result = Utils.getCollectionBound(observations, "urn:ogc:def:crs:EPSG::4326");
 
         EnvelopeType expResult = new EnvelopeType(null, new DirectPositionType(-180.0, -90.0), new DirectPositionType(180.0, 90.0), "urn:ogc:def:crs:EPSG::4326");
         expResult.setSrsDimension(2);

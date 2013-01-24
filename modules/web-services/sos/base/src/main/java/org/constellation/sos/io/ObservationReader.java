@@ -32,6 +32,7 @@ import org.geotoolkit.sos.xml.ResponseModeType;
 import org.opengis.observation.Observation;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.temporal.TemporalPrimitive;
 
 /**
  *
@@ -119,7 +120,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException;
+    TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException;
 
     /**
      * Return an observation for the specified identifier.

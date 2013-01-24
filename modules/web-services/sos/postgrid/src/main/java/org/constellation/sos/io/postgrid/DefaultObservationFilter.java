@@ -41,7 +41,7 @@ import static org.constellation.sos.ws.Utils.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
@@ -417,7 +417,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(final EnvelopeType e) throws CstlServiceException {
+    public void setBoundingBox(final Envelope e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 

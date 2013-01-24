@@ -44,7 +44,7 @@ import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
 import org.geotoolkit.sos.xml.v100.OfferingResponseModeType;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
 import org.geotoolkit.xml.Namespaces;

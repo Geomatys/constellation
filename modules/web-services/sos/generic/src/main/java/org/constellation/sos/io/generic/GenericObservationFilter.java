@@ -36,7 +36,6 @@ import org.constellation.generic.database.Where;
 import org.constellation.sos.io.ObservationResult;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
@@ -45,6 +44,7 @@ import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.sos.ws.Utils.*;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.sos.xml.ObservationOffering;
 
 /**
@@ -352,7 +352,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(EnvelopeType e) throws CstlServiceException {
+    public void setBoundingBox(final Envelope e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 

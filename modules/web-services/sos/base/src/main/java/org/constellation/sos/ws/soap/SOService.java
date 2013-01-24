@@ -170,7 +170,7 @@ public class SOService extends OGCWebService<SOSworker> {
             LOGGER.info("received SOAP getfeatureOfInterest request");
             final SOSworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.getFeatureOfInterest(requestfeatureOfInterest);
+            return (AbstractFeatureType) worker.getFeatureOfInterest(requestfeatureOfInterest);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
@@ -190,7 +190,7 @@ public class SOService extends OGCWebService<SOSworker> {
             LOGGER.info("received SOAP getfeatureOfInterest request");
             final SOSworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.getFeatureOfInterestTime(requestfeatureOfInterestTime);
+            return (AbstractTimePrimitiveType) worker.getFeatureOfInterestTime(requestfeatureOfInterestTime);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());

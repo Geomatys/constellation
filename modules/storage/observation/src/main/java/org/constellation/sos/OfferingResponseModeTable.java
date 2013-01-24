@@ -26,7 +26,7 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.sos.xml.v100.OfferingResponseModeType;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.util.Utilities;
 
 /**

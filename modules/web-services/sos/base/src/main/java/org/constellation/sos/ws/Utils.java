@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.DirectPosition;
+import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 import org.geotoolkit.gml.xml.v311.BoundingShapeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
@@ -46,6 +47,7 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.swe.xml.v101.TextBlockType;
 import org.opengis.observation.Observation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.opengis.temporal.Position;
 
 /**
  *
@@ -136,15 +138,10 @@ public final class Utils {
      *
      * @param time a GML time position object.
      */
-    public static String getTimeValue(final TimePositionType time) throws CstlServiceException {
-        if (time != null && time.getValue() != null) {
-            String value = time.getValue();
-
-            /*we delete the data after the second
-            if (value.indexOf('.') != -1) {
-                value = value.substring(0, value.indexOf('.'));
-            }*/
+    public static String getTimeValue(final Position time) throws CstlServiceException {
+        if (time != null && time.getDateTime() != null) {
              try {
+                 final String value = time.getDateTime().toString();
                  //here t is not used but it allow to verify the syntax of the timestamp
                  final ISODateParser parser = new ISODateParser();
                  final Date d = parser.parseToDate(value);
@@ -152,7 +149,7 @@ public final class Utils {
                  return t.toString();
 
              } catch(IllegalArgumentException e) {
-                throw new CstlServiceException("Unable to parse the value: " + value + '\n' +
+                throw new CstlServiceException("Unable to parse the value: " + time.toString() + '\n' +
                                                "Bad format of timestamp:\n" + e.getMessage(),
                                                INVALID_PARAMETER_VALUE, "eventTime");
              } 
@@ -237,7 +234,7 @@ public final class Utils {
      * @param collection
      * @return
      */
-    public static EnvelopeType getCollectionBound(final List<Observation> observations, final String srsName) {
+    public static Envelope getCollectionBound(final List<Observation> observations, final String srsName) {
         double minx = Double.MAX_VALUE;
         double miny = Double.MAX_VALUE;
         double maxx = -Double.MAX_VALUE;

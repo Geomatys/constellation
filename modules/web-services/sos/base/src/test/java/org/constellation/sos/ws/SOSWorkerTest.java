@@ -31,7 +31,6 @@ import org.constellation.test.utils.MetadataUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
@@ -68,6 +67,7 @@ import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.ogc.xml.v110.TimeAfterType;
 import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
@@ -2176,7 +2176,7 @@ public class SOSWorkerTest {
 
         GetFeatureOfInterest request = new GetFeatureOfInterest("1.0.0", "SOS", "station-001");
 
-        AbstractFeatureType result = worker.getFeatureOfInterest(request);
+        AbstractFeature result = worker.getFeatureOfInterest(request);
 
         assertTrue (result instanceof SamplingPoint);
 

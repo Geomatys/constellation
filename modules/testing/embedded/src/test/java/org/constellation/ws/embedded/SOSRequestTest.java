@@ -20,7 +20,7 @@ package org.constellation.ws.embedded;
 // JUnit dependencies
 import org.geotoolkit.ows.xml.v110.Operation;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import java.util.Arrays;
 import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.Capabilities;

@@ -33,7 +33,7 @@ import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.*;
 
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.lucene.IndexingException;
@@ -332,7 +332,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(EnvelopeType e) throws CstlServiceException {
+    public void setBoundingBox(Envelope e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 

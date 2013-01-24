@@ -64,7 +64,6 @@ import static org.constellation.sos.ws.Normalizer.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
 import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
@@ -92,32 +91,20 @@ import org.geotoolkit.sos.xml.GetResultResponse;
 import org.geotoolkit.sos.xml.InsertObservation;
 import org.geotoolkit.sos.xml.InsertObservationResponse;
 import org.geotoolkit.sos.xml.FilterCapabilities;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.Envelope;
-import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
-import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.FeatureCollectionType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.observation.xml.AbstractObservation;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
-import org.geotoolkit.observation.xml.v100.ObservationType;
-import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.ogc.xml.XMLLiteral;
-import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.TimeAfterType;
 import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v110.TimeDuringType;
 import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
-import org.geotoolkit.sampling.xml.v100.ObjectFactory;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
-import org.geotoolkit.sampling.xml.v100.SamplingPointType;
-import org.geotoolkit.sampling.xml.v100.SamplingSolidType;
-import org.geotoolkit.sampling.xml.v100.SamplingSurfaceType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SmlFactory;
 import org.geotoolkit.sml.xml.v100.SensorML;
@@ -125,7 +112,6 @@ import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
-import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swes.xml.DescribeSensor;
 import org.geotoolkit.swes.xml.InsertSensor;
 import org.geotoolkit.swes.xml.ObservationTemplate;
@@ -168,6 +154,10 @@ import org.opengis.filter.temporal.TOverlaps;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.ObservationCollection;
 import org.opengis.observation.sampling.SamplingPoint;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
+import org.opengis.temporal.TemporalGeometricPrimitive;
+import org.opengis.temporal.TemporalPrimitive;
 import org.opengis.util.CodeList;
 
 
@@ -1070,7 +1060,7 @@ public class SOSworker extends AbstractWorker {
 
         //we treat the time restriction
         final List<Filter> times = requestObservation.getTemporalFilter();
-        final AbstractTimeGeometricPrimitiveType templateTime = treatEventTimeRequest(times, template, localOmFilter);
+        final TemporalGeometricPrimitive templateTime = treatEventTimeRequest(times, template, localOmFilter);
 
         //we treat the restriction on the feature of interest
 
@@ -1154,7 +1144,7 @@ public class SOSworker extends AbstractWorker {
                             localOmFilter.setFeatureOfInterest(matchingFeatureOfInterest);
                         // if there is no matching FOI we must return an empty result
                         } else {
-                            return new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");
+                            return buildObservationCollection(currentVersion, "urn:ogc:def:nil:OGC:inapplicable");
                         }
                     }
 
@@ -1243,7 +1233,7 @@ public class SOSworker extends AbstractWorker {
              *
              */
             final List<Observation> matchingResult;
-            final EnvelopeType computedBounds;
+            final Envelope computedBounds;
 
             // case (1)
             if (!(localOmFilter instanceof ObservationFilterReader)) {
@@ -1274,11 +1264,11 @@ public class SOSworker extends AbstractWorker {
                 if (template) {
 
                     final String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
-                    final ObservationType temporaryTemplate = ((ObservationType) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
+                    final AbstractObservation temporaryTemplate = ((AbstractObservation) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
                     
                     // Remove the default templateTime
                     if (!localOmFilter.isDefaultTemplateTime() && templateTime == null) {
-                        temporaryTemplate.setSamplingTime(null);
+                        temporaryTemplate.emptySamplingTime();
                     }
                     templates.put(temporaryTemplateId, temporaryTemplate);
 
@@ -1292,7 +1282,7 @@ public class SOSworker extends AbstractWorker {
 
                     observations.add(temporaryTemplate);
                 } else {
-                    observations.add((ObservationType) o);
+                    observations.add(o);
                 }
             }
 
@@ -1301,7 +1291,7 @@ public class SOSworker extends AbstractWorker {
             if ("EPSG:4326".equals(requestObservation.getSrsName())) {
                 srsName ="EPSG:4326";
             }
-            final EnvelopeType envelope;
+            final Envelope envelope;
             if (computedBounds == null) {
                 envelope = getCollectionBound(observations, srsName);
             } else {
@@ -1398,9 +1388,9 @@ public class SOSworker extends AbstractWorker {
          */
 
         // case TEquals with time instant
-        if (template.getSamplingTime() instanceof TimeInstantType) {
-           final TimeInstantType ti           = (TimeInstantType) template.getSamplingTime();
-           final TimeEqualsType equals        = new TimeEqualsType(null, ti);
+        if (template.getSamplingTime() instanceof Instant) {
+           final Instant ti      = (Instant) template.getSamplingTime();
+           final TEquals equals  = new TimeEqualsType(null, ti);
            times.add(equals);
 
         } else if (template.getSamplingTime() instanceof TimePeriodType) {
@@ -1408,17 +1398,17 @@ public class SOSworker extends AbstractWorker {
 
             //case TBefore
             if (tp.getBeginPosition().equals(new TimePositionType(TimeIndeterminateValueType.BEFORE))) {
-                final TimeBeforeType before  = new TimeBeforeType(null, new TimeInstantType(tp.getEndPosition()));
+                final Before before  = new TimeBeforeType(null, new TimeInstantType(tp.getEndPosition()));
                 times.add(before);
 
             //case TAfter
             } else if (tp.getEndPosition().equals(new TimePositionType(TimeIndeterminateValueType.NOW))) {
-                final TimeAfterType after  = new TimeAfterType(null, new TimeInstantType(tp.getBeginPosition()));
+                final After after  = new TimeAfterType(null, new TimeInstantType(tp.getBeginPosition()));
                 times.add(after);
 
             //case TDuring/TEquals  (here the sense of T_Equals with timePeriod is lost but not very usefull)
             } else {
-                final TimeDuringType during  = new TimeDuringType(null, tp);
+                final During during  = new TimeDuringType(null, tp);
                 times.add(during);
             }
         }
@@ -1474,9 +1464,9 @@ public class SOSworker extends AbstractWorker {
                 LOGGER.log(Level.FINER, " Values: {0}", values);
                 if (bound instanceof TEquals) {
                     final TEquals filter = (TEquals) bound;
-                    if (filter.getExpression2() instanceof TimeInstantType) {
-                        final TimeInstantType ti    = (TimeInstantType) filter.getExpression2();
-                        final Timestamp boundEquals = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
+                    if (filter.getExpression2() instanceof Instant) {
+                        final Instant ti    = (Instant) filter.getExpression2();
+                        final Timestamp boundEquals = Timestamp.valueOf(getTimeValue(ti.getPosition()));
 
                         LOGGER.finer("TE case 1");
                         //case 1 the periods contains a matching values
@@ -1486,8 +1476,8 @@ public class SOSworker extends AbstractWorker {
 
                 } else if (bound instanceof After) {
                     final After filter = (After) bound;
-                    final TimeInstantType ti   = (TimeInstantType) filter.getExpression2();
-                    final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
+                    final Instant ti   = (Instant) filter.getExpression2();
+                    final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(ti.getPosition()));
 
                     // case 1 the period overlaps the bound
                     if (tBegin.before(boundBegin) && tEnd.after(boundBegin)) {
@@ -1498,8 +1488,8 @@ public class SOSworker extends AbstractWorker {
 
                 } else if (bound instanceof Before) {
                     final Before filter = (Before) bound;
-                    final TimeInstantType ti = (TimeInstantType) filter.getExpression2();
-                    final Timestamp boundEnd = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
+                    final Instant ti    = (Instant) filter.getExpression2();
+                    final Timestamp boundEnd = Timestamp.valueOf(getTimeValue(ti.getPosition()));
 
                     // case 1 the period overlaps the bound
                     if (tBegin.before(boundEnd) && tEnd.after(boundEnd)) {
@@ -1510,9 +1500,9 @@ public class SOSworker extends AbstractWorker {
 
                 } else if (bound instanceof During) {
                     final During filter = (During) bound;
-                    final TimePeriodType tp = (TimePeriodType)filter.getExpression2();
-                    final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(tp.getBeginPosition()));
-                    final Timestamp boundEnd   = Timestamp.valueOf(getTimeValue(tp.getEndPosition()));
+                    final Period tp     = (Period)filter.getExpression2();
+                    final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(tp.getBeginning().getPosition()));
+                    final Timestamp boundEnd   = Timestamp.valueOf(getTimeValue(tp.getEnding().getPosition()));
 
                     // case 1 the period overlaps the first bound
                     if (tBegin.before(boundBegin) && tEnd.before(boundEnd) && tEnd.after(boundBegin)) {
@@ -1605,7 +1595,7 @@ public class SOSworker extends AbstractWorker {
         return values;
     }
 
-    public AbstractFeatureType getFeatureOfInterest(final GetFeatureOfInterest request) throws CstlServiceException {
+    public AbstractFeature getFeatureOfInterest(final GetFeatureOfInterest request) throws CstlServiceException {
         verifyBaseRequest(request, true, false);
         LOGGER.log(logLevel, "GetFeatureOfInterest request processing\n");
         final long start = System.currentTimeMillis();
@@ -1621,7 +1611,7 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
         }
 
-        AbstractFeatureType result = null;
+        AbstractFeature result = null;
 
         // we return a single result
         if (request.getFeatureOfInterestId().size() == 1) {
@@ -1630,7 +1620,7 @@ public class SOSworker extends AbstractWorker {
                 throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
             } else {
                 if (!alwaysFeatureCollection) {
-                    return (SamplingFeatureType)singleResult;
+                    return (AbstractFeature) singleResult;
                 } else {
                     final List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
                     features.add(buildFeatureProperty(singleResult));
@@ -1658,12 +1648,12 @@ public class SOSworker extends AbstractWorker {
 
         if (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty()) {
             final Filter spatialFilter = request.getSpatialFilters().get(0); // TODO handle multiple filters (SOS 2.0.0)
-            if (spatialFilter instanceof BBOXType) {
-                final List<SamplingFeature> results = spatialFiltering((BBOXType) spatialFilter, currentVersion);
+            if (spatialFilter instanceof BBOX) {
+                final List<SamplingFeature> results = spatialFiltering((BBOX) spatialFilter, currentVersion);
 
                 // we return a single result
                 if (results.size() == 1) {
-                    result = (AbstractFeatureType) results.get(0);
+                    result = (AbstractFeature) results.get(0);
 
                 // we return a feature collection
                 } else if (results.size() > 1) {
@@ -1688,12 +1678,11 @@ public class SOSworker extends AbstractWorker {
         return result;
     }
 
-    public AbstractTimePrimitiveType getFeatureOfInterestTime(final GetFeatureOfInterestTime request) throws CstlServiceException {
+    public TemporalPrimitive getFeatureOfInterestTime(final GetFeatureOfInterestTime request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetFeatureOfInterestTime request processing\n");
         final long start = System.currentTimeMillis();
         verifyBaseRequest(request, true, false);
 
-        final AbstractTimePrimitiveType result;
         final String fid = request.getFeatureOfInterestId();
 
         // if there is no filter we throw an exception
@@ -1701,6 +1690,7 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("You must specify a samplingFeatureId", MISSING_PARAMETER_VALUE);
         }
 
+        final TemporalPrimitive result;
         if (omReader.getFeatureOfInterestNames().contains(fid)) {
             result = omReader.getFeatureOfInterestTime(fid);
         } else {
@@ -1710,30 +1700,8 @@ public class SOSworker extends AbstractWorker {
         return result;
     }
 
-    /**
-     * Build the correct featurePropertyType from a sampling feature
-     *
-     * @param feature
-     * @return
-     */
-    private FeaturePropertyType buildFeatureProperty(final SamplingFeature feature) {
-        final ObjectFactory samplingFactory = new ObjectFactory();
-        if (feature instanceof SamplingPointType) {
-            return new FeaturePropertyType(samplingFactory.createSamplingPoint((SamplingPointType)feature));
-        } else if (feature instanceof SamplingCurveType) {
-            return new FeaturePropertyType(samplingFactory.createSamplingCurve((SamplingCurveType)feature));
-        } else if (feature instanceof SamplingSolidType) {
-            return new FeaturePropertyType(samplingFactory.createSamplingSolid((SamplingSolidType)feature));
-        } else if (feature instanceof SamplingSurfaceType) {
-            return new FeaturePropertyType(samplingFactory.createSamplingSurface((SamplingSurfaceType)feature));
-        } else {
-            LOGGER.log(Level.WARNING, "unexpected feature type:{0}", feature);
-            return null;
-        }
-    }
-
-    private List<SamplingFeature> spatialFiltering(final BBOXType bbox, final String currentVersion) throws CstlServiceException {
-        final EnvelopeType e = bbox.getEnvelope();
+    private List<SamplingFeature> spatialFiltering(final BBOX bbox, final String currentVersion) throws CstlServiceException {
+        final Envelope e = getEnvelopeFromBBOX(currentVersion, bbox);
         if (e != null && e.isCompleteEnvelope2D()) {
 
             final List<SamplingFeature> matchingFeatureOfInterest = new ArrayList<SamplingFeature>();
@@ -1945,7 +1913,7 @@ public class SOSworker extends AbstractWorker {
            final String id;
            if (obs instanceof Measurement) {
                id = omWriter.writeMeasurement((Measurement)obs);
-               LOGGER.log(logLevel, "new Measurement inserted: id = " + id + " for the sensor " + ((ProcessType)obs.getProcedure()).getName());
+               LOGGER.log(logLevel, "new Measurement inserted: id = " + id + " for the sensor " + obs.getProcedure());
             } else {
 
                 //in first we verify that the observation is conform to the template
@@ -1954,7 +1922,7 @@ public class SOSworker extends AbstractWorker {
                 if (obs.matchTemplate(template)) {
                     if (obs.getSamplingTime() != null && obs.getResult() != null) {
                         id = omWriter.writeObservation(obs);
-                        LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + ((ProcessType)obs.getProcedure()).getName());
+                        LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + obs.getProcedure());
                     } else {
                         throw new CstlServiceException("The observation sampling time and the result must be specify",
                                                       MISSING_PARAMETER_VALUE, "samplingTime");
@@ -1980,10 +1948,10 @@ public class SOSworker extends AbstractWorker {
      *
      * @return true if there is no errors in the time constraint else return false.
      */
-    private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(final List<Filter> times, final boolean template, final ObservationFilter localOmFilter) throws CstlServiceException {
+    private TemporalGeometricPrimitive treatEventTimeRequest(final List<Filter> times, final boolean template, final ObservationFilter localOmFilter) throws CstlServiceException {
 
         //In template mode  his method return a temporal Object.
-        AbstractTimeGeometricPrimitiveType templateTime = null;
+        TemporalGeometricPrimitive templateTime = null;
 
         if (!times.isEmpty()) {
 
@@ -2021,8 +1989,8 @@ public class SOSworker extends AbstractWorker {
                     if (!template) {
                         localOmFilter.setTimeEquals(timeFilter);
 
-                    } else if (timeFilter instanceof AbstractTimeGeometricPrimitiveType) {
-                        templateTime = (AbstractTimeGeometricPrimitiveType) timeFilter;
+                    } else if (timeFilter instanceof TemporalGeometricPrimitive) {
+                        templateTime = (TemporalGeometricPrimitive) timeFilter;
 
                     } else {
                         throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
@@ -2080,8 +2048,8 @@ public class SOSworker extends AbstractWorker {
                     if (!template) {
                         localOmFilter.setTimeDuring(timeFilter);
                     }
-                    if (timeFilter instanceof TimePeriodType) {
-                        templateTime = (TimePeriodType)timeFilter;
+                    if (timeFilter instanceof Period) {
+                        templateTime = (Period)timeFilter;
 
                     } else {
                         throw new CstlServiceException("TM_During operation require TimePeriod!",
@@ -2194,7 +2162,7 @@ public class SOSworker extends AbstractWorker {
             if (offering != null) {
                 updateOffering(offering, template);
             } else {
-                createOffering(offeringName, template);
+                createOffering(version, offeringName, template);
             }
         }
 
@@ -2205,7 +2173,7 @@ public class SOSworker extends AbstractWorker {
         if (offering != null) {
             updateOffering(offering, template);
         } else {
-            createOffering("allSensor", template);
+            createOffering(version, "allSensor", template);
         }
     }
 
@@ -2255,25 +2223,20 @@ public class SOSworker extends AbstractWorker {
      *
      * @throws CstlServiceException If the service does not succeed to store the offering in the datasource.
      */
-    private void createOffering(final String offeringName, final ObservationTemplate template) throws CstlServiceException {
+    private void createOffering(final String version, final String offeringName, final ObservationTemplate template) throws CstlServiceException {
        LOGGER.log(logLevel, "offering {0} not present, first build", offeringName);
 
         // TODO bounded by??? station?
 
         // for the eventime of the offering we take the time of now.
         final Timestamp t = new Timestamp(System.currentTimeMillis());
-        final TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
+        final Period time = buildTimePeriod(version, t.toString(), null);
 
         //we add the template process
         final String process = template.getProcedure();
 
         //we add the template phenomenon
-        final PhenomenonType phenomenon;
-        if (template.getObservedProperties().isEmpty()) {
-            phenomenon = new PhenomenonType(template.getObservedProperties().get(0), null);
-        } else {
-            phenomenon = null;
-        }
+        final List<String> observedProperties = template.getObservedProperties();
 
         //we add the template feature of interest
         final String featureOfInterest = template.getFeatureOfInterest();
@@ -2289,14 +2252,14 @@ public class SOSworker extends AbstractWorker {
             description = "Base offering containing all the sensors.";
         }
         // we create a the new Offering
-        omWriter.writeOffering(new ObservationOfferingType(
+        omWriter.writeOffering(buildOffering(version, 
                                             OFFERING_ID_BASE + offeringName,
                                             OFFERING_ID_BASE + offeringName,
                                             description,
                                             srsName,
                                             time,
                                             process,
-                                            phenomenon,
+                                            observedProperties,
                                             featureOfInterest,
                                             offeringOutputFormat,
                                             resultModel,
