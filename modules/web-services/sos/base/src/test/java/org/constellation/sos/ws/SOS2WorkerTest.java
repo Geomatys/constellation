@@ -23,6 +23,9 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.constellation.test.utils.MetadataUtilities;
+
+import static org.constellation.sos.ws.SOSConstants.*;
 
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
@@ -30,15 +33,16 @@ import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.sos.xml.Capabilities;
 import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.swes.xml.v200.DescribeSensorType;
-
-import static org.constellation.sos.ws.SOSConstants.*;
-import org.constellation.test.utils.MetadataUtilities;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sml.xml.v100.SensorML;
+import org.geotoolkit.swes.xml.InsertSensorResponse;
+import org.geotoolkit.swes.xml.v200.InsertSensorType;
+import org.geotoolkit.swes.xml.v200.DescribeSensorType;
+import org.geotoolkit.xml.MarshallerPool;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.swes.xml.v200.InsertSensorResponseType;
 
 
 // JUnit dependencies
@@ -321,6 +325,92 @@ public class SOS2WorkerTest {
         MetadataUtilities.componentEquals(expResult, result);
 
         SensorMLMarshallerPool.getInstance().release(unmarshaller);
+    }
+
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void RegisterSensorErrorTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+
+        /**
+         * Test 1 we register a system sensor with no decription format
+         */
+        AbstractSensorML sensorDescription = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
+        InsertSensorType request = new InsertSensorType("2.0.0", sensorDescription,  null);
+        boolean exLaunched = false;
+        try {
+            worker.registerSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(),       PROCEDURE_DESCRIPTION_FORMAT);
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+        }
+
+        assertTrue(exLaunched);
+
+        /**
+         * Test 2 we register a system sensor with an invalid decription format
+         */
+        request = new InsertSensorType("2.0.0", sensorDescription, "something");
+        exLaunched = false;
+        try {
+            worker.registerSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(),       PROCEDURE_DESCRIPTION_FORMAT);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+
+        assertTrue(exLaunched);
+
+        marshallerPool.release(unmarshaller);
+    }
+
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void RegisterSensorTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+        /**
+         * Test 1 we register a system sensor
+         */
+        AbstractSensorML sensorDescription = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
+
+        /*JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-6.xml"));
+
+        ObservationType obsTemplate = (ObservationType)obj.getValue();*/
+
+        InsertSensorType request = new InsertSensorType("2.0.0", sensorDescription, "http://www.opengis.net/sensorML/1.0.0");
+
+        InsertSensorResponse response = worker.registerSensor(request);
+        
+        assertTrue(response instanceof InsertSensorResponseType);
+
+        assertEquals("urn:ogc:object:sensor:GEOM:4", response.getAssignedProcedure());
+
+        /**
+         * we verify that the sensor is well registered
+         */
+        DescribeSensorType DSrequest  = new DescribeSensorType("2.0.0","SOS","urn:ogc:object:sensor:GEOM:4", "http://www.opengis.net/sensorML/1.0.0");
+        AbstractSensorML absResult = (AbstractSensorML) worker.describeSensor(DSrequest);
+
+
+        assertTrue(absResult instanceof SensorML);
+        assertTrue(sensorDescription instanceof SensorML);
+        SensorML result = (SensorML) absResult;
+        SensorML expResult = (SensorML) sensorDescription;
+
+        MetadataUtilities.systemSMLEquals(expResult, result);
+
+
+        marshallerPool.release(unmarshaller);
     }
 
     /**

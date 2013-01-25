@@ -149,7 +149,6 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
        super.DescribeSensorTest();
     }
 
-
     /**
      * Tests the RegisterSensor method
      *

@@ -74,6 +74,7 @@ import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v110.TimeDuringType;
 import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swes.xml.InsertSensorResponse;
 
 import org.opengis.observation.sampling.SamplingPoint;
@@ -2090,6 +2091,8 @@ public class SOSWorkerTest {
         InsertSensorResponse response = worker.registerSensor(request);
 
         assertEquals("urn:ogc:object:sensor:GEOM:6", response.getAssignedProcedure());
+        
+        assertNull(response.getAssignedOffering());
 
         /**
          * we verify that the sensor is well registered
@@ -2104,7 +2107,6 @@ public class SOSWorkerTest {
         SensorML expResult = (SensorML) sensorDescription;
 
         MetadataUtilities.systemSMLEquals(expResult, result);
-
 
         marshallerPool.release(unmarshaller);
     }

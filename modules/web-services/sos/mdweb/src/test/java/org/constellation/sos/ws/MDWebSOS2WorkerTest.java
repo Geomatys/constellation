@@ -19,19 +19,19 @@ package org.constellation.sos.ws;
 
 // JUnit dependencies
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.sql.Connection;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.xml.MarshallerPool;
-
 
 import org.junit.*;
 
@@ -39,50 +39,62 @@ import org.junit.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
+public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
 
+    private static DefaultDataSource ds2 = null;
 
-    private static final File configDir = new File("FSSOSWorkerTest");
+    private static final File configDir = new File("MDSOSWorkerTest");
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+
+        final String url2 = "jdbc:derby:memory:MDTest200;create=true";
+        ds2 = new DefaultDataSource(url2);
+
+        Connection con2 = ds2.getConnection();
+
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con2);
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML_v2.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/profiles/inputLevels.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
+
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
 
         if (configDir.exists()) {
             FileUtilities.deleteDirectory(configDir);
         }
+
         if (!configDir.exists()) {
             configDir.mkdir();
-
-
-
-            File sensorDirectory = new File(configDir, "sensors");
-            sensorDirectory.mkdir();
-            writeCommonDataFile(sensorDirectory, "system.xml",     "urn:ogc:object:sensor:GEOM:1");
-            writeCommonDataFile(sensorDirectory, "component.xml",  "urn:ogc:object:sensor:GEOM:2");
-            writeCommonDataFile(sensorDirectory, "component2.xml", "urn:ogc:object:sensor:GEOM:3");
 
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic SMLConfiguration = new Automatic();
-            SMLConfiguration.setDataDirectory(configDir.getName() + "/sensors");
+            BDD smBdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url2, "", "");
+            SMLConfiguration.setBdd(smBdd);
+            SMLConfiguration.setFormat("mdweb");
 
             Automatic OMConfiguration  = new Automatic();
+
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(DataSourceType.NONE);
             configuration.setObservationWriterType(DataSourceType.NONE);
             configuration.setObservationFilterType(DataSourceType.NONE);
 
-            configuration.setSMLType(DataSourceType.FILESYSTEM);
-
+            configuration.setSMLType(DataSourceType.MDWEB);
             configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
             configuration.setProfile("transactional");
-            configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+            configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
-            
             marshaller.marshal(configuration, configFile);
 
         }
@@ -93,14 +105,26 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         worker.setLogLevel(Level.FINER);
     }
 
-
     @AfterClass
     public static void tearDownClass() throws Exception {
         if (worker != null) {
             worker.destroy();
         }
         FileUtilities.deleteDirectory(configDir);
+        File derbyLog = new File("derby.log");
+        if (derbyLog.exists()) {
+            derbyLog.delete();
+        }
+        File mappingFile = new File("mapping.properties");
+        if (mappingFile.exists()) {
+            mappingFile.delete();
+        }
+        if (ds2 != null) {
+            ds2.shutdown();
+        }
     }
+
+
 
     @Before
     public void setUp() throws Exception {
@@ -108,25 +132,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
 
     @After
     public void tearDown() throws Exception {
-
     }
-
-    public static void writeCommonDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {
-
-        File dataFile = new File(dataDirectory, identifier + ".xml");
-        FileWriter fw = new FileWriter(dataFile);
-        InputStream in = Util.getResourceAsStream("org/constellation/xml/sml/" + resourceName);
-
-        byte[] buffer = new byte[1024];
-        int size;
-
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            fw.write(new String(buffer, 0, size));
-        }
-        in.close();
-        fw.close();
-    }
-
 
     /**
      * Tests the DescribeSensor method
@@ -139,6 +145,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
        super.DescribeSensorErrorTest();
     }
 
+
     /**
      * Tests the DescribeSensor method
      *
@@ -149,7 +156,6 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void DescribeSensorTest() throws Exception {
        super.DescribeSensorTest();
     }
-
 
     /**
      * Tests the RegisterSensor method
@@ -183,5 +189,4 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void destroyTest() throws Exception {
         super.destroyTest();
     }
-
 }

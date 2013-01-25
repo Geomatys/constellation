@@ -96,14 +96,10 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.Envelope;
-import org.geotoolkit.gml.xml.v311.FeatureCollectionType;
-import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
+import org.geotoolkit.gml.xml.FeatureCollection;
+import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.ogc.xml.XMLLiteral;
-import org.geotoolkit.ogc.xml.v110.TimeAfterType;
-import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
-import org.geotoolkit.ogc.xml.v110.TimeDuringType;
-import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SmlFactory;
@@ -446,6 +442,9 @@ public class SOSworker extends AbstractWorker {
                 //we initialize the variables depending on the Reader capabilities
                 this.acceptedResponseMode   = omReader.getResponseModes();
                 this.acceptedResponseFormat = omReader.getResponseFormats();
+            } else {
+                this.acceptedResponseMode   = new ArrayList<ResponseModeType>();
+                this.acceptedResponseFormat = new ArrayList<String>();
             }
             if (!DataSourceType.NONE.equals(omWriterType)) {
                 omFactory = getOMFactory(omWriterType);
@@ -725,11 +724,35 @@ public class SOSworker extends AbstractWorker {
             //we update the parameter in operation metadata.
             final AbstractOperation go = om.getOperation("GetObservation");
 
+            final Collection<String> foiNames;
+            final Collection<String> procNames;
+            final Collection<String> phenNames;
+            final Collection<String> offNames;
+            final List<String> eventTime;
+            final List<String> queryableResultProperties;
+            if (omReader != null) {
+                foiNames  = omReader.getFeatureOfInterestNames();
+                procNames = omReader.getProcedureNames();
+                phenNames = omReader.getPhenomenonNames();
+                offNames  = omReader.getOfferingNames(currentVersion);
+                eventTime = omReader.getEventTime();
+            } else {
+                foiNames  = new ArrayList<String>();
+                procNames = new ArrayList<String>();
+                phenNames = new ArrayList<String>();
+                offNames  = new ArrayList<String>();
+                eventTime = new ArrayList<String>();
+            }
+            if (omFilter != null) {
+                queryableResultProperties = omFilter.supportedQueryableResultProperties();
+            } else {
+                queryableResultProperties = new ArrayList<String>();
+            }
+            
             // the list of offering names
-            go.updateParameter(OFFERING, omReader.getOfferingNames(currentVersion));
+            go.updateParameter(OFFERING, offNames);
 
             // the event time range
-            final List<String> eventTime = omReader.getEventTime();
             if (eventTime != null && eventTime.size() == 1) {
                 final Range range = buildRange(currentVersion, eventTime.get(0), "now");
                 go.updateParameter(EVENT_TIME, range);
@@ -739,16 +762,14 @@ public class SOSworker extends AbstractWorker {
             }
 
             //the process list
-            final Collection<String> procNames = omReader.getProcedureNames();
             go.updateParameter(PROCEDURE, procNames);
 
             //the phenomenon list
-            go.updateParameter("observedProperty", omReader.getPhenomenonNames());
+            go.updateParameter("observedProperty", phenNames);
 
             //the feature of interest list
-            Collection<String> foiNames = omReader.getFeatureOfInterestNames();
             go.updateParameter("featureOfInterest", foiNames);
-
+            
             // the different responseMode available
             final List<String> arm = new ArrayList<String>();
             for (ResponseModeType rm: acceptedResponseMode) {
@@ -760,8 +781,7 @@ public class SOSworker extends AbstractWorker {
             go.updateParameter("responseFormat", acceptedResponseFormat);
 
             // the result filtrable part
-            final List<String> queryableResultProperties = omFilter.supportedQueryableResultProperties();
-            if (queryableResultProperties != null && !queryableResultProperties.isEmpty()) {
+            if (!queryableResultProperties.isEmpty()) {
                 go.updateParameter("result", queryableResultProperties);
             }
 
@@ -796,8 +816,14 @@ public class SOSworker extends AbstractWorker {
         if (keepCapabilities) {
             cont = loadedCapabilities.getContents();
         } else {
-            // we add the list of observation ofeerings
-            cont = buildContents(currentVersion, omReader.getObservationOfferings(currentVersion));
+            // we add the list of observation offerings
+            final List<ObservationOffering> offerings;
+            if (omReader != null) {
+                offerings = omReader.getObservationOfferings(currentVersion);
+            } else {
+                offerings = new ArrayList<ObservationOffering>();
+            }
+            cont = buildContents(currentVersion, offerings);
         }
         
         // we build and normalize the document
@@ -1118,10 +1144,10 @@ public class SOSworker extends AbstractWorker {
                                         final double stationMaxX  = sc.getBoundedBy().getEnvelope().getUpperCorner().getValue().get(0);
                                         final double stationMinY  = sc.getBoundedBy().getEnvelope().getLowerCorner().getValue().get(1);
                                         final double stationMaxY  = sc.getBoundedBy().getEnvelope().getUpperCorner().getValue().get(1);
-                                        final double minx         = e.getLowerCorner().getValue().get(0);
-                                        final double maxx         = e.getUpperCorner().getValue().get(0);
-                                        final double miny         = e.getLowerCorner().getValue().get(1);
-                                        final double maxy         = e.getUpperCorner().getValue().get(1);
+                                        final double minx         = e.getLowerCorner().getOrdinate(0);
+                                        final double maxx         = e.getUpperCorner().getOrdinate(0);
+                                        final double miny         = e.getLowerCorner().getOrdinate(1);
+                                        final double maxy         = e.getUpperCorner().getOrdinate(1);
 
                                         // we look if the station if contained in the BBOX
                                         if (stationMaxX < maxx && stationMinX > minx &&
@@ -1327,10 +1353,10 @@ public class SOSworker extends AbstractWorker {
 
             final double stationX = sp.getPosition().getDirectPosition().getOrdinate(0);
             final double stationY = sp.getPosition().getDirectPosition().getOrdinate(1);
-            final double minx     = e.getLowerCorner().getValue().get(0);
-            final double maxx     = e.getUpperCorner().getValue().get(0);
-            final double miny     = e.getLowerCorner().getValue().get(1);
-            final double maxy     = e.getUpperCorner().getValue().get(1);
+            final double minx     = e.getLowerCorner().getOrdinate(0);
+            final double maxx     = e.getUpperCorner().getOrdinate(0);
+            final double miny     = e.getLowerCorner().getOrdinate(1);
+            final double maxy     = e.getUpperCorner().getOrdinate(1);
 
             // we look if the station if contained in the BBOX
             return stationX < maxx && stationX > minx && stationY < maxy && stationY > miny;
@@ -1390,7 +1416,7 @@ public class SOSworker extends AbstractWorker {
         // case TEquals with time instant
         if (template.getSamplingTime() instanceof Instant) {
            final Instant ti      = (Instant) template.getSamplingTime();
-           final TEquals equals  = new TimeEqualsType(null, ti);
+           final TEquals equals  = buildTimeEquals(currentVersion, null, ti);
            times.add(equals);
 
         } else if (template.getSamplingTime() instanceof TimePeriodType) {
@@ -1398,17 +1424,17 @@ public class SOSworker extends AbstractWorker {
 
             //case TBefore
             if (tp.getBeginPosition().equals(new TimePositionType(TimeIndeterminateValueType.BEFORE))) {
-                final Before before  = new TimeBeforeType(null, new TimeInstantType(tp.getEndPosition()));
+                final Before before  = buildTimeBefore(currentVersion, null, new TimeInstantType(tp.getEndPosition()));
                 times.add(before);
 
             //case TAfter
             } else if (tp.getEndPosition().equals(new TimePositionType(TimeIndeterminateValueType.NOW))) {
-                final After after  = new TimeAfterType(null, new TimeInstantType(tp.getBeginPosition()));
+                final After after  = buildTimeAfter(currentVersion, null, new TimeInstantType(tp.getBeginPosition()));
                 times.add(after);
 
             //case TDuring/TEquals  (here the sense of T_Equals with timePeriod is lost but not very usefull)
             } else {
-                final During during  = new TimeDuringType(null, tp);
+                final During during  = buildTimeDuring(currentVersion, null, tp);
                 times.add(during);
             }
         }
@@ -1622,9 +1648,9 @@ public class SOSworker extends AbstractWorker {
                 if (!alwaysFeatureCollection) {
                     return (AbstractFeature) singleResult;
                 } else {
-                    final List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
+                    final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
                     features.add(buildFeatureProperty(singleResult));
-                    final FeatureCollectionType collection = new FeatureCollectionType("feature-collection-1", null, null, features);
+                    final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
                     collection.computeBounds();
                     result = collection;
                 }
@@ -1632,7 +1658,7 @@ public class SOSworker extends AbstractWorker {
 
         // we return a featureCollection
         } else if (request.getFeatureOfInterestId().size() > 1) {
-            final List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
+            final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
             for (String featureID : request.getFeatureOfInterestId()) {
                 final SamplingFeature feature = omReader.getFeatureOfInterest(featureID);
                 if (feature == null) {
@@ -1641,7 +1667,7 @@ public class SOSworker extends AbstractWorker {
                     features.add(buildFeatureProperty(feature));
                 }
             }
-            final FeatureCollectionType collection = new FeatureCollectionType("feature-collection-1", null, null, features);
+            final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
             collection.computeBounds();
             result = collection;
         }
@@ -1657,11 +1683,11 @@ public class SOSworker extends AbstractWorker {
 
                 // we return a feature collection
                 } else if (results.size() > 1) {
-                    final List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
+                    final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
                     for (SamplingFeature feature : results) {
                         features.add(buildFeatureProperty(feature));
                     }
-                    final FeatureCollectionType collection = new FeatureCollectionType("feature-collection-1", null, null, features);
+                    final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
                     collection.computeBounds();
                     result = collection;
 
@@ -1754,6 +1780,13 @@ public class SOSworker extends AbstractWorker {
         verifyBaseRequest(request, true, false);
         final String currentVersion = request.getVersion().toString();
 
+        if (currentVersion.equals("2.0.0")) {
+            if (request.getProcedureDescriptionFormat() == null) {
+                throw new CstlServiceException("Procedure description format must be specified" , MISSING_PARAMETER_VALUE, PROCEDURE_DESCRIPTION_FORMAT);
+            } else if (!ACCEPTED_SENSORML_FORMATS.get("2.0.0").contains(request.getProcedureDescriptionFormat())){
+                throw new CstlServiceException("This procedure description format is not supported" , INVALID_PARAMETER_VALUE, PROCEDURE_DESCRIPTION_FORMAT);
+            }
+        }
         boolean success = false;
         String id = "";
         try {
@@ -1896,11 +1929,11 @@ public class SOSworker extends AbstractWorker {
 
             // Debug part
             if (verifySynchronization) {
-                if (obs.getSamplingTime() instanceof TimeInstantType) {
-                   final TimeInstantType timeInstant = (TimeInstantType) obs.getSamplingTime();
+                if (obs.getSamplingTime() instanceof Instant) {
+                   final Instant timeInstant = (Instant) obs.getSamplingTime();
                     try {
                         final ISODateParser parser = new ISODateParser();
-                        final Date d = parser.parseToDate(timeInstant.getTimePosition().getValue());
+                        final Date d = parser.parseToDate(timeInstant.getPosition().getDateTime().toString());
                         final long t = System.currentTimeMillis() - d.getTime();
                         LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + TemporalUtilities.durationToString(t) + ')');
                     } catch (IllegalArgumentException ex) {
@@ -1966,9 +1999,10 @@ public class SOSworker extends AbstractWorker {
                     final Object timeFilter   = filter.getExpression2();
 
                     // look for "latest" or "getFirst" filter (52N compatibility)
-                    if (timeFilter instanceof TimeInstantType){
-                        final TimeInstantType ti = (TimeInstantType) timeFilter;
-                        if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("latest")) {
+                    if (timeFilter instanceof Instant){
+                        final Instant ti = (Instant) timeFilter;
+                        if (ti.getPosition() != null && ti.getPosition().getDateTime() != null &&
+                            ti.getPosition().getDateTime().toString().equalsIgnoreCase("latest")) {
                             if (!template) {
                                 localOmFilter.setTimeLatest();
                                 continue;
@@ -1976,7 +2010,8 @@ public class SOSworker extends AbstractWorker {
                                 LOGGER.warning("latest time are not handled with template mode");
                             }
                         }
-                        if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("getFirst")) {
+                        if (ti.getPosition() != null && ti.getPosition().getDateTime() != null &&
+                            ti.getPosition().getDateTime().toString().equalsIgnoreCase("getFirst")) {
                             if (!template) {
                                 localOmFilter.setTimeFirst();
                                 continue;
@@ -2008,9 +2043,9 @@ public class SOSworker extends AbstractWorker {
 
                     if (!template) {
                         localOmFilter.setTimeBefore(timeFilter);
-                    } else if (timeFilter instanceof TimeInstantType) {
-                        final TimeInstantType ti = (TimeInstantType)timeFilter;
-                        templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
+                    } else if (timeFilter instanceof Instant) {
+                        final Instant ti = (Instant)timeFilter;
+                        templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getPosition());
                     } else {
                         throw new CstlServiceException("TM_Before operation require timeInstant!",
                                                       INVALID_PARAMETER_VALUE, EVENT_TIME);
@@ -2027,9 +2062,9 @@ public class SOSworker extends AbstractWorker {
 
                     if (!template) {
                         localOmFilter.setTimeAfter(timeFilter);
-                    } else if (timeFilter instanceof TimeInstantType) {
-                        final TimeInstantType ti = (TimeInstantType)timeFilter;
-                        templateTime = new TimePeriodType(ti.getTimePosition());
+                    } else if (timeFilter instanceof Instant) {
+                        final Instant ti = (Instant)timeFilter;
+                        templateTime = new TimePeriodType(ti.getPosition());
 
                     } else {
                        throw new CstlServiceException("TM_After operation require timeInstant!",
@@ -2146,13 +2181,8 @@ public class SOSworker extends AbstractWorker {
      */
     private void addSensorToOffering(final AbstractSensorML sensor, final ObservationTemplate template, final String version) throws CstlServiceException {
 
-        //we search which are the networks binded to this sensor
+        //we search which are the networks binded to this sensor TODO remove
         final List<String> networkNames = getNetworkNames(sensor);
-
-        final int size = networkNames.size();
-        if (size == 0) {
-            LOGGER.severe("There is no network in that SensorML file");
-        }
 
         // for each network we create (or update) an offering
         for (String networkName : networkNames) {
