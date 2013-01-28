@@ -1120,7 +1120,7 @@ public class SOSworker extends AbstractWorker {
                     
                             for (String refStation : off.getFeatureOfInterestIds()) {
                                 // TODO for SOS 2.0 use observed area
-                                final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation);
+                                final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation, currentVersion);
                                 if (station == null) {
                                     throw new CstlServiceException("the feature of interest is not registered",
                                             INVALID_PARAMETER_VALUE);
@@ -1266,7 +1266,7 @@ public class SOSworker extends AbstractWorker {
                 matchingResult = new ArrayList<Observation>();
                 final Set<String> observationIDs = localOmFilter.filterObservation();
                 for (String observationID : observationIDs) {
-                    matchingResult.add(omReader.getObservation(observationID, resultModel));
+                    matchingResult.add(omReader.getObservation(observationID, resultModel, currentVersion));
                 }
                 computedBounds         = null;
 
@@ -1641,7 +1641,7 @@ public class SOSworker extends AbstractWorker {
 
         // we return a single result
         if (request.getFeatureOfInterestId().size() == 1) {
-            final SamplingFeature singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0));
+            final SamplingFeature singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0), currentVersion);
             if (singleResult == null) {
                 throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
             } else {
@@ -1649,7 +1649,7 @@ public class SOSworker extends AbstractWorker {
                     return (AbstractFeature) singleResult;
                 } else {
                     final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
-                    features.add(buildFeatureProperty(singleResult));
+                    features.add(buildFeatureProperty(currentVersion, singleResult));
                     final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
                     collection.computeBounds();
                     result = collection;
@@ -1660,11 +1660,11 @@ public class SOSworker extends AbstractWorker {
         } else if (request.getFeatureOfInterestId().size() > 1) {
             final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
             for (String featureID : request.getFeatureOfInterestId()) {
-                final SamplingFeature feature = omReader.getFeatureOfInterest(featureID);
+                final SamplingFeature feature = omReader.getFeatureOfInterest(featureID, currentVersion);
                 if (feature == null) {
                     throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
                 } else {
-                    features.add(buildFeatureProperty(feature));
+                    features.add(buildFeatureProperty(currentVersion, feature));
                 }
             }
             final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
@@ -1685,7 +1685,7 @@ public class SOSworker extends AbstractWorker {
                 } else if (results.size() > 1) {
                     final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
                     for (SamplingFeature feature : results) {
-                        features.add(buildFeatureProperty(feature));
+                        features.add(buildFeatureProperty(currentVersion, feature));
                     }
                     final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
                     collection.computeBounds();
@@ -1735,7 +1735,7 @@ public class SOSworker extends AbstractWorker {
             for (ObservationOffering off : offerings) {
                 // TODO for SOS 2.0 use observed area
                 for (String refStation : off.getFeatureOfInterestIds()) {
-                    final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation);
+                    final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation, currentVersion);
                     if (station == null) {
                         LOGGER.log(Level.WARNING, "the feature of interest is not registered:{0}", refStation);
                         continue;
@@ -1950,7 +1950,7 @@ public class SOSworker extends AbstractWorker {
             } else {
 
                 //in first we verify that the observation is conform to the template
-                final Observation template = (Observation) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME);
+                final Observation template = (Observation) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME, currentVersion);
                 //if the observation to insert match the template we can insert it in the OM db
                 if (obs.matchTemplate(template)) {
                     if (obs.getSamplingTime() != null && obs.getResult() != null) {

@@ -93,7 +93,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointType> implem
                                        result.getString(indexOf(query.name)),
                                        result.getString(indexOf(query.description)),
                                        new FeaturePropertyType(result.getString(indexOf(query.sampledFeature))),
-                                       new PointPropertyType(p));
+                                       p);
         
     }
     

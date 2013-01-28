@@ -61,16 +61,25 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.gml.xml.v321.DirectPositionType;
 import org.geotoolkit.gml.xml.v321.EnvelopeType;
+import org.geotoolkit.gml.xml.v321.FeaturePropertyType;
+import org.geotoolkit.gml.xml.v321.LineStringType;
+import org.geotoolkit.gml.xml.v321.PointType;
 import org.geotoolkit.observation.xml.v100.MeasurementType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
+import org.geotoolkit.sampling.xml.v100.SamplingPointType;
+import org.geotoolkit.sampling.xml.v200.SFSamplingFeatureType;
+import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
 import org.geotoolkit.sos.xml.ObservationOffering;
+import org.opengis.observation.sampling.SamplingFeature;
 
 
 /**
@@ -372,19 +381,19 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeatureType getFeatureOfInterest(final String samplingFeatureName) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws CstlServiceException {
         //TODO remove those duplicated catch block
         try {
             final SamplingPointTable pointTable = omDatabase.getTable(SamplingPointTable.class);
-            return pointTable.getEntry(samplingFeatureName);
+            return convert(version, pointTable.getEntry(samplingFeatureName));
         } catch (NoSuchRecordException ex) {
             try {
                 final SamplingFeatureTable foiTable = omDatabase.getTable(SamplingFeatureTable.class);
-                return foiTable.getEntry(samplingFeatureName);
+                return convert(version, foiTable.getEntry(samplingFeatureName));
             } catch (NoSuchRecordException ex2) {
                 try {
                     final SamplingCurveTable curveTable = omDatabase.getTable(SamplingCurveTable.class);
-                    return curveTable.getEntry(samplingFeatureName);
+                    return convert(version, curveTable.getEntry(samplingFeatureName));
                 } catch (NoSuchRecordException ex3) {
                     return null;
                 }  catch (CatalogException ex3) {
@@ -415,12 +424,72 @@ public class DefaultObservationReader implements ObservationReader {
                     NO_APPLICABLE_CODE);
         }
     }
+    
+    private SamplingFeature convert(final String version, final SamplingFeature feature) {
+        if (version.equals("2.0.0")) {
+            if (feature instanceof SamplingPointType) {
+                final SamplingPointType sp = (SamplingPointType) feature;
+                final FeaturePropertyType fp;
+                if (sp.getSampledFeatures() != null && !sp.getSampledFeatures().isEmpty()) {
+                    fp = new FeaturePropertyType(sp.getSampledFeatures().iterator().next().getHref());
+                } else {
+                    fp = null;
+                }
+                final PointType pt;
+                if (sp.getPosition() != null) {
+                    final DirectPositionType dp = new DirectPositionType(sp.getPosition().getPos());
+                    pt = new PointType(sp.getPosition().getId(), dp);
+                } else {
+                    pt = null;
+                }
+                return new SFSpatialSamplingFeatureType(sp.getId(), sp.getName(), sp.getDescription(),
+                        "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint", fp, pt, null);
+            } else if (feature instanceof SamplingCurveType) {
+                final SamplingCurveType sp = (SamplingCurveType) feature;
+                final FeaturePropertyType fp;
+                if (sp.getSampledFeatures() != null && !sp.getSampledFeatures().isEmpty()) {
+                    fp = new FeaturePropertyType(sp.getSampledFeatures().iterator().next().getHref());
+                } else {
+                    fp = null;
+                }
+                final LineStringType pt;
+                if (sp.getShape() != null && sp.getShape().getAbstractCurve() instanceof org.geotoolkit.gml.xml.v311.LineStringType) {
+                    final org.geotoolkit.gml.xml.v311.LineStringType line311 = (org.geotoolkit.gml.xml.v311.LineStringType)sp.getShape().getAbstractCurve();
+                    final List<org.geotoolkit.gml.xml.v321.DirectPositionType> positions = new ArrayList<org.geotoolkit.gml.xml.v321.DirectPositionType>();
+                    for (org.geotoolkit.gml.xml.v311.DirectPositionType pos : line311.getPos()) {
+                        positions.add(new DirectPositionType(pos.getValue()));
+                    }
+                    pt = new LineStringType(line311.getId(), positions);
+                    
+                } else {
+                    pt = null;
+                }
+                final EnvelopeType env = new EnvelopeType(sp.getBoundedBy().getEnvelope());
+                return new SFSpatialSamplingFeatureType(sp.getId(), sp.getName(), sp.getDescription(), 
+                        "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingCurve", fp, pt, env);
+            } else if (feature instanceof SamplingFeatureType) {
+                final SamplingFeatureType sp = (SamplingFeatureType) feature;
+                final FeaturePropertyType fp;
+                if (sp.getSampledFeatures() != null && !sp.getSampledFeatures().isEmpty()) {
+                    fp = new FeaturePropertyType(sp.getSampledFeatures().iterator().next().getHref());
+                } else {
+                    fp = null;
+                }
+                return new SFSamplingFeatureType(sp.getId(), sp.getName(), sp.getDescription(), 
+                        "http://www.opengis.net/def/samplingFeatureType/OGC-OM/SF_SamplingFeature", fp, null);
+            } else {
+                throw new IllegalArgumentException("unexpected feature type.");
+            }
+        } else {
+            return feature;
+        }
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ObservationType getObservation(final String identifier, final QName resultModel) throws CstlServiceException {
+    public ObservationType getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
         try {
             if (resultModel.equals(MEASUREMENT_QNAME)) {
                 return (MeasurementType) measTable.getEntry(identifier);

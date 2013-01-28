@@ -36,7 +36,9 @@ import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.gml.xml.GMLXmlFactory;
+import org.geotoolkit.gml.xml.Point;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
@@ -54,18 +56,16 @@ import org.geotoolkit.swe.xml.v101.QuantityType;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
 import org.geotoolkit.swe.xml.v101.TextBlockType;
 import org.geotoolkit.swe.xml.v101.TimeType;
-import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
-import org.geotoolkit.gml.xml.v311.PointPropertyType;
-import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
-import org.geotoolkit.sampling.xml.v100.SamplingPointType;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.ObservationOffering;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+import org.opengis.geometry.DirectPosition;
+
+import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.Period;
 
 
@@ -351,7 +351,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeatureType getFeatureOfInterest(String samplingFeatureId) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterest(final String samplingFeatureId, final String version) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var19", "var20", "var21", "var22", "var23", "var24", "var48"), samplingFeatureId);
 
@@ -375,16 +375,16 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 LOGGER.log(Level.SEVERE, "unable to parse the srs dimension: {0}", dimension);
             }
             final List<Double> coordinates = getCoordinates(samplingFeatureId);
-            final DirectPositionType pos = new DirectPositionType(srsName, srsDimension, coordinates);
-            final PointType location     = new PointType(pointID, pos);
+            final DirectPosition pos = buildDirectPosition(version, srsName, srsDimension, coordinates);
+            final Point location     = buildPoint(version, pointID, pos);
 
-            final FeaturePropertyType sampleFeatureProperty;
+            final FeatureProperty sampleFeatureProperty;
             if (sampledFeature != null) {
-                sampleFeatureProperty = new FeaturePropertyType(sampledFeature);
+                sampleFeatureProperty = buildFeatureProperty(version, sampledFeature);
             } else {
                 sampleFeatureProperty = null;
             }
-            return  new SamplingPointType(samplingFeatureId, name, description, sampleFeatureProperty, new PointPropertyType(location));
+            return buildSamplingPoint(version, samplingFeatureId, name, description, sampleFeatureProperty, location);
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
@@ -420,10 +420,10 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public ObservationType getObservation(String identifier, QName resultModel) throws CstlServiceException {
+    public ObservationType getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var26", "var27", "var28", "var29", "var30", "var31"), identifier);
-            final SamplingFeatureType featureOfInterest = getFeatureOfInterest(values.getVariable("var26"));
+            final SamplingFeature featureOfInterest = getFeatureOfInterest(values.getVariable("var26"), version);
             final PhenomenonType observedProperty = getPhenomenon(values.getVariable("var27"));
             final ProcessType procedure = new ProcessType(values.getVariable("var28"));
 
@@ -441,7 +441,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             final DataArrayPropertyType result = new DataArrayPropertyType(dataArray);
             return new ObservationType(identifier,
                                         null,
-                                        featureOfInterest,
+                                        (org.geotoolkit.sampling.xml.v100.SamplingFeatureType)featureOfInterest,
                                         observedProperty,
                                         procedure,
                                         result,

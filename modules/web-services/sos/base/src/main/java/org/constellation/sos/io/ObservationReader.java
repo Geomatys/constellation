@@ -20,15 +20,16 @@ package org.constellation.sos.io;
 // J2SE dependencies
 import java.util.Collection;
 import java.util.List;
+import javax.xml.namespace.QName;
 
 // Constellation dependencies
-import javax.xml.namespace.QName;
 import org.constellation.ws.CstlServiceException;
 
-// GeoAPI
-import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
+// Geotoolkit
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
+
+// GeoAPI
 import org.opengis.observation.Observation;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -110,7 +111,7 @@ public interface ObservationReader {
      * @return the corresponding feature Of interest.
      * @throws org.constellation.ws.CstlServiceException
      */
-    SamplingFeature getFeatureOfInterest(final String samplingFeatureName) throws CstlServiceException;
+    SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws CstlServiceException;
 
 
     /**
@@ -129,7 +130,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    Observation getObservation(final String identifier, final QName resultModel) throws CstlServiceException;
+    Observation getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException;
 
     /**
      * Return a result for the specified identifier.

@@ -17,6 +17,8 @@
 
 package org.constellation.sos.ws;
 
+import java.util.ArrayList;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
@@ -26,6 +28,8 @@ import org.constellation.ws.MimeType;
 import org.constellation.test.utils.MetadataUtilities;
 
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.geotoolkit.gml.xml.AbstractFeature;
+import org.geotoolkit.ogc.xml.v200.BBOXType;
 
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
@@ -42,6 +46,8 @@ import org.geotoolkit.swes.xml.v200.DescribeSensorType;
 import org.geotoolkit.xml.MarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
+import org.geotoolkit.sos.xml.v200.GetFeatureOfInterestType;
 import org.geotoolkit.swes.xml.v200.InsertSensorResponseType;
 
 
@@ -408,6 +414,114 @@ public class SOS2WorkerTest {
         SensorML expResult = (SensorML) sensorDescription;
 
         MetadataUtilities.systemSMLEquals(expResult, result);
+
+
+        marshallerPool.release(unmarshaller);
+    }
+    
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void GetFeatureOfInterestErrorTest() throws Exception {
+
+        /**
+         * Test 1 : bad featureID
+         */
+        GetFeatureOfInterestType request = new GetFeatureOfInterestType("2.0.0", "SOS", "wrongFID");
+
+        boolean exLaunched = false;
+        try {
+            worker.getFeatureOfInterest(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+        /**
+         * Test 2 : no filter
+         */
+        exLaunched = false;
+        request = new GetFeatureOfInterestType("2.0.0", "SOS", new ArrayList<String>());
+
+        try {
+            worker.getFeatureOfInterest(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+        /**
+         * Test 3 : malformed BBOX filter
+         */
+        exLaunched = false;
+        BBOXType bbox = new BBOXType();
+        request = new GetFeatureOfInterestType("2.0.0", "SOS", bbox);
+
+
+        try {
+            worker.getFeatureOfInterest(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+    }
+
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void GetFeatureOfInterestTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+        /**
+         * Test 1 : getFeatureOfInterest with featureID filter
+         */
+        SFSpatialSamplingFeatureType expResult = ((JAXBElement<SFSpatialSamplingFeatureType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/feature1.xml"))).getValue();
+
+        GetFeatureOfInterestType request = new GetFeatureOfInterestType("2.0.0", "SOS", "station-001");
+
+        AbstractFeature result = worker.getFeatureOfInterest(request);
+
+        assertTrue ("was" + result, result instanceof SFSpatialSamplingFeatureType);
+
+        assertEquals(expResult, result);
+
+        /**
+         * Test 2 : getFeatureOfInterest with featureID filter (SamplingCurve)
+         */
+        SFSpatialSamplingFeatureType expResultC = ((JAXBElement<SFSpatialSamplingFeatureType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/feature3.xml"))).getValue();
+
+        request = new GetFeatureOfInterestType("2.0.0", "SOS", "station-006");
+
+        result = worker.getFeatureOfInterest(request);
+
+        assertTrue (result instanceof SFSpatialSamplingFeatureType);
+        
+        final SFSpatialSamplingFeatureType resultC = (SFSpatialSamplingFeatureType) result;
+
+        assertEquals(expResultC.getShape(), resultC.getShape());
+        
+        assertEquals(expResultC.getBoundedBy(), resultC.getBoundedBy());
+        
+        assertEquals(expResultC, resultC);
+
+        /**
+         * Test 3 : getFeatureOfInterest with BBOX filter restore when multiple works
+
+        request = new GetFeatureOfInterest("1.0.0", "SOS", new GetFeatureOfInterest.Location(new BBOXType(null, 64000.0, 1730000.0, 66000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")));
+
+        result = worker.getFeatureOfInterest(request);
+
+        assertTrue (result instanceof SamplingPoint);
+
+        assertEquals(expResult, result);*/
+
 
 
         marshallerPool.release(unmarshaller);

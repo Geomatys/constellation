@@ -74,7 +74,6 @@ import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v110.TimeDuringType;
 import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swes.xml.InsertSensorResponse;
 
 import org.opengis.observation.sampling.SamplingPoint;
@@ -2151,7 +2150,7 @@ public class SOSWorkerTest {
          */
         exLaunched = false;
         BBOXType bbox = new BBOXType();
-        request = new GetFeatureOfInterest("1.0.0", "SOS", new GetFeatureOfInterest.Location(bbox));
+        request = new GetFeatureOfInterest("1.0.0", "SOS", bbox);
 
 
         try {
@@ -2174,7 +2173,7 @@ public class SOSWorkerTest {
         /**
          * Test 1 : getFeatureOfInterest with featureID filter
          */
-        SamplingPoint expResult = ((JAXBElement<SamplingPoint>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/feature1.xml"))).getValue();
+        SamplingPoint expResult = ((JAXBElement<SamplingPoint>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/feature1.xml"))).getValue();
 
         GetFeatureOfInterest request = new GetFeatureOfInterest("1.0.0", "SOS", "station-001");
 
@@ -2187,7 +2186,7 @@ public class SOSWorkerTest {
         /**
          * Test 2 : getFeatureOfInterest with featureID filter (SamplingCurve)
          */
-        SamplingCurveType expResultC = ((JAXBElement<SamplingCurveType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/feature3.xml"))).getValue();
+        SamplingCurveType expResultC = ((JAXBElement<SamplingCurveType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/feature3.xml"))).getValue();
 
         request = new GetFeatureOfInterest("1.0.0", "SOS", "station-006");
 

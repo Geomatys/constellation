@@ -35,19 +35,20 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 
-import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.observation.xml.v100.ObservationType;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
 import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.v101.AnyResultType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.sos.xml.ObservationOffering;
+
+import org.opengis.observation.Observation;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.temporal.TemporalPrimitive;
 
 /**
  *
@@ -287,7 +288,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeatureType getFeatureOfInterest(final String samplingFeatureName) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws CstlServiceException {
         final File samplingFeatureFile = new File(foiDirectory, samplingFeatureName + FILE_EXTENSION);
         if (samplingFeatureFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -297,8 +298,8 @@ public class FileObservationReader implements ObservationReader {
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof SamplingFeatureType) {
-                    return (SamplingFeatureType) obj;
+                if (obj instanceof SamplingFeature) {
+                    return (SamplingFeature) obj;
                 }
                 throw new CstlServiceException("The file " + samplingFeatureFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
@@ -316,7 +317,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationType getObservation(final String identifier, final QName resultModel) throws CstlServiceException {
+    public Observation getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
         File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (!observationFile.exists()) {
             observationFile = new File(observationTemplateDirectory, identifier + FILE_EXTENSION);
@@ -329,8 +330,8 @@ public class FileObservationReader implements ObservationReader {
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof ObservationType) {
-                    return (ObservationType) obj;
+                if (obj instanceof Observation) {
+                    return (Observation) obj;
                 }
                 throw new CstlServiceException("The file " + observationFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
@@ -358,8 +359,8 @@ public class FileObservationReader implements ObservationReader {
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof ObservationType) {
-                    final ObservationType obs = (ObservationType) obj;
+                if (obj instanceof Observation) {
+                    final Observation obs = (Observation) obj;
                     final DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
                     return new AnyResultType(null, arrayP.getDataArray());
                 }
@@ -412,7 +413,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException {
+    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException {
         throw new CstlServiceException("The Filesystem implementation of SOS does not support GetFeatureofInterestTime");
     }
     

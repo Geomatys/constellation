@@ -75,9 +75,9 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
 
             File featureDirectory = new File(configDir, "features");
             featureDirectory.mkdir();
-            writeDataFile(featureDirectory, "feature1.xml", "station-001");
-            writeDataFile(featureDirectory, "feature2.xml", "station-002");
-            writeDataFile(featureDirectory, "feature3.xml", "station-006");
+            writeDataFile(featureDirectory, "v200/feature1.xml", "station-001");
+            writeDataFile(featureDirectory, "v200/feature2.xml", "station-002");
+            writeDataFile(featureDirectory, "v200/feature3.xml", "station-006");
 
             File observationsDirectory = new File(configDir, "observations");
             observationsDirectory.mkdir();
@@ -195,6 +195,28 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void getCapabilitiesTest() throws Exception {
         super.getCapabilitiesTest();
 
+    }
+
+    /**
+     * Tests the GetFeatureOfInterest method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetFeatureOfInterestErrorTest() throws Exception {
+        super.GetFeatureOfInterestErrorTest();
+    }
+
+    /**
+     * Tests the GetFeatureOfInterest method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetFeatureOfInterestTest() throws Exception {
+        super.GetFeatureOfInterestTest();
     }
 
     /**

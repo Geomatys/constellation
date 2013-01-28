@@ -226,7 +226,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      * Tests the GetFeatureOfInterest method
      *
      * @throws java.lang.Exception
-     *
+     */
     @Test
     @Override
     public void GetFeatureOfInterestErrorTest() throws Exception {
@@ -237,7 +237,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      * Tests the GetFeatureOfInterest method
      *
      * @throws java.lang.Exception
-     *
+     */
     @Ignore
     @Override
     public void GetFeatureOfInterestTest() throws Exception {
