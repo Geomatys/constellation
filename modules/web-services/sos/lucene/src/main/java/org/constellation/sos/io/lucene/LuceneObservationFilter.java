@@ -34,17 +34,17 @@ import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.*;
 
 import org.geotoolkit.gml.xml.Envelope;
-import org.geotoolkit.gml.xml.v311.TimeInstantType;
-import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.observation.xml.v100.ProcessType;
+import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.sos.xml.ResponseModeType;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.ObservationOffering;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.opengis.observation.Observation;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 /**
  * TODO
  * 
@@ -99,7 +99,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterGetResult(final Observation template, final QName resultModel) {
-        final ProcessType process = (ProcessType) template.getProcedure();
+        final Process process = (Process) template.getProcedure();
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             luceneRequest = new StringBuilder("type:measurement AND procedure:\"" + process.getHref() + "\" ");
         } else {
@@ -171,10 +171,10 @@ public class LuceneObservationFilter implements ObservationFilter {
      */
     @Override
     public void setTimeEquals(final Object time) throws CstlServiceException {
-        if (time instanceof TimePeriodType) {
-            final TimePeriodType tp = (TimePeriodType) time;
-            final String begin      = getLuceneTimeValue(tp.getBeginPosition());
-            final String end        = getLuceneTimeValue(tp.getEndPosition());
+        if (time instanceof Period) {
+            final Period tp = (Period) time;
+            final String begin      = getLuceneTimeValue(tp.getBeginning().getPosition());
+            final String end        = getLuceneTimeValue(tp.getEnding().getPosition());
 
             // we request directly a multiple observation or a period observation (one measure during a period)
             luceneRequest.append("AND (");
@@ -182,9 +182,9 @@ public class LuceneObservationFilter implements ObservationFilter {
             luceneRequest.append(" sampling_time_end:").append(end).append(") ");
 
         // if the temporal object is a timeInstant
-        } else if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position    = getLuceneTimeValue(ti.getTimePosition());
+        } else if (time instanceof Instant) {
+            final Instant ti = (Instant) time;
+            final String position    = getLuceneTimeValue(ti.getPosition());
             luceneRequest.append("AND (");
 
             // case 1 a single observation
@@ -206,9 +206,9 @@ public class LuceneObservationFilter implements ObservationFilter {
     @Override
     public void setTimeBefore(final Object time) throws CstlServiceException {
         // for the operation before the temporal object must be an timeInstant
-        if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position    = getLuceneTimeValue(ti.getTimePosition());
+        if (time instanceof Instant) {
+            final Instant ti = (Instant) time;
+            final String position    = getLuceneTimeValue(ti.getPosition());
             luceneRequest.append("AND (");
 
             // the single and multpile observations which begin after the bound
@@ -226,9 +226,9 @@ public class LuceneObservationFilter implements ObservationFilter {
     @Override
     public void setTimeAfter(final Object time) throws CstlServiceException {
         // for the operation after the temporal object must be an timeInstant
-        if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position    = getLuceneTimeValue(ti.getTimePosition());
+        if (time instanceof Instant) {
+            final Instant ti = (Instant) time;
+            final String position    = getLuceneTimeValue(ti.getPosition());
             luceneRequest.append("AND (");
 
             // the single and multpile observations which begin after the bound
@@ -249,10 +249,10 @@ public class LuceneObservationFilter implements ObservationFilter {
      */
     @Override
     public void setTimeDuring(final Object time) throws CstlServiceException {
-        if (time instanceof TimePeriodType) {
-            final TimePeriodType tp = (TimePeriodType) time;
-            final String begin      = getLuceneTimeValue(tp.getBeginPosition());
-            final String end        = getLuceneTimeValue(tp.getEndPosition());
+        if (time instanceof Period) {
+            final Period tp = (Period) time;
+            final String begin      = getLuceneTimeValue(tp.getBeginning().getPosition());
+            final String end        = getLuceneTimeValue(tp.getEnding().getPosition());
             luceneRequest.append("AND (");
 
             // the multiple observations included in the period

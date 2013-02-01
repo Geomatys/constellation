@@ -5,7 +5,7 @@
     <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:6"/>
     <om:observedProperty>
         <swe:CompositePhenomenon dimension="2" gml:id="aggregatePhenomenon">
-            <gml:name>urn:ogc:def:phenomenon:GEOM:aggregate</gml:name>
+            <gml:name>urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon</gml:name>
             <swe:component>
                  <swe:Phenomenon gml:id="depth">
                     <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>

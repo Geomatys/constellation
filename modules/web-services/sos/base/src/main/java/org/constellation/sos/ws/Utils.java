@@ -23,19 +23,15 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.AbstractFeature;
+import org.geotoolkit.gml.xml.BoundingShape;
 import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.Envelope;
-import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
-import org.geotoolkit.gml.xml.v311.BoundingShapeType;
-import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
-import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
-import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
 import org.geotoolkit.sml.xml.AbstractDerivableComponent;
@@ -44,9 +40,10 @@ import org.geotoolkit.sml.xml.AbstractIdentifier;
 import org.geotoolkit.sml.xml.AbstractProcess;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.swe.xml.v101.TextBlockType;
 import org.opengis.observation.Observation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.SOSXmlFactory;
+import org.geotoolkit.swe.xml.TextBlock;
 import org.opengis.temporal.Position;
 
 /**
@@ -171,9 +168,9 @@ public final class Utils {
      *
      * @param time a GML time position object.
      */
-    public static String getLuceneTimeValue(final TimePositionType time) throws CstlServiceException {
-        if (time != null && time.getValue() != null) {
-            String value = time.getValue();
+    public static String getLuceneTimeValue(final Position time) throws CstlServiceException {
+        if (time != null && time.getDateTime() != null) {
+            String value = time.getDateTime().toString();
 
             // we delete the data after the second TODO remove
             if (value.indexOf('.') != -1) {
@@ -235,40 +232,38 @@ public final class Utils {
      * @param collection
      * @return
      */
-    public static Envelope getCollectionBound(final List<Observation> observations, final String srsName) {
+    public static Envelope getCollectionBound(final String version, final List<Observation> observations, final String srsName) {
         double minx = Double.MAX_VALUE;
         double miny = Double.MAX_VALUE;
         double maxx = -Double.MAX_VALUE;
         double maxy = -Double.MAX_VALUE;
 
         for (Observation observation: observations) {
-            final FeaturePropertyType featureProp = ((ObservationType)observation).getPropertyFeatureOfInterest();
-
-            if (featureProp != null && featureProp.getAbstractFeature() != null) {
-                final AbstractFeatureType feature = featureProp.getAbstractFeature();
+            final AbstractFeature feature = (AbstractFeature) observation.getFeatureOfInterest();
+            if (feature != null) {
                 if (feature.getBoundedBy() != null) {
-                    final BoundingShapeType bound = feature.getBoundedBy();
+                    final BoundingShape bound = feature.getBoundedBy();
                     if (bound.getEnvelope() != null) {
                         if (bound.getEnvelope().getLowerCorner() != null
-                            && bound.getEnvelope().getLowerCorner().getValue() != null
-                            && bound.getEnvelope().getLowerCorner().getValue().size() == 2 ) {
-                            final List<Double> lower = bound.getEnvelope().getLowerCorner().getValue();
-                            if (lower.get(0) < minx) {
-                                minx = lower.get(0);
+                            && bound.getEnvelope().getLowerCorner().getCoordinate() != null
+                            && bound.getEnvelope().getLowerCorner().getCoordinate().length == 2 ) {
+                            final double[] lower = bound.getEnvelope().getLowerCorner().getCoordinate();
+                            if (lower[0] < minx) {
+                                minx = lower[0];
                             }
-                            if (lower.get(1) < miny) {
-                                miny = lower.get(1);
+                            if (lower[1] < miny) {
+                                miny = lower[1];
                             }
                         }
                         if (bound.getEnvelope().getUpperCorner() != null
-                            && bound.getEnvelope().getUpperCorner().getValue() != null
-                            && bound.getEnvelope().getUpperCorner().getValue().size() == 2 ) {
-                            final List<Double> upper = bound.getEnvelope().getUpperCorner().getValue();
-                            if (upper.get(0) > maxx) {
-                                maxx = upper.get(0);
+                            && bound.getEnvelope().getUpperCorner().getCoordinate() != null
+                            && bound.getEnvelope().getUpperCorner().getCoordinate().length == 2 ) {
+                            final double[] upper = bound.getEnvelope().getUpperCorner().getCoordinate();
+                            if (upper[0] > maxx) {
+                                maxx = upper[0];
                             }
-                            if (upper.get(1) > maxy) {
-                                maxy = upper.get(1);
+                            if (upper[1] > maxy) {
+                                maxy = upper[1];
                             }
                         }
                     }
@@ -289,9 +284,9 @@ public final class Utils {
             maxy = 90.0;
         }
 
-        final EnvelopeType env =  new EnvelopeType(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), srsName);
+        final Envelope env = SOSXmlFactory.buildEnvelope(version, minx, miny, maxx, maxy, srsName);
         env.setSrsDimension(2);
-        env.setAxisLabels("Y X");
+        env.setAxisLabels(Arrays.asList("Y X"));
         return env;
     }
 
@@ -317,7 +312,7 @@ public final class Utils {
      * @param value the datablock builder.
      * @param currentIndex the current object index.
      */
-    public static void fillEndingDataHoles(final Appendable value, int currentIndex, final List<String> fieldList, final TextBlockType encoding, final int nbBlockByHole) throws IOException {
+    public static void fillEndingDataHoles(final Appendable value, int currentIndex, final List<String> fieldList, final TextBlock encoding, final int nbBlockByHole) throws IOException {
         while (currentIndex < fieldList.size()) {
             if (value != null) {
                 for (int i = 0; i < nbBlockByHole; i++) {
@@ -340,7 +335,7 @@ public final class Utils {
      *
      * @return the updated phenomenon index.
      */
-    public static int fillDataHoles(final Appendable value, int currentIndex, final String searchedField, final List<String> fieldList, final TextBlockType encoding, final int nbBlockByHole) throws IOException {
+    public static int fillDataHoles(final Appendable value, int currentIndex, final String searchedField, final List<String> fieldList, final TextBlock encoding, final int nbBlockByHole) throws IOException {
         while (currentIndex < fieldList.size() && !fieldList.get(currentIndex).equals(searchedField)) {
             if (value != null) {
                 for (int i = 0; i < nbBlockByHole; i++) {

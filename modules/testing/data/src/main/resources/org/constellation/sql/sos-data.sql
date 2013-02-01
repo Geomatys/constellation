@@ -2,7 +2,7 @@
 INSERT INTO "observation"."phenomenons" ("id", "name", "description") VALUES ('depth', 'urn:ogc:def:phenomenon:GEOM:depth', 'profondeur');
 INSERT INTO "observation"."phenomenons" ("id", "name", "description") VALUES ('temperature', 'urn:ogc:def:phenomenon:GEOM:temperature', 'temperature');
 
-INSERT INTO "observation"."composite_phenomenons" ("id", "name", "description", "dimension") VALUES ('aggregatePhenomenon', 'urn:ogc:def:phenomenon:GEOM:aggregate', NULL, 2);
+INSERT INTO "observation"."composite_phenomenons" ("id", "name", "description", "dimension") VALUES ('aggregatePhenomenon', 'urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon', NULL, 2);
 INSERT INTO "observation"."components" ("composite_phenomenon", "component") VALUES ('aggregatePhenomenon', 'depth');
 INSERT INTO "observation"."components" ("composite_phenomenon", "component") VALUES ('aggregatePhenomenon', 'temperature');
 

@@ -66,6 +66,8 @@ public class FileObservationReader implements ObservationReader {
      */
     protected final String observationIdBase;
 
+    protected final String phenomenonIdBase;
+    
     private File offeringDirectory;
 
     private File phenomenonDirectory;
@@ -87,6 +89,7 @@ public class FileObservationReader implements ObservationReader {
 
     public FileObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
+        this.phenomenonIdBase  = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             offeringDirectory            = new File(dataDirectory, "offerings");
@@ -147,7 +150,10 @@ public class FileObservationReader implements ObservationReader {
                 Unmarshaller unmarshaller = null;
                 try {
                     unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
-                    final Object obj = unmarshaller.unmarshal(offeringFile);
+                    Object obj = unmarshaller.unmarshal(offeringFile);
+                    if (obj instanceof JAXBElement) {
+                        obj = ((JAXBElement)obj).getValue();
+                    }
                     if (obj instanceof ObservationOffering) {
                         return (ObservationOffering) obj;
                     }
@@ -243,7 +249,11 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public PhenomenonType getPhenomenon(final String phenomenonName) throws CstlServiceException {
+    public PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
+        // we remove the phenomenon id base
+        if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+            phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
+        }
         final File phenomenonFile = new File(phenomenonDirectory, phenomenonName + FILE_EXTENSION);
         if (phenomenonFile.exists()) {
             Unmarshaller unmarshaller = null;

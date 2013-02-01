@@ -171,7 +171,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      * Tests the GetObservation method
      *
      * @throws java.lang.Exception
-     *
+     */
     @Test
     @Override
     public void GetObservationErrorTest() throws Exception {
@@ -182,7 +182,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      * Tests the GetObservation method
      *
      * @throws java.lang.Exception
-     *
+     */
     @Ignore
     @Override
     public void GetObservationTest() throws Exception {

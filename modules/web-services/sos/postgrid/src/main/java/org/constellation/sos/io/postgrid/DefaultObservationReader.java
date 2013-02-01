@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -61,13 +62,12 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.gml.xml.v321.AbstractTimeObjectType;
 import org.geotoolkit.gml.xml.v321.DirectPositionType;
 import org.geotoolkit.gml.xml.v321.EnvelopeType;
 import org.geotoolkit.gml.xml.v321.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v321.LineStringType;
 import org.geotoolkit.gml.xml.v321.PointType;
-import org.geotoolkit.observation.xml.v100.MeasurementType;
-import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
@@ -79,7 +79,32 @@ import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sampling.xml.v200.SFSamplingFeatureType;
 import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
 import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.SOSXmlFactory;
+import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
+import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
+import org.geotoolkit.swe.xml.v101.TextBlockType;
+import org.geotoolkit.swe.xml.v200.AbstractDataComponentType;
+import org.geotoolkit.swe.xml.v200.BooleanType;
+import org.geotoolkit.swe.xml.v200.CategoryType;
+import org.geotoolkit.swe.xml.v200.CountRangeType;
+import org.geotoolkit.swe.xml.v200.CountType;
+import org.geotoolkit.swe.xml.v200.DataArrayType;
+import org.geotoolkit.swe.xml.v200.DataArrayType.ElementType;
+import org.geotoolkit.swe.xml.v200.DataArrayType.Encoding;
+import org.geotoolkit.swe.xml.v200.DataRecordType;
+import org.geotoolkit.swe.xml.v200.DataRecordType.Field;
+import org.geotoolkit.swe.xml.v200.QuantityRangeType;
+import org.geotoolkit.swe.xml.v200.QuantityType;
+import org.geotoolkit.swe.xml.v200.TextType;
+import org.geotoolkit.swe.xml.v200.TimeRangeType;
+import org.geotoolkit.swe.xml.v200.TimeType;
+import org.geotoolkit.swe.xml.v200.VectorType;
+import org.opengis.observation.Measurement;
+import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 
 
 /**
@@ -99,6 +124,10 @@ public class DefaultObservationReader implements ObservationReader {
      */
     protected final String observationIdBase;
 
+    protected final String phenomenonIdBase;
+    
+    protected final String sensorIdBase;
+    
     /**
      * A Database object for the O&M dataBase.
      */
@@ -142,6 +171,8 @@ public class DefaultObservationReader implements ObservationReader {
      */
     public DefaultObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
+        this.phenomenonIdBase  = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
+        this.sensorIdBase      = (String) properties.get(OMFactory.SENSOR_ID_BASE);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
@@ -173,9 +204,26 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> getOfferingNames(final String version) throws CstlServiceException {
+    public Collection<String> getOfferingNames(final String version) throws CstlServiceException {
         try {
-            return offTable.getIdentifiers();
+            if (version.equals("1.0.0")) {
+                return offTable.getIdentifiers();
+                
+            // for 2.0 we adapt the offering with one by procedure   
+            } else if (version.equals("2.0.0")) {
+                final ProcessTable procTable = omDatabase.getTable(ProcessTable.class);
+                final Set<String> procedures = procTable.getIdentifiers();
+                final List<String> result = new ArrayList<String>();
+                for (String procedure : procedures) {
+                    if (procedure.startsWith(sensorIdBase)) {
+                        procedure = procedure.replace(sensorIdBase, "");
+                    }
+                    result.add("offering-" + procedure);
+                }
+                return result;
+            } else {
+                throw new IllegalArgumentException("unexpected SOS version:" + version);
+            }
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
@@ -202,12 +250,18 @@ public class DefaultObservationReader implements ObservationReader {
     @Override
     public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
         try {
-            final ObservationOfferingType off =  offTable.getEntry(offeringName);
+            final String offeringNameVar;
             if (version.equals("2.0.0")) {
-                return offeringToV200(version, off);
+                final String procedureName = sensorIdBase + offeringName.substring(9);
+                if (!getProcedureNames().contains(procedureName)) {
+                    return null;
+                }
+                offeringNameVar = "offering-allSensor";
             } else {
-                return off;
+                offeringNameVar = offeringName;
             }
+            final ObservationOfferingType off =  offTable.getEntry(offeringNameVar);
+            return convert(version, off, offeringName);
         } catch (NoSuchRecordException ex) {
             return null;
         } catch (CatalogException ex) {
@@ -220,40 +274,41 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
     
-    private ObservationOffering offeringToV200(final String version, final ObservationOfferingType off) {
-        final EnvelopeType env;
-                if (off.getBoundedBy() != null && off.getBoundedBy().getEnvelope() != null) {
-                    env = new EnvelopeType(off.getBoundedBy().getEnvelope());
-                } else {
-                    env = null;
-                }
-                final org.geotoolkit.gml.xml.v321.TimePeriodType period;
-                if (off.getTime() != null) {
-                    final TimePeriodType pv100 = (TimePeriodType) off.getTime();
-                    period = new org.geotoolkit.gml.xml.v321.TimePeriodType(pv100.getBeginPosition().getValue(), pv100.getEndPosition().getValue());
-                } else {
-                    period = null;
-                }
-                final String singleProcedure;
-                if (version.equals("2.0.0") && off.getProcedures().size() > 1) {
-                    LOGGER.warning("multiple procedure unsuported in V2.0.0");
-                    singleProcedure = off.getProcedures().get(0);
-                } else if (version.equals("2.0.0") && off.getProcedures().size() == 1) {
-                    singleProcedure = off.getProcedures().get(0);
-                } else {
-                    singleProcedure = null;
-                }
-                return new org.geotoolkit.sos.xml.v200.ObservationOfferingType(
-                                                   off.getId(),
-                                                   off.getName(),
-                                                   off.getDescription(),
-                                                   env,
-                                                   period,
-                                                   singleProcedure,
-                                                   off.getObservedProperties(),
-                                                   off.getFeatureOfInterestIds(),
-                                                   off.getResponseFormat(),
-                                                   Arrays.asList("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation"));
+    private ObservationOffering convert(final String version, final ObservationOfferingType off, final String offeringName) {
+        if (version.equals("2.0.0")) {
+            final EnvelopeType env;
+            if (off.getBoundedBy() != null && off.getBoundedBy().getEnvelope() != null) {
+                env = new EnvelopeType(off.getBoundedBy().getEnvelope());
+            } else {
+                env = null;
+            }
+            final org.geotoolkit.gml.xml.v321.TimePeriodType period;
+            if (off.getTime() != null) {
+                final TimePeriodType pv100 = (TimePeriodType) off.getTime();
+                period = new org.geotoolkit.gml.xml.v321.TimePeriodType(pv100.getBeginPosition().getValue(), pv100.getEndPosition().getValue());
+            } else {
+                period = null;
+            }
+            final String singleProcedure;
+            if (version.equals("2.0.0")) {
+                singleProcedure = sensorIdBase + offeringName.substring(9);
+            } else {
+                singleProcedure = null;
+            }
+            return new org.geotoolkit.sos.xml.v200.ObservationOfferingType(
+                                               off.getId(),
+                                               offeringName,
+                                               off.getDescription(),
+                                               env,
+                                               period,
+                                               singleProcedure,
+                                               off.getObservedProperties(),
+                                               off.getFeatureOfInterestIds(),
+                                               off.getResponseFormat(),
+                                               Arrays.asList("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation"));
+        } else {
+            return off;
+        }
     }
 
     /**
@@ -263,13 +318,13 @@ public class DefaultObservationReader implements ObservationReader {
     public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
         try {
             final List<ObservationOffering> loo = new ArrayList<ObservationOffering>();
-            final Set<ObservationOfferingType> set  = offTable.getEntries();
             if (version.equals("2.0.0")) {
-                for (ObservationOfferingType off : set) {
-                    loo.add(offeringToV200(version, off));
+                final Collection<String> offeringNames = getOfferingNames(version);
+                for (String offeringName : offeringNames) {
+                    loo.add(getObservationOffering(offeringName, version));
                 }
             } else {
-                
+                final Set<ObservationOfferingType> set  = offTable.getEntries();
                 loo.addAll(set);
             }
             return loo;
@@ -328,7 +383,11 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public PhenomenonType getPhenomenon(final String phenomenonName) throws CstlServiceException {
+    public PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
+        // we remove the phenomenon id base
+        if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+            phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
+        }
         try {
             final CompositePhenomenonTable compositePhenomenonTable = omDatabase.getTable(CompositePhenomenonTable.class);
             CompositePhenomenonType cphen = null;
@@ -489,12 +548,12 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationType getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
+    public Observation getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
         try {
             if (resultModel.equals(MEASUREMENT_QNAME)) {
-                return (MeasurementType) measTable.getEntry(identifier);
+                return convert(version, measTable.getEntry(identifier));
             } else {
-                return (ObservationType) obsTable.getEntry(identifier);
+                return convert(version, obsTable.getEntry(identifier));
             }
         } catch (CatalogException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -511,6 +570,112 @@ public class DefaultObservationReader implements ObservationReader {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
+        }
+    }
+    
+    private Observation convert(final String version, final Observation observation) {
+       if (version.equals("2.0.0")) {
+           final String name = observation.getName();
+           final String type;
+           if (observation instanceof Measurement) {
+               type = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement";
+           } else {
+               type = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_ComplexObservation";
+           }
+           final AbstractTimeObjectType time;
+           if (observation.getSamplingTime() instanceof Period) {
+               final Period p = (Period) observation.getSamplingTime();
+               String dateBegin = null;
+               if (p.getBeginning() != null && p.getBeginning().getPosition() != null) {
+                   dateBegin = p.getBeginning().getPosition().getDateTime().toString();
+               }
+               String dateEnd = null;
+               if (p.getEnding() != null && p.getEnding().getPosition() != null) {
+                   dateEnd = p.getEnding().getPosition().getDateTime().toString();
+               }
+               time = (AbstractTimeObjectType) SOSXmlFactory.buildTimePeriod(version, dateBegin, dateEnd);
+           } else if (observation.getSamplingTime() instanceof Instant) {
+               final Instant p = (Instant) observation.getSamplingTime();
+               String date = null;
+               if (p.getPosition() != null) {
+                   date = p.getPosition().getDateTime().toString();
+               }
+               time = (AbstractTimeObjectType) SOSXmlFactory.buildTimeInstant(version, date);
+           } else if (observation.getSamplingTime() != null) {
+               throw new IllegalArgumentException("Unexpected samplingTime type:" + observation.getSamplingTime().getClass().getName());
+           } else {
+               time = null;
+           }
+           final String procedure            = ((org.geotoolkit.observation.xml.Process)observation.getProcedure()).getHref();
+           final String observedProperty     = ((org.geotoolkit.swe.xml.Phenomenon)observation.getObservedProperty()).getName();
+           final SamplingFeature sf          = convert(version, (SamplingFeature)observation.getFeatureOfInterest());
+           final FeaturePropertyType feature = (FeaturePropertyType) SOSXmlFactory.buildFeatureProperty(version, sf);
+           final Object result;
+           if (observation.getResult() instanceof DataArrayPropertyType) {
+               final DataArrayPropertyType resultv100 = (DataArrayPropertyType) observation.getResult();
+               final TextBlockType encodingV100 = (TextBlockType) resultv100.getDataArray().getEncoding();
+               
+               final int count = resultv100.getDataArray().getElementCount().getCount().getValue();
+               final String id = resultv100.getDataArray().getId();
+               final Encoding enc = new Encoding(encodingV100.getId(), encodingV100.getDecimalSeparator(), encodingV100.getTokenSeparator(), encodingV100.getBlockSeparator());
+               final String values = resultv100.getDataArray().getValues();
+               final SimpleDataRecordType recordv100 =  (SimpleDataRecordType) resultv100.getDataArray().getElementType();
+               final List<Field> fields = new ArrayList<Field>();
+               for (AnyScalarPropertyType scalar : recordv100.getField()) {
+                   final AbstractDataComponentType component = convert(scalar.getValue());
+                   fields.add(new Field(scalar.getName(), component));
+               }
+               final DataRecordType record = new DataRecordType(fields);
+               final ElementType elem = new ElementType(resultv100.getDataArray().getName(), record);
+               final org.geotoolkit.swe.xml.v200.DataArrayType array = new DataArrayType(id, count, enc, values, elem);
+               final org.geotoolkit.swe.xml.v200.DataArrayPropertyType resultv200 = new org.geotoolkit.swe.xml.v200.DataArrayPropertyType(array);
+               result = resultv200;
+           } else {
+               result = observation.getResult();
+           }
+           return new org.geotoolkit.observation.xml.v200.OMObservationType(name, type, time, procedure, observedProperty, feature, result);
+       } else {
+           return observation;
+       }
+    }
+    
+    private AbstractDataComponentType convert(org.geotoolkit.swe.xml.v101.AbstractDataComponentType data) {
+        if (data instanceof org.geotoolkit.swe.xml.v101.BooleanType) {
+            final org.geotoolkit.swe.xml.v101.BooleanType old = (org.geotoolkit.swe.xml.v101.BooleanType)data;
+            return new BooleanType(old.isValue(), old.getDefinition());
+        } else if (data instanceof org.geotoolkit.swe.xml.v101.VectorType) {
+            final org.geotoolkit.swe.xml.v101.VectorType old = (org.geotoolkit.swe.xml.v101.VectorType)data;
+            return new VectorType(); // TODO
+        } else if (data instanceof org.geotoolkit.swe.xml.v101.TimeType) {
+            final org.geotoolkit.swe.xml.v101.TimeType old = (org.geotoolkit.swe.xml.v101.TimeType)data;
+            return new TimeType(old.getDefinition());
+        } else if (data instanceof org.geotoolkit.swe.xml.v101.TimeRange) {
+            final org.geotoolkit.swe.xml.v101.TimeRange old = (org.geotoolkit.swe.xml.v101.TimeRange)data;
+            return new TimeRangeType(old.getDefinition(), old.getValue());
+        } else if (data instanceof org.geotoolkit.swe.xml.v101.Category) {
+            final org.geotoolkit.swe.xml.v101.Category old = (org.geotoolkit.swe.xml.v101.Category)data;
+            return new CategoryType(old.getDefinition(), old.getValue());
+        } else if (data instanceof org.geotoolkit.swe.xml.v101.QuantityRange) {
+            final org.geotoolkit.swe.xml.v101.QuantityRange old = (org.geotoolkit.swe.xml.v101.QuantityRange)data;
+            return new QuantityRangeType(old.getDefinition(), old.getValue());
+        } else if (data instanceof org.geotoolkit.swe.xml.v101.CountRange) {
+            final org.geotoolkit.swe.xml.v101.CountRange old = (org.geotoolkit.swe.xml.v101.CountRange)data;
+            return new CountRangeType(old.getDefinition(), old.getValue());
+        } else if (data instanceof org.geotoolkit.swe.xml.v101.QuantityType) {
+            final org.geotoolkit.swe.xml.v101.QuantityType old = (org.geotoolkit.swe.xml.v101.QuantityType)data;
+            String uomCode = null;
+            if (old.getUom() != null) {
+                uomCode = old.getUom().getCode();
+            }
+            return new QuantityType(old.getDefinition(), uomCode, old.getValue());
+        } else if (data instanceof org.geotoolkit.swe.xml.v101.Text) {
+            final org.geotoolkit.swe.xml.v101.Text old = (org.geotoolkit.swe.xml.v101.Text)data;
+            return new TextType(old.getDefinition(), old.getValue());
+        } else if (data instanceof org.geotoolkit.swe.xml.v101.Count) {
+            final org.geotoolkit.swe.xml.v101.Count old = (org.geotoolkit.swe.xml.v101.Count)data;
+            return new CountType(old.getDefinition(), old.getValue());
+        } else {
+            throw new IllegalArgumentException("Unexpected data component type:" + data);
         }
     }
 

@@ -42,17 +42,18 @@ import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.Envelope;
-import org.geotoolkit.gml.xml.v311.TimeInstantType;
-import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.geotoolkit.observation.xml.v100.ProcessType;
+import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.util.logging.Logging;
+
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.sos.xml.ObservationOffering;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 
 /**
  *
@@ -81,12 +82,14 @@ public class DefaultObservationFilter implements ObservationFilter {
     /**
      * The base for observation id.
      */
-    protected String observationIdBase;
+    protected final String observationIdBase;
 
     /**
      * The base for observation id.
      */
-    protected String observationTemplateIdBase;
+    protected final String observationTemplateIdBase;
+    
+    protected final String phenomenonIdBase;
 
     /**
      * Clone a new Observation Filter.
@@ -98,6 +101,7 @@ public class DefaultObservationFilter implements ObservationFilter {
         this.map                       = omFilter.map;
         this.observationIdBase         = omFilter.observationIdBase;
         this.observationTemplateIdBase = omFilter.observationTemplateIdBase;
+        this.phenomenonIdBase          = omFilter.phenomenonIdBase;
     }
 
     
@@ -105,6 +109,7 @@ public class DefaultObservationFilter implements ObservationFilter {
         this.observationIdBase         = (String)     properties.get(OMFactory.OBSERVATION_ID_BASE);
         this.observationTemplateIdBase = (String)     properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
         this.map                       = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
+        this.phenomenonIdBase          = (String)     properties.get(OMFactory.PHENOMENON_ID_BASE);
         
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
@@ -149,7 +154,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterGetResult(final Observation template, final QName resultModel) {
-        final ProcessType process = (ProcessType) template.getProcedure();
+        final Process process = (Process) template.getProcedure();
         
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"measurements\" WHERE ");
@@ -196,10 +201,12 @@ public class DefaultObservationFilter implements ObservationFilter {
     public void setObservedProperties(final List<String> phenomenon, final List<String> compositePhenomenon) {
         sqlRequest.append(" AND( ");
         for (String p : phenomenon) {
+            p = p.replace(phenomenonIdBase, "");
             sqlRequest.append(" \"observed_property\"='").append(p).append("' OR ");
 
         }
         for (String p : compositePhenomenon) {
+            p = p.replace(phenomenonIdBase, "");
             sqlRequest.append(" \"observed_property_composite\"='").append(p).append("' OR ");
         }
         sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
@@ -224,10 +231,10 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void setTimeEquals(final Object time) throws CstlServiceException {
-        if (time instanceof TimePeriodType) {
-            final TimePeriodType tp = (TimePeriodType) time;
-            final String begin      = getTimeValue(tp.getBeginPosition());
-            final String end        = getTimeValue(tp.getEndPosition());
+        if (time instanceof Period) {
+            final Period tp    = (Period) time;
+            final String begin = getTimeValue(tp.getBeginning().getPosition());
+            final String end   = getTimeValue(tp.getEnding().getPosition());
 
             // we request directly a multiple observation or a period observation (one measure during a period)
             sqlRequest.append("AND (");
@@ -235,9 +242,9 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest.append(" \"sampling_time_end\"='").append(end).append("') ");
 
         // if the temporal object is a timeInstant
-        } else if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position    = getTimeValue(ti.getTimePosition());
+        } else if (time instanceof Instant) {
+            final Instant ti      = (Instant) time;
+            final String position = getTimeValue(ti.getPosition());
             sqlRequest.append("AND (");
 
             // case 1 a single observation
@@ -259,9 +266,9 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public void setTimeBefore(final Object time) throws CstlServiceException  {
         // for the operation before the temporal object must be an timeInstant
-        if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position    = getTimeValue(ti.getTimePosition());
+        if (time instanceof Instant) {
+            final Instant ti      = (Instant) time;
+            final String position = getTimeValue(ti.getPosition());
             sqlRequest.append("AND (");
 
             // the single and multpile observations which begin after the bound
@@ -279,9 +286,9 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public void setTimeAfter(final Object time) throws CstlServiceException {
         // for the operation after the temporal object must be an timeInstant
-        if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position    = getTimeValue(ti.getTimePosition());
+        if (time instanceof Instant) {
+            final Instant ti      = (Instant) time;
+            final String position = getTimeValue(ti.getPosition());
             sqlRequest.append("AND (");
 
             // the single and multpile observations which begin after the bound
@@ -302,10 +309,10 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void setTimeDuring(final Object time) throws CstlServiceException {
-        if (time instanceof TimePeriodType) {
-            final TimePeriodType tp = (TimePeriodType) time;
-            final String begin      = getTimeValue(tp.getBeginPosition());
-            final String end        = getTimeValue(tp.getEndPosition());
+        if (time instanceof Period) {
+            final Period tp    = (Period) time;
+            final String begin = getTimeValue(tp.getBeginning().getPosition());
+            final String end   = getTimeValue(tp.getEnding().getPosition());
             sqlRequest.append("AND (");
 
             // the multiple observations included in the period

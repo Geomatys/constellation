@@ -37,23 +37,23 @@ import org.apache.lucene.util.Version;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.Utils;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
-import org.geotoolkit.gml.xml.v311.TimeInstantType;
-import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.gml.xml.AbstractGML;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.observation.xml.v100.MeasurementType;
-import org.geotoolkit.observation.xml.v100.ObservationType;
-import org.geotoolkit.observation.xml.v100.ProcessType;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
+import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.swe.xml.Phenomenon;
+import org.opengis.observation.Observation;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
+import org.opengis.temporal.TemporalObject;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
+public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
 
     private File observationDirectory;
 
@@ -99,7 +99,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
      * {@inheritDoc}
      */
     @Override
-    protected ObservationType getEntry(final String identifier) throws IndexingException {
+    protected Observation getEntry(final String identifier) throws IndexingException {
         throw new UnsupportedOperationException("not used in this implementation");
     }
 
@@ -125,8 +125,8 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
                 if (observation instanceof JAXBElement) {
                     observation = ((JAXBElement)observation).getValue();
                 }
-                if (observation instanceof ObservationType) {
-                    indexDocument(writer, (ObservationType) observation);
+                if (observation instanceof Observation) {
+                    indexDocument(writer, (Observation) observation);
                     nbObservation++;
                 } else {
                      LOGGER.info("The observation file " + observationFile.getName() + " does not contains an observation:" + observation);
@@ -138,8 +138,8 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
                 if (observation instanceof JAXBElement) {
                     observation = ((JAXBElement)observation).getValue();
                 }
-                if (observation instanceof ObservationType) {
-                    indexDocument(writer, (ObservationType) observation);
+                if (observation instanceof Observation) {
+                    indexDocument(writer, (Observation) observation);
                     nbTemplate++;
                 } else {
                      LOGGER.info("The template observation file " + observationFile.getName() + " does not contains an observation:" + observation);
@@ -179,7 +179,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
      * {@inheritDoc}
      */
     @Override
-    protected Document createDocument(final ObservationType observation, final int docid) {
+    protected Document createDocument(final Observation observation, final int docid) {
         // make a new, empty document
         final Document doc = new Document();
 
@@ -189,22 +189,22 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
         } else {
             doc.add(new Field("type",    "observation" , Field.Store.YES, Field.Index.ANALYZED));
         }
-        doc.add(new Field("procedure",   ((ProcessType)observation.getProcedure()).getHref(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("procedure",   ((Process)observation.getProcedure()).getHref(), Field.Store.YES, Field.Index.ANALYZED));
 
-        doc.add(new Field("observed_property",   ((PhenomenonType)observation.getObservedProperty()).getId(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("observed_property",   ((Phenomenon)observation.getObservedProperty()).getName(), Field.Store.YES, Field.Index.ANALYZED));
 
-        doc.add(new Field("feature_of_interest",   ((SamplingFeatureType)observation.getFeatureOfInterest()).getId(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("feature_of_interest",   ((AbstractGML)observation.getFeatureOfInterest()).getId(), Field.Store.YES, Field.Index.ANALYZED));
 
         try {
-            final AbstractTimeGeometricPrimitiveType time = observation.getSamplingTime();
-            if (time instanceof TimePeriodType) {
-                final TimePeriodType period = (TimePeriodType) time;
-                doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(period.getBeginPosition()), Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field("sampling_time_end",   Utils.getLuceneTimeValue(period.getEndPosition()), Field.Store.YES, Field.Index.ANALYZED));
+            final TemporalObject time = observation.getSamplingTime();
+            if (time instanceof Period) {
+                final Period period = (Period) time;
+                doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(period.getBeginning().getPosition()), Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field("sampling_time_end",   Utils.getLuceneTimeValue(period.getEnding().getPosition()), Field.Store.YES, Field.Index.ANALYZED));
 
-            } else if (time instanceof TimeInstantType) {
-                final TimeInstantType instant = (TimeInstantType) time;
-                doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(instant.getTimePosition()), Field.Store.YES, Field.Index.ANALYZED));
+            } else if (time instanceof Instant) {
+                final Instant instant = (Instant) time;
+                doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(instant.getPosition()), Field.Store.YES, Field.Index.ANALYZED));
                 doc.add(new Field("sampling_time_end",    "NULL", Field.Store.YES, Field.Index.ANALYZED));
 
             } else if (time != null) {
@@ -228,7 +228,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
      * {@inheritDoc}
      */
     @Override
-    protected String getIdentifier(ObservationType obj) {
+    protected String getIdentifier(Observation obj) {
         return obj.getName();
     }
 

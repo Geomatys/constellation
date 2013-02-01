@@ -80,12 +80,12 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
             File observationsDirectory = new File(configDir, "observations");
             observationsDirectory.mkdir();
-            writeDataFile(observationsDirectory, "observation1.xml", "urn:ogc:object:observation:GEOM:304");
-            writeDataFile(observationsDirectory, "observation2.xml", "urn:ogc:object:observation:GEOM:305");
-            writeDataFile(observationsDirectory, "observation3.xml", "urn:ogc:object:observation:GEOM:406");
-            writeDataFile(observationsDirectory, "observation4.xml", "urn:ogc:object:observation:GEOM:307");
-            writeDataFile(observationsDirectory, "observation5.xml", "urn:ogc:object:observation:GEOM:507");
-            writeDataFile(observationsDirectory, "observation6.xml", "urn:ogc:object:observation:GEOM:801");
+            writeDataFile(observationsDirectory, "v100/observation1.xml", "urn:ogc:object:observation:GEOM:304");
+            writeDataFile(observationsDirectory, "v100/observation2.xml", "urn:ogc:object:observation:GEOM:305");
+            writeDataFile(observationsDirectory, "v100/observation3.xml", "urn:ogc:object:observation:GEOM:406");
+            writeDataFile(observationsDirectory, "v100/observation4.xml", "urn:ogc:object:observation:GEOM:307");
+            writeDataFile(observationsDirectory, "v100/observation5.xml", "urn:ogc:object:observation:GEOM:507");
+            writeDataFile(observationsDirectory, "v100/observation6.xml", "urn:ogc:object:observation:GEOM:801");
 
             File observationTemplatesDirectory = new File(configDir, "observationTemplates");
             observationTemplatesDirectory.mkdir();

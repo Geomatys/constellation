@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sos:ObservationOffering gml:id="offering-allSensor" 
+                         xmlns:sos="http://www.opengis.net/sos/2.0" 
+                         xmlns:swes="http://www.opengis.net/swes/2.0" 
+                         xmlns:xlink="http://www.w3.org/1999/xlink" 
+                         xmlns:swe="http://www.opengis.net/swe/1.0.1" 
+                         xmlns:gml="http://www.opengis.net/gml" 
+                         xmlns:om="http://www.opengis.net/om/1.0">
+    <swes:name>offering-allSensor</swes:name>
+    <swes:procedure>urn:ogc:object:sensor:GEOM:6</swes:procedure>
+    <swes:observedProperty>urn:ogc:def:phenomenon:GEOM:resultComponents</swes:observedProperty>
+    <swes:observedProperty>urn:ogc:def:phenomenon:GEOM:depth</swes:observedProperty>
+    <swes:observedProperty>rn:ogc:def:phenomenon:GEOM:temperature</swes:observedProperty>
+    <sos:phenomenonTime>
+        <gml:TimePeriod gml:id="phenomenonTime3">
+            <gml:beginPosition>>2008-05-14T10:40:25.236</gml:beginPosition>
+            <gml:endPosition indeterminatePosition="now"/>
+        </gml:TimePeriod>
+    </sos:phenomenonTime>
+    <swes:relatedFeature>
+        <swes:FeatureRelationship>
+            <swes:target xlink:href="station-001"/>
+        </swes:FeatureRelationship>
+    </swes:relatedFeature>
+    <swes:relatedFeature>
+        <swes:FeatureRelationship>
+            <swes:target xlink:href="station-002"/>
+        </swes:FeatureRelationship>
+    </swes:relatedFeature>
+    <swes:relatedFeature>
+        <swes:FeatureRelationship>
+            <swes:target xlink:href="station-006"/>
+        </swes:FeatureRelationship>
+    </swes:relatedFeature>
+</sos:ObservationOffering>

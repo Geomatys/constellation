@@ -52,7 +52,7 @@ CREATE TABLE "observation"."components" (
 
 CREATE TABLE "observation"."composite_phenomenons" (
     "id"          character varying(40) NOT NULL,
-    "name"        character varying(40),
+    "name"        character varying(60),
     "description" character varying(50),
     "dimension"   integer
 );

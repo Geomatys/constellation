@@ -64,7 +64,16 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
             
             File offeringV200Directory = new File(offeringDirectory, "2.0.0");
             offeringV200Directory.mkdir();
-            writeDataFile(offeringV200Directory, "v200/offering-1.xml", "offering-allSensor");
+            writeDataFile(offeringV200Directory, "v200/offering-1.xml", "offering-1");
+            writeDataFile(offeringV200Directory, "v200/offering-2.xml", "offering-4");
+            writeDataFile(offeringV200Directory, "v200/offering-3.xml", "offering-3");
+            writeDataFile(offeringV200Directory, "v200/offering-4.xml", "offering-5");
+            writeDataFile(offeringV200Directory, "v200/offering-5.xml", "offering-2");
+            writeDataFile(offeringV200Directory, "v200/offering-6.xml", "offering-6");
+            writeDataFile(offeringV200Directory, "v200/offering-7.xml", "offering-7");
+            writeDataFile(offeringV200Directory, "v200/offering-8.xml", "offering-8");
+            writeDataFile(offeringV200Directory, "v200/offering-9.xml", "offering-9");
+            writeDataFile(offeringV200Directory, "v200/offering-10.xml", "offering-10");
 
 
             File phenomenonDirectory = new File(configDir, "phenomenons");
@@ -81,12 +90,12 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
 
             File observationsDirectory = new File(configDir, "observations");
             observationsDirectory.mkdir();
-            writeDataFile(observationsDirectory, "observation1.xml", "urn:ogc:object:observation:GEOM:304");
-            writeDataFile(observationsDirectory, "observation2.xml", "urn:ogc:object:observation:GEOM:305");
-            writeDataFile(observationsDirectory, "observation3.xml", "urn:ogc:object:observation:GEOM:406");
-            writeDataFile(observationsDirectory, "observation4.xml", "urn:ogc:object:observation:GEOM:307");
-            writeDataFile(observationsDirectory, "observation5.xml", "urn:ogc:object:observation:GEOM:507");
-            writeDataFile(observationsDirectory, "observation6.xml", "urn:ogc:object:observation:GEOM:801");
+            writeDataFile(observationsDirectory, "v200/observation1.xml", "urn:ogc:object:observation:GEOM:304");
+            writeDataFile(observationsDirectory, "v200/observation2.xml", "urn:ogc:object:observation:GEOM:305");
+            writeDataFile(observationsDirectory, "v200/observation3.xml", "urn:ogc:object:observation:GEOM:406");
+            writeDataFile(observationsDirectory, "v200/observation4.xml", "urn:ogc:object:observation:GEOM:307");
+            writeDataFile(observationsDirectory, "v200/observation5.xml", "urn:ogc:object:observation:GEOM:507");
+            writeDataFile(observationsDirectory, "v200/observation6.xml", "urn:ogc:object:observation:GEOM:801");
 
             File observationTemplatesDirectory = new File(configDir, "observationTemplates");
             observationTemplatesDirectory.mkdir();
@@ -96,6 +105,29 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
             writeDataFile(observationTemplatesDirectory, "observationTemplate-7.xml", "urn:ogc:object:observation:template:GEOM:7");
             writeDataFile(observationTemplatesDirectory, "observationTemplate-8.xml", "urn:ogc:object:observation:template:GEOM:8");
 
+             File sensorDirectory = new File(configDir, "sensors");
+            sensorDirectory.mkdir();
+            File sensor1         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:1.xml");
+            sensor1.createNewFile();
+            File sensor2         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:2.xml");
+            sensor2.createNewFile();
+            File sensor3         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:3.xml");
+            sensor3.createNewFile();
+            File sensor4         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:4.xml");
+            sensor4.createNewFile();
+            File sensor5         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:5.xml");
+            sensor5.createNewFile();
+            File sensor6         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:6.xml");
+            sensor6.createNewFile();
+            File sensor7         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:7.xml");
+            sensor7.createNewFile();
+            File sensor8         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:8.xml");
+            sensor8.createNewFile();
+            File sensor9         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:9.xml");
+            sensor9.createNewFile();
+            File sensor10        = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:10.xml");
+            sensor10.createNewFile();
+            
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic SMLConfiguration = new Automatic();
@@ -195,6 +227,28 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void getCapabilitiesTest() throws Exception {
         super.getCapabilitiesTest();
 
+    }
+    
+    /**
+     * Tests the GetObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetObservationErrorTest() throws Exception {
+        super.GetObservationErrorTest();
+    }
+    
+    /**
+     * Tests the GetObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetObservationTest() throws Exception {
+        super.GetObservationTest();
     }
 
     /**

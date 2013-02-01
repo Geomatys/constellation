@@ -79,12 +79,16 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * The base for observation id.
      */
     protected final String observationIdBase;
-
-    private static final String VAR01 = "var01";
     
+    protected final String phenomenonIdBase;
+    
+    protected final String sensorIdBase;
+
     public DefaultGenericObservationReader(Automatic configuration, Map<String, Object> properties) throws CstlServiceException, MetadataIoException {
         super(configuration);
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
+        this.phenomenonIdBase  = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
+        this.sensorIdBase      = (String) properties.get(OMFactory.SENSOR_ID_BASE);
     }
 
     /**
@@ -93,8 +97,24 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public List<String> getOfferingNames(final String version) throws CstlServiceException {
         try {
-            final Values values = loadData(Arrays.asList(VAR01));
-            return values.getVariables(VAR01);
+            if (version.equals("1.0.0")) {
+                final Values values = loadData("var01");
+                return values.getVariables("var01");
+                
+            // for 2.0 we adapt the offering with one by procedure   
+            } else if (version.equals("2.0.0")) {
+                final Values values = loadData("var02");
+                final List<String> result = new ArrayList<String>();
+                for (String procedure : values.getVariables("var02")) {
+                    if (procedure.startsWith(sensorIdBase)) {
+                        procedure = procedure.replace(sensorIdBase, "");
+                    }
+                    result.add("offering-" + procedure);
+                }
+                return result;
+            } else {
+                throw new IllegalArgumentException("unexpected SOS version:" + version);
+            }
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
@@ -192,7 +212,17 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
         try {
-            final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18", "var46"), offeringName);
+            final String offeringNameVar;
+            if (version.equals("2.0.0")) {
+                final String procedureName = sensorIdBase + offeringName.substring(9);
+                if (!getProcedureNames().contains(procedureName)) {
+                    return null;
+                }
+                offeringNameVar = "offering-allSensor";
+            } else {
+                offeringNameVar = offeringName;
+            }
+            final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18", "var46"), offeringNameVar);
 
             final boolean exist = values.getVariable("var46") != null;
             if (!exist) {
@@ -219,19 +249,15 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
             time  = GMLXmlFactory.createTimePeriod(gmlVersion, offeringBegin, offeringEnd);
             
-
-
             // procedure
             final List<ReferenceType> procedures = new ArrayList<ReferenceType>();
             for (String procedureName : values.getVariables("var10")) {
                 procedures.add(new ReferenceType(null, procedureName));
             }
+            
             final String singleProcedure;
-            if (version.equals("2.0.0") && procedures.size() > 1) {
-                LOGGER.warning("multiple procedure unsuported in V2.0.0");
-                singleProcedure = procedures.get(0).getHref();
-            } else if (version.equals("2.0.0") && procedures.size() == 1) {
-                singleProcedure = procedures.get(0).getHref();
+            if (version.equals("2.0.0")) {
+                singleProcedure = sensorIdBase + offeringName.substring(9);
             } else {
                 singleProcedure = null;
             }
@@ -316,17 +342,12 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      */
     @Override
     public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
-        try {
-            final Values values = loadData(Arrays.asList(VAR01));
-            final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
-            final List<String> offeringNames = values.getVariables(VAR01);
-            for (String offeringName : offeringNames) {
-                offerings.add(getObservationOffering(offeringName, version));
-            }
-            return offerings;
-        } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
+        final List<String> offeringNames = getOfferingNames(version);
+        for (String offeringName : offeringNames) {
+            offerings.add(getObservationOffering(offeringName, version));
         }
+        return offerings;
     }
 
     /**
@@ -334,6 +355,10 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      */
     @Override
     public PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
+        // we remove the phenomenon id base
+        if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+            phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
+        }
         // TODO return composite phenomenon
         try {
             final Values values = loadData(Arrays.asList("var13", "var14", "var47"), phenomenonName);

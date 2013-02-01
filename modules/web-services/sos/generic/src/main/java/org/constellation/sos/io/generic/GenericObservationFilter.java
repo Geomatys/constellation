@@ -38,7 +38,7 @@ import org.geotoolkit.sos.xml.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.geotoolkit.observation.xml.v100.ProcessType;
+import org.geotoolkit.observation.xml.Process;
 import org.opengis.observation.Observation;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -112,7 +112,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         final From from           = configurationQuery.getFrom("observations");
         final Where where         = configurationQuery.getWhere(PROCEDURE);
 
-        final ProcessType process = (ProcessType) template.getProcedure();
+        final Process process = (Process) template.getProcedure();
         where.replaceVariable(PROCEDURE, process.getHref(), true);
         currentQuery.addSelect(select);
         currentQuery.addFrom(from);

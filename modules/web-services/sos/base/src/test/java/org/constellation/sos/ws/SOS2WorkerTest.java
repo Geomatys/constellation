@@ -18,6 +18,9 @@
 package org.constellation.sos.ws;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -29,26 +32,41 @@ import org.constellation.test.utils.MetadataUtilities;
 
 import static org.constellation.sos.ws.SOSConstants.*;
 import org.geotoolkit.gml.xml.AbstractFeature;
+import org.geotoolkit.gml.xml.v321.TimeInstantType;
+import org.geotoolkit.gml.xml.v321.TimePeriodType;
+import org.geotoolkit.gml.xml.v321.TimePositionType;
+import org.geotoolkit.observation.xml.v200.OMObservationType;
 import org.geotoolkit.ogc.xml.v200.BBOXType;
+import org.geotoolkit.ogc.xml.v200.TemporalOpsType;
+import org.geotoolkit.ogc.xml.v200.TimeAfterType;
+import org.geotoolkit.ogc.xml.v200.TimeBeforeType;
+import org.geotoolkit.ogc.xml.v200.TimeDuringType;
+import org.geotoolkit.ogc.xml.v200.TimeEqualsType;
 
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.sos.xml.Capabilities;
 import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
+import org.geotoolkit.sos.xml.v200.GetFeatureOfInterestType;
+import org.geotoolkit.sos.xml.v200.GetObservationResponseType;
+import org.geotoolkit.sos.xml.v200.GetObservationType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sml.xml.v100.SensorML;
+import org.geotoolkit.swe.xml.v200.DataArrayPropertyType;
+import org.geotoolkit.swe.xml.v200.TimeType;
 import org.geotoolkit.swes.xml.InsertSensorResponse;
 import org.geotoolkit.swes.xml.v200.InsertSensorType;
 import org.geotoolkit.swes.xml.v200.DescribeSensorType;
+import org.geotoolkit.swes.xml.v200.InsertSensorResponseType;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
-import org.geotoolkit.sos.xml.v200.GetFeatureOfInterestType;
-import org.geotoolkit.swes.xml.v200.InsertSensorResponseType;
+import org.geotoolkit.swe.xml.v200.DataRecordType;
+import org.geotoolkit.swe.xml.v200.DataRecordType.Field;
 
 
 // JUnit dependencies
@@ -141,7 +159,7 @@ public class SOS2WorkerTest {
 
         assertTrue(result.getContents() != null);
         assertTrue(result.getContents().getOfferings() != null);
-        assertTrue(result.getContents().getOfferings().size() == 1);
+        assertEquals(result.getContents().getOfferings().size(), 10);
 
         /*
          *  TEST 2 : full get capabilities
@@ -160,7 +178,7 @@ public class SOS2WorkerTest {
         assertTrue(result.getServiceProvider() != null);
         assertTrue(result.getContents() != null);
         assertTrue(result.getContents().getOfferings() != null);
-        assertTrue(result.getContents().getOfferings().size() == 1);
+        assertEquals(result.getContents().getOfferings().size(), 10);
         assertTrue(result != null);
 
         /*
@@ -234,7 +252,7 @@ public class SOS2WorkerTest {
         assertTrue(result.getServiceProvider() == null);
         assertTrue(result.getContents() != null);
         assertTrue(result.getContents().getOfferings() != null);
-        assertTrue(result.getContents().getOfferings().size() == 1);
+        assertEquals(result.getContents().getOfferings().size(),  10);
         assertTrue(result != null);
 
     }
@@ -334,6 +352,573 @@ public class SOS2WorkerTest {
     }
 
     /**
+     * Tests the GetObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    public void GetObservationErrorTest() throws Exception {
+        final List<String> nullList = null;
+        /**
+         *  Test 1: getObservation with bad response format
+         */
+        GetObservationType request  = new GetObservationType("2.0.0",
+                                                     "offering-1",
+                                                     null,
+                                                     Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                                     null,
+                                                     nullList,
+                                                     "text/xml;subtype=\"om/3.0.0\"");
+        boolean exLaunched = false;
+        try {
+            worker.getObservation(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), RESPONSE_FORMAT);
+        }
+        assertTrue(exLaunched);
+
+        /**
+         *  Test 2: getObservation with missinf response format
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-1",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                      null,
+                                      nullList,
+                                      null);
+        exLaunched = false;
+        try {
+            worker.getObservation(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), RESPONSE_FORMAT);
+        }
+        assertTrue(exLaunched);
+
+        /**
+         *  Test 6: getObservation with procedure urn:ogc:object:sensor:GEOM:3
+         *          + Time filter TEquals
+         *
+         * with wrong offering
+         */
+        List<TemporalOpsType> times = new ArrayList<TemporalOpsType>();
+        TimePeriodType period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
+        TimeEqualsType equals = new TimeEqualsType(null, period);
+        times.add(equals);
+        request  = new GetObservationType("2.0.0",
+                                      "inexistant-offering",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                      null,
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        exLaunched = false;
+        try {
+            worker.getObservation(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), OFFERING);
+        }
+        assertTrue(exLaunched);
+
+        /**
+         *  Test 9: getObservation with unexisting procedure
+         *          + Time filter TEquals
+         *
+         */
+        times = new ArrayList<TemporalOpsType>();
+        period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
+        equals = new TimeEqualsType(null, period);
+        times.add(equals);
+        request  = new GetObservationType("2.0.0",
+                                      "offering-1",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:36"),
+                                      null,
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        exLaunched = false;
+        try {
+            worker.getObservation(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), PROCEDURE);
+        }
+        assertTrue(exLaunched);
+
+        /**
+         *  Test 10: getObservation with procedure urn:ogc:object:sensor:GEOM:1
+         *          and with wrong observed prop
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-1",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:1"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:hotness"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+
+        exLaunched = false;
+        try {
+            worker.getObservation(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "observedProperty");
+        }
+        assertTrue(exLaunched);
+
+        /**
+         *  Test 11: getObservation with procedure urn:ogc:object:sensor:GEOM:5
+         *          and with wrong foi
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-1",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:1"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      Arrays.asList("NIMP"),
+                                      "text/xml; subtype=\"om/1.0.0\"");
+
+        exLaunched = false;
+        try {
+            worker.getObservation(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "featureOfInterest");
+        }
+        assertTrue(exLaunched);
+    }
+
+    /**
+     * Tests the GetObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    public void GetObservationTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+        final List<String> nullList = null;
+        
+        /**
+         *  Test 1: getObservation with procedure urn:ogc:object:sensor:GEOM:4 and no resultModel
+         */
+        GetObservationType request  = new GetObservationType("2.0.0",
+                                      "offering-4",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        GetObservationResponseType result = (GetObservationResponseType) worker.getObservation(request);
+
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation3.xml"));
+
+        OMObservationType expResult = (OMObservationType)obj.getValue();
+
+        assertEquals(result.getMember().size(), 1);
+
+        OMObservationType obsResult = (OMObservationType) result.getMember().iterator().next();
+
+
+        assertTrue(obsResult != null);
+        assertEquals(expResult.getName(), obsResult.getName());
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        assertTrue(expResult.getResult() instanceof DataArrayPropertyType);
+
+        DataArrayPropertyType expR = (DataArrayPropertyType) expResult.getResult();
+        DataArrayPropertyType obsR = (DataArrayPropertyType) obsResult.getResult();
+
+        assertTrue(obsR.getDataArray().getElementType().getAbstractRecord() instanceof DataRecordType);
+        DataRecordType expSdr = (DataRecordType) expR.getDataArray().getElementType().getAbstractRecord();
+        DataRecordType obsSdr = (DataRecordType) obsR.getDataArray().getElementType().getAbstractRecord();
+
+        Iterator<Field> i1 = expSdr.getField().iterator();
+        Iterator<Field> i2 = obsSdr.getField().iterator();
+        TimeType expT = (TimeType) i1.next().getTime();
+        TimeType obsT = (TimeType) i2.next().getTime();
+
+        assertEquals(expT.getUom(), obsT.getUom());
+        assertEquals(expT, obsT);
+        assertEquals(i1.next(), i2.next());
+
+        assertEquals(expSdr, obsSdr);
+        assertEquals(expR.getDataArray().getElementType(),     obsR.getDataArray().getElementType());
+        assertEquals(expR.getDataArray().getEncoding(),        obsR.getDataArray().getEncoding());
+        assertEquals(expR.getDataArray().getValues(),          obsR.getDataArray().getValues());
+        assertEquals(expR.getDataArray().getId(),              obsR.getDataArray().getId());
+        assertEquals(expR.getDataArray().getElementCount(),    obsR.getDataArray().getElementCount());
+        assertEquals(expR.getDataArray().getName(),            obsR.getDataArray().getName());
+        assertEquals(expR.getDataArray().getPropertyElementType(), obsR.getDataArray().getPropertyElementType());
+        assertEquals(expR.getDataArray().getPropertyEncoding(), obsR.getDataArray().getPropertyEncoding());
+        assertEquals(expR.getDataArray().getElementCount(),     obsR.getDataArray().getElementCount());
+        assertEquals(expR.getDataArray().getDefinition(),       obsR.getDataArray().getDefinition());
+        assertEquals(expR.getDataArray().getDescription(),      obsR.getDataArray().getDescription());
+        assertEquals(expR.getDataArray().getParameterName(),    obsR.getDataArray().getParameterName());
+        assertEquals(expR.getDataArray().getDescriptionReference(),                      obsR.getDataArray().getDescriptionReference());
+        assertEquals(expR.getDataArray().isFixed(),                      obsR.getDataArray().isFixed());
+        assertEquals(expR.getDataArray(),                      obsR.getDataArray());
+
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 2: getObservation with procedure urn:ogc:object:sensor:GEOM:4 avec responseMode null
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-4",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation3.xml"));
+
+        expResult = (OMObservationType)obj.getValue();
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult = (OMObservationType) result.getMember().iterator().next();
+
+        assertTrue(obsResult != null);
+        assertEquals(expResult.getName(), obsResult.getName());
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+
+        /**
+         *  Test 3: getObservation with procedure urn:ogc:object:sensor:GEOM:4
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-4",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation3.xml"));
+
+        expResult = (OMObservationType)obj.getValue();
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult = (OMObservationType) result.getMember().iterator().next();
+
+
+        assertTrue(obsResult != null);
+        assertEquals(expResult.getName(), obsResult.getName());
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 4: getObservation with procedure urn:ogc:object:sensor:GEOM:3
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-3",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        assertEquals(result.getMember().size(), 1);
+        obsResult =  (OMObservationType) result.getMember().iterator().next();
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        obsR      = (DataArrayPropertyType) obsResult.getResult();
+        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 15.0);
+
+        /**
+         *  Test 5: getObservation with procedure urn:ogc:object:sensor:GEOM:3
+         *          + Time filter TBefore
+         */
+        List<TemporalOpsType> times = new ArrayList<TemporalOpsType>();
+        TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
+        TimeBeforeType before   = new TimeBeforeType(null, instant);
+        times.add(before);
+        request  = new GetObservationType("2.0.0",
+                                      "offering-3",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        assertEquals(result.getMember().size(), 1);
+
+        assertEquals(result.getMember().iterator().next().getName(), "urn:ogc:object:observation:GEOM:304");
+
+        /**
+         *  Test 6: getObservation with procedure urn:ogc:object:sensor:GEOM:3
+         *          + Time filter TAFter
+         */
+        times = new ArrayList<TemporalOpsType>();
+        TimeAfterType after   = new TimeAfterType(null, instant);
+        times.add(after);
+        request  = new GetObservationType("2.0.0",
+                                      "offering-3",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult =  (OMObservationType) result.getMember().iterator().next();
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        obsR      = (DataArrayPropertyType) obsResult.getResult();
+        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 15);
+
+        /**
+         *  Test 7: getObservation with procedure urn:ogc:object:sensor:GEOM:3
+         *          + Time filter TDuring
+         */
+        times = new ArrayList<TemporalOpsType>();
+        TimePeriodType period  = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T08:00:00.0"));
+        TimeDuringType during = new TimeDuringType(null, period);
+        times.add(during);
+        request  = new GetObservationType("2.0.0",
+                                      "offering-3",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult =  (OMObservationType) result.getMember().iterator().next();
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        obsR      = (DataArrayPropertyType) obsResult.getResult();
+        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 10);
+
+        /**
+         *  Test 8: getObservation with procedure urn:ogc:object:sensor:GEOM:3
+         *          + Time filter TEquals
+         */
+        times = new ArrayList<TemporalOpsType>();
+        period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
+        TimeEqualsType equals = new TimeEqualsType(null, period);
+        times.add(equals);
+        request  = new GetObservationType("2.0.0",
+                                      "offering-3",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult =  (OMObservationType) result.getMember().iterator().next();
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        obsR      = (DataArrayPropertyType) obsResult.getResult();
+        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 5);
+
+
+        /**
+         *  Test 13: getObservation with procedure urn:ogc:object:sensor:GEOM:4
+         *           with observedproperties = urn:ogc:def:phenomenon:GEOM:depth
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-4",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:depth"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation3.xml"));
+
+        expResult = (OMObservationType)obj.getValue();
+        assertEquals(result.getMember().size(), 1);
+
+
+        obsResult = (OMObservationType) result.getMember().iterator().next();
+        assertTrue(obsResult != null);
+
+        assertEquals(expResult.getName(), obsResult.getName());
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 14: getObservation with procedure urn:ogc:object:sensor:GEOM:5
+         *           with observedproperties = urn:ogc:def:phenomenon:GEOM:aggreagtePhenomenon
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-5",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:5"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation5.xml"));
+
+        expResult = (OMObservationType)obj.getValue();
+        assertEquals(result.getMember().size(), 1);
+
+
+        obsResult = (OMObservationType) result.getMember().iterator().next();
+        assertTrue(obsResult != null);
+
+        assertEquals(expResult.getName(), obsResult.getName());
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 15: getObservation with procedure urn:ogc:object:sensor:GEOM:5
+         *           with observedproperties = urn:ogc:def:phenomenon:GEOM:aggreagtePhenomenon
+         *           with foi                =  10972X0137-PLOUF
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-5",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:5"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"),
+                                      Arrays.asList("station-002"),
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation5.xml"));
+
+        expResult = (OMObservationType)obj.getValue();
+        assertEquals(result.getMember().size(), 1);
+
+
+        obsResult = (OMObservationType) result.getMember().iterator().next();
+        assertTrue(obsResult != null);
+
+        assertEquals(expResult.getName(), obsResult.getName());
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 16: getObservation with procedure urn:ogc:object:sensor:GEOM:3
+         *           with observedProperties = urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon
+         *           => no error but no result
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-3",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"),
+                                      Arrays.asList("station-002"),
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+
+        GetObservationResponseType collExpResult = new GetObservationResponseType();
+        assertEquals(collExpResult, result);
+
+
+
+        /**
+         *  Test 18: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-4",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      new BBOXType(null, 64000.0, 1730000.0, 66000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582"),
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation3.xml"));
+
+        expResult = (OMObservationType)obj.getValue();
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult = (OMObservationType) result.getMember().iterator().next();
+
+
+        assertTrue(obsResult != null);
+        assertEquals(expResult.getName(), obsResult.getName());
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 19: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter (no result expected)
+         */
+        request  = new GetObservationType("2.0.0",
+                                      "offering-4",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      new BBOXType(null, 66000.0, 1730000.0, 67000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582"),
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+
+        collExpResult = new GetObservationResponseType();
+        assertEquals(collExpResult, result);
+
+
+        marshallerPool.release(unmarshaller);
+    }
+
+
+    /**
      * Tests the RegisterSensor method
      *
      * @throws java.lang.Exception
@@ -391,7 +976,7 @@ public class SOS2WorkerTest {
 
         /*JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-6.xml"));
 
-        ObservationType obsTemplate = (ObservationType)obj.getValue();*/
+        OMObservationType obsTemplate = (OMObservationType)obj.getValue();*/
 
         InsertSensorType request = new InsertSensorType("2.0.0", sensorDescription, "http://www.opengis.net/sensorML/1.0.0");
 
@@ -514,7 +1099,7 @@ public class SOS2WorkerTest {
         /**
          * Test 3 : getFeatureOfInterest with BBOX filter restore when multiple works
 
-        request = new GetFeatureOfInterest("1.0.0", "SOS", new GetFeatureOfInterest.Location(new BBOXType(null, 64000.0, 1730000.0, 66000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")));
+        request = new GetFeatureOfInterest("2.0.0", "SOS", new GetFeatureOfInterest.Location(new BBOXType(null, 64000.0, 1730000.0, 66000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")));
 
         result = worker.getFeatureOfInterest(request);
 
