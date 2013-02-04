@@ -112,6 +112,10 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
         }
     }
 
+    @Override
+    public void remove(K key) {
+    }
+
     protected synchronized void fireUpdateEvent(){
         final long oldTime = lastUpdateTime;
         lastUpdateTime = System.currentTimeMillis();

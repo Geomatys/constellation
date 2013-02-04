@@ -107,6 +107,13 @@ public interface Provider<K,V> {
     void removeAll();
 
     /**
+     * Remove a data from this provider.
+     *
+     * @param name Data name to be removed from this provider.
+     */
+    void remove(K key);
+
+    /**
      * Update the provider configuration.
      * 
      * @param config : new configuration

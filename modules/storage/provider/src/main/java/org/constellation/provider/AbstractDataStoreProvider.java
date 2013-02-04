@@ -177,4 +177,17 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         super.visit();
     }
 
+    @Override
+    public void remove(Name key) {
+        if (store == null) {
+            reload();
+        }
+
+        try {
+            store.deleteFeatureType(key);
+            reload();
+        } catch (DataStoreException ex) {
+            getLogger().log(Level.INFO, "Unable to remove "+ key.toString() +" from provider.", ex);
+        }
+    }
 }

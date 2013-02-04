@@ -111,4 +111,18 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         return null;
     }
 
+    @Override
+    public void remove(Name key) {
+        if (store == null) {
+            reload();
+        }
+
+        try {
+            store.delete(key);
+            reload();
+       } catch (DataStoreException ex) {
+            getLogger().log(Level.WARNING, ex.getMessage(), ex);
+        }
+    }
+
 }
