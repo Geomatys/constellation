@@ -107,6 +107,7 @@ public class AnyResultTable extends SingletonTable<AnyResultType> implements Clo
             final DataArrayType entry = dataArrays.getEntry(results.getString(indexOf(query.definition)));
             final DataArrayType array = new DataArrayType(entry.getId(),
                                                       entry.getElementCount().getCount().getValue(),  
+                                                      entry.getId(),
                                                       entry.getElementType(),
                                                       entry.getEncoding(),
                                                       results.getString(indexOf(query.values))); 
@@ -137,8 +138,9 @@ public class AnyResultTable extends SingletonTable<AnyResultType> implements Clo
                     results = statement.statement.executeQuery();
                 } else if (result instanceof DataArrayPropertyType) {
                     final DataArrayType array = ((DataArrayPropertyType)result).getDataArray();
-                    if (array == null)
+                    if (array == null) {
                         throw new CatalogException("The data array is null!");
+                    }
                     statement.statement.setString(indexOf(query.values),array.getValues());
                     statement.statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
                     statement.statement.setString(indexOf(query.definition), array.getId());

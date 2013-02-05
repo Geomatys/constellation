@@ -252,6 +252,17 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     }
 
     /**
+     * Tests the GetObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetObservationSamplingCurveTest() throws Exception {
+        super.GetObservationSamplingCurveTest();
+    }
+    
+    /**
      * Tests the GetFeatureOfInterest method
      *
      * @throws java.lang.Exception

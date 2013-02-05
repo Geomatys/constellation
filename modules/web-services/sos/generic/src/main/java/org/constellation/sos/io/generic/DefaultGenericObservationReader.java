@@ -20,9 +20,7 @@ package org.constellation.sos.io.generic;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
@@ -36,34 +34,38 @@ import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.gml.xml.GMLXmlFactory;
+import org.geotoolkit.gml.xml.LineString;
 import org.geotoolkit.gml.xml.Point;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.ResponseModeType;
-import org.geotoolkit.swe.xml.v101.AbstractDataComponentType;
 import org.geotoolkit.swe.xml.v101.AnyResultType;
-import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
-import org.geotoolkit.swe.xml.v101.BooleanType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
 import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
-import org.geotoolkit.swe.xml.v101.QuantityType;
-import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
-import org.geotoolkit.swe.xml.v101.TextBlockType;
-import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
-import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.gml.xml.v321.FeaturePropertyType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
+import org.geotoolkit.observation.xml.v200.OMObservationType;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.SOSXmlFactory;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+import org.geotoolkit.swe.xml.AbstractDataComponent;
+import org.geotoolkit.swe.xml.AbstractDataRecord;
+import org.geotoolkit.swe.xml.AnyScalar;
+import org.geotoolkit.swe.xml.DataArray;
+import org.geotoolkit.swe.xml.TextBlock;
+import org.geotoolkit.swe.xml.UomProperty;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.observation.Observation;
 
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.Period;
@@ -152,8 +154,13 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public List<String> getFeatureOfInterestNames() throws CstlServiceException {
         try {
-            final Values values = loadData(Arrays.asList("var04"));
-            return values.getVariables("var04");
+            final Values values = loadData(Arrays.asList("var04", "var67"));
+            final List<String> result = values.getVariables("var04");
+            final List<String> curves = values.getVariables("var67");
+            if (!curves.isEmpty()) {
+                result.addAll(curves);
+            }
+            return result;
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
@@ -359,14 +366,41 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
         }
-        // TODO return composite phenomenon
         try {
             final Values values = loadData(Arrays.asList("var13", "var14", "var47"), phenomenonName);
             final boolean exist = values.getVariable("var47") != null;
             if (!exist) {
-                return null;
+                return getCompositePhenomenon(phenomenonName);
             }
             return new PhenomenonType(phenomenonName, values.getVariable("var13"), values.getVariable("var14"));
+        } catch (MetadataIoException ex) {
+            throw new CstlServiceException(ex);
+        }
+    }
+    
+    private PhenomenonType getCompositePhenomenon(String phenomenonName) throws CstlServiceException {
+        // we remove the phenomenon id base
+        if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+            phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
+        }
+        try {
+            Values compositeValues = loadData("var68", phenomenonName);
+            final boolean exist = compositeValues.getVariable("var68") != null;
+            if (!exist) {
+                return null;
+            }
+            compositeValues = loadData(Arrays.asList("var17"), phenomenonName);
+            final List<PhenomenonType> components = new ArrayList<PhenomenonType>();
+            for (String componentID : compositeValues.getVariables("var17")) {
+                components.add(getPhenomenon(componentID));
+            }
+            compositeValues = loadData(Arrays.asList("var15", "var16"), phenomenonName);
+            final CompositePhenomenonType phenomenon = new CompositePhenomenonType(phenomenonName,
+                                                                               compositeValues.getVariable("var15"),
+                                                                               compositeValues.getVariable("var16"),
+                                                                               null,
+                                                                               components);
+            return phenomenon;
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
@@ -382,7 +416,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
 
             final boolean exist = values.getVariable("var48") != null;
             if (!exist) {
-                return null;
+                return getFeatureOfInterestCurve(samplingFeatureId, version);
             }
 
             final String name            = values.getVariable("var19");
@@ -413,6 +447,69 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
+    }
+    
+    public SamplingFeature getFeatureOfInterestCurve(final String samplingFeatureId, final String version) throws CstlServiceException {
+        try {
+            final Values values = loadData(Arrays.asList("var51", "var52", "var53", "var54", "var55", "var56", "var56", "var57",
+                                                         "var58", "var59", "var60", "var61", "var62", "var63"), samplingFeatureId);
+
+            final boolean exist = values.getVariable("var51") != null;
+            if (!exist) {
+                return null;
+            }
+
+            final String name            = values.getVariable("var53");
+            final String description     = values.getVariable("var52");
+            final String sampledFeature  = values.getVariable("var59");
+            
+            final String boundSrsName    = values.getVariable("var54");
+            final Double lcx             = (Double) values.getTypedVariable("var55");
+            final Double lcy             = (Double) values.getTypedVariable("var56");
+            final Double ucx             = (Double) values.getTypedVariable("var57");
+            final Double ucy             = (Double) values.getTypedVariable("var58");
+            final Envelope env           = SOSXmlFactory.buildEnvelope(version, lcx, lcy, ucx, ucy, boundSrsName);
+
+            final String lengthUom       = values.getVariable("var60");
+            final Double lengthValue     = (Double) values.getTypedVariable("var61");
+            
+            final String shapeID         = values.getVariable("var62");
+            final String shapeSrsName    = values.getVariable("var63");
+
+            final LineString location    = buildShape(version, shapeID);
+
+            final FeatureProperty sampleFeatureProperty;
+            if (sampledFeature != null) {
+                sampleFeatureProperty = buildFeatureProperty(version, sampledFeature);
+            } else {
+                sampleFeatureProperty = null;
+            }
+            return buildSamplingCurve(version, samplingFeatureId, name, description, sampleFeatureProperty, location, lengthValue, lengthUom, env);
+        } catch (MetadataIoException ex) {
+            throw new CstlServiceException(ex);
+        }
+    }
+    
+    private LineString buildShape(final String version, final String shapeID) throws MetadataIoException {
+        final Values values = loadData(Arrays.asList("var64", "var65", "var66"), shapeID);
+        final List<Object> xValues     = values.getTypedVariables("var64");
+        final List<Object> yValues     = values.getTypedVariables("var65");
+        final List<Object> zValues     = values.getTypedVariables("var66");
+        final List<DirectPosition> pos = new ArrayList<DirectPosition>();
+        for (int i = 0; i < xValues.size(); i++) {
+            final List<Double> coord = new ArrayList<Double>();
+            final Double x = (Double) xValues.get(i);
+            final Double y = (Double) yValues.get(i);
+            coord.add(x);
+            coord.add(y);
+            if (zValues.size() < i) {
+                final Double z = (Double) zValues.get(i);
+                coord.add(z);
+            }
+            pos.add(buildDirectPosition(version, null, null, coord));
+        }
+        return buildLineString(version, pos);
+        
     }
 
     private List<Double> getCoordinates(String samplingFeatureId) throws CstlServiceException {
@@ -445,13 +542,20 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public ObservationType getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
+    public Observation getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var26", "var27", "var28", "var29", "var30", "var31"), identifier);
-            final SamplingFeature featureOfInterest = getFeatureOfInterest(values.getVariable("var26"), version);
-            final PhenomenonType observedProperty = getPhenomenon(values.getVariable("var27"));
-            final ProcessType procedure = new ProcessType(values.getVariable("var28"));
-
+            final String foiPoint = values.getVariable("var26");
+            final String foiCurve = values.getVariable("var50");
+            final SamplingFeature featureOfInterest;
+            if (foiPoint != null) {
+                featureOfInterest = getFeatureOfInterest(foiPoint, version);
+            } else if (foiCurve != null){
+                featureOfInterest = getFeatureOfInterestCurve(foiCurve, version);
+            } else {
+               featureOfInterest = null;
+               LOGGER.log(Level.INFO, "no featureOfInterest for result:{0}", identifier);
+            }
             String begin = values.getVariable("var29");
             if (begin != null) {
                 begin = begin.replace(' ', 'T');
@@ -460,17 +564,44 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             if (end != null) {
                 end = end.replace(' ', 'T');
             }
-            final TimePeriodType samplingTime = new TimePeriodType(begin, end);
-            final AnyResultType anyResult = getResult(values.getVariable("var31"), resultModel);
-            final DataArrayType dataArray = anyResult.getArray();
-            final DataArrayPropertyType result = new DataArrayPropertyType(dataArray);
-            return new ObservationType(identifier,
-                                        null,
-                                        (org.geotoolkit.sampling.xml.v100.SamplingFeatureType)featureOfInterest,
-                                        observedProperty,
-                                        procedure,
-                                        result,
-                                        samplingTime);
+            final Period samplingTime = SOSXmlFactory.buildTimePeriod(version, begin, end);
+            final String proc             = values.getVariable("var28");
+            final String phenomenon       = values.getVariable("var27");
+            final String phenomenonComp   = values.getVariable("var49");
+            final String resultID         = values.getVariable("var31");
+            final PhenomenonType observedProperty;
+            if (phenomenon != null) {
+                observedProperty = getPhenomenon(phenomenon);
+            } else if (phenomenonComp != null) {
+                observedProperty = getCompositePhenomenon(phenomenonComp);
+            } else {
+                observedProperty = null;
+                LOGGER.log(Level.INFO, "no phenomenon for result:{0}", identifier);
+            }
+            if (version.equals("1.0.0")) {
+                final AnyResultType anyResult = (AnyResultType) getResult(resultID, resultModel, version);
+                final DataArrayType dataArray = anyResult.getArray();
+                final DataArrayPropertyType result = new DataArrayPropertyType(dataArray);
+                return new ObservationType(identifier,
+                                            null,
+                                            (org.geotoolkit.sampling.xml.v100.SamplingFeatureType)featureOfInterest,
+                                            observedProperty,
+                                            new ProcessType(proc),
+                                            result,
+                                            (org.geotoolkit.gml.xml.v311.TimePeriodType)samplingTime);
+            } else if (version.equals("2.0.0")) {
+                final FeaturePropertyType foi = (FeaturePropertyType) SOSXmlFactory.buildFeatureProperty(version, featureOfInterest);
+                final org.geotoolkit.swe.xml.v200.DataArrayPropertyType result = (org.geotoolkit.swe.xml.v200.DataArrayPropertyType) getResult(resultID, resultModel, version);
+                return new OMObservationType(identifier, 
+                                             "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_ComplexObservation", 
+                                             (org.geotoolkit.gml.xml.v321.TimePeriodType)samplingTime,
+                                             proc,
+                                             observedProperty.getName(),
+                                             foi,
+                                             result);
+            } else {
+                throw new IllegalArgumentException("Unexpected version:" + version);
+            }
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
@@ -480,7 +611,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public AnyResultType getResult(String identifier, QName resutModel) throws CstlServiceException {
+    public Object getResult(final String identifier, final QName resutModel, final String version) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var32", "var33", "var34", "var35", "var36", "var37", "var38", "var39",
                     "var40", "var41", "var42", "var43"), identifier);
@@ -491,42 +622,51 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             final String tokenSeparator   = values.getVariable("var35");
             final String decimalSeparator = values.getVariable("var36");
             final String blockSeparator   = values.getVariable("var37");
-            final TextBlockType encoding = new TextBlockType(encodingID, tokenSeparator, blockSeparator, decimalSeparator);
+            final TextBlock encoding      = SOSXmlFactory.buildTextBlock(version, encodingID, tokenSeparator, blockSeparator, decimalSeparator);
 
             //data block description
             final String blockId          = values.getVariable("var38");
             final String dataRecordId     = values.getVariable("var39");
-            final Set<AnyScalarPropertyType> fields = new HashSet<AnyScalarPropertyType>();
+            final List<AnyScalar> fields  = new ArrayList<AnyScalar>();
             final List<String> fieldNames = values.getVariables("var40");
             final List<String> fieldDef   = values.getVariables("var41");
             final List<String> type       = values.getVariables("var42");
             final List<String> uomCodes   = values.getVariables("var43");
             for(int i = 0; i < fieldNames.size(); i++) {
-                AbstractDataComponentType component = null;
+                AbstractDataComponent component = null;
                 final String typeName   = type.get(i);
                 final String fieldName  = fieldNames.get(i);
                 final String definition = fieldDef.get(i);
-                final String uomCode    = uomCodes.get(i);
+                final UomProperty uomCode;
+                if (typeName.equals("Boolean")) {
+                    uomCode = SOSXmlFactory.buildUomProperty(version, uomCodes.get(i), null);
+                } else {
+                    uomCode = null;
+                }
                 if (typeName != null) {
                     if ("Quantity".equals(typeName)) {
-                        component = new QuantityType(definition, uomCode, null);
+                        component = SOSXmlFactory.buildQuantity(version,definition, uomCode, null);
                     } else if ("Time".equals(typeName)) {
-                        component = new TimeType(definition, uomCode, null);
+                        component = SOSXmlFactory.buildTime(version, definition, uomCode);
                     } else if ("Boolean".equals(typeName)) {
-                        component = new BooleanType(definition, null);
+                        component = SOSXmlFactory.buildBoolean(version, definition, null);
                     } else {
                         LOGGER.severe("unexpected field type");
                     }
                 }
-                final AnyScalarPropertyType field = new AnyScalarPropertyType(dataRecordId, fieldName, component);
+                final AnyScalar field = SOSXmlFactory.buildAnyScalar(version, dataRecordId, fieldName, component);
                 fields.add(field);
             }
 
-            final SimpleDataRecordType elementType = new SimpleDataRecordType(blockId, dataRecordId, null, false, fields);
+            final AbstractDataRecord elementType = SOSXmlFactory.buildSimpleDatarecord(version, blockId, dataRecordId, null, false, fields);
 
-            final String dataValues     = values.getVariable("var33");
-            final DataArrayType result = new DataArrayType(blockId, count, elementType, encoding, dataValues);
-            return new AnyResultType(identifier, result);
+            final String dataValues    = values.getVariable("var33");
+            final DataArray result = SOSXmlFactory.buildDataArray(version, blockId, count, blockId, elementType, encoding, dataValues);
+            if (version.equals("1.0.0")) {
+                return new AnyResultType(identifier, (DataArrayType)result);
+            } else {
+                return new org.geotoolkit.swe.xml.v200.DataArrayPropertyType((org.geotoolkit.swe.xml.v200.DataArrayType)result);
+            }
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }

@@ -139,7 +139,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    Object getResult(final String identifier, final QName resultModel) throws CstlServiceException;
+    Object getResult(final String identifier, final QName resultModel, final String version) throws CstlServiceException;
 
     /**
      * Return a reference from the specified identifier

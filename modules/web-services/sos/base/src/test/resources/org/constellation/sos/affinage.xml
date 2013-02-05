@@ -8,7 +8,7 @@
 <select group="filterObservation">
     <col>
         <var>name</var>
-        <sql>name</sql>
+        <sql>"name"</sql>
     </col>
 </select>
 
@@ -33,37 +33,37 @@
 
 -- ==== WHERE =======
 
-<where group="observationType"><![CDATA["name" LIKE '%&observationIdBase%']]></where>
+<where group="observationType">"name" LIKE '%:${observationIdBase}%'</where>
 
 -- ==== PROCEDURE (capteur) =======
 
-<where group="procedure"><![CDATA["procedure"=&procedure]]></where>
+<where group="procedure">"procedure"=:${procedure}</where>
 
 -- ==== PHENOMENON ===========
 
-<where group="simplePhenomenon"><![CDATA["observed_property"=&phenomenon]]></where>
-<where group="compositePhenomenon"><![CDATA["observed_property_composite"=&phenomenon]]></where>
+<where group="simplePhenomenon">"observed_property"=:${phenomenon}</where>
+<where group="compositePhenomenon">"observed_property_composite"=:${phenomenon}</where>
 
 -- ==== FEATURE OF INTEREST (station)=============
 
-<where group="foi"><![CDATA["feature_of_interest_point"=&foi]]></where>
+<where group="foi">"feature_of_interest_point"=:${foi} OR "feature_of_interest_curve"=:${foi}</where>
 
 -- ==== TIME BEFORE ======== 
-<where group="tbefore"><![CDATA["sampling_time_begin"<=&time]]></where>
+<where group="tbefore"><![CDATA["sampling_time_begin"<=:${time}]]></where>
 
 -- ===== TIME AFTER ========
-<where group="tafter"><![CDATA[("sampling_time_begin">=&time) OR ("sampling_time_begin"<=&time AND "sampling_time_end">=&time)]]></where>
+<where group="tafter"><![CDATA[("sampling_time_begin">=:${time}) OR ("sampling_time_begin"<=:${time} AND "sampling_time_end">=:${time})]]></where>
 
 
 -- ===== TIME DURING ========
-<where group="tduring"><![CDATA[("sampling_time_begin">=&begin AND "sampling_time_end"<= &end) OR ("sampling_time_begin">=&begin AND "sampling_time_begin"<=&end AND "sampling_time_end" IS NULL) OR   ("sampling_time_begin"<=&begin AND "sampling_time_end"<= &end AND "sampling_time_end">= &begin) OR ("sampling_time_begin">=&begin AND "sampling_time_end">= &end AND "sampling_time_begin"<= &end) OR
-("sampling_time_begin"<=&begin AND "sampling_time_end">= &end)]]></where>
+<where group="tduring"><![CDATA[("sampling_time_begin">=:${begin} AND "sampling_time_end"<= :${end}) OR ("sampling_time_begin">=:${begin} AND "sampling_time_begin"<=:${end} AND "sampling_time_end" IS NULL) OR   ("sampling_time_begin"<=:${begin} AND "sampling_time_end"<= :${end} AND "sampling_time_end">= :${begin}) OR ("sampling_time_begin">=:${begin} AND "sampling_time_end">= :${end} AND "sampling_time_begin"<= :${end}) OR
+("sampling_time_begin"<=:${begin} AND "sampling_time_end">= :${end})]]></where>
 
 
 -- ===== TIME EQUALS TimePeriod========
-<where group="tequalsTP"><![CDATA["sampling_time_begin"=&begin AND "sampling_time_end"=&end]]></where>
+<where group="tequalsTP"><![CDATA["sampling_time_begin"=:${begin} AND "sampling_time_end"=:${end}]]></where>
 
 -- ===== TIME EQUALS TimeInstant========
-<where group="tequalsTI"><![CDATA[("sampling_time_begin"=&position AND "sampling_time_end" IS NULL) OR ("sampling_time_begin"<=&position AND "sampling_time_end">=&position)]]></where>
+<where group="tequalsTI"><![CDATA[("sampling_time_begin"=:${position} AND "sampling_time_end" IS NULL) OR ("sampling_time_begin"<=:${position} AND "sampling_time_end">=:${position})]]></where>
 
 </query>

@@ -176,7 +176,7 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
      * Tests the GetObservation method
      *
      * @throws java.lang.Exception
-     *
+     */
     @Test
     @Override
     public void GetObservationSamplingCurveTest() throws Exception {

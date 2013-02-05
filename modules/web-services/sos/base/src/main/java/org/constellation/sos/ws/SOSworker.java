@@ -1456,7 +1456,7 @@ public class SOSworker extends AbstractWorker {
             for (ObservationResult result: results) {
                 final Timestamp tBegin = result.beginTime;
                 final Timestamp tEnd   = result.endTime;
-                final Object r         = omReader.getResult(result.resultID, resultModel);
+                final Object r         = omReader.getResult(result.resultID, resultModel, currentVersion);
                 if (r instanceof AnyResult) {
                     final DataArray array = ((AnyResult)r).getArray();
                     if (array != null) {

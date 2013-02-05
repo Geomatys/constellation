@@ -90,12 +90,11 @@ import org.geotoolkit.swe.xml.v200.CategoryType;
 import org.geotoolkit.swe.xml.v200.CountRangeType;
 import org.geotoolkit.swe.xml.v200.CountType;
 import org.geotoolkit.swe.xml.v200.DataArrayType;
-import org.geotoolkit.swe.xml.v200.DataArrayType.ElementType;
-import org.geotoolkit.swe.xml.v200.DataArrayType.Encoding;
 import org.geotoolkit.swe.xml.v200.DataRecordType;
 import org.geotoolkit.swe.xml.v200.DataRecordType.Field;
 import org.geotoolkit.swe.xml.v200.QuantityRangeType;
 import org.geotoolkit.swe.xml.v200.QuantityType;
+import org.geotoolkit.swe.xml.v200.TextEncodingType;
 import org.geotoolkit.swe.xml.v200.TextType;
 import org.geotoolkit.swe.xml.v200.TimeRangeType;
 import org.geotoolkit.swe.xml.v200.TimeType;
@@ -617,7 +616,7 @@ public class DefaultObservationReader implements ObservationReader {
                
                final int count = resultv100.getDataArray().getElementCount().getCount().getValue();
                final String id = resultv100.getDataArray().getId();
-               final Encoding enc = new Encoding(encodingV100.getId(), encodingV100.getDecimalSeparator(), encodingV100.getTokenSeparator(), encodingV100.getBlockSeparator());
+               final TextEncodingType enc = new TextEncodingType(encodingV100.getId(), encodingV100.getDecimalSeparator(), encodingV100.getTokenSeparator(), encodingV100.getBlockSeparator());
                final String values = resultv100.getDataArray().getValues();
                final SimpleDataRecordType recordv100 =  (SimpleDataRecordType) resultv100.getDataArray().getElementType();
                final List<Field> fields = new ArrayList<Field>();
@@ -625,9 +624,9 @@ public class DefaultObservationReader implements ObservationReader {
                    final AbstractDataComponentType component = convert(scalar.getValue());
                    fields.add(new Field(scalar.getName(), component));
                }
-               final DataRecordType record = new DataRecordType(fields);
-               final ElementType elem = new ElementType(resultv100.getDataArray().getName(), record);
-               final org.geotoolkit.swe.xml.v200.DataArrayType array = new DataArrayType(id, count, enc, values, elem);
+               final DataRecordType record = new DataRecordType(recordv100.getId(), recordv100.getDefinition(), recordv100.isFixed(), fields);
+               //final ElementType elem = new ElementType(resultv100.getDataArray().getName(), record);
+               final org.geotoolkit.swe.xml.v200.DataArrayType array = new DataArrayType(id, count, enc, values, id, record);
                final org.geotoolkit.swe.xml.v200.DataArrayPropertyType resultv200 = new org.geotoolkit.swe.xml.v200.DataArrayPropertyType(array);
                result = resultv200;
            } else {
@@ -648,7 +647,7 @@ public class DefaultObservationReader implements ObservationReader {
             return new VectorType(); // TODO
         } else if (data instanceof org.geotoolkit.swe.xml.v101.TimeType) {
             final org.geotoolkit.swe.xml.v101.TimeType old = (org.geotoolkit.swe.xml.v101.TimeType)data;
-            return new TimeType(old.getDefinition());
+            return new TimeType(old.getDefinition(), null);
         } else if (data instanceof org.geotoolkit.swe.xml.v101.TimeRange) {
             final org.geotoolkit.swe.xml.v101.TimeRange old = (org.geotoolkit.swe.xml.v101.TimeRange)data;
             return new TimeRangeType(old.getDefinition(), old.getValue());
@@ -683,7 +682,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Object getResult(final String identifier, final QName resultModel) throws CstlServiceException {
+    public Object getResult(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
         try {
             if (resultModel.equals(MEASUREMENT_QNAME)) {
                 final MeasureTable meaTable = omDatabase.getTable(MeasureTable.class);

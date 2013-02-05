@@ -142,10 +142,10 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest = new StringBuilder("SELECT \"name\" FROM \"observation\".\"observations\" WHERE \"name\" LIKE '%");
         }
         if (requestMode == INLINE) {
-            sqlRequest.append(observationIdBase).append("%' AND ");
+            sqlRequest.append(observationIdBase).append("%' ");
 
         } else if (requestMode == RESULT_TEMPLATE) {
-            sqlRequest.append(observationTemplateIdBase).append("%' AND ");
+            sqlRequest.append(observationTemplateIdBase).append("%' ");
         }
     }
 
@@ -170,9 +170,8 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void setProcedure(final List<String> procedures, final List<ObservationOffering> offerings) {
-        sqlRequest.append(" ( ");
         if (!procedures.isEmpty()) {
-
+            sqlRequest.append("AND ( ");
             for (String s : procedures) {
                 if (s != null) {
                     String dbId = map.getProperty(s);
@@ -182,16 +181,20 @@ public class DefaultObservationFilter implements ObservationFilter {
                     sqlRequest.append(" \"procedure\"='").append(dbId).append("' OR ");
                 }
             }
-        } else {
+            sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
+            sqlRequest.append(") ");
+        } else if (!offerings.isEmpty()) {
+            
+            sqlRequest.append("AND ( ");
             //if is not specified we use all the process of the offering
             for (ObservationOffering off : offerings) {
                 for (String proc : off.getProcedures()) {
                     sqlRequest.append(" \"procedure\"='").append(proc).append("' OR ");
                 }
             }
+            sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
+            sqlRequest.append(") ");
         }
-        sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
-        sqlRequest.append(") ");
     }
 
     /**
@@ -199,18 +202,20 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void setObservedProperties(final List<String> phenomenon, final List<String> compositePhenomenon) {
-        sqlRequest.append(" AND( ");
-        for (String p : phenomenon) {
-            p = p.replace(phenomenonIdBase, "");
-            sqlRequest.append(" \"observed_property\"='").append(p).append("' OR ");
+        if (!phenomenon.isEmpty() && !compositePhenomenon.isEmpty()) {
+            sqlRequest.append(" AND( ");
+            for (String p : phenomenon) {
+                p = p.replace(phenomenonIdBase, "");
+                sqlRequest.append(" \"observed_property\"='").append(p).append("' OR ");
 
+            }
+            for (String p : compositePhenomenon) {
+                p = p.replace(phenomenonIdBase, "");
+                sqlRequest.append(" \"observed_property_composite\"='").append(p).append("' OR ");
+            }
+            sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
+            sqlRequest.append(") ");
         }
-        for (String p : compositePhenomenon) {
-            p = p.replace(phenomenonIdBase, "");
-            sqlRequest.append(" \"observed_property_composite\"='").append(p).append("' OR ");
-        }
-        sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
-        sqlRequest.append(") ");
     }
 
     /**
@@ -218,12 +223,14 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void setFeatureOfInterest(final List<String> fois) {
-        sqlRequest.append(" AND (");
-        for (String foi : fois) {
-            sqlRequest.append("(\"feature_of_interest_point\"='").append(foi).append("' OR \"feature_of_interest\"='").append(foi).append("' OR \"feature_of_interest_curve\"='").append(foi).append("') OR");
+        if (!fois.isEmpty()) {
+            sqlRequest.append(" AND (");
+            for (String foi : fois) {
+                sqlRequest.append("(\"feature_of_interest_point\"='").append(foi).append("' OR \"feature_of_interest\"='").append(foi).append("' OR \"feature_of_interest_curve\"='").append(foi).append("') OR");
+            }
+            sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
+            sqlRequest.append(") ");
         }
-        sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
-        sqlRequest.append(") ");
     }
 
     /**

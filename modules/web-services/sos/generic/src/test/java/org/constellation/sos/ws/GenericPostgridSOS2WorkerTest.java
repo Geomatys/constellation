@@ -183,7 +183,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     @Override
     public void GetObservationTest() throws Exception {
         super.GetObservationTest();
@@ -193,8 +193,8 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      * Tests the GetObservation method
      *
      * @throws java.lang.Exception
-     *
-    @Ignore
+     */
+    @Test
     @Override
     public void GetObservationSamplingCurveTest() throws Exception {
         super.GetObservationSamplingCurveTest();
@@ -238,7 +238,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     @Override
     public void GetFeatureOfInterestTest() throws Exception {
         super.GetFeatureOfInterestTest();

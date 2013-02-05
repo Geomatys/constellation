@@ -90,6 +90,17 @@
             <from>"observation"."phenomenons"</from>
             <where>"id"=:$</where>
          </query>
+         <!-- composite phenomenon exist? -->
+         <query>
+            <select>
+               <col>
+                  <var>var68</var>
+                  <sql>"id"</sql>
+               </col>
+            </select>
+            <from>"observation"."composite_phenomenons"</from>
+            <where>"id"=:$</where>
+         </query>
 	 <!-- simple phenomenon -->
          <query>
             <select>
@@ -162,6 +173,73 @@
             <from>"observation"."sampling_points"</from>
             <where>"id"=:$</where>
          </query>
+          <!-- feature of interest (samplingCurve) exist-->
+         <query>
+            <select>
+               <col>
+                  <var>var51</var>
+                  <sql>"id"</sql>
+               </col>
+            </select>
+            <from>"observation"."sampling_curves"</from>
+            <where>"id"=:$</where>
+         </query>
+          <!-- feature of interest (samplingCurve)-->
+         <query>
+            <select>
+               <col>
+                  <var>var52</var>
+                  <sql>"description"</sql>
+               </col>
+               <col>
+                  <var>var53</var>
+                  <sql>"name"</sql>
+               </col>
+               <col>
+                  <var>var54</var>
+                  <sql>"srs_name"</sql>
+               </col>
+               <col>
+                  <var>var55</var>
+                  <sql>"lower_corner_x"</sql>
+               </col>
+               <col>
+                  <var>var56</var>
+                  <sql>"lower_corner_y"</sql>
+               </col>
+               <col>
+                  <var>var57</var>
+                  <sql>"upper_corner_x"</sql>
+               </col>
+               <col>
+                  <var>var58</var>
+                  <sql>"upper_corner_y"</sql>
+               </col>
+               <col>
+                  <var>var59</var>
+                  <sql>"sampled_feature"</sql>
+               </col>
+               <col>
+                  <var>var60</var>
+                  <sql>"length_uom"</sql>
+               </col>
+               <col>
+                  <var>var61</var>
+                  <sql>"length_value"</sql>
+               </col>
+               <col>
+                  <var>var62</var>
+                  <sql>"shape_id"</sql>
+               </col>
+               <col>
+                  <var>var63</var>
+                  <sql>"shape_srsname"</sql>
+               </col>
+            </select>
+            <from>"observation"."sampling_curves" sc, "sos"."envelopes" env</from>
+            <where>sc."id"=:$
+                AND sc."boundedby" = env."id"</where>
+         </query>
 	 <!-- observation -->
          <query>
             <select>
@@ -170,8 +248,16 @@
                   <sql>"feature_of_interest_point"</sql>
                </col>
                <col>
+                  <var>var50</var>
+                  <sql>"feature_of_interest_curve"</sql>
+               </col>
+               <col>
                   <var>var27</var>
                   <sql>"observed_property"</sql>
+               </col>
+               <col>
+                  <var>var49</var>
+                  <sql>"observed_property_composite"</sql>
                </col>
                <col>
                   <var>var28</var>
@@ -232,6 +318,25 @@
             <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."text_block_encodings" e</from>
             <where>r."definition" = d."id_array_definition" AND d."encoding"=e."id_encoding" AND r."id_result"=:$</where>
          </query>
+          <!-- feature of interest curve lineString -->
+         <query>
+            <select>
+               <col>
+                  <var>var64</var>
+                  <sql>"x"</sql>
+               </col>
+               <col>
+                  <var>var65</var>
+                  <sql>"y"</sql>
+               </col>
+               <col>
+                  <var>var66</var>
+                  <sql>"z"</sql>
+               </col>
+            </select>
+            <from>"observation"."linestring"</from>
+            <where>"id"=:$</where>
+        </query>
          <!-- feature of interest coordinates -->
          <query>
             <select>
@@ -288,11 +393,20 @@
             <select>
                <col>
                   <var>var04</var>
-                  <sql>"name"</sql>
+                  <sql>"id"</sql>
                </col>
             </select>
             <from>"observation"."sampling_points"</from>
          </query>
+         <query>
+            <select>
+               <col>
+                  <var>var67</var>
+                  <sql>"id"</sql>
+               </col>
+            </select>
+            <from>"observation"."sampling_curves"</from>
+        </query>
          <!-- observation offering -->
          <query>
             <select>

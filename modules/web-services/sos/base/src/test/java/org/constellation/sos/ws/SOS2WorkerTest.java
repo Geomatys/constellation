@@ -17,6 +17,7 @@
 
 package org.constellation.sos.ws;
 
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -553,6 +554,8 @@ public class SOS2WorkerTest {
         assertEquals(i1.next(), i2.next());
 
         assertEquals(expSdr, obsSdr);
+        assertEquals(expR.getDataArray().getElementType().getName(),     obsR.getDataArray().getElementType().getName());
+        assertEquals(expR.getDataArray().getElementType().getAbstractArray(),     obsR.getDataArray().getElementType().getAbstractArray());
         assertEquals(expR.getDataArray().getElementType(),     obsR.getDataArray().getElementType());
         assertEquals(expR.getDataArray().getEncoding(),        obsR.getDataArray().getEncoding());
         assertEquals(expR.getDataArray().getValues(),          obsR.getDataArray().getValues());
@@ -809,6 +812,16 @@ public class SOS2WorkerTest {
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        final DataArrayPropertyType expArray = (DataArrayPropertyType) expResult.getResult();
+        final DataArrayPropertyType resArray = (DataArrayPropertyType) obsResult.getResult();
+        assertEquals(expArray.getDataArray().getElementCount(), resArray.getDataArray().getElementCount());
+        assertEquals(expArray.getDataArray().getElementType(),  resArray.getDataArray().getElementType());
+        assertEquals(expArray.getDataArray().getEncoding(),  resArray.getDataArray().getEncoding());
+        assertEquals(expArray.getDataArray(), resArray.getDataArray());
+        assertEquals(expArray, resArray);
+        
         assertEquals(expResult.getResult(), obsResult.getResult());
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
@@ -917,6 +930,83 @@ public class SOS2WorkerTest {
         marshallerPool.release(unmarshaller);
     }
 
+    /**
+     * Tests the GetObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    public void GetObservationSamplingCurveTest() throws Exception {
+
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        final List<String> nullList = null;
+        
+        /**
+         *  Test 2: getObservation with procedure urn:ogc:object:sensor:GEOM:8
+         *
+         */
+        GetObservationType request  = new GetObservationType("2.0.0",
+                                      "offering-8",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:8"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        GetObservationResponseType result = (GetObservationResponseType) worker.getObservation(request);
+        OMObservationType obsResult = (OMObservationType) result.getMember().iterator().next();
+
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation6.xml"));
+        OMObservationType expResult = (OMObservationType)obj.getValue();
+
+        assertTrue(obsResult.getFeatureOfInterest() instanceof SFSpatialSamplingFeatureType);
+        final SFSpatialSamplingFeatureType expectedFOI = (SFSpatialSamplingFeatureType)expResult.getFeatureOfInterest();
+        final SFSpatialSamplingFeatureType resultFOI   = (SFSpatialSamplingFeatureType)obsResult.getFeatureOfInterest();
+        assertEquals(expectedFOI.getShape(),     resultFOI.getShape());
+        assertEquals(expectedFOI.getBoundedBy(), resultFOI.getBoundedBy());
+        assertEquals(expectedFOI, resultFOI);
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        final DataArrayPropertyType expArray = (DataArrayPropertyType) expResult.getResult();
+        final DataArrayPropertyType resArray = (DataArrayPropertyType) obsResult.getResult();
+        assertEquals(expArray.getDataArray().getElementCount(), resArray.getDataArray().getElementCount());
+        assertEquals(expArray.getDataArray().getElementType(),  resArray.getDataArray().getElementType());
+        assertEquals(expArray.getDataArray().getEncoding(),  resArray.getDataArray().getEncoding());
+        assertEquals(expArray.getDataArray(), resArray.getDataArray());
+        assertEquals(expArray, resArray);
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 3: getObservation with no procedure And FID = station-006
+         *
+         */
+        request  = new GetObservationType("2.0.0",
+                                      null,
+                                      null,
+                                      null,
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      Arrays.asList("station-006"),
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        result = (GetObservationResponseType) worker.getObservation(request);
+        assertEquals(1, result.getMember().size());
+        obsResult = (OMObservationType) result.getMember().iterator().next();
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation6.xml"));
+        expResult = (OMObservationType)obj.getValue();
+
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        marshallerPool.release(unmarshaller);
+    }
 
     /**
      * Tests the RegisterSensor method

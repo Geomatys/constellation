@@ -36,8 +36,6 @@ import org.constellation.generic.database.Where;
 import org.constellation.sos.io.ObservationResult;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.TimeInstantType;
-import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.observation.xml.Process;
 import org.opengis.observation.Observation;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
@@ -46,6 +44,8 @@ import static org.constellation.sos.ws.Utils.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.sos.xml.ObservationOffering;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 
 /**
  *
@@ -82,15 +82,22 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         this.map = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
     }
     
+    @Override
+    protected Connection acquireConnection() throws SQLException {
+        final Connection c = super.acquireConnection();
+        c.setAutoCommit(true);
+        return c;
+    }
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) {
         currentQuery              = new Query();
-        final Select select       = configurationQuery.getSelect("filterObservation");
-        final From from           = configurationQuery.getFrom("observations");
-        final Where where         = configurationQuery.getWhere("observationType");
+        final Select select       = new Select(configurationQuery.getSelect("filterObservation"));
+        final From from           = new From(configurationQuery.getFrom("observations"));
+        final Where where         = new Where(configurationQuery.getWhere("observationType"));
 
         if (requestMode == INLINE) {
             where.replaceVariable("observationIdBase", observationIdBase, false);
@@ -108,9 +115,9 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     @Override
     public void initFilterGetResult(final Observation template, final QName resultModel) {
         currentQuery              = new Query();
-        final Select select       = configurationQuery.getSelect("filterResult");
-        final From from           = configurationQuery.getFrom("observations");
-        final Where where         = configurationQuery.getWhere(PROCEDURE);
+        final Select select       = new Select(configurationQuery.getSelect("filterResult"));
+        final From from           = new From(configurationQuery.getFrom("observations"));
+        final Where where         = new Where(configurationQuery.getWhere(PROCEDURE));
 
         final Process process = (Process) template.getProcedure();
         where.replaceVariable(PROCEDURE, process.getHref(), true);
@@ -131,7 +138,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
                     if (dbId == null) {
                         dbId = s;
                     }
-                    final Where where = configurationQuery.getWhere(PROCEDURE);
+                    final Where where = new Where(configurationQuery.getWhere(PROCEDURE));
                     where.replaceVariable(PROCEDURE, dbId, true);
                     currentQuery.addWhere(where);
                 }
@@ -140,7 +147,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             //if is not specified we use all the process of the offering
             for (ObservationOffering off : offerings) {
                 for (String proc : off.getProcedures()) {
-                     final Where where = configurationQuery.getWhere(PROCEDURE);
+                     final Where where = new Where(configurationQuery.getWhere(PROCEDURE));
                      where.replaceVariable(PROCEDURE, proc, true);
                      currentQuery.addWhere(where);
                 }
@@ -154,12 +161,18 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     @Override
     public void setObservedProperties(final List<String> phenomenon, final List<String> compositePhenomenon) {
         for (String p : phenomenon) {
-            final Where where = configurationQuery.getWhere("simplePhenomenon");
+            if (p.contains(phenomenonIdBase)) {
+                p = p.replace(phenomenonIdBase, "");
+            }
+            final Where where = new Where(configurationQuery.getWhere("simplePhenomenon"));
             where.replaceVariable("phenomenon", p, true);
             currentQuery.addWhere(where);
         }
         for (String p : compositePhenomenon) {
-            final Where where = configurationQuery.getWhere("compositePhenomenon");
+            if (p.contains(phenomenonIdBase)) {
+                p = p.replace(phenomenonIdBase, "");
+            }
+            final Where where = new Where(configurationQuery.getWhere("compositePhenomenon"));
             where.replaceVariable("phenomenon", p, true);
             currentQuery.addWhere(where);
         }
@@ -171,7 +184,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     @Override
     public void setFeatureOfInterest(final List<String> fois) {
         for (String foi : fois) {
-            final Where where = configurationQuery.getWhere("foi");
+            final Where where = new Where(configurationQuery.getWhere("foi"));
             where.replaceVariable("foi", foi, true);
             currentQuery.addWhere(where);
         }
@@ -182,22 +195,22 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      */
     @Override
     public void setTimeEquals(final Object time) throws CstlServiceException {
-        if (time instanceof TimePeriodType) {
-            final TimePeriodType tp = (TimePeriodType) time;
-            final String begin      = getTimeValue(tp.getBeginPosition());
-            final String end        = getTimeValue(tp.getEndPosition());
+        if (time instanceof Period) {
+            final Period tp    = (Period) time;
+            final String begin = getTimeValue(tp.getBeginning().getPosition());
+            final String end   = getTimeValue(tp.getEnding().getPosition());
 
-            final Where where       = configurationQuery.getWhere("tequalsTP");
+            final Where where       = new Where(configurationQuery.getWhere("tequalsTP"));
             where.replaceVariable("begin", begin, true);
             where.replaceVariable("end", end, true);
             currentQuery.addWhere(where);
 
         // if the temporal object is a timeInstant
-        } else if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position = getTimeValue(ti.getTimePosition());
+        } else if (time instanceof Instant) {
+            final Instant ti = (Instant) time;
+            final String position = getTimeValue(ti.getPosition());
 
-            final Where where = configurationQuery.getWhere("tequalsTI");
+            final Where where = new Where(configurationQuery.getWhere("tequalsTI"));
             where.replaceVariable("position", position, true);
             currentQuery.addWhere(where);
 
@@ -213,11 +226,11 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     @Override
     public void setTimeBefore(final Object time) throws CstlServiceException  {
         // for the operation before the temporal object must be an timeInstant
-        if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position = getTimeValue(ti.getTimePosition());
+        if (time instanceof Instant) {
+            final Instant ti = (Instant) time;
+            final String position = getTimeValue(ti.getPosition());
             
-            final Where where = configurationQuery.getWhere("tbefore");
+            final Where where = new Where(configurationQuery.getWhere("tbefore"));
             where.replaceVariable("time", position, true);
             currentQuery.addWhere(where);
 
@@ -233,11 +246,11 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     @Override
     public void setTimeAfter(final Object time) throws CstlServiceException {
         // for the operation after the temporal object must be an timeInstant
-        if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position    = getTimeValue(ti.getTimePosition());
+        if (time instanceof Instant) {
+            final Instant ti = (Instant) time;
+            final String position    = getTimeValue(ti.getPosition());
             
-            final Where where        = configurationQuery.getWhere("tafter");
+            final Where where        = new Where(configurationQuery.getWhere("tafter"));
             where.replaceVariable("time", position, true);
             currentQuery.addWhere(where);
 
@@ -252,12 +265,12 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      */
     @Override
     public void setTimeDuring(final Object time) throws CstlServiceException {
-        if (time instanceof TimePeriodType) {
-            final TimePeriodType tp = (TimePeriodType) time;
-            final String begin      = getTimeValue(tp.getBeginPosition());
-            final String end        = getTimeValue(tp.getEndPosition());
+        if (time instanceof Period) {
+            final Period tp    = (Period) time;
+            final String begin = getTimeValue(tp.getBeginning().getPosition());
+            final String end   = getTimeValue(tp.getEnding().getPosition());
 
-            final Where where = configurationQuery.getWhere("tduring");
+            final Where where = new Where(configurationQuery.getWhere("tduring"));
             where.replaceVariable("begin", begin, true);
             where.replaceVariable("end", end, true);
             currentQuery.addWhere(where);
@@ -326,8 +339,8 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             connection.close();
             return results;
         } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "SQLException while executing the query: {0}", request);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            LOGGER.log(Level.WARNING, "SQLException while executing the query: {0} \nmsg:{1}", new Object[]{request, ex.getMessage()});
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(), ex,
                                           NO_APPLICABLE_CODE);
         }
     }

@@ -359,7 +359,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public AnyResult getResult(final String identifier, final QName resutModel) throws CstlServiceException {
+    public AnyResult getResult(final String identifier, final QName resutModel, final String version) throws CstlServiceException {
         final File anyResultFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (anyResultFile.exists()) {
             Unmarshaller unmarshaller = null;

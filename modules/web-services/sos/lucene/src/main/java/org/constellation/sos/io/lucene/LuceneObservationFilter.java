@@ -113,6 +113,7 @@ public class LuceneObservationFilter implements ObservationFilter {
     @Override
     public void setProcedure(final List<String> procedures, final List<ObservationOffering> offerings) {
         luceneRequest.append(" ( ");
+        boolean add = false;
         if (!procedures.isEmpty()) {
 
             for (String s : procedures) {
@@ -122,6 +123,7 @@ public class LuceneObservationFilter implements ObservationFilter {
                         dbId = s;
                     }
                     luceneRequest.append(" procedure:\"").append(dbId).append("\" OR ");
+                    add = true;
                 }
             }
         } else {
@@ -129,11 +131,14 @@ public class LuceneObservationFilter implements ObservationFilter {
             for (ObservationOffering off : offerings) {
                 for (String proc : off.getProcedures()) {
                     luceneRequest.append(" procedure:\"").append(proc).append("\" OR ");
+                    add = true;
                 }
             }
         }
         luceneRequest.delete(luceneRequest.length() - 3, luceneRequest.length());
-        luceneRequest.append(") ");
+        if (add) {
+            luceneRequest.append(") ");
+        }
     }
 
     /**

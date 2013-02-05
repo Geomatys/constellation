@@ -110,7 +110,10 @@ public class DataArrayTable extends SingletonTable<DataArrayType> implements Clo
         
         return new DataArrayType(idArray,
                                   results.getInt(indexOf(query.elementCount)),
-                                  entry, encoding, null);
+                                  idArray,
+                                  entry, 
+                                  encoding,
+                                  null);
     }
     
     /**

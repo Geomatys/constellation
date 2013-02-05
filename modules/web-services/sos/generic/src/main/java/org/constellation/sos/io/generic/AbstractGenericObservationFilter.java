@@ -69,12 +69,14 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
      /**
      * The base for observation id.
      */
-    protected String observationIdBase;
+    protected final String observationIdBase;
 
     /**
      * The base for observation id.
      */
-    protected String observationTemplateIdBase;
+    protected final String observationTemplateIdBase;
+    
+    protected final String phenomenonIdBase;
     
     /**
      * The O&M data source
@@ -102,6 +104,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
     public AbstractGenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase         = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
         this.observationTemplateIdBase = (String) properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
+        this.phenomenonIdBase          = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
@@ -147,6 +150,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
         this.dataSource                = that.dataSource;
         this.logLevel                  = that.logLevel;
         this.staticParameters          = that.staticParameters;
+        this.phenomenonIdBase          = that.phenomenonIdBase;
     }
 
     private void processStatiqueQuery(final Query query) throws SQLException {
