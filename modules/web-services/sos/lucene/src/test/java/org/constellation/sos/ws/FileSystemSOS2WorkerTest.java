@@ -283,6 +283,39 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void GetFeatureOfInterestTest() throws Exception {
         super.GetFeatureOfInterestTest();
     }
+    
+    /**
+     * Tests the GetResult method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetResultErrorTest() throws Exception {
+        super.GetResultErrorTest();
+    }
+
+    /**
+     * Tests the GetResult method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetResultTest() throws Exception {
+        super.GetResultTest();
+    }
+
+    /**
+     * Tests the InsertObservation method
+     *
+     * @throws java.lang.Exception
+     *
+    @Test
+    @Override
+    public void insertObservationTest() throws Exception {
+        super.insertObservationTest();
+    }
 
     /**
      * Tests the destroy method

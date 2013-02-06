@@ -187,7 +187,7 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
      * Tests the GetResult method
      *
      * @throws java.lang.Exception
-     *
+     */
     @Test
     @Override
     public void GetResultErrorTest() throws Exception {
@@ -198,7 +198,7 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
      * Tests the GetResult method
      *
      * @throws java.lang.Exception
-     *
+     */
     @Test
     @Override
     public void GetResultTest() throws Exception {
@@ -206,7 +206,7 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
     }
 
     /**
-     * Tests the RegisterSensor method
+     * Tests the InsertObservation method
      *
      * @throws java.lang.Exception
      *

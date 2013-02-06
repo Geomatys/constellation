@@ -30,9 +30,24 @@ public class ObservationResult {
     public Timestamp beginTime;
     public Timestamp endTime;
 
-    public ObservationResult(String resultID, Timestamp beginTime, Timestamp endTime) {
+    public ObservationResult(final String resultID, final Timestamp beginTime, final Timestamp endTime) {
         this.beginTime = beginTime;
         this.endTime   = endTime;
         this.resultID  = resultID;
+    }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[ObservationResult]\n");
+        if (resultID != null) {
+            sb.append("resultID:").append(resultID).append("\n");
+        }
+        if (beginTime != null) {
+            sb.append("beginTime:").append(beginTime).append("\n");
+        }
+        if (endTime != null) {
+            sb.append("endTime:").append(endTime).append("\n");
+        }
+        return sb.toString();
     }
 }

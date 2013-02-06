@@ -36,8 +36,6 @@ import org.constellation.generic.database.Where;
 import org.constellation.sos.io.ObservationResult;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.observation.xml.Process;
-import org.opengis.observation.Observation;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.sos.ws.Utils.*;
@@ -113,14 +111,13 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterGetResult(final Observation template, final QName resultModel) {
+    public void initFilterGetResult(final String procedure, final QName resultModel) {
         currentQuery              = new Query();
         final Select select       = new Select(configurationQuery.getSelect("filterResult"));
         final From from           = new From(configurationQuery.getFrom("observations"));
         final Where where         = new Where(configurationQuery.getWhere(PROCEDURE));
 
-        final Process process = (Process) template.getProcedure();
-        where.replaceVariable(PROCEDURE, process.getHref(), true);
+        where.replaceVariable(PROCEDURE, procedure, true);
         currentQuery.addSelect(select);
         currentQuery.addFrom(from);
         currentQuery.addWhere(where);

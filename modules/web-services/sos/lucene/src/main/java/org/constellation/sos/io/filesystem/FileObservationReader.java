@@ -39,12 +39,10 @@ import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.swe.xml.AnyResult;
-import org.geotoolkit.swe.xml.v101.AnyResultType;
-import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
-import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.swe.xml.Phenomenon;
 
 import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -249,7 +247,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
+    public Phenomenon getPhenomenon(String phenomenonName) throws CstlServiceException {
         // we remove the phenomenon id base
         if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
@@ -263,8 +261,8 @@ public class FileObservationReader implements ObservationReader {
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof PhenomenonType) {
-                    return (PhenomenonType) obj;
+                if (obj instanceof Phenomenon) {
+                    return (Phenomenon) obj;
                 }
                 throw new CstlServiceException("The file " + phenomenonFile + " does not contains an phenomenon Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
@@ -359,7 +357,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public AnyResult getResult(final String identifier, final QName resutModel, final String version) throws CstlServiceException {
+    public Object getResult(final String identifier, final QName resutModel, final String version) throws CstlServiceException {
         final File anyResultFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (anyResultFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -371,8 +369,8 @@ public class FileObservationReader implements ObservationReader {
                 }
                 if (obj instanceof Observation) {
                     final Observation obs = (Observation) obj;
-                    final DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
-                    return new AnyResultType(null, arrayP.getDataArray());
+                    final DataArrayProperty arrayP = (DataArrayProperty) obs.getResult();
+                    return arrayP.getDataArray();
                 }
                 throw new CstlServiceException("The file " + anyResultFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {

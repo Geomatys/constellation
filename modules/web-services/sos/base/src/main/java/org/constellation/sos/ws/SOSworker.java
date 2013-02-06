@@ -83,7 +83,7 @@ import org.geotoolkit.sos.xml.GetObservation;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
-import org.geotoolkit.sos.xml.v100.GetResult;
+import org.geotoolkit.sos.xml.GetResult;
 import org.geotoolkit.sos.xml.GetResultResponse;
 import org.geotoolkit.sos.xml.InsertObservation;
 import org.geotoolkit.sos.xml.InsertObservationResponse;
@@ -97,12 +97,12 @@ import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureCollection;
 import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.observation.xml.AbstractObservation;
+import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.ogc.xml.XMLLiteral;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SmlFactory;
 import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.swe.xml.AbstractEncoding;
-import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swes.xml.DescribeSensor;
@@ -117,6 +117,7 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+import org.geotoolkit.swe.xml.AnyResult;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -150,6 +151,7 @@ import org.opengis.observation.ObservationCollection;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
+import org.opengis.temporal.TemporalObject;
 import org.opengis.temporal.TemporalPrimitive;
 import org.opengis.util.CodeList;
 
@@ -1383,29 +1385,45 @@ public class SOSworker extends AbstractWorker {
         
         // we clone the filter for this request
         final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
-
-        Observation template = null;
-        if (request.getObservationTemplateId() != null) {
-            final String id = request.getObservationTemplateId();
-            template = templates.get(id);
+        final String observationTemplateID    = request.getObservationTemplateId();
+        
+        final String procedure;
+        final TemporalObject time;
+        final QName resultModel;
+        if (observationTemplateID != null) {
+            final Observation template = templates.get(observationTemplateID);
             if (template == null) {
                 throw new CstlServiceException("this template does not exist or is no longer usable",
                                               INVALID_PARAMETER_VALUE, "ObservationTemplateId");
             }
-        } else {
+            procedure = ((Process) template.getProcedure()).getHref();
+            time      = template.getSamplingTime();
+            if (template instanceof Measurement) {
+                resultModel = MEASUREMENT_QNAME;
+            } else {
+                resultModel = OBSERVATION_QNAME;
+            }
+        } else if (currentVersion.equals("1.0.0")){
             throw new CstlServiceException("ObservationTemplateID must be specified",
                                           MISSING_PARAMETER_VALUE, "ObservationTemplateId");
-        }
-
-        final QName resultModel;
-        if (template instanceof Measurement) {
-            resultModel = MEASUREMENT_QNAME;
         } else {
+            if (request.getOffering() == null) {
+                throw new CstlServiceException("The offering parameter must be specified",
+                                              MISSING_PARAMETER_VALUE, "offering");
+            } else {
+                final ObservationOffering off = omReader.getObservationOffering(request.getOffering(), currentVersion);
+                if (off== null) {
+                    throw new CstlServiceException("The offering parameter is invalid",
+                                              INVALID_PARAMETER_VALUE, "offering");
+                } 
+                procedure = off.getProcedures().get(0);
+            }
+            time = null;
             resultModel = OBSERVATION_QNAME;
         }
 
         //we begin to create the sql request
-        localOmFilter.initFilterGetResult(template, resultModel);
+        localOmFilter.initFilterGetResult(procedure, resultModel);
 
         //we treat the time constraint
         final List<Filter> times = request.getTemporalFilter();
@@ -1415,13 +1433,13 @@ public class SOSworker extends AbstractWorker {
          */
 
         // case TEquals with time instant
-        if (template.getSamplingTime() instanceof Instant) {
-           final Instant ti      = (Instant) template.getSamplingTime();
+        if (time instanceof Instant) {
+           final Instant ti      = (Instant) time;
            final TEquals equals  = buildTimeEquals(currentVersion, null, ti);
            times.add(equals);
 
-        } else if (template.getSamplingTime() instanceof Period) {
-            final Period tp = (Period) template.getSamplingTime();
+        } else if (time instanceof Period) {
+            final Period tp = (Period) time;
 
             //case TBefore
             if (TimeIndeterminateValueType.BEFORE.equals(((AbstractTimePosition)tp.getBeginning().getPosition()).getIndeterminatePosition())) {
@@ -1457,24 +1475,38 @@ public class SOSworker extends AbstractWorker {
                 final Timestamp tBegin = result.beginTime;
                 final Timestamp tEnd   = result.endTime;
                 final Object r         = omReader.getResult(result.resultID, resultModel, currentVersion);
-                if (r instanceof AnyResult) {
-                    final DataArray array = ((AnyResult)r).getArray();
+                if (r instanceof DataArray) {
+                    final DataArray array = (DataArray)r;
                     if (array != null) {
                         final String resultValues = getResultValues(tBegin, tEnd, array, times);
-                        datablock.append(resultValues).append('\n');
+                        if (!resultValues.isEmpty()) {
+                            datablock.append(resultValues).append('\n');
+                        }
                     } else {
                         throw new IllegalArgumentException("Array is null");
                     }
                 } else if (r instanceof Measure) {
                     final Measure meas = (Measure) r;
                     datablock.append(tBegin).append(',').append(meas.getValue()).append("@@");
+                } else if (r instanceof AnyResult) {
+                    final DataArray array = ((AnyResult)r).getArray();
+                    if (array != null) {
+                        final String resultValues = getResultValues(tBegin, tEnd, array, times);
+                        if (!resultValues.isEmpty()) {
+                            datablock.append(resultValues).append('\n');
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Array is null");
+                    }
+                } else {
+                    throw new IllegalArgumentException("Unexpected result type:" + r);
                 }
 
             }
             values = datablock.toString();
         }
         final String url = getServiceUrl().substring(0, getServiceUrl().length() -1);
-        final GetResultResponse response = buildGetResultResponse(currentVersion, values, url + '/' + request.getObservationTemplateId());
+        final GetResultResponse response = buildGetResultResponse(currentVersion, values, url + '/' + observationTemplateID);
         LOGGER.log(logLevel, "GetResult processed in {0} ms", (System.currentTimeMillis() - start));
         return response;
     }

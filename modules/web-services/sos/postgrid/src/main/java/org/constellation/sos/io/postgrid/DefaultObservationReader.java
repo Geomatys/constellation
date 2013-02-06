@@ -251,7 +251,12 @@ public class DefaultObservationReader implements ObservationReader {
         try {
             final String offeringNameVar;
             if (version.equals("2.0.0")) {
-                final String procedureName = sensorIdBase + offeringName.substring(9);
+                final String procedureName;
+                if (offeringName.length() >= 9) {
+                    procedureName = sensorIdBase + offeringName.substring(9);
+                } else {
+                    procedureName = offeringName;
+                }
                 if (!getProcedureNames().contains(procedureName)) {
                     return null;
                 }

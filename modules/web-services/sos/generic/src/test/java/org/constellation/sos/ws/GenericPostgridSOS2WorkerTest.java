@@ -204,7 +204,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      * Tests the GetResult method
      *
      * @throws java.lang.Exception
-     *
+     */
     @Test
     @Override
     public void GetResultErrorTest() throws Exception {
@@ -215,11 +215,21 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      * Tests the GetResult method
      *
      * @throws java.lang.Exception
-     *
-    @Ignore
+     */
     @Override
     public void GetResultTest() throws Exception {
         super.GetResultTest();
+    }
+    
+     /**
+     * Tests the InsertObservation method
+     *
+     * @throws java.lang.Exception
+     *
+    @Test
+    @Override
+    public void insertObservationTest() throws Exception {
+        super.insertObservationTest();
     }
 
     /**

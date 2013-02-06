@@ -20,13 +20,13 @@ package org.constellation.sos.io;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-
 import javax.xml.namespace.QName;
+
 import org.constellation.ws.CstlServiceException;
+
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
-import org.opengis.observation.Observation;
 
 /**
  * 
@@ -42,7 +42,7 @@ public interface ObservationFilter {
     /**
      * Initialize the query for a restricted to the results request.
      */
-    void initFilterGetResult(Observation procedure, QName resultModel) throws CstlServiceException;
+    void initFilterGetResult(final String procedure, QName resultModel) throws CstlServiceException;
 
     /**
      * Add some procedure filter to the request.
