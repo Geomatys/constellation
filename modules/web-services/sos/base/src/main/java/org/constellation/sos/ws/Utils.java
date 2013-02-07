@@ -284,7 +284,7 @@ public final class Utils {
             maxy = 90.0;
         }
 
-        final Envelope env = SOSXmlFactory.buildEnvelope(version, minx, miny, maxx, maxy, srsName);
+        final Envelope env = SOSXmlFactory.buildEnvelope(version, null, minx, miny, maxx, maxy, srsName);
         env.setSrsDimension(2);
         env.setAxisLabels(Arrays.asList("Y X"));
         return env;

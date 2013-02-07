@@ -235,6 +235,10 @@
                   <var>var63</var>
                   <sql>"shape_srsname"</sql>
                </col>
+               <col>
+                  <var>var82</var>
+                  <sql>env."id"</sql>
+               </col>
             </select>
             <from>"observation"."sampling_curves" sc, "sos"."envelopes" env</from>
             <where>sc."id"=:$
@@ -279,6 +283,45 @@
             <from>"observation"."observations"</from>
             <where>"name"=:$</where>
          </query>
+          <!-- measurement -->
+         <query>
+            <select>
+               <col>
+                  <var>var69</var>
+                  <sql>"feature_of_interest_point"</sql>
+               </col>
+               <col>
+                  <var>var70</var>
+                  <sql>"feature_of_interest_curve"</sql>
+               </col>
+               <col>
+                  <var>var71</var>
+                  <sql>"observed_property"</sql>
+               </col>
+               <col>
+                  <var>var72</var>
+                  <sql>"observed_property_composite"</sql>
+               </col>
+               <col>
+                  <var>var73</var>
+                  <sql>"procedure"</sql>
+               </col>
+               <col>
+                  <var>var74</var>
+                  <sql>"sampling_time_begin"</sql>
+               </col>
+               <col>
+                  <var>var75</var>
+                  <sql>"sampling_time_end"</sql>
+               </col>
+               <col>
+                  <var>var76</var>
+                  <sql>"result"</sql>
+               </col>
+            </select>
+            <from>"observation"."measurements"</from>
+            <where>"name"=:$</where>
+         </query>
 	 <!-- result -->
          <query>
             <select>
@@ -317,6 +360,40 @@
             </select>
             <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."text_block_encodings" e</from>
             <where>r."definition" = d."id_array_definition" AND d."encoding"=e."id_encoding" AND r."id_result"=:$</where>
+         </query>
+         <!-- result measure -->
+         <query>
+            <select>
+               <col>
+                  <var>var77</var>
+                  <sql>"uom"</sql>
+               </col>
+               <col>
+                  <var>var78</var>
+                  <sql>"value"</sql>
+               </col>
+            </select>
+            <from>"observation"."measures"</from>
+            <where>"name" = :$</where>
+         </query>
+         <!--  unit of measure -->
+         <query>
+            <select>
+               <col>
+                  <var>var79</var>
+                  <sql>"name"</sql>
+               </col>
+               <col>
+                  <var>var80</var>
+                  <sql>"quantity_type"</sql>
+               </col>
+               <col>
+                  <var>var81</var>
+                  <sql>"unit_system"</sql>
+               </col>
+            </select>
+            <from>"observation"."unit_of_measures"</from>
+            <where>"id" = :$</where>
          </query>
           <!-- feature of interest curve lineString -->
          <query>

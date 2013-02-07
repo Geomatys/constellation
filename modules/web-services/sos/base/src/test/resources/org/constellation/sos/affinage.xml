@@ -15,21 +15,22 @@
 <select group="filterResult">
     <col>
         <var>result</var>
-        <sql>result</sql>
+        <sql>"result"</sql>
     </col>
     <col>
         <var>sampling_time_begin</var>
-        <sql>sampling_time_begin</sql>
+        <sql>"sampling_time_begin"</sql>
     </col>
     <col>
         <var>sampling_time_end</var>
-        <sql>sampling_time_end</sql>
+        <sql>"sampling_time_end"</sql>
     </col>
 </select>
 
 -- ==== FROM ========
 
 <from group="observations">"observation"."observations"</from>
+<from group="measurements">"observation"."measurements"</from>
 
 -- ==== WHERE =======
 

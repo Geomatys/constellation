@@ -94,7 +94,12 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     public void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) {
         currentQuery              = new Query();
         final Select select       = new Select(configurationQuery.getSelect("filterObservation"));
-        final From from           = new From(configurationQuery.getFrom("observations"));
+        final From from;
+        if (resultModel.equals(OBSERVATION_QNAME)) {
+            from = new From(configurationQuery.getFrom("observations"));
+        } else {
+            from = new From(configurationQuery.getFrom("measurements"));
+        }
         final Where where         = new Where(configurationQuery.getWhere("observationType"));
 
         if (requestMode == INLINE) {

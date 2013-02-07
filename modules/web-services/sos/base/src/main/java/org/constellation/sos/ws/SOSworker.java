@@ -1369,7 +1369,7 @@ public class SOSworker extends AbstractWorker {
     }
     
     private Envelope getEnvelopeFromBBOX(final String version, final BBOX bbox) {
-        return buildEnvelope(version, bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), bbox.getSRS());
+        return buildEnvelope(version, null, bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), bbox.getSRS());
     }
 
     /**
@@ -2306,6 +2306,7 @@ public class SOSworker extends AbstractWorker {
         //we create a list of accepted responseMode (fixed)
         final List<ResponseModeType> responses = Arrays.asList(RESULT_TEMPLATE, INLINE);
         final List<QName> resultModel = Arrays.asList(OBSERVATION_QNAME, MEASUREMENT_QNAME);
+        final List<String> resultModelV200 = Arrays.asList(OBSERVATION_MODEL);
         final List<String> offeringOutputFormat = Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
         final List<String> srsName = Arrays.asList("EPSG:4326");
 
@@ -2320,11 +2321,13 @@ public class SOSworker extends AbstractWorker {
                                             description,
                                             srsName,
                                             time,
-                                            process,
+                                            Arrays.asList(process),
+                                            null,
                                             observedProperties,
-                                            featureOfInterest,
+                                            Arrays.asList(featureOfInterest),
                                             offeringOutputFormat,
                                             resultModel,
+                                            resultModelV200,
                                             responses));
     }
 
