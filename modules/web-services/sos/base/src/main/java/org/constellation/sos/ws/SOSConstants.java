@@ -201,7 +201,7 @@ public final class SOSConstants {
 
         final List<DomainType> gcParameters = new ArrayList<DomainType>();
         gcParameters.add(new DomainType("service", "SOS"));
-        gcParameters.add(new DomainType("Acceptversions", "1.0.0"));
+        gcParameters.add(new DomainType("Acceptversions", Arrays.asList("1.0.0", "2.0.0")));
         gcParameters.add(new DomainType("Sections", Arrays.asList("ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities", "All")));
         gcParameters.add(new DomainType("AcceptFormats", "text/xml"));
         
@@ -209,21 +209,21 @@ public final class SOSConstants {
         operations.add(getCapabilities);
 
         final List<DomainType> rsParameters = new ArrayList<DomainType>();
-        rsParameters.add(new DomainType("version", "1.0.0"));
+        rsParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
         rsParameters.add(new DomainType("service", "SOS"));
         
         final Operation registerSensor = new Operation(onlyPost, rsParameters, null, null, "RegisterSensor");
         operations.add(registerSensor);
         
         final List<DomainType> grParameters = new ArrayList<DomainType>();
-        grParameters.add(new DomainType("version", "1.0.0"));
+        grParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
         grParameters.add(new DomainType("service", "SOS"));
         
         final Operation getResult = new Operation(onlyPost, grParameters, null, null, "GetResult");
         operations.add(getResult);
         
         final List<DomainType> goParameters = new ArrayList<DomainType>();
-        goParameters.add(new DomainType("version", "1.0.0"));
+        goParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
         goParameters.add(new DomainType("service", "SOS"));
         goParameters.add(new DomainType("srsName", new AnyValue()));
         goParameters.add(new DomainType("offering", "offering-AllSensor"));
@@ -239,8 +239,17 @@ public final class SOSConstants {
         final Operation getObservation = new Operation(onlyPost, goParameters, null, null, "GetObservation");
         operations.add(getObservation);
         
+        final List<DomainType> gobidParameters = new ArrayList<DomainType>();
+        gobidParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
+        gobidParameters.add(new DomainType("service", "SOS"));
+        gobidParameters.add(new DomainType("observation", new AnyValue()));
+        
+        final Operation getObservationById = new Operation(onlyPost, gobidParameters, null, null, "GetObservationById");
+        
+        operations.add(getObservationById);
+        
         final List<DomainType> ioParameters = new ArrayList<DomainType>();
-        ioParameters.add(new DomainType("version", "1.0.0"));
+        ioParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
         ioParameters.add(new DomainType("service", "SOS"));
         
         final Operation insertObservation = new Operation(onlyPost, ioParameters, null, null, "InsertObservation");
@@ -248,7 +257,7 @@ public final class SOSConstants {
         
         final List<DomainType> gfParameters = new ArrayList<DomainType>();
         gfParameters.add(new DomainType("featureOfInterestId", "toUpdate"));
-        gfParameters.add(new DomainType("version", "1.0.0"));
+        gfParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
         gfParameters.add(new DomainType("service", "SOS"));
         
         final Operation getFeatureOfInterest = new Operation(getAndPost, gfParameters, null, null, "GetFeatureOfInterest");
@@ -256,14 +265,14 @@ public final class SOSConstants {
         
         final List<DomainType> gftParameters = new ArrayList<DomainType>();
         gftParameters.add(new DomainType("featureOfInterestId", "toUpdate"));
-        gftParameters.add(new DomainType("version", "1.0.0"));
+        gftParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
         gftParameters.add(new DomainType("service", "SOS"));
         
         final Operation getFeatureOfInterestTime = new Operation(onlyPost, gftParameters, null, null, "GetFeatureOfInterestTime");
         operations.add(getFeatureOfInterestTime);
         
         final List<DomainType> dsParameters = new ArrayList<DomainType>();
-        dsParameters.add(new DomainType("version", "1.0.0"));
+        dsParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
         dsParameters.add(new DomainType("service", "SOS"));
         dsParameters.add(new DomainType("outputFormat", "text/xml;subtype=\"sensorML/1.0.0\""));
         dsParameters.add(new DomainType("procedure", "toUpdate"));

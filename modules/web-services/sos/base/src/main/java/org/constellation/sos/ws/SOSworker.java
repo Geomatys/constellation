@@ -119,6 +119,8 @@ import org.geotoolkit.sos.xml.GetObservationById;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import org.geotoolkit.swe.xml.AnyResult;
+import org.geotoolkit.swes.xml.DeleteSensor;
+import org.geotoolkit.swes.xml.DeleteSensorResponse;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -881,6 +883,29 @@ public class SOSworker extends AbstractWorker {
 
         LOGGER.log(logLevel, "describeSensor processed in {0} ms.\n", (System.currentTimeMillis() - start));
         return result;
+    }
+    
+    public DeleteSensorResponse deleteSensor(final DeleteSensor request) throws CstlServiceException  {
+        LOGGER.log(logLevel, "DescribeSensor request processing\n");
+        final long start = System.currentTimeMillis();
+
+        // we get the form
+        verifyBaseRequest(request, true, false);
+        final String currentVersion = request.getVersion().toString();
+
+        // we verify that we have a sensor ID.
+        final String sensorId = request.getProcedure();
+        if (sensorId == null) {
+            throw new CstlServiceException("You must specify the sensor ID!", MISSING_PARAMETER_VALUE, PROCEDURE);
+        }
+        final boolean result = smlWriter.deleteSensor(sensorId);
+        if (result) {
+            smlReader.removeFromCache(sensorId);
+            LOGGER.log(logLevel, "describeSensor processed in {0} ms.\n", (System.currentTimeMillis() - start));
+            return buildDeleteSensorResponse(currentVersion, sensorId);
+        } else {
+            throw new CstlServiceException("unable to delete sensor:" + sensorId);
+        }
     }
 
     public Object getObservationById(final GetObservationById request) throws CstlServiceException {

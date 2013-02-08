@@ -74,6 +74,8 @@ import org.geotoolkit.sos.xml.v200.InsertObservationType;
 import org.geotoolkit.swe.xml.v200.DataArrayType;
 import org.geotoolkit.swe.xml.v200.DataRecordType;
 import org.geotoolkit.swe.xml.v200.DataRecordType.Field;
+import org.geotoolkit.swes.xml.v200.DeleteSensorResponseType;
+import org.geotoolkit.swes.xml.v200.DeleteSensorType;
 
 
 // JUnit dependencies
@@ -1076,7 +1078,7 @@ public class SOS2WorkerTest {
 
         marshallerPool.release(unmarshaller);
     }
-
+    
     /**
      * Tests the RegisterSensor method
      *
@@ -1118,6 +1120,29 @@ public class SOS2WorkerTest {
 
 
         marshallerPool.release(unmarshaller);
+    }
+    
+    public void DeleteSensorTest() throws Exception {
+        
+        final DeleteSensorType request = new DeleteSensorType("2.0.0","urn:ogc:object:sensor:GEOM:4");
+        final DeleteSensorResponseType result = (DeleteSensorResponseType) worker.deleteSensor(request);
+        final DeleteSensorResponseType expResult = new DeleteSensorResponseType("urn:ogc:object:sensor:GEOM:4");
+        
+        assertEquals(expResult, result);
+        
+        /**
+         * Test 1 system sensor
+         */
+        DescribeSensorType requestds  = new DescribeSensorType("2.0.0", "SOS", "urn:ogc:object:sensor:GEOM:4", "http://www.opengis.net/sensorml/1.0.0");
+        boolean exLaunched = false;
+        try {
+            worker.describeSensor(requestds);
+        } catch (CstlServiceException ex) {
+           exLaunched = true;
+           assertTrue(ex.getMessage().contains("this sensor is not registered"));
+        }
+        assertTrue(exLaunched);
+        
     }
     
     /**

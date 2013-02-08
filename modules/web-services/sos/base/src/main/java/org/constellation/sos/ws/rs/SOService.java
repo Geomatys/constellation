@@ -29,46 +29,51 @@ import com.sun.jersey.spi.resource.Singleton;
 
 //JAXB dependencies
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.sos.ws.SOSworker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
-import org.constellation.sos.ws.SOSworker;
 import org.constellation.ws.MimeType;
+import org.constellation.ws.UnauthorizedException;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.sos.ws.SOSConstants.*;
-import org.constellation.ws.UnauthorizedException;
 
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;
-import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
-import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.sos.xml.v100.DescribeSensor;
+import org.geotoolkit.ows.xml.AcceptFormats;
+import org.geotoolkit.ows.xml.AcceptVersions;
+import org.geotoolkit.ows.xml.Sections;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.swes.xml.DescribeSensor;
+import org.geotoolkit.swes.xml.InsertSensor;
 import org.geotoolkit.sos.xml.GetCapabilities;
 import org.geotoolkit.sos.xml.GetObservation;
-import org.geotoolkit.sos.xml.v100.GetResult;
-import org.geotoolkit.sos.xml.v100.InsertObservation;
-import org.geotoolkit.sos.xml.v100.RegisterSensor;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
-import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.xml.GetResult;
+import org.geotoolkit.sos.xml.InsertObservation;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.SOSResponseWrapper;
-import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
+import org.geotoolkit.sos.xml.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+
+import org.opengis.observation.ObservationCollection;
 
 /**
  *
@@ -132,7 +137,7 @@ public class SOService extends OGCWebService<SOSworker> {
                     }
                 }
                 Object marshalled;
-                if (response instanceof ObservationCollectionType) {
+                if (response instanceof ObservationCollection) {
                     marshalled = new SOSResponseWrapper(response);
                 } else if (response instanceof String) {
                     marshalled = (String) response;
@@ -164,8 +169,8 @@ public class SOService extends OGCWebService<SOSworker> {
                 return Response.ok(worker.getResult(gr), MimeType.TEXT_XML).build();
              }
 
-             if (request instanceof RegisterSensor) {
-                final RegisterSensor rs = (RegisterSensor)request;
+             if (request instanceof InsertSensor) {
+                final InsertSensor rs = (InsertSensor)request;
                 return Response.ok(worker.registerSensor(rs), MimeType.TEXT_XML).build();
              }
 
@@ -320,19 +325,19 @@ public class SOService extends OGCWebService<SOSworker> {
 
         final String currentVersion;
         String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
-        AcceptVersionsType versions;
+        AcceptVersions versions;
         if (version != null) {
             if (version.indexOf(',') != -1) {
                 version = version.substring(0, version.indexOf(','));
             }
-            versions = new AcceptVersionsType(version);
             currentVersion = "2.0.0";
+            versions =  OWSXmlFactory.buildAcceptVersion(currentVersion, Arrays.asList(version));
         } else {
-            versions = new AcceptVersionsType("1.0.0");
             currentVersion = "1.0.0";
+            versions =  OWSXmlFactory.buildAcceptVersion(currentVersion, Arrays.asList("1.0.0"));
         }
 
-        final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
+        final AcceptFormats formats = OWSXmlFactory.buildAcceptFormat(currentVersion, Arrays.asList(getParameter(ACCEPT_FORMATS_PARAMETER, false)));
 
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
@@ -355,7 +360,7 @@ public class SOService extends OGCWebService<SOSworker> {
             //if there is no requested Sections we add all the sections
             requestedSections = SectionsType.getExistingSections("1.1.1");
         }
-        final SectionsType sections     = new SectionsType(requestedSections);
+        final Sections sections = OWSXmlFactory.buildSections(currentVersion, requestedSections);
         return buildGetCapabilities(currentVersion,
                                    versions,
                                    sections,
@@ -369,8 +374,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * Build a new getCapabilities request from kvp encoding
      */
     private DescribeSensor createDescribeSensor() throws CstlServiceException {
-
-        return new DescribeSensor(getParameter(VERSION_PARAMETER, true),
+        return buildDescribeSensor(getParameter(VERSION_PARAMETER, true),
                                   getParameter(SERVICE_PARAMETER, true),
                                   getParameter(PROCEDURE, true),
                                   getParameter(OUTPUT_FORMAT, true));
@@ -381,6 +385,6 @@ public class SOService extends OGCWebService<SOSworker> {
     private GetFeatureOfInterest createGetFeatureOfInterest() throws CstlServiceException {
         final String featureID = getParameter("FeatureOfInterestId", true);
         final List<String> fidList = StringUtilities.toStringList(featureID);
-        return new GetFeatureOfInterest(getParameter(VERSION_PARAMETER, true),getParameter(SERVICE_PARAMETER, true), fidList);
+        return buildGetFeatureOfInterest(getParameter(VERSION_PARAMETER, true),getParameter(SERVICE_PARAMETER, true), fidList);
     }
 }

@@ -180,6 +180,17 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
     }
 
     /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void DeleteSensorTest() throws Exception {
+        super.DeleteSensorTest();
+    }
+    
+    /**
      * Tests the destroy method
      *
      * @throws java.lang.Exception

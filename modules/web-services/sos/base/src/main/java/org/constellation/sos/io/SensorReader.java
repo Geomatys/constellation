@@ -18,7 +18,6 @@
 package org.constellation.sos.io;
 
 import java.util.Collection;
-import java.util.List;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
 
@@ -36,7 +35,7 @@ public interface SensorReader {
      * @return the specified sensor description from the specified ID.
      * @throws org.constellation.ws.CstlServiceException
      */
-    AbstractSensorML getSensor(String sensorID) throws CstlServiceException;
+    AbstractSensorML getSensor(final String sensorID) throws CstlServiceException;
 
     /**
      * Return all sensor ID's.
@@ -51,6 +50,8 @@ public interface SensorReader {
      */
     String getInfos();
 
+    void removeFromCache(final String sensorID);
+    
     /**
      * Destroy and free the resource used by the reader.
      */

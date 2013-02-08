@@ -142,4 +142,9 @@ public class FileSensorReader implements SensorReader {
         }
         return result;
     }
+
+    @Override
+    public void removeFromCache(String sensorID) {
+        // do nothing no cache
+    }
 }
