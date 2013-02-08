@@ -115,6 +115,7 @@ import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.GetObservationById;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import org.geotoolkit.swe.xml.AnyResult;
@@ -882,6 +883,24 @@ public class SOSworker extends AbstractWorker {
         return result;
     }
 
+    public Object getObservationById(final GetObservationById request) throws CstlServiceException {
+        LOGGER.log(logLevel, "getObservation request processing\n");
+        final long start = System.currentTimeMillis();
+
+        //we verify the base request attribute
+        verifyBaseRequest(request, true, false);
+
+        final String currentVersion = request.getVersion().toString();
+     
+        final List<Observation> observation = new ArrayList<Observation>();
+        for (String oid : request.getObservation()) {
+            observation.add(omReader.getObservation(oid, OBSERVATION_QNAME, currentVersion));
+        }
+        final ObservationCollection response = buildGetObservationByIdResponse(currentVersion, "collection-1", null, observation);
+        LOGGER.log(logLevel, "getObservationById processed in {0}ms.\n", (System.currentTimeMillis() - start));
+        return response;
+    }
+    
     /**
      * Web service operation which respond a collection of observation satisfying
      * the restriction specified in the query.
@@ -1327,7 +1346,7 @@ public class SOSworker extends AbstractWorker {
                 LOGGER.log(Level.FINER, "Using computed bounds:{0}", computedBounds);
                 envelope = computedBounds;
             }
-            ObservationCollection ocResponse = buildObservationCollection(currentVersion, "collection-1", envelope, observations);
+            ObservationCollection ocResponse = buildGetObservationResponse(currentVersion, "collection-1", envelope, observations);
             ocResponse = regroupObservation(currentVersion, envelope, ocResponse);
             ocResponse = normalizeDocument(currentVersion, ocResponse);
             response   = ocResponse;

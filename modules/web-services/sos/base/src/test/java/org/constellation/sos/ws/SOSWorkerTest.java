@@ -74,6 +74,7 @@ import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v110.TimeDuringType;
 import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.v100.GetObservationById;
 import org.geotoolkit.swes.xml.InsertSensorResponse;
 
 import org.opengis.observation.sampling.SamplingPoint;
@@ -1526,6 +1527,35 @@ public class SOSWorkerTest {
         marshallerPool.release(unmarshaller);
     }
 
+    
+    public void GetObservationByIdTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        
+        GetObservationById request = new GetObservationById("1.0.0", "urn:ogc:object:observation:GEOM:304", "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.INLINE, "EPSG:4326");
+        
+        final ObservationCollectionType response = (ObservationCollectionType) worker.getObservationById(request);
+        
+        final ObservationType result = (ObservationType) response.getMember().get(0);
+        
+        java.io.Reader ioReader = new InputStreamReader(Util.getResourceAsStream("org/constellation/sos/v100/observation1.xml"), "UTF-8");
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(ioReader);
+
+        ObservationType expResult = (ObservationType)obj.getValue();
+
+        assertEquals(expResult.getFeatureOfInterest(), result.getFeatureOfInterest());
+        DataArrayPropertyType expArray = (DataArrayPropertyType)expResult.getResult();
+        DataArrayPropertyType resArray = (DataArrayPropertyType)result.getResult();
+        assertEquals(expArray.getDataArray().getElementType(), resArray.getDataArray().getElementType());
+        assertEquals(expArray.getDataArray().getEncoding(), resArray.getDataArray().getEncoding());
+        assertEquals(expArray.getDataArray().getValues(), resArray.getDataArray().getValues());
+        assertEquals(expArray.getDataArray().getPropertyElementType(), resArray.getDataArray().getPropertyElementType());
+        assertEquals(expArray.getDataArray().getPropertyEncoding(), resArray.getDataArray().getPropertyEncoding());
+        assertEquals(expArray.getDataArray(), resArray.getDataArray());
+        assertEquals(expArray, resArray);
+        assertEquals(expResult, result);
+        marshallerPool.release(unmarshaller);
+    }
+    
     /**
      * Tests the GetResult method
      *

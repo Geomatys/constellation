@@ -263,6 +263,17 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     }
     
     /**
+     * Tests the GetObservationById method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetObservationByIdTest() throws Exception {
+        super.GetObservationByIdTest();
+    }
+    
+    /**
      * Tests the GetFeatureOfInterest method
      *
      * @throws java.lang.Exception

@@ -36,8 +36,8 @@
                     <swe:value>5</swe:value>
                 </swe:Count>
             </swe:elementCount>
-             <swe:elementType gml:id="dataArray-2" name="dataArray-2">
-                <swe:SimpleDataRecord gml:id="datarecord-0" fixed="false" >
+            <swe:elementType gml:id="dataArray-2" name="dataArray-2">
+                <swe:SimpleDataRecord gml:id="datarecord-0" fixed="false">
                     <swe:field name="Time">
                         <swe:Time definition="urn:ogc:data:time:iso8601"/>
                     </swe:field>

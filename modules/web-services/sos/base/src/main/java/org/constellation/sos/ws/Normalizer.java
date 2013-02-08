@@ -137,7 +137,7 @@ public final class Normalizer {
         for (Observation entry: merged.values()) {
             obervations.add(entry);
         }
-        return SOSXmlFactory.buildObservationCollection(version, "collection-1", bounds, obervations);
+        return SOSXmlFactory.buildGetObservationResponse(version, "collection-1", bounds, obervations);
     }
 
     /**

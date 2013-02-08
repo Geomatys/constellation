@@ -201,6 +201,17 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
     }
 
     /**
+     * Tests the GetObservationById method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetObservationByIdTest() throws Exception {
+        super.GetObservationByIdTest();
+    }
+    
+    /**
      * Tests the GetResult method
      *
      * @throws java.lang.Exception

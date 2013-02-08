@@ -17,6 +17,7 @@
 
 package org.constellation.sos.ws;
 
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -65,6 +66,8 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.v200.GetObservationByIdResponseType;
+import org.geotoolkit.sos.xml.v200.GetObservationByIdType;
 import org.geotoolkit.sos.xml.v200.GetResultResponseType;
 import org.geotoolkit.sos.xml.v200.GetResultType;
 import org.geotoolkit.sos.xml.v200.InsertObservationType;
@@ -1011,6 +1014,26 @@ public class SOS2WorkerTest {
         marshallerPool.release(unmarshaller);
     }
 
+    public void GetObservationByIdTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        
+        GetObservationByIdType request = new GetObservationByIdType("2.0.0", Arrays.asList("urn:ogc:object:observation:GEOM:304"));
+        
+        final GetObservationByIdResponseType response = (GetObservationByIdResponseType) worker.getObservationById(request);
+        
+        final OMObservationType result = (OMObservationType) response.getMember().get(0);
+        
+        java.io.Reader ioReader = new InputStreamReader(Util.getResourceAsStream("org/constellation/sos/v200/observation1.xml"), "UTF-8");
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(ioReader);
+
+        OMObservationType expResult = (OMObservationType)obj.getValue();
+
+        assertEquals(expResult.getFeatureOfInterest(), result.getFeatureOfInterest());
+        assertEquals(expResult.getResult(), result.getResult());
+        assertEquals(expResult, result);
+        marshallerPool.release(unmarshaller);
+    }
+    
     /**
      * Tests the RegisterSensor method
      *
