@@ -38,9 +38,8 @@ import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.NoSuchTableException;
+import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.gml.xml.v311.ReferenceType;
-import org.geotoolkit.observation.xml.v100.MeasurementType;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
@@ -144,10 +143,10 @@ public class DefaultObservationWriter implements ObservationWriter {
     @Override
     public String writeObservation(final Observation observation) throws CstlServiceException {
         try {
-            if (observation instanceof MeasurementType && measTable != null) {
-                return measTable.getIdentifier((Measurement) observation);
+            if (observation instanceof Measurement && measTable != null) {
+                return measTable.getIdentifier((Measurement) OMXmlFactory.convert("1.0.0", observation));
             } else if (obsTable != null) {
-                return obsTable.getIdentifier(observation);
+                return obsTable.getIdentifier(OMXmlFactory.convert("1.0.0", observation));
             }
             return null;
         } catch (CatalogException ex) {
@@ -156,21 +155,6 @@ public class DefaultObservationWriter implements ObservationWriter {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String writeMeasurement(final Measurement measurement) throws CstlServiceException {
-        try {
-            return measTable.getIdentifier(measurement);
-        } catch (CatalogException ex) {
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 
@@ -197,8 +181,7 @@ public class DefaultObservationWriter implements ObservationWriter {
     public void updateOffering(final String offeringId, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException {
         try {
             if (offProc != null) {
-                final ReferenceType ref = new ReferenceType(null, offProc);
-                final OfferingProcedureType offProcedure = new OfferingProcedureType(offeringId, ref);
+                final OfferingProcedureType offProcedure = new OfferingProcedureType(offeringId, offProc);
                 offTable.getProcedures().getIdentifier(offProcedure);
             }
             if (offPheno != null) {
@@ -209,8 +192,7 @@ public class DefaultObservationWriter implements ObservationWriter {
                 }
             }
             if (offSF != null) {
-                final ReferenceType ref = new ReferenceType(null, offSF);
-                final OfferingSamplingFeatureType offSamp = new OfferingSamplingFeatureType(offeringId, ref);
+                final OfferingSamplingFeatureType offSamp = new OfferingSamplingFeatureType(offeringId, offSF);
                 offTable.getStations().getIdentifier(offSamp);
             }
         } catch (CatalogException ex) {

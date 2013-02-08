@@ -27,7 +27,6 @@ import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.swes.xml.ObservationTemplate;
 
 // GeoAPI dependencies
-import org.opengis.observation.Measurement;
 import org.opengis.observation.Observation;
 
 /**
@@ -57,17 +56,6 @@ public interface ObservationWriter {
      * @throws CstlServiceException
      */
     String writeObservation(final Observation observation) throws CstlServiceException;
-
-    /**
-     * Write a new Measurement into the database
-     *
-     * @param measurement An O&M measurement
-     *
-     * @return The new identifiers of the observation
-     *
-     * @throws CstlServiceException
-     */
-    String writeMeasurement(final Measurement measurement) throws CstlServiceException;
 
     /**
      * Write a new Observation offering into the database

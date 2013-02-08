@@ -67,6 +67,8 @@ import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.v200.GetResultResponseType;
 import org.geotoolkit.sos.xml.v200.GetResultType;
+import org.geotoolkit.sos.xml.v200.InsertObservationType;
+import org.geotoolkit.swe.xml.v200.DataArrayType;
 import org.geotoolkit.swe.xml.v200.DataRecordType;
 import org.geotoolkit.swe.xml.v200.DataRecordType.Field;
 
@@ -1619,6 +1621,45 @@ public class SOS2WorkerTest {
 
         marshallerPool.release(unmarshaller);
 
+    }
+    
+    /**
+     * Tests the InsertObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    public void insertObservationTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observationTemplate-3.xml"));
+
+        OMObservationType template = (OMObservationType)obj.getValue();
+
+        TimePeriodType period = new TimePeriodType(new TimePositionType("2007-06-01T01:00:00.0"), new TimePositionType("2007-06-01T03:00:00.0"));
+        template.setPhenomenonTime(period);
+
+        // and we fill the result object
+        DataArrayPropertyType arrayP = (DataArrayPropertyType) template.getResult();
+        DataArrayType array = arrayP.getDataArray();
+        array.setElementCount(3);
+        array.setValues("2007-06-01T01:01:00,6.560@@2007-06-01T02:00:00,6.550@@2007-06-01T03:00:00,6.550@@");
+
+        InsertObservationType request = new InsertObservationType("2.0.0", Arrays.asList("offering-3"), Arrays.asList(template));
+        worker.insertObservation(request);
+
+        GetResultType GRrequest = new GetResultType("offering-3", null, "2.0.0");
+        GetResultResponseType result = (GetResultResponseType) worker.getResult(GRrequest);
+
+        String value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@2007-05-01T05:59:00,6.560@@2007-05-01T06:59:00,6.560@@" + '\n' +
+                       "2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@" + '\n' +
+                       "2007-05-01T17:59:00,6.560@@2007-05-01T18:59:00,6.550@@2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@" + '\n' +
+                       "2007-06-01T01:01:00,6.560@@2007-06-01T02:00:00,6.550@@2007-06-01T03:00:00,6.550@@" + '\n';
+        GetResultResponseType expResult = new GetResultResponseType(value);
+
+        assertEquals(expResult.getResultValues(), result.getResultValues());
+        assertEquals(expResult, result);
+
+        marshallerPool.release(unmarshaller);
     }
 
     /**

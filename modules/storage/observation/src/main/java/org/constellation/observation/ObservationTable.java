@@ -51,6 +51,7 @@ import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.observation.xml.v100.ObservationType;
+import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
@@ -59,6 +60,8 @@ import org.geotoolkit.swe.xml.v101.AnyResultType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 
 
 /**
@@ -257,7 +260,7 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
         if (procedures == null) {
             procedures = getDatabase().getTable(ProcessTable.class);
         }
-        final ProcessType procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
+        final Process procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
         
         if (results == null) {
             results = getDatabase().getTable(AnyResultTable.class);
@@ -272,9 +275,9 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
             }
         }
         
-        if(pheno == null) pheno     = compoPheno;
-        if(station == null && stationCurve == null) station =  stationPoint;
-        if(station == null && stationPoint == null) station =  stationCurve;
+        if(pheno == null) {pheno     = compoPheno;}
+        if(station == null && stationCurve == null) {station =  stationPoint;}
+        if(station == null && stationPoint == null) {station =  stationCurve;}
 
         final String name                               = result.getString(indexOf(query.name));
         final Timestamp begin                           = result.getTimestamp(indexOf(query.samplingTimeBegin));
@@ -313,7 +316,7 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                                     result.getString(indexOf(query.description)),
                                     station,
                                     pheno,
-                                    procedure,
+                                    (ProcessType)procedure,
                                     //manque quality
                                     resultat,
                                     samplingTime);
@@ -417,7 +420,7 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
 
                 //on insere le capteur
                 if (obs.getProcedure() != null) {
-                    final ProcessType process = (ProcessType)obs.getProcedure();
+                    final Process process = (Process)obs.getProcedure();
                     if (procedures == null) {
                         procedures = getDatabase().getTable(ProcessTable.class);
                     }
@@ -437,13 +440,14 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                     try {
                         prid = Integer.parseInt(rid);
                     } catch (NumberFormatException ex) {
-                        Logger.getAnonymousLogger().severe("unable to parse an integer identifier for result:" + rid);
+                        Logger.getAnonymousLogger().log(Level.SEVERE, "unable to parse an integer identifier for result:{0}", rid);
                         parsed = false;
                     }
-                    if (parsed)
+                    if (parsed) {
                         statement.statement.setInt(indexOf(query.result), prid);
-                    else
+                    } else {
                         statement.statement.setNull(indexOf(query.result), java.sql.Types.INTEGER);
+                    }
 
                 } else {
                     statement.statement.setNull(indexOf(query.result), java.sql.Types.INTEGER);
@@ -451,11 +455,11 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
 
                 // on insere le "samplingTime""
                 if (obs.getSamplingTime() != null){
-                    if (obs.getSamplingTime() instanceof TimePeriodType) {
+                    if (obs.getSamplingTime() instanceof Period) {
 
-                        final TimePeriodType sampTime = (TimePeriodType)obs.getSamplingTime();
-                        if (sampTime.getBeginPosition()!= null) {
-                            String s       = sampTime.getBeginPosition().getValue();
+                        final Period sampTime = (Period)obs.getSamplingTime();
+                        if (sampTime.getBeginning()!= null) {
+                            String s       = sampTime.getBeginning().getPosition().getDateTime().toString();
                             s = s.replace("T", " ");
                             final Timestamp date = Timestamp.valueOf(s);
                             statement.statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
@@ -463,9 +467,9 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                             statement.statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.TIMESTAMP);
                         }
 
-                        if (sampTime.getEndPosition() != null) {
+                        if (sampTime.getEnding() != null) {
 
-                            String s = sampTime.getEndPosition().getValue();
+                            String s = sampTime.getEnding().getPosition().getDateTime().toString();
                             s = s.replace("T", " ");
                             final Timestamp date = Timestamp.valueOf(s);
                             statement.statement.setTimestamp(indexOf(query.samplingTimeEnd),  date);
@@ -474,10 +478,10 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                             statement.statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
                         }
 
-                    } else if (obs.getSamplingTime() instanceof TimeInstantType) {
-                        final TimeInstantType sampTime = (TimeInstantType)obs.getSamplingTime();
-                        if (sampTime.getTimePosition() !=null) {
-                            final String s       = sampTime.getTimePosition().getValue();
+                    } else if (obs.getSamplingTime() instanceof Instant) {
+                        final Instant sampTime = (Instant)obs.getSamplingTime();
+                        if (sampTime.getPosition() !=null) {
+                            final String s       = sampTime.getPosition().getDateTime().toString();
                             final Timestamp date = Timestamp.valueOf(s);
                             statement.statement.setTimestamp(indexOf(query.samplingTimeBegin),  date);
                             statement.statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);

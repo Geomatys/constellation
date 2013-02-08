@@ -1937,11 +1937,30 @@ public class SOSworker extends AbstractWorker {
         //we get the id of the sensor and we create a sensor object
         final String sensorId = request.getAssignedSensorId();
         String num = null;
-        if (sensorId.startsWith(sensorIdBase)) {
-            num = sensorId.substring(sensorIdBase.length());
+        if (currentVersion.equals("1.0.0")) {
+            if (sensorId == null) {
+                throw new CstlServiceException("The sensor identifier is missing.",
+                                             MISSING_PARAMETER_VALUE, "assignedSensorId");
+            } else if (sensorId.startsWith(sensorIdBase)) {
+                num = sensorId.substring(sensorIdBase.length());
+            } else {
+                throw new CstlServiceException("The sensor identifier is not valid it must start with " + sensorIdBase,
+                                             INVALID_PARAMETER_VALUE, "assignedSensorId");
+            }
         } else {
-            throw new CstlServiceException("The sensor identifier is not valid it must start with " + sensorIdBase,
-                                         INVALID_PARAMETER_VALUE, "assignedSensorId");
+            final List<String> offeringNames = request.getOffering();
+            if (offeringNames == null || offeringNames.isEmpty()) {
+                throw new CstlServiceException("The offering identifiers are missing.",
+                                             MISSING_PARAMETER_VALUE, "offering");
+            } else {
+                final ObservationOffering off = omReader.getObservationOffering(offeringNames.get(0), currentVersion);
+                if (off != null) {
+                    // TODO
+                } else {
+                    throw new CstlServiceException("The offering identifier is invalid.",
+                                             INVALID_PARAMETER_VALUE, "offering");
+                }
+            }
         }
 
         //we get the observation and we assign to it the sensor
@@ -1976,27 +1995,30 @@ public class SOSworker extends AbstractWorker {
 
             //we record the observation in the O&M database
            final String id;
-           if (obs instanceof Measurement) {
-               id = omWriter.writeMeasurement((Measurement)obs);
-               LOGGER.log(logLevel, "new Measurement inserted: id = " + id + " for the sensor " + obs.getProcedure());
+            if (currentVersion.equals("2.0.0")) {
+                id = omWriter.writeObservation(obs);
             } else {
-
-                //in first we verify that the observation is conform to the template
-                final Observation template = (Observation) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME, currentVersion);
-                //if the observation to insert match the template we can insert it in the OM db
-                if (obs.matchTemplate(template)) {
-                    if (obs.getSamplingTime() != null && obs.getResult() != null) {
-                        id = omWriter.writeObservation(obs);
-                        LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + obs.getProcedure());
-                    } else {
-                        throw new CstlServiceException("The observation sampling time and the result must be specify",
-                                                      MISSING_PARAMETER_VALUE, "samplingTime");
-                    }
+                if (obs instanceof Measurement) {
+                    id = omWriter.writeObservation(obs);
                 } else {
-                    throw new CstlServiceException(" The observation doesn't match with the template of the sensor",
-                                                  INVALID_PARAMETER_VALUE, "samplingTime");
+                    //in first we verify that the observation is conform to the template
+                    final Observation template = (Observation) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME, currentVersion);
+                    //if the observation to insert match the template we can insert it in the OM db
+                    if (obs.matchTemplate(template)) {
+                        if (obs.getSamplingTime() != null && obs.getResult() != null) {
+                            id = omWriter.writeObservation(obs);
+                            LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + obs.getProcedure());
+                        } else {
+                            throw new CstlServiceException("The observation sampling time and the result must be specify",
+                                    MISSING_PARAMETER_VALUE, "samplingTime");
+                        }
+                    } else {
+                        throw new CstlServiceException(" The observation doesn't match with the template of the sensor",
+                                INVALID_PARAMETER_VALUE, "samplingTime");
+                    }
                 }
-           }
+            }
+           
            ids.add(id);
         }
 

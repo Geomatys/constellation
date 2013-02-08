@@ -230,7 +230,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
     @Override
     public void insertObservationTest() throws Exception {
         super.insertObservationTest();
-    }
+    }/
 
     /**
      * Tests the GetFeatureOfInterest method
