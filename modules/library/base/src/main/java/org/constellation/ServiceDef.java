@@ -53,6 +53,7 @@ public enum ServiceDef {
     CONFIG(Specification.NONE, Organization.NONE, null, Profile.NONE, "1.0", false),
     // SOS service definition
     SOS_1_0_0(Specification.SOS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true),
+    SOS_2_0_0(Specification.SOS, Organization.OGC, "2.0.0", Profile.NONE, "1.1.0", true),
     // Security services definitions
     PEP(Specification.PEP, Organization.OASIS, null, Profile.NONE, null, false),
     PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE, null, false),

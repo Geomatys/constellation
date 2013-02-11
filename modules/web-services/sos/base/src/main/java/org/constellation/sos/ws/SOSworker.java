@@ -832,7 +832,7 @@ public class SOSworker extends AbstractWorker {
         final Capabilities temp = buildCapabilities(currentVersion, si, sp, om, getCurrentUpdateSequence(), fc, cont);
         final Capabilities c    = normalizeDocument(temp);
         LOGGER.log(logLevel, "getCapabilities processed in {0} ms.\n", (System.currentTimeMillis() - start));
-        putCapabilitiesInCache("1.0.0", null, c);
+        putCapabilitiesInCache(currentVersion, null, c);
         return (Capabilities) c.applySections(sections);
     }
 

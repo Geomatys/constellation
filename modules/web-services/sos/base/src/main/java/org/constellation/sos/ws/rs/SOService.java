@@ -46,6 +46,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.UnauthorizedException;
+import org.constellation.ws.Worker;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.sos.ws.SOSConstants.*;
@@ -87,7 +88,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * Build a new Restfull SOS service.
      */
     public SOService() throws CstlServiceException {
-        super(ServiceDef.SOS_1_0_0);
+        super(ServiceDef.SOS_1_0_0, ServiceDef.SOS_2_0_0);
         setXMLContext(SOSMarshallerPool.getInstance());
         LOGGER.log(Level.INFO, "SOS REST service running ({0} instances)\n", getWorkerMapSize());
     }
@@ -106,7 +107,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest, SOSworker worker) {
+    public Response treatIncomingRequest(final Object objectRequest, final SOSworker worker) {
         ServiceDef serviceDef = null;
         try {
             worker.setServiceUrl(getServiceURL());
@@ -114,7 +115,7 @@ public class SOService extends OGCWebService<SOSworker> {
 
             final RequestBase request;
             if (objectRequest == null) {
-                request = adaptQuery(getParameter(REQUEST_PARAMETER, true));
+                request = adaptQuery(getParameter(REQUEST_PARAMETER, true), worker);
             } else if (objectRequest instanceof RequestBase) {
                 request = (RequestBase) objectRequest;
             } else {
@@ -299,7 +300,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * @return
      * @throws CstlServiceException
      */
-    private RequestBase adaptQuery(String request) throws CstlServiceException {
+    private RequestBase adaptQuery(String request, final Worker w) throws CstlServiceException {
          if ("GetObservation"    .equalsIgnoreCase(request) ||
              "InsertObservation" .equalsIgnoreCase(request) ||
              "GetResult"         .equalsIgnoreCase(request) ||
@@ -312,7 +313,7 @@ public class SOService extends OGCWebService<SOSworker> {
          } else if ("DescribeSensor".equalsIgnoreCase(request)) {
              return createDescribeSensor();
          } else if ("GetCapabilities".equalsIgnoreCase(request)) {
-             return createNewGetCapabilities();
+             return createNewGetCapabilities(w);
          }
          throw new CstlServiceException("The operation " + request + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
@@ -321,23 +322,32 @@ public class SOService extends OGCWebService<SOSworker> {
     /**
      * Build a new getCapabilities request from kvp encoding
      */
-    private GetCapabilities createNewGetCapabilities() throws CstlServiceException {
+    private GetCapabilities createNewGetCapabilities(final Worker worker) throws CstlServiceException {
 
-        final String currentVersion;
-        String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
-        AcceptVersions versions;
-        if (version != null) {
-            if (version.indexOf(',') != -1) {
-                version = version.substring(0, version.indexOf(','));
-            }
-            currentVersion = "2.0.0";
-            versions =  OWSXmlFactory.buildAcceptVersion(currentVersion, Arrays.asList(version));
-        } else {
-            currentVersion = "1.0.0";
-            versions =  OWSXmlFactory.buildAcceptVersion(currentVersion, Arrays.asList("1.0.0"));
+        String version        = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
+        String currentVersion = getParameter(VERSION_PARAMETER, false);
+        
+        if (currentVersion == null) {
+            currentVersion = worker.getBestVersion(null).version.toString();
         }
+        isVersionSupported(currentVersion);
 
-        final AcceptFormats formats = OWSXmlFactory.buildAcceptFormat(currentVersion, Arrays.asList(getParameter(ACCEPT_FORMATS_PARAMETER, false)));
+        final List<String> versions = new ArrayList<String>();
+        if (version != null) {
+            String[] vArray = version.split(",");
+            versions.addAll(Arrays.asList(vArray));
+        } else {
+            versions.add(currentVersion);
+        }
+        final AcceptVersions acceptVersions = buildAcceptVersion(currentVersion, versions);
+        
+        final String format = getParameter(ACCEPT_FORMATS_PARAMETER, false);
+        final AcceptFormats formats;
+        if (format != null) {
+            formats = OWSXmlFactory.buildAcceptFormat("1.1.0", Arrays.asList(format));
+        } else {
+            formats = null;
+        }
 
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
@@ -360,9 +370,9 @@ public class SOService extends OGCWebService<SOSworker> {
             //if there is no requested Sections we add all the sections
             requestedSections = SectionsType.getExistingSections("1.1.1");
         }
-        final Sections sections = OWSXmlFactory.buildSections(currentVersion, requestedSections);
+        final Sections sections = OWSXmlFactory.buildSections("1.1.0", requestedSections);
         return buildGetCapabilities(currentVersion,
-                                   versions,
+                                   acceptVersions,
                                    sections,
                                    formats,
                                    updateSequence,

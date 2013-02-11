@@ -16,13 +16,11 @@
  */
 package org.constellation.ws.embedded;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.JAXBException;
 import org.constellation.sos.ws.soap.SOService;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
@@ -55,8 +53,10 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
-    public void testSOSGetCapabilities() throws JAXBException, IOException {
+    public void testSOSGetCapabilities() throws Exception {
 
+        waitForStart();
+        
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
