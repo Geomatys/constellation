@@ -148,20 +148,12 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setObservedProperties(final List<String> phenomenon, final List<String> compositePhenomenon) {
+    public void setObservedProperties(final List<String> phenomenon) {
         for (String p : phenomenon) {
             if (p.contains(phenomenonIdBase)) {
                 p = p.replace(phenomenonIdBase, "");
             }
-            final Where where = new Where(configurationQuery.getWhere("simplePhenomenon"));
-            where.replaceVariable("phenomenon", p, true);
-            currentQuery.addWhere(where);
-        }
-        for (String p : compositePhenomenon) {
-            if (p.contains(phenomenonIdBase)) {
-                p = p.replace(phenomenonIdBase, "");
-            }
-            final Where where = new Where(configurationQuery.getWhere("compositePhenomenon"));
+            final Where where = new Where(configurationQuery.getWhere("phenomenon"));
             where.replaceVariable("phenomenon", p, true);
             currentQuery.addWhere(where);
         }

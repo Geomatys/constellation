@@ -133,14 +133,11 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setObservedProperties(final List<String> phenomenon, final List<String> compositePhenomenon) {
+    public void setObservedProperties(final List<String> phenomenon) {
         luceneRequest.append(" AND( ");
         for (String p : phenomenon) {
             luceneRequest.append(" observed_property:\"").append(p).append('"').append(OR_OPERATOR);
 
-        }
-        for (String p : compositePhenomenon) {
-            luceneRequest.append(" observed_property:\"").append(p).append('"').append(OR_OPERATOR);
         }
         luceneRequest.delete(luceneRequest.length() - 3, luceneRequest.length());
         luceneRequest.append(") ");

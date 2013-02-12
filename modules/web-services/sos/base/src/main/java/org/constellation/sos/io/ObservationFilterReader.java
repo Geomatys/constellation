@@ -19,7 +19,7 @@ package org.constellation.sos.io;
 
 import java.util.List;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.Envelope;
 import org.opengis.observation.Observation;
 
 /**
@@ -84,5 +84,5 @@ public interface ObservationFilterReader extends ObservationFilter {
      * this methode return the current shape.
      * @return 
      */
-    EnvelopeType getCollectionBoundingShape();
+    Envelope getCollectionBoundingShape();
 }

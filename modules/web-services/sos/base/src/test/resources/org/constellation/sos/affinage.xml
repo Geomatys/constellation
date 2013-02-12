@@ -42,8 +42,7 @@
 
 -- ==== PHENOMENON ===========
 
-<where group="simplePhenomenon">"observed_property"=:${phenomenon}</where>
-<where group="compositePhenomenon">"observed_property_composite"=:${phenomenon}</where>
+<where group="phenomenon">"observed_property"=:${phenomenon} OR "observed_property_composite"=:${phenomenon}</where>
 
 -- ==== FEATURE OF INTEREST (station)=============
 

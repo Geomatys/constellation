@@ -131,7 +131,6 @@ import org.geotoolkit.swe.xml.DataArrayProperty;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
-import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Measure;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -1059,8 +1058,7 @@ public class SOSworker extends AbstractWorker {
         //TODO verifier que les pheno appartiennent a l'offering
         final List<String> observedProperties = requestObservation.getObservedProperty();
         if (observedProperties != null && !observedProperties.isEmpty()) {
-            final List<String> singlePhenomenons    = new ArrayList<String>();
-            final List<String> compositePhenomenons = new ArrayList<String>();
+            final List<String> phenomenons    = new ArrayList<String>();
             for (String phenomenonName : observedProperties) {
 
                 if (!phenomenonName.equals(phenomenonIdBase + "ALL")) {
@@ -1070,16 +1068,11 @@ public class SOSworker extends AbstractWorker {
                         throw new CstlServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
                                 INVALID_PARAMETER_VALUE, "observedProperty");
                     }
-                    if (phen instanceof CompositePhenomenon) {
-                        compositePhenomenons.add(phenomenonName);
-
-                    } else {
-                        singlePhenomenons.add(phenomenonName);
-                    }
+                    phenomenons.add(phenomenonName);
                 }
             }
-            if (singlePhenomenons.size() > 0 || compositePhenomenons.size() > 0) {
-                localOmFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
+            if (!phenomenons.isEmpty()) {
+                localOmFilter.setObservedProperties(phenomenons);
             }
         } else {
             throw new CstlServiceException("You must specify at least One phenomenon", MISSING_PARAMETER_VALUE, "observedProperty");
@@ -1806,14 +1799,7 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException(" this phenomenon " + request.getObservedProperty() + " is not registred in the database!",
                     INVALID_PARAMETER_VALUE, "observedProperty");
         }
-        final List<String> singlePhenomenons    = new ArrayList<String>();
-        final List<String> compositePhenomenons = new ArrayList<String>();
-        if (phenomenon instanceof CompositePhenomenon) {
-            compositePhenomenons.add(request.getObservedProperty());
-        } else {
-            singlePhenomenons.add(request.getObservedProperty());
-        }
-        localOmFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
+        localOmFilter.setObservedProperties(Arrays.asList(request.getObservedProperty()));
         
         final List<Observation> matchingResult;
         // case (1)

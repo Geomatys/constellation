@@ -186,17 +186,13 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setObservedProperties(final List<String> phenomenon, final List<String> compositePhenomenon) {
-        if (!phenomenon.isEmpty() && !compositePhenomenon.isEmpty()) {
+    public void setObservedProperties(final List<String> phenomenon) {
+        if (!phenomenon.isEmpty()) {
             sqlRequest.append(" AND( ");
             for (String p : phenomenon) {
                 p = p.replace(phenomenonIdBase, "");
-                sqlRequest.append(" \"observed_property\"='").append(p).append("' OR ");
+                sqlRequest.append(" \"observed_property\"='").append(p).append("' OR \"observed_property_composite\"='").append(p).append("' OR ");
 
-            }
-            for (String p : compositePhenomenon) {
-                p = p.replace(phenomenonIdBase, "");
-                sqlRequest.append(" \"observed_property_composite\"='").append(p).append("' OR ");
             }
             sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
             sqlRequest.append(") ");

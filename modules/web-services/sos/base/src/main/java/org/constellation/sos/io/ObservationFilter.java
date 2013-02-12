@@ -37,12 +37,12 @@ public interface ObservationFilter {
     /**
      * Initialize the query for a full observation request.
      */
-    void initFilterObservation(ResponseModeType requestMode, QName resultModel) throws CstlServiceException;
+    void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) throws CstlServiceException;
 
     /**
      * Initialize the query for a restricted to the results request.
      */
-    void initFilterGetResult(final String procedure, QName resultModel) throws CstlServiceException;
+    void initFilterGetResult(final String procedure, final QName resultModel) throws CstlServiceException;
 
     /**
      * Add some procedure filter to the request.
@@ -59,7 +59,7 @@ public interface ObservationFilter {
      * @param phenomenon
      * @param compositePhenomenon
      */
-    void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon);
+    void setObservedProperties(final List<String> phenomenon);
 
     /**
      * Add some sampling point filter to the request.
