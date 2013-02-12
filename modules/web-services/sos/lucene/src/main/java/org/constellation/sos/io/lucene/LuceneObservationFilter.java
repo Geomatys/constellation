@@ -26,7 +26,6 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 import org.constellation.generic.database.Automatic;
-import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.ws.CstlServiceException;
@@ -52,8 +51,6 @@ public class LuceneObservationFilter implements ObservationFilter {
 
     private static final Logger LOGGER =Logger.getLogger("org.constellation.sos.io.lucene");
     
-    private final Properties map;
-
     private StringBuilder luceneRequest;
 
     private LuceneObservationSearcher searcher;
@@ -61,12 +58,10 @@ public class LuceneObservationFilter implements ObservationFilter {
     private static final String OR_OPERATOR = " OR ";
 
     public LuceneObservationFilter(final LuceneObservationFilter omFilter) throws CstlServiceException {
-        this.map      = omFilter.map;
         this.searcher = omFilter.searcher;
     }
 
     public LuceneObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
-        this.map  =  (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
         try {
             this.searcher = new LuceneObservationSearcher(configuration.getConfigurationDirectory(), "");
         } catch (IndexingException ex) {
@@ -115,11 +110,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
             for (String s : procedures) {
                 if (s != null) {
-                    String dbId = map.getProperty(s);
-                    if (dbId == null) {
-                        dbId = s;
-                    }
-                    luceneRequest.append(" procedure:\"").append(dbId).append("\" OR ");
+                    luceneRequest.append(" procedure:\"").append(s).append("\" OR ");
                     add = true;
                 }
             }

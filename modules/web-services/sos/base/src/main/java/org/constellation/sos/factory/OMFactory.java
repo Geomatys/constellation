@@ -40,8 +40,6 @@ public interface OMFactory {
 
     public static final String PHENOMENON_ID_BASE = "phenomenonIdBase";
 
-    public static final String IDENTIFIER_MAPPING = "identifierMapping";
-    
     public static final String ALWAYS_FEATURE_COLLECTION = "alwaysFeatureCollection";
 
     /**

@@ -66,18 +66,12 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      */
     private final PreparedStatement newSensorIdStmt;
 
-    /**
-     * The properties file allowing to store the id mapping between physical and database ID.
-     */
-    private final Properties map;
-
     public MDWebSensorWriter(final Automatic configuration, final Map<String, Object> properties) throws MetadataIoException {
         super(configuration);
         final String sensorIdBase = (String) properties.get(OMFactory.SENSOR_ID_BASE);
         final BDD db = configuration.getBdd();
         try {
             smlConnection   = db.getConnection();
-            this.map        = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
              //we build the prepared Statement
             final String version = ((AbstractReader)mdWriter).getVersion();
             if ("2.0".equals(version)) {
@@ -148,11 +142,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     @Override
     public boolean deleteSensor(final String sensorId) throws CstlServiceException {
         try {
-            String dbId = map.getProperty(sensorId);
-            if (dbId == null) {
-                dbId = sensorId;
-            }
-            return super.deleteMetadata(dbId);
+            return super.deleteMetadata(sensorId);
         } catch (MetadataIoException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a Metadata IO Exception:" + ex.getMessage(),

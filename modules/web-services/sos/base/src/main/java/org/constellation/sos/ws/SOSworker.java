@@ -20,9 +20,6 @@ package org.constellation.sos.ws;
 // JDK dependencies
 import java.util.Iterator;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -184,12 +181,6 @@ public class SOSworker extends AbstractWorker {
      * A list of temporary resultTemplate
      */
     private final Map<String, ResultTemplate> resultTemplates = new HashMap<String, ResultTemplate>();
-
-    /**
-     * The properties file allowing to store the id mapping between physical and database ID.
-     */
-    @Deprecated
-    private final Properties map = new Properties();
 
     /**
      * The base for sensor id.
@@ -358,9 +349,6 @@ public class SOSworker extends AbstractWorker {
                 loadCachedCapabilities(configurationDirectory);
             }
 
-            // the file who record the map between phisycal ID and DB ID.
-            loadMapping(configurationDirectory);
-
             //we get the O&M filter Type
             final DataSourceType omFilterType = configuration.getObservationFilterType();
 
@@ -416,7 +404,6 @@ public class SOSworker extends AbstractWorker {
             properties.put(OMFactory.OBSERVATION_TEMPLATE_ID_BASE, observationTemplateIdBase);
             properties.put(OMFactory.SENSOR_ID_BASE, sensorIdBase);
             properties.put(OMFactory.PHENOMENON_ID_BASE, phenomenonIdBase);
-            properties.put(OMFactory.IDENTIFIER_MAPPING, map);
 
             // we add the general parameters to the properties
             properties.putAll(configuration.getParameters());
@@ -623,34 +610,6 @@ public class SOSworker extends AbstractWorker {
             if (capaUM != null) {
                 SOSMarshallerPool.getInstance().release(capaUM);
             }
-        }
-    }
-
-    /**
-     * Load the Mapping between database identifier/real Identifier
-     *
-     * @param configDirectory
-     */
-    private void loadMapping(final File configDirectory) {
-        // the file who record the map between phisycal ID and DB ID.
-        try {
-            final File f = new File(configDirectory, "mapping.properties");
-            if (f.exists()) {
-                final FileInputStream in = new FileInputStream(f);
-                map.load(in);
-                in.close();
-            } else {
-                LOGGER.info("No mapping file found creating one.");
-                final boolean created = f.createNewFile();
-                if (!created) {
-                    LOGGER.warning("unable to create a new empty mapping file.");
-                }
-            }
-        } catch (FileNotFoundException e) {
-            // this tecnically can't happen
-            LOGGER.warning("File Not Found Exception while loading the mapping file");
-        }  catch (IOException e) {
-            LOGGER.log(Level.WARNING, "IO Exception while loading the mapping file:{0}", e.getMessage());
         }
     }
 
@@ -1076,20 +1035,16 @@ public class SOSworker extends AbstractWorker {
 
         //we get the list of process
         final List<String> procedures = requestObservation.getProcedure();
-        for (String s : procedures) {
-            if (s != null) {
-                String dbId = map.getProperty(s);
-                if (dbId == null) {
-                    dbId = s;
-                }
-                LOGGER.log(logLevel, "process ID: {0}", dbId);
-                if (!omReader.existProcedure(dbId)) {
+        for (String procedure : procedures) {
+            if (procedure != null) {
+                LOGGER.log(logLevel, "process ID: {0}", procedure);
+                if (!omReader.existProcedure(procedure)) {
                     throw new CstlServiceException(" this process is not registred in the table", INVALID_PARAMETER_VALUE, PROCEDURE);
                 }
                 if (!offerings.isEmpty()) {
                     boolean found = false;
                     for (ObservationOffering off : offerings) {
-                        if (!found && off.getProcedures().contains(dbId)) {
+                        if (!found && off.getProcedures().contains(procedure)) {
                             found = true;
                         }
                     }
@@ -1711,28 +1666,6 @@ public class SOSworker extends AbstractWorker {
         return values;
     }
     
-    private Period extractTimeBounds(final String version, final String brutValues, final AbstractEncoding abstractEncoding) {
-        final String[] result = new String[2];
-        if (abstractEncoding instanceof TextBlock) {
-            final TextBlock encoding        = (TextBlock) abstractEncoding;
-            final StringTokenizer tokenizer = new StringTokenizer(brutValues, encoding.getBlockSeparator());
-            boolean first = true;
-            while (tokenizer.hasMoreTokens()) {
-                final String block = tokenizer.nextToken();
-                String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
-                if (first) {
-                    result[0] = samplingTimeValue;
-                    first = false;
-                } else if (!tokenizer.hasMoreTokens()) {
-                    result[1] = samplingTimeValue;
-                }
-            }
-        } else {
-            LOGGER.warning("unable to parse datablock unknown encoding");
-        }
-        return buildTimePeriod(version, result[0], result[1]);
-    }
-
     public AbstractFeature getFeatureOfInterest(final GetFeatureOfInterest request) throws CstlServiceException {
         verifyBaseRequest(request, true, false);
         LOGGER.log(logLevel, "GetFeatureOfInterest request processing\n");
@@ -2025,15 +1958,10 @@ public class SOSworker extends AbstractWorker {
             //and we write it in the sensorML Database
             smlWriter.writeSensor(id, process);
 
-            final String phyId = getPhysicalID(process);
-
-            // we record the mapping between physical id and database id
-            recordMapping(id, phyId);
-
             // and we record the position of the piezometer
             final DirectPosition position = getSensorPosition(process);
             if (omWriter != null) {
-                omWriter.recordProcedureLocation(phyId, position);
+                omWriter.recordProcedureLocation(id, position);
 
                 //we assign the new capteur id to the observation template
                 temp.setProcedure(id);
@@ -2514,35 +2442,6 @@ public class SOSworker extends AbstractWorker {
             return MimeType.APPLICATION_XML;
         }
         return outputFormat;
-    }
-
-    /**
-     * Record the mapping between physical ID and database ID.
-     *
-     * @param form The "form" containing the sensorML data.
-     * @param dbId The identifier of the sensor in the O&M database.
-     */
-    @Deprecated
-    private void recordMapping(final String dbId, final String physicalID) throws CstlServiceException {
-        try {
-            if (dbId != null && physicalID != null) {
-                map.setProperty(physicalID, dbId);
-                final File configDirectory = configurationDirectory;
-                if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
-                    final File mappingFile     = new File(configDirectory, "mapping.properties");
-                    final FileOutputStream out = new FileOutputStream(mappingFile);
-                    map.store(out, "");
-                    out.close();
-                }
-            }
-
-        } catch (FileNotFoundException ex) {
-            throw new CstlServiceException("The service cannot build the temporary file:"  + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-            throw new CstlServiceException("the service has throw an IOException:" + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
-        }
     }
 
     /**

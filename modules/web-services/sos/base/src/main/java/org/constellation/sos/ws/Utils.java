@@ -25,6 +25,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
@@ -43,7 +44,9 @@ import org.geotoolkit.util.logging.Logging;
 import org.opengis.observation.Observation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
+import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.TextBlock;
+import org.opengis.temporal.Period;
 import org.opengis.temporal.Position;
 
 /**
@@ -355,5 +358,27 @@ public final class Utils {
             }
         }
         return null;
+    }
+    
+    public static Period extractTimeBounds(final String version, final String brutValues, final AbstractEncoding abstractEncoding) {
+        final String[] result = new String[2];
+        if (abstractEncoding instanceof TextBlock) {
+            final TextBlock encoding        = (TextBlock) abstractEncoding;
+            final StringTokenizer tokenizer = new StringTokenizer(brutValues, encoding.getBlockSeparator());
+            boolean first = true;
+            while (tokenizer.hasMoreTokens()) {
+                final String block = tokenizer.nextToken();
+                String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
+                if (first) {
+                    result[0] = samplingTimeValue;
+                    first = false;
+                } else if (!tokenizer.hasMoreTokens()) {
+                    result[1] = samplingTimeValue;
+                }
+            }
+        } else {
+            LOGGER.warning("unable to parse datablock unknown encoding");
+        }
+        return SOSXmlFactory.buildTimePeriod(version, result[0], result[1]);
     }
 }

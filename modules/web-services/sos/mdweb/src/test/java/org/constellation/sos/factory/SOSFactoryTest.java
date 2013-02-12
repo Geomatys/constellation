@@ -77,7 +77,6 @@ public class SOSFactoryTest {
         parameters.put(OMFactory.OBSERVATION_ID_BASE, "idbase");
         parameters.put(OMFactory.OBSERVATION_TEMPLATE_ID_BASE, "templateIdBase");
         parameters.put(OMFactory.SENSOR_ID_BASE, "sensorBase");
-        parameters.put(OMFactory.IDENTIFIER_MAPPING, new Properties());
 
         boolean exLaunched = false;
         try  {

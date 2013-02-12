@@ -28,7 +28,6 @@ import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
 import org.mdweb.io.MD_IOException;
@@ -44,11 +43,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 public class MDWebSensorReader extends MDWebMetadataReader implements SensorReader {
 
-    /**
-     * The properties file allowing to store the id mapping between physical and database ID.
-     */
-    private final Properties map;
-    
     /**
      * Build a new Sensor reader for a MDweb database.
      * 
@@ -74,7 +68,6 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
             throw new MetadataIoException("the service has throw a MD_IO Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
         }
-        this.map = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
     }
 
     /**
@@ -91,11 +84,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
     @Override
     public AbstractSensorML getSensor(final String sensorId) throws CstlServiceException {
         try {
-            String dbId = map.getProperty(sensorId);
-            if (dbId == null) {
-                dbId = sensorId;
-            }
-            final Object metadata   = getMetadata(dbId, AbstractMetadataReader.SENSORML);
+            final Object metadata   = getMetadata(sensorId, AbstractMetadataReader.SENSORML);
             
             if (metadata instanceof AbstractSensorML) {
                return (AbstractSensorML) metadata;

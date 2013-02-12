@@ -27,7 +27,6 @@ import java.util.*;
 import java.util.logging.Level;
 
 // Constellation dependencies
-import org.constellation.sos.factory.OMFactory;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.From;
 import org.constellation.generic.database.Query;
@@ -52,18 +51,11 @@ import org.opengis.temporal.Period;
 public class GenericObservationFilter extends AbstractGenericObservationFilter {
 
     /**
-     * The properties file allowing to store the id mapping between physical and database ID.
-     */
-    protected Properties map;
-
-
-    /**
      * Clone a  Generic Observation Filter for CSTL O&M datasource.
      * @param omFilter
      */
     public GenericObservationFilter(final GenericObservationFilter omFilter) {
         super(omFilter);
-        this.map                       = omFilter.map;
     }
 
     /**
@@ -77,7 +69,6 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      */
     public GenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         super(configuration, properties);
-        this.map = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
     }
     
     @Override
@@ -136,12 +127,8 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         if (!procedures.isEmpty()) {
             for (String s : procedures) {
                 if (s != null) {
-                    String dbId = map.getProperty(s);
-                    if (dbId == null) {
-                        dbId = s;
-                    }
                     final Where where = new Where(configurationQuery.getWhere(PROCEDURE));
-                    where.replaceVariable(PROCEDURE, dbId, true);
+                    where.replaceVariable(PROCEDURE, s, true);
                     currentQuery.addWhere(where);
                 }
             }

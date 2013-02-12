@@ -67,11 +67,6 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     private final Connection connection;
 
-    /**
-     * The properties file allowing to store the id mapping between physical and database ID.
-     */
-    protected Properties map;
-
      /**
      * use for debugging purpose
      */
@@ -96,7 +91,6 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     public DefaultObservationFilter(final DefaultObservationFilter omFilter) {
         this.connection                = omFilter.connection;
-        this.map                       = omFilter.map;
         this.observationIdBase         = omFilter.observationIdBase;
         this.observationTemplateIdBase = omFilter.observationTemplateIdBase;
         this.phenomenonIdBase          = omFilter.phenomenonIdBase;
@@ -106,7 +100,6 @@ public class DefaultObservationFilter implements ObservationFilter {
     public DefaultObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase         = (String)     properties.get(OMFactory.OBSERVATION_ID_BASE);
         this.observationTemplateIdBase = (String)     properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
-        this.map                       = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
         this.phenomenonIdBase          = (String)     properties.get(OMFactory.PHENOMENON_ID_BASE);
         
         if (configuration == null) {
@@ -170,11 +163,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest.append("AND ( ");
             for (String s : procedures) {
                 if (s != null) {
-                    String dbId = map.getProperty(s);
-                    if (dbId == null) {
-                        dbId = s;
-                    }
-                    sqlRequest.append(" \"procedure\"='").append(dbId).append("' OR ");
+                    sqlRequest.append(" \"procedure\"='").append(s).append("' OR ");
                 }
             }
             sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
