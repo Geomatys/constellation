@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.xml.namespace.QName;
 import net.jcip.annotations.Immutable;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorsType;
 import org.geotoolkit.ogc.xml.v110.GeometryOperandsType;
@@ -82,6 +83,16 @@ public final class SOSConstants {
     
     public static final String OBSERVATION_MODEL = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation";
 
+    /**
+     * A list of supported MIME type
+     */
+    public static final List<String> ACCEPTED_OUTPUT_FORMATS;
+    static {
+        ACCEPTED_OUTPUT_FORMATS = Arrays.asList(MimeType.TEXT_XML,
+                                                MimeType.APPLICATION_XML,
+                                                MimeType.TEXT_PLAIN);
+    }
+    
     /**
      * The base Qname for measurement observation.
      */

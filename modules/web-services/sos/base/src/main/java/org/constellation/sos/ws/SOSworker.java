@@ -218,16 +218,6 @@ public class SOSworker extends AbstractWorker {
     private final List<Timer> schreduledTask = new ArrayList<Timer>();
 
     /**
-     * A list of supported MIME type
-     */
-    private static final List<String> ACCEPTED_OUTPUT_FORMATS;
-    static {
-        ACCEPTED_OUTPUT_FORMATS = Arrays.asList(MimeType.TEXT_XML,
-                                                MimeType.APPLICATION_XML,
-                                                MimeType.TEXT_PLAIN);
-    }
-
-    /**
      * A list of supported SensorML version
      */
     private static final Map<String, List<String>> ACCEPTED_SENSORML_FORMATS = new HashMap<String, List<String>>();
@@ -1356,30 +1346,6 @@ public class SOSworker extends AbstractWorker {
         return response;
     }
 
-    /**
-     * Return true if the samplingPoint entry is strictly inside the specified envelope.
-     *
-     * @param sp A sampling point (2D) station.
-     * @param e An envelope (2D).
-     * @return True if the sampling point is strictly inside the specified envelope.
-     */
-    private boolean samplingPointMatchEnvelope(final Point sp, final Envelope e) {
-        if (sp.getDirectPosition() != null) {
-
-            final double stationX = sp.getDirectPosition().getOrdinate(0);
-            final double stationY = sp.getDirectPosition().getOrdinate(1);
-            final double minx     = e.getLowerCorner().getOrdinate(0);
-            final double maxx     = e.getUpperCorner().getOrdinate(0);
-            final double miny     = e.getLowerCorner().getOrdinate(1);
-            final double maxy     = e.getUpperCorner().getOrdinate(1);
-
-            // we look if the station if contained in the BBOX
-            return stationX < maxx && stationX > minx && stationY < maxy && stationY > miny;
-        }
-        LOGGER.log(Level.WARNING, " the feature of interest does not have proper position");
-        return false;
-    }
-    
     private Envelope getEnvelopeFromBBOX(final String version, final BBOX bbox) {
         return buildEnvelope(version, null, bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), bbox.getSRS());
     }
@@ -2427,21 +2393,6 @@ public class SOSworker extends AbstractWorker {
                                             resultModel,
                                             resultModelV200,
                                             responses));
-    }
-
-    /**
-     * Return the current output format MIME type (default: application/xml).
-     *
-     * @return The current output format MIME type (default: application/xml).
-     *
-     * @deprecated thread unsafe todo replace
-     */
-    @Deprecated
-    public String getOutputFormat() {
-        if (outputFormat == null) {
-            return MimeType.APPLICATION_XML;
-        }
-        return outputFormat;
     }
 
     /**

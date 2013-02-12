@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
@@ -46,6 +47,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.TextBlock;
+import org.opengis.geometry.primitive.Point;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.Position;
 
@@ -380,5 +382,29 @@ public final class Utils {
             LOGGER.warning("unable to parse datablock unknown encoding");
         }
         return SOSXmlFactory.buildTimePeriod(version, result[0], result[1]);
+    }
+    
+    /**
+     * Return true if the samplingPoint entry is strictly inside the specified envelope.
+     *
+     * @param sp A sampling point (2D) station.
+     * @param e An envelope (2D).
+     * @return True if the sampling point is strictly inside the specified envelope.
+     */
+    public static boolean samplingPointMatchEnvelope(final Point sp, final Envelope e) {
+        if (sp.getDirectPosition() != null) {
+
+            final double stationX = sp.getDirectPosition().getOrdinate(0);
+            final double stationY = sp.getDirectPosition().getOrdinate(1);
+            final double minx     = e.getLowerCorner().getOrdinate(0);
+            final double maxx     = e.getUpperCorner().getOrdinate(0);
+            final double miny     = e.getLowerCorner().getOrdinate(1);
+            final double maxy     = e.getUpperCorner().getOrdinate(1);
+
+            // we look if the station if contained in the BBOX
+            return stationX < maxx && stationX > minx && stationY < maxy && stationY > miny;
+        }
+        LOGGER.log(Level.WARNING, " the feature of interest does not have proper position");
+        return false;
     }
 }

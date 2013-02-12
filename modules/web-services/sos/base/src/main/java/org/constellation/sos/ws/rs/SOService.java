@@ -157,7 +157,7 @@ public class SOService extends OGCWebService<SOSworker> {
              if (request instanceof GetFeatureOfInterest) {
                 final GetFeatureOfInterest gf     = (GetFeatureOfInterest)request;
                 final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterest(gf));
-                return Response.ok(response, worker.getOutputFormat()).build();
+                return Response.ok(response, MimeType.TEXT_XML).build();
              }
 
              if (request instanceof InsertObservation) {
@@ -183,7 +183,7 @@ public class SOService extends OGCWebService<SOSworker> {
 
              if (request instanceof GetCapabilities) {
                 final GetCapabilities gc = (GetCapabilities)request;
-                return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
+                return Response.ok(worker.getCapabilities(gc), getCapabilitiesOutputFormat(gc)).build();
              }
 
              throw new CstlServiceException("The operation " + request + " is not supported by the service",
@@ -378,6 +378,18 @@ public class SOService extends OGCWebService<SOSworker> {
                                    updateSequence,
                                    getParameter(SERVICE_PARAMETER, true));
 
+    }
+    
+    private String getCapabilitiesOutputFormat(final GetCapabilities request) {
+        final AcceptFormats formats = request.getAcceptFormats();
+        if (formats != null && formats.getOutputFormat().size() > 0 ) {
+            for (String form: formats.getOutputFormat()) {
+                if (ACCEPTED_OUTPUT_FORMATS.contains(form)) {
+                    return form;
+                }
+            }
+        }
+        return MimeType.APPLICATION_XML;
     }
 
     /**
