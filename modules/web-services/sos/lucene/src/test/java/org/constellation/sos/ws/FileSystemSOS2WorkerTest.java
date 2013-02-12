@@ -328,6 +328,12 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         super.insertObservationTest();
     }
 
+    @Test
+    @Override
+    public void insertResultTest() throws Exception {
+        super.insertResultTest();
+    }
+    
     /**
      * Tests the destroy method
      *

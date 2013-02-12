@@ -249,7 +249,12 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
         super.GetFeatureOfInterestTest();
     }
 
-
+    @Test
+    @Override
+    public void insertResultTest() throws Exception {
+        super.insertResultTest();
+    }
+    
     /**
      * Tests the destroy method
      *

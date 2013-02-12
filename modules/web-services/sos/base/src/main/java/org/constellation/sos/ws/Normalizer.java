@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
+import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.observation.xml.v100.MeasureType;
 import org.geotoolkit.observation.xml.v100.MeasurementType;
@@ -41,6 +42,8 @@ import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 
 /**
  * Static methods use to create valid XML file, by setting object into referenceMode.
@@ -108,7 +111,7 @@ public final class Normalizer {
         for (Observation obs : members) {
             final Process process = (Process) obs.getProcedure();
             if (merged.containsKey(process.getHref())) {
-                final Observation uniqueObs         = merged.get(process.getHref());
+                final AbstractObservation uniqueObs = (AbstractObservation) merged.get(process.getHref());
                 if (uniqueObs.getResult() instanceof DataArrayProperty) {
                     final DataArrayProperty mergedArrayP = (DataArrayProperty) uniqueObs.getResult();
                     final DataArray mergedArray          = mergedArrayP.getDataArray();
@@ -121,6 +124,31 @@ public final class Normalizer {
                         mergedArray.setElementCount(mergedArray.getElementCount().getCount().getValue() + array.getElementCount().getCount().getValue());
                         mergedArray.setValues(mergedArray.getValues() + array.getValues());
                     } 
+                }
+                // merge the samplingTime
+                if (uniqueObs.getSamplingTime() instanceof Period) {
+                    final Period totalPeriod = (Period)uniqueObs.getSamplingTime();
+                    if (obs.getSamplingTime() instanceof Instant) {
+                        final Instant instant = (Instant)obs.getSamplingTime();
+                        if (totalPeriod.getBeginning().getPosition().getDate().getTime() > instant.getPosition().getDate().getTime()) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  instant.getPosition(), totalPeriod.getEnding().getPosition());
+                            uniqueObs.setSamplingTimePeriod(newPeriod);
+                        }
+                        if (totalPeriod.getEnding().getPosition().getDate().getTime() < instant.getPosition().getDate().getTime()) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), instant.getPosition());
+                            uniqueObs.setSamplingTimePeriod(newPeriod);
+                        } 
+                    } else if (obs.getSamplingTime() instanceof Period) {
+                        final Period period = (Period)obs.getSamplingTime();
+                        if (totalPeriod.getBeginning().getPosition().getDate().getTime() > period.getBeginning().getPosition().getDate().getTime()) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  period.getBeginning().getPosition(), totalPeriod.getEnding().getPosition());
+                            uniqueObs.setSamplingTimePeriod(newPeriod);
+                        }
+                        if (totalPeriod.getEnding().getPosition().getDate().getTime() < period.getEnding().getPosition().getDate().getTime()) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), period.getEnding().getPosition());
+                            uniqueObs.setSamplingTimePeriod(newPeriod);
+                        }
+                    }
                 }
             } else {
                 final Observation clone;

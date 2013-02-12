@@ -265,7 +265,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
         super.GetFeatureOfInterestTest();
     }
 
-
+    
     /**
      * Tests the destroy method
      *

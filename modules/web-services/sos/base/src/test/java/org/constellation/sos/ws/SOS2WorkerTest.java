@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.constellation.util.Util;
@@ -66,11 +67,17 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.InsertResultResponse;
 import org.geotoolkit.sos.xml.v200.GetObservationByIdResponseType;
 import org.geotoolkit.sos.xml.v200.GetObservationByIdType;
 import org.geotoolkit.sos.xml.v200.GetResultResponseType;
 import org.geotoolkit.sos.xml.v200.GetResultType;
 import org.geotoolkit.sos.xml.v200.InsertObservationType;
+import org.geotoolkit.sos.xml.v200.InsertResultTemplateResponseType;
+import org.geotoolkit.sos.xml.v200.InsertResultTemplateType;
+import org.geotoolkit.sos.xml.v200.InsertResultType;
+import org.geotoolkit.swe.xml.v200.AbstractDataComponentType;
+import org.geotoolkit.swe.xml.v200.AbstractEncodingType;
 import org.geotoolkit.swe.xml.v200.DataArrayType;
 import org.geotoolkit.swe.xml.v200.DataRecordType;
 import org.geotoolkit.swe.xml.v200.DataRecordType.Field;
@@ -1678,6 +1685,18 @@ public class SOS2WorkerTest {
      */
     public void insertObservationTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        
+        GetResultType GRrequest = new GetResultType("offering-3", null, "2.0.0");
+        GetResultResponseType result = (GetResultResponseType) worker.getResult(GRrequest);
+
+        String value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@2007-05-01T05:59:00,6.560@@2007-05-01T06:59:00,6.560@@" + '\n' +
+                       "2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@" + '\n' +
+                       "2007-05-01T17:59:00,6.560@@2007-05-01T18:59:00,6.550@@2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@" + '\n';
+        
+        GetResultResponseType expResult = new GetResultResponseType(value);
+
+        assertEquals(expResult.getResultValues(), result.getResultValues());
+        assertEquals(expResult, result);
 
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observationTemplate-3.xml"));
 
@@ -1695,18 +1714,143 @@ public class SOS2WorkerTest {
         InsertObservationType request = new InsertObservationType("2.0.0", Arrays.asList("offering-3"), Arrays.asList(template));
         worker.insertObservation(request);
 
-        GetResultType GRrequest = new GetResultType("offering-3", null, "2.0.0");
-        GetResultResponseType result = (GetResultResponseType) worker.getResult(GRrequest);
+        GRrequest = new GetResultType("offering-3", null, "2.0.0");
+        result = (GetResultResponseType) worker.getResult(GRrequest);
 
-        String value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@2007-05-01T05:59:00,6.560@@2007-05-01T06:59:00,6.560@@" + '\n' +
-                       "2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@" + '\n' +
-                       "2007-05-01T17:59:00,6.560@@2007-05-01T18:59:00,6.550@@2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@" + '\n' +
-                       "2007-06-01T01:01:00,6.560@@2007-06-01T02:00:00,6.550@@2007-06-01T03:00:00,6.550@@" + '\n';
-        GetResultResponseType expResult = new GetResultResponseType(value);
+        value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@2007-05-01T05:59:00,6.560@@2007-05-01T06:59:00,6.560@@" + '\n' +
+                "2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@" + '\n' +
+                "2007-05-01T17:59:00,6.560@@2007-05-01T18:59:00,6.550@@2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@" + '\n' +
+                "2007-06-01T01:01:00,6.560@@2007-06-01T02:00:00,6.550@@2007-06-01T03:00:00,6.550@@" + '\n';
+        expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
         assertEquals(expResult, result);
 
+        marshallerPool.release(unmarshaller);
+    }
+    
+    /**
+     * Tests the InsertObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    public void insertResultTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observationTemplate-3.xml"));
+
+        OMObservationType template = (OMObservationType)obj.getValue();
+
+
+        // and we fill the result object
+        DataArrayPropertyType arrayP = (DataArrayPropertyType) template.getResult();
+        DataArrayType array = arrayP.getDataArray();
+        final AbstractDataComponentType record = array.getElementType().getValue();
+        final AbstractEncodingType encoding = array.getEncoding();
+        template .setResult(null);
+
+        InsertResultTemplateType request = new InsertResultTemplateType("2.0.0", "offering-3", template, record, encoding);
+        InsertResultTemplateResponseType result = (InsertResultTemplateResponseType) worker.insertResultTemplate(request);
+
+        final String templateID = result.getAcceptedTemplate();
+        assertTrue(templateID.startsWith("urn:ogc:object:observation:template:GEOM:"));
+        
+        String value = "2012-01-01T00:01:00,12.1@@2012-01-01T00:02:00,13.1@@";
+        final InsertResultType requestIR = new InsertResultType("2.0.0", templateID, value);
+        final InsertResultResponse response = worker.insertResult(requestIR);
+        assertNotNull(response);
+        
+
+                final List<String> nullList = null;
+        
+        /**
+         *  Test 1: getObservation with procedure urn:ogc:object:sensor:GEOM:4 and no resultModel
+         */
+        GetObservationType requestGO  = new GetObservationType("2.0.0",
+                                      "offering-3",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      nullList,
+                                      "text/xml; subtype=\"om/1.0.0\"");
+        
+        GetObservationResponseType resultGO = (GetObservationResponseType) worker.getObservation(requestGO);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation4.xml"));
+
+        OMObservationType expResult = (OMObservationType)obj.getValue();
+
+        assertEquals(resultGO.getMember().size(), 1);
+
+        OMObservationType obsResult = (OMObservationType) resultGO.getMember().iterator().next();
+
+        Marshaller marshaller = marshallerPool.acquireMarshaller();
+        marshaller.marshal(obsResult, System.out);
+        marshallerPool.release(marshaller);
+        
+        assertTrue(obsResult != null);
+        obsResult.setName(null);
+        expResult.setName(null);
+        assertEquals(expResult.getName(), obsResult.getName());
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        assertTrue(expResult.getResult() instanceof DataArrayPropertyType);
+
+        DataArrayPropertyType expR = (DataArrayPropertyType) expResult.getResult();
+        DataArrayPropertyType obsR = (DataArrayPropertyType) obsResult.getResult();
+
+        assertTrue(obsR.getDataArray().getElementType().getAbstractRecord() instanceof DataRecordType);
+        DataRecordType expSdr = (DataRecordType) expR.getDataArray().getElementType().getAbstractRecord();
+        DataRecordType obsSdr = (DataRecordType) obsR.getDataArray().getElementType().getAbstractRecord();
+
+        Iterator<Field> i1 = expSdr.getField().iterator();
+        Iterator<Field> i2 = obsSdr.getField().iterator();
+        TimeType expT = (TimeType) i1.next().getTime();
+        TimeType obsT = (TimeType) i2.next().getTime();
+
+        assertEquals(expT.getUom(), obsT.getUom());
+        assertEquals(expT, obsT);
+        assertEquals(i1.next(), i2.next());
+
+        assertEquals(expSdr, obsSdr);
+        assertEquals(expR.getDataArray().getElementType().getName(),     obsR.getDataArray().getElementType().getName());
+        assertEquals(expR.getDataArray().getElementType().getAbstractArray(),     obsR.getDataArray().getElementType().getAbstractArray());
+        assertEquals(expR.getDataArray().getElementType(),     obsR.getDataArray().getElementType());
+        assertEquals(expR.getDataArray().getEncoding(),        obsR.getDataArray().getEncoding());
+        
+        
+        String v = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@2007-05-01T05:59:00,6.560@@2007-05-01T06:59:00,6.560@@2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@2007-05-01T17:59:00,6.560@@2007-05-01T18:59:00,6.550@@2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@2007-06-01T01:01:00,6.560@@2007-06-01T02:00:00,6.550@@2007-06-01T03:00:00,6.550@@2012-01-01T00:01:00,12.1@@2012-01-01T00:02:00,13.1@@";
+        expR.getDataArray().setValues(v);
+        
+        assertEquals(expR.getDataArray().getValues(),          obsR.getDataArray().getValues());
+        assertEquals(expR.getDataArray().getId(),              obsR.getDataArray().getId());
+        
+        expR.getDataArray().setElementCount(20);
+        
+        assertEquals(expR.getDataArray().getElementCount(),    obsR.getDataArray().getElementCount());
+        assertEquals(expR.getDataArray().getName(),            obsR.getDataArray().getName());
+        assertEquals(expR.getDataArray().getPropertyElementType(), obsR.getDataArray().getPropertyElementType());
+        assertEquals(expR.getDataArray().getPropertyEncoding(), obsR.getDataArray().getPropertyEncoding());
+        assertEquals(expR.getDataArray().getElementCount(),     obsR.getDataArray().getElementCount());
+        assertEquals(expR.getDataArray().getDefinition(),       obsR.getDataArray().getDefinition());
+        assertEquals(expR.getDataArray().getDescription(),      obsR.getDataArray().getDescription());
+        assertEquals(expR.getDataArray().getParameterName(),    obsR.getDataArray().getParameterName());
+        assertEquals(expR.getDataArray().getDescriptionReference(),                      obsR.getDataArray().getDescriptionReference());
+        assertEquals(expR.getDataArray().isFixed(),                      obsR.getDataArray().isFixed());
+        assertEquals(expR.getDataArray(),                      obsR.getDataArray());
+
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        
+        ((TimePeriodType)expResult.getSamplingTime()).setBeginPosition(new TimePositionType("2007-05-01T02:59:00.0"));
+        ((TimePeriodType)expResult.getSamplingTime()).setEndPosition(new TimePositionType("2012-01-01T00:02:00"));
+
+                    
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        
         marshallerPool.release(unmarshaller);
     }
 

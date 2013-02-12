@@ -165,7 +165,7 @@ public class FileObservationWriter implements ObservationWriter {
             if (observationFile.exists()) {
                 final boolean created      = observationFile.createNewFile();
                 if (!created) {
-                    throw new CstlServiceException("unable to create an observation file.", NO_APPLICABLE_CODE);
+                    throw new CstlServiceException("unable to create an observation file:" + observationFile.getName(), NO_APPLICABLE_CODE);
                 }
             } else {
                 LOGGER.log(Level.WARNING, "we overwrite the file:{0}", observationFile.getPath());

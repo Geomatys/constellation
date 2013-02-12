@@ -74,12 +74,13 @@ import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.Range;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
-import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.Capabilities;
 import org.geotoolkit.sos.xml.Contents;
 import org.geotoolkit.sos.xml.GetCapabilities;
 import org.geotoolkit.sos.xml.GetObservation;
+import org.geotoolkit.sos.xml.GetObservationById;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
@@ -87,8 +88,11 @@ import org.geotoolkit.sos.xml.GetResult;
 import org.geotoolkit.sos.xml.GetResultResponse;
 import org.geotoolkit.sos.xml.InsertObservation;
 import org.geotoolkit.sos.xml.InsertObservationResponse;
+import org.geotoolkit.sos.xml.InsertResultTemplate;
+import org.geotoolkit.sos.xml.InsertResultTemplateResponse;
 import org.geotoolkit.sos.xml.FilterCapabilities;
 import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.sos.xml.ResultTemplate;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractTimePosition;
@@ -105,6 +109,9 @@ import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
+import org.geotoolkit.swe.xml.AnyResult;
+import org.geotoolkit.swes.xml.DeleteSensor;
+import org.geotoolkit.swes.xml.DeleteSensorResponse;
 import org.geotoolkit.swes.xml.DescribeSensor;
 import org.geotoolkit.swes.xml.InsertSensor;
 import org.geotoolkit.swes.xml.ObservationTemplate;
@@ -115,12 +122,12 @@ import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.sos.xml.GetObservationById;
+import org.geotoolkit.sos.xml.InsertResult;
+import org.geotoolkit.sos.xml.InsertResultResponse;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
-import org.geotoolkit.swe.xml.AnyResult;
-import org.geotoolkit.swes.xml.DeleteSensor;
-import org.geotoolkit.swes.xml.DeleteSensorResponse;
+import org.geotoolkit.swe.xml.AbstractDataRecord;
+import org.geotoolkit.swe.xml.DataArrayProperty;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -172,10 +179,16 @@ public class SOSworker extends AbstractWorker {
      * A list of temporary ObservationTemplate
      */
     private final Map<String, Observation> templates = new HashMap<String, Observation>();
+    
+    /**
+     * A list of temporary resultTemplate
+     */
+    private final Map<String, ResultTemplate> resultTemplates = new HashMap<String, ResultTemplate>();
 
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
      */
+    @Deprecated
     private final Properties map = new Properties();
 
     /**
@@ -307,7 +320,7 @@ public class SOSworker extends AbstractWorker {
      */
     public SOSworker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.SOS);
-        setSupportedVersion(ServiceDef.SOS_1_0_0);
+        setSupportedVersion(ServiceDef.SOS_2_0_0, ServiceDef.SOS_1_0_0);
         isStarted = true;
         final SOSConfiguration configuration;
 
@@ -683,7 +696,7 @@ public class SOSworker extends AbstractWorker {
         
         Sections sections = request.getSections();
         if (sections == null) {
-            sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
+            sections = OWSXmlFactory.buildSections("1.1.0", Arrays.asList("All"));
         }
         
         // If the getCapabilities response is in cache, we just return it.
@@ -1697,6 +1710,28 @@ public class SOSworker extends AbstractWorker {
             }
         return values;
     }
+    
+    private Period extractTimeBounds(final String version, final String brutValues, final AbstractEncoding abstractEncoding) {
+        final String[] result = new String[2];
+        if (abstractEncoding instanceof TextBlock) {
+            final TextBlock encoding        = (TextBlock) abstractEncoding;
+            final StringTokenizer tokenizer = new StringTokenizer(brutValues, encoding.getBlockSeparator());
+            boolean first = true;
+            while (tokenizer.hasMoreTokens()) {
+                final String block = tokenizer.nextToken();
+                String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
+                if (first) {
+                    result[0] = samplingTimeValue;
+                    first = false;
+                } else if (!tokenizer.hasMoreTokens()) {
+                    result[1] = samplingTimeValue;
+                }
+            }
+        } else {
+            LOGGER.warning("unable to parse datablock unknown encoding");
+        }
+        return buildTimePeriod(version, result[0], result[1]);
+    }
 
     public AbstractFeature getFeatureOfInterest(final GetFeatureOfInterest request) throws CstlServiceException {
         verifyBaseRequest(request, true, false);
@@ -1800,6 +1835,75 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("there is not such samplingFeature on the server", INVALID_PARAMETER_VALUE);
         }
         LOGGER.log(logLevel, "GetFeatureOfInterestTime processed in {0} ms", (System.currentTimeMillis() - start));
+        return result;
+    }
+    
+    public InsertResultTemplateResponse insertResultTemplate(final InsertResultTemplate request) throws CstlServiceException {
+        LOGGER.log(logLevel, "InsertResultTemplate request processing\n");
+        final long start = System.currentTimeMillis();
+        verifyBaseRequest(request, true, false);
+        final String currentVersion = request.getVersion().toString();
+        if (request.getTemplate() == null) {
+            throw new CstlServiceException("ResultTemplate must be specified", MISSING_PARAMETER_VALUE, "proposedTemplate");
+        }
+        // verify the validity of the template
+        if (request.getTemplate().getObservationTemplate() == null) {
+            throw new CstlServiceException("ResultTemplate must contains observationTemplate", MISSING_PARAMETER_VALUE, "observationTemplate");
+        }
+        if (request.getTemplate().getOffering() == null) {
+            throw new CstlServiceException("ResultTemplate must contains offering", MISSING_PARAMETER_VALUE, "offering");
+        }
+        if (request.getTemplate().getResultEncoding() == null) {
+            throw new CstlServiceException("ResultTemplate must contains resultEncoding", MISSING_PARAMETER_VALUE, "resultEncoding");
+        }
+        if (request.getTemplate().getResultStructure() == null) {
+            throw new CstlServiceException("ResultTemplate must contains resultStructure", MISSING_PARAMETER_VALUE, "resultStructure");
+        }
+        
+        final String templateID = observationTemplateIdBase + UUID.randomUUID();
+        resultTemplates.put(templateID, request.getTemplate());
+        
+        final InsertResultTemplateResponse result = buildInsertResultTemplateResponse(currentVersion, templateID);
+        LOGGER.log(logLevel, "InsertResultTemplate processed in {0} ms", (System.currentTimeMillis() - start));
+        return result;
+    }
+    
+    public InsertResultResponse insertResult(final InsertResult request) throws CstlServiceException {
+        LOGGER.log(logLevel, "InsertResultTemplate request processing\n");
+        final long start = System.currentTimeMillis();
+        verifyBaseRequest(request, true, false);
+        final String currentVersion = request.getVersion().toString();
+        
+        final String templateID = request.getTemplate();
+        if (templateID == null) {
+            throw new CstlServiceException("template ID missing.", MISSING_PARAMETER_VALUE, "template");
+        }
+        final ResultTemplate template = resultTemplates.get(templateID);
+        if (template == null) {
+            throw new CstlServiceException("template ID is invalid:" + templateID, INVALID_PARAMETER_VALUE, "template");
+        }
+        final AbstractObservation obs   = (AbstractObservation) template.getObservationTemplate();
+        final AbstractEncoding encoding = template.getResultEncoding();
+        final String values             = request.getResultValues();
+        int count = 0;
+        if (encoding instanceof TextBlock) {
+            final String separator = ((TextBlock)encoding).getBlockSeparator();
+            count = values.split(separator).length;
+        }
+        final DataArrayProperty array = buildDataArrayProperty(currentVersion, 
+                                               null, 
+                                               count, 
+                                               null, 
+                                               (AbstractDataRecord)template.getResultStructure(), 
+                                               encoding, 
+                                               values);
+        obs.setName(omReader.getNewObservationId());
+        obs.setResult(array);
+        obs.setSamplingTimePeriod(extractTimeBounds(currentVersion, values, encoding));
+        omWriter.writeObservation(obs);
+        omFilter.refresh();
+        final InsertResultResponse result = buildInsertResultResponse(currentVersion);
+        LOGGER.log(logLevel, "InsertResult processed in {0} ms", (System.currentTimeMillis() - start));
         return result;
     }
 
@@ -2418,6 +2522,7 @@ public class SOSworker extends AbstractWorker {
      * @param form The "form" containing the sensorML data.
      * @param dbId The identifier of the sensor in the O&M database.
      */
+    @Deprecated
     private void recordMapping(final String dbId, final String physicalID) throws CstlServiceException {
         try {
             if (dbId != null && physicalID != null) {

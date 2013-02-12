@@ -406,7 +406,16 @@ public class FileObservationReader implements ObservationReader {
      */
     @Override
     public String getNewObservationId() throws CstlServiceException {
-        return observationIdBase + observationDirectory.list().length;
+        String obsID = null;
+        boolean exist = true;
+        int i = observationDirectory.list().length;
+        while (exist) {
+            obsID = observationIdBase + i;
+            final File newFile = new File(observationDirectory, obsID);
+            exist = newFile.exists();
+            i++;
+        }
+        return obsID;
     }
 
     /**
