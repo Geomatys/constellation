@@ -193,6 +193,17 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
     public void GetObservationByIdTest() throws Exception {
         super.GetObservationByIdTest();
     }
+    
+    /**
+     * Tests the GetResultTemplate method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetResultTemplateTest() throws Exception {
+        super.GetResultTemplateTest();
+    }
 
     /**
      * Tests the GetResult method

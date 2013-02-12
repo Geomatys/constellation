@@ -994,7 +994,7 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionType) worker.getObservation(request);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/observationTemplate-4.xml"));
 
         expResult = (ObservationType)obj.getValue();
 
@@ -1046,7 +1046,7 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionType) worker.getObservation(request);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/observationTemplate-4.xml"));
 
         expResult = (ObservationType)obj.getValue();
 
@@ -1097,7 +1097,7 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionType) worker.getObservation(request);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/observationTemplate-4.xml"));
 
         expResult = (ObservationType)obj.getValue();
 
@@ -1149,7 +1149,7 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionType) worker.getObservation(request);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/observationTemplate-4.xml"));
 
         expResult = (ObservationType)obj.getValue();
 
@@ -1636,7 +1636,7 @@ public class SOSWorkerTest {
                                       null);
         ObservationCollectionType obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
 
-        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/observationTemplate-3.xml"));
 
         ObservationType templateExpResult = (ObservationType)obj.getValue();
 
@@ -1713,7 +1713,7 @@ public class SOSWorkerTest {
                                         null);
         obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/observationTemplate-3.xml"));
 
         templateExpResult = (ObservationType)obj.getValue();
 
@@ -1868,7 +1868,7 @@ public class SOSWorkerTest {
                                         null);
         obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/observationTemplate-3.xml"));
 
         templateExpResult = (ObservationType)obj.getValue();
 
@@ -1939,7 +1939,7 @@ public class SOSWorkerTest {
                                         null);
         obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/observationTemplate-3.xml"));
 
         templateExpResult = (ObservationType)obj.getValue();
 
@@ -1998,7 +1998,7 @@ public class SOSWorkerTest {
     public void insertObservationTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
-        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/observationTemplate-3.xml"));
 
         ObservationType template = (ObservationType)obj.getValue();
 

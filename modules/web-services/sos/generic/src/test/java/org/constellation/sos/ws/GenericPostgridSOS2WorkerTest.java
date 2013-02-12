@@ -212,6 +212,17 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
     }
 
     /**
+     * Tests the GetResultTemplate method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetResultTemplateTest() throws Exception {
+        super.GetResultTemplateTest();
+    }
+    
+    /**
      * Tests the GetResult method
      *
      * @throws java.lang.Exception

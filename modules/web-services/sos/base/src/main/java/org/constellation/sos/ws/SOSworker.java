@@ -119,10 +119,13 @@ import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.GetResultTemplate;
+import org.geotoolkit.sos.xml.GetResultTemplateResponse;
 import org.geotoolkit.sos.xml.InsertResult;
 import org.geotoolkit.sos.xml.InsertResultResponse;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractDataRecord;
 import org.geotoolkit.swe.xml.DataArrayProperty;
 
@@ -1062,10 +1065,6 @@ public class SOSworker extends AbstractWorker {
 
                 if (!phenomenonName.equals(phenomenonIdBase + "ALL")) {
 
-                    /* we remove the phenomenon id base
-                    if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
-                        phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
-                    }*/
                     final Phenomenon phen = omReader.getPhenomenon(phenomenonName);
                     if (phen == null) {
                         throw new CstlServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
@@ -1138,33 +1137,9 @@ public class SOSworker extends AbstractWorker {
 
                                 } else if (station instanceof AbstractFeature) {
                                     final AbstractFeature sc = (AbstractFeature) station;
-                                    if (sc.getBoundedBy() != null && 
-                                        sc.getBoundedBy().getEnvelope() != null &&
-                                        sc.getBoundedBy().getEnvelope().getLowerCorner() != null && 
-                                        sc.getBoundedBy().getEnvelope().getUpperCorner() != null &&
-                                        sc.getBoundedBy().getEnvelope().getLowerCorner().getCoordinate().length > 1 && 
-                                        sc.getBoundedBy().getEnvelope().getUpperCorner().getCoordinate().length > 1) {
-
-                                        final double stationMinX  = sc.getBoundedBy().getEnvelope().getLowerCorner().getOrdinate(0);
-                                        final double stationMaxX  = sc.getBoundedBy().getEnvelope().getUpperCorner().getOrdinate(0);
-                                        final double stationMinY  = sc.getBoundedBy().getEnvelope().getLowerCorner().getOrdinate(1);
-                                        final double stationMaxY  = sc.getBoundedBy().getEnvelope().getUpperCorner().getOrdinate(1);
-                                        final double minx         = e.getLowerCorner().getOrdinate(0);
-                                        final double maxx         = e.getUpperCorner().getOrdinate(0);
-                                        final double miny         = e.getLowerCorner().getOrdinate(1);
-                                        final double maxy         = e.getUpperCorner().getOrdinate(1);
-
-                                        // we look if the station if contained in the BBOX
-                                        if (stationMaxX < maxx && stationMinX > minx &&
-                                            stationMaxY < maxy && stationMinY > miny) {
-
-                                            matchingFeatureOfInterest.add(sc.getId());
-                                            add = true;
-                                        } else {
-                                            LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", sc.getId());
-                                        }
-                                    } else {
-                                        LOGGER.log(Level.WARNING, " the feature of interest (samplingCurve){0} does not have proper bounds", sc.getId());
+                                    if (BoundMatchEnvelope(sc, e)) {
+                                        matchingFeatureOfInterest.add(sc.getId());
+                                        add = true;
                                     }
                                 } else {
                                     LOGGER.log(Level.WARNING, "unknow implementation:{0}", station.getClass().getName());
@@ -1805,6 +1780,76 @@ public class SOSworker extends AbstractWorker {
         LOGGER.log(logLevel, "InsertResult processed in {0} ms", (System.currentTimeMillis() - start));
         return result;
     }
+    
+    public GetResultTemplateResponse getResultTemplate(final GetResultTemplate request) throws CstlServiceException {
+        LOGGER.log(logLevel, "InsertResultTemplate request processing\n");
+        final long start = System.currentTimeMillis();
+        verifyBaseRequest(request, true, false);
+        final String currentVersion = request.getVersion().toString();
+        if (request.getOffering() == null) {
+            throw new CstlServiceException("offering parameter is missing.", MISSING_PARAMETER_VALUE, "offering");
+        }
+        final ObservationOffering offering = omReader.getObservationOffering(request.getOffering(), currentVersion);
+        if (offering == null) {
+            throw new CstlServiceException("offering parameter is invalid.", INVALID_PARAMETER_VALUE, "offering");
+        }
+        // we clone the filter for this request
+        final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
+        
+        localOmFilter.initFilterObservation(RESULT_TEMPLATE, OBSERVATION_QNAME);
+        localOmFilter.setProcedure(offering.getProcedures(), Arrays.asList(offering));
+        if (request.getObservedProperty() == null) {
+            throw new CstlServiceException("observedProperty parameter is missing.", MISSING_PARAMETER_VALUE, "observedProperty");
+        }
+        final Phenomenon phenomenon = omReader.getPhenomenon(request.getObservedProperty());
+        if (phenomenon == null) {
+            throw new CstlServiceException(" this phenomenon " + request.getObservedProperty() + " is not registred in the database!",
+                    INVALID_PARAMETER_VALUE, "observedProperty");
+        }
+        final List<String> singlePhenomenons    = new ArrayList<String>();
+        final List<String> compositePhenomenons = new ArrayList<String>();
+        if (phenomenon instanceof CompositePhenomenon) {
+            compositePhenomenons.add(request.getObservedProperty());
+        } else {
+            singlePhenomenons.add(request.getObservedProperty());
+        }
+        localOmFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
+        
+        final List<Observation> matchingResult;
+        // case (1)
+        if (!(localOmFilter instanceof ObservationFilterReader)) {
+            matchingResult = new ArrayList<Observation>();
+            final Set<String> observationIDs = localOmFilter.filterObservation();
+            for (String observationID : observationIDs) {
+                matchingResult.add(omReader.getObservation(observationID, OBSERVATION_QNAME, currentVersion));
+            }
+        // case (2)
+        } else {
+            final ObservationFilterReader omFR = (ObservationFilterReader) localOmFilter;
+            matchingResult = omFR.getObservationTemplates();
+        }
+        final AbstractDataComponent structure;
+        final AbstractEncoding encoding;
+        if (matchingResult.isEmpty()) {
+            throw new CstlServiceException("there is no result template matching the arguments");
+        } else {
+            if (matchingResult.size() > 1) {
+                LOGGER.warning("more than one result for resultTemplate");
+            }
+            final Object result = matchingResult.get(0).getResult();
+            if (result instanceof DataArrayProperty) {
+                final DataArray array = ((DataArrayProperty)result).getDataArray();
+                structure             = array.getPropertyElementType().getAbstractRecord();
+                encoding              = array.getEncoding();
+            } else {
+                throw new CstlServiceException("unable to extract structure and encoding for other result type than DataArrayProperty");
+            }
+        }
+        
+        final GetResultTemplateResponse result = buildGetResultTemplateResponse(currentVersion, structure, encoding);
+        LOGGER.log(logLevel, "InsertResult processed in {0} ms", (System.currentTimeMillis() - start));
+        return result;
+    }
 
     private List<SamplingFeature> spatialFiltering(final BBOX bbox, final String currentVersion) throws CstlServiceException {
         final Envelope e = getEnvelopeFromBBOX(currentVersion, bbox);
@@ -1822,6 +1867,12 @@ public class SOSworker extends AbstractWorker {
                     }
                     if (station.getGeometry() instanceof Point) {
                         if (samplingPointMatchEnvelope((Point)station.getGeometry(), e)) {
+                            matchingFeatureOfInterest.add(station);
+                        } else {
+                            LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", getIDFromObject(station));
+                        }
+                    } else if (station instanceof AbstractFeature) {
+                        if (BoundMatchEnvelope((AbstractFeature) station, e)) {
                             matchingFeatureOfInterest.add(station);
                         } else {
                             LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", getIDFromObject(station));

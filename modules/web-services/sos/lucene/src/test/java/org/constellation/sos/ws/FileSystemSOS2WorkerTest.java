@@ -99,8 +99,8 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
 
             File observationTemplatesDirectory = new File(configDir, "observationTemplates");
             observationTemplatesDirectory.mkdir();
-            writeDataFile(observationTemplatesDirectory, "observationTemplate-3.xml", "urn:ogc:object:observation:template:GEOM:3");
-            writeDataFile(observationTemplatesDirectory, "observationTemplate-4.xml", "urn:ogc:object:observation:template:GEOM:4");
+            writeDataFile(observationTemplatesDirectory, "v200/observationTemplate-3.xml", "urn:ogc:object:observation:template:GEOM:3");
+            writeDataFile(observationTemplatesDirectory, "v200/observationTemplate-4.xml", "urn:ogc:object:observation:template:GEOM:4");
             writeDataFile(observationTemplatesDirectory, "observationTemplate-5.xml", "urn:ogc:object:observation:template:GEOM:5");
             writeDataFile(observationTemplatesDirectory, "observationTemplate-7.xml", "urn:ogc:object:observation:template:GEOM:7");
             writeDataFile(observationTemplatesDirectory, "observationTemplate-8.xml", "urn:ogc:object:observation:template:GEOM:8");
@@ -293,6 +293,17 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     @Override
     public void GetFeatureOfInterestTest() throws Exception {
         super.GetFeatureOfInterestTest();
+    }
+    
+    /**
+     * Tests the GetResultTemplate method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetResultTemplateTest() throws Exception {
+        super.GetResultTemplateTest();
     }
     
     /**

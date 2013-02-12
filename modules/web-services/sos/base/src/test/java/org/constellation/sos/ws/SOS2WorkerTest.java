@@ -71,6 +71,8 @@ import org.geotoolkit.sos.xml.InsertResultResponse;
 import org.geotoolkit.sos.xml.v200.GetObservationByIdResponseType;
 import org.geotoolkit.sos.xml.v200.GetObservationByIdType;
 import org.geotoolkit.sos.xml.v200.GetResultResponseType;
+import org.geotoolkit.sos.xml.v200.GetResultTemplateResponseType;
+import org.geotoolkit.sos.xml.v200.GetResultTemplateType;
 import org.geotoolkit.sos.xml.v200.GetResultType;
 import org.geotoolkit.sos.xml.v200.InsertObservationType;
 import org.geotoolkit.sos.xml.v200.InsertResultTemplateResponseType;
@@ -1311,6 +1313,28 @@ public class SOS2WorkerTest {
         assertTrue(exLaunched);
     }
 
+    public void GetResultTemplateTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        /** 
+         *   getResultTemplate with procedure urn:ogc:object:sensor:GEOM:4
+         */
+        GetResultTemplateType GOrequest  = new GetResultTemplateType("2.0.0",
+                                      "offering-4",
+                                      "urn:ogc:def:phenomenon:GEOM:depth");
+        GetResultTemplateResponseType obsCollResult = (GetResultTemplateResponseType) worker.getResultTemplate(GOrequest);
+
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observationTemplate-4.xml"));
+
+        OMObservationType templateExpResult = (OMObservationType)obj.getValue();
+
+        DataArrayPropertyType arrayP = (DataArrayPropertyType) templateExpResult.getResult();
+        DataArrayType array = arrayP.getDataArray();
+
+        assertEquals(array.getEncoding(), obsCollResult.getResultEncoding());
+        assertEquals(array.getElementType().getValue(), obsCollResult.getResultStructure());
+
+    }
+    
     /**
      * Tests the GetResult method
      *
@@ -1318,63 +1342,6 @@ public class SOS2WorkerTest {
      */
     public void GetResultTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-
-
-        /** TODO  GETRESULTTEMPLATE
-        
-         *   getObservation with procedure urn:ogc:object:sensor:GEOM:4
-         *           with resultTemplate mode
-         *
-        GetObservation GOrequest  = new GetObservation("2.0.0",
-                                      "offering-allSensor",
-                                      null,
-                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
-                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
-                                      null,
-                                      null,
-                                      "text/xml; subtype=\"om/2.0.0\"",
-                                      OBSERVATION_QNAME,
-                                      ResponseModeType.RESULT_TEMPLATE,
-                                      null);
-        ObservationCollectionType obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
-
-        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
-
-        ObservationType templateExpResult = (ObservationType)obj.getValue();
-
-        //for template the sampling time is 1970 to now
-        TimePeriodType period = new TimePeriodType(new TimePositionType("1900-01-01T00:00:00"));
-        templateExpResult.setSamplingTime(period);
-
-        // and we empty the result object
-        DataArrayPropertyType arrayP = (DataArrayPropertyType) templateExpResult.getResult();
-        DataArrayType array = arrayP.getDataArray();
-        array.setElementCount(0);
-        array.setValues("");
-
-        templateExpResult.setName("urn:ogc:object:observation:template:GEOM:3-0");
-
-        assertEquals(obsCollResult.getMember().size(), 1);
-
-        ObservationType obsResult = (ObservationType) obsCollResult.getMember().iterator().next();
-
-        assertNotNull(obsResult);
-
-        DataArrayPropertyType obsR = (DataArrayPropertyType) obsResult.getResult();
-        SimpleDataRecordType obsSdr = (SimpleDataRecordType) obsR.getDataArray().getElementType();
-        obsSdr.setBlockId(null);
-
-        assertTrue(obsResult != null);
-        assertEquals(templateExpResult.getName(), obsResult.getName());
-        assertEquals(templateExpResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
-        assertEquals(templateExpResult.getObservedProperty(), obsResult.getObservedProperty());
-        assertEquals(templateExpResult.getProcedure(), obsResult.getProcedure());
-        assertEquals(((DataArrayPropertyType)templateExpResult.getResult()).getDataArray().getName(), ((DataArrayPropertyType)obsResult.getResult()).getDataArray().getName());
-        assertEquals(((DataArrayPropertyType)templateExpResult.getResult()).getDataArray().getEncoding(), ((DataArrayPropertyType)obsResult.getResult()).getDataArray().getEncoding());
-        assertEquals(((DataArrayPropertyType)templateExpResult.getResult()).getDataArray(), ((DataArrayPropertyType)obsResult.getResult()).getDataArray());
-        assertEquals(templateExpResult.getResult(), obsResult.getResult());
-        assertEquals(templateExpResult.getSamplingTime(), obsResult.getSamplingTime());
-        assertEquals(templateExpResult, obsResult);
 
         /**
          * Test 1:  getResult with no TimeFilter
@@ -1390,61 +1357,6 @@ public class SOS2WorkerTest {
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
         assertEquals(expResult, result);
-
-        /**
-         *   getObservation with procedure urn:ogc:object:sensor:GEOM:3
-         *   with resultTemplate mode and time filter TBefore
-         
-        List<EventTime> times = new ArrayList<EventTime>();
-        TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T05:00:00.0"));
-        TimeBeforeType bfilter = new TimeBeforeType(null, instant);
-        EventTime before = new EventTime(null, bfilter, null);
-        times.add(before);
-        GOrequest  = new GetObservation("2.0.0",
-                                        "offering-allSensor",
-                                        times,
-                                        Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
-                                        Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
-                                        null,
-                                        null,
-                                        "text/xml; subtype=\"om/2.0.0\"",
-                                        OBSERVATION_QNAME,
-                                        ResponseModeType.RESULT_TEMPLATE,
-                                        null);
-        obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
-
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
-
-        templateExpResult = (ObservationType)obj.getValue();
-
-        //for template the sampling time is 1970 to now
-        period = new TimePeriodType(TimeIndeterminateValueType.BEFORE, new TimePositionType("2007-05-01T05:00:00.0"));
-        templateExpResult.setSamplingTime(period);
-
-        // and we empty the result object
-        arrayP = (DataArrayPropertyType) templateExpResult.getResult();
-        array = arrayP.getDataArray();
-        array.setElementCount(0);
-        array.setValues("");
-
-        templateExpResult.setName("urn:ogc:object:observation:template:GEOM:3-1");
-
-        assertEquals(obsCollResult.getMember().size(), 1);
-
-        obsResult = (ObservationType) obsCollResult.getMember().iterator().next();
-
-        obsR = (DataArrayPropertyType) obsResult.getResult();
-        obsSdr = (SimpleDataRecordType) obsR.getDataArray().getElementType();
-        obsSdr.setBlockId(null);
-
-        assertTrue(obsResult != null);
-        assertEquals(templateExpResult.getName(), obsResult.getName());
-        assertEquals(templateExpResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
-        assertEquals(templateExpResult.getObservedProperty(), obsResult.getObservedProperty());
-        assertEquals(templateExpResult.getProcedure(), obsResult.getProcedure());
-        assertEquals(templateExpResult.getResult(), obsResult.getResult());
-        assertEquals(templateExpResult.getSamplingTime(), obsResult.getSamplingTime());
-        assertEquals(templateExpResult, obsResult);
 
         /**
          * Test 2:  getResult with no TimeFilter
@@ -1533,62 +1445,6 @@ public class SOS2WorkerTest {
         assertEquals(expResult, result);
 
 
-         /**
-         *   getObservation with procedure urn:ogc:object:sensor:GEOM:3
-         *   with resultTemplate mode and time filter TAfter
-         *
-        times = new ArrayList<EventTime>();
-        instant = new TimeInstantType(new TimePositionType("2007-05-01T19:00:00.0"));
-        afilter = new TimeAfterType(null, instant);
-        after = new EventTime(afilter, null, null);
-        times.add(after);
-        GOrequest  = new GetObservation("2.0.0",
-                                        "offering-allSensor",
-                                        times,
-                                        Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
-                                        Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
-                                        null,
-                                        null,
-                                        "text/xml; subtype=\"om/2.0.0\"",
-                                        OBSERVATION_QNAME,
-                                        ResponseModeType.RESULT_TEMPLATE,
-                                        null);
-        obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
-
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
-
-        templateExpResult = (ObservationType)obj.getValue();
-
-        //for template the sampling time is 1970 to now
-        period = new TimePeriodType(new TimePositionType("2007-05-01T19:00:00.0"));
-        templateExpResult.setSamplingTime(period);
-
-        // and we empty the result object
-        arrayP = (DataArrayPropertyType) templateExpResult.getResult();
-        array = arrayP.getDataArray();
-        array.setElementCount(0);
-        array.setValues("");
-
-        templateExpResult.setName("urn:ogc:object:observation:template:GEOM:3-2");
-
-        assertEquals(obsCollResult.getMember().size(), 1);
-
-        obsResult = (ObservationType) obsCollResult.getMember().iterator().next();
-
-        obsR = (DataArrayPropertyType) obsResult.getResult();
-        obsSdr = (SimpleDataRecordType) obsR.getDataArray().getElementType();
-        obsSdr.setBlockId(null);
-
-        assertTrue(obsResult != null);
-        assertEquals(templateExpResult.getName(), obsResult.getName());
-        assertEquals(templateExpResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
-        assertEquals(templateExpResult.getObservedProperty(), obsResult.getObservedProperty());
-        assertEquals(templateExpResult.getProcedure(), obsResult.getProcedure());
-        assertEquals(templateExpResult.getResult(), obsResult.getResult());
-        assertEquals(templateExpResult.getSamplingTime(), obsResult.getSamplingTime());
-        assertEquals(templateExpResult, obsResult);
-
-
         /**
          * Test 7:  getResult with no TimeFilter
          */
@@ -1604,60 +1460,6 @@ public class SOS2WorkerTest {
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
         assertEquals(expResult, result);
-
-         /**
-         *   getObservation with procedure urn:ogc:object:sensor:GEOM:3
-         *   with resultTemplate mode and time filter TEquals
-         *
-        times = new ArrayList<EventTime>();
-        instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.0"));
-        efilter = new TimeEqualsType(null, instant);
-        equals = new EventTime(efilter);
-        times.add(equals);
-        GOrequest  = new GetObservation("2.0.0",
-                                        "offering-allSensor",
-                                        times,
-                                        Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
-                                        Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
-                                        null,
-                                        null,
-                                        "text/xml; subtype=\"om/2.0.0\"",
-                                        OBSERVATION_QNAME,
-                                        ResponseModeType.RESULT_TEMPLATE,
-                                        null);
-        obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
-
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
-
-        templateExpResult = (ObservationType)obj.getValue();
-
-        instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.0"));
-        templateExpResult.setSamplingTime(instant);
-
-        // and we empty the result object
-        arrayP = (DataArrayPropertyType) templateExpResult.getResult();
-        array = arrayP.getDataArray();
-        array.setElementCount(0);
-        array.setValues("");
-
-        templateExpResult.setName("urn:ogc:object:observation:template:GEOM:3-3");
-
-        assertEquals(obsCollResult.getMember().size(), 1);
-
-        obsResult = (ObservationType) obsCollResult.getMember().iterator().next();
-
-        obsR = (DataArrayPropertyType) obsResult.getResult();
-        obsSdr = (SimpleDataRecordType) obsR.getDataArray().getElementType();
-        obsSdr.setBlockId(null);
-
-        assertTrue(obsResult != null);
-        assertEquals(templateExpResult.getName(), obsResult.getName());
-        assertEquals(templateExpResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
-        assertEquals(templateExpResult.getObservedProperty(), obsResult.getObservedProperty());
-        assertEquals(templateExpResult.getProcedure(), obsResult.getProcedure());
-        assertEquals(templateExpResult.getResult(), obsResult.getResult());
-        assertEquals(templateExpResult.getSamplingTime(), obsResult.getSamplingTime());
-        assertEquals(templateExpResult, obsResult);
 
         /**
          * Test 8:  getResult with no TimeFilter
@@ -1761,7 +1563,7 @@ public class SOS2WorkerTest {
         assertNotNull(response);
         
 
-                final List<String> nullList = null;
+         final List<String> nullList = null;
         
         /**
          *  Test 1: getObservation with procedure urn:ogc:object:sensor:GEOM:4 and no resultModel
