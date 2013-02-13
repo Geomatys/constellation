@@ -577,8 +577,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
             if (version.equals("1.0.0")) {
                 if (resultModel.equals(OBSERVATION_QNAME)) {
-                    final AnyResultType anyResult = (AnyResultType) getResult(resultID, resultModel, version);
-                    final DataArrayPropertyType result = anyResult.getPropertyArray();
+                    final DataArrayPropertyType result = (DataArrayPropertyType) getResult(resultID, resultModel, version);
                     return new ObservationType(identifier,
                                                 null,
                                                 (org.geotoolkit.sampling.xml.v100.SamplingFeatureType)featureOfInterest,
@@ -673,7 +672,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 final String dataValues    = values.getVariable("var33");
                 final DataArray result = SOSXmlFactory.buildDataArray(version, blockId, count, blockId, elementType, encoding, dataValues);
                 if (version.equals("1.0.0")) {
-                    return new AnyResultType(identifier, (DataArrayType)result);
+                    return new org.geotoolkit.swe.xml.v101.DataArrayPropertyType((DataArrayType)result);
                 } else {
                     return new org.geotoolkit.swe.xml.v200.DataArrayPropertyType((org.geotoolkit.swe.xml.v200.DataArrayType)result);
                 }

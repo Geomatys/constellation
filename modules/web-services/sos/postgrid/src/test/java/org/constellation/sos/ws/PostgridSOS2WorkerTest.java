@@ -42,7 +42,8 @@ import org.junit.*;
 public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
 
     private static DefaultDataSource ds = null;
-
+    private static File workingDirectory;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
 
@@ -92,6 +93,14 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
         pool.release(marshaller);
         init();
         worker = new SOSworker("", configDir);
+        worker.setServiceUrl(URL);
+        worker.setLogLevel(Level.FINER);
+        workingDirectory = configDir;
+    }
+    
+    @Override
+    public void initWorker() {
+        worker = new SOSworker("", workingDirectory);
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
     }
@@ -271,7 +280,7 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     @Override
     public void destroyTest() throws Exception {
         super.destroyTest();

@@ -167,6 +167,10 @@ public final class Utils {
                                               MISSING_PARAMETER_VALUE, "eventTime");
           }
     }
+    
+    public static Timestamp getTimestampValue(final Position time) throws CstlServiceException {
+        return Timestamp.valueOf(getTimeValue(time));
+    }
 
     /**
      * return a SQL formatted timestamp

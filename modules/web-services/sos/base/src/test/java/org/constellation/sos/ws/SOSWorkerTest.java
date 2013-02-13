@@ -80,15 +80,13 @@ import org.geotoolkit.swes.xml.InsertSensorResponse;
 import org.opengis.observation.sampling.SamplingPoint;
 
 // JUnit dependencies
-import org.junit.Ignore;
 import static org.junit.Assert.*;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-@Ignore
-public class SOSWorkerTest {
+public abstract class SOSWorkerTest {
 
     protected static SOSworker worker;
 
@@ -104,6 +102,8 @@ public class SOSWorkerTest {
         capabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         marshallerPool.release(unmarshaller);
     }
+    
+    public abstract void initWorker();
 
     /**
      * Tests the getcapabilities method
@@ -2256,9 +2256,10 @@ public class SOSWorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertTrue(ex.getMessage().contains("The service is not running"));
         }
 
         assertTrue(exLaunched);
+        initWorker();
     }
 }

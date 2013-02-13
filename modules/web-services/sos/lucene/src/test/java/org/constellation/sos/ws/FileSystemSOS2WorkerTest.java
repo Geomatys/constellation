@@ -155,6 +155,12 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         worker.setLogLevel(Level.FINER);
     }
 
+    @Override
+    public void initWorker() {
+        worker = new SOSworker("", configDir);
+        worker.setServiceUrl(URL);
+        worker.setLogLevel(Level.FINER);
+    }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
@@ -350,7 +356,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     @Override
     public void destroyTest() throws Exception {
         super.destroyTest();

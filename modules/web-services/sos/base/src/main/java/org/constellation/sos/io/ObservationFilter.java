@@ -51,7 +51,7 @@ public interface ObservationFilter {
      * @param procedures
      * @param off
      */
-    void setProcedure(List<String> procedures, List<ObservationOffering> offerings) throws CstlServiceException;
+    void setProcedure(final List<String> procedures, final List<ObservationOffering> offerings) throws CstlServiceException;
 
     /**
      * Add some phenomenon filter to the request.
@@ -67,7 +67,7 @@ public interface ObservationFilter {
      * @param phenomenon
      * @param compositePhenomenon
      */
-    void setFeatureOfInterest(List<String> fois);
+    void setFeatureOfInterest(final List<String> fois);
 
     /**
      * Add a TM_Equals filter to the current request.

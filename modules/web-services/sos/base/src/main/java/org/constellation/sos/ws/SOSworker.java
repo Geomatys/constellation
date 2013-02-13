@@ -51,7 +51,6 @@ import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
 import org.constellation.ws.UnauthorizedException;
 
 import static org.constellation.api.QueryConstants.*;
@@ -61,7 +60,6 @@ import static org.constellation.sos.ws.Normalizer.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.AbstractOperation;
@@ -78,6 +76,10 @@ import org.geotoolkit.sos.xml.Contents;
 import org.geotoolkit.sos.xml.GetCapabilities;
 import org.geotoolkit.sos.xml.GetObservation;
 import org.geotoolkit.sos.xml.GetObservationById;
+import org.geotoolkit.sos.xml.GetResultTemplate;
+import org.geotoolkit.sos.xml.GetResultTemplateResponse;
+import org.geotoolkit.sos.xml.InsertResult;
+import org.geotoolkit.sos.xml.InsertResultResponse;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
@@ -97,6 +99,7 @@ import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureCollection;
 import org.geotoolkit.gml.xml.FeatureProperty;
+import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.ogc.xml.XMLLiteral;
@@ -106,7 +109,9 @@ import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
-import org.geotoolkit.swe.xml.AnyResult;
+import org.geotoolkit.swe.xml.AbstractDataComponent;
+import org.geotoolkit.swe.xml.AbstractDataRecord;
+import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swes.xml.DeleteSensor;
 import org.geotoolkit.swes.xml.DeleteSensorResponse;
 import org.geotoolkit.swes.xml.DescribeSensor;
@@ -119,15 +124,8 @@ import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.sos.xml.GetResultTemplate;
-import org.geotoolkit.sos.xml.GetResultTemplateResponse;
-import org.geotoolkit.sos.xml.InsertResult;
-import org.geotoolkit.sos.xml.InsertResultResponse;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
-import org.geotoolkit.swe.xml.AbstractDataComponent;
-import org.geotoolkit.swe.xml.AbstractDataRecord;
-import org.geotoolkit.swe.xml.DataArrayProperty;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -208,11 +206,6 @@ public class SOSworker extends AbstractWorker {
      * The valid time for a getObservation template (in ms).
      */
     private long templateValidTime;
-
-    /**
-     * The current MIME type of return
-     */
-    private String outputFormat;
 
     /**
      * A list of schreduled Task (used in close method).
@@ -626,7 +619,6 @@ public class SOSworker extends AbstractWorker {
             boolean found = false;
             for (String form: formats.getOutputFormat()) {
                 if (ACCEPTED_OUTPUT_FORMATS.contains(form)) {
-                    outputFormat = form;
                     found = true;
                 }
             }
@@ -634,9 +626,6 @@ public class SOSworker extends AbstractWorker {
                 throw new CstlServiceException("accepted format : text/xml, application/xml",
                                                  INVALID_PARAMETER_VALUE, "acceptFormats");
             }
-
-        } else {
-            this.outputFormat = MimeType.APPLICATION_XML;
         }
 
         //set the current updateSequence parameter
@@ -926,8 +915,7 @@ public class SOSworker extends AbstractWorker {
             for (String s : acceptedResponseFormat) {
                 arf.append(s).append('\n');
             }
-            throw new CstlServiceException("Response format must be specify\n" +
-                    "Accepted values are:\n" + arf.toString(),
+            throw new CstlServiceException("Response format must be specify.\nAccepted values are:\n" + arf.toString(),
                     MISSING_PARAMETER_VALUE, "responseFormat");
         }
 
@@ -1380,8 +1368,7 @@ public class SOSworker extends AbstractWorker {
 
         // case TEquals with time instant
         if (time instanceof Instant) {
-           final Instant ti      = (Instant) time;
-           final TEquals equals  = buildTimeEquals(currentVersion, null, ti);
+           final TEquals equals  = buildTimeEquals(currentVersion, null, time);
            times.add(equals);
 
         } else if (time instanceof Period) {
@@ -1421,8 +1408,13 @@ public class SOSworker extends AbstractWorker {
                 final Timestamp tBegin = result.beginTime;
                 final Timestamp tEnd   = result.endTime;
                 final Object r         = omReader.getResult(result.resultID, resultModel, currentVersion);
-                if (r instanceof DataArray) {
-                    final DataArray array = (DataArray)r;
+                if (r instanceof DataArray || r instanceof DataArrayProperty) {
+                    final DataArray array;
+                    if (r instanceof DataArrayProperty) {
+                        array = ((DataArrayProperty)r).getDataArray();
+                    } else {
+                        array = (DataArray)r;
+                    }
                     if (array != null) {
                         final String resultValues = getResultValues(tBegin, tEnd, array, times);
                         if (!resultValues.isEmpty()) {
@@ -1434,20 +1426,9 @@ public class SOSworker extends AbstractWorker {
                 } else if (r instanceof Measure) {
                     final Measure meas = (Measure) r;
                     datablock.append(tBegin).append(',').append(meas.getValue()).append("@@");
-                } else if (r instanceof AnyResult) {
-                    final DataArray array = ((AnyResult)r).getArray();
-                    if (array != null) {
-                        final String resultValues = getResultValues(tBegin, tEnd, array, times);
-                        if (!resultValues.isEmpty()) {
-                            datablock.append(resultValues).append('\n');
-                        }
-                    } else {
-                        throw new IllegalArgumentException("Array is null");
-                    }
                 } else {
                     throw new IllegalArgumentException("Unexpected result type:" + r);
                 }
-
             }
             values = datablock.toString();
         }
@@ -1471,43 +1452,40 @@ public class SOSworker extends AbstractWorker {
                     final TEquals filter = (TEquals) bound;
                     if (filter.getExpression2() instanceof Instant) {
                         final Instant ti    = (Instant) filter.getExpression2();
-                        final Timestamp boundEquals = Timestamp.valueOf(getTimeValue(ti.getPosition()));
+                        final Timestamp boundEquals = getTimestampValue(ti.getPosition());
 
                         LOGGER.finer("TE case 1");
                         //case 1 the periods contains a matching values
                         values = parseDataBlock(values, array.getEncoding(), null, null, boundEquals);
-
                     }
 
                 } else if (bound instanceof After) {
                     final After filter = (After) bound;
                     final Instant ti   = (Instant) filter.getExpression2();
-                    final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(ti.getPosition()));
+                    final Timestamp boundBegin = getTimestampValue(ti.getPosition());
 
                     // case 1 the period overlaps the bound
                     if (tBegin.before(boundBegin) && tEnd.after(boundBegin)) {
                         LOGGER.finer("TA case 1");
                         values = parseDataBlock(values, array.getEncoding(), boundBegin, null, null);
-
                     }
 
                 } else if (bound instanceof Before) {
                     final Before filter = (Before) bound;
                     final Instant ti    = (Instant) filter.getExpression2();
-                    final Timestamp boundEnd = Timestamp.valueOf(getTimeValue(ti.getPosition()));
+                    final Timestamp boundEnd = getTimestampValue(ti.getPosition());
 
                     // case 1 the period overlaps the bound
                     if (tBegin.before(boundEnd) && tEnd.after(boundEnd)) {
                         LOGGER.finer("TB case 1");
                         values = parseDataBlock(values, array.getEncoding(), null, boundEnd, null);
-
                     }
 
                 } else if (bound instanceof During) {
                     final During filter = (During) bound;
                     final Period tp     = (Period)filter.getExpression2();
-                    final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(tp.getBeginning().getPosition()));
-                    final Timestamp boundEnd   = Timestamp.valueOf(getTimeValue(tp.getEnding().getPosition()));
+                    final Timestamp boundBegin = getTimestampValue(tp.getBeginning().getPosition());
+                    final Timestamp boundEnd   = getTimestampValue(tp.getEnding().getPosition());
 
                     // case 1 the period overlaps the first bound
                     if (tBegin.before(boundBegin) && tEnd.before(boundEnd) && tEnd.after(boundBegin)) {
@@ -1554,7 +1532,7 @@ public class SOSworker extends AbstractWorker {
                 final StringTokenizer tokenizer = new StringTokenizer(brutValues, encoding.getBlockSeparator());
                 while (tokenizer.hasMoreTokens()) {
                     final String block = tokenizer.nextToken();
-                    String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
+                    final String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
                     Date d = null;
                     try {
                         final ISODateParser parser = new ISODateParser();
@@ -2463,8 +2441,8 @@ public class SOSworker extends AbstractWorker {
         super.destroy();
         if (smlReader != null) {smlReader.destroy();}
         if (smlWriter != null) {smlWriter.destroy();}
-        if (omReader != null)  {omReader.destroy();}
-        if (omWriter != null)  {omWriter.destroy();}
+        if (omReader  != null) {omReader.destroy();}
+        if (omWriter  != null) {omWriter.destroy();}
         for (Timer t : schreduledTask) {
             t.cancel();
         }

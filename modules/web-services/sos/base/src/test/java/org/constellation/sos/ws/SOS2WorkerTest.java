@@ -95,8 +95,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@Ignore
-public class SOS2WorkerTest {
+public abstract class SOS2WorkerTest {
 
     protected static SOSworker worker;
 
@@ -112,6 +111,8 @@ public class SOS2WorkerTest {
         capabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         marshallerPool.release(unmarshaller);
     }
+    
+    public abstract void initWorker();
 
     /**
      * Tests the getcapabilities method
@@ -1671,9 +1672,10 @@ public class SOS2WorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertTrue(ex.getMessage().contains("The service is not running"));
         }
 
         assertTrue(exLaunched);
+        initWorker();
     }
 }

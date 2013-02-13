@@ -70,6 +70,7 @@ import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.swe.xml.v101.AnyResultType;
 
 import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -498,7 +499,8 @@ public class DefaultObservationReader implements ObservationReader {
             } else {
                 final AnyResultTable resTable = omDatabase.getTable(AnyResultTable.class);
                 final Integer id = Integer.parseInt(identifier);
-                return resTable.getEntry(id);
+                final AnyResultType result = resTable.getEntry(id);
+                return result.getPropertyArray();
             }
 
         } catch (CatalogException ex) {
