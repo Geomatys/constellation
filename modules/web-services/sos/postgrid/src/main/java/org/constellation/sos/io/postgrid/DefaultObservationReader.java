@@ -233,7 +233,7 @@ public class DefaultObservationReader implements ObservationReader {
             } else {
                 offeringNameVar = offeringName;
             }
-            final ObservationOfferingType off =  offTable.getEntry(offeringNameVar);
+            final ObservationOfferingType off = new ObservationOfferingType(offTable.getEntry(offeringNameVar));
             if (version.equals("2.0.0")) {
                 off.setName(offeringName);
                 off.setProcedures(Arrays.asList(sensorIdBase + offeringName.substring(9)));
