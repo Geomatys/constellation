@@ -82,7 +82,7 @@ import org.geotoolkit.swe.xml.v200.AbstractDataComponentType;
 import org.geotoolkit.swe.xml.v200.AbstractEncodingType;
 import org.geotoolkit.swe.xml.v200.DataArrayType;
 import org.geotoolkit.swe.xml.v200.DataRecordType;
-import org.geotoolkit.swe.xml.v200.DataRecordType.Field;
+import org.geotoolkit.swe.xml.v200.Field;
 import org.geotoolkit.swes.xml.v200.DeleteSensorResponseType;
 import org.geotoolkit.swes.xml.v200.DeleteSensorType;
 
