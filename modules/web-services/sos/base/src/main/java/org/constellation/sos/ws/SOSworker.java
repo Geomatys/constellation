@@ -101,6 +101,7 @@ import org.geotoolkit.gml.xml.FeatureCollection;
 import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.observation.xml.AbstractObservation;
+import org.geotoolkit.observation.xml.ObservationComparator;
 import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.ogc.xml.XMLLiteral;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -1227,6 +1228,7 @@ public class SOSworker extends AbstractWorker {
                 for (String observationID : observationIDs) {
                     matchingResult.add(omReader.getObservation(observationID, resultModel, currentVersion));
                 }
+                Collections.sort(matchingResult, new ObservationComparator());
                 computedBounds         = null;
 
             // case (2)
