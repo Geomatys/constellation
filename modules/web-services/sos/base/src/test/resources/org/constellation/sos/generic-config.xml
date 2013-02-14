@@ -465,6 +465,15 @@
             </select>
             <from>"observation"."phenomenons"</from>
          </query>
+         <query>
+            <select>
+               <col>
+                  <var>var83</var>
+                  <sql>"name"</sql>
+               </col>
+            </select>
+            <from>"observation"."composite_phenomenons"</from>
+         </query>
 	<!-- all feature of interest name -->
          <query>
             <select>

@@ -129,7 +129,6 @@ import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
-import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Measure;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.filter.Filter;
@@ -1051,8 +1050,7 @@ public class SOSworker extends AbstractWorker {
 
                 if (!phenomenonName.equals(phenomenonIdBase + "ALL")) {
 
-                    final Phenomenon phen = omReader.getPhenomenon(phenomenonName);
-                    if (phen == null) {
+                    if (!omReader.existPhenomenon(phenomenonName)) {
                         throw new CstlServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
                                 INVALID_PARAMETER_VALUE, "observedProperty");
                     }
@@ -1665,6 +1663,7 @@ public class SOSworker extends AbstractWorker {
         LOGGER.log(logLevel, "GetFeatureOfInterestTime request processing\n");
         final long start = System.currentTimeMillis();
         verifyBaseRequest(request, true, false);
+        final String currentVersion = request.getVersion().toString();
 
         final String fid = request.getFeatureOfInterestId();
 
@@ -1675,7 +1674,7 @@ public class SOSworker extends AbstractWorker {
 
         final TemporalPrimitive result;
         if (omReader.getFeatureOfInterestNames().contains(fid)) {
-            result = omReader.getFeatureOfInterestTime(fid);
+            result = omReader.getFeatureOfInterestTime(fid, currentVersion);
         } else {
             throw new CstlServiceException("there is not such samplingFeature on the server", INVALID_PARAMETER_VALUE);
         }
@@ -1772,8 +1771,7 @@ public class SOSworker extends AbstractWorker {
         if (request.getObservedProperty() == null) {
             throw new CstlServiceException("observedProperty parameter is missing.", MISSING_PARAMETER_VALUE, "observedProperty");
         }
-        final Phenomenon phenomenon = omReader.getPhenomenon(request.getObservedProperty());
-        if (phenomenon == null) {
+        if (!omReader.existPhenomenon(request.getObservedProperty())) {
             throw new CstlServiceException(" this phenomenon " + request.getObservedProperty() + " is not registred in the database!",
                     INVALID_PARAMETER_VALUE, "observedProperty");
         }

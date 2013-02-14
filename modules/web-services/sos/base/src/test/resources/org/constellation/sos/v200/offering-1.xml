@@ -13,7 +13,7 @@
     <swes:observedProperty>rn:ogc:def:phenomenon:GEOM:temperature</swes:observedProperty>
     <sos:phenomenonTime>
         <gml:TimePeriod gml:id="phenomenonTime3">
-            <gml:beginPosition>>2008-05-14T10:40:25.236</gml:beginPosition>
+            <gml:beginPosition>2008-05-14T10:40:25.236</gml:beginPosition>
             <gml:endPosition indeterminatePosition="now"/>
         </gml:TimePeriod>
     </sos:phenomenonTime>

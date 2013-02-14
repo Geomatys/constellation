@@ -220,7 +220,7 @@ public class MeasurementTable extends SingletonTable<MeasurementType> implements
                                     result.getString(indexOf(query.description)),
                                     station,
                                     pheno,
-                                    procedure,
+                                    procedure.getHref(),
                                     //manque quality
                                     resultat,
                                     samplingTime);

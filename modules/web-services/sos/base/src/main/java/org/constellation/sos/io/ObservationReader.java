@@ -31,7 +31,6 @@ import org.geotoolkit.sos.xml.ResponseModeType;
 
 // GeoAPI
 import org.opengis.observation.Observation;
-import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.TemporalPrimitive;
 
@@ -87,14 +86,8 @@ public interface ObservationReader {
      */
     Collection<String> getPhenomenonNames() throws CstlServiceException;
 
-    /**
-     * Return a phenomenon with the specified identifier
-     * @param phenomenonName
-     * @return
-     * @throws org.constellation.ws.CstlServiceException
-     */
-    Phenomenon getPhenomenon(final String phenomenonName) throws CstlServiceException;
-
+    boolean existPhenomenon(final String phenomenonName) throws CstlServiceException;
+    
     /**
      * Return a list of sampling feature identifiers.
      *
@@ -121,7 +114,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException;
+    TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws CstlServiceException;
 
     /**
      * Return an observation for the specified identifier.

@@ -62,14 +62,13 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.gml.xml.v321.EnvelopeType;
 import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
-import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.swe.xml.v101.AnyResultType;
 
 import org.opengis.observation.Observation;
@@ -235,7 +234,11 @@ public class DefaultObservationReader implements ObservationReader {
                 offeringNameVar = offeringName;
             }
             final ObservationOfferingType off =  offTable.getEntry(offeringNameVar);
-            return convert(version, off, offeringName);
+            if (version.equals("2.0.0")) {
+                off.setName(offeringName);
+                off.setProcedures(Arrays.asList(sensorIdBase + offeringName.substring(9)));
+            }
+            return SOSXmlFactory.convert(version, off);
         } catch (NoSuchRecordException ex) {
             return null;
         } catch (CatalogException ex) {
@@ -248,43 +251,6 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
     
-    private ObservationOffering convert(final String version, final ObservationOfferingType off, final String offeringName) {
-        if (version.equals("2.0.0")) {
-            final EnvelopeType env;
-            if (off.getBoundedBy() != null && off.getBoundedBy().getEnvelope() != null) {
-                env = new EnvelopeType(off.getBoundedBy().getEnvelope());
-            } else {
-                env = null;
-            }
-            final org.geotoolkit.gml.xml.v321.TimePeriodType period;
-            if (off.getTime() != null) {
-                final TimePeriodType pv100 = (TimePeriodType) off.getTime();
-                period = new org.geotoolkit.gml.xml.v321.TimePeriodType(pv100.getBeginPosition().getValue(), pv100.getEndPosition().getValue());
-            } else {
-                period = null;
-            }
-            final String singleProcedure;
-            if (version.equals("2.0.0")) {
-                singleProcedure = sensorIdBase + offeringName.substring(9);
-            } else {
-                singleProcedure = null;
-            }
-            return new org.geotoolkit.sos.xml.v200.ObservationOfferingType(
-                                               off.getId(),
-                                               offeringName,
-                                               off.getDescription(),
-                                               env,
-                                               period,
-                                               singleProcedure,
-                                               off.getObservedProperties(),
-                                               off.getFeatureOfInterestIds(),
-                                               off.getResponseFormat(),
-                                               Arrays.asList("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation"));
-        } else {
-            return off;
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -357,7 +323,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
+    public boolean existPhenomenon(String phenomenonName) throws CstlServiceException {
         // we remove the phenomenon id base
         if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
@@ -371,13 +337,13 @@ public class DefaultObservationReader implements ObservationReader {
             //we let continue to look if it is a phenomenon (simple)
             }
             if (cphen != null) {
-                return cphen;
+                return true;
             }
             final PhenomenonTable phenomenonTable = omDatabase.getTable(PhenomenonTable.class);
-            return (PhenomenonType) phenomenonTable.getEntry(phenomenonName);
+            return phenomenonTable.getEntry(phenomenonName) != null;
 
         } catch (NoSuchRecordException ex) {
-            return null;
+            return false;
 
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -581,9 +547,9 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException {
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws CstlServiceException {
         try {
-            List<Date> bounds = specialTable.getTimeForStation(samplingFeatureName);
+            final List<Date> bounds = specialTable.getTimeForStation(samplingFeatureName);
             return new TimePeriodType(new TimePositionType(bounds.get(0)), new TimePositionType(bounds.get(1)));
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);

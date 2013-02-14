@@ -42,7 +42,6 @@ import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.swe.xml.Phenomenon;
 
 import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -247,33 +246,13 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Phenomenon getPhenomenon(String phenomenonName) throws CstlServiceException {
+    public boolean existPhenomenon(String phenomenonName) throws CstlServiceException {
         // we remove the phenomenon id base
         if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
         }
         final File phenomenonFile = new File(phenomenonDirectory, phenomenonName + FILE_EXTENSION);
-        if (phenomenonFile.exists()) {
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(phenomenonFile);
-                if (obj instanceof JAXBElement) {
-                    obj = ((JAXBElement)obj).getValue();
-                }
-                if (obj instanceof Phenomenon) {
-                    return (Phenomenon) obj;
-                }
-                throw new CstlServiceException("The file " + phenomenonFile + " does not contains an phenomenon Object.", NO_APPLICABLE_CODE);
-            } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + phenomenonFile, ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (unmarshaller != null) {
-                    MARSHALLER_POOL.release(unmarshaller);
-                }
-            }
-        }
-        return null;
+        return phenomenonFile.exists();
     }
 
     /**
@@ -430,7 +409,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException {
+    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws CstlServiceException {
         throw new CstlServiceException("The Filesystem implementation of SOS does not support GetFeatureofInterestTime");
     }
     

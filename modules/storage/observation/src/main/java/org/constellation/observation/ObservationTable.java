@@ -316,7 +316,7 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                                     result.getString(indexOf(query.description)),
                                     station,
                                     pheno,
-                                    (ProcessType)procedure,
+                                    procedure.getHref(),
                                     //manque quality
                                     resultat,
                                     samplingTime);

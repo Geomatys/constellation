@@ -42,32 +42,26 @@ import org.geotoolkit.gml.xml.LineString;
 import org.geotoolkit.gml.xml.Point;
 import org.geotoolkit.gml.xml.v311.UnitOfMeasureEntry;
 import org.geotoolkit.sos.xml.ResponseModeType;
-import org.geotoolkit.swe.xml.v101.AnyResultType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
-import org.geotoolkit.swe.xml.v101.DataArrayType;
-import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
-import org.geotoolkit.gml.xml.v321.FeaturePropertyType;
+import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.observation.xml.v100.MeasureType;
-import org.geotoolkit.observation.xml.v100.MeasurementType;
-import org.geotoolkit.observation.xml.v100.ObservationType;
-import org.geotoolkit.observation.xml.v100.ProcessType;
-import org.geotoolkit.observation.xml.v200.OMObservationType;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractDataRecord;
 import org.geotoolkit.swe.xml.AnyScalar;
-import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.UomProperty;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+import org.geotoolkit.swe.xml.Phenomenon;
 import org.geotoolkit.swe.xml.PhenomenonProperty;
 
 import org.opengis.geometry.DirectPosition;
+import org.opengis.observation.Measure;
 import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.Period;
@@ -144,11 +138,18 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public List<String> getPhenomenonNames() throws CstlServiceException {
         try {
-            final Values values = loadData(Arrays.asList("var03"));
-            return values.getVariables("var03");
+            final Values values = loadData(Arrays.asList("var03", "var83"));
+            final List<String> results = values.getVariables("var03");
+            results.addAll(values.getVariables("var83"));
+            return results;
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
+    }
+    
+    @Override
+    public boolean existPhenomenon(String phenomenonName) throws CstlServiceException {
+        return getPhenomenonNames().contains(phenomenonName);
     }
 
     /**
@@ -348,8 +349,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     /**
      * {@inheritDoc}
      */
-    @Override
-    public PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
+    private PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
         // we remove the phenomenon id base
         if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
@@ -566,7 +566,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             final String phenomenon       = values.getVariable(variables.get(2));
             final String phenomenonComp   = values.getVariable(variables.get(3));
             final String resultID         = values.getVariable(variables.get(7));
-            final PhenomenonType observedProperty;
+            final Phenomenon observedProperty;
             if (phenomenon != null) {
                 observedProperty = getPhenomenon(phenomenon);
             } else if (phenomenonComp != null) {
@@ -575,38 +575,40 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 observedProperty = null;
                 LOGGER.log(Level.INFO, "no phenomenon for result:{0}", identifier);
             }
+            final FeatureProperty foi = SOSXmlFactory.buildFeatureProperty(version, featureOfInterest);
+            final Object result = getResult(resultID, resultModel, version);
             if (version.equals("1.0.0")) {
                 if (resultModel.equals(OBSERVATION_QNAME)) {
-                    final DataArrayPropertyType result = (DataArrayPropertyType) getResult(resultID, resultModel, version);
-                    return new ObservationType(identifier,
-                                                null,
-                                                (org.geotoolkit.sampling.xml.v100.SamplingFeatureType)featureOfInterest,
-                                                observedProperty,
-                                                new ProcessType(proc),
-                                                result,
-                                                (org.geotoolkit.gml.xml.v311.TimePeriodType)samplingTime);
+                    
+                    return OMXmlFactory.buildObservation(version,
+                                                         identifier,
+                                                         null,
+                                                         foi,
+                                                         observedProperty,
+                                                         proc,
+                                                         result,
+                                                         samplingTime);
                 } else if (resultModel.equals(MEASUREMENT_QNAME)) {
-                    final MeasureType result = (MeasureType) getResult(resultID, resultModel, version);
-                    return new MeasurementType(identifier,
-                                               null,
-                                               (org.geotoolkit.sampling.xml.v100.SamplingFeatureType)featureOfInterest,
-                                               observedProperty,
-                                               new ProcessType(proc),
-                                               result,
-                                               (org.geotoolkit.gml.xml.v311.TimePeriodType)samplingTime);
+                    return OMXmlFactory.buildMeasurement(version,
+                                                         identifier,
+                                                         null,
+                                                         foi,
+                                                         observedProperty,
+                                                         proc,
+                                                         (Measure)result,
+                                                         (org.geotoolkit.gml.xml.v311.TimePeriodType)samplingTime);
                 } else {
                     throw new IllegalArgumentException("unexpected resultModel:" + resultModel);
                 }
             } else if (version.equals("2.0.0")) {
-                final FeaturePropertyType foi = (FeaturePropertyType) SOSXmlFactory.buildFeatureProperty(version, featureOfInterest);
-                final org.geotoolkit.swe.xml.v200.DataArrayPropertyType result = (org.geotoolkit.swe.xml.v200.DataArrayPropertyType) getResult(resultID, resultModel, version);
-                return new OMObservationType(identifier, 
-                                             "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_ComplexObservation", 
-                                             (org.geotoolkit.gml.xml.v321.TimePeriodType)samplingTime,
-                                             proc,
-                                             observedProperty.getName(),
-                                             foi,
-                                             result);
+                return OMXmlFactory.buildObservation(version,
+                                                     identifier,
+                                                     null,
+                                                     foi,
+                                                     observedProperty,
+                                                     proc,
+                                                     result,
+                                                     samplingTime);
             } else {
                 throw new IllegalArgumentException("Unexpected version:" + version);
             }
@@ -669,13 +671,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
 
                 final AbstractDataRecord elementType = SOSXmlFactory.buildSimpleDatarecord(version, blockId, dataRecordId, null, false, fields);
 
-                final String dataValues    = values.getVariable("var33");
-                final DataArray result = SOSXmlFactory.buildDataArray(version, blockId, count, blockId, elementType, encoding, dataValues);
-                if (version.equals("1.0.0")) {
-                    return new org.geotoolkit.swe.xml.v101.DataArrayPropertyType((DataArrayType)result);
-                } else {
-                    return new org.geotoolkit.swe.xml.v200.DataArrayPropertyType((org.geotoolkit.swe.xml.v200.DataArrayType)result);
-                }
+                final String dataValues = values.getVariable("var33");
+                return SOSXmlFactory.buildDataArrayProperty(version, blockId, count, blockId, elementType, encoding, dataValues);
+                
             } else if (resultModel.equals(MEASUREMENT_QNAME)) {
                 final Values values    = loadData(Arrays.asList("var77", "var78"), identifier);
                 final String uomValue = values.getVariable("var78");
@@ -704,7 +702,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException {
+    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws CstlServiceException {
         throw new CstlServiceException("The Default generic implementation of SOS does not support GetFeatureofInterestTime");
     }
 
