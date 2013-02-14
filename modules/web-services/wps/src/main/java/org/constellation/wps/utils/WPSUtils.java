@@ -334,22 +334,44 @@ public class WPSUtils {
     public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.FormChoice type) {
         return describeComplex(attributeClass, ioType, type, null);
     }
-    
-    
-    public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.FormChoice type, final String schema) {
-                
+
+    /**
+     * Return the SupportedComplexDataInputType for the given class.
+     *
+     * @param attributeClass The java class to get complex type from.
+     * @param ioType The type of parameter to describe (input or output).
+     * @param type The complex type (complex, reference, etc.).
+     * @param userData A map containing user's options for type support.
+     * @return SupportedComplexDataInputType
+     */
+    public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.FormChoice type, final Map<String, Object> userData) {
+
         final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
         final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
         final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
-        final List<WPSIO.FormatSupport> infos = WPSIO.getFormats(attributeClass, ioType);
+        List<WPSIO.FormatSupport> infos = null;
+        String schema = null;
+
+        if (userData != null) {
+            try {
+                infos = (List<WPSIO.FormatSupport>) userData.get(WPSIO.SUPPORTED_FORMATS_KEY);
+                schema = (String) userData.get(WPSIO.SCHEMA_KEY);
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "A parameter type definition can't be read.", e);
+            }
+        }
+
+        if (infos == null) {
+            infos = WPSIO.getFormats(attributeClass, ioType);
+        }
 
         if (infos != null) {
             for (WPSIO.FormatSupport inputClass : infos) {
 
                 final ComplexDataDescriptionType complexDesc = new ComplexDataDescriptionType();
-                complexDesc.setEncoding(inputClass.getEncoding() != null ? inputClass.getEncoding() : null); //Encoding
-                complexDesc.setMimeType(inputClass.getMimeType() != null ? inputClass.getMimeType() : null); //Mime
-                complexDesc.setSchema(schema != null ? schema : inputClass.getSchema());                     //URL to xsd schema
+                complexDesc.setEncoding(inputClass.getEncoding()); //Encoding
+                complexDesc.setMimeType(inputClass.getMimeType()); //Mime
+                complexDesc.setSchema(schema != null ? schema : inputClass.getSchema()); //URL to xsd schema
 
                 if (inputClass.isDefaultFormat()) {
                     complexComb.setFormat(complexDesc);
@@ -366,6 +388,7 @@ public class WPSUtils {
         }
         return complex;
     }
+
 
     /**
      * Check if all requested inputs/outputs are present in the process descriptor. Check also if all mandatory

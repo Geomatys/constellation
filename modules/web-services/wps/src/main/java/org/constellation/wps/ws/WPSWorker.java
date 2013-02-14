@@ -34,6 +34,7 @@ import org.geotoolkit.geometry.isoonjts.GeometryUtils;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.ows.xml.v110.*;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.parameter.ExtendedParameterDescriptor;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.process.*;
 import org.geotoolkit.referencing.CRS;
@@ -117,7 +118,7 @@ public class WPSWorker extends AbstractWorker {
     /**
      * Timeout in seconds use to kill long process execution in synchronous mode.
      */
-    private static final int TIMEOUT = 30;    
+    private static final int TIMEOUT = 30;
 
     private static final String SCHEMA_FOLDER_NAME = "/schemas";
 
@@ -602,7 +603,7 @@ public class WPSWorker extends AbstractWorker {
             descriptionType.setIdentifier(identifier);                                                                      //Process Identifier
             descriptionType.setTitle(WPSUtils.buildProcessTitle(processDesc));                                              //Process Title
             descriptionType.setAbstract(WPSUtils.capitalizeFirstLetter(processDesc.getProcedureDescription().toString()));  //Process abstract
-            descriptionType.setProcessVersion(WPS_1_0_0);                                                                   //Process verstion
+            descriptionType.setProcessVersion(WPS_1_0_0);                                                                   //Process version
             descriptionType.setWSDL(null);                                                                                  //TODO WSDL
             descriptionType.setStatusSupported(true);
             descriptionType.setStoreSupported(supportStorage);
@@ -642,7 +643,23 @@ public class WPSWorker extends AbstractWorker {
                     if (WPSIO.isSupportedBBoxInputClass(clazz)) {
                         in.setBoundingBoxData(WPS_SUPPORTED_CRS);
 
-                         //Simple object (Integer, double, ...) and Object which need a conversion from String like affineTransform or WKT Geometry
+                        //Complex type (XML, ...)
+                    } else if (WPSIO.isSupportedComplexInputClass(clazz)) {
+                        Map<String, Object> userData = null;
+                        if(paramDesc instanceof ExtendedParameterDescriptor) {
+                            userData = ((ExtendedParameterDescriptor)paramDesc).getUserObject();
+                        }
+                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX, userData));
+
+                        //Reference type (XML, ...)
+                    } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
+                        Map<String, Object> userData = null;
+                        if(paramDesc instanceof ExtendedParameterDescriptor) {
+                            userData = ((ExtendedParameterDescriptor)paramDesc).getUserObject();
+                        }
+                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.REFERENCE, userData));
+
+                        //Simple object (Integer, double, ...) and Object which need a conversion from String like affineTransform or WKT Geometry
                     } else if (WPSIO.isSupportedLiteralInputClass(clazz)) {
                         final LiteralInputType literal = new LiteralInputType();
 
@@ -664,14 +681,6 @@ public class WPSWorker extends AbstractWorker {
 
                         in.setLiteralData(literal);
 
-                        //Complex type (XML, ...)
-                    } else if (WPSIO.isSupportedComplexInputClass(clazz)) {
-                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX));
-
-                        //Reference type (XML, ...)
-                    } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
-                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.REFERENCE));
-
                     } else {
                         throw new CstlServiceException("Process input not supported.", NO_APPLICABLE_CODE);
                     }
@@ -691,7 +700,9 @@ public class WPSWorker extends AbstractWorker {
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
                         final Class clazz = ft.getClass();
-                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX, publicAddress));
+                        HashMap<String, Object> userData = new HashMap<String, Object>(1);
+                        userData.put(WPSIO.SCHEMA_KEY, publicAddress);
+                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX, userData));
                     } catch (JAXBException ex) {
                         throw new CstlServiceException("The schema for parameter "+ param.getName().getCode() + "can't be build.", NO_APPLICABLE_CODE);
                     }
@@ -771,7 +782,9 @@ public class WPSWorker extends AbstractWorker {
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
-                        out.setComplexOutput(WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX, publicAddress));
+                        HashMap<String, Object> userData = new HashMap<String, Object>(1);
+                        userData.put(WPSIO.SCHEMA_KEY, publicAddress);
+                        out.setComplexOutput(WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX, userData));
                     } catch (JAXBException ex) {
                         throw new CstlServiceException("The schema for parameter "+ param.getName().getCode() + "can't be build.", NO_APPLICABLE_CODE);
                     }
