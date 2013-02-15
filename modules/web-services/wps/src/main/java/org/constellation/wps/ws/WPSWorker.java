@@ -92,7 +92,7 @@ public class WPSWorker extends AbstractWorker {
 
     private final String webdavFolderPath;
     private String webdavURL;
-
+    
     private final ProcessContext context;
     /**
      * Supported CRS.
@@ -112,10 +112,12 @@ public class WPSWorker extends AbstractWorker {
         supportedCRS.getCRS().addAll(DEFAULT_CRS);
         WPS_SUPPORTED_CRS.setSupported(supportedCRS);
     }
-    private static final int TIMEOUT = 30;
+    private static final int TIMEOUT = 30;    
+    
+    private static final String SCHEMA_FOLDER_NAME = "/schemas";
 
     /**
-     * List of process descriptor available.
+     * List of process descriptors available.
      */
     private final List<ProcessDescriptor> ProcessDescriptorList = new ArrayList<ProcessDescriptor>();
 
@@ -171,9 +173,9 @@ public class WPSWorker extends AbstractWorker {
         } else {
             webdavFolderPath = WPSConstant.TEMP_FOLDER;
         }
-
+        
         this.webdavURL = null; //initialize on WPS execute request.
-
+        
         //create new WebDav instance
         final boolean webdav = createWebDav();
         if (!webdav) {
@@ -195,7 +197,7 @@ public class WPSWorker extends AbstractWorker {
      */
     private void fillProcessList() {
         if (context != null && context.getProcesses() != null) {
-            // Load all process from all factory
+            // Load all processes from all factory
             if (Boolean.TRUE == context.getProcesses().getLoadAll()) {
                 LOGGER.info("Loading all process");
                 final Iterator<ProcessingRegistry> factoryIte = ProcessFinder.getProcessFactories();
@@ -332,6 +334,7 @@ public class WPSWorker extends AbstractWorker {
                     INVALID_PARAMETER_VALUE, LANGUAGE_PARAMETER.toLowerCase());
         }
 
+        //check VERSION
         List<String> versionsAccepted = null;
         if (request.getAcceptVersions() != null) {
             versionsAccepted = request.getAcceptVersions().getVersion();
@@ -345,7 +348,7 @@ public class WPSWorker extends AbstractWorker {
             }
         }
 
-        //if versionAccepted parametrize is not define return the last getCapabilities
+        //if versionAccepted parameter is not define return the last getCapabilities
         if (versionsAccepted == null || versionSupported) {
             //set the current updateSequence parameter
             final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
@@ -434,6 +437,9 @@ public class WPSWorker extends AbstractWorker {
      */
     private ProcessDescriptions describeProcess100(DescribeProcess request) throws CstlServiceException {
 
+        //needed to get the public adress of generated schemas (for feature parameters).
+        updateWebDavURL();
+        
         //check mandatory IDENTIFIER is not missing.
         if (request.getIdentifier() == null || request.getIdentifier().isEmpty()) {
             throw new CstlServiceException("The parameter " + IDENTIFER_PARAMETER + " must be specified.",
@@ -540,13 +546,13 @@ public class WPSWorker extends AbstractWorker {
                      */
                     FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup)param);
                     
-                    // Input class
-                    final Class clazz = ft.getClass();
-                    String placeToStore = webdavFolderPath + "/" +ft.getName().getLocalPart()+".xsd";
-                    String publicAddress = webdavURL + "/" +ft.getName().getLocalPart()+".xsd";
+                    // Build the schema xsd, and store it into temporary folder.
+                    String placeToStore = webdavFolderPath + SCHEMA_FOLDER_NAME + "/" +ft.getName().getLocalPart()+".xsd";
+                    String publicAddress = webdavURL + SCHEMA_FOLDER_NAME + "/" +ft.getName().getLocalPart()+".xsd";
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
+                        final Class clazz = ft.getClass();
                         in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX, publicAddress));
                     } catch (JAXBException ex) {
                         throw new CstlServiceException("The schema for parameter "+ param.getName().getCode() + "can't be build.", NO_APPLICABLE_CODE);
@@ -622,8 +628,8 @@ public class WPSWorker extends AbstractWorker {
                     
                     // Input class
                     final Class clazz = ft.getClass();                    
-                    String placeToStore = webdavFolderPath + "/" +ft.getName().getLocalPart()+".xsd";
-                    String publicAddress = webdavURL + "/" +ft.getName().getLocalPart()+".xsd";                 
+                    String placeToStore = webdavFolderPath + SCHEMA_FOLDER_NAME + "/" +ft.getName().getLocalPart()+".xsd";
+                    String publicAddress = webdavURL + SCHEMA_FOLDER_NAME + "/" +ft.getName().getLocalPart()+".xsd";                 
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
@@ -738,7 +744,7 @@ public class WPSWorker extends AbstractWorker {
         //check requested INPUT/OUTPUT. Throw a CstlException otherwise.
         WPSUtils.checkValidInputOuputRequest(processDesc, request);
 
-        /*
+       /*
          * ResponseDocument attributes
          */
         boolean useLineage = isOutputRespDoc && respDoc.isLineage();
@@ -1105,10 +1111,9 @@ public class WPSWorker extends AbstractWorker {
                 if(inputDescriptor instanceof ParameterDescriptor) {
                     in.parameter(inputIdentifierCode).setValue(dataValue);
                 } else if(inputDescriptor instanceof ParameterDescriptorGroup && dataValue instanceof ComplexAttribute) {
-                    ParameterValueGroup group = WPSConvertersUtils.featureToParameterGroup(
+                    WPSConvertersUtils.featureToParameterGroup(
                             (ComplexAttribute)dataValue, 
-                            (ParameterDescriptorGroup)inputDescriptor);
-                    in.groups(inputIdentifierCode).add(group);
+                            in.addGroup(inputIdentifierCode));
                 } else {
                     throw new Exception();
                 }
@@ -1330,4 +1335,30 @@ public class WPSWorker extends AbstractWorker {
         }
         return outputValue;
     }
+    
+    
+    private void checkForSchemasToStore(ProcessDescriptor source) throws JAXBException {
+        /*
+         * Check each input and output. If we get a parameterDescriptorGroup,
+         * we must store a schema which describe its structure.
+         */
+        for (GeneralParameterDescriptor desc : source.getInputDescriptor().descriptors()) {
+            if (desc instanceof ParameterDescriptorGroup) {
+                FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup) desc);
+                String placeToStore = webdavFolderPath + SCHEMA_FOLDER_NAME + "/" + ft.getName().getLocalPart() + ".xsd";
+                File xsdStore = new File(placeToStore);
+                WPSUtils.storeFeatureSchema(ft, xsdStore);
+            }
+        }
+        for (GeneralParameterDescriptor desc : source.getOutputDescriptor().descriptors()) {
+            if (desc instanceof ParameterDescriptorGroup) {
+                FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup) desc);
+                String placeToStore = webdavFolderPath + SCHEMA_FOLDER_NAME + "/" + ft.getName().getLocalPart() + ".xsd";
+                File xsdStore = new File(placeToStore);
+                WPSUtils.storeFeatureSchema(ft, xsdStore);
+            }
+        }
+    }
+
 }
+
