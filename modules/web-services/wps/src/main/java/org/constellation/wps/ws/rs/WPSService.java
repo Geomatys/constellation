@@ -16,57 +16,38 @@
  */
 package org.constellation.wps.ws.rs;
 
-import java.util.logging.Level;
-import javax.ws.rs.Path;
 import com.sun.jersey.spi.resource.Singleton;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
 import org.constellation.ServiceDef;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.configuration.Processes;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
-
-import static org.constellation.api.QueryConstants.*;
-import org.constellation.configuration.ProcessContext;
-import org.constellation.configuration.Processes;
-import static org.constellation.wps.ws.WPSConstant.*;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-
-import org.geotoolkit.wps.xml.v100.DataInputsType;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
-import org.geotoolkit.wps.xml.v100.DataType;
-import org.geotoolkit.wps.xml.v100.DescribeProcess;
-import org.geotoolkit.wps.xml.v100.DocumentOutputDefinitionType;
-import org.geotoolkit.wps.xml.v100.Execute;
-import org.geotoolkit.wps.xml.v100.GetCapabilities;
-import org.geotoolkit.wps.xml.v100.InputReferenceType;
-import org.geotoolkit.wps.xml.v100.InputType;
-import org.geotoolkit.wps.xml.v100.OutputDefinitionType;
-import org.geotoolkit.wps.xml.v100.ProcessDescriptions;
-import org.geotoolkit.wps.xml.v100.RequestBaseType;
-import org.geotoolkit.wps.xml.v100.ResponseDocumentType;
-import org.geotoolkit.wps.xml.v100.ResponseFormType;
-import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
+import org.geotoolkit.wps.xml.v100.*;
 
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+
+import static org.constellation.api.QueryConstants.*;
+import static org.constellation.wps.ws.WPSConstant.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -106,6 +87,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         super.destroy();
 
         //Shutdown the WPS scheduler.
+        LOGGER.log(Level.INFO, "Shutdown executor pool");
         if (EXECUTOR != null) {
             EXECUTOR.shutdown();
         }

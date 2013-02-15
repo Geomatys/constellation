@@ -39,8 +39,22 @@ public class ProcessContext {
     private String security;
 
     private Languages supportedLanguages;
-    
+
+    /**
+     * Path where output wps data will be saved.
+     */
     private String webdavDirectory;
+
+    /**
+     * Identifier of FileCoverageStore provider used by WPS to publish
+     * coverages in WMS.
+     */
+    private String fileCoverageProviderId;
+
+    /**
+     * Instance name of the WMS service linked to current WPS.
+     */
+    private String wmsInstanceName;
 
     public ProcessContext() {
 
@@ -73,7 +87,7 @@ public class ProcessContext {
 
 
     /**
-     * @param layers the layers to set
+     * @param processes the layers to set
      */
     public void setProcesses(List<ProcessFactory> processes) {
         this.processes = new Processes(processes);
@@ -122,7 +136,36 @@ public class ProcessContext {
     public void setWebdavDirectory(String webdavDirectory) {
         this.webdavDirectory = webdavDirectory;
     }
-    
+
+    /**
+     * @return the wmsInstanceName
+     */
+    public String getWmsInstanceName() {
+        return wmsInstanceName;
+    }
+
+    /**
+     * @param wmsInstanceName the wmsInstanceName to set
+     */
+    public void setWmsInstanceName(String wmsInstanceName) {
+        this.wmsInstanceName = wmsInstanceName;
+    }
+
+    /**
+     * @return the fileCoverageProviderId
+     */
+    public String getFileCoverageProviderId() {
+        return fileCoverageProviderId;
+    }
+
+
+    /**
+     * @param fileCoverageProviderId the fileCoverageProviderId to set
+     */
+    public void setFileCoverageProviderId(String fileCoverageProviderId) {
+        this.fileCoverageProviderId = fileCoverageProviderId;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
@@ -135,6 +178,12 @@ public class ProcessContext {
         }
         if (webdavDirectory != null) {
             sb.append("WebDav directory :\n").append(webdavDirectory);
+        }
+        if (wmsInstanceName != null) {
+            sb.append("WMS instance name :\n").append(wmsInstanceName);
+        }
+        if (fileCoverageProviderId != null) {
+            sb.append("FileCoverageStore id :\n").append(fileCoverageProviderId);
         }
         return sb.toString();
     }

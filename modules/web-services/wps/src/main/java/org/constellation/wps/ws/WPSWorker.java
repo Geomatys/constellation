@@ -21,28 +21,33 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.*;
 import org.constellation.configuration.Process;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.service.RestartServiceDescriptor;
+import org.constellation.provider.LayerProvider;
+import org.constellation.provider.LayerProviderProxy;
 import org.constellation.wps.utils.WPSUtils;
 import org.constellation.wps.ws.rs.WPSService;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.WSEngine;
 import org.geotoolkit.geometry.isoonjts.GeometryUtils;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.ows.xml.v110.*;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
-import org.geotoolkit.process.AbstractProcess;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.process.ProcessingRegistry;
+import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.process.*;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.wps.converters.WPSConvertersUtils;
 import org.geotoolkit.wps.io.WPSIO;
+import org.geotoolkit.wps.io.WPSMimeType;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
 import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
 import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
@@ -62,10 +67,14 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.math.BigInteger;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -77,6 +86,7 @@ import static org.constellation.api.CommonConstants.DEFAULT_CRS;
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wps.ws.WPSConstant.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.opengis.parameter.ParameterValue;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -85,18 +95,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 public class WPSWorker extends AbstractWorker {
 
-    /**
-     * Try to create temporary directory.
-     */
-    private final boolean supportStorage;
-
-    private final String webdavFolderPath;
-    private String webdavURL;
-    
-    private final String schemaFolder;
-    private String schemaURL;
-    
-    private final ProcessContext context;
     /**
      * Supported CRS.
      */
@@ -115,9 +113,47 @@ public class WPSWorker extends AbstractWorker {
         supportedCRS.getCRS().addAll(DEFAULT_CRS);
         WPS_SUPPORTED_CRS.setSupported(supportedCRS);
     }
+
+    /**
+     * Timeout in seconds use to kill long process execution in synchronous mode.
+     */
     private static final int TIMEOUT = 30;    
-    
+
     private static final String SCHEMA_FOLDER_NAME = "/schemas";
+
+    private static final String WMS_SUPPORTED = "WMS_SUPPORTED";
+
+    /**
+     * Try to create temporary directory.
+     */
+    private final boolean supportStorage;
+
+    /**
+     * Path where output file will be saved.
+     */
+    private final String webdavFolderPath;
+
+    /**
+     * WebDav URL.
+     */
+    private String webdavURL;
+
+    private final String schemaFolder;
+    private String schemaURL;
+
+    /**
+     * WMS link attributes
+     */
+    private boolean wmsSupported = false;
+    private String wmsInstanceName;
+    private String wmsInstanceURL;
+    private String wmsProviderId;
+    private String fileCoverageStorePath;
+
+    /**
+     * WPS context configuration.
+     */
+    private final ProcessContext context;
 
     /**
      * List of process descriptors available.
@@ -198,7 +234,43 @@ public class WPSWorker extends AbstractWorker {
         } else {
             this.supportStorage = true;
         }
-        
+
+        //WMS link
+        if (context.getWmsInstanceName() != null) {
+            this.wmsInstanceName = context.getWmsInstanceName();
+
+            if (context.getFileCoverageProviderId() != null) {
+                this.wmsProviderId = context.getFileCoverageProviderId();
+
+                LayerProvider provider = null;
+                for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
+                    if (p.getId().equals(this.wmsProviderId)) {
+                        provider = p;
+                        break;
+                    }
+                }
+
+                if(WSEngine.getInstance("WMS", wmsInstanceName) == null || provider == null) {
+                    startError = "Linked WMS instance is not found or FileCoverageStore not defined.";
+                } else {
+                    final ParameterValue pathParam = (ParameterValue)Parameters.search(provider.getSource(), "path",3).get(0);
+                    this.fileCoverageStorePath = ((URL) pathParam.getValue()).getPath();
+                    final File dir = new File(this.fileCoverageStorePath);
+                    dir.mkdirs();
+                    this.wmsSupported = true;
+                }
+
+            } else {
+                startError = "Linked provider identifier name is not defined.";
+            }
+        } else {
+            startError = "Linked WMS instance name is not defined.";
+        }
+
+        if (!wmsSupported) {
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) don't support WMS outputs : \n " + startError, id);
+        }
+
         fillProcessList();
 
         if (isStarted) {
@@ -264,12 +336,12 @@ public class WPSWorker extends AbstractWorker {
                     }
                 }
             }        
-        for(ProcessDescriptor desc : ProcessDescriptorList) {
+        for(ProcessDescriptor desc : processDescriptorList) {
             try {
                 checkForSchemasToStore(desc);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Process " + desc.getDisplayName() + " can't be added. Needed schemas can't be build.", ex);
-                ProcessDescriptorList.remove(desc);
+                processDescriptorList.remove(desc);
                 continue;
             }
         }
@@ -286,6 +358,18 @@ public class WPSWorker extends AbstractWorker {
         super.destroy();
         //Delete recursuvly temporary directory.
         FileUtilities.deleteDirectory(new File(webdavFolderPath));
+    }
+
+    /**
+     * Update the current WMS URL based on the current service URL.
+     */
+    private void updateWMSURL() {
+        String webappURL = getServiceUrl();
+        if (webappURL != null) {
+            this.wmsInstanceURL = webappURL.replace("/wps/"+getId(), "/wms/"+this.wmsInstanceName);
+        } else {
+            LOGGER.log(Level.WARNING, "Service URL undefined.");
+        }
     }
 
     /**
@@ -336,7 +420,7 @@ public class WPSWorker extends AbstractWorker {
                 marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(webdavCtx, new File(webDavInstanceDir, "WebdavContext.xml"));
             } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, "Error during WebDav coniguration", ex);
+                LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;
             } finally {
                 if (marshaller != null) {
@@ -423,6 +507,22 @@ public class WPSWorker extends AbstractWorker {
                     VERSION_NEGOTIATION_FAILED, ACCEPT_VERSIONS_PARAMETER.toLowerCase());
         }
     }
+
+    public static Map<String, Object> buildParametersMap(final String webdavURL, final String webdavFolderPath, final String wmsInstanceName,
+                                                         final String wmsInstanceURL, final String fileCoverageStorePath, final String wmsProviderId,
+                                                         final String layerName, final Boolean wmsSupported) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put(WPSConvertersUtils.OUT_STORAGE_DIR, webdavFolderPath);
+        parameters.put(WPSConvertersUtils.OUT_STORAGE_URL, webdavURL);
+        parameters.put(WPSConvertersUtils.WMS_INSTANCE_NAME, wmsInstanceName);
+        parameters.put(WPSConvertersUtils.WMS_INSTANCE_URL, wmsInstanceURL);
+        parameters.put(WPSConvertersUtils.WMS_STORAGE_DIR, fileCoverageStorePath);
+        parameters.put(WPSConvertersUtils.WMS_STORAGE_ID, wmsProviderId);
+        parameters.put(WPSConvertersUtils.WMS_LAYER_NAME, layerName);
+        parameters.put(WMS_SUPPORTED, wmsSupported);
+        return parameters;
+    }
+
 
     //////////////////////////////////////////////////////////////////////
     //                      DescribeProcess
@@ -702,6 +802,7 @@ public class WPSWorker extends AbstractWorker {
     public Object execute(Execute request) throws CstlServiceException {
         isWorking();
         updateWebDavURL();
+        updateWMSURL();
 
         //check SERVICE=WPS
         if (!request.getService().equalsIgnoreCase(WPS_SERVICE)) {
@@ -782,7 +883,7 @@ public class WPSWorker extends AbstractWorker {
         //check requested INPUT/OUTPUT. Throw a CstlException otherwise.
         WPSUtils.checkValidInputOuputRequest(processDesc, request);
 
-       /*
+        /*
          * ResponseDocument attributes
          */
         boolean useLineage = isOutputRespDoc && respDoc.isLineage();
@@ -872,6 +973,16 @@ public class WPSWorker extends AbstractWorker {
                 response.setOutputDefinitions(outputsDef);
             }
 
+            final Map<String, Object> parameters =  buildParametersMap(
+                    webdavURL,
+                    webdavFolderPath,
+                    wmsInstanceName,
+                    wmsInstanceURL,
+                    fileCoverageStorePath,
+                    wmsProviderId,
+                    "WPS_"+getId()+"_"+WPSUtils.buildLayerName(processDesc),
+                    wmsSupported);
+
             ////////
             // DOC Async
             ////////
@@ -885,7 +996,7 @@ public class WPSWorker extends AbstractWorker {
                 //copy of the current response for async purpose.
                 final ExecuteResponse responseAsync = new ExecuteResponse(response);
 
-                process.addListener(new WPSProcessListener(request, responseAsync, respDocFileName, ServiceDef.WPS_1_0_0, webdavURL, webdavFolderPath));
+                process.addListener(new WPSProcessListener(request, responseAsync, respDocFileName, ServiceDef.WPS_1_0_0, parameters));
 
                 status = new StatusType();
                 status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
@@ -940,7 +1051,7 @@ public class WPSWorker extends AbstractWorker {
 
                     //no error - fill response outputs.
                     final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-                    fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, webdavURL, webdavFolderPath);
+                    fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, parameters);
                     response.setProcessOutputs(outputs);
                     status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
                     status.setProcessSucceeded("Process completed.");
@@ -1169,11 +1280,11 @@ public class WPSWorker extends AbstractWorker {
      * @param wantedOutputs The definition of the outputs we must treat.
      * @param processOutputDesc The descriptors of the geotk process outputs.
      * @param result The values which have been filled by the process.
-     * @param serviceURL URL of the WPS service.
+     * @param parameters URL of the WPS service.
      * @throws CstlServiceException If one of the outputs is invalid.
      */
     public static void fillOutputsFromProcessResult(final ProcessOutputs outputs, final List<DocumentOutputDefinitionType> wantedOutputs,
-            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result, final String serviceURL, final String folderPath)
+            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result, final Map<String, Object> parameters)
             throws CstlServiceException {
         if (result == null) {
             throw new CstlServiceException("Empty process result.", NO_APPLICABLE_CODE);
@@ -1203,7 +1314,7 @@ public class WPSWorker extends AbstractWorker {
             if (outputDescriptor instanceof ParameterDescriptor) {
                 //output value object.
                 final Object outputValue = result.parameter(outputIdentifierCode).getValue();
-                outputs.getOutput().add(createDocumentResponseOutput((ParameterDescriptor) outputDescriptor, outputsRequest, outputValue, serviceURL, folderPath));
+                outputs.getOutput().add(createDocumentResponseOutput((ParameterDescriptor) outputDescriptor, outputsRequest, outputValue, parameters));
             } else if (outputDescriptor instanceof ParameterDescriptorGroup) {
                 /**
                  * TODO: Treat ParameterValueGroup for outputs.
@@ -1223,12 +1334,12 @@ public class WPSWorker extends AbstractWorker {
      * @param outputDescriptor
      * @param requestedOutput
      * @param outputValue
-     * @param serviceURL
+     * @param parameters
      * @return
      * @throws CstlServiceException
      */
     public static OutputDataType createDocumentResponseOutput(final ParameterDescriptor outputDescriptor, final DocumentOutputDefinitionType requestedOutput,
-            final Object outputValue, final String serviceURL, final String folderPath) throws CstlServiceException {
+            final Object outputValue, final Map<String, Object> parameters) throws CstlServiceException {
 
         final OutputDataType outData = new OutputDataType();
 
@@ -1249,7 +1360,7 @@ public class WPSWorker extends AbstractWorker {
         final Class outClass = outputDescriptor.getValueClass(); // output class
 
         if (requestedOutput.isAsReference()) {
-            final OutputReferenceType ref = createReferenceOutput(outputIdentifier, outClass, requestedOutput, outputValue, serviceURL, folderPath);
+            final OutputReferenceType ref = createReferenceOutput(outputIdentifier, outClass, requestedOutput, outputValue, parameters);
 
             outData.setReference(ref);
         } else {
@@ -1263,13 +1374,30 @@ public class WPSWorker extends AbstractWorker {
             } else if (WPSIO.isSupportedComplexOutputClass(outClass)) {
 
                 try {
-                    final ComplexDataType complex = WPSConvertersUtils.convertToComplex(
+                    ComplexDataType complex = null;
+                    if (outputValue instanceof GridCoverage && requestedOutput.getMimeType().equals(WPSMimeType.OGC_WMS.val())) {
+                        if (parameters.get(WMS_SUPPORTED).equals(Boolean.TRUE)) {
+                            //add output identifier to layerName
+                            parameters.put(WPSConvertersUtils.WMS_LAYER_NAME, parameters.get(WPSConvertersUtils.WMS_LAYER_NAME)+"_"+outputIdentifierCode);
+                            complex = WPSConvertersUtils.convertToWMSComplex(
+                                    outputValue,
+                                    requestedOutput.getMimeType(),
+                                    requestedOutput.getEncoding(),
+                                    requestedOutput.getSchema(),
+                                    parameters);
+                            restartWMS(parameters);
+                        } else {
+                            LOGGER.log(Level.WARNING, "Can't publish {0} value in a WMS.", outputIdentifier);
+                        }
+
+                    } else {
+                        complex = WPSConvertersUtils.convertToComplex(
                             outputValue,
                             requestedOutput.getMimeType(),
                             requestedOutput.getEncoding(),
                             requestedOutput.getSchema(),
-                            folderPath,
-                            serviceURL);
+                            parameters);
+                    }
 
                     data.setComplexData(complex);
 
@@ -1297,18 +1425,46 @@ public class WPSWorker extends AbstractWorker {
         return outData;
     }
 
+    private static void restartWMS(Map<String, Object> parameters) {
+
+        final String wmsInstance = (String) parameters.get(WPSConvertersUtils.WMS_INSTANCE_NAME);
+        final String providerId = (String) parameters.get(WPSConvertersUtils.WMS_STORAGE_ID);
+
+        //restart provider
+        final Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
+        for (LayerProvider p : layerProviders) {
+            if (p.getId().equals(providerId)) {
+                p.reload();
+                break;
+            }
+        }
+
+        //restart WMS worker
+        try {
+            final ProcessDescriptor restartServiceDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
+            final ParameterValueGroup restartServiceInputs = restartServiceDesc.getInputDescriptor().createValue();
+            restartServiceInputs.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue("WMS");
+            restartServiceInputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(wmsInstance);
+            restartServiceDesc.createProcess(restartServiceInputs).call();
+        } catch (ProcessException e) {
+            LOGGER.log(Level.WARNING, "Error during WMS "+wmsInstance+" restart.", e);
+        } catch (NoSuchIdentifierException e) {
+            LOGGER.log(Level.WARNING, "Error during WMS "+wmsInstance+" restart.", e);
+        }
+    }
+
     /**
      * Create reference output.
      *
      * @param clazz
      * @param requestedOutput
      * @param outputValue
-     * @param serviceURL
+     * @param parameters
      * @return
      * @throws CstlServiceException
      */
     private static OutputReferenceType createReferenceOutput(final String outputIdentifier, final Class clazz, final DocumentOutputDefinitionType requestedOutput,
-            final Object outputValue, final String serviceURL, final String folderPath) throws CstlServiceException {
+            final Object outputValue, final Map<String, Object> parameters) throws CstlServiceException {
 
         try {
            return (OutputReferenceType) WPSConvertersUtils.convertToReference(
@@ -1316,8 +1472,7 @@ public class WPSWorker extends AbstractWorker {
                     requestedOutput.getMimeType(),
                     requestedOutput.getEncoding(),
                     requestedOutput.getSchema(),
-                    folderPath,
-                    serviceURL,
+                    parameters,
                     WPSIO.IOType.OUTPUT);
 
         } catch (NonconvertibleObjectException ex) {

@@ -134,6 +134,17 @@ public class WPSUtils {
     }
 
     /**
+     * Build layerName
+     *
+     * @param processDesc
+     * @return authority.code
+     */
+    public static String buildLayerName(final ProcessDescriptor processDesc) {
+        ArgumentChecks.ensureNonNull("processDesc", processDesc);
+        return  processDesc.getIdentifier().getAuthority().getTitle().toString() + "." + processDesc.getIdentifier().getCode();
+    }
+
+    /**
      * Extract the factory name from a process identifier. e.g : urn:ogc:geomatys:wps:math:add return math.
      *
      * @param identifier

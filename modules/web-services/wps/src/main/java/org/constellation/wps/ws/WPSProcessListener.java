@@ -17,6 +17,7 @@
 package org.constellation.wps.ws;
 
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +31,7 @@ import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.util.Exceptions;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.wps.converters.WPSConvertersUtils;
 import org.geotoolkit.wps.xml.v100.*;
 
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -45,10 +47,10 @@ public class WPSProcessListener implements ProcessListener{
 
     private final Execute request;
     private final ExecuteResponse responseDoc;
-    private final String folderPath;
     private final String fileName;
     private final ServiceDef def;
-    private final String serviceURL;
+    final Map<String, Object> parameters;
+    private final String folderPath;
     private long nextTimestamp;
     private final boolean useStatus;
 
@@ -58,18 +60,16 @@ public class WPSProcessListener implements ProcessListener{
      * @param responseDoc ExecuteResponse base
      * @param fileName name of the file to update
      * @param def service def (use when exception occurs)
-     * @param serviceURL service URL (for reference outputs)
-     * @param folderPath path were ExecuteResponse document and outputs will be stored
      */
     public WPSProcessListener(final Execute request, final ExecuteResponse responseDoc, final String fileName, final ServiceDef def,
-            final String serviceURL, final String folderPath) {
+            final Map<String, Object> parameters) {
         this.request = request;
         this.responseDoc = responseDoc;
         this.fileName = fileName;
         this.def = def;
-        this.serviceURL = serviceURL;
+        this.parameters = parameters;
+        this.folderPath = (String) parameters.get(WPSConvertersUtils.OUT_STORAGE_DIR);
         this.nextTimestamp = System.currentTimeMillis() + TIMEOUT;
-        this.folderPath = folderPath;
         this.useStatus = this.request.getResponseForm().getResponseDocument().isStatus();
     }
     
@@ -113,7 +113,7 @@ public class WPSProcessListener implements ProcessListener{
         try {
             final List<GeneralParameterDescriptor> processOutputDesc = event.getSource().getDescriptor().getOutputDescriptor().descriptors();
             final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-            WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput(), serviceURL, folderPath);
+            WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput(), parameters);
             final StatusType status = new StatusType();
             status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
             status.setProcessSucceeded("Process completed.");
