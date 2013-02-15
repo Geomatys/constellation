@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import javax.measure.converter.UnitConverter;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -36,18 +37,17 @@ import javax.xml.datatype.DatatypeFactory;
 import org.constellation.ServiceDef;
 import static org.constellation.api.CommonConstants.DEFAULT_CRS;
 import static org.constellation.api.QueryConstants.*;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.Process;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
+import org.constellation.configuration.WebdavContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.wps.utils.WPSUtils;
 import static org.constellation.wps.ws.WPSConstant.*;
 import org.constellation.wps.ws.rs.WPSService;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.data.FeatureStoreUtilities;
-import org.geotoolkit.feature.FeatureTypeBuilder;
-import org.geotoolkit.feature.FeatureTypeUtilities;
 
 import org.geotoolkit.geometry.isoonjts.GeometryUtils;
 import org.geotoolkit.gml.JTStoGeometry;
@@ -68,7 +68,6 @@ import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
 import org.geotoolkit.wps.xml.v100.*;
 import org.geotoolkit.xml.MarshallerPool;
-import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 
 import org.opengis.geometry.Envelope;
@@ -76,7 +75,6 @@ import org.opengis.parameter.*;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
-import org.openide.util.Exceptions;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -90,7 +88,8 @@ public class WPSWorker extends AbstractWorker {
      */
     private final boolean supportStorage;
 
-    private final String temporaryFolderPath;
+    private final String webdavFolderPath;
+    private String webdavURL;
 
     private final ProcessContext context;
     /**
@@ -164,18 +163,26 @@ public class WPSWorker extends AbstractWorker {
         }
         this.context = candidate;
         fillProcessList();
-        if (context != null && context.getTmpDirectory() != null) {
-            final File tmpDir = new File(context.getTmpDirectory());
-            if (!tmpDir.isDirectory()) {
-                supportStorage = tmpDir.mkdirs();
-            } else {
-                supportStorage = true;
-            }
-            temporaryFolderPath = context.getTmpDirectory();
+
+        if (context != null && context.getWebdavDirectory() != null) {
+            webdavFolderPath = context.getWebdavDirectory();
         } else {
-            supportStorage      = WPSUtils.createTempDirectory();
-            temporaryFolderPath = WPSUtils.getTempDirectoryPath();
+            webdavFolderPath = WPSConstant.TEMP_FOLDER;
         }
+
+        this.webdavURL = null; //initialize on WPS execute request.
+
+        //create new WebDav instance
+        final boolean webdav = createWebDav();
+        if (!webdav) {
+            this.supportStorage = false;
+            startError = "Error during WPS WebDav service creation.";
+            isStarted = false;
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
+        } else {
+            this.supportStorage = true;
+        }
+
         if (isStarted) {
             LOGGER.log(Level.INFO, "WPS worker {0} running", id);
         }
@@ -234,9 +241,70 @@ public class WPSWorker extends AbstractWorker {
     public void destroy() {
         super.destroy();
         //Delete recursuvly temporary directory.
-        FileUtilities.deleteDirectory(new File(temporaryFolderPath));
+        FileUtilities.deleteDirectory(new File(webdavFolderPath));
     }
 
+    /**
+     * Update the current WebDav URL based on the current service URL. TODO find
+     * a better way to build webdavURL
+     */
+    private void updateWebDavURL() {
+        String webappURL = getServiceUrl();
+        if (webappURL != null) {
+            webappURL = webappURL.substring(0, webappURL.indexOf("/WS/wps/" + getId()));
+            this.webdavURL = webappURL + "/webdav/" + getId();
+        } else {
+            LOGGER.log(Level.WARNING, "Service URL undefined.");
+        }
+    }
+
+    /**
+     * Create a new configuration of webdav servlet if not exist and make
+     * directory where temporary files will be stored.
+     *
+     * @return false if something went wrong.
+     */
+    private boolean createWebDav() {
+        final String webDavName = getId();
+        final File configDir = ConfigDirectory.getConfigDirectory();
+        final File webDavDir = new File(configDir, "webdav");
+
+        if (!webDavDir.exists()) {
+            webDavDir.mkdir();
+        }
+
+        final File webDavInstanceDir = new File(webDavDir, webDavName);
+        if (!webDavInstanceDir.exists()) {
+            webDavInstanceDir.mkdir();
+        }
+        final File tmpDir = new File(webdavFolderPath);
+        if (!tmpDir.exists() || !tmpDir.isDirectory()) {
+            tmpDir.mkdirs();
+        }
+
+        //configure webdav
+        final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
+        webdavCtx.setId(webDavName);
+        final File webdavConfig = new File(webDavInstanceDir, "WebdavContext.xml");
+        if (!webdavConfig.exists()) {
+            Marshaller marshaller = null;
+            try {
+                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                marshaller.marshal(webdavCtx, new File(webDavInstanceDir, "WebdavContext.xml"));
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, "Error during WebDav coniguration", ex);
+                return false;
+            } finally {
+                if (marshaller != null) {
+                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                }
+            }
+        }
+
+        return true;
+
+    }
+    
     //////////////////////////////////////////////////////////////////////
     //                      GetCapabilities
     //////////////////////////////////////////////////////////////////////
@@ -472,8 +540,8 @@ public class WPSWorker extends AbstractWorker {
                     
                     // Input class
                     final Class clazz = ft.getClass();
-                    String placeToStore = temporaryFolderPath + "/" +ft.getName().getLocalPart()+".xsd";
-                    String publicAddress = WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" +ft.getName().getLocalPart()+".xsd";
+                    String placeToStore = webdavFolderPath + "/" +ft.getName().getLocalPart()+".xsd";
+                    String publicAddress = webdavURL + "/" +ft.getName().getLocalPart()+".xsd";
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
@@ -552,8 +620,8 @@ public class WPSWorker extends AbstractWorker {
                     
                     // Input class
                     final Class clazz = ft.getClass();                    
-                    String placeToStore = temporaryFolderPath + "/" +ft.getName().getLocalPart()+".xsd";
-                    String publicAddress = WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" +ft.getName().getLocalPart()+".xsd";                 
+                    String placeToStore = webdavFolderPath + "/" +ft.getName().getLocalPart()+".xsd";
+                    String publicAddress = webdavURL + "/" +ft.getName().getLocalPart()+".xsd";                 
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
@@ -587,7 +655,7 @@ public class WPSWorker extends AbstractWorker {
      */
     public Object execute(Execute request) throws CstlServiceException {
         isWorking();
-
+        updateWebDavURL();
 
         //check SERVICE=WPS
         if (!request.getService().equalsIgnoreCase(WPS_SERVICE)) {
@@ -774,7 +842,7 @@ public class WPSWorker extends AbstractWorker {
                 ////////
                 // DOC Async
                 ////////
-                process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0, getServiceUrl(), temporaryFolderPath));
+                process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0, webdavURL, webdavFolderPath));
                 WPSService.getExecutor().submit(process);
 
             } else {
@@ -799,7 +867,7 @@ public class WPSWorker extends AbstractWorker {
                 }
 
                 final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-                fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, getServiceUrl(), temporaryFolderPath);
+                fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, webdavURL, webdavFolderPath);
                 response.setProcessOutputs(outputs);
                 status = new StatusType();
                 status.setCreationTime(WPSProcessListener.getCurrentXMLGregorianCalendar());
@@ -811,8 +879,8 @@ public class WPSWorker extends AbstractWorker {
                 if (!supportStorage) {
                     throw new CstlServiceException("Storage not supported.", STORAGE_NOT_SUPPORTED, "storeExecuteResponse");
                 }
-                response.setStatusLocation(WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" + respDocFileName); //Output data URL
-                WPSUtils.storeResponse(response, temporaryFolderPath, respDocFileName);
+                response.setStatusLocation(webdavURL + "/" + respDocFileName); //Output data URL
+                WPSUtils.storeResponse(response, webdavFolderPath, respDocFileName);
             }
 
             //Delete input temporary files
@@ -1112,7 +1180,7 @@ public class WPSWorker extends AbstractWorker {
                             requestedOutput.getEncoding(),
                             requestedOutput.getSchema(),
                             folderPath,
-                            WPSUtils.getTempDirectoryURL(serviceURL));
+                            serviceURL);
 
                     data.setComplexData(complex);
 
@@ -1160,7 +1228,7 @@ public class WPSWorker extends AbstractWorker {
                     requestedOutput.getEncoding(),
                     requestedOutput.getSchema(),
                     folderPath,
-                    WPSUtils.getTempDirectoryURL(serviceURL),
+                    serviceURL,
                     WPSIO.IOType.OUTPUT);
 
            return reference;

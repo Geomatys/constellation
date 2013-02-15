@@ -18,8 +18,6 @@ package org.constellation.wps.utils;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +27,6 @@ import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.constellation.util.Util;
 import static org.constellation.wps.ws.WPSConstant.*;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
@@ -357,7 +354,7 @@ public class WPSUtils {
     }
 
     /**
-     * Check if all requested inputs/outputs are presente in the process descriptor. Check also if all mandatory
+     * Check if all requested inputs/outputs are present in the process descriptor. Check also if all mandatory
      * inputs/outputs are specified. If an non allowed input/output is requested or if a mandatory input/output is
      * missing, an {@link CstlServiceException CstlServiceException} will be throw.
      *
@@ -456,12 +453,12 @@ public class WPSUtils {
     /**
      * Confronts the process parameters {@code Map} to the list of requested identifiers for an type of IO
      * (Input,Output). If there is a missing mandatory parameter in the list of requested identifiers, an {@link CstlServiceException CstlServiceException}
-     * will be throw. If an unknow parameter is requested, it also throw an {@link CstlServiceException CstlServiceException}
+     * will be throw. If an unknown parameter is requested, it also throw an {@link CstlServiceException CstlServiceException}
      *
      * @param descMap - {@code Map} contain all parameters with their mandatory attributes for INPUT or OUTPUT.
      * @param requestIdentifiers - {@code List} of requested identifiers in INPUT or OUTPUT.
      * @param iotype - {@link WPSIO.IOType type}.
-     * @throws CstlServiceException for missing or unknow parmeter.
+     * @throws CstlServiceException for missing or unknown parameter.
      */
     private static void checkIOIdentifiers(final Map<String, Boolean> descMap, final List<String> requestIdentifiers, final WPSIO.IOType iotype)
             throws CstlServiceException {
@@ -488,28 +485,6 @@ public class WPSUtils {
                 }
             }
         }
-    }
-
-    /**
-     * Create the temporary directory used for storage.
-     *
-     * @return {@code true} if success, {@code false} if failed.
-     */
-    public static boolean createTempDirectory() {
-        final String tmpDirPath = getTempDirectoryPath();
-        final File tmpDir       = new File(tmpDirPath);
-        if (tmpDir.isDirectory()) {
-            LOGGER.log(Level.INFO, "Temporary storage directory already created at : {0}", tmpDir);
-            return true;
-        }
-        
-        boolean success = tmpDir.mkdirs();
-        if (success) {
-            LOGGER.log(Level.INFO, "Temporary storage directory created at : {0}", tmpDir);
-        } else {
-            LOGGER.log(Level.WARNING, "Temporary storage directory can't be created at : {0}", tmpDir);
-        }
-        return success;
     }
 
      /**
@@ -545,44 +520,10 @@ public class WPSUtils {
     }
 
     /**
-     * Retrurn the absolute path to the temporary directory.
-     *
-     * @return absolut path String.
+     * Return tuple toString mime/encoding/schema. "[mimeType, encoding, schema]".
+     * @param requestedOuptut DocumentOutputDefinitionType
+     * @return tuple string.
      */
-    public static String getTempDirectoryPath() {
-        return Util.getWebappDiretory().getAbsolutePath() + TEMP_FOLDER;
-    }
-
-    /**
-     * Return the temporary folder URL. e.g : http://server:port/domain/tempDoc/
-     *
-     * @param workerURL
-     * @return temporary folder path URL.
-     */
-    public static String getTempDirectoryURL(final String workerURL) {
-        String path = null;
-        try {
-            final URL url = new URL(workerURL);
-            path = url.getProtocol() + "://" + url.getAuthority() + "/" + url.getPath().split("/")[1] + TEMP_FOLDER;
-        } catch (MalformedURLException ex) {
-            LOGGER.log(Level.WARNING, "Error during temporary folder URL.", ex);
-        }
-        return path;
-    }
-
-    /**
-     * Clean temporary file used as process inputs.
-     *
-     * @param files
-     */
-    public static void cleanTempFiles(List<File> files) {
-        if (files != null) {
-            for (final File f : files) {
-                f.delete();
-            }
-        }
-    }
-
     public static String outputDefinitionToString(final DocumentOutputDefinitionType requestedOuptut) {
         final StringBuilder builder = new StringBuilder();
         final String begin = "[";

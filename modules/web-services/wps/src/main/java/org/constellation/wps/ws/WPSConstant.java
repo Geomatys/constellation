@@ -71,9 +71,9 @@ public final class WPSConstant {
     public static final String PROCESS_PREFIX = "urn:ogc:cstl:wps:";
     
     /**
-     * Temprary directory name used for store responses.
+     * Temporary directory name used for store responses.
      */
-    public static final String TEMP_FOLDER = "/wps/output" ;
+    public static final String TEMP_FOLDER = "/tmp/wps" ;
     
     public static final OperationsMetadata OPERATIONS_METADATA;
     static {

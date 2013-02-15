@@ -24,8 +24,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.geotoolkit.gui.swing.tree.Trees;
 
 /**
- *
+ * Configuration for a WPS service.
+ * 
  * @author Guilhem Legal (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  * @since 0.9
  */
 @XmlRootElement(name="ProcessContext")
@@ -38,7 +40,7 @@ public class ProcessContext {
 
     private Languages supportedLanguages;
     
-    private String tmpDirectory;
+    private String webdavDirectory;
 
     public ProcessContext() {
 
@@ -108,17 +110,17 @@ public class ProcessContext {
     }
     
     /**
-     * @return the tmpDirectory
+     * @return the webdavDirectory
      */
-    public String getTmpDirectory() {
-        return tmpDirectory;
+    public String getWebdavDirectory() {
+        return webdavDirectory;
     }
 
     /**
-     * @param tmpDirectory the tmpDirectory to set
+     * @param webdavDirectory the webdavDirectory to set
      */
-    public void setTmpDirectory(String tmpDirectory) {
-        this.tmpDirectory = tmpDirectory;
+    public void setWebdavDirectory(String webdavDirectory) {
+        this.webdavDirectory = webdavDirectory;
     }
     
     @Override
@@ -130,6 +132,9 @@ public class ProcessContext {
         }
         if (supportedLanguages != null) {
             sb.append("Supported languages:\n").append(supportedLanguages);
+        }
+        if (webdavDirectory != null) {
+            sb.append("WebDav directory :\n").append(webdavDirectory);
         }
         return sb.toString();
     }
