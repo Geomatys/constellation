@@ -119,7 +119,7 @@ public class WPSWorker extends AbstractWorker {
     /**
      * List of process descriptors available.
      */
-    private final List<ProcessDescriptor> ProcessDescriptorList = new ArrayList<ProcessDescriptor>();
+    private final List<ProcessDescriptor> processDescriptorList = new ArrayList<ProcessDescriptor>();
 
     /**
      * Constructor.
@@ -204,7 +204,12 @@ public class WPSWorker extends AbstractWorker {
                 while (factoryIte.hasNext()) {
                     final ProcessingRegistry factory = factoryIte.next();
                     for (final ProcessDescriptor descriptor : factory.getDescriptors()) {
-                        ProcessDescriptorList.add(descriptor);
+                        if (WPSUtils.isSupportedProcess(descriptor)) {
+                            processDescriptorList.add(descriptor);
+                        } else {
+                            LOGGER.log(Level.WARNING, "Process {0}:{1} not supported.",
+                                    new Object[] {descriptor.getIdentifier().getAuthority().getTitle().toString(),descriptor.getIdentifier().getCode()});
+                        }
                     }
                 }
             } else {
@@ -214,14 +219,24 @@ public class WPSWorker extends AbstractWorker {
                         if (Boolean.TRUE == processFactory.getLoadAll()) {
                             LOGGER.log(Level.INFO, "loading all process for factory:{0}", processFactory.getAutorityCode());
                             for (final ProcessDescriptor descriptor : factory.getDescriptors()) {
-                                ProcessDescriptorList.add(descriptor);
+                                if (WPSUtils.isSupportedProcess(descriptor)) {
+                                    processDescriptorList.add(descriptor);
+                                } else {
+                                    LOGGER.log(Level.WARNING, "Process {0}:{1} not supported.",
+                                            new Object[] {descriptor.getIdentifier().getAuthority().getTitle().toString(),descriptor.getIdentifier().getCode()});
+                                }
                             }
                         } else {
                             for (final Process process : processFactory.getInclude().getProcess()) {
                                 try {
                                     final ProcessDescriptor desc = factory.getDescriptor(process.getId());
                                     if (desc != null) {
-                                        ProcessDescriptorList.add(desc);
+                                        if (WPSUtils.isSupportedProcess(desc)) {
+                                            processDescriptorList.add(desc);
+                                        } else {
+                                            LOGGER.log(Level.WARNING, "Process {0}:{1} not supported.",
+                                                    new Object[] {desc.getIdentifier().getAuthority().getTitle().toString(),desc.getIdentifier().getCode()});
+                                        }
                                     }
                                 } catch (NoSuchIdentifierException ex) {
                                     LOGGER.log(Level.WARNING, "Unable to find a process named:" + process.getId() + " in factory " + processFactory.getAutorityCode(), ex);
@@ -234,6 +249,7 @@ public class WPSWorker extends AbstractWorker {
                 }
             }
         }
+        LOGGER.log(Level.INFO, "{0} processes loaded.", processDescriptorList.size());
     }
 
     @Override
@@ -306,7 +322,6 @@ public class WPSWorker extends AbstractWorker {
         }
 
         return true;
-
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -315,8 +330,8 @@ public class WPSWorker extends AbstractWorker {
     /**
      * GetCapabilities request
      *
-     * @param request
-     * @return
+     * @param request request
+     * @return WPSCapabilitiesType
      * @throws CstlServiceException
      */
     public WPSCapabilitiesType getCapabilities(final GetCapabilities request) throws CstlServiceException {
@@ -371,10 +386,8 @@ public class WPSWorker extends AbstractWorker {
 
             final ProcessOfferings offering = new ProcessOfferings();
 
-            for (final ProcessDescriptor procDesc : ProcessDescriptorList) {
-                if (WPSUtils.isSupportedProcess(procDesc)) {
-                    offering.getProcess().add(WPSUtils.generateProcessBrief(procDesc));
-                }
+            for (final ProcessDescriptor procDesc : processDescriptorList) {
+                offering.getProcess().add(WPSUtils.generateProcessBrief(procDesc));
             }
             final org.geotoolkit.wps.xml.v100.Languages languages = new org.geotoolkit.wps.xml.v100.Languages("en-EN", Arrays.asList("en-EN"));
            
@@ -393,7 +406,7 @@ public class WPSWorker extends AbstractWorker {
     /**
      * Describe process request.
      *
-     * @param request
+     * @param request request
      * @return ProcessDescriptions
      * @throws CstlServiceException
      *
@@ -431,7 +444,7 @@ public class WPSWorker extends AbstractWorker {
     /**
      * Describe a process in WPS v1.0.0.
      *
-     * @param request
+     * @param request request
      * @return ProcessDescriptions
      * @throws CstlServiceException
      */
@@ -657,7 +670,7 @@ public class WPSWorker extends AbstractWorker {
     /**
      * Redirect execute requests from the WPS version requested.
      *
-     * @param request
+     * @param request request
      * @return execute response (Raw data or Document response) depends of the ResponseFormType in execute request
      * @throws CstlServiceException
      */
@@ -695,8 +708,8 @@ public class WPSWorker extends AbstractWorker {
     /**
      * Execute a process in wps v1.0.0.
      *
-     * @param request
-     * @return
+     * @param request request
+     * @return execute response (Raw data or Document response) depends of the ResponseFormType in execute request
      * @throws CstlServiceException
      */
     private Object execute100(Execute request) throws CstlServiceException {
