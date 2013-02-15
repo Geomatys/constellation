@@ -45,6 +45,9 @@ import static org.constellation.wps.ws.WPSConstant.*;
 import org.constellation.wps.ws.rs.WPSService;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.data.FeatureStoreUtilities;
+import org.geotoolkit.feature.FeatureTypeBuilder;
+import org.geotoolkit.feature.FeatureTypeUtilities;
 
 import org.geotoolkit.geometry.isoonjts.GeometryUtils;
 import org.geotoolkit.gml.JTStoGeometry;
@@ -65,6 +68,8 @@ import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
 import org.geotoolkit.wps.xml.v100.*;
 import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.feature.type.ComplexType;
+import org.opengis.feature.type.FeatureType;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.*;
@@ -377,7 +382,7 @@ public class WPSWorker extends AbstractWorker {
                 throw new CstlServiceException("Process " + identifier.getValue() + " not supported by the service.",
                         INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
             }
-
+            
             final ProcessDescriptionType descriptionType = new ProcessDescriptionType();
             descriptionType.setIdentifier(identifier);                                                                      //Process Identifier
             descriptionType.setTitle(WPSUtils.buildProcessTitle(processDesc));                                              //Process Title
@@ -397,19 +402,24 @@ public class WPSWorker extends AbstractWorker {
             final ProcessDescriptionType.DataInputs dataInputs = new ProcessDescriptionType.DataInputs();
             for (final GeneralParameterDescriptor param : input.descriptors()) {
 
-                // If the Parameter Descriptor isn't a GroupeParameterDescriptor
-                if (param instanceof ParameterDescriptor) {
-                    final InputDescriptionType in = new InputDescriptionType();
-                    final ParameterDescriptor paramDesc = (ParameterDescriptor) param;
-
+                /*
+                 * Whatever the parameter type is, we prepare the name, title, abstract and multiplicity parts.
+                 */
+                    final InputDescriptionType in = new InputDescriptionType();                    
+                    
                     // Parameter informations
-                    in.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, paramDesc, WPSIO.IOType.INPUT)));
-                    in.setTitle(WPSUtils.capitalizeFirstLetter(paramDesc.getName().getCode()));
-                    in.setAbstract(WPSUtils.capitalizeFirstLetter(paramDesc.getRemarks().toString()));
+                    in.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, param, WPSIO.IOType.INPUT)));
+                    in.setTitle(WPSUtils.capitalizeFirstLetter(param.getName().getCode()));
+                    in.setAbstract(WPSUtils.capitalizeFirstLetter(param.getRemarks().toString()));
 
                     //set occurs
-                    in.setMaxOccurs(BigInteger.valueOf(paramDesc.getMaximumOccurs()));
-                    in.setMinOccurs(BigInteger.valueOf(paramDesc.getMinimumOccurs()));
+                    in.setMaxOccurs(BigInteger.valueOf(param.getMaximumOccurs()));
+                    in.setMinOccurs(BigInteger.valueOf(param.getMinimumOccurs()));
+                    
+                // If the Parameter Descriptor isn't a ParameterDescriptorGroup
+                if (param instanceof ParameterDescriptor) {
+                    final ParameterDescriptor paramDesc = (ParameterDescriptor) param;
+
                     // Input class
                     final Class clazz = paramDesc.getValueClass();
 
@@ -448,13 +458,34 @@ public class WPSWorker extends AbstractWorker {
                     } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
                         in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.REFERENCE));
 
-
-
                     } else {
                         throw new CstlServiceException("Process input not supported.", NO_APPLICABLE_CODE);
                     }
 
                     dataInputs.getInput().add(in);
+                     
+                } else if (param instanceof ParameterDescriptorGroup) {
+                    /*
+                     * If we get a parameterDescriptorGroup, we must expose the 
+                     * parameters contained in it as one single input. To do so,
+                     * we'll expose a feature type input.
+                     */
+                    FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup)param);
+                    
+                    // Input class
+                    final Class clazz = ft.getClass();
+                    
+                    if (WPSIO.isSupportedComplexInputClass(clazz)) {
+                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX));
+
+                        //Reference type (XML, ...)
+                    } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
+                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.REFERENCE));
+
+                    } else {
+                        throw new CstlServiceException("Process input not supported.", NO_APPLICABLE_CODE);
+                    }
+                    
                 } else {
                     throw new CstlServiceException("Process parameter invalid", NO_APPLICABLE_CODE);
                 }
@@ -470,7 +501,12 @@ public class WPSWorker extends AbstractWorker {
             for (GeneralParameterDescriptor param : output.descriptors()) {
                 final OutputDescriptionType out = new OutputDescriptionType();
 
-                //simple paramater
+                //parameter informations
+                out.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, param, WPSIO.IOType.OUTPUT)));
+                out.setTitle(WPSUtils.capitalizeFirstLetter(param.getName().getCode()));
+                out.setAbstract(WPSUtils.capitalizeFirstLetter(param.getRemarks().toString()));
+                
+                //simple parameter
                 if (param instanceof ParameterDescriptor) {
                     final ParameterDescriptor paramDesc = (ParameterDescriptor) param;
 
@@ -508,6 +544,27 @@ public class WPSWorker extends AbstractWorker {
                         throw new CstlServiceException("Process output not supported.", NO_APPLICABLE_CODE);
                     }
 
+                } else if (param instanceof ParameterDescriptorGroup) {
+                    /*
+                     * If we get a parameterDescriptorGroup, we must expose the 
+                     * parameters contained in it as one single input. To do so,
+                     * we'll expose a feature type input.
+                     */
+                    FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup)param);
+                    
+                    // Input class
+                    final Class clazz = ft.getClass();
+                    
+                    if (WPSIO.isSupportedComplexOutputClass(clazz)) {
+                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX));
+
+                    } else if (WPSIO.isSupportedReferenceOutputClass(clazz)) {
+                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.REFERENCE));
+
+                    } else {
+                        throw new CstlServiceException("Process output not supported.", NO_APPLICABLE_CODE);
+                    }
+                    
                 } else {
                     throw new CstlServiceException("Process parameter invalid", NO_APPLICABLE_CODE);
                 }

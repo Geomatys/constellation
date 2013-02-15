@@ -185,7 +185,7 @@ public class WPSUtils {
      * @param ioType
      * @return processIdentifier:ioType:paramName
      */
-    public static String buildProcessIOIdentifiers(final ProcessDescriptor procDesc, final ParameterDescriptor input,
+    public static String buildProcessIOIdentifiers(final ProcessDescriptor procDesc, final GeneralParameterDescriptor input,
             final WPSIO.IOType ioType) {
         if (input != null) {
             if (ioType.equals(WPSIO.IOType.INPUT)) {
@@ -350,13 +350,13 @@ public class WPSUtils {
         //check inputs
         final List<String> inputIdentifiers = extractRequestInputIdentifiers(request);
         final ParameterDescriptorGroup inputDescriptorGroup = processDesc.getInputDescriptor();
-        final Map<String, Boolean> inputDescMap = desciptorsAsMap(inputDescriptorGroup, processDesc, WPSIO.IOType.INPUT);
+        final Map<String, Boolean> inputDescMap = descriptorsAsMap(inputDescriptorGroup, processDesc, WPSIO.IOType.INPUT);
         checkIOIdentifiers(inputDescMap, inputIdentifiers, WPSIO.IOType.INPUT);
 
         //check outputs
         final List<String> outputIdentifiers = extractRequestOutputIdentifiers(request);
         final ParameterDescriptorGroup outputDescriptorGroup = processDesc.getOutputDescriptor();
-        final Map<String, Boolean> outputDescMap = desciptorsAsMap(outputDescriptorGroup, processDesc, WPSIO.IOType.OUTPUT);
+        final Map<String, Boolean> outputDescMap = descriptorsAsMap(outputDescriptorGroup, processDesc, WPSIO.IOType.OUTPUT);
         checkIOIdentifiers(outputDescMap, outputIdentifiers, WPSIO.IOType.OUTPUT);
 
     }
@@ -414,7 +414,7 @@ public class WPSUtils {
      * @param descGroup
      * @return all parameters code and there mandatory value as map.
      */
-    private static Map<String, Boolean> desciptorsAsMap(final ParameterDescriptorGroup descGroup, final ProcessDescriptor procDesc,
+    private static Map<String, Boolean> descriptorsAsMap(final ParameterDescriptorGroup descGroup, final ProcessDescriptor procDesc,
             final WPSIO.IOType iOType) {
 
         final Map<String, Boolean> map = new HashMap<String, Boolean>();
