@@ -26,6 +26,9 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import static org.constellation.wps.ws.WPSConstant.*;
 import org.constellation.ws.CstlServiceException;
@@ -561,5 +564,20 @@ public class WPSUtils {
 
         marsh.marshal(s, destination);
     }
-        
+
+
+    /**
+     * @return the current time in an XMLGregorianCalendar.
+     */
+    public static XMLGregorianCalendar getCurrentXMLGregorianCalendar(){
+        XMLGregorianCalendar xcal = null;
+        try {
+            final GregorianCalendar c = new GregorianCalendar();
+            c.setTime(new Date());
+            xcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+        } catch (DatatypeConfigurationException ex) {
+            LOGGER.log(Level.INFO, "Can't create the creation time of the status.");
+        }
+        return xcal;
+    }
 }
