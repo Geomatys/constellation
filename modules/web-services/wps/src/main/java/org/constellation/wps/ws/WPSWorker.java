@@ -93,6 +93,9 @@ public class WPSWorker extends AbstractWorker {
     private final String webdavFolderPath;
     private String webdavURL;
     
+    private final String schemaFolder;
+    private String schemaURL;
+    
     private final ProcessContext context;
     /**
      * Supported CRS.
@@ -166,12 +169,21 @@ public class WPSWorker extends AbstractWorker {
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         }
         this.context = candidate;
-        fillProcessList();
 
         if (context != null && context.getWebdavDirectory() != null) {
             webdavFolderPath = context.getWebdavDirectory();
         } else {
             webdavFolderPath = WPSConstant.TEMP_FOLDER;
+        }
+        
+        //Configure the directory to store parameters schema into.
+        File schemaLoc = new File(webdavFolderPath + SCHEMA_FOLDER_NAME);
+        schemaLoc.mkdir();
+        
+        if(schemaLoc.exists()) {
+            schemaFolder = schemaLoc.getAbsolutePath();
+        } else {
+            schemaFolder = webdavFolderPath;
         }
         
         this.webdavURL = null; //initialize on WPS execute request.
@@ -186,6 +198,8 @@ public class WPSWorker extends AbstractWorker {
         } else {
             this.supportStorage = true;
         }
+        
+        fillProcessList();
 
         if (isStarted) {
             LOGGER.log(Level.INFO, "WPS worker {0} running", id);
@@ -196,7 +210,9 @@ public class WPSWorker extends AbstractWorker {
      * Create process list from context file.
      */
     private void fillProcessList() {
-        if (context != null && context.getProcesses() != null) {
+        if (context == null || context.getProcesses() == null) {
+            return;
+        }
             // Load all processes from all factory
             if (Boolean.TRUE == context.getProcesses().getLoadAll()) {
                 LOGGER.info("Loading all process");
@@ -247,6 +263,14 @@ public class WPSWorker extends AbstractWorker {
                         LOGGER.log(Level.WARNING, "No process factory found for authorityCode:{0}", processFactory.getAutorityCode());
                     }
                 }
+            }        
+        for(ProcessDescriptor desc : ProcessDescriptorList) {
+            try {
+                checkForSchemasToStore(desc);
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, "Process " + desc.getDisplayName() + " can't be added. Needed schemas can't be build.", ex);
+                ProcessDescriptorList.remove(desc);
+                continue;
             }
         }
         LOGGER.log(Level.INFO, "{0} processes loaded.", processDescriptorList.size());
@@ -452,6 +476,7 @@ public class WPSWorker extends AbstractWorker {
 
         //needed to get the public adress of generated schemas (for feature parameters).
         updateWebDavURL();
+        schemaURL = schemaFolder.replace(webdavFolderPath, webdavURL);
         
         //check mandatory IDENTIFIER is not missing.
         if (request.getIdentifier() == null || request.getIdentifier().isEmpty()) {
@@ -560,8 +585,8 @@ public class WPSWorker extends AbstractWorker {
                     FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup)param);
                     
                     // Build the schema xsd, and store it into temporary folder.
-                    String placeToStore = webdavFolderPath + SCHEMA_FOLDER_NAME + "/" +ft.getName().getLocalPart()+".xsd";
-                    String publicAddress = webdavURL + SCHEMA_FOLDER_NAME + "/" +ft.getName().getLocalPart()+".xsd";
+                    String placeToStore = schemaFolder + "/" +ft.getName().getLocalPart()+".xsd";
+                    String publicAddress = schemaURL + "/" +ft.getName().getLocalPart()+".xsd";
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
@@ -641,8 +666,8 @@ public class WPSWorker extends AbstractWorker {
                     
                     // Input class
                     final Class clazz = ft.getClass();                    
-                    String placeToStore = webdavFolderPath + SCHEMA_FOLDER_NAME + "/" +ft.getName().getLocalPart()+".xsd";
-                    String publicAddress = webdavURL + SCHEMA_FOLDER_NAME + "/" +ft.getName().getLocalPart()+".xsd";                 
+                    String placeToStore = schemaFolder + "/" +ft.getName().getLocalPart()+".xsd";
+                    String publicAddress = schemaURL + "/" +ft.getName().getLocalPart()+".xsd";                 
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
@@ -1358,7 +1383,7 @@ public class WPSWorker extends AbstractWorker {
         for (GeneralParameterDescriptor desc : source.getInputDescriptor().descriptors()) {
             if (desc instanceof ParameterDescriptorGroup) {
                 FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup) desc);
-                String placeToStore = webdavFolderPath + SCHEMA_FOLDER_NAME + "/" + ft.getName().getLocalPart() + ".xsd";
+                String placeToStore = schemaFolder + "/" + ft.getName().getLocalPart() + ".xsd";
                 File xsdStore = new File(placeToStore);
                 WPSUtils.storeFeatureSchema(ft, xsdStore);
             }
@@ -1366,7 +1391,7 @@ public class WPSWorker extends AbstractWorker {
         for (GeneralParameterDescriptor desc : source.getOutputDescriptor().descriptors()) {
             if (desc instanceof ParameterDescriptorGroup) {
                 FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup) desc);
-                String placeToStore = webdavFolderPath + SCHEMA_FOLDER_NAME + "/" + ft.getName().getLocalPart() + ".xsd";
+                String placeToStore = schemaFolder + "/" + ft.getName().getLocalPart() + ".xsd";
                 File xsdStore = new File(placeToStore);
                 WPSUtils.storeFeatureSchema(ft, xsdStore);
             }
