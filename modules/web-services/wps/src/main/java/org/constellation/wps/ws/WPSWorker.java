@@ -54,6 +54,7 @@ import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.*;
+import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
@@ -768,8 +769,6 @@ public class WPSWorker extends AbstractWorker {
             requestInputData = request.getDataInputs().getInput();
         }
         final List<GeneralParameterDescriptor> processInputDesc = processDesc.getInputDescriptor().descriptors();
-
-
         //Fill input process with there default values
         for (final GeneralParameterDescriptor inputGeneDesc : processInputDesc) {
 
@@ -779,9 +778,7 @@ public class WPSWorker extends AbstractWorker {
                 if (inputDesc.getDefaultValue() != null) {
                     in.parameter(inputDesc.getName().getCode()).setValue(inputDesc.getDefaultValue());
                 }
-            } else {
-                throw new CstlServiceException("Process parameter invalid", OPERATION_NOT_SUPPORTED);
-            }
+            } 
         }
 
         //Fill process input with datas from execute request.
@@ -915,10 +912,10 @@ public class WPSWorker extends AbstractWorker {
             final String inputIdentifierCode = WPSUtils.extractProcessIOCode(inputIdentifier);
 
             //Check if it's a valid input identifier and hold it if found.
-            ParameterDescriptor inputDescriptor = null;
+            GeneralParameterDescriptor inputDescriptor = null;
             for (final GeneralParameterDescriptor processInput : processInputDesc) {
-                if (processInput.getName().getCode().equals(inputIdentifierCode) && processInput instanceof ParameterDescriptor) {
-                    inputDescriptor = (ParameterDescriptor) processInput;
+                if (processInput.getName().getCode().equals(inputIdentifierCode)) {
+                    inputDescriptor = processInput;
                     break;
                 }
             }
@@ -951,15 +948,18 @@ public class WPSWorker extends AbstractWorker {
                 }
             }
 
-
             /*
              * Get expected input Class from the process input
              */
-            final Class expectedClass = inputDescriptor.getValueClass();
-
+            Class expectedClass;
+            if(inputDescriptor instanceof ParameterDescriptor) {
+                expectedClass = ((ParameterDescriptor)inputDescriptor).getValueClass();
+            } else {
+                expectedClass = Feature.class;
+            }
+            
             Object dataValue = null;
             //LOGGER.log(Level.INFO, "Input : " + inputIdentifier + " : expected Class " + expectedClass.getCanonicalName());
-
 
             /**
              * Handle referenced input data.
@@ -988,7 +988,6 @@ public class WPSWorker extends AbstractWorker {
                     files.add((File) dataValue);
                 }
             }
-
 
             /**
              * Handle Bbox input data.
@@ -1051,11 +1050,15 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Literal value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
                 }
 
+                if(!(inputDescriptor instanceof ParameterDescriptor)) {
+                    throw new CstlServiceException("Invalid parameter type.", INVALID_PARAMETER_VALUE, inputIdentifier);
+                }
+                
                 final LiteralDataType literal = inputRequest.getData().getLiteralData();
                 final String data = literal.getValue();
 
-                if (inputDescriptor.getUnit() != null) {
-                    final Unit paramUnit = inputDescriptor.getUnit();
+                final Unit paramUnit = ((ParameterDescriptor)inputDescriptor).getUnit();
+                if (paramUnit != null) {
                     final Unit requestedUnit = Unit.valueOf(literal.getUom());
                     final UnitConverter converter = requestedUnit.getConverterTo(paramUnit);
                     dataValue = Double.valueOf(converter.convert(Double.valueOf(data)));
@@ -1072,28 +1075,37 @@ public class WPSWorker extends AbstractWorker {
             }
 
             try {
-                in.parameter(inputIdentifierCode).setValue(dataValue);
-            } catch (InvalidParameterValueException ex) {
+                if(inputDescriptor instanceof ParameterDescriptor) {
+                    in.parameter(inputIdentifierCode).setValue(dataValue);
+                } else if(inputDescriptor instanceof ParameterDescriptorGroup && dataValue instanceof ComplexAttribute) {
+                    ParameterValueGroup group = WPSConvertersUtils.featureToParameterGroup(
+                            (ComplexAttribute)dataValue, 
+                            (ParameterDescriptorGroup)inputDescriptor);
+                    in.groups(inputIdentifierCode).add(group);
+                } else {
+                    throw new Exception();
+                }
+            } catch (Exception ex) {
                 throw new CstlServiceException("Invalid data input value.", ex, INVALID_PARAMETER_VALUE, inputIdentifier);
             }
         }
     }
 
     /**
-     * Fill outputs of the ProcessOutputs object using the process result, the list of requested outputs and the list of
-     * process output desciptors.
+     * Fill outputs of the ProcessOutputs object using the process result, the
+     * list of requested outputs and the list of process output desciptors.
      *
-     * @param outputs
-     * @param wantedOutputs
-     * @param processOutputDesc
-     * @param result
-     * @param serviceURL
-     * @throws CstlServiceException
+     * @param outputs The WPS outputs to fill.
+     * @param wantedOutputs The definition of the outputs we must treat.
+     * @param processOutputDesc The descriptors of the geotk process outputs.
+     * @param result The values which have been filled by the process.
+     * @param serviceURL URL of the WPS service.
+     * @throws CstlServiceException If one of the outputs is invalid.
      */
     public static void fillOutputsFromProcessResult(final ProcessOutputs outputs, final List<DocumentOutputDefinitionType> wantedOutputs,
             final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result, final String serviceURL, final String folderPath)
             throws CstlServiceException {
-        if(result == null){
+        if (result == null) {
             throw new CstlServiceException("Empty process result.", NO_APPLICABLE_CODE);
         }
 
@@ -1107,25 +1119,33 @@ public class WPSWorker extends AbstractWorker {
             final String outputIdentifierCode = WPSUtils.extractProcessIOCode(outputIdentifier);
 
             //Check if it's a valid input identifier and hold it if found.
-            ParameterDescriptor outputDescriptor = null;
+            GeneralParameterDescriptor outputDescriptor = null;
             for (final GeneralParameterDescriptor processInput : processOutputDesc) {
-                if (processInput.getName().getCode().equals(outputIdentifierCode) && processInput instanceof ParameterDescriptor) {
+                if (processInput.getName().getCode().equals(outputIdentifierCode)) {
                     outputDescriptor = (ParameterDescriptor) processInput;
                     break;
                 }
             }
             if (outputDescriptor == null) {
-                throw new CstlServiceException("Invalid or unknow output identifier " + outputIdentifier + ".", INVALID_PARAMETER_VALUE, outputIdentifier);
+                throw new CstlServiceException("Invalid or unknown output identifier " + outputIdentifier + ".", INVALID_PARAMETER_VALUE, outputIdentifier);
             }
 
-            //output value object.
-            final Object outputValue = result.parameter(outputIdentifierCode).getValue();
-
-            outputs.getOutput().add(createDocumentResponseOutput(outputDescriptor, outputsRequest, outputValue, serviceURL, folderPath));
+            if (outputDescriptor instanceof ParameterDescriptor) {
+                //output value object.
+                final Object outputValue = result.parameter(outputIdentifierCode).getValue();
+                outputs.getOutput().add(createDocumentResponseOutput((ParameterDescriptor) outputDescriptor, outputsRequest, outputValue, serviceURL, folderPath));
+            } else if (outputDescriptor instanceof ParameterDescriptorGroup) {
+                /**
+                 * TODO: Treat ParameterValueGroup for outputs.
+                 */
+                throw new CstlServiceException("Invalid or unknown output identifier " + outputIdentifier + ".", INVALID_PARAMETER_VALUE, outputIdentifier); 
+            } else {
+                throw new CstlServiceException("Invalid or unknown output identifier " + outputIdentifier + ".", INVALID_PARAMETER_VALUE, outputIdentifier);                
+            }
 
         }//end foreach wanted outputs
-
     }
+    
 
     /**
      * Create {@link OutputDataType output} object for one requested output.

@@ -440,11 +440,8 @@ public class WPSUtils {
             final List<GeneralParameterDescriptor> descriptors = descGroup.descriptors();
 
             for (final GeneralParameterDescriptor geneDesc : descriptors) {
-                if (geneDesc instanceof ParameterDescriptor) {
-                    final ParameterDescriptor desc = (ParameterDescriptor) geneDesc;
-                    final String id = buildProcessIOIdentifiers(procDesc, desc, iOType);
-                    map.put(id, desc.getMinimumOccurs() > 0);
-                }
+                    final String id = buildProcessIOIdentifiers(procDesc, geneDesc, iOType);
+                    map.put(id, geneDesc.getMinimumOccurs() > 0);
             }
         }
         return map;
