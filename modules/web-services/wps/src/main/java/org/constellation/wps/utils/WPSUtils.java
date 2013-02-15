@@ -32,6 +32,7 @@ import javax.xml.bind.Marshaller;
 import org.constellation.util.Util;
 import static org.constellation.wps.ws.WPSConstant.*;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
@@ -46,6 +47,9 @@ import org.geotoolkit.wps.io.WPSIO;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
+import org.opengis.feature.type.FeatureType;
 
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -267,45 +271,62 @@ public class WPSUtils {
      * @return true if process is supported, false if is not.
      */
     public static boolean isSupportedProcess(final ProcessDescriptor descriptor) {
-
+        
         //Inputs
-        final List<GeneralParameterDescriptor> inputDesc = descriptor.getInputDescriptor().descriptors();
-        for (GeneralParameterDescriptor input : inputDesc) {
-            if (!(input instanceof ParameterDescriptor)) {
-                return false;
-            } else {
-                final ParameterDescriptor inputParam = (ParameterDescriptor) input;
-                final Class inputClass = inputParam.getValueClass();
-                if (!WPSIO.isSupportedInputClass(inputClass)) {
-                    return false;
-                }
-            }
+        final GeneralParameterDescriptor inputDesc = descriptor.getInputDescriptor();
+        if(!isSupportedParameter(inputDesc, WPSIO.IOType.INPUT)) {
+            return false;
         }
 
         //Outputs
-        final List<GeneralParameterDescriptor> outputDesc = descriptor.getOutputDescriptor().descriptors();
-        for (GeneralParameterDescriptor output : outputDesc) {
-            if (!(output instanceof ParameterDescriptor)) {
-                return false;
-            } else {
-                final ParameterDescriptor outputParam = (ParameterDescriptor) output;
-                final Class outputClass = outputParam.getValueClass();
-                if (!WPSIO.isSupportedOutputClass(outputClass)) {
-                    return false;
+        GeneralParameterDescriptor outputDesc = descriptor.getOutputDescriptor();        
+        if(!isSupportedParameter(outputDesc, WPSIO.IOType.OUTPUT)) {
+            return false;
+        }        
+        return true;
+    }
+    
+    /**
+     * A function which test if the given parameter can be proceed by the WPS.
+     * @param toTest The descriptor of the parameter to test.
+     * @param type The parameter type (input or output).
+     * @return true if the WPS can work with this parameter, false otherwise.
+     */
+    public static boolean isSupportedParameter(GeneralParameterDescriptor toTest, WPSIO.IOType type) {
+        boolean isClean = false;
+        if (toTest instanceof ParameterDescriptorGroup) {
+            for (GeneralParameterDescriptor desc : ((ParameterDescriptorGroup) toTest).descriptors()) {
+                isClean = isSupportedParameter(desc, type);
+                if (!isClean) {
+                    break;
                 }
             }
+        } else if (toTest instanceof ParameterDescriptor) {
+            final ParameterDescriptor param = (ParameterDescriptor) toTest;
+            final Class paramClass = param.getValueClass();
+
+            isClean = (type.equals(WPSIO.IOType.INPUT))
+                    ? WPSIO.isSupportedInputClass(paramClass)
+                    : WPSIO.isSupportedOutputClass(paramClass);
         }
-        return true;
+        return isClean;
     }
 
     /**
      * Return the SupportedComplexDataInputType for the given class.
      *
-     * @param attributeClass
-     * @return SupportedComplexDataInputType
+     * @param attributeClass The java class to get complex type from.
+     * @param ioType The type of parameter to describe (input or output).
+     * @param type The complex type (complex, reference, etc.).
+     * @return SupportedComplexDataInputType 
      */
     public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.FormChoice type) {
-
+        return describeComplex(attributeClass, ioType, type, null);
+    }
+    
+    
+    public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.FormChoice type, final String schema) {
+                
         final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
         final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
         final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
@@ -316,8 +337,8 @@ public class WPSUtils {
 
                 final ComplexDataDescriptionType complexDesc = new ComplexDataDescriptionType();
                 complexDesc.setEncoding(inputClass.getEncoding() != null ? inputClass.getEncoding() : null); //Encoding
-                complexDesc.setMimeType(inputClass.getMimeType() != null ? inputClass.getMimeType() : null);                    //Mime
-                complexDesc.setSchema(inputClass.getSchema() != null ? inputClass.getSchema() : null);       //URL to xsd schema
+                complexDesc.setMimeType(inputClass.getMimeType() != null ? inputClass.getMimeType() : null); //Mime
+                complexDesc.setSchema(schema != null ? schema : inputClass.getSchema());                     //URL to xsd schema
 
                 if (inputClass.isDefaultFormat()) {
                     complexComb.setFormat(complexDesc);
@@ -448,9 +469,9 @@ public class WPSUtils {
         final String type = iotype == WPSIO.IOType.INPUT ? "INPUT" : "OUTPUT";
 
         if (descMap.isEmpty() && !requestIdentifiers.isEmpty()) {
-            throw new CstlServiceException("This process have no inputs.", INVALID_PARAMETER_VALUE, "input"); //process have no inputs
+            throw new CstlServiceException("This process have no inputs.", INVALID_PARAMETER_VALUE, "input"); //process have no input
         } else {
-            //check for Unknow parameter.
+            //check for Unknown parameter.
             for (final String identifier : requestIdentifiers) {
                 if (!descMap.containsKey(identifier)) {
                     throw new CstlServiceException("Unknow " + type + " parameter : " + identifier + ".", INVALID_PARAMETER_VALUE, identifier);
@@ -491,7 +512,7 @@ public class WPSUtils {
         return success;
     }
 
-    /**
+     /**
      * Store the given object into a temorary file specified by the given fileName into the temporary folder. The object
      * to store is marshalled by the {@link WPSMarshallerPool}. If the temporary file already exist he will be
      * overwrited.
@@ -584,4 +605,23 @@ public class WPSUtils {
         builder.append(end);
         return builder.toString();
     }
+    
+    /**
+     * A function to retrieve a Feature schema, and store it into the given file
+     * as an xsd.
+     *
+     * @param source The feature to get schema from.
+     * @param destination The file where we want to save our feature schema.
+     * @throws JAXBException If we can't parse / write the schema properly.
+     */
+    public static void storeFeatureSchema(FeatureType source, File destination) throws JAXBException {
+
+        JAXBFeatureTypeWriter writer = new JAXBFeatureTypeWriter();
+        Schema s = writer.getSchemaFromFeatureType(source);
+        MarshallerPool pool = XSDMarshallerPool.getInstance();
+        Marshaller marsh = pool.acquireMarshaller();
+
+        marsh.marshal(s, destination);
+    }
+        
 }

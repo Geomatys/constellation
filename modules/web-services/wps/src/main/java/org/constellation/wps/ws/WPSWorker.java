@@ -76,6 +76,7 @@ import org.opengis.parameter.*;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
+import org.openide.util.Exceptions;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -447,7 +448,6 @@ public class WPSWorker extends AbstractWorker {
                         literal.setValuesReference(null);
                         literal.setDataType(WPSConvertersUtils.createDataType(clazz));
 
-
                         in.setLiteralData(literal);
 
                         //Complex type (XML, ...)
@@ -461,8 +461,6 @@ public class WPSWorker extends AbstractWorker {
                     } else {
                         throw new CstlServiceException("Process input not supported.", NO_APPLICABLE_CODE);
                     }
-
-                    dataInputs.getInput().add(in);
                      
                 } else if (param instanceof ParameterDescriptorGroup) {
                     /*
@@ -474,21 +472,21 @@ public class WPSWorker extends AbstractWorker {
                     
                     // Input class
                     final Class clazz = ft.getClass();
-                    
-                    if (WPSIO.isSupportedComplexInputClass(clazz)) {
-                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX));
-
-                        //Reference type (XML, ...)
-                    } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
-                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.REFERENCE));
-
-                    } else {
-                        throw new CstlServiceException("Process input not supported.", NO_APPLICABLE_CODE);
+                    String placeToStore = temporaryFolderPath + "/" +ft.getName().getLocalPart()+".xsd";
+                    String publicAddress = WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" +ft.getName().getLocalPart()+".xsd";
+                    File xsdStore = new File(placeToStore);
+                    try {
+                        WPSUtils.storeFeatureSchema(ft, xsdStore);
+                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX, publicAddress));
+                    } catch (JAXBException ex) {
+                        throw new CstlServiceException("The schema for parameter "+ param.getName().getCode() + "can't be build.", NO_APPLICABLE_CODE);
                     }
                     
                 } else {
                     throw new CstlServiceException("Process parameter invalid", NO_APPLICABLE_CODE);
                 }
+                
+                dataInputs.getInput().add(in);
             }
             if (!dataInputs.getInput().isEmpty()) {
                 descriptionType.setDataInputs(dataInputs);
@@ -553,16 +551,15 @@ public class WPSWorker extends AbstractWorker {
                     FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup)param);
                     
                     // Input class
-                    final Class clazz = ft.getClass();
-                    
-                    if (WPSIO.isSupportedComplexOutputClass(clazz)) {
-                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX));
-
-                    } else if (WPSIO.isSupportedReferenceOutputClass(clazz)) {
-                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.REFERENCE));
-
-                    } else {
-                        throw new CstlServiceException("Process output not supported.", NO_APPLICABLE_CODE);
+                    final Class clazz = ft.getClass();                    
+                    String placeToStore = temporaryFolderPath + "/" +ft.getName().getLocalPart()+".xsd";
+                    String publicAddress = WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" +ft.getName().getLocalPart()+".xsd";                 
+                    File xsdStore = new File(placeToStore);
+                    try {
+                        WPSUtils.storeFeatureSchema(ft, xsdStore);
+                        out.setComplexOutput(WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX, publicAddress));
+                    } catch (JAXBException ex) {
+                        throw new CstlServiceException("The schema for parameter "+ param.getName().getCode() + "can't be build.", NO_APPLICABLE_CODE);
                     }
                     
                 } else {
@@ -666,7 +663,7 @@ public class WPSWorker extends AbstractWorker {
                     INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
         }
 
-        //check requested INPUT/OUTPUT. Throw an CstlException otherwise.
+        //check requested INPUT/OUTPUT. Throw a CstlException otherwise.
         WPSUtils.checkValidInputOuputRequest(processDesc, request);
         try {
             final GregorianCalendar c = new GregorianCalendar();
