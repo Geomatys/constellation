@@ -728,15 +728,10 @@ public class WPSWorker extends AbstractWorker {
                 out.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, param, WPSIO.IOType.OUTPUT)));
                 out.setTitle(WPSUtils.capitalizeFirstLetter(param.getName().getCode()));
                 out.setAbstract(WPSUtils.capitalizeFirstLetter(param.getRemarks().toString()));
-                
+
                 //simple parameter
                 if (param instanceof ParameterDescriptor) {
                     final ParameterDescriptor paramDesc = (ParameterDescriptor) param;
-
-                    //parameter information
-                    out.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, paramDesc, WPSIO.IOType.OUTPUT)));
-                    out.setTitle(WPSUtils.capitalizeFirstLetter(paramDesc.getName().getCode()));
-                    out.setAbstract(WPSUtils.capitalizeFirstLetter(paramDesc.getRemarks().toString()));
 
                     //input class
                     final Class clazz = paramDesc.getValueClass();
@@ -746,6 +741,22 @@ public class WPSWorker extends AbstractWorker {
                         out.setBoundingBoxOutput(WPS_SUPPORTED_CRS);
 
                         //Simple object (Integer, double) and Object which need a conversion from String like affineTransform or Geometry
+                        //Complex type (XML, raster, ...)
+                    } else if (WPSIO.isSupportedComplexInputClass(clazz)) {
+                        Map<String, Object> userData = null;
+                        if (paramDesc instanceof ExtendedParameterDescriptor) {
+                            userData = ((ExtendedParameterDescriptor) paramDesc).getUserObject();
+                        }
+                        out.setComplexOutput(WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX, userData));
+
+                        //Reference type (XML, ...)
+                    } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
+                        Map<String, Object> userData = null;
+                        if (paramDesc instanceof ExtendedParameterDescriptor) {
+                            userData = ((ExtendedParameterDescriptor) paramDesc).getUserObject();
+                        }
+                        out.setComplexOutput(WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.REFERENCE, userData));
+
                     } else if (WPSIO.isSupportedLiteralOutputClass(clazz)) {
 
                         final LiteralOutputType literal = new LiteralOutputType();
@@ -755,13 +766,6 @@ public class WPSWorker extends AbstractWorker {
                         }
 
                         out.setLiteralOutput(literal);
-
-                        //Complex type (XML, raster, ...)
-                    } else if (WPSIO.isSupportedComplexOutputClass(clazz)) {
-                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX));
-
-                    } else if (WPSIO.isSupportedReferenceOutputClass(clazz)) {
-                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.REFERENCE));
 
                     } else {
                         throw new CstlServiceException("Process output not supported.", NO_APPLICABLE_CODE);
