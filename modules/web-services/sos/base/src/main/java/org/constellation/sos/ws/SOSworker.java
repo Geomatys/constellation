@@ -139,6 +139,7 @@ import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.temporal.After;
 import org.opengis.filter.temporal.Before;
@@ -172,6 +173,8 @@ public class SOSworker extends AbstractWorker {
     public static final int DISCOVERY     = 0;
     public static final int TRANSACTIONAL = 1;
 
+    private boolean multipleVersionActivated = true;
+    
     /**
      * A list of temporary ObservationTemplate
      */
@@ -296,7 +299,6 @@ public class SOSworker extends AbstractWorker {
      */
     public SOSworker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.SOS);
-        setSupportedVersion(ServiceDef.SOS_2_0_0, ServiceDef.SOS_1_0_0);
         isStarted = true;
         final SOSConfiguration configuration;
 
@@ -333,7 +335,7 @@ public class SOSworker extends AbstractWorker {
             if (keepCapabilities) {
                 loadCachedCapabilities(configurationDirectory);
             }
-
+            
             //we get the O&M filter Type
             final DataSourceType omFilterType = configuration.getObservationFilterType();
 
@@ -382,6 +384,18 @@ public class SOSworker extends AbstractWorker {
             alwaysFeatureCollection   = configuration.getParameters().containsKey(OMFactory.ALWAYS_FEATURE_COLLECTION) ?
             Boolean.parseBoolean(configuration.getParameters().get(OMFactory.ALWAYS_FEATURE_COLLECTION)) : false;
 
+            final String multiVersProp = configuration.getParameters().get("multipleVersion");
+            if (multiVersProp != null) {
+                multipleVersionActivated = Boolean.parseBoolean(multiVersProp);
+                LOGGER.log(Level.INFO, "Multiple version activated:{0}", multipleVersionActivated);
+                if (multipleVersionActivated) {
+                    setSupportedVersion(ServiceDef.SOS_2_0_0, ServiceDef.SOS_1_0_0);
+                } else {
+                    setSupportedVersion(ServiceDef.SOS_1_0_0);
+                }
+            } else {
+                setSupportedVersion(ServiceDef.SOS_2_0_0, ServiceDef.SOS_1_0_0);
+            }
 
             // we fill a map of properties to sent to the reader/writer/filter
             final Map<String, Object> properties = new HashMap<String, Object>();
@@ -1170,14 +1184,14 @@ public class SOSworker extends AbstractWorker {
 
             } else if (filter instanceof PropertyIsEqualTo) {
 
-                final Expression propertyName  = ((PropertyIsEqualTo)filter).getExpression1();
-                final Expression literal       = ((PropertyIsEqualTo)filter).getExpression2();
-                if (propertyName == null || literal == null) {
+                final PropertyName propertyName  = (PropertyName)((PropertyIsEqualTo)filter).getExpression1();
+                final Expression literal         = ((PropertyIsEqualTo)filter).getExpression2();
+                if (propertyName == null || propertyName.getPropertyName() == null || propertyName.getPropertyName().isEmpty() || literal == null) {
                      throw new CstlServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
                                                    INVALID_PARAMETER_VALUE, "propertyIsEqualTo"); // cite test
                 }
                 if (!localOmFilter.supportedQueryableResultProperties().isEmpty()) {
-                    localOmFilter.setResultEquals(propertyName.toString(), literal.toString());
+                    localOmFilter.setResultEquals(propertyName.getPropertyName(), literal.toString());
                 }
 
             } else if (filter instanceof PropertyIsLike) {
@@ -2235,7 +2249,7 @@ public class SOSworker extends AbstractWorker {
                 
                 if (request.getVersion().toString().equals("1.0.0")) {
                     request.setVersion("1.0.0");
-                } else if (request.getVersion().toString().equals("2.0.0")) {
+                } else if (multipleVersionActivated && request.getVersion().toString().equals("2.0.0")) {
                     request.setVersion("2.0.0");
                 } else {
                     final CodeList code;
