@@ -40,11 +40,11 @@ public class DefaultWMSVisitorFactory implements WMSVisitorFactory {
             "text/xml",
             "text/plain",
             "text/html",
+            "application/gml+xml",
             "application/vnd.ogc.gml",
             "application/vnd.ogc.xml",
-            "xml",
-            "gml",
-            "gml3"
+            "application/vnd.ogc.gml3",
+
         };
     }
 
@@ -55,14 +55,13 @@ public class DefaultWMSVisitorFactory implements WMSVisitorFactory {
             return new CSVGraphicVisitor(gfi);
         } else if (MimeType.TEXT_HTML.equalsIgnoreCase(mimeType)) {
             return new HTMLGraphicVisitor(gfi, layerDetails);
-        } else if (MimeType.APP_GML.equalsIgnoreCase(mimeType)
+        } else if (MimeType.APP_GML_XML.equalsIgnoreCase(mimeType)
+                || MimeType.APP_GML.equalsIgnoreCase(mimeType)
                 || MimeType.TEXT_XML.equalsIgnoreCase(mimeType)
-                || MimeType.APP_XML.equalsIgnoreCase(mimeType)
-                || Query.XML.equalsIgnoreCase(mimeType)
-                || Query.GML.equalsIgnoreCase(mimeType)) {
+                || MimeType.APP_XML.equalsIgnoreCase(mimeType)) {
             // GML
            return new GMLGraphicVisitor(gfi, 0,mimeType);
-        } else if (Query.GML3.equalsIgnoreCase(mimeType)) {
+        } else if (MimeType.APP_GML3.equalsIgnoreCase(mimeType)) {
             // GML 3
             return new GMLGraphicVisitor(gfi, 1, mimeType);
         }

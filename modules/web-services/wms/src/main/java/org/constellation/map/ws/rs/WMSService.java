@@ -164,10 +164,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                 final GetFeatureInfoVisitor visitor = worker.getFeatureInfo(requestFeatureInfo);
                 final Object result = visitor.getResult();
                 //Need to reset the GML mime format to XML for browsers
-                String infoFormat = visitor.getMimeType();
-                if (infoFormat.equals(GML) || infoFormat.equals(GML3)) {
-                    infoFormat = MimeType.APP_XML;
-                }
+                final String infoFormat = visitor.getMimeType();
                 return Response.ok(result, infoFormat).build();
             }
             // For backward compatibility between WMS 1.1.1 and WMS 1.0.0, we handle the "Capabilities" request
