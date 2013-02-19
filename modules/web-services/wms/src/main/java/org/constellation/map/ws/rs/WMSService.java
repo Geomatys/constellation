@@ -42,6 +42,7 @@ import javax.xml.bind.JAXBException;
 import org.constellation.ServiceDef;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.map.ws.QueryContext;
+import org.constellation.map.ws.WMSConstant;
 import org.constellation.map.ws.WMSWorker;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.query.QueryAdapter;
@@ -473,14 +474,11 @@ public class WMSService extends GridWebService<WMSWorker> {
          * we verify that the exception format is an allowed value
          */
         if (ServiceDef.WMS_1_3_0_SLD.version.toString().equals(version)) {
-            if (strExceptions != null &&
-                (!"XML".equals(strExceptions) && !"INIMAGE".equals(strExceptions) && !"BLANK".equals(strExceptions))) {
+            if (strExceptions != null && !WMSConstant.EXCEPTION_130.contains(strExceptions)) {
                 throw new CstlServiceException("exception format:" + strExceptions + " is not allowed. Use XML, INIMAGE or BLANK", INVALID_PARAMETER_VALUE);
             }
         } else {
-            if (strExceptions != null &&
-                (!"application/vnd.ogc.se_xml".equals(strExceptions) && !"application/vnd.ogc.se_inimage".equals(strExceptions)
-              && !"application/vnd.ogc.se_blank".equals(strExceptions))) {
+            if (strExceptions != null && !WMSConstant.EXCEPTION_111.contains(strExceptions)) {
                 throw new CstlServiceException("exception format:" + strExceptions + " is not allowed. Use application/vnd.ogc.se_xml, application/vnd.ogc.se_inimage or application/vnd.ogc.se_blank", INVALID_PARAMETER_VALUE);
             }
         }

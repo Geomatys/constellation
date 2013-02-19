@@ -74,10 +74,12 @@ import org.constellation.configuration.DimensionDefinition;
 import org.constellation.configuration.WMSPortrayal;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.query.wms.WMSQuery.*;
-import org.geotoolkit.cql.CQL;
-import org.geotoolkit.cql.CQLException;
+import static org.constellation.map.ws.WMSConstant.*;
 
 //Geotoolkit dependencies
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
@@ -681,9 +683,14 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     /**
      * Apply the layer customization extracted from the configuration.
      *
-     * @param outputLayer111
+     * @param version
+     * @param outputLayer
      * @param configLayer
+     * @param layerDetails
+     * @param legendUrlPng
+     * @param legendUrlGif
      * @return
+     * @throws CstlServiceException
      */
     private AbstractLayer customizeLayer(final String version, final AbstractLayer outputLayer, final Layer configLayer,
             final LayerDetails layerDetails, final String legendUrlPng, final String legendUrlGif) throws CstlServiceException
@@ -774,6 +781,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     }
 
 
+    /**
+     *
+     * @param currentVersion
+     * @param ms
+     * @param layerDetails
+     * @param legendUrlPng
+     * @param legendUrlGif
+     * @return
+     */
     private org.geotoolkit.wms.xml.Style convertMutableStyleToWmsStyle(final String currentVersion, final MutableStyle ms, final LayerDetails layerDetails,
             final String legendUrlPng, final String legendUrlGif)
     {
@@ -1046,11 +1062,19 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     @Override
     public PortrayalResponse getMap(final GetMap getMap) throws CstlServiceException {
         isWorking();
+        final String queryVersion = getMap.getVersion().toString();
+
     	//
     	// Note this is almost the same logic as in getFeatureInfo
     	//
+        // TODO support BLANK exception format for WMS1.1.1 and WMS1.3.0
         final String errorType = getMap.getExceptionFormat();
-        final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
+        boolean errorInImage = false;
+        if (queryVersion.equals(ServiceDef.WMS_1_3_0.version.toString())) {
+            errorInImage = EXCEPTION_130_INIMAGE.equalsIgnoreCase(errorType);
+        } else {
+            errorInImage = EXCEPTION_111_INIMAGE.equalsIgnoreCase(errorType);
+        }
 
 
         // 1. SCENE
