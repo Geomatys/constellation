@@ -78,7 +78,6 @@ import static org.constellation.map.ws.WMSConstant.*;
 
 //Geotoolkit dependencies
 import org.geotoolkit.cql.CQL;
-import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.exception.PortrayalException;
@@ -97,6 +96,7 @@ import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
@@ -1070,10 +1070,13 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // TODO support BLANK exception format for WMS1.1.1 and WMS1.3.0
         final String errorType = getMap.getExceptionFormat();
         boolean errorInImage = false;
+        boolean errorBlank = false;
         if (queryVersion.equals(ServiceDef.WMS_1_3_0.version.toString())) {
             errorInImage = EXCEPTION_130_INIMAGE.equalsIgnoreCase(errorType);
+            errorBlank = EXCEPTION_130_BLANK.equalsIgnoreCase(errorType);
         } else {
             errorInImage = EXCEPTION_111_INIMAGE.equalsIgnoreCase(errorType);
+            errorBlank = EXCEPTION_111_BLANK.equalsIgnoreCase(errorType);
         }
 
 
@@ -1084,12 +1087,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         try{
             layerRefs = getLayerReferences(layerNames);
         } catch (CstlServiceException ex) {
-        	//TODO: distinguish
-            if (errorInImage) {
-                return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
-            } else {
-                throw new CstlServiceException(ex, LAYER_NOT_DEFINED, KEY_LAYERS.toLowerCase());
-            }
+            return handleExceptions(getMap, errorInImage, errorBlank, ex, LAYER_NOT_DEFINED,  KEY_LAYERS.toLowerCase());
         }
         for (LayerDetails layer : layerRefs) {
             if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
@@ -1102,7 +1100,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final List<String> styleNames = getMap.getStyles();
         final StyledLayerDescriptor sld = getMap.getSld();
 
-        final List<MutableStyle> styles = getStyles(layerRefs, sld, styleNames);
+        List<MutableStyle> styles;
+        try {
+            styles = getStyles(layerRefs, sld, styleNames);
+        } catch (CstlServiceException ex) {
+            return handleExceptions(getMap, errorInImage, errorBlank, ex, STYLE_NOT_DEFINED, null);
+        }
         //       -- create the rendering parameter Map
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
@@ -1144,11 +1147,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
             sdef.setContext(context);
         } catch (PortrayalException ex) {
-            if (errorInImage) {
-                return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
-            } else {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            }
+            return handleExceptions(getMap, errorInImage, errorBlank, ex, NO_APPLICABLE_CODE, null);
         }
 
 
@@ -1199,15 +1198,32 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             try {
                 response.prepareNow();
             } catch (PortrayalException ex) {
-                if (errorInImage) {
-                    return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
-                } else {
-                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-                }
+                return handleExceptions(getMap, errorInImage, errorBlank, ex, NO_APPLICABLE_CODE, null);
             }
         }
 
         return response;
+    }
+
+    private PortrayalResponse handleExceptions(GetMap getMap, boolean errorInImage, boolean errorBlank,
+                                               Exception ex, OWSExceptionCode expCode, String locator) throws CstlServiceException {
+        if (errorInImage) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
+        } else if (errorBlank) {
+            Color exColor = getMap.getBackground() != null ? getMap.getBackground() : Color.WHITE;
+            if (getMap.getTransparent()) {
+                exColor = new Color(0x00FFFFFF & exColor.getRGB(), true); //mark alpha bit as 0 to make color transparent
+            }
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return new PortrayalResponse(Cstl.getPortrayalService().writeBlankImage(exColor, getMap.getSize()));
+        } else {
+            if (locator != null) {
+                throw new CstlServiceException(ex, expCode, locator);
+            } else {
+                throw new CstlServiceException(ex, expCode);
+            }
+        }
     }
 
     private static MutableStyle extractStyle(final Name layerName, final StyledLayerDescriptor sld) throws CstlServiceException{

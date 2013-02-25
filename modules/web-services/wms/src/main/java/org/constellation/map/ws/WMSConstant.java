@@ -95,7 +95,7 @@ public final class WMSConstant {
     static {
         EXCEPTION_111.add(EXCEPTION_111_XML);
         EXCEPTION_111.add(EXCEPTION_111_INIMAGE);
-        //EXCEPTION_111.add(EXCEPTION_111_BLANK); //Not supported yet, TODO implement it in GetMap request.
+        EXCEPTION_111.add(EXCEPTION_111_BLANK);
     }
 
 
@@ -106,6 +106,6 @@ public final class WMSConstant {
     static {
         EXCEPTION_130.add(EXCEPTION_130_XML);
         EXCEPTION_130.add(EXCEPTION_130_INIMAGE);
-        //EXCEPTION_130.add(EXCEPTION_130_BLANK); //Not supported yet, TODO implement it in GetMap request.
+        EXCEPTION_130.add(EXCEPTION_130_BLANK);
     }
 }
