@@ -46,14 +46,14 @@
                         <swe:Time definition="urn:ogc:data:time:iso8601"/>
                     </swe:field>
                     <swe:field name="depth">
-                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:depth">
+                        <swe:Quantity definition="urn:x-ogc:def:phenomenon:GEOM:depth">
                             <swe:uom code="m"/>
                         </swe:Quantity>
                     </swe:field>
                 </swe:SimpleDataRecord>
             </swe:elementType>
             <swe:encoding>
-                <swe:TextBlock blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="textblock"/>
+                <swe:TextBlock blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
             </swe:encoding>
             <swe:values></swe:values>
         </swe:DataArray>

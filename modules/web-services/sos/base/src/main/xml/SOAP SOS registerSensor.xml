@@ -60,45 +60,11 @@
 						</classifier>
 					</ClassifierList>
 				</classification>
-				<!-- Période de début / fin du capteur sur le site -->
-				<validTime>
-					<gml:TimePeriod>
-						<gml:beginPosition>2004-06-01</gml:beginPosition>
-						<gml:endPosition indeterminatePosition="now"/>
-					</gml:TimePeriod>
-				</validTime>
-				<!-- Période de données disponible -->
-				<capabilities>
-					<swe:DataRecord definition="urn:x-brgm:def:property:periodOfData">
-						<swe:field name="periodOfData" xlink:role="urn:x-brgm:def:property:periodOfData">
-							<swe:TimeRange>
-								<swe:value>1987-04-23 now</swe:value>
-							</swe:TimeRange>
-						</swe:field>
-					</swe:DataRecord>
-				</capabilities>
-				<contact xlink:role="urn:x-ogc:def:role:manufacturer">
-					<ResponsibleParty>
-						<organizationName>IRIS</organizationName>
-					</ResponsibleParty>
-				</contact>
-				<position name="conductivitePosition" xlink:href="piezometer#piezoPosition"/>
-				<!--~~~~~~~~~~~~~-->
-				<!-- Detector Inputs-->
-				<!--~~~~~~~~~~~~~-->
-				<!-- note: in most cases, a detector’s input will be a phenomenon and its output a measured digital value (e.g. 
-				Quantity)  -->
-				<inputs>
-					<InputList>
-						<input name="level">
-							<swe:ObservableProperty definition="urn:x-ogc:def:phenomenon:OGC:level"/>
-						</input>
-					</InputList>
-				</inputs>
+				<!-- Pts>
 				<!--~~~~~~~~~~~~~~-->
 				<!-- Detector Outputs-->
 				<!--~~~~~~~~~~~~~~-->
-				<!-- note: in this case, the detector’s output is also a phenomenon (electrical resistance) rather than 
+				<!-- note: in this case, the detectorï¿½s output is also a phenomenon (electrical resistance) rather than 
 				measured digital values -->
 				<outputs>
 					<OutputList>
@@ -107,7 +73,7 @@
 						</output>
 					</OutputList>
 				</outputs>
-				<!-- Fréquence d'acquisition, précision, plage de validité,...  -->
+				<!-- Frï¿½quence d'acquisition, prï¿½cision, plage de validitï¿½,...  -->
 				<parameters>
 					<ParameterList>
 						<parameter name="frequency" xlink:role="urn:x-ogc:def:property:frequency">
@@ -140,7 +106,7 @@
 			<om:observedProperty>
 				<swe:Phenomenon gml:id="depth">
 				    <gml:description>profondeur</gml:description>
-					<gml:name>urn:x-ogc:def:phenonmenon:BRGM:depth</gml:name>
+					<gml:name>urn:x-ogc:def:phenomenon:BRGM:depth</gml:name>
 				</swe:Phenomenon>
 			</om:observedProperty>
 			<om:featureOfInterest>

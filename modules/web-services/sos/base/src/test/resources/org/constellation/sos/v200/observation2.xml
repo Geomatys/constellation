@@ -43,16 +43,16 @@
                         <swe:Time definition="urn:ogc:data:time:iso8601"/>
                     </swe:field>
                     <swe:field name="depth">
-                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:depth">
+                        <swe:Quantity definition="urn:x-ogc:def:phenomenon:GEOM:depth">
                             <swe:uom code="m"/>
                         </swe:Quantity>
                     </swe:field>
                 </swe:DataRecord>
             </swe:elementType>
             <swe:encoding>
-                <swe:TextEncoding blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="textblock"/>
+                <swe:TextEncoding blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
             </swe:encoding>
-            <swe:values>2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@</swe:values>
+            <swe:values>2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@</swe:values>
         </swe:DataArray>
     </om:result>
 </om:OM_Observation>

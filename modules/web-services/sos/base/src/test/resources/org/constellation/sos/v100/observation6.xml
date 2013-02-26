@@ -28,7 +28,7 @@
             <gml:description>Geology traverse</gml:description>
             <gml:name>cycle1</gml:name>
             <gml:boundedBy>
-                <gml:Envelope srsName="urn:ogc:def:crs:EPSG:6.8:4283" gml:id="bound-1">
+                <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582" gml:id="bound-1">
                     <gml:lowerCorner>-30.711 134.196</gml:lowerCorner>
                     <gml:upperCorner>-30.702 134.205</gml:upperCorner>
                 </gml:Envelope>
@@ -44,7 +44,7 @@
                     <gml:pos>-30.702 134.199</gml:pos>
                 </gml:LineString>
             </sa:shape>
-            <sa:length uom="m">750</sa:length>
+            <sa:length/>
         </sa:SamplingCurve>
     </om:featureOfInterest>
     <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
@@ -60,21 +60,21 @@
                         <swe:Time definition="urn:ogc:data:time:iso8601"/>
                     </swe:field>
                     <swe:field name="depth">
-                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:depth">
+                        <swe:Quantity definition="urn:x-ogc:def:phenomenon:GEOM:depth">
                             <swe:uom code="m"/>
                         </swe:Quantity>
                     </swe:field>
                     <swe:field name="temperature">
-                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:temperature">
+                        <swe:Quantity definition="urn:x-ogc:def:phenomenon:GEOM:temperature">
                             <swe:uom code="°C"/>
                         </swe:Quantity>
                     </swe:field>
                 </swe:SimpleDataRecord>
             </swe:elementType>
             <swe:encoding>
-                <swe:TextBlock blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="textblock"/>
+                <swe:TextBlock blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
             </swe:encoding>
-            <swe:values>2007-05-01T12:59:00,6.560@@2007-05-01T13:59:00,6.560@@2007-05-01T14:59:00,6.560@@2007-05-01T15:59:00,6.560@@2007-05-01T16:59:00,6.560@@</swe:values>
+            <swe:values>2007-05-01T12:59:00,6.56@@2007-05-01T13:59:00,6.56@@2007-05-01T14:59:00,6.56@@2007-05-01T15:59:00,6.56@@2007-05-01T16:59:00,6.56@@</swe:values>
         </swe:DataArray>
     </om:result>
 </om:Observation>
