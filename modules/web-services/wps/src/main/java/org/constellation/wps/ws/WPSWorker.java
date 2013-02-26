@@ -269,7 +269,7 @@ public class WPSWorker extends AbstractWorker {
         }
 
         if (!wmsSupported) {
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) don't support WMS outputs : \n " + startError, id);
+            LOGGER.log(Level.WARNING, "\nThe WPS worker ({0}) don\'t support WMS outputs : \n " + startError, id);
         }
 
         fillProcessList();
@@ -367,7 +367,11 @@ public class WPSWorker extends AbstractWorker {
     private void updateWMSURL() {
         String webappURL = getServiceUrl();
         if (webappURL != null) {
-            this.wmsInstanceURL = webappURL.replace("/wps/"+getId(), "/wms/"+this.wmsInstanceName);
+            if (webappURL.contains("/wps/"+getId())) {
+                this.wmsInstanceURL = webappURL.replace("/wps/"+getId(), "/wms/"+this.wmsInstanceName);
+            } else {
+                LOGGER.log(Level.WARNING, "Wrong service URL.");
+            }
         } else {
             LOGGER.log(Level.WARNING, "Service URL undefined.");
         }
@@ -380,8 +384,16 @@ public class WPSWorker extends AbstractWorker {
     private void updateWebDavURL() {
         String webappURL = getServiceUrl();
         if (webappURL != null) {
-            webappURL = webappURL.substring(0, webappURL.indexOf("/WS/wps/" + getId()));
-            this.webdavURL = webappURL + "/webdav/" + getId();
+            final int index = webappURL.indexOf("/wps/" + getId());
+            if (index != -1) {
+                webappURL = webappURL.substring(0, index);
+                if (webappURL.contains("/WS")) {
+                    webappURL = webappURL.substring(0, webappURL.indexOf("/WS"));
+                }
+                this.webdavURL = webappURL + "/webdav/" + getId();
+            } else {
+                LOGGER.log(Level.WARNING, "Wrong service URL.");
+            }
         } else {
             LOGGER.log(Level.WARNING, "Service URL undefined.");
         }
