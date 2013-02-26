@@ -1,31 +1,59 @@
 
-INSERT INTO "observation"."phenomenons" ("id", "name", "description") VALUES ('depth', 'urn:ogc:def:phenomenon:GEOM:depth', 'profondeur');
-INSERT INTO "observation"."phenomenons" ("id", "name", "description") VALUES ('temperature', 'urn:ogc:def:phenomenon:GEOM:temperature', 'temperature');
+INSERT INTO "observation"."phenomenons" ("id", "name", "description") VALUES ('depth', 'urn:ogc:def:phenomenon:GEOM:depth', NULL);
+INSERT INTO "observation"."phenomenons" ("id", "name", "description") VALUES ('temperature', 'urn:ogc:def:phenomenon:GEOM:temperature', NULL);
 
 INSERT INTO "observation"."composite_phenomenons" ("id", "name", "description", "dimension") VALUES ('aggregatePhenomenon', 'urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon', NULL, 2);
 INSERT INTO "observation"."components" ("composite_phenomenon", "component") VALUES ('aggregatePhenomenon', 'depth');
 INSERT INTO "observation"."components" ("composite_phenomenon", "component") VALUES ('aggregatePhenomenon', 'temperature');
 
-
-
+--INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
+--VALUES ('offering-allSensor', 'offering-allSensor', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
 
 INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
-VALUES ('offering-allSensor', 'offering-allSensor', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
+VALUES ('offering-1', 'offering-1', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
+INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
+VALUES ('offering-2', 'offering-2', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
+INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
+VALUES ('offering-3', 'offering-3', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
+INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
+VALUES ('offering-4', 'offering-4', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
+INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
+VALUES ('offering-5', 'offering-5', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
+INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
+VALUES ('offering-6', 'offering-6', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
+INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
+VALUES ('offering-7', 'offering-7', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
+INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
+VALUES ('offering-8', 'offering-8', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
+INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
+VALUES ('offering-9', 'offering-9', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
+INSERT INTO "sos"."observation_offerings" ("id", "name", "srs_name", "description", "event_time_begin", "event_time_end", "bounded_by", "response_format", "response_mode", "result_model_namespace", "result_model_localpart")
+VALUES ('offering-10', 'offering-10', 'EPSG:4326', NULL, '2008-05-14 10:40:25.236', NULL, NULL, 'application/xml', NULL, 'http://www.opengis.net/om/1.0', 'Observation');
 
 
 
-INSERT INTO "sos"."offering_phenomenons" ("id_offering", "phenomenon", "composite_phenomenon") VALUES ('offering-allSensor', '', 'aggregatePhenomenon');
-INSERT INTO "sos"."offering_phenomenons" ("id_offering", "phenomenon", "composite_phenomenon") VALUES ('offering-allSensor', 'depth', '');
-INSERT INTO "sos"."offering_phenomenons" ("id_offering", "phenomenon", "composite_phenomenon") VALUES ('offering-allSensor', 'temperature', '');
+--INSERT INTO "sos"."offering_phenomenons" ("id_offering", "phenomenon", "composite_phenomenon") VALUES ('offering-allSensor', '', 'aggregatePhenomenon');
+--INSERT INTO "sos"."offering_phenomenons" ("id_offering", "phenomenon", "composite_phenomenon") VALUES ('offering-allSensor', 'depth', '');
+--INSERT INTO "sos"."offering_phenomenons" ("id_offering", "phenomenon", "composite_phenomenon") VALUES ('offering-allSensor', 'temperature', '');
 
+--INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-001');
+--INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-002');
+--INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-003');
+--INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-004');
+--INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-007');
+--INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-008');
+--INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-009');
 
-INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-001');
-INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-002');
-INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-003');
-INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-004');
-INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-007');
-INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-008');
-INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-009');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-1', 'reference-001');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-2', 'reference-002');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-3', 'reference-003');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-4', 'reference-004');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-5', 'reference-007');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-6', 'reference-011');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-7', 'reference-008');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-8', 'reference-009');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-9', 'reference-012');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-10', 'reference-013');
 
 INSERT INTO "observation"."process" ("name", "description") VALUES ('urn:ogc:object:sensor:GEOM:1', NULL);
 INSERT INTO "observation"."process" ("name", "description") VALUES ('urn:ogc:object:sensor:GEOM:2', NULL);
@@ -38,35 +66,61 @@ INSERT INTO "observation"."process" ("name", "description") VALUES ('urn:ogc:obj
 INSERT INTO "observation"."process" ("name", "description") VALUES ('urn:ogc:object:sensor:GEOM:9', NULL);
 INSERT INTO "observation"."process" ("name", "description") VALUES ('urn:ogc:object:sensor:GEOM:10', NULL);
 
-INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-allSensor', 'RESULT_TEMPLATE');
-INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-allSensor', 'INLINE');
+--INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-allSensor', 'RESULT_TEMPLATE');
+--INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-allSensor', 'INLINE');
 
-INSERT INTO "sos"."offering_sampling_features" ("id_offering", "sampling_feature") VALUES ('offering-allSensor', 'reference-005');
-INSERT INTO "sos"."offering_sampling_features" ("id_offering", "sampling_feature") VALUES ('offering-allSensor', 'reference-006');
-INSERT INTO "sos"."offering_sampling_features" ("id_offering", "sampling_feature") VALUES ('offering-allSensor', 'reference-010');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-1', 'RESULT_TEMPLATE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-1', 'INLINE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-2', 'RESULT_TEMPLATE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-2', 'INLINE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-3', 'RESULT_TEMPLATE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-3', 'INLINE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-4', 'RESULT_TEMPLATE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-4', 'INLINE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-5', 'RESULT_TEMPLATE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-5', 'INLINE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-6', 'RESULT_TEMPLATE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-6', 'INLINE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-7', 'RESULT_TEMPLATE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-7', 'INLINE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-8', 'RESULT_TEMPLATE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-8', 'INLINE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-9', 'RESULT_TEMPLATE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-9', 'INLINE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-10', 'RESULT_TEMPLATE');
+INSERT INTO "sos"."offering_response_modes" ("id_offering", "mode") VALUES ('offering-10', 'INLINE');
+
+--INSERT INTO "sos"."offering_sampling_features" ("id_offering", "sampling_feature") VALUES ('offering-allSensor', 'reference-005');
+--INSERT INTO "sos"."offering_sampling_features" ("id_offering", "sampling_feature") VALUES ('offering-allSensor', 'reference-006');
+--INSERT INTO "sos"."offering_sampling_features" ("id_offering", "sampling_feature") VALUES ('offering-allSensor', 'reference-010');
+
+INSERT INTO "sos"."offering_sampling_features" ("id_offering", "sampling_feature") VALUES ('offering-4', 'reference-005');
 
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-001', '', '', 'urn:ogc:object:sensor:GEOM:1', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-002', '', '', 'urn:ogc:object:sensor:GEOM:2', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-003', '', '', 'urn:ogc:object:sensor:GEOM:3', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-004', '', '', 'urn:ogc:object:sensor:GEOM:4', '', '', '', '', 0);
+INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-005', '', '', 'station-001', '', '', '', '', 0);
+INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-006', '', '', 'station-002', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-007', '', '', 'urn:ogc:object:sensor:GEOM:5', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-008', '', '', 'urn:ogc:object:sensor:GEOM:7', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-009', '', '', 'urn:ogc:object:sensor:GEOM:8', '', '', '', '', 0);
-INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-005', '', '', 'station-001', '', '', '', '', 0);
-INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-006', '', '', 'station-002', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-010', '', '', 'station-006', '', '', '', '', 0);
+INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-011', '', '', 'urn:ogc:object:sensor:GEOM:6', '', '', '', '', 0);
+INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-012', '', '', 'urn:ogc:object:sensor:GEOM:9', '', '', '', '', 0);
+INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-013', '', '', 'urn:ogc:object:sensor:GEOM:10', '', '', '', '', 0);
 
 INSERT INTO "observation"."Distributions" ("name", "scale", "offset", "log") VALUES ('normale', 1, 0, 0);
 
-INSERT INTO "observation"."sampling_points" ("id", "description", "name", "sampled_feature", "point_id", "point_srsname", "point_srsdimension", "x_value", "y_value") VALUES ('station-001', 'Point d''eau BSSS', '10972X0137-PONT' , 'urn:-sandre:object:bdrhf:123X', 'STATION-LOCALISATION', 'urn:ogc:def:crs:EPSG:27582', 2, 65400, 1731368);
-INSERT INTO "observation"."sampling_points" ("id", "description", "name", "sampled_feature", "point_id", "point_srsname", "point_srsdimension", "x_value", "y_value") VALUES ('station-002', 'Point d''eau BSSS', '10972X0137-PLOUF', 'urn:-sandre:object:bdrhf:123X', 'STATION-LOCALISATION', 'urn:ogc:def:crs:EPSG:27582', 2, 65400, 1731368);
-INSERT INTO "observation"."sampling_points" ("id", "description", "name", "sampled_feature", "point_id", "point_srsname", "point_srsdimension", "x_value", "y_value") VALUES ('station-003', 'Station Thermale',  '66685X4587-WARP',  'urn:-sandre:object:bdrhf:123X', 'STATION-LOCALISATION', 'urn:ogc:def:crs:EPSG:27582', 2, 70800, 1891659);
-INSERT INTO "observation"."sampling_points" ("id", "description", "name", "sampled_feature", "point_id", "point_srsname", "point_srsdimension", "x_value", "y_value") VALUES ('station-004', 'Puits',             '99917X9856-FRAG',  'urn:-sandre:object:bdrhf:123X', 'STATION-LOCALISATION', 'urn:ogc:def:crs:EPSG:27582', 2, 41945, 2567987);
-INSERT INTO "observation"."sampling_points" ("id", "description", "name", "sampled_feature", "point_id", "point_srsname", "point_srsdimension", "x_value", "y_value") VALUES ('station-005', 'bouée ds le rhone', '44499X4517-TRUC',  'urn:-sandre:object:bdrhf:123X', 'STATION-LOCALISATION', 'urn:ogc:def:crs:EPSG:27582', 2, 62500, 1625236);
+INSERT INTO "observation"."sampling_points" ("id", "description", "name", "sampled_feature", "point_id", "point_srsname", "point_srsdimension", "x_value", "y_value") VALUES ('station-001', 'Point d''eau BSSS', '10972X0137-PONT' , 'urn:-sandre:object:bdrhf:123X', 'STATION-LOCALISATION', 'urn:ogc:def:crs:epsg:7.9:27582', 2, 65400, 1731368);
+INSERT INTO "observation"."sampling_points" ("id", "description", "name", "sampled_feature", "point_id", "point_srsname", "point_srsdimension", "x_value", "y_value") VALUES ('station-002', 'Point d''eau BSSS', '10972X0137-PLOUF', 'urn:-sandre:object:bdrhf:123X', 'STATION-LOCALISATION', 'urn:ogc:def:crs:epsg:7.9:27582', 2, 65400, 1731368);
+INSERT INTO "observation"."sampling_points" ("id", "description", "name", "sampled_feature", "point_id", "point_srsname", "point_srsdimension", "x_value", "y_value") VALUES ('station-003', 'Station Thermale',  '66685X4587-WARP',  'urn:-sandre:object:bdrhf:123X', 'STATION-LOCALISATION', 'urn:ogc:def:crs:epsg:7.9:27582', 2, 70800, 1891659);
+INSERT INTO "observation"."sampling_points" ("id", "description", "name", "sampled_feature", "point_id", "point_srsname", "point_srsdimension", "x_value", "y_value") VALUES ('station-004', 'Puits',             '99917X9856-FRAG',  'urn:-sandre:object:bdrhf:123X', 'STATION-LOCALISATION', 'urn:ogc:def:crs:epsg:7.9:27582', 2, 41945, 2567987);
+INSERT INTO "observation"."sampling_points" ("id", "description", "name", "sampled_feature", "point_id", "point_srsname", "point_srsdimension", "x_value", "y_value") VALUES ('station-005', 'bouée ds le rhone', '44499X4517-TRUC',  'urn:-sandre:object:bdrhf:123X', 'STATION-LOCALISATION', 'urn:ogc:def:crs:epsg:7.9:27582', 2, 62500, 1625236);
 
 INSERT INTO "sos"."envelopes" ("id", "srs_name", "lower_corner_x", "lower_corner_y", "upper_corner_x", "upper_corner_y") VALUES ('bound-1', 'urn:ogc:def:crs:EPSG:6.8:4283', -30.711, 134.196, -30.702, 134.205);
 
-INSERT INTO "observation"."sampling_curves" ("id", "description", "name", "boundedby", "sampled_feature", "length_uom", "length_value", "shape_id", "shape_srsname") VALUES ('station-006', 'Geology traverse', 'cycle1', 'bound-1', NULL, 'm', 750, 'pr1_ls1', 'urn:ogc:def:crs:EPSG:27582');
+INSERT INTO "observation"."sampling_curves" ("id", "description", "name", "boundedby", "sampled_feature", "length_uom", "length_value", "shape_id", "shape_srsname") VALUES ('station-006', 'Geology traverse', 'cycle1', 'bound-1', NULL, 'm', 750, 'pr1_ls1', 'urn:ogc:def:crs:epsg:7.9:27582');
 INSERT INTO "observation"."linestring" ("id", "x", "y" , "z") VALUES ('pr1_ls1',-30.711, 134.205, null);
 INSERT INTO "observation"."linestring" ("id", "x", "y" , "z") VALUES ('pr1_ls1',-30.710, 134.204, null);
 INSERT INTO "observation"."linestring" ("id", "x", "y" , "z") VALUES ('pr1_ls1',-30.709, 134.203, null);

@@ -10,7 +10,6 @@
     <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:4"/>
     <om:observedProperty>
        <swe:Phenomenon gml:id="depth">
-            <gml:description>profondeur</gml:description>
             <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
         </swe:Phenomenon>
     </om:observedProperty>
@@ -24,7 +23,7 @@
             <sa:sampledFeature  xlink:href="urn:-sandre:object:bdrhf:123X"/>
             <sa:position gml:id="STATION-LOCALISATION">
                 <gml:Point>
-                    <gml:pos srsName="urn:ogc:def:crs:EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+                    <gml:pos srsName="urn:ogc:def:crs:epsg:7.9:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
                 </gml:Point>
             </sa:position>
         </sa:SamplingPoint>

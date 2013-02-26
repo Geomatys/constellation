@@ -60,11 +60,31 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             
             File offeringV100Directory = new File(offeringDirectory, "1.0.0");
             offeringV100Directory.mkdir();
-            writeDataFile(offeringV100Directory, "v100/offering-1.xml", "offering-allSensor");
+            //writeDataFile(offeringV100Directory, "v100/offering-all.xml", "offering-allSensor");
+            writeDataFile(offeringV100Directory, "v100/offering-1.xml", "offering-1");
+            writeDataFile(offeringV100Directory, "v100/offering-2.xml", "offering-2");
+            writeDataFile(offeringV100Directory, "v100/offering-3.xml", "offering-3");
+            writeDataFile(offeringV100Directory, "v100/offering-4.xml", "offering-4");
+            writeDataFile(offeringV100Directory, "v100/offering-5.xml", "offering-5");
+            writeDataFile(offeringV100Directory, "v100/offering-6.xml", "offering-6");
+            writeDataFile(offeringV100Directory, "v100/offering-7.xml", "offering-7");
+            writeDataFile(offeringV100Directory, "v100/offering-8.xml", "offering-8");
+            writeDataFile(offeringV100Directory, "v100/offering-9.xml", "offering-9");
+            writeDataFile(offeringV100Directory, "v100/offering-10.xml", "offering-10");
             
             File offeringV200Directory = new File(offeringDirectory, "2.0.0");
             offeringV200Directory.mkdir();
-            writeDataFile(offeringV200Directory, "v200/offering-1.xml", "offering-allSensor");
+            writeDataFile(offeringV200Directory, "v200/offering-1.xml", "offering-1");
+            writeDataFile(offeringV200Directory, "v200/offering-5.xml", "offering-2");
+            writeDataFile(offeringV200Directory, "v200/offering-3.xml", "offering-3");
+            writeDataFile(offeringV200Directory, "v200/offering-2.xml", "offering-4");
+            writeDataFile(offeringV200Directory, "v200/offering-4.xml", "offering-5");
+            writeDataFile(offeringV200Directory, "v200/offering-6.xml", "offering-6");
+            writeDataFile(offeringV200Directory, "v200/offering-7.xml", "offering-7");
+            writeDataFile(offeringV200Directory, "v200/offering-8.xml", "offering-8");
+            writeDataFile(offeringV200Directory, "v200/offering-9.xml", "offering-9");
+            writeDataFile(offeringV200Directory, "v200/offering-10.xml", "offering-10");
+            
 
             File phenomenonDirectory = new File(configDir, "phenomenons");
             phenomenonDirectory.mkdir();

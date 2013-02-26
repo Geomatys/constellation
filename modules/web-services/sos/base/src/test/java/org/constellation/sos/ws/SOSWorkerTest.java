@@ -169,7 +169,7 @@ public abstract class SOSWorkerTest {
 
         assertTrue(result.getContents() != null);
         assertTrue(result.getContents().getOfferings() != null);
-        assertTrue(result.getContents().getOfferings().size() == 1);
+        assertEquals("nb offering!", 10, result.getContents().getOfferings().size());
 
         /*
          *  TEST 2 : full get capabilities
@@ -188,7 +188,7 @@ public abstract class SOSWorkerTest {
         assertTrue(result.getServiceProvider() != null);
         assertTrue(result.getContents() != null);
         assertTrue(result.getContents().getOfferings() != null);
-        assertTrue(result.getContents().getOfferings().size() == 1);
+        assertEquals("nb offering!", 10, result.getContents().getOfferings().size());
         assertTrue(result != null);
 
         /*
@@ -262,7 +262,7 @@ public abstract class SOSWorkerTest {
         assertTrue(result.getServiceProvider() == null);
         assertTrue(result.getContents() != null);
         assertTrue(result.getContents().getOfferings() != null);
-        assertTrue(result.getContents().getOfferings().size() == 1);
+        assertEquals("nb offering!", 10, result.getContents().getOfferings().size());
         assertTrue(result != null);
 
     }
@@ -371,7 +371,7 @@ public abstract class SOSWorkerTest {
          *  Test 1: getObservation with bad response format
          */
         GetObservation request  = new GetObservation("1.0.0",
-                                                     "offering-allSensor",
+                                                     "offering-4",
                                                      null,
                                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                                      null,
@@ -395,7 +395,7 @@ public abstract class SOSWorkerTest {
          *  Test 2: getObservation with bad response format
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       null,
@@ -427,7 +427,7 @@ public abstract class SOSWorkerTest {
         EventTime equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -459,7 +459,7 @@ public abstract class SOSWorkerTest {
         equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       null,
@@ -555,7 +555,7 @@ public abstract class SOSWorkerTest {
         equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       null,
@@ -588,7 +588,7 @@ public abstract class SOSWorkerTest {
         equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       null,
@@ -619,7 +619,7 @@ public abstract class SOSWorkerTest {
         equals = new EventTime(filter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-8",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:36"),
                                       null,
@@ -644,7 +644,7 @@ public abstract class SOSWorkerTest {
          *          and with wrong observed prop
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:hotness"),
@@ -666,11 +666,11 @@ public abstract class SOSWorkerTest {
         assertTrue(exLaunched);
 
         /**
-         *  Test 11: getObservation with procedure urn:ogc:object:sensor:GEOM:5
+         *  Test 11: getObservation with procedure urn:ogc:object:sensor:GEOM:4
          *          and with wrong foi
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -706,7 +706,7 @@ public abstract class SOSWorkerTest {
          *  Test 1: getObservation with procedure urn:ogc:object:sensor:GEOM:4 and no resultModel
          */
         GetObservation request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -732,8 +732,8 @@ public abstract class SOSWorkerTest {
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());
-        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
-        assertTrue(expResult.getResult() instanceof DataArrayPropertyType);
+        assertTrue("not a dataArray. Was:" + obsResult.getResult(), obsResult.getResult() instanceof DataArrayPropertyType);
+        assertTrue("not a dataArray. Was:" + obsResult.getResult(), expResult.getResult() instanceof DataArrayPropertyType);
 
         DataArrayPropertyType expR = (DataArrayPropertyType) expResult.getResult();
         DataArrayPropertyType obsR = (DataArrayPropertyType) obsResult.getResult();
@@ -778,7 +778,7 @@ public abstract class SOSWorkerTest {
          *  Test 2: getObservation with procedure urn:ogc:object:sensor:GEOM:4 avec responseMode null
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -812,7 +812,7 @@ public abstract class SOSWorkerTest {
          *  Test 3: getObservation with procedure urn:ogc:object:sensor:GEOM:4
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -846,7 +846,7 @@ public abstract class SOSWorkerTest {
          *  Test 4: getObservation with procedure urn:ogc:object:sensor:GEOM:3
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -874,7 +874,7 @@ public abstract class SOSWorkerTest {
         EventTime before        = new EventTime(null, filter, null);
         times.add(before);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -899,7 +899,7 @@ public abstract class SOSWorkerTest {
         EventTime after         = new EventTime(afilter,null, null);
         times.add(after);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -928,7 +928,7 @@ public abstract class SOSWorkerTest {
         EventTime during       = new EventTime(null, null, dfilter);
         times.add(during);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -957,7 +957,7 @@ public abstract class SOSWorkerTest {
         EventTime equals = new EventTime(efilter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -982,7 +982,7 @@ public abstract class SOSWorkerTest {
          *           with resultTemplate mode
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1034,7 +1034,7 @@ public abstract class SOSWorkerTest {
         equals = new EventTime(efilter);
         times.add(equals);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1085,7 +1085,7 @@ public abstract class SOSWorkerTest {
         after = new EventTime(afilter,null, null);
         times.add(after);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1137,7 +1137,7 @@ public abstract class SOSWorkerTest {
         before = new EventTime(null, bfilter, null);
         times.add(before);
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       times,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1183,7 +1183,7 @@ public abstract class SOSWorkerTest {
          *           with observedproperties = urn:ogc:def:phenomenon:GEOM:depth
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:depth"),
@@ -1217,7 +1217,7 @@ public abstract class SOSWorkerTest {
          *           with observedproperties = urn:ogc:def:phenomenon:GEOM:aggreagtePhenomenon
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-5",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:5"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"),
@@ -1252,7 +1252,7 @@ public abstract class SOSWorkerTest {
          *           with foi                =  10972X0137-PLOUF
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-5",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:5"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"),
@@ -1287,7 +1287,7 @@ public abstract class SOSWorkerTest {
          *           => no error but no result
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"),
@@ -1309,7 +1309,7 @@ public abstract class SOSWorkerTest {
          *  => measurement type
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-7",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:7"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1343,7 +1343,7 @@ public abstract class SOSWorkerTest {
          *  Test 18: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1377,7 +1377,7 @@ public abstract class SOSWorkerTest {
          *  Test 19: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter (no result expected)
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-4",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1410,7 +1410,7 @@ public abstract class SOSWorkerTest {
          *           with resultTemplate mode
          */
         GetObservation request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-8",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:8"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1473,7 +1473,7 @@ public abstract class SOSWorkerTest {
          *
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-8",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:8"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1501,7 +1501,7 @@ public abstract class SOSWorkerTest {
          *
          */
         request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-8",
                                       null,
                                       null,
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1624,7 +1624,7 @@ public abstract class SOSWorkerTest {
          *           with resultTemplate mode
          */
         GetObservation GOrequest  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1701,7 +1701,7 @@ public abstract class SOSWorkerTest {
         EventTime before = new EventTime(null, bfilter, null);
         times.add(before);
         GOrequest  = new GetObservation("1.0.0",
-                                        "offering-allSensor",
+                                        "offering-3",
                                         times,
                                         Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                         Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1856,7 +1856,7 @@ public abstract class SOSWorkerTest {
         after = new EventTime(afilter, null, null);
         times.add(after);
         GOrequest  = new GetObservation("1.0.0",
-                                        "offering-allSensor",
+                                        "offering-3",
                                         times,
                                         Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                         Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -1927,7 +1927,7 @@ public abstract class SOSWorkerTest {
         equals = new EventTime(efilter);
         times.add(equals);
         GOrequest  = new GetObservation("1.0.0",
-                                        "offering-allSensor",
+                                        "offering-3",
                                         times,
                                         Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                         Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
@@ -2019,7 +2019,7 @@ public abstract class SOSWorkerTest {
          *           with resultTemplate mode
          */
         GetObservation GOrequest  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),

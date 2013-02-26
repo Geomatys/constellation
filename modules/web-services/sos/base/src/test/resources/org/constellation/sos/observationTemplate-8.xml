@@ -9,13 +9,11 @@
             <swe:component>
                  <swe:Phenomenon gml:id="depth">
                     <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
-                    <gml:description>profondeur</gml:description>
                  </swe:Phenomenon>
             </swe:component>
             <swe:component>
                 <swe:Phenomenon gml:id="temperature">
                     <gml:name>urn:ogc:def:phenomenon:GEOM:temperature</gml:name>
-                    <gml:description>temperature</gml:description>
                 </swe:Phenomenon>>
             </swe:component>
         </swe:CompositePhenomenon>
@@ -31,7 +29,7 @@
                 </gml:Envelope>
             </gml:boundedBy>
             <sa:shape>
-                <gml:LineString gml:id="pr1_ls1" srsName="urn:ogc:def:crs:EPSG:27582">
+                <gml:LineString gml:id="pr1_ls1" srsName="urn:ogc:def:crs:epsg:7.9:27582">
                     <gml:pos>-30.711 134.205</gml:pos>
                     <gml:pos>-30.710 134.204</gml:pos>
                     <gml:pos>-30.709 134.203</gml:pos>

@@ -218,22 +218,7 @@ public class DefaultObservationReader implements ObservationReader {
     @Override
     public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
         try {
-            final String offeringNameVar;
-            if (version.equals("2.0.0")) {
-                final String procedureName;
-                if (offeringName.length() >= 9) {
-                    procedureName = sensorIdBase + offeringName.substring(9);
-                } else {
-                    procedureName = offeringName;
-                }
-                if (!getProcedureNames().contains(procedureName)) {
-                    return null;
-                }
-                offeringNameVar = "offering-allSensor";
-            } else {
-                offeringNameVar = offeringName;
-            }
-            final ObservationOfferingType off = new ObservationOfferingType(offTable.getEntry(offeringNameVar));
+            final ObservationOfferingType off = new ObservationOfferingType(offTable.getEntry(offeringName));
             if (version.equals("2.0.0")) {
                 off.setName(offeringName);
                 off.setProcedures(Arrays.asList(sensorIdBase + offeringName.substring(9)));

@@ -20,7 +20,7 @@
             <sf:sampledFeature xlink:href="urn:-sandre:object:bdrhf:123X"/>
             <sams:shape>
                 <gml:Point gml:id="STATION-LOCALISATION">
-                    <gml:pos srsName="urn:ogc:def:crs:EPSG:27582">65400.0 1731368.0</gml:pos>
+                    <gml:pos srsName="urn:ogc:def:crs:epsg:7.9:27582">65400.0 1731368.0</gml:pos>
                 </gml:Point>
             </sams:shape>
         </sams:SF_SpatialSamplingFeature>

@@ -223,22 +223,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
         try {
-            final String offeringNameVar;
-            if (version.equals("2.0.0")) {
-                final String procedureName;
-                if (offeringName.length() >= 9) {
-                    procedureName = sensorIdBase + offeringName.substring(9);
-                } else {
-                    procedureName = offeringName;
-                }
-                if (!getProcedureNames().contains(procedureName)) {
-                    return null;
-                }
-                offeringNameVar = "offering-allSensor";
-            } else {
-                offeringNameVar = offeringName;
-            }
-            final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18", "var46"), offeringNameVar);
+            final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18", "var46"), offeringName);
 
             final boolean exist = values.getVariable("var46") != null;
             if (!exist) {

@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.gml.xml.AbstractTimePosition;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
+import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.observation.xml.v100.MeasureType;
@@ -140,11 +142,18 @@ public final class Normalizer {
                         } 
                     } else if (obs.getSamplingTime() instanceof Period) {
                         final Period period = (Period)obs.getSamplingTime();
+                        // BEGIN
                         if (totalPeriod.getBeginning().getPosition().getDate().getTime() > period.getBeginning().getPosition().getDate().getTime()) {
                             final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  period.getBeginning().getPosition(), totalPeriod.getEnding().getPosition());
                             uniqueObs.setSamplingTimePeriod(newPeriod);
                         }
-                        if (totalPeriod.getEnding().getPosition().getDate().getTime() < period.getEnding().getPosition().getDate().getTime()) {
+                        
+                        // END
+                        if (TimeIndeterminateValueType.NOW.equals(((AbstractTimePosition)totalPeriod.getEnding().getPosition()).getIndeterminatePosition()) ||
+                            TimeIndeterminateValueType.NOW.equals(((AbstractTimePosition)     period.getEnding().getPosition()).getIndeterminatePosition())) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), period.getEnding().getPosition());
+                            
+                        } else if (totalPeriod.getEnding().getPosition().getDate().getTime() < period.getEnding().getPosition().getDate().getTime()) {
                             final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), period.getEnding().getPosition());
                             uniqueObs.setSamplingTimePeriod(newPeriod);
                         }

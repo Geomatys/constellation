@@ -8,11 +8,9 @@
             <gml:name>urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon</gml:name>
             <swe:component gml:id="depth">
                 <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
-                <gml:description>profondeur</gml:description>
             </swe:component>
             <swe:component gml:id="temperature">
                 <gml:name>urn:ogc:def:phenomenon:GEOM:temperature</gml:name>
-                <gml:description>temperature</gml:description>
             </swe:component>
         </swe:CompositePhenomenon>
     </om:observedProperty>
@@ -26,7 +24,7 @@
             <sa:sampledFeature  xlink:href="urn:-sandre:object:bdrhf:123X"/>
             <sa:position>
                 <gml:Point gml:id="STATION-LOCALISATION">
-                    <gml:pos srsName="urn:ogc:def:crs:EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+                    <gml:pos srsName="urn:ogc:def:crs:epsg:7.9:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
                 </gml:Point>
             </sa:position>
         </sa:SamplingPoint>

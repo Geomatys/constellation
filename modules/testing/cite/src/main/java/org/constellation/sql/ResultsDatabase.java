@@ -400,22 +400,22 @@ public class ResultsDatabase {
         final StringBuilder sb = new StringBuilder();
         final boolean x364 = X364.isSupported();
         if (previous == null) {
-            if (x364) sb.append(X364.FOREGROUND_BLUE.sequence());
-            if (x364) sb.append(X364.BOLD.sequence());
+            if (x364) {sb.append(X364.FOREGROUND_BLUE.sequence());}
+            if (x364) {sb.append(X364.BOLD.sequence());}
             sb.append("This is the first session of tests launched for ");
             sb.append(service).append(" ").append(version)
               .append(". We can't compare the results with a previous one.");
-            if (x364) sb.append(X364.RESET.sequence());
+            if (x364) {sb.append(X364.RESET.sequence());}
             LOGGER.info(sb.toString());
             return;
         }
-        if (x364) sb.append(X364.FOREGROUND_MAGENTA.sequence());
-        if (x364) sb.append(X364.BOLD.sequence());
+        if (x364) {sb.append(X364.FOREGROUND_MAGENTA.sequence());}
+        if (x364) {sb.append(X364.BOLD.sequence());}
         sb.append("Results for the session ");
         sb.append(service).append(" ").append(version).append(", executed at ").append(DATE_FORMAT.format(date));
         sb.append(" compared to the one at ").append(previous.toString()).append(endOfLine);
-        if (x364) sb.append(X364.RESET.sequence());
-        if (x364) sb.append(X364.FOREGROUND_GREEN.sequence());
+        if (x364) {sb.append(X364.RESET.sequence());}
+        if (x364) {sb.append(X364.FOREGROUND_GREEN.sequence());}
         if (newlyPassedTests.isEmpty()) {
             sb.append(tab).append("No tests have been corrected in the current session.").append(endOfLine);
         } else {
@@ -425,14 +425,14 @@ public class ResultsDatabase {
             }
         }
 
-        if (x364) sb.append(X364.FOREGROUND_DEFAULT.sequence());
+        if (x364) {sb.append(X364.FOREGROUND_DEFAULT.sequence());}
         if (problematicTests.isEmpty()) {
-            if (x364) sb.append(X364.FOREGROUND_GREEN.sequence());
+            if (x364) {sb.append(X364.FOREGROUND_GREEN.sequence());}
             sb.append(tab).append("No new tests have failed in the current session.").append(endOfLine);
-            if (x364) sb.append(X364.FOREGROUND_DEFAULT.sequence());
+            if (x364) {sb.append(X364.FOREGROUND_DEFAULT.sequence());}
         } else {
-            if (x364) sb.append(X364.FOREGROUND_RED.sequence());
-            if (x364) sb.append(X364.BOLD.sequence());
+            if (x364) {sb.append(X364.FOREGROUND_RED.sequence());}
+            if (x364) {sb.append(X364.BOLD.sequence());}
             sb.append(tab).append("/!\\ Some tests are now failing ! You should fix them to restore the build /!\\")
               .append(endOfLine);
             for (Result res : problematicTests) {
@@ -443,7 +443,7 @@ public class ResultsDatabase {
         }
 
         if (!problematicGroupTests.isEmpty()) {
-            if (x364) sb.append(X364.FOREGROUND_RED.sequence());
+            if (x364) {sb.append(X364.FOREGROUND_RED.sequence());}
             sb.append(tab).append("Some Group tests are now failing because of new activated test failling (not an error)")
               .append(endOfLine);
             for (Result res : problematicGroupTests) {
@@ -451,33 +451,33 @@ public class ResultsDatabase {
                 sb.append(tab).append(tab).append(tab).append("==> Directory: ").append(res.getDirectory())
                   .append(endOfLine);
             }
-            if (x364) sb.append(X364.FOREGROUND_DEFAULT.sequence());
+            if (x364) {sb.append(X364.FOREGROUND_DEFAULT.sequence());}
         }
 
         if (!newlyActivatedTests.isEmpty()) {
-            if (x364) sb.append(X364.FOREGROUND_GREEN.sequence());
+            if (x364) {sb.append(X364.FOREGROUND_GREEN.sequence());}
             sb.append(tab).append("New tests have been activated in the current session.").append(endOfLine);
             for (Result res : newlyActivatedTests) {
                 sb.append(tab).append(tab).append("Id: ").append(res.getId());
                 sb.append(" Result:").append(res.isPassed()).append(endOfLine);
             }
-            if (x364) sb.append(X364.FOREGROUND_DEFAULT.sequence());
+            if (x364) {sb.append(X364.FOREGROUND_DEFAULT.sequence());}
         }
 
         if (!deActivatedTests.isEmpty()) {
-            if (x364) sb.append(X364.FOREGROUND_RED.sequence());
-            if (x364) sb.append(X364.BOLD.sequence());
+            if (x364) {sb.append(X364.FOREGROUND_RED.sequence());}
+            if (x364) {sb.append(X364.BOLD.sequence());}
             sb.append(tab).append("/!\\ Some tests have been deactivated in the current session! ! You should reactivate them to restore the build /!\\")
                     .append(endOfLine);
             for (Result res : deActivatedTests) {
                 sb.append(tab).append(tab).append("Id: ").append(res.getId()).append(endOfLine);
                 sb.append(tab).append(tab).append(tab).append("==> Directory: ").append(res.getDirectory());
-                sb.append("previous Result:").append(res.isPassed()).append(endOfLine);
+                sb.append(" Previous result:").append(res.isPassed()).append(endOfLine);
             }
-            if (x364) sb.append(X364.FOREGROUND_DEFAULT.sequence());
+            if (x364) {sb.append(X364.FOREGROUND_DEFAULT.sequence());}
         }
 
-        if (x364) sb.append(X364.RESET.sequence());
+        if (x364) {sb.append(X364.RESET.sequence());}
         LOGGER.info(sb.toString());
     }
 

@@ -2189,7 +2189,7 @@ public class SOSworker extends AbstractWorker {
                         localOmFilter.setTimeAfter(timeFilter);
                     } else if (timeFilter instanceof Instant) {
                         final Instant ti = (Instant)timeFilter;
-                        templateTime = buildTimePeriod(version, ti.getPosition(), null);
+                        templateTime = buildTimePeriod(version, ti.getPosition(), TimeIndeterminateValueType.NOW);
 
                     } else {
                        throw new CstlServiceException("TM_After operation require timeInstant!",
