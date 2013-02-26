@@ -2225,6 +2225,7 @@ public abstract class SOSWorkerTest {
         assertTrue (result instanceof SamplingCurveType);
 
         final SamplingCurveType resultC = (SamplingCurveType) result;
+        assertEquals(expResultC.getShape(),  resultC.getShape());
         assertEquals(expResultC.getLength(), resultC.getLength());
         assertEquals(expResultC, resultC);
 
