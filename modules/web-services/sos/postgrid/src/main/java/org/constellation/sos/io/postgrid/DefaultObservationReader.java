@@ -174,29 +174,11 @@ public class DefaultObservationReader implements ObservationReader {
     @Override
     public Collection<String> getOfferingNames(final String version) throws CstlServiceException {
         try {
-            if (version.equals("1.0.0")) {
-                return offTable.getIdentifiers();
-                
-            // for 2.0 we adapt the offering with one by procedure   
-            } else if (version.equals("2.0.0")) {
-                final ProcessTable procTable = omDatabase.getTable(ProcessTable.class);
-                final Set<String> procedures = procTable.getIdentifiers();
-                final List<String> result = new ArrayList<String>();
-                for (String procedure : procedures) {
-                    if (procedure.startsWith(sensorIdBase)) {
-                        procedure = procedure.replace(sensorIdBase, "");
-                    }
-                    result.add("offering-" + procedure);
-                }
-                return result;
-            } else {
-                throw new IllegalArgumentException("unexpected SOS version:" + version);
-            }
+            return offTable.getIdentifiers();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
-
         }
     }
 
