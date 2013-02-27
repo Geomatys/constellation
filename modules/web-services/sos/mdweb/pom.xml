@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.constellation.web-services</groupId>
     <artifactId>cstl-web-sos</artifactId>
-    <version>0.9.1</version>
+    <version>0.9-SNAPSHOT</version>
   </parent>
 
 
