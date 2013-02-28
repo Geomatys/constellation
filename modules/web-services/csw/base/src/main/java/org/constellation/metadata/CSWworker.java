@@ -51,11 +51,11 @@ import org.constellation.filter.FilterParserException;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -85,6 +85,7 @@ import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.ogc.xml.SortBy;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.AbstractDomain;
@@ -95,11 +96,12 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
-import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 
 // GeoAPI dependencies
 import org.opengis.filter.sort.SortOrder;
@@ -199,6 +201,13 @@ public class CSWworker extends AbstractWorker {
      */
     private int profile;
 
+    private MetadataSecurityFilter securityFilter;
+            
+    /**
+     * use this flag to pass the shiro security when using the worker in a non web context.
+     */
+    private boolean shiroAccessible = true;
+    
     /**
      * Build a new CSW worker with the specified configuration directory
      *
@@ -249,6 +258,11 @@ public class CSWworker extends AbstractWorker {
             final String ts = configuration.getParameter("transactionSecurized");
             if (ts != null && !ts.isEmpty()) {
                 transactionSecurized = Boolean.parseBoolean(ts);
+            }
+            // look for shiro accessibility
+            final String sa = configuration.getParameter("shiroAccessible");
+            if (sa != null && !sa.isEmpty()) {
+                shiroAccessible = Boolean.parseBoolean(sa);
             }
             LOGGER.info("CSW" + suffix + " worker (" + configuration.getFormat() + ") \"" + serviceID + "\" running\n");
 
@@ -310,6 +324,7 @@ public class CSWworker extends AbstractWorker {
         indexSearcher                 = cswfactory.getIndexSearcher(configDir, serviceID);
         luceneFilterParser            = cswfactory.getLuceneFilterParser();
         sqlFilterParser               = cswfactory.getSQLFilterParser();
+        securityFilter                = cswfactory.getSecurityFilter();
         if (profile == TRANSACTIONAL) {
             mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);
             catalogueHarvester        = cswfactory.getCatalogueHarvester(configuration, mdWriter);
@@ -679,8 +694,14 @@ public class CSWworker extends AbstractWorker {
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
 
-        final String version = request.getVersion().toString();
-        final String id = request.getRequestId();
+        final String version   = request.getVersion().toString();
+        final String id        = request.getRequestId();
+        final String userLogin;
+        if (shiroAccessible) {
+            userLogin = SecurityManager.getCurrentUserLogin();
+        } else {
+            userLogin = null;
+        }
 
         // we initialize the output format of the response
         initializeOutputFormat(request);
@@ -799,7 +820,7 @@ public class CSWworker extends AbstractWorker {
            LOGGER.log(logLevel, "ebrim SQL query obtained:{0}", sqlQuery);
            try {
             // we try to execute the query
-            results = mdReader.executeEbrimSQLQuery(sqlQuery.getQuery());
+            results = securityFilter.filterResults(userLogin, mdReader.executeEbrimSQLQuery(sqlQuery.getQuery()));
            } catch (MetadataIoException ex) {
                CodeList execptionCode = ex.getExceptionCode();
                if (execptionCode == null) {
@@ -848,7 +869,7 @@ public class CSWworker extends AbstractWorker {
             }
 
             // we try to execute the query
-            results = executeLuceneQuery(luceneQuery);
+            results = securityFilter.filterResults(userLogin, executeLuceneQuery(luceneQuery));
         }
         final int nbResults = results.length;
 
@@ -1017,11 +1038,16 @@ public class CSWworker extends AbstractWorker {
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
 
-        final String version = request.getVersion().toString();
+        final String version   = request.getVersion().toString();
+        final String userLogin;
+        if (shiroAccessible) {
+            userLogin = SecurityManager.getCurrentUserLogin();
+        } else {
+            userLogin = null;
+        }
         
         // we initialize the output format of the response
         initializeOutputFormat(request);
-
 
         // we get the level of the record to return (Brief, summary, full)
         ElementSetType set = ElementSetType.SUMMARY;
@@ -1074,7 +1100,7 @@ public class CSWworker extends AbstractWorker {
 
             final String saved = id;
             id = executeIdentifierQuery(id);
-            if (id == null) {
+            if (id == null || !securityFilter.allowed(userLogin, id)) {
                 unexistingID.add(saved);
                 LOGGER.log(Level.WARNING, "unexisting id:{0}", saved);
                 continue;
@@ -1303,24 +1329,13 @@ public class CSWworker extends AbstractWorker {
      * @return
      */
     public TransactionResponse transaction(final Transaction request) throws CstlServiceException {
-        return transaction(request, false);
-    }
-
-    /**
-     * A web service method allowing to Insert / update / delete record from the CSW.
-     *
-     * @param request
-     * @param javaCall use this flag to pass the shiro security whan using the worker in a non web context.
-     * @return
-     */
-    public TransactionResponse transaction(final Transaction request, final boolean javaCall) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
 
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
         }
-        if (!javaCall && transactionSecurized && !SecurityManager.isAuthenticated()) {
+        if (shiroAccessible && transactionSecurized && !SecurityManager.isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform a transaction request.");
         }
         final long startTime = System.currentTimeMillis();
@@ -1748,5 +1763,4 @@ public class CSWworker extends AbstractWorker {
     protected MarshallerPool getMarshallerPool() {
         return CSWMarshallerPool.getInstance();
     }
-
 }

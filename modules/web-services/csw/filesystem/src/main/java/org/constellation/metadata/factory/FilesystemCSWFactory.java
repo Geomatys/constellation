@@ -45,6 +45,8 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 
 import static org.constellation.generic.database.Automatic.*;
+import org.constellation.metadata.security.MetadataSecurityFilter;
+import org.constellation.metadata.security.NoMetadataSecurityFilter;
 
 // GeotoolKit dependencies
 import org.geotoolkit.lucene.IndexingException;
@@ -142,5 +144,10 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
     @Override
     public FilterParser getSQLFilterParser() {
         return new SQLFilterParser();
+    }
+
+    @Override
+    public MetadataSecurityFilter getSecurityFilter() {
+        return new NoMetadataSecurityFilter();
     }
 }

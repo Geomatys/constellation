@@ -43,6 +43,8 @@ import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 import static org.constellation.generic.database.Automatic.*;
+import org.constellation.metadata.security.MetadataSecurityFilter;
+import org.constellation.metadata.security.NoMetadataSecurityFilter;
 
 /**
  *
@@ -134,6 +136,11 @@ public class NetCDFCSWFactory implements AbstractCSWFactory {
     @Override
     public FilterParser getSQLFilterParser() {
         return new SQLFilterParser();
+    }
+
+    @Override
+    public MetadataSecurityFilter getSecurityFilter() {
+        return new NoMetadataSecurityFilter();
     }
     
 }

@@ -18,13 +18,11 @@ package org.constellation.metadata.io.netcdf;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
@@ -45,9 +43,6 @@ import org.geotoolkit.xml.AnchoredMarshallerPool;
 import static org.constellation.test.utils.MetadataUtilities.*;
 
 // JUnit dependencies
-import org.geotoolkit.csw.xml.v202.BriefRecordType;
-import org.geotoolkit.csw.xml.v202.RecordType;
-import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.geotoolkit.util.ComparisonMode;
 import static org.junit.Assert.*;
 import org.junit.*;
@@ -81,6 +76,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
             File configFile = new File(configDir, "config.xml");
             Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
             configuration.putParameter("transactionSecurized", "false");
+            configuration.putParameter("shiroAccessible", "false");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
             GenericDatabaseMarshallerPool.getInstance().release(marshaller);

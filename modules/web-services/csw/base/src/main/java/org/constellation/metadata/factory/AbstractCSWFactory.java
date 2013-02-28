@@ -26,6 +26,7 @@ import java.util.Map;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.filter.FilterParser;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
@@ -116,4 +117,6 @@ public interface AbstractCSWFactory {
     FilterParser getLuceneFilterParser();
     
     FilterParser getSQLFilterParser();
+    
+    MetadataSecurityFilter getSecurityFilter();
 }

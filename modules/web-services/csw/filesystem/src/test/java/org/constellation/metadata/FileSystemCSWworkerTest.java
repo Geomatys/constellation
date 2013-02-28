@@ -70,6 +70,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             File configFile = new File(configDir, "config.xml");
             Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
             configuration.putParameter("transactionSecurized", "false");
+            configuration.putParameter("shiroAccessible", "false");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
             GenericDatabaseMarshallerPool.getInstance().release(marshaller);
