@@ -12,6 +12,10 @@
             <key>transactionSecurized</key>
             <value>false</value>
         </entry>
+        <entry>
+            <key>shiroAccessible</key>
+            <value>false</value>
+        </entry>
     </cstl:customParameters>
 </cstl:LayerContext>
 

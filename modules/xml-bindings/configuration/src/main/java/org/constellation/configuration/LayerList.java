@@ -74,4 +74,15 @@ public class LayerList {
         hash = 11 * hash + (this.layer != null ? this.layer.hashCode() : 0);
         return hash;
     }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("LayerList\n");
+        if (layer != null && !layer.isEmpty()) {
+            for (Layer l: layer) {
+                sb.append(l).append('\n');
+            }
+        }
+        return sb.toString();
+    }
 }

@@ -286,7 +286,6 @@ public class Layer {
             sb.append("name:\n").append(name).append('\n');
         }
         if (styles != null && !styles.isEmpty()) {
-            sb.append("styles:\n").append(styles).append('\n');
             for (String style : styles) {
                 sb.append("style:\n").append(style).append('\n');
             }
