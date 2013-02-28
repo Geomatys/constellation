@@ -43,6 +43,8 @@ public interface Worker {
      * @param logLevel
      */
     void setLogLevel(Level logLevel);
+    
+    void setShiroAccessible(final boolean shiroAccessible);
 
     /**
      * Return the identifier of the worker.

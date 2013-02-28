@@ -144,6 +144,7 @@ public class WFSWorkerTest {
         worker = new DefaultWFSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+        worker.setShiroAccessible(false);
     }
 
     @AfterClass

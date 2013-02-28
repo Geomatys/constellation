@@ -273,10 +273,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException {
         isWorking();
-        final String queryVersion = getCapab.getVersion().toString();
-
+        final String queryVersion      = getCapab.getVersion().toString();
         final String requestedLanguage = getCapab.getLanguage();
-
+        final String userLogin         = getUserLogin();
         // we get the request language, if its not set we get the default "eng"
         final String currentLanguage;
         if (requestedLanguage != null && supportedLanguages.contains(requestedLanguage) && !requestedLanguage.equals(defaultLanguage)) {
@@ -313,10 +312,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         //Build the list of layers
         final List<AbstractLayer> outputLayers = new ArrayList<AbstractLayer>();
-        final Map<Name,Layer> layers = getLayers();
+        final Map<Name,Layer> layers = getLayers(userLogin);
 
         for (Name name : layers.keySet()) {
-            final LayerDetails layer = getLayerReference(name);
+            final LayerDetails layer = getLayerReference(userLogin, name);
             final Layer configLayer  = layers.get(name);
 
             if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
@@ -513,7 +512,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             if(!configLayer.getDimensions().isEmpty()){
                 try {
                     final MapItem mi = layer.getMapLayer(null, null);
-                    applyLayerFiltersAndDims(mi);
+                    applyLayerFiltersAndDims(mi, userLogin);
 
                     if(mi instanceof FeatureMapLayer){
                         final FeatureMapLayer fml = (FeatureMapLayer) mi;
@@ -835,8 +834,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     	//
         // 1. SCENE
         //       -- get the List of layer references
-        final List<Name> layerNames = getFI.getQueryLayers();
-        final List<LayerDetails> layerRefs = getLayerReferences(layerNames);
+        final String userLogin             = getUserLogin();
+        final List<Name> layerNames        = getFI.getQueryLayers();
+        final List<LayerDetails> layerRefs = getLayerReferences(userLogin, layerNames);
 
         for (LayerDetails layer : layerRefs) {
             if (!layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) {
@@ -849,7 +849,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final List<String> styleNames          = getFI.getStyles();
         final StyledLayerDescriptor sld = getFI.getSld();
 
-        final List<MutableStyle> styles        = getStyles(layerRefs, sld, styleNames);
+        final List<MutableStyle> styles        = getStyles(layerRefs, sld, styleNames, userLogin);
         //       -- create the rendering parameter Map
         final Double elevation                 = getFI.getElevation();
         final Date time                        = getFI.getTime();
@@ -863,7 +863,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
             sdef.setContext(context);
             //apply layercontext filters
-            applyLayerFiltersAndDims(context);
+            applyLayerFiltersAndDims(context, userLogin);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
@@ -963,8 +963,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     @Override
     public PortrayalResponse getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
         isWorking();
-        final LayerDetails layer = getLayerReference(getLegend.getLayer());
-        final String layerName = layer.getName().toString();
+        final String userLogin   = getUserLogin();
+        final LayerDetails layer = getLayerReference(userLogin, getLegend.getLayer());
+        final String layerName   = layer.getName().toString();
         if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
             throw new CstlServiceException("You are not allowed to request the layer \""+
                     layerName +"\".", LAYER_NOT_QUERYABLE, KEY_LAYER.toLowerCase());
@@ -1024,8 +1025,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             } else {
                 // No sld given, we use the style.
-                final Map<Name,Layer> layers = getLayers();
-                final Layer layerRef = layers.get(layer.getName());
+                final Map<Name,Layer> layers = getLayers(userLogin);
+                final Layer layerRef         = layers.get(layer.getName());
 
                 final List<String> defaultStyleRefs = layerRef.getStyles();
                 if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
@@ -1063,7 +1064,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     public PortrayalResponse getMap(final GetMap getMap) throws CstlServiceException {
         isWorking();
         final String queryVersion = getMap.getVersion().toString();
-
+        final String userLogin    = getUserLogin();
     	//
     	// Note this is almost the same logic as in getFeatureInfo
     	//
@@ -1085,7 +1086,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final List<Name> layerNames = getMap.getLayers();
         final List<LayerDetails> layerRefs;
         try{
-            layerRefs = getLayerReferences(layerNames);
+            layerRefs = getLayerReferences(userLogin, layerNames);
         } catch (CstlServiceException ex) {
             return handleExceptions(getMap, errorInImage, errorBlank, ex, LAYER_NOT_DEFINED,  KEY_LAYERS.toLowerCase());
         }
@@ -1102,7 +1103,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         List<MutableStyle> styles;
         try {
-            styles = getStyles(layerRefs, sld, styleNames);
+            styles = getStyles(layerRefs, sld, styleNames, userLogin);
         } catch (CstlServiceException ex) {
             return handleExceptions(getMap, errorInImage, errorBlank, ex, STYLE_NOT_DEFINED, null);
         }
@@ -1143,7 +1144,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 context.items().add(mapLayer);
             }
             //apply layercontext filters
-            applyLayerFiltersAndDims(context);
+            applyLayerFiltersAndDims(context, userLogin);
 
             sdef.setContext(context);
         } catch (PortrayalException ex) {
@@ -1270,7 +1271,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     }
 
     private List<MutableStyle> getStyles(final List<LayerDetails> layerRefs, final StyledLayerDescriptor sld,
-                                         final List<String> styleNames) throws CstlServiceException {
+                                         final List<String> styleNames, final String userLogin) throws CstlServiceException {
         final List<MutableStyle> styles = new ArrayList<MutableStyle>();
         for (int i=0; i<layerRefs.size(); i++) {
 
@@ -1289,7 +1290,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
-                final Map<Name,Layer> layers = getLayers();
+                final Map<Name,Layer> layers = getLayers(userLogin);
                 final Layer layer = layers.get(layerRefs.get(i).getName());
 
                 final List<String> defaultStyleRefs = layer.getStyles();
@@ -1310,8 +1311,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         return styles;
     }
 
-    private void applyLayerFiltersAndDims(final MapItem item){
-        final Map<Name,Layer> layersContext = getLayers();
+    private void applyLayerFiltersAndDims(final MapItem item, final String userLogin){
+        final Map<Name,Layer> layersContext = getLayers(userLogin);
 
         if(item instanceof FeatureMapLayer){
             final FeatureMapLayer fml = (FeatureMapLayer)item;
@@ -1357,7 +1358,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         for(MapItem layer : item.items()){
-            applyLayerFiltersAndDims(layer);
+            applyLayerFiltersAndDims(layer, userLogin);
         }
 
     }

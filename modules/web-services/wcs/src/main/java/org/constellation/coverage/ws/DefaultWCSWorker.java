@@ -221,16 +221,17 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     @Override
     public DescribeCoverageResponse describeCoverage(final DescribeCoverage request) throws CstlServiceException {
         isWorking();
-        final String version = request.getVersion().toString();
+        final String version   = request.getVersion().toString();
+        final String userLogin = getUserLogin();
         if (version.isEmpty()) {
             throw new CstlServiceException("The parameter VERSION must be specified.",
                            MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
         }
 
         if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
-            return describeCoverage100(request);
+            return describeCoverage100(request, userLogin);
         } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
-            return describeCoverage111(request);
+            return describeCoverage111(request, userLogin);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
                     "is not handled.", NO_APPLICABLE_CODE, KEY_VERSION.toLowerCase());
@@ -246,7 +247,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private DescribeCoverageResponse describeCoverage100(final DescribeCoverage request)
+    private DescribeCoverageResponse describeCoverage100(final DescribeCoverage request, final String userLogin)
             throws CstlServiceException {
 
         if (request.getIdentifier().isEmpty()) {
@@ -257,7 +258,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final List<CoverageOfferingType> coverageOfferings = new ArrayList<CoverageOfferingType>();
         for (String coverage : request.getIdentifier()) {
             final Name tmpName = parseCoverageName(coverage);
-            final LayerDetails layerRef = getLayerReference(tmpName);
+            final LayerDetails layerRef = getLayerReference(userLogin, tmpName);
             if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
                 throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
@@ -269,7 +270,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
             final Name fullCoverageName = coverageRef.getName();
-            final Layer configLayer = getLayers().get(fullCoverageName);
+            final Layer configLayer = getLayers(userLogin).get(fullCoverageName);
             final String coverageName;
 
             if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
@@ -429,7 +430,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private DescribeCoverageResponse describeCoverage111(final DescribeCoverage request) throws CstlServiceException {
+    private DescribeCoverageResponse describeCoverage111(final DescribeCoverage request, final String userLogin) throws CstlServiceException {
         if (request.getIdentifier().isEmpty()) {
             throw new CstlServiceException("The parameter IDENTIFIER must be specified",
                     MISSING_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
@@ -438,7 +439,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final List<CoverageDescriptionType> coverageDescriptions = new ArrayList<CoverageDescriptionType>();
         for (String coverage : request.getIdentifier()) {
             final Name tmpName = parseCoverageName(coverage);
-            final LayerDetails layerRef = getLayerReference(tmpName);
+            final LayerDetails layerRef = getLayerReference(userLogin, tmpName);
             if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
                 throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_IDENTIFIER.toLowerCase());
@@ -450,7 +451,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
             final Name fullCoverageName = coverageRef.getName();
-            final Layer configLayer = getLayers().get(fullCoverageName);
+            final Layer configLayer = getLayers(userLogin).get(fullCoverageName);
             final String coverageName;
 
             if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
@@ -567,7 +568,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     public GetCapabilitiesResponse getCapabilities(final GetCapabilities request) throws CstlServiceException {
         isWorking();
         //we begin by extract the base attribute
-        String version = request.getVersion().toString();
+        String version         = request.getVersion().toString();
+        final String userLogin = getUserLogin();
         if (version.isEmpty()) {
             // For the moment the only version that we really support is this one.
             version = "1.0.0";
@@ -604,7 +606,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final String format;
         final GetCapabilitiesResponse response;
         if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
-            response = getCapabilities100((WCSCapabilitiesType)staticCapabilities);
+            response = getCapabilities100((WCSCapabilitiesType)staticCapabilities, userLogin);
         } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
             // if the user have specified one format accepted (only one for now != spec)
             final AcceptFormats formats = request.getAcceptFormats();
@@ -618,7 +620,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 }
             }
 
-            response = getCapabilities111((Capabilities)staticCapabilities);
+            response = getCapabilities111((Capabilities)staticCapabilities, userLogin);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
@@ -638,7 +640,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private GetCapabilitiesResponse getCapabilities100(final WCSCapabilitiesType staticCapabilities) throws CstlServiceException {
+    private GetCapabilitiesResponse getCapabilities100(final WCSCapabilitiesType staticCapabilities, final String userLogin) throws CstlServiceException {
         
         //we update the url in the static part.
         final Request req = WCSConstant.REQUEST_100.clone();
@@ -650,10 +652,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final org.geotoolkit.wcs.xml.v100.ServiceType service  = staticCapabilities.getService();
         final ContentMetadata contentMetadata;
         final List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
-        final Map<Name,Layer> layers = getLayers();
+        final Map<Name,Layer> layers = getLayers(userLogin);
         try {
             for (Name name : layers.keySet()) {
-                final LayerDetails layer = getLayerReference(name);
+                final LayerDetails layer = getLayerReference(userLogin, name);
                 final Layer configLayer  = layers.get(name);
 
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
@@ -731,7 +733,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private Capabilities getCapabilities111(final Capabilities staticCapabilities) throws CstlServiceException {
+    private Capabilities getCapabilities111(final Capabilities staticCapabilities, final String userLogin) throws CstlServiceException {
        
 
         final ServiceIdentification si = staticCapabilities.getServiceIdentification();
@@ -743,10 +745,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         // Generate the Contents part of the GetCapabilities.
         final Contents contents;
         final List<CoverageSummaryType> summary = new ArrayList<CoverageSummaryType>();
-        final Map<Name,Layer> layers = getLayers();
+        final Map<Name,Layer> layers = getLayers(userLogin);
         try {
             for (Name name : layers.keySet()) {
-                final LayerDetails layer = getLayerReference(name);
+                final LayerDetails layer = getLayerReference(userLogin, name);
                 final Layer configLayer  = layers.get(name);
 
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
@@ -814,6 +816,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     public Object getCoverage(final GetCoverage request) throws CstlServiceException {
         isWorking();
         final String inputVersion = request.getVersion().toString();
+        final String userLogin    = getUserLogin();
         if (inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
                            MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
@@ -837,7 +840,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     KEY_COVERAGE.toLowerCase());
         }
         final Name tmpName = parseCoverageName(request.getCoverage());
-        final LayerDetails tmplayerRef = getLayerReference(tmpName);
+        final LayerDetails tmplayerRef = getLayerReference(userLogin, tmpName);
         if (!tmplayerRef.isQueryable(ServiceDef.Query.WCS_ALL) || tmplayerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
                     tmplayerRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());

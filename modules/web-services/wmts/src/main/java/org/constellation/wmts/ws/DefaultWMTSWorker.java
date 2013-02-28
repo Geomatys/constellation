@@ -114,7 +114,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
         LOGGER.log(logLevel, "getCapabilities request processing\n");
         final long start = System.currentTimeMillis();
-
+        final String userLogin  = getUserLogin();
+        
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("WMTS")) {
@@ -182,10 +183,10 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         // and the list of matrix set
         final List<TileMatrixSet> tileSets = new ArrayList<TileMatrixSet>();
 
-        final Map<Name,Layer> declaredLayers = getLayers();
+        final Map<Name,Layer> declaredLayers = getLayers(userLogin);
 
         for(final Name n : declaredLayers.keySet()){
-            final LayerDetails details = getLayerReference(n);
+            final LayerDetails details = getLayerReference(userLogin, n);
             final Layer configlayer    = declaredLayers.get(n);
             final Object origin        = details.getOrigin();
             if(!(origin instanceof CoverageReference)){
@@ -280,10 +281,10 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     public String getFeatureInfo(GetFeatureInfo request) throws CstlServiceException {
 
         //       -- get the List of layer references
-        final GetTile getTile = request.getGetTile();
-
+        final GetTile getTile       = request.getGetTile();
+        final String userLogin      = getUserLogin();
         final Name layerName        = Util.parseLayerName(getTile.getLayer());
-        final LayerDetails layerRef = getLayerReference(layerName);
+        final LayerDetails layerRef = getLayerReference(userLogin, layerName);
 
         Coverage c = null;
 
@@ -394,13 +395,14 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      * {@inheritDoc}
      */
     @Override
-    public TileReference getTile(GetTile request) throws CstlServiceException {
+    public TileReference getTile(final GetTile request) throws CstlServiceException {
 
         //1 LAYER NOT USED FOR NOW
         Name layerName = Util.parseLayerName(request.getLayer());
-
+        final String userLogin  = getUserLogin();
+        
         //switch alias -> name
-        final Map<Name,Layer> declaredLayers = getLayers();
+        final Map<Name,Layer> declaredLayers = getLayers(userLogin);
         if(declaredLayers != null){
             for(Entry<Name,Layer> entry : declaredLayers.entrySet()){
                 if(layerName.getLocalPart().equalsIgnoreCase(entry.getValue().getAlias())){
@@ -449,7 +451,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
 
         try{
-            final LayerDetails details = getLayerReference(layerName);
+            final LayerDetails details = getLayerReference(userLogin, layerName);
             if(details == null){
                 throw new CstlServiceException("No layer for name : " + layerName , INVALID_PARAMETER_VALUE, "layerName");
             }

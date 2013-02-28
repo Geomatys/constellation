@@ -58,6 +58,7 @@ public class WMTSWorkerTest {
         worker = new DefaultWMTSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+        worker.setShiroAccessible(false);
     }
 
     @AfterClass

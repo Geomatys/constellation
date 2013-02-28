@@ -100,6 +100,7 @@ public class WFSServiceTest {
         Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
         LayerContext context = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
         context.getCustomParameters().put("transactionSecurized", "false");
+        context.getCustomParameters().put("shiroAccessible", "false");
 
         Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
         m.marshal(context, LayerContext);

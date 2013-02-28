@@ -233,7 +233,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
            }
        }
        if (!foundID) {
-           final List<QName> typeNames = Utils.getQNameListFromNameSet(getLayers().keySet());
+           final List<QName> typeNames = Utils.getQNameListFromNameSet(getLayers(null).keySet());
            Collections.sort(typeNames, new QNameComparator());
            final QueryType query = new QueryType(IDENTIFIER_FILTER, typeNames, "2.0.0");
            final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, typeNames);
@@ -297,6 +297,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         LOGGER.log(logLevel, "GetCapabilities request proccesing");
         final long start = System.currentTimeMillis();
         
+        final String userLogin  = getUserLogin();
         //choose the best version from acceptVersion
         final AcceptVersions versions = request.getAcceptVersions();
         if (versions != null) {
@@ -340,11 +341,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         /*
          *  layer providers
          */
-        final Map<Name,Layer> layers = getLayers();
+        final Map<Name,Layer> layers = getLayers(userLogin);
         final List<Name> layerNames  = new ArrayList<Name>(layers.keySet());
         Collections.sort(layerNames, new NameComparator());
         for (final Name layerName : layerNames) {
-            final LayerDetails layer = getLayerReference(layerName);
+            final LayerDetails layer = getLayerReference(userLogin, layerName);
             final Layer configLayer  = layers.get(layerName);
 
             if (layer instanceof FeatureLayerDetails) {
@@ -460,7 +461,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         // we verify the base attribute
         verifyBaseRequest(request, false, false);
         final String currentVersion = request.getVersion().toString();
-
+        final String userLogin      = getUserLogin();
+        
         final String gmlVersion;
         if ("2.0.0".equals(currentVersion)) {
             gmlVersion = "3.2.1";
@@ -470,12 +472,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final JAXBFeatureTypeWriter writer  = new JAXBFeatureTypeWriter(gmlVersion);
         final List<QName> names             = request.getTypeName();
         final List<FeatureType> types       = new ArrayList<FeatureType>();
-        final Map<Name,Layer> layers = getLayers();
+        final Map<Name,Layer> layers = getLayers(userLogin);
 
         if (names.isEmpty()) {
             //search all types
             for (final Name name : layers.keySet()) {
-                final LayerDetails layer = getLayerReference(name);
+                final LayerDetails layer = getLayerReference(userLogin, name);
                 if (!(layer instanceof FeatureLayerDetails)) {continue;}
 
                 try {
@@ -491,10 +493,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (name == null) {continue;}
 
                 final Name n = Utils.getNameFromQname(name);
-                if (layersContainsKey(n) == null) {
+                if (layersContainsKey(userLogin, n) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + name, INVALID_PARAMETER_VALUE, "typenames");
                 }
-                final LayerDetails layer = getLayerReference(n);
+                final LayerDetails layer = getLayerReference(userLogin, n);
 
                 if(!(layer instanceof FeatureLayerDetails)) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + name, INVALID_PARAMETER_VALUE, "typenames");
@@ -651,12 +653,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, false, false);
 
         long nbMatched                             = 0;
+        final String userLogin                     = getUserLogin();
         final String currentVersion                = request.getVersion().toString();
         final int maxFeatures                      = request.getCount();
         final Integer startIndex                   = request.getStartIndex();
         final List<FeatureCollection> collections  = new ArrayList<FeatureCollection>();
         final Map<String, String> schemaLocations  = new HashMap<String, String>();
-        final Map<Name,Layer> layers               = getLayers();
+        final Map<Name,Layer> layers               = getLayers(userLogin);
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
         if ((request.getQuery() == null || request.getQuery().isEmpty()) && (request.getStoredQuery() == null || request.getStoredQuery().isEmpty())) {
             throw new CstlServiceException("You must specify a query!", MISSING_PARAMETER_VALUE);
@@ -704,10 +707,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             for (QName typeName : typeNames) {
 
                 final Name fullTypeName = Utils.getNameFromQname(typeName);
-                if (layersContainsKey(fullTypeName) == null) {
+                if (layersContainsKey(userLogin, fullTypeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typenames");
                 }
-                final LayerDetails layerD = getLayerReference(fullTypeName);
+                final LayerDetails layerD = getLayerReference(userLogin, fullTypeName);
 
                 if (!(layerD instanceof FeatureLayerDetails)) {continue;}
 
@@ -815,9 +818,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             throw new CstlServiceException("ValueReference must not be empty", INVALID_PARAMETER_VALUE, "valueReference");
         }
         
+        final String userLogin                     = getUserLogin();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
         final String currentVersion                = request.getVersion().toString();
-        final Map<Name,Layer> layers               = getLayers();
+        final Map<Name,Layer> layers               = getLayers(userLogin);
         final List<? extends Query> queries        = extractStoredQueries(request);
         final Integer maxFeatures                  = request.getCount();
         final Map<String, String> schemaLocations  = new HashMap<String, String>();
@@ -864,10 +868,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             for (QName typeName : typeNames) {
 
                 final Name fullTypeName = Utils.getNameFromQname(typeName);
-                if (layersContainsKey(fullTypeName) == null) {
+                if (layersContainsKey(userLogin, fullTypeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typenames");
                 }
-                final LayerDetails layerD = getLayerReference(fullTypeName);
+                final LayerDetails layerD = getLayerReference(userLogin, fullTypeName);
 
                 if (!(layerD instanceof FeatureLayerDetails)) {continue;}
 
@@ -963,6 +967,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, true, false);
 
         // we prepare the report
+        final String userLogin                      = getUserLogin();
         final String currentVersion                 = request.getVersion().toString();
         int totalInserted                           = 0;
         int totalUpdated                            = 0;
@@ -972,7 +977,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final Map<String, String> inserted          = new LinkedHashMap<String, String>();
         final Map<String, String> replaced          = new LinkedHashMap<String, String>();
         final Map<String, String> namespaceMapping  = request.getPrefixMapping();
-        final JAXPStreamFeatureReader featureReader = new JAXPStreamFeatureReader(getFeatureTypes());
+        final JAXPStreamFeatureReader featureReader = new JAXPStreamFeatureReader(getFeatureTypes(userLogin));
         featureReader.getProperties().put(JAXPStreamFeatureReader.BINDING_PACKAGE, "GML");
         
         for (Object transaction: transactions) {
@@ -1052,10 +1057,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         throw new CstlServiceException("Unexpected Object to insert:" + featureType);
                     }
 
-                    if (layersContainsKey(typeName) == null) {
+                    if (layersContainsKey(userLogin, typeName) == null) {
                         throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                     }
-                    final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(typeName);
+                    final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(userLogin, typeName);
                     try {
                         final CoordinateReferenceSystem trueCrs = layer.getStore().getFeatureType(typeName).getCoordinateReferenceSystem();
                         if(trueCrs != null && !CRS.equalsIgnoreMetadata(trueCrs, featureCollection.getFeatureType().getCoordinateReferenceSystem())){
@@ -1091,10 +1096,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 final Filter filter = extractJAXBFilter(deleteRequest.getFilter(), Filter.EXCLUDE, namespaceMapping, currentVersion);
 
                 final Name typeName = Utils.getNameFromQname(deleteRequest.getTypeName());
-                if (layersContainsKey(typeName) == null) {
+                if (layersContainsKey(userLogin, typeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typename");
                 }
-                final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(typeName);
+                final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(userLogin, typeName);
                 try {
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
 
@@ -1136,10 +1141,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 final CoordinateReferenceSystem crs = extractCRS(updateRequest.getSrsName());
 
                 final Name typeName = Utils.getNameFromQname(updateRequest.getTypeName());
-                if (layersContainsKey(typeName) == null) {
+                if (layersContainsKey(userLogin, typeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typename");
                 }
-                final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(typeName);
+                final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(userLogin, typeName);
                 try {
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
                     if (ft == null) {
@@ -1287,12 +1292,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     throw new CstlServiceException("Unexpected replacement object:" + featureType);
                 }
                         
-                if (layersContainsKey(typeName) == null) {
+                if (layersContainsKey(userLogin, typeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
                 
                 try {
-                    final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(typeName);
+                    final FeatureLayerDetails layer = (FeatureLayerDetails) getLayerReference(userLogin, typeName);
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
 
                     // we extract the number of feature to replace
@@ -1676,13 +1681,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
          }
     }
 
-    private List<FeatureType> getFeatureTypes() throws CstlServiceException {
+    private List<FeatureType> getFeatureTypes(final String userLogin) throws CstlServiceException {
         final List<FeatureType> types       = new ArrayList<FeatureType>();
-        final Map<Name,Layer> layers        = getLayers();
+        final Map<Name,Layer> layers        = getLayers(userLogin);
 
         //search all types
         for (final Name name : layers.keySet()) {
-            final LayerDetails layer = getLayerReference(name);
+            final LayerDetails layer = getLayerReference(userLogin, name);
             if (!(layer instanceof FeatureLayerDetails)) {continue;}
             try {
                 //fix feature type to define the exposed crs : true EPSG axis order

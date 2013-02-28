@@ -107,6 +107,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
                 Source s1 = new Source("src", Boolean.TRUE, null, null);
 
                 LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
+                lc.getCustomParameters().put("shiroAccessible", "false");
 
                 //we write the configuration file
                 File configFile = new File(configDir, "layerContext.xml");

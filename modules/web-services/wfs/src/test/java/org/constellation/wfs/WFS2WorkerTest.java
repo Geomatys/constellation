@@ -206,6 +206,7 @@ public class WFS2WorkerTest {
         worker = new DefaultWFSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+        worker.setShiroAccessible(false);
     }
 
     @AfterClass
@@ -1818,6 +1819,7 @@ public class WFS2WorkerTest {
         worker = new DefaultWFSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+        worker.setShiroAccessible(false);
 
         resultlsqI = worker.listStoredQueries(requestlsq);
 
@@ -1874,6 +1876,7 @@ public class WFS2WorkerTest {
         worker = new DefaultWFSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+        worker.setShiroAccessible(false);
 
         resultlsqI = worker.listStoredQueries(requestlsq);
 

@@ -114,6 +114,11 @@ public abstract class AbstractWorker implements Worker {
     protected UnmodifiableArrayList<ServiceDef> supportedVersions;
 
     /**
+     * use this flag to pass the shiro security when using the worker in a non web context.
+     */
+    protected boolean shiroAccessible = true;
+    
+    /**
      * A Policy Decision Point (PDP) if some security constraints have been defined.
      */
     protected SimplePDP pdp = null;
@@ -124,6 +129,16 @@ public abstract class AbstractWorker implements Worker {
         this.id = id;
         this.configurationDirectory = configurationDirectory;
         this.specification = specification;
+    }
+    
+    protected String getUserLogin() {
+        final String userLogin;
+        if (shiroAccessible) {
+            userLogin = org.constellation.ws.security.SecurityManager.getCurrentUserLogin();
+        } else {
+            userLogin = null;
+        }
+        return userLogin;
     }
 
     protected void setSupportedVersion(final ServiceDef... supportedVersions) {
@@ -217,6 +232,11 @@ public abstract class AbstractWorker implements Worker {
     @Override
     public void setLogLevel(final Level logLevel) {
         this.logLevel = logLevel;
+    }
+    
+    @Override
+    public void setShiroAccessible(final boolean shiroAccessible) {
+        this.shiroAccessible = shiroAccessible;
     }
 
     /**

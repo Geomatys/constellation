@@ -204,11 +204,6 @@ public class CSWworker extends AbstractWorker {
     private MetadataSecurityFilter securityFilter;
             
     /**
-     * use this flag to pass the shiro security when using the worker in a non web context.
-     */
-    private boolean shiroAccessible = true;
-    
-    /**
      * Build a new CSW worker with the specified configuration directory
      *
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
@@ -696,12 +691,7 @@ public class CSWworker extends AbstractWorker {
 
         final String version   = request.getVersion().toString();
         final String id        = request.getRequestId();
-        final String userLogin;
-        if (shiroAccessible) {
-            userLogin = SecurityManager.getCurrentUserLogin();
-        } else {
-            userLogin = null;
-        }
+        final String userLogin = getUserLogin();
 
         // we initialize the output format of the response
         initializeOutputFormat(request);
@@ -1039,12 +1029,7 @@ public class CSWworker extends AbstractWorker {
         verifyBaseRequest(request);
 
         final String version   = request.getVersion().toString();
-        final String userLogin;
-        if (shiroAccessible) {
-            userLogin = SecurityManager.getCurrentUserLogin();
-        } else {
-            userLogin = null;
-        }
+        final String userLogin = getUserLogin();
         
         // we initialize the output format of the response
         initializeOutputFormat(request);

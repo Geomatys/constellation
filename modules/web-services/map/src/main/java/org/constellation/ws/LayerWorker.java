@@ -26,20 +26,26 @@ import java.util.List;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.map.factory.MapFactory;
+import org.constellation.map.security.LayerSecurityFilter;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
+import org.geotoolkit.factory.FactoryNotFoundException;
 import org.opengis.feature.type.Name;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.style.MutableStyle;
@@ -57,6 +63,7 @@ public abstract class LayerWorker extends AbstractWorker {
 
     protected final String defaultLanguage;
 
+    private LayerSecurityFilter securityFilter;
 
     public LayerWorker(final String id, final File configurationDirectory, final Specification specification) {
         super(id, configurationDirectory, specification);
@@ -93,6 +100,13 @@ public abstract class LayerWorker extends AbstractWorker {
                             LOGGER.log(Level.INFO, "transaction securized:{0}", ts);
                             transactionSecurized = Boolean.parseBoolean(ts);
                         }
+                        // look for shiro accessibility
+                        final String sa = candidate.getCustomParameters().get("shiroAccessible");
+                        if (sa != null && !sa.isEmpty()) {
+                            shiroAccessible = Boolean.parseBoolean(sa);
+                        }
+                        final MapFactory mapfactory = getMapFactory(candidate.getImplementation());
+                        securityFilter = mapfactory.getSecurityFilter();
                     } else {
                         startError = "The layer context File does not contain a layerContext object";
                         isStarted  = false;
@@ -100,6 +114,10 @@ public abstract class LayerWorker extends AbstractWorker {
                     }
                 } catch (JAXBException ex) {
                     startError = "JAXBExeception while unmarshalling the layer context File";
+                    isStarted  = false;
+                    LOGGER.log(Level.WARNING, startError, ex);
+                } catch (FactoryNotFoundException ex) {
+                    startError = ex.getMessage();
                     isStarted  = false;
                     LOGGER.log(Level.WARNING, startError, ex);
                 } finally {
@@ -132,10 +150,27 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     /**
+     * Select the good CSW factory in the available ones in function of the dataSource type.
+     *
+     * @param type
+     * @return
+     */
+    private MapFactory getMapFactory(final DataSourceType type) {
+        final Iterator<MapFactory> ite = ServiceRegistry.lookupProviders(MapFactory.class);
+        while (ite.hasNext()) {
+            MapFactory currentFactory = ite.next();
+            if (currentFactory.factoryMatchType(type)) {
+                return currentFactory;
+            }
+        }
+        throw new FactoryNotFoundException("No Map factory has been found for type:" + type);
+    }
+    
+    /**
      *
      * @return map of additional informations for each layer declared in the layer context.
      */
-    protected Map<Name, Layer> getLayers(){
+    protected Map<Name, Layer> getLayers(final String login){
         if (layerContext == null) {
             return new HashMap<Name, Layer>();
         }
@@ -157,11 +192,13 @@ public abstract class LayerWorker extends AbstractWorker {
                         continue;
                     // we look for detailled informations in the include sections
                     } else {
-                        final Layer layer = source.isIncludedLayer(qn);
-                        if (layer == null) {
-                            layers.put(layerName, new Layer(qn));
-                        } else {
-                            layers.put(layerName, layer);
+                        if (securityFilter.allowed(login, layerName)) {
+                            final Layer layer = source.isIncludedLayer(qn);
+                            if (layer == null) {
+                                layers.put(layerName, new Layer(qn));
+                            } else {
+                                layers.put(layerName, layer);
+                            }
                         }
                     }
                 /*
@@ -169,7 +206,7 @@ public abstract class LayerWorker extends AbstractWorker {
                  */
                 } else {
                     Layer layer = source.isIncludedLayer(qn);
-                    if (layer != null) {
+                    if (layer != null && securityFilter.allowed(login, layerName)) {
                         layers.put(layerName, layer);
                     }
                 }
@@ -184,10 +221,10 @@ public abstract class LayerWorker extends AbstractWorker {
      * @return a list of LayerDetails
      * @throws CstlServiceException
      */
-    protected List<LayerDetails> getLayerReferences(final Collection<Name> layerNames) throws CstlServiceException {
+    protected List<LayerDetails> getLayerReferences(final String login, final Collection<Name> layerNames) throws CstlServiceException {
         final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
         for (Name layerName : layerNames) {
-            layerRefs.add(getLayerReference(layerName));
+            layerRefs.add(getLayerReference(login, layerName));
         }
         return layerRefs;
     }
@@ -198,10 +235,10 @@ public abstract class LayerWorker extends AbstractWorker {
      * @return a LayerDetails
      * @throws CstlServiceException
      */
-    protected LayerDetails getLayerReference(final Name layerName) throws CstlServiceException {
+    protected LayerDetails getLayerReference(final String login, final Name layerName) throws CstlServiceException {
         final LayerDetails layerRef;
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
-        final Name fullName = layersContainsKey(layerName);
+        final Name fullName = layersContainsKey(login, layerName);
         if (fullName != null) {
             layerRef = namedProxy.get(fullName);
             if (layerRef == null) {throw new CstlServiceException("Unable to find  the Layer named:" + layerName + " in the provider proxy", NO_APPLICABLE_CODE);}
@@ -215,12 +252,12 @@ public abstract class LayerWorker extends AbstractWorker {
      * We can't use directly layers.containsKey because it may miss the namespace or the alias.
      * @param name
      */
-    protected Name layersContainsKey(Name name) {
+    protected Name layersContainsKey(final String login, final Name name) {
         if (name == null) {
             return null;
         }
 
-        final Map<Name,Layer> layers = getLayers();
+        final Map<Name,Layer> layers = getLayers(login);
         if (layers == null) {
             return null;
         }

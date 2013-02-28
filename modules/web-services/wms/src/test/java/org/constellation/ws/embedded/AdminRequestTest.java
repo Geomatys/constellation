@@ -242,6 +242,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
         sources.add(new Source("shapeSrc", true, null, null));
         Layers layerObj = new Layers(sources);
         LayerContext layerContext = new LayerContext(layerObj);
+        layerContext.getCustomParameters().put("shiroAccessible", "false");
 
         postRequestObject(conec, layerContext);
         Object obj = unmarshallResponse(conec);
