@@ -119,6 +119,11 @@ public abstract class AbstractWorker implements Worker {
     protected boolean shiroAccessible = true;
     
     /**
+     * use this flag to pass the shiro security when using the worker in a non web context.
+     */
+    protected boolean cacheCapabilities = true;
+    
+    /**
      * A Policy Decision Point (PDP) if some security constraints have been defined.
      */
     protected SimplePDP pdp = null;
@@ -411,8 +416,10 @@ public abstract class AbstractWorker implements Worker {
      * @param capabilities 
      */
     protected void putCapabilitiesInCache(final String version, final String language, final AbstractCapabilitiesCore capabilities) {
-        final String keyCache = specification.name() + '-' + id + '-' + version + '-' + language;
-        CAPS_RESPONSE.put(keyCache, capabilities);
+        if (cacheCapabilities) {
+            final String keyCache = specification.name() + '-' + id + '-' + version + '-' + language;
+            CAPS_RESPONSE.put(keyCache, capabilities);
+        }
     }
     
     protected void clearCapabilitiesCache() {

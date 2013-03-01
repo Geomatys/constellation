@@ -105,6 +105,11 @@ public abstract class LayerWorker extends AbstractWorker {
                         if (sa != null && !sa.isEmpty()) {
                             shiroAccessible = Boolean.parseBoolean(sa);
                         }
+                        // look for capabilities cache flag
+                        final String cc = candidate.getCustomParameters().get("cacheCapabilities");
+                        if (cc != null && !cc.isEmpty()) {
+                            cacheCapabilities = Boolean.parseBoolean(cc);
+                        }
                         final MapFactory mapfactory = getMapFactory(candidate.getImplementation());
                         securityFilter = mapfactory.getSecurityFilter();
                     } else {
