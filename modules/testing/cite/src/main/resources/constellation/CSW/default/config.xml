@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <automatic format='filesystem'>
     <dataDirectory>data</dataDirectory>
-    <customParameters>
+    <customparameters>
         <entry>
             <key>transactionSecurized</key>
             <value>false</value>
@@ -10,5 +10,5 @@
             <key>shiroAccessible</key>
             <value>false</value>
         </entry>
-    </customParameters>
+    </customparameters>
 </automatic>
