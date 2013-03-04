@@ -33,7 +33,7 @@ import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.xml.stream.XMLStreamException;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.util.ArgumentChecks;
+import org.apache.sis.util.ArgumentChecks;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;

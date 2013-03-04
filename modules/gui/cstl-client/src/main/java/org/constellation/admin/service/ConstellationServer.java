@@ -55,7 +55,7 @@ import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.client.ServerFactory;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
-import org.geotoolkit.util.ArgumentChecks;
+import org.apache.sis.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.xml.MarshallerPool;

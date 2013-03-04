@@ -41,7 +41,7 @@ import org.geotoolkit.ows.xml.v110.DomainMetadataType;
 import org.geotoolkit.ows.xml.v110.LanguageStringType;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.util.ArgumentChecks;
+import org.apache.sis.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wps.io.WPSIO;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;

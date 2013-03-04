@@ -46,7 +46,7 @@ import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.Source;
 
 // Geotoolkit dependencies
-import org.geotoolkit.util.ArgumentChecks;
+import org.apache.sis.util.ArgumentChecks;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
 
