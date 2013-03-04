@@ -100,8 +100,9 @@
         <module>metadata</module>
         <module>metadata-mdw</module>
     	<module>generic</module>
-	    <module>observation</module>
-	    <module>provider</module>
+	<module>observation</module>
+	<module>om2</module>
+	<module>provider</module>
         <module>provider-data-coveragesgroup</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
@@ -179,6 +180,7 @@
         <module>metadata-mdw</module>
     	<module>generic</module>
         <module>observation</module>
+	<module>om2</module>
       </modules>
     </profile>
     <profile>

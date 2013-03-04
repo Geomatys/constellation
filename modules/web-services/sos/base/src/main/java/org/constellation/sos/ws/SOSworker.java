@@ -886,7 +886,7 @@ public class SOSworker extends AbstractWorker {
      
         final List<Observation> observation = new ArrayList<Observation>();
         for (String oid : request.getObservation()) {
-            observation.add(omReader.getObservation(oid, OBSERVATION_QNAME, currentVersion));
+            observation.add(omReader.getObservation(oid, OBSERVATION_QNAME, INLINE, currentVersion));
         }
         final ObservationCollection response = buildGetObservationByIdResponse(currentVersion, "collection-1", null, observation);
         LOGGER.log(logLevel, "getObservationById processed in {0}ms.\n", (System.currentTimeMillis() - start));
@@ -1240,7 +1240,7 @@ public class SOSworker extends AbstractWorker {
                 matchingResult = new ArrayList<Observation>();
                 final Set<String> observationIDs = localOmFilter.filterObservation();
                 for (String observationID : observationIDs) {
-                    matchingResult.add(omReader.getObservation(observationID, resultModel, currentVersion));
+                    matchingResult.add(omReader.getObservation(observationID, resultModel, mode, currentVersion));
                 }
                 Collections.sort(matchingResult, new ObservationComparator());
                 computedBounds         = null;
@@ -1768,7 +1768,7 @@ public class SOSworker extends AbstractWorker {
     }
     
     public GetResultTemplateResponse getResultTemplate(final GetResultTemplate request) throws CstlServiceException {
-        LOGGER.log(logLevel, "InsertResultTemplate request processing\n");
+        LOGGER.log(logLevel, "GetResultTemplate request processing\n");
         final long start = System.currentTimeMillis();
         verifyBaseRequest(request, true, false);
         final String currentVersion = request.getVersion().toString();
@@ -1799,7 +1799,7 @@ public class SOSworker extends AbstractWorker {
             matchingResult = new ArrayList<Observation>();
             final Set<String> observationIDs = localOmFilter.filterObservation();
             for (String observationID : observationIDs) {
-                matchingResult.add(omReader.getObservation(observationID, OBSERVATION_QNAME, currentVersion));
+                matchingResult.add(omReader.getObservation(observationID, OBSERVATION_QNAME, RESULT_TEMPLATE, currentVersion));
             }
         // case (2)
         } else {
@@ -2073,7 +2073,7 @@ public class SOSworker extends AbstractWorker {
                     id = omWriter.writeObservation(obs);
                 } else {
                     //in first we verify that the observation is conform to the template
-                    final Observation template = (Observation) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME, currentVersion);
+                    final Observation template = (Observation) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME, RESULT_TEMPLATE, currentVersion);
                     //if the observation to insert match the template we can insert it in the OM db
                     if (obs.matchTemplate(template)) {
                         if (obs.getSamplingTime() != null && obs.getResult() != null) {

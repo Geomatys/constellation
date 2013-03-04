@@ -143,7 +143,12 @@ public final class Normalizer {
                     } else if (obs.getSamplingTime() instanceof Period) {
                         final Period period = (Period)obs.getSamplingTime();
                         // BEGIN
-                        if (totalPeriod.getBeginning().getPosition().getDate().getTime() > period.getBeginning().getPosition().getDate().getTime()) {
+                        if (TimeIndeterminateValueType.BEFORE.equals(((AbstractTimePosition)totalPeriod.getBeginning().getPosition()).getIndeterminatePosition()) ||
+                            TimeIndeterminateValueType.BEFORE.equals(((AbstractTimePosition)     period.getBeginning().getPosition()).getIndeterminatePosition())) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), period.getEnding().getPosition());
+                            uniqueObs.setSamplingTimePeriod(newPeriod);
+                            
+                        } else if (totalPeriod.getBeginning().getPosition().getDate().getTime() > period.getBeginning().getPosition().getDate().getTime()) {
                             final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  period.getBeginning().getPosition(), totalPeriod.getEnding().getPosition());
                             uniqueObs.setSamplingTimePeriod(newPeriod);
                         }
@@ -152,6 +157,7 @@ public final class Normalizer {
                         if (TimeIndeterminateValueType.NOW.equals(((AbstractTimePosition)totalPeriod.getEnding().getPosition()).getIndeterminatePosition()) ||
                             TimeIndeterminateValueType.NOW.equals(((AbstractTimePosition)     period.getEnding().getPosition()).getIndeterminatePosition())) {
                             final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), period.getEnding().getPosition());
+                            uniqueObs.setSamplingTimePeriod(newPeriod);
                             
                         } else if (totalPeriod.getEnding().getPosition().getDate().getTime() < period.getEnding().getPosition().getDate().getTime()) {
                             final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), period.getEnding().getPosition());

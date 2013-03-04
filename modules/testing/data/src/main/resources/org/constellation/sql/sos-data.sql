@@ -165,9 +165,9 @@ INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "de
 INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "definition") VALUES (6, NULL,  '2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@', 'dataArray-2');
 INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "definition") VALUES (7, NULL,  '2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@', 'dataArray-2');
 INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "definition") VALUES (8, NULL,  '2007-05-01T12:59:00,6.56@@2007-05-01T13:59:00,6.56@@2007-05-01T14:59:00,6.56@@2007-05-01T15:59:00,6.56@@2007-05-01T16:59:00,6.56@@', 'dataArray-2');
-INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "definition") VALUES (10, NULL, '2007-05-01T12:59:00,6.56@@2007-05-01T13:59:00,6.56@@2007-05-01T14:59:00,6.56@@2007-05-01T15:59:00,6.56@@2007-05-01T16:59:00,6.56@@', 'dataArray-4');
+INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "definition") VALUES (10, NULL, '2007-05-01T12:59:00,6.56,12.0@@2007-05-01T13:59:00,6.56,13.0@@2007-05-01T14:59:00,6.56,14.0@@2007-05-01T15:59:00,6.56,15.0@@2007-05-01T16:59:00,6.56,16.0@@', 'dataArray-4');
 
-INSERT INTO "observation"."unit_of_measures" ("id", "name", "quantity_type", "unit_system") VALUES ('degrees', 'degree celcius', NULL, '°C');
+INSERT INTO "observation"."unit_of_measures" ("id", "name", "quantity_type", "unit_system") VALUES ('degrees', NULL, NULL, '°C');
 INSERT INTO "observation"."measures" ("name", "uom", "value") VALUES ('measure-001', 'degrees', NULL);
 
 INSERT INTO "observation"."observations" ("name", "description", "feature_of_interest", "procedure", "sampling_time_begin", "sampling_time_end", "result_definition", "observed_property", "result", "distribution", "feature_of_interest_point", "observed_property_composite", "feature_of_interest_curve") VALUES ('urn:ogc:object:observation:template:GEOM:3', NULL, NULL, 'urn:ogc:object:sensor:GEOM:3', NULL, NULL, NULL, 'depth', 1, 'normale', 'station-001', NULL, NULL);

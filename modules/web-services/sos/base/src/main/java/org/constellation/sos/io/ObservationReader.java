@@ -123,7 +123,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    Observation getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException;
+    Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException;
 
     /**
      * Return a result for the specified identifier.

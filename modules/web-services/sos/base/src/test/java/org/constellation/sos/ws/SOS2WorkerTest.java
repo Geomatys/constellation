@@ -198,7 +198,7 @@ public abstract class SOS2WorkerTest {
         assertTrue(result.getContents() != null);
         assertTrue(result.getContents().getOfferings() != null);
         assertEquals(result.getContents().getOfferings().size(), 10);
-        assertTrue(result != null);
+        assertNotNull(result);
 
         /*
          *  TEST 3 : get capabilities section Operation metadata
@@ -216,7 +216,7 @@ public abstract class SOS2WorkerTest {
         assertTrue(result.getServiceIdentification() == null);
         assertTrue(result.getServiceProvider() == null);
         assertTrue(result.getContents() == null);
-        assertTrue(result != null);
+        assertNotNull(result);
 
         /*
          *  TEST 4 : get capabilities section Service provider
@@ -234,7 +234,7 @@ public abstract class SOS2WorkerTest {
         assertTrue(result.getServiceIdentification() == null);
         assertTrue(result.getServiceProvider() != null);
         assertTrue(result.getContents() == null);
-        assertTrue(result != null);
+        assertNotNull(result);
 
         /*
          *  TEST 5 : get capabilities section Service Identification
@@ -252,7 +252,7 @@ public abstract class SOS2WorkerTest {
         assertTrue(result.getServiceIdentification() != null);
         assertTrue(result.getServiceProvider() == null);
         assertTrue(result.getContents() == null);
-        assertTrue(result != null);
+        assertNotNull(result);
 
         /*
          *  TEST 6 : get capabilities section Contents
@@ -272,7 +272,7 @@ public abstract class SOS2WorkerTest {
         assertTrue(result.getContents() != null);
         assertTrue(result.getContents().getOfferings() != null);
         assertEquals(result.getContents().getOfferings().size(),  10);
-        assertTrue(result != null);
+        assertNotNull(result);
 
     }
 
@@ -572,7 +572,12 @@ public abstract class SOS2WorkerTest {
         assertEquals(i1.next(), i2.next());
 
         assertEquals(expSdr, obsSdr);
-        assertEquals(expR.getDataArray().getElementType().getName(),     obsR.getDataArray().getElementType().getName());
+
+        // do not compare datarray name (ID) because it depends on the implementation
+        expR = (DataArrayPropertyType) expResult.getResult();
+        obsR = (DataArrayPropertyType) obsResult.getResult();
+        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());
+        
         assertEquals(expR.getDataArray().getElementType().getAbstractArray(),     obsR.getDataArray().getElementType().getAbstractArray());
         assertEquals(expR.getDataArray().getElementType(),     obsR.getDataArray().getElementType());
         assertEquals(expR.getDataArray().getEncoding(),        obsR.getDataArray().getEncoding());
@@ -620,6 +625,12 @@ public abstract class SOS2WorkerTest {
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        
+        // do not compare datarray name (ID) because it depends on the implementation
+        expR = (DataArrayPropertyType) expResult.getResult();
+        obsR = (DataArrayPropertyType) obsResult.getResult();
+        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());
+        
         assertEquals(expResult.getResult(), obsResult.getResult());
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
@@ -652,6 +663,12 @@ public abstract class SOS2WorkerTest {
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        
+        // do not compare datarray name (ID) because it depends on the implementation
+        expR = (DataArrayPropertyType) expResult.getResult();
+        obsR = (DataArrayPropertyType) obsResult.getResult();
+        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());
+        
         assertEquals(expResult.getResult(), obsResult.getResult());
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
@@ -799,6 +816,12 @@ public abstract class SOS2WorkerTest {
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        
+        // do not compare datarray name (ID) because it depends on the implementation
+        expR = (DataArrayPropertyType) expResult.getResult();
+        obsR = (DataArrayPropertyType) obsResult.getResult();
+        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());
+        
         assertEquals(expResult.getResult(), obsResult.getResult());
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
@@ -834,6 +857,10 @@ public abstract class SOS2WorkerTest {
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         final DataArrayPropertyType expArray = (DataArrayPropertyType) expResult.getResult();
         final DataArrayPropertyType resArray = (DataArrayPropertyType) obsResult.getResult();
+        
+        // do not compare datarray name (ID) because it depends on the implementation
+        emptyNameAndId(expArray.getDataArray(),  resArray.getDataArray());
+        
         assertEquals(expArray.getDataArray().getElementCount(), resArray.getDataArray().getElementCount());
         assertEquals(expArray.getDataArray().getElementType(),  resArray.getDataArray().getElementType());
         assertEquals(expArray.getDataArray().getEncoding(),  resArray.getDataArray().getEncoding());
@@ -872,6 +899,12 @@ public abstract class SOS2WorkerTest {
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        
+         // do not compare datarray name (ID) because it depends on the implementation
+        expR = (DataArrayPropertyType) expResult.getResult();
+        obsR = (DataArrayPropertyType) obsResult.getResult();
+        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());
+        
         assertEquals(expResult.getResult(), obsResult.getResult());
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
@@ -924,6 +957,12 @@ public abstract class SOS2WorkerTest {
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        
+         // do not compare datarray name (ID) because it depends on the implementation
+        expR = (DataArrayPropertyType) expResult.getResult();
+        obsR = (DataArrayPropertyType) obsResult.getResult();
+        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());
+        
         assertEquals(expResult.getResult(), obsResult.getResult());
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
@@ -986,8 +1025,12 @@ public abstract class SOS2WorkerTest {
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());
 
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
-        final DataArrayPropertyType expArray = (DataArrayPropertyType) expResult.getResult();
-        final DataArrayPropertyType resArray = (DataArrayPropertyType) obsResult.getResult();
+        DataArrayPropertyType expArray = (DataArrayPropertyType) expResult.getResult();
+        DataArrayPropertyType resArray = (DataArrayPropertyType) obsResult.getResult();
+        
+         // do not compare datarray name (ID) because it depends on the implementation
+        emptyNameAndId(expArray.getDataArray(),  resArray.getDataArray());
+        
         assertEquals(expArray.getDataArray().getElementCount(), resArray.getDataArray().getElementCount());
         assertEquals(expArray.getDataArray().getElementType(),  resArray.getDataArray().getElementType());
         assertEquals(expArray.getDataArray().getEncoding(),  resArray.getDataArray().getEncoding());
@@ -1019,6 +1062,12 @@ public abstract class SOS2WorkerTest {
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        
+         // do not compare datarray name (ID) because it depends on the implementation
+        expArray = (DataArrayPropertyType) expResult.getResult();
+        resArray = (DataArrayPropertyType) obsResult.getResult();
+        emptyNameAndId(expArray.getDataArray(),  resArray.getDataArray());
+        
         assertEquals(expResult.getResult(), obsResult.getResult());
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
@@ -1041,6 +1090,12 @@ public abstract class SOS2WorkerTest {
         OMObservationType expResult = (OMObservationType)obj.getValue();
 
         assertEquals(expResult.getFeatureOfInterest(), result.getFeatureOfInterest());
+        
+         // do not compare datarray name (ID) because it depends on the implementation
+        DataArrayPropertyType expArray = (DataArrayPropertyType) expResult.getResult();
+        DataArrayPropertyType resArray = (DataArrayPropertyType) result.getResult();
+        emptyNameAndId(expArray.getDataArray(),  resArray.getDataArray());
+        
         assertEquals(expResult.getResult(), result.getResult());
         assertEquals(expResult, result);
         marshallerPool.release(unmarshaller);
@@ -1618,6 +1673,8 @@ public abstract class SOS2WorkerTest {
         assertEquals(i1.next(), i2.next());
 
         assertEquals(expSdr, obsSdr);
+        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());        
+        
         assertEquals(expR.getDataArray().getElementType().getName(),     obsR.getDataArray().getElementType().getName());
         assertEquals(expR.getDataArray().getElementType().getAbstractArray(),     obsR.getDataArray().getElementType().getAbstractArray());
         assertEquals(expR.getDataArray().getElementType(),     obsR.getDataArray().getElementType());
@@ -1677,5 +1734,17 @@ public abstract class SOS2WorkerTest {
 
         assertTrue(exLaunched);
         initWorker();
+    }
+    
+    private static void emptyNameAndId(final DataArrayType resArray, final DataArrayType expArray) {
+        resArray.setId(null);              
+        expArray.setId(null);
+        resArray.setName(null);              
+        expArray.setName(null);
+        resArray.getPropertyElementType().setName(null);
+        expArray.getPropertyElementType().setName(null);
+        resArray.getPropertyElementType().getValue().setId(null);
+        expArray.getPropertyElementType().getValue().setId(null);
+        
     }
 }

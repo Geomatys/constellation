@@ -395,7 +395,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Observation getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
+    public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
         try {
             if (resultModel.equals(MEASUREMENT_QNAME)) {
                 return OMXmlFactory.convert(version, measTable.getEntry(identifier));

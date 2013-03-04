@@ -304,7 +304,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Observation getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
+    public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
         File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (!observationFile.exists()) {
             observationFile = new File(observationTemplateDirectory, identifier + FILE_EXTENSION);

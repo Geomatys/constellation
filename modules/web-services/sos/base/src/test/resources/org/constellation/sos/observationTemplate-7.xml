@@ -26,7 +26,6 @@
     <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="om:Measure">
         <om:name>measure-001</om:name>
         <om:uom id="degrees">
-            <gml:name>degree celcius</gml:name>
             <gml:unitsSystem>°C</gml:unitsSystem>
         </om:uom>
         <om:value>0.0</om:value>

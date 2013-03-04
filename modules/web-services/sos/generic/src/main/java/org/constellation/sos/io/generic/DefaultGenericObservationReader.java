@@ -516,7 +516,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public Observation getObservation(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
+    public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
         try {
             final List<String> variables;
             if (resultModel.equals(OBSERVATION_QNAME))  {
