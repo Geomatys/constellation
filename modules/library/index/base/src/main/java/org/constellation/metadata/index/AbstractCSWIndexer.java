@@ -42,7 +42,7 @@ import org.apache.lucene.document.StringField;
 // geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.util.NullArgumentException;
+import org.apache.sis.util.NullArgumentException;
 
 import static org.constellation.metadata.CSWQueryable.*;
 /**

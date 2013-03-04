@@ -29,7 +29,7 @@ import java.util.logging.Level;
 
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.util.NullArgumentException;
+import org.apache.sis.util.NullArgumentException;
 import org.geotoolkit.util.Utilities;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterDescriptorGroup;
