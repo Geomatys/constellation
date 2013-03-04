@@ -47,7 +47,7 @@ import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.util.ComparisonMode;
+import org.apache.sis.util.ComparisonMode;
 import org.geotoolkit.xml.IdentifierSpace;
 
 import org.opengis.feature.catalog.FeatureCatalogue;

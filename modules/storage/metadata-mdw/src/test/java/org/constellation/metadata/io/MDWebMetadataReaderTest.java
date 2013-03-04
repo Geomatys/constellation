@@ -42,7 +42,7 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.v100.SensorML;
-import org.geotoolkit.util.ComparisonMode;
+import org.apache.sis.util.ComparisonMode;
 import org.geotoolkit.util.Utilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;

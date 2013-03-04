@@ -22,7 +22,7 @@ import java.util.Collection;
 import javax.xml.bind.JAXBElement;
 
 import org.geotoolkit.util.Utilities;
-import org.geotoolkit.util.ComparisonMode;
+import org.apache.sis.util.ComparisonMode;
 import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.csw.xml.v202.GetRecordsType;
 import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;

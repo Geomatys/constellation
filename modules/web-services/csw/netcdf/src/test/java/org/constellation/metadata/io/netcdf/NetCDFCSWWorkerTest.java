@@ -43,7 +43,7 @@ import org.geotoolkit.xml.AnchoredMarshallerPool;
 import static org.constellation.test.utils.MetadataUtilities.*;
 
 // JUnit dependencies
-import org.geotoolkit.util.ComparisonMode;
+import org.apache.sis.util.ComparisonMode;
 import static org.junit.Assert.*;
 import org.junit.*;
 
