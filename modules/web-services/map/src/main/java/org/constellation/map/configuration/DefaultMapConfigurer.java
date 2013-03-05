@@ -59,7 +59,7 @@ import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.converter.Classes;
+import org.apache.sis.util.Classes;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 
 import org.opengis.feature.type.Name;

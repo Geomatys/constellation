@@ -37,7 +37,7 @@ import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.util.collection.Cache;
+import org.apache.sis.util.collection.Cache;
 
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;

@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import org.constellation.util.ReflectionUtilities;
 import org.geotoolkit.util.SimpleInternationalString;
-import org.geotoolkit.util.converter.Classes;
+import org.apache.sis.util.Classes;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.util.InternationalString;
 
@@ -54,7 +54,7 @@ public final class Utils {
     public static final String UNKNOW_IDENTIFIER = "unknow_identifier";
 
     private Utils() {}
-    
+
     /**
       * This method try to find a title for this object.
       * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
@@ -128,7 +128,7 @@ public final class Utils {
         paths.add("ISO 19115:MD_Metadata:metadataStandardName");
         paths.add("ISO 19115-2:MI_Metadata:metadataStandardName");
         paths.add("ISO 19115:CI_ResponsibleParty:xLink:href");
-        
+
         for (String path : paths) {
             Object value = ReflectionUtilities.getValuesFromPath(path, obj);
             if (value instanceof String) {
@@ -153,7 +153,7 @@ public final class Utils {
     public static String findIdentifier(final Object obj) {
 
         String identifier = UNKNOW_IDENTIFIER;
-        
+
         final List<String> paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
@@ -161,7 +161,7 @@ public final class Utils {
         paths.add("ISO 19115:CI_ResponsibleParty:organisationName");
         paths.add("Catalog Web Service:Record:identifier:content");
         paths.add("Ebrim v3.0:*:id");
-        paths.add("Ebrim v2.5:*:id"); 
+        paths.add("Ebrim v2.5:*:id");
         paths.add("ISO 19110:FC_FeatureCatalogue:id");
         paths.add("SensorML:SensorML:member:process:id");
 
@@ -232,7 +232,7 @@ public final class Utils {
                         attributeName = pathID;
                         pathID = "";
                     }
-                    
+
                     //we extract the specified type if there is one
                     String paramClassName = null;
                     int brackIndex = attributeName.indexOf('[');
@@ -256,7 +256,7 @@ public final class Utils {
                                     if (setter != null) {
                                         ReflectionUtilities.invokeMethod(setter, temp, currentObject);
                                     }
-                                } 
+                                }
                             } else if (currentObject instanceof Collection) {
                                 if (((Collection) currentObject).size() > 0) {
                                     currentObject = ((Collection) currentObject).iterator().next();
@@ -265,7 +265,7 @@ public final class Utils {
                                     }
                                 } else {
                                     if (paramClassName == null) {
-                                        Class returnType = Classes.boundOfParameterizedAttribute(getter);
+                                        Class returnType = Classes.boundOfParameterizedProperty(getter);
                                         currentObject = ReflectionUtilities.newInstance(returnType);
                                     } else {
                                         try {
@@ -299,7 +299,7 @@ public final class Utils {
                         } else {
                             parameterClass = String.class;
                         }
-                        
+
                         Method setter = ReflectionUtilities.getSetterFromName(attributeName, parameterClass, currentObject.getClass());
                         if (setter != null) {
                             // if the parameter is a string collection
@@ -317,7 +317,7 @@ public final class Utils {
             }
         }
     }
-    
+
     /**
      * This method try to set an title for this object.
      *
@@ -357,7 +357,7 @@ public final class Utils {
                         attributeName = pathID;
                         pathID = "";
                     }
-                    
+
                     //we extract the specified type if there is one
                     String paramClassName = null;
                     int brackIndex = attributeName.indexOf('[');
@@ -390,7 +390,7 @@ public final class Utils {
                                     if (setter != null) {
                                         ReflectionUtilities.invokeMethod(setter, temp, currentObject);
                                     }
-                                } 
+                                }
                             } else if (currentObject instanceof Collection) {
                                 if (((Collection) currentObject).size() > 0) {
                                     currentObject = ((Collection) currentObject).iterator().next();
@@ -399,7 +399,7 @@ public final class Utils {
                                     }
                                 } else {
                                     if (paramClassName == null) {
-                                        Class returnType = Classes.boundOfParameterizedAttribute(getter);
+                                        Class returnType = Classes.boundOfParameterizedProperty(getter);
                                         currentObject = ReflectionUtilities.newInstance(returnType);
                                     } else {
                                         try {
@@ -449,6 +449,6 @@ public final class Utils {
                 }
             }
         }
-        
+
     }
 }
