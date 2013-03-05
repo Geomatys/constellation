@@ -516,7 +516,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             if (reader != null) {
                 try {
                     for (String identifier : identifiers) {
-                        objectToIndex.add(reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115));
+                        objectToIndex.add(reader.getMetadata(identifier, AbstractMetadataReader.NATIVE));
                     }
                 } catch (MetadataIoException ex) {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE);

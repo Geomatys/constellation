@@ -339,7 +339,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
             if (result == null) {
                 final FullRecord f = mdReader.getRecord(identifier);
-                result       = getObjectFromRecord(identifier, f, mode);
+                if (mode == NATIVE) {
+                    result = f;
+                } else {
+                    result = getObjectFromRecord(identifier, f, mode);
+                }
             } else {
                 LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
             }

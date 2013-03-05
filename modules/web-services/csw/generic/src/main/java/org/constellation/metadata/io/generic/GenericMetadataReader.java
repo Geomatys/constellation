@@ -105,7 +105,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
         final Values values = loadData(identifier, mode, type, elementName);
 
         final Object result;
-        if (mode == ISO_19115) {
+        if (mode == ISO_19115 || mode == NATIVE) {
             result = getISO(identifier, values);
             
         } else if (mode == DUBLINCORE) {

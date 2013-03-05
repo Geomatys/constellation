@@ -32,10 +32,11 @@ import org.geotoolkit.util.logging.Logging;
  */
 public abstract class AbstractMetadataReader implements MetadataReader {
     
-    public static final int DUBLINCORE = 0;
+    public static final int DUBLINCORE  = 0;
     public static final int ISO_19115   = 1;
     public static final int EBRIM       = 2;
-    public static final int SENSORML   = 3;
+    public static final int SENSORML    = 3;
+    public static final int NATIVE      = 4;
     
     /**
      * A debugging logger
