@@ -756,9 +756,14 @@ public class OM2ObservationReader implements ObservationReader {
             final ResultSet rs         = stmt.executeQuery("SELECT max(\"time_begin\"), min(\"time_end\") FROM \"om\".\"offerings\"");
             final List<String> results = new ArrayList<String>();
             if (rs.next()) {
-                results.add(rs.getString(1));
-                results.add(rs.getString(2));
-                
+                String s = rs.getString(1);
+                if (s != null) {
+                    results.add(s);
+                }
+                s = rs.getString(2);
+                if (s != null) {
+                    results.add(s);
+                }
             } 
             rs.close();
             stmt.close();

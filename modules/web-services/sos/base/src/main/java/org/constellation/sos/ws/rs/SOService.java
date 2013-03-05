@@ -18,7 +18,6 @@
 package org.constellation.sos.ws.rs;
 
 // Jersey dependencies
-import org.geotoolkit.util.StringUtilities;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
 import java.util.logging.Level;
@@ -52,6 +51,7 @@ import static org.constellation.api.QueryConstants.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -69,10 +69,14 @@ import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.SOSResponseWrapper;
 import org.geotoolkit.sos.xml.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
-import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.xml.GetObservationById;
+import org.geotoolkit.sos.xml.GetResultTemplate;
+import org.geotoolkit.sos.xml.InsertResult;
+import org.geotoolkit.sos.xml.InsertResultTemplate;
+import org.geotoolkit.swes.xml.DeleteSensor;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.opengis.observation.ObservationCollection;
 
@@ -147,11 +151,15 @@ public class SOService extends OGCWebService<SOSworker> {
                 }
                 return Response.ok(marshalled, outputFormat).build();
              }
+             
+             if (request instanceof GetObservationById) {
+                final GetObservationById ds   = (GetObservationById)request;
+                return Response.ok(worker.getObservationById(ds), MimeType.TEXT_XML).build();
+             }
 
              if (request instanceof DescribeSensor) {
                 final DescribeSensor ds       = (DescribeSensor)request;
-                final AbstractSensorML sensor = worker.describeSensor(ds);
-                return Response.ok(sensor, MimeType.TEXT_XML).build();
+                return Response.ok(worker.describeSensor(ds), MimeType.TEXT_XML).build();
              }
 
              if (request instanceof GetFeatureOfInterest) {
@@ -173,6 +181,26 @@ public class SOService extends OGCWebService<SOSworker> {
              if (request instanceof InsertSensor) {
                 final InsertSensor rs = (InsertSensor)request;
                 return Response.ok(worker.registerSensor(rs), MimeType.TEXT_XML).build();
+             }
+             
+             if (request instanceof DeleteSensor) {
+                final DeleteSensor rs = (DeleteSensor)request;
+                return Response.ok(worker.deleteSensor(rs), MimeType.TEXT_XML).build();
+             }
+             
+             if (request instanceof InsertResult) {
+                final InsertResult rs = (InsertResult)request;
+                return Response.ok(worker.insertResult(rs), MimeType.TEXT_XML).build();
+             }
+             
+             if (request instanceof InsertResultTemplate) {
+                final InsertResultTemplate rs = (InsertResultTemplate)request;
+                return Response.ok(worker.insertResultTemplate(rs), MimeType.TEXT_XML).build();
+             }
+             
+             if (request instanceof GetResultTemplate) {
+                final GetResultTemplate rs = (GetResultTemplate)request;
+                return Response.ok(worker.getResultTemplate(rs), MimeType.TEXT_XML).build();
              }
 
              if (request instanceof GetFeatureOfInterestTime) {

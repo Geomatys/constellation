@@ -139,11 +139,23 @@ public class OM2ObservationWriter implements ObservationWriter {
             
             if (observation.getSamplingTime() instanceof Period) {
                 final Period period = (Period)observation.getSamplingTime();
-                stmt.setTimestamp(2, new Timestamp(period.getBeginning().getPosition().getDate().getTime()));
-                stmt.setTimestamp(3, new Timestamp(period.getEnding().getPosition().getDate().getTime()));
+                if (period.getBeginning().getPosition().getDate() != null) {
+                    stmt.setTimestamp(2, new Timestamp(period.getBeginning().getPosition().getDate().getTime()));
+                } else {
+                    stmt.setNull(2, java.sql.Types.TIMESTAMP);
+                }
+                if (period.getEnding().getPosition().getDate() != null) {
+                    stmt.setTimestamp(3, new Timestamp(period.getEnding().getPosition().getDate().getTime()));
+                } else {
+                    stmt.setNull(3, java.sql.Types.TIMESTAMP);
+                }
             } else if (observation.getSamplingTime() instanceof Instant) {
                 final Instant instant = (Instant)observation.getSamplingTime();
-                stmt.setTimestamp(2, new Timestamp(instant.getPosition().getDate().getTime()));
+                if (instant.getPosition().getDate() != null) {
+                    stmt.setTimestamp(2, new Timestamp(instant.getPosition().getDate().getTime()));
+                } else {
+                    stmt.setNull(2, java.sql.Types.TIMESTAMP);
+                }
                 stmt.setNull(3, java.sql.Types.TIMESTAMP);
             } else {
                 stmt.setNull(2, java.sql.Types.TIMESTAMP);
@@ -152,7 +164,11 @@ public class OM2ObservationWriter implements ObservationWriter {
             
             stmt.setString(4, ((Phenomenon)observation.getObservedProperty()).getName());
             stmt.setString(5, ((org.geotoolkit.observation.xml.Process)observation.getProcedure()).getHref());
-            stmt.setString(6, ((org.geotoolkit.sampling.xml.SamplingFeature)observation.getFeatureOfInterest()).getId());
+            if (observation.getFeatureOfInterest() != null) {
+                stmt.setString(6, ((org.geotoolkit.sampling.xml.SamplingFeature)observation.getFeatureOfInterest()).getId());
+            } else {
+                stmt.setNull(6, java.sql.Types.VARCHAR);
+            }
             writeFeatureOfInterest(observation.getFeatureOfInterest(), c);
             
             writeResult(oid, observation.getResult(), c);
@@ -235,25 +251,40 @@ public class OM2ObservationWriter implements ObservationWriter {
             final String values = array.getValues();
             final StringTokenizer tokenizer = new StringTokenizer(values, encoding.getBlockSeparator());
             int n = 1;
-            String lastDate = null;
+            Timestamp lastDate = null;
             while (tokenizer.hasMoreTokens()) {
                 String block = tokenizer.nextToken();
                 // time field
                 int tokenIndex = block.indexOf(encoding.getTokenSeparator());
                 final String time = block.substring(0, tokenIndex).replace('T', ' ');
+                final Timestamp realTime;
+                try {
+                    realTime = Timestamp.valueOf(time);
+                } catch (IllegalArgumentException ex) {
+                    throw new CstlServiceException("Bad format of timestamp for:" + time);
+                }
                 block = block.substring(tokenIndex + 1);
                 for (int i = 0; i < fields.size(); i++) {
-                    String value;
+                    Double value;
                     if (i == fields.size() - 1) {
-                        value    = block;
-                        lastDate = time;
+                        try {
+                            value = Double.parseDouble(block);
+                        } catch (NumberFormatException ex) {
+                            throw new CstlServiceException("Bad format of double for:" + block);
+                        }
+                        lastDate  = realTime;
                     } else {
-                        value = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
+                        final String tmp = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
+                        try {
+                            value = Double.parseDouble(tmp);
+                        } catch (NumberFormatException ex) {
+                            throw new CstlServiceException("Bad format of double for:" + tmp);
+                        }
                     }
                     stmt.setInt(1, oid);
                     stmt.setInt(2, n);
-                    stmt.setString(3, time);
-                    stmt.setString(4, value);
+                    stmt.setTimestamp(3, realTime);
+                    stmt.setDouble(4, value);
                     stmt.setString(5, fields.get(i).fieldUom);
                     stmt.setString(6, fields.get(i).fieldType);
                     stmt.setString(7, fields.get(i).fieldName);
@@ -264,7 +295,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             }
             if (lastDate != null) {
                 final PreparedStatement stmt2 = c.prepareStatement("UPDATE \"om\".\"observations\" SET \"time_end\"=? WHERE \"id\"=?");
-                stmt2.setString(1, lastDate);
+                stmt2.setTimestamp(1, lastDate);
                 stmt2.setInt(2, oid);
                 stmt2.executeUpdate();
             }

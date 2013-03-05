@@ -102,6 +102,11 @@
                     <artifactId>cstl-web-sos-postgrid</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+		<dependency>
+                    <groupId>org.constellation.web-services</groupId>
+                    <artifactId>cstl-web-sos-om2</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
                 <dependency>
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-csw-mdw</artifactId>
@@ -466,6 +471,11 @@
                 <dependency>
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-sos-postgrid</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.web-services</groupId>
+                    <artifactId>cstl-web-sos-om2</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
