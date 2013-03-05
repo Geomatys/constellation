@@ -695,7 +695,7 @@ public class OM2ObservationReader implements ObservationReader {
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
-            final ResultSet rs         = stmt.executeQuery("SELECT max(\"id\") FROM \"om\".\"mesures\"");
+            final ResultSet rs         = stmt.executeQuery("SELECT max(\"id\") FROM \"om\".\"observations\"");
             int resultNum;
             if (rs.next()) {
                 resultNum = rs.getInt(1) + 1;

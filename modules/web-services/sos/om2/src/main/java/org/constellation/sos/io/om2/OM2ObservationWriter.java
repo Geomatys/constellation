@@ -171,10 +171,11 @@ public class OM2ObservationWriter implements ObservationWriter {
             }
             writeFeatureOfInterest(observation.getFeatureOfInterest(), c);
             
-            writeResult(oid, observation.getResult(), c);
-            
             stmt.executeUpdate();
             stmt.close();
+            
+            writeResult(oid, observation.getResult(), c);
+            
             c.close();
             return observation.getName();
         } catch (SQLException ex) {
