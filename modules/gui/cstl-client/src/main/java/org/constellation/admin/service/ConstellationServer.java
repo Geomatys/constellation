@@ -1177,6 +1177,28 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
+        
+        public boolean addToIndex(final String id, final List<String> identifiers) {
+            try {
+                final String idList = StringUtilities.toCommaSeparatedValues(identifiers);
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_ADD_TO_INDEX + "&id=" + id + "&identifiers=" + idList;
+                return sendRequestAck(url, null);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
+        public boolean removeFromIndex(final String id, final List<String> identifiers) {
+            try {
+                final String idList = StringUtilities.toCommaSeparatedValues(identifiers);
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REMOVE_FROM_INDEX + "&id=" + id + "&identifiers=" + idList;
+                return sendRequestAck(url, null);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
 
         public boolean importFile(final String id, final File importFile, final String fileName) {
             try {

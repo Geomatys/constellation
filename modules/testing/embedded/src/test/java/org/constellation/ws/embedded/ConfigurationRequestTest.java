@@ -239,6 +239,53 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
 
         assertEquals(15, response.getSearchResults().getNumberOfRecordsMatched());
     }
+    
+    @Test
+    public void testCSWRemoveFromIndex() throws Exception {
+
+        // first we make a getRecords request to count the number of record
+        URL niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+
+        URLConnection conec = niUrl.openConnection();
+
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof GetRecordsResponseType);
+        GetRecordsResponseType response = (GetRecordsResponseType) obj;
+
+        assertEquals(15, response.getSearchResults().getNumberOfRecordsMatched());
+
+        // remove metadata from the index
+        niUrl = new URL(getConfigurationURL() + "request=removeFromIndex&id=default&identifiers=urn_test");
+
+        // for a POST request
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof AcknowlegementType);
+        AcknowlegementType expResult = new AcknowlegementType("Success",  "The specified record have been remove from the CSW index");
+        assertEquals(expResult, obj);
+
+
+        //normally we don't have to restart the CSW TODO
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=restart&id=default");
+        conec = niUrl.openConnection();
+        obj = unmarshallResponse(conec);
+
+
+         // verify that the number of record have increased
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof GetRecordsResponseType);
+        response = (GetRecordsResponseType) obj;
+
+        assertEquals(14, response.getSearchResults().getNumberOfRecordsMatched());
+    }
 
     @Test
     public void testListAvailableService() throws Exception {
