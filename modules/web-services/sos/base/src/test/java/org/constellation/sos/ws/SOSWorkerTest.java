@@ -886,7 +886,7 @@ public abstract class SOSWorkerTest {
         List<EventTime> times = new ArrayList<EventTime>();
         TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
         TimeBeforeType filter   = new TimeBeforeType(null, instant);
-        EventTime before        = new EventTime(null, filter, null);
+        EventTime before        = new EventTime(filter);
         times.add(before);
         request  = new GetObservation("1.0.0",
                                       "offering-3",
@@ -911,7 +911,7 @@ public abstract class SOSWorkerTest {
          */
         times = new ArrayList<EventTime>();
         TimeAfterType afilter   = new TimeAfterType(null, instant);
-        EventTime after         = new EventTime(afilter,null, null);
+        EventTime after         = new EventTime(afilter);
         times.add(after);
         request  = new GetObservation("1.0.0",
                                       "offering-3",
@@ -940,7 +940,7 @@ public abstract class SOSWorkerTest {
         times = new ArrayList<EventTime>();
         TimePeriodType period  = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T08:00:00.0"));
         TimeDuringType dfilter = new TimeDuringType(null, period);
-        EventTime during       = new EventTime(null, null, dfilter);
+        EventTime during       = new EventTime(dfilter);
         times.add(during);
         request  = new GetObservation("1.0.0",
                                       "offering-3",
@@ -1097,7 +1097,7 @@ public abstract class SOSWorkerTest {
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T17:58:00.0"));
         afilter = new TimeAfterType(null, instant);
-        after = new EventTime(afilter,null, null);
+        after = new EventTime(afilter);
         times.add(after);
         request  = new GetObservation("1.0.0",
                                       "offering-4",
@@ -1149,7 +1149,7 @@ public abstract class SOSWorkerTest {
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T17:58:00.0"));
         TimeBeforeType bfilter = new TimeBeforeType(null, instant);
-        before = new EventTime(null, bfilter, null);
+        before = new EventTime(bfilter);
         times.add(before);
         request  = new GetObservation("1.0.0",
                                       "offering-4",
@@ -1776,7 +1776,7 @@ public abstract class SOSWorkerTest {
         List<EventTime> times = new ArrayList<EventTime>();
         TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T05:00:00.0"));
         TimeBeforeType bfilter = new TimeBeforeType(null, instant);
-        EventTime before = new EventTime(null, bfilter, null);
+        EventTime before = new EventTime(bfilter);
         times.add(before);
         GOrequest  = new GetObservation("1.0.0",
                                         "offering-3",
@@ -1851,7 +1851,7 @@ public abstract class SOSWorkerTest {
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
         TimeAfterType afilter = new TimeAfterType(null, instant);
-        EventTime after = new EventTime(afilter, null, null);
+        EventTime after = new EventTime(afilter);
         times.add(after);
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
@@ -1872,7 +1872,7 @@ public abstract class SOSWorkerTest {
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T04:00:00.0"));
         bfilter = new TimeBeforeType(null, instant);
-        EventTime before2 = new EventTime(null, bfilter, null);
+        EventTime before2 = new EventTime(bfilter);
         times.add(before2);
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
@@ -1914,7 +1914,7 @@ public abstract class SOSWorkerTest {
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T04:00:00.0"));
         TimeDuringType dfilter = new TimeDuringType(null, period);
-        EventTime during = new EventTime(null, null, dfilter);
+        EventTime during = new EventTime(dfilter);
         times.add(during);
 
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
@@ -1937,7 +1937,7 @@ public abstract class SOSWorkerTest {
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T19:00:00.0"));
         afilter = new TimeAfterType(null, instant);
-        after = new EventTime(afilter, null, null);
+        after = new EventTime(afilter);
         times.add(after);
         GOrequest  = new GetObservation("1.0.0",
                                         "offering-3",
@@ -1976,7 +1976,7 @@ public abstract class SOSWorkerTest {
         obsSdr = (SimpleDataRecordType) obsR.getDataArray().getElementType();
         obsSdr.setBlockId(null);
 
-        assertTrue(obsResult != null);
+        assertNotNull(obsResult);
         assertEquals(templateExpResult.getName(), obsResult.getName());
         assertEquals(templateExpResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(templateExpResult.getObservedProperty(), obsResult.getObservedProperty());

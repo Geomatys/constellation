@@ -27,8 +27,8 @@ import javax.sql.DataSource;
 // JTS dependencies
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.WKBWriter;
+import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -58,6 +58,7 @@ import org.geotoolkit.swe.xml.Quantity;
 import org.geotoolkit.swe.xml.SimpleDataRecord;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.opengis.observation.AnyFeature;
+import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Measure;
 
 // GeoAPI dependencies
@@ -87,7 +88,9 @@ public class OM2ObservationWriter implements ObservationWriter {
 
     protected final DataSource source;
     
-    protected String observationIdBase;
+    protected final String observationIdBase;
+    
+    protected final String sensorIdBase;
 
     /**
      * Build a new Observation writer for postgrid dataSource.
@@ -98,6 +101,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      */
     public OM2ObservationWriter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
+        this.sensorIdBase      = (String) properties.get(OMFactory.SENSOR_ID_BASE);
         
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
@@ -161,8 +165,10 @@ public class OM2ObservationWriter implements ObservationWriter {
                 stmt.setNull(2, java.sql.Types.TIMESTAMP);
                 stmt.setNull(3, java.sql.Types.TIMESTAMP);
             }
-            
+            writePhenomenon((Phenomenon)observation.getObservedProperty(), c);
             stmt.setString(4, ((Phenomenon)observation.getObservedProperty()).getName());
+            
+            writeProcedure((org.geotoolkit.observation.xml.Process)observation.getProcedure(), c);
             stmt.setString(5, ((org.geotoolkit.observation.xml.Process)observation.getProcedure()).getHref());
             if (observation.getFeatureOfInterest() != null) {
                 stmt.setString(6, ((org.geotoolkit.sampling.xml.SamplingFeature)observation.getFeatureOfInterest()).getId());
@@ -176,6 +182,8 @@ public class OM2ObservationWriter implements ObservationWriter {
             
             writeResult(oid, observation.getResult(), c);
             
+            updateOrCreateOffering(observation, c);
+            
             c.close();
             return observation.getName();
         } catch (SQLException ex) {
@@ -183,6 +191,47 @@ public class OM2ObservationWriter implements ObservationWriter {
         }
     }
     
+    private void writePhenomenon(final Phenomenon phenomenon, final Connection c) throws SQLException {
+        final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"observed_properties\" WHERE \"id\"=?");
+        stmtExist.setString(1, phenomenon.getName());
+        final ResultSet rs = stmtExist.executeQuery();
+        if (!rs.next()) {
+            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"observed_properties\" VALUES(?)");
+            stmtInsert.setString(1, phenomenon.getName());
+            stmtInsert.executeUpdate();
+            stmtInsert.close();
+            if (phenomenon instanceof CompositePhenomenon) {
+                final CompositePhenomenon composite = (CompositePhenomenon) phenomenon;
+                final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)");
+                for (org.opengis.observation.Phenomenon phen : composite.getComponent()) {
+                    final Phenomenon child = (Phenomenon) phen;
+                    writePhenomenon(child, c);
+                    stmtInsertCompo.setString(1, phenomenon.getName());
+                    stmtInsertCompo.setString(2, child.getName());
+                    stmtInsertCompo.executeUpdate();
+                }
+                stmtInsertCompo.close();
+            }
+        } 
+        rs.close();
+        stmtExist.close();
+    }
+    
+    private void writeProcedure(final org.geotoolkit.observation.xml.Process procedure, final Connection c) throws SQLException {
+        final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"procedures\" WHERE \"id\"=?");
+        stmtExist.setString(1, procedure.getHref());
+        final ResultSet rs = stmtExist.executeQuery();
+        if (!rs.next()) {
+            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"procedures\" VALUES(?)");
+            stmtInsert.setString(1, procedure.getHref());
+            stmtInsert.executeUpdate();
+            stmtInsert.close();
+        } 
+        rs.close();
+        stmtExist.close();
+    }
+    
+    // TODO
     private void writeFeatureOfInterest(final AnyFeature foi, final Connection c) throws CstlServiceException {
         
     }
@@ -302,6 +351,142 @@ public class OM2ObservationWriter implements ObservationWriter {
             }
         }
         stmt.close();
+    }
+    
+    private void updateOrCreateOffering(final Observation observation, final Connection c) throws SQLException {
+        
+       final String procedureID = ((org.geotoolkit.observation.xml.Process)observation.getProcedure()).getHref();
+       final String offeringID  = "offering-" + procedureID.substring(sensorIdBase.length());
+       
+       final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"offerings\" WHERE \"identifier\"=?");
+        stmtExist.setString(1, offeringID);
+        final ResultSet rs = stmtExist.executeQuery();
+        
+        // INSERT
+        if (!rs.next()) {
+            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)");
+            stmtInsert.setString(1, offeringID);
+            stmtInsert.setString(2, "Offering for procedure:" + procedureID);
+            stmtInsert.setString(3, offeringID);
+            if (observation.getSamplingTime() instanceof Period) {
+                final Period period = (Period)observation.getSamplingTime();
+                if (period.getBeginning().getPosition().getDate() != null) {
+                    stmtInsert.setTimestamp(4, new Timestamp(period.getBeginning().getPosition().getDate().getTime()));
+                } else {
+                    stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
+                }
+                if (period.getEnding().getPosition().getDate() != null) {
+                    stmtInsert.setTimestamp(5, new Timestamp(period.getEnding().getPosition().getDate().getTime()));
+                } else {
+                    stmtInsert.setNull(5, java.sql.Types.TIMESTAMP);
+                }
+            } else if (observation.getSamplingTime() instanceof Instant) {
+                final Instant instant = (Instant)observation.getSamplingTime();
+                if (instant.getPosition().getDate() != null) {
+                    stmtInsert.setTimestamp(4, new Timestamp(instant.getPosition().getDate().getTime()));
+                } else {
+                    stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
+                }
+                stmtInsert.setNull(5, java.sql.Types.TIMESTAMP);
+            } else {
+                stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
+                stmtInsert.setNull(5, java.sql.Types.TIMESTAMP);
+            }
+            stmtInsert.setString(6, procedureID);
+            stmtInsert.executeUpdate();
+            stmtInsert.close();
+            
+            final String phenoID = ((Phenomenon)observation.getObservedProperty()).getName();
+            final PreparedStatement stmtInsertOP = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
+            stmtInsertOP.setString(1, offeringID);
+            stmtInsertOP.setString(2, phenoID);
+            stmtInsertOP.executeUpdate();
+            stmtInsertOP.close();
+            
+        // UPDATE
+        } else {
+            
+            /*
+             * update time bound
+             */ 
+            final Timestamp timeBegin = rs.getTimestamp(4);
+            final long offBegin;
+            if (timeBegin != null) {
+                offBegin = timeBegin.getTime();
+            } else {
+                offBegin = Long.MAX_VALUE;
+            }
+            final Timestamp timeEnd   = rs.getTimestamp(5);
+            final long offEnd;
+            if (timeEnd != null) {
+                offEnd = timeEnd.getTime();
+            } else {
+                offEnd = -Long.MAX_VALUE;
+            }
+            
+            if (observation.getSamplingTime() instanceof Period) {
+                final Period period = (Period)observation.getSamplingTime();
+                if (period.getBeginning().getPosition().getDate() != null) {
+                    final long obsBeginTime = period.getBeginning().getPosition().getDate().getTime();
+                    if (obsBeginTime < offBegin) {
+                        final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_begin\"=?");
+                        beginStmt.setTimestamp(1, new Timestamp(obsBeginTime));
+                        beginStmt.executeUpdate();
+                        beginStmt.close();
+                    }
+                }
+                if (period.getEnding().getPosition().getDate() != null) {
+                    final long obsEndTime = period.getEnding().getPosition().getDate().getTime();
+                    if (obsEndTime > offEnd) {
+                        final PreparedStatement endStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_end\"=?");
+                        endStmt.setTimestamp(1, new Timestamp(obsEndTime));
+                        endStmt.executeUpdate();
+                        endStmt.close();
+                    }
+                }
+            } else if (observation.getSamplingTime() instanceof Instant) {
+                final Instant instant = (Instant)observation.getSamplingTime();
+                if (instant.getPosition().getDate() != null) {
+                    final long obsTime = instant.getPosition().getDate().getTime();
+                    if (obsTime < offBegin) {
+                        final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_begin\"=?");
+                        beginStmt.setTimestamp(1, new Timestamp(obsTime));
+                        beginStmt.executeUpdate();
+                        beginStmt.close();
+                    }
+                    if (obsTime > offEnd) {
+                        final PreparedStatement endStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_end\"=?");
+                        endStmt.setTimestamp(1, new Timestamp(obsTime));
+                        endStmt.executeUpdate();
+                        endStmt.close();
+                    }
+                }
+            }
+            
+            /*
+             * Phenomenon
+             */
+            final String phenoID = ((Phenomenon)observation.getObservedProperty()).getName();
+            final PreparedStatement phenoStmt = c.prepareStatement("SELECT * FROM  \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=? AND \"phenomenon\"=?");
+            phenoStmt.setString(1, offeringID);
+            phenoStmt.setString(2, phenoID);
+            final ResultSet rsp = phenoStmt.executeQuery();
+            if (!rsp.next()) {
+                final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
+                stmtInsert.setString(1, offeringID);
+                stmtInsert.setString(2, phenoID);
+                stmtInsert.executeUpdate();
+                stmtInsert.close();
+            }
+            rsp.close();
+            phenoStmt.close();
+            
+            /*
+             * Feature Of interest TODO
+             */
+        }
+        rs.close();
+        stmtExist.close();
     }
 
     /**

@@ -38,6 +38,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
+import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 
 // Constellation dependencies
@@ -46,7 +47,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
 
 import static org.constellation.sos.ws.SOSConstants.*;
 
@@ -105,6 +105,8 @@ public class OM2ObservationReader implements ObservationReader {
     protected final String sensorIdBase;
     
     protected final DataSource source;
+    
+    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     
     private static final CoordinateReferenceSystem defaultCRS;
     static {
@@ -244,7 +246,7 @@ public class OM2ObservationReader implements ObservationReader {
             } finally {
                 c.close();
             }
-            final List<String> responseFormat         = Arrays.asList(MimeType.APPLICATION_XML);
+            final List<String> responseFormat         = Arrays.asList(RESPONSE_FORMAT_V100, RESPONSE_FORMAT_V200);
             final List<QName> resultModel             = Arrays.asList(OBSERVATION_QNAME, MEASUREMENT_QNAME);
             final List<String> resultModelV200        = Arrays.asList(OBSERVATION_MODEL);
             final List<ResponseModeType> responseMode = Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
@@ -581,23 +583,31 @@ public class OM2ObservationReader implements ObservationReader {
             final List<Double> value     = new ArrayList<Double>();
             final List<String> uom       = new ArrayList<String>();
             final List<String> fieldType = new ArrayList<String>();
-            final List<String> time      = new ArrayList<String>();
+            final List<Timestamp> time   = new ArrayList<Timestamp>();
             final List<String> fieldDef  = new ArrayList<String>();
             final List<String> fieldName = new ArrayList<String>();
             try {
                 final PreparedStatement stmt  = c.prepareStatement("SELECT \"value\", \"field_type\", \"uom\", \"time\" ,\"field_definition\", \"field_name\""
                                                                  + "FROM \"om\".\"mesures\" "
                                                                  + "WHERE \"id_observation\"=?");
-                stmt.setString(1, identifier);
+                final int id;
+                try {
+                    id = Integer.parseInt(identifier);
+                } catch (NumberFormatException ex) {
+                    throw new CstlServiceException("Unable to parse result ID:" + identifier);
+                }
+                stmt.setInt(1, id);
                 final ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     value.add(rs.getDouble(1));
                     fieldType.add(rs.getString(2));
                     uom.add(rs.getString(3));
-                    time.add(rs.getString(4));
+                    time.add(rs.getTimestamp(4));
                     fieldDef.add(rs.getString(5));
                     fieldName.add(rs.getString(6));
                 }
+                rs.close();
+                stmt.close();
             } finally {
                 c.close();
             }
@@ -608,7 +618,7 @@ public class OM2ObservationReader implements ObservationReader {
             fields.add(getDefaultTimeField(version));
             final StringBuilder values = new StringBuilder();
             int nbValue = 0;
-            String oldTime = null;
+            Timestamp oldTime = null;
             for (int i = 0; i < uom.size(); i++) {
                 final AbstractDataComponent compo;
                 if ("Quantity".equals(fieldType.get(i))) {
@@ -621,7 +631,7 @@ public class OM2ObservationReader implements ObservationReader {
                 if (!fields.contains(scalar)) {
                     fields.add(scalar);
                 }
-                final String currentTime = time.get(i);
+                final Timestamp currentTime = time.get(i);
                 if (currentTime.equals(oldTime)) {
                     values.append(encoding.getTokenSeparator()).append(value.get(i));
                 } else {
@@ -629,7 +639,7 @@ public class OM2ObservationReader implements ObservationReader {
                     if (oldTime != null) {
                         values.append(encoding.getBlockSeparator());
                     }
-                    values.append(currentTime.replace(' ', 'T').substring(0, currentTime.length() - 2)).append(encoding.getTokenSeparator()).append(value.get(i));
+                    values.append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value.get(i));
                 }
                 oldTime = currentTime;
             }
@@ -795,6 +805,6 @@ public class OM2ObservationReader implements ObservationReader {
      */
     @Override
     public List<String> getResponseFormats() throws CstlServiceException {
-        return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
+        return Arrays.asList(RESPONSE_FORMAT_V100, RESPONSE_FORMAT_V200);
     }
 }
