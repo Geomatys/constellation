@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.WKBWriter;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -65,6 +66,7 @@ import org.opengis.observation.Measure;
 import org.opengis.observation.Observation;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
+import org.opengis.temporal.TemporalObject;
 import org.opengis.util.FactoryException;
 
 
@@ -137,26 +139,31 @@ public class OM2ObservationWriter implements ObservationWriter {
     public String writeObservation(final Observation observation) throws CstlServiceException {
         try {
             final Connection c           = source.getConnection();
+            c.setAutoCommit(false);
             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"observations\" VALUES(?,?,?,?,?,?)");
             final int oid = Integer.parseInt(observation.getName().substring(observationIdBase.length()));
             stmt.setInt(1, oid);
             
-            if (observation.getSamplingTime() instanceof Period) {
-                final Period period = (Period)observation.getSamplingTime();
-                if (period.getBeginning().getPosition().getDate() != null) {
-                    stmt.setTimestamp(2, new Timestamp(period.getBeginning().getPosition().getDate().getTime()));
+            final TemporalObject samplingTime = observation.getSamplingTime();
+            if (samplingTime instanceof Period) {
+                final Period period  = (Period) samplingTime;
+                final Date beginDate = period.getBeginning().getPosition().getDate();
+                final Date endDate   = period.getEnding().getPosition().getDate();
+                if (beginDate != null) {
+                    stmt.setTimestamp(2, new Timestamp(beginDate.getTime()));
                 } else {
                     stmt.setNull(2, java.sql.Types.TIMESTAMP);
                 }
-                if (period.getEnding().getPosition().getDate() != null) {
-                    stmt.setTimestamp(3, new Timestamp(period.getEnding().getPosition().getDate().getTime()));
+                if (endDate != null) {
+                    stmt.setTimestamp(3, new Timestamp(endDate.getTime()));
                 } else {
                     stmt.setNull(3, java.sql.Types.TIMESTAMP);
                 }
-            } else if (observation.getSamplingTime() instanceof Instant) {
-                final Instant instant = (Instant)observation.getSamplingTime();
-                if (instant.getPosition().getDate() != null) {
-                    stmt.setTimestamp(2, new Timestamp(instant.getPosition().getDate().getTime()));
+            } else if (samplingTime instanceof Instant) {
+                final Instant instant = (Instant) samplingTime;
+                final Date date       = instant.getPosition().getDate();
+                if (date != null) {
+                    stmt.setTimestamp(2, new Timestamp(date.getTime()));
                 } else {
                     stmt.setNull(2, java.sql.Types.TIMESTAMP);
                 }
@@ -165,25 +172,29 @@ public class OM2ObservationWriter implements ObservationWriter {
                 stmt.setNull(2, java.sql.Types.TIMESTAMP);
                 stmt.setNull(3, java.sql.Types.TIMESTAMP);
             }
-            writePhenomenon((Phenomenon)observation.getObservedProperty(), c);
-            stmt.setString(4, ((Phenomenon)observation.getObservedProperty()).getName());
+            final Phenomenon phenomenon = (Phenomenon)observation.getObservedProperty();
+            writePhenomenon(phenomenon, c);
+            stmt.setString(4, phenomenon.getName());
             
-            writeProcedure((org.geotoolkit.observation.xml.Process)observation.getProcedure(), c);
-            stmt.setString(5, ((org.geotoolkit.observation.xml.Process)observation.getProcedure()).getHref());
-            if (observation.getFeatureOfInterest() != null) {
-                stmt.setString(6, ((org.geotoolkit.sampling.xml.SamplingFeature)observation.getFeatureOfInterest()).getId());
+            final org.geotoolkit.observation.xml.Process procedure = (org.geotoolkit.observation.xml.Process)observation.getProcedure();
+            writeProcedure(procedure.getHref(), c);
+            stmt.setString(5, procedure.getHref());
+            final org.geotoolkit.sampling.xml.SamplingFeature foi = (org.geotoolkit.sampling.xml.SamplingFeature)observation.getFeatureOfInterest();
+            if (foi != null) {
+                stmt.setString(6, foi.getId());
             } else {
                 stmt.setNull(6, java.sql.Types.VARCHAR);
             }
-            writeFeatureOfInterest(observation.getFeatureOfInterest(), c);
+            writeFeatureOfInterest(foi, c);
             
             stmt.executeUpdate();
             stmt.close();
             
             writeResult(oid, observation.getResult(), c);
             
-            updateOrCreateOffering(observation, c);
+            updateOrCreateOffering(procedure.getHref(),samplingTime, phenomenon.getName(), c);
             
+            c.commit();
             c.close();
             return observation.getName();
         } catch (SQLException ex) {
@@ -217,13 +228,13 @@ public class OM2ObservationWriter implements ObservationWriter {
         stmtExist.close();
     }
     
-    private void writeProcedure(final org.geotoolkit.observation.xml.Process procedure, final Connection c) throws SQLException {
+    private void writeProcedure(final String procedureID, final Connection c) throws SQLException {
         final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"procedures\" WHERE \"id\"=?");
-        stmtExist.setString(1, procedure.getHref());
+        stmtExist.setString(1, procedureID);
         final ResultSet rs = stmtExist.executeQuery();
         if (!rs.next()) {
             final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"procedures\" VALUES(?)");
-            stmtInsert.setString(1, procedure.getHref());
+            stmtInsert.setString(1, procedureID);
             stmtInsert.executeUpdate();
             stmtInsert.close();
         } 
@@ -353,9 +364,8 @@ public class OM2ObservationWriter implements ObservationWriter {
         stmt.close();
     }
     
-    private void updateOrCreateOffering(final Observation observation, final Connection c) throws SQLException {
+    private void updateOrCreateOffering(final String procedureID, final TemporalObject samplingTime, final String phenoID, final Connection c) throws SQLException {
         
-       final String procedureID = ((org.geotoolkit.observation.xml.Process)observation.getProcedure()).getHref();
        final String offeringID  = "offering-" + procedureID.substring(sensorIdBase.length());
        
        final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"offerings\" WHERE \"identifier\"=?");
@@ -368,22 +378,25 @@ public class OM2ObservationWriter implements ObservationWriter {
             stmtInsert.setString(1, offeringID);
             stmtInsert.setString(2, "Offering for procedure:" + procedureID);
             stmtInsert.setString(3, offeringID);
-            if (observation.getSamplingTime() instanceof Period) {
-                final Period period = (Period)observation.getSamplingTime();
-                if (period.getBeginning().getPosition().getDate() != null) {
-                    stmtInsert.setTimestamp(4, new Timestamp(period.getBeginning().getPosition().getDate().getTime()));
+            if (samplingTime instanceof Period) {
+                final Period period  = (Period)samplingTime;
+                final Date beginDate = period.getBeginning().getPosition().getDate();
+                final Date endDate   = period.getEnding().getPosition().getDate();
+                if (beginDate != null) {
+                    stmtInsert.setTimestamp(4, new Timestamp(beginDate.getTime()));
                 } else {
                     stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
                 }
-                if (period.getEnding().getPosition().getDate() != null) {
-                    stmtInsert.setTimestamp(5, new Timestamp(period.getEnding().getPosition().getDate().getTime()));
+                if (endDate != null) {
+                    stmtInsert.setTimestamp(5, new Timestamp(endDate.getTime()));
                 } else {
                     stmtInsert.setNull(5, java.sql.Types.TIMESTAMP);
                 }
-            } else if (observation.getSamplingTime() instanceof Instant) {
-                final Instant instant = (Instant)observation.getSamplingTime();
-                if (instant.getPosition().getDate() != null) {
-                    stmtInsert.setTimestamp(4, new Timestamp(instant.getPosition().getDate().getTime()));
+            } else if (samplingTime instanceof Instant) {
+                final Instant instant = (Instant)samplingTime;
+                final Date date       = instant.getPosition().getDate();
+                if (date != null) {
+                    stmtInsert.setTimestamp(4, new Timestamp(date.getTime()));
                 } else {
                     stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
                 }
@@ -396,7 +409,6 @@ public class OM2ObservationWriter implements ObservationWriter {
             stmtInsert.executeUpdate();
             stmtInsert.close();
             
-            final String phenoID = ((Phenomenon)observation.getObservedProperty()).getName();
             final PreparedStatement stmtInsertOP = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
             stmtInsertOP.setString(1, offeringID);
             stmtInsertOP.setString(2, phenoID);
@@ -424,10 +436,12 @@ public class OM2ObservationWriter implements ObservationWriter {
                 offEnd = -Long.MAX_VALUE;
             }
             
-            if (observation.getSamplingTime() instanceof Period) {
-                final Period period = (Period)observation.getSamplingTime();
-                if (period.getBeginning().getPosition().getDate() != null) {
-                    final long obsBeginTime = period.getBeginning().getPosition().getDate().getTime();
+            if (samplingTime instanceof Period) {
+                final Period period  = (Period) samplingTime;
+                final Date beginDate = period.getBeginning().getPosition().getDate();
+                final Date endDate   = period.getEnding().getPosition().getDate();
+                if (beginDate != null) {
+                    final long obsBeginTime = beginDate.getTime();
                     if (obsBeginTime < offBegin) {
                         final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_begin\"=?");
                         beginStmt.setTimestamp(1, new Timestamp(obsBeginTime));
@@ -435,8 +449,8 @@ public class OM2ObservationWriter implements ObservationWriter {
                         beginStmt.close();
                     }
                 }
-                if (period.getEnding().getPosition().getDate() != null) {
-                    final long obsEndTime = period.getEnding().getPosition().getDate().getTime();
+                if (endDate != null) {
+                    final long obsEndTime = endDate.getTime();
                     if (obsEndTime > offEnd) {
                         final PreparedStatement endStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_end\"=?");
                         endStmt.setTimestamp(1, new Timestamp(obsEndTime));
@@ -444,10 +458,11 @@ public class OM2ObservationWriter implements ObservationWriter {
                         endStmt.close();
                     }
                 }
-            } else if (observation.getSamplingTime() instanceof Instant) {
-                final Instant instant = (Instant)observation.getSamplingTime();
-                if (instant.getPosition().getDate() != null) {
-                    final long obsTime = instant.getPosition().getDate().getTime();
+            } else if (samplingTime instanceof Instant) {
+                final Instant instant = (Instant) samplingTime;
+                final Date date       = instant.getPosition().getDate();
+                if (date != null) {
+                    final long obsTime = date.getTime();
                     if (obsTime < offBegin) {
                         final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_begin\"=?");
                         beginStmt.setTimestamp(1, new Timestamp(obsTime));
@@ -466,7 +481,6 @@ public class OM2ObservationWriter implements ObservationWriter {
             /*
              * Phenomenon
              */
-            final String phenoID = ((Phenomenon)observation.getObservedProperty()).getName();
             final PreparedStatement phenoStmt = c.prepareStatement("SELECT * FROM  \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=? AND \"phenomenon\"=?");
             phenoStmt.setString(1, offeringID);
             phenoStmt.setString(2, phenoID);
