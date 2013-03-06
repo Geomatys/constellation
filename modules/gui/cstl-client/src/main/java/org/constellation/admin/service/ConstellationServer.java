@@ -1199,6 +1199,16 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
+        
+        public boolean clearCache(final String id) {
+            try {
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CLEAR_CACHE + "&id=" + id;
+                return sendRequestAck(url, null);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
 
         public boolean importFile(final String id, final File importFile, final String fileName) {
             try {

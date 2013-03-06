@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.imageio.spi.ServiceRegistry;
@@ -747,11 +748,7 @@ public class CSWworker extends AbstractWorker {
                     }
                     //we verify that the typeName is supported
                     if (!supportedTypeNames.contains(type)) {
-                        String typeName = "null";
-                        if (type != null) {
-                            typeName = type.getLocalPart();
-                        }
-                        throw new CstlServiceException("The typeName " + typeName + " is not supported by the service:" +'\n' +
+                        throw new CstlServiceException("The typeName " + type.getLocalPart() + " is not supported by the service:" +'\n' +
                                                       "supported one are:" + '\n' + supportedTypeNames(),
                                                       INVALID_PARAMETER_VALUE, TYPENAMES);
                     }
@@ -1747,5 +1744,13 @@ public class CSWworker extends AbstractWorker {
     @Override
     protected MarshallerPool getMarshallerPool() {
         return CSWMarshallerPool.getInstance();
+    }
+    
+    public void clearCache() throws CstlServiceException {
+        try {
+            indexSearcher.refresh();
+        } catch (IndexingException ex) {
+            throw new CstlServiceException("Error while refreshing cache", ex, NO_APPLICABLE_CODE);
+        }
     }
 }

@@ -227,8 +227,18 @@ public class CSWService extends OGCWebService<CSWworker> {
                 throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
                         INVALID_PARAMETER_VALUE, "id");
             }
+        } else if ("clearCache".equals(request)) {
+            final String identifier = getParameter("id", true);
+            final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", identifier);
+            if (worker != null) {
+                worker.clearCache();
+                return Response.ok(new AcknowlegementType("Success", "CSW cache cleared"), "text/xml").build();
+            } else {
+                throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
+                        INVALID_PARAMETER_VALUE, "id");
+            }
         } else {
-            throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
+            throw new CstlServiceException("The operation " + request + " is not supported by the CSW administration service",
                         INVALID_PARAMETER_VALUE, "request");
         }
     }

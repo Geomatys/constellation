@@ -221,8 +221,8 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertEquals(expResult, obj);
 
 
-        //normally we don't have to restart the CSW TODO
-        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=restart&id=default");
+        //clear the csw cache
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=clearCache&id=default");
         conec = niUrl.openConnection();
         obj = unmarshallResponse(conec);
 
@@ -268,8 +268,8 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertEquals(expResult, obj);
 
 
-        //normally we don't have to restart the CSW TODO
-        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=restart&id=default");
+        //clear the csw cache
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=clearCache&id=default");
         conec = niUrl.openConnection();
         obj = unmarshallResponse(conec);
 
