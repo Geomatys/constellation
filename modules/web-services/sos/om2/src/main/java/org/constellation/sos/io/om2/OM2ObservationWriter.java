@@ -16,6 +16,7 @@
  */
 package org.constellation.sos.io.om2;
 
+import com.vividsolutions.jts.geom.Geometry;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
@@ -44,12 +46,14 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.GeometrytoJTS;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.swe.xml.Phenomenon;
 import org.geotoolkit.swes.xml.ObservationTemplate;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.swe.xml.AnyScalar;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.DataArrayProperty;
@@ -58,7 +62,6 @@ import org.geotoolkit.swe.xml.DataRecord;
 import org.geotoolkit.swe.xml.Quantity;
 import org.geotoolkit.swe.xml.SimpleDataRecord;
 import org.geotoolkit.swe.xml.TextBlock;
-import org.opengis.observation.AnyFeature;
 import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Measure;
 
@@ -243,8 +246,39 @@ public class OM2ObservationWriter implements ObservationWriter {
     }
     
     // TODO
-    private void writeFeatureOfInterest(final AnyFeature foi, final Connection c) throws CstlServiceException {
-        
+    private void writeFeatureOfInterest(final SamplingFeature foi, final Connection c) throws SQLException {
+        final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"sampling_features\" WHERE \"id\"=?");
+        stmtExist.setString(1, foi.getId());
+        final ResultSet rs = stmtExist.executeQuery();
+        if (!rs.next()) {
+            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"sampling_features\" VALUES(?,?,?,?,?,?)");
+            stmtInsert.setString(1, foi.getId());
+            stmtInsert.setString(2, foi.getName());
+            stmtInsert.setString(3, foi.getDescription());
+            stmtInsert.setNull(4, java.sql.Types.VARCHAR); // TODO
+            
+            if (foi.getGeometry() != null) {
+                try {
+                    WKBWriter writer = new WKBWriter();
+                    final Geometry geom = GeometrytoJTS.toJTS((AbstractGeometry)foi.getGeometry());
+                    final int SRID = geom.getSRID();
+                    stmtInsert.setBytes(5, writer.write(geom));
+                    stmtInsert.setInt(6, SRID);
+                } catch (FactoryException ex) {
+                    LOGGER.log(Level.WARNING, "unable to transform the geometry to JTS", ex);
+                    stmtInsert.setNull(5, java.sql.Types.VARBINARY);
+                    stmtInsert.setNull(6, java.sql.Types.INTEGER);
+                }
+            } else {
+                stmtInsert.setNull(5, java.sql.Types.VARBINARY);
+                stmtInsert.setNull(6, java.sql.Types.INTEGER);
+            }
+            
+            stmtInsert.executeUpdate();
+            stmtInsert.close();
+        } 
+        rs.close();
+        stmtExist.close();
     }
     
     private void writeResult(final int oid, final Object result, final Connection c) throws SQLException, CstlServiceException {

@@ -107,6 +107,8 @@ public class OM2ObservationReader implements ObservationReader {
     
     protected final DataSource source;
     
+    private final boolean isPostgres;
+    
     private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     
     private static final CoordinateReferenceSystem defaultCRS;
@@ -138,6 +140,7 @@ public class OM2ObservationReader implements ObservationReader {
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object (DefaultObservationReader)", NO_APPLICABLE_CODE);
         }
+        isPostgres = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
         try {
             this.source = db.getDataSource();
             // try if the connection is valid
@@ -383,8 +386,12 @@ public class OM2ObservationReader implements ObservationReader {
             final String sampledFeature;
             final byte[] b;
             final int srid;
-
-            final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"om\".\"sampling_features\" WHERE \"id\"=?");
+            final PreparedStatement stmt;
+            if (isPostgres) {
+                stmt  = c.prepareStatement("SELECT \"id\", \"name\", \"description\", \"sampledfeature\", \"postgis\".st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"sampling_features\" WHERE \"id\"=?");
+            } else {
+                stmt  = c.prepareStatement("SELECT * FROM \"om\".\"sampling_features\" WHERE \"id\"=?");
+            }
             stmt.setString(1, id);
             final ResultSet rs = stmt.executeQuery();
             if (rs.next()) {

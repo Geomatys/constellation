@@ -59,7 +59,7 @@ CREATE TABLE "om"."sampling_features" (
     "name"             character varying(100),
     "description"      character varying(100),
     "sampledfeature"   character varying(100),
-    "shape"            bit varying(200),
+    "shape"            postgis.geometry,
     "crs"              integer
 );
 
