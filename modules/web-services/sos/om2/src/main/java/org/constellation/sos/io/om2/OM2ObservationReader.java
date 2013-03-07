@@ -39,6 +39,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 // Constellation dependencies
@@ -363,67 +364,75 @@ public class OM2ObservationReader implements ObservationReader {
     @Override
     public SamplingFeature getFeatureOfInterest(final String id, final String version) throws CstlServiceException {
         try {
-            final Connection c         = source.getConnection();
+            final Connection c = source.getConnection();
+            c.setReadOnly(true);
             try {
-                final String name;
-                final String description;
-                final String sampledFeature;
-                final byte[] b;
-                final int srid;
-                
-                final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"om\".\"sampling_features\" WHERE \"id\"=?");
-                stmt.setString(1, id);
-                final ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    name           = rs.getString(2);
-                    description    = rs.getString(3);
-                    sampledFeature = rs.getString(4);
-                    b              = rs.getBytes(5);
-                    srid           = rs.getInt(6);
-                } else {
-                    return null;
-                }
-                final CoordinateReferenceSystem crs;
-                if (srid != 0) {
-                    crs = CRS.decode("urn:ogc:def:crs:EPSG:" + srid);
-                } else {
-                    crs = defaultCRS;
-                }
-                final Geometry geom;
-                if (b != null) {
-                    WKBReader reader = new WKBReader();
-                    geom             = reader.read(b);
-                } else {
-                    geom = null;
-                } 
-
-                final String gmlVersion = getGMLVersion(version);
-                final FeatureProperty prop;
-                if (sampledFeature != null) {
-                    prop = buildFeatureProperty(version, sampledFeature);
-                } else {
-                    prop = null;
-                }
-                if (geom instanceof Point) {
-                    final org.geotoolkit.gml.xml.Point point = JTStoGeometry.toGML(gmlVersion, (Point)geom, crs);
-                    // little hack fo unit test
-                    point.setSrsName(null);
-                    return buildSamplingPoint(version, id, name, description, prop, point);
-                } else if (geom instanceof LineString) {
-                    final org.geotoolkit.gml.xml.LineString line = JTStoGeometry.toGML(gmlVersion, (LineString)geom, crs);
-                    line.emptySrsNameOnChild();
-                    final Envelope bound = line.getBounds();
-                    return buildSamplingCurve(version, id, name, description, prop, line, null, null, bound);
-                } else if (geom != null) {
-                    return buildSamplingFeature(version, id, name, description, prop);   
-                } else {
-                    throw new IllegalArgumentException("Unexpected geometry type:" + geom.getClass());
-                }
+                return getFeatureOfInterest(id, version, c);
             } finally {
                 c.close();
             }
         } catch (SQLException ex) {
             throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
+    private SamplingFeature getFeatureOfInterest(final String id, final String version, final Connection c) throws SQLException, CstlServiceException {
+        try {
+            final String name;
+            final String description;
+            final String sampledFeature;
+            final byte[] b;
+            final int srid;
+
+            final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"om\".\"sampling_features\" WHERE \"id\"=?");
+            stmt.setString(1, id);
+            final ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                name           = rs.getString(2);
+                description    = rs.getString(3);
+                sampledFeature = rs.getString(4);
+                b              = rs.getBytes(5);
+                srid           = rs.getInt(6);
+            } else {
+                return null;
+            }
+            final CoordinateReferenceSystem crs;
+            if (srid != 0) {
+                crs = CRS.decode("urn:ogc:def:crs:EPSG:" + srid);
+            } else {
+                crs = defaultCRS;
+            }
+            final Geometry geom;
+            if (b != null) {
+                WKBReader reader = new WKBReader();
+                geom             = reader.read(b);
+            } else {
+                geom = null;
+            } 
+
+            final String gmlVersion = getGMLVersion(version);
+            final FeatureProperty prop;
+            if (sampledFeature != null) {
+                prop = buildFeatureProperty(version, sampledFeature);
+            } else {
+                prop = null;
+            }
+            if (geom instanceof Point) {
+                final org.geotoolkit.gml.xml.Point point = JTStoGeometry.toGML(gmlVersion, (Point)geom, crs);
+                // little hack fo unit test
+                point.setSrsName(null);
+                return buildSamplingPoint(version, id, name, description, prop, point);
+            } else if (geom instanceof LineString) {
+                final org.geotoolkit.gml.xml.LineString line = JTStoGeometry.toGML(gmlVersion, (LineString)geom, crs);
+                line.emptySrsNameOnChild();
+                final Envelope bound = line.getBounds();
+                return buildSamplingCurve(version, id, name, description, prop, line, null, null, bound);
+            } else if (geom != null) {
+                return buildSamplingFeature(version, id, name, description, prop);   
+            } else {
+                throw new IllegalArgumentException("Unexpected geometry type:" + geom.getClass());
+            }
+            
         } catch (ParseException ex) {
             throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
         } catch (FactoryException ex) {
@@ -438,6 +447,7 @@ public class OM2ObservationReader implements ObservationReader {
     public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
         try {
             final Connection c         = source.getConnection();
+            c.setReadOnly(true);
             try {
                 final String idToParse;
                 if (identifier.startsWith(observationIdBase)) {
@@ -472,8 +482,6 @@ public class OM2ObservationReader implements ObservationReader {
                 final String procedure;
                 final String foi;
                 final TemporalGeometricPrimitive time;
-                final double value;
-                final String uom;
                 
                 final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"om\".\"observations\" WHERE \"id\"=?");
                 stmt.setInt(1, id);
@@ -496,7 +504,7 @@ public class OM2ObservationReader implements ObservationReader {
                     return null;
                 }
                 
-                final SamplingFeature feature = getFeatureOfInterest(foi, version);
+                final SamplingFeature feature = getFeatureOfInterest(foi, version, c);
                 final FeatureProperty prop    = buildFeatureProperty(version, feature);
                 final String phenID;
                 if (observedProperty.startsWith(phenomenonIdBase)) {
@@ -570,56 +578,68 @@ public class OM2ObservationReader implements ObservationReader {
      */
     @Override
     public Object getResult(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
-        if (resultModel.equals(MEASUREMENT_QNAME)) {
-            return buildMeasureResult(identifier, version);
-        } else {
-            return buildComplexResult(identifier, version);
-        }
-    }
-    
-    private DataArrayProperty buildComplexResult(final String identifier, final String version) throws CstlServiceException {
         try {
-            final Connection c           = source.getConnection();
-            final List<Double> value     = new ArrayList<Double>();
-            final List<String> uom       = new ArrayList<String>();
-            final List<String> fieldType = new ArrayList<String>();
-            final List<Timestamp> time   = new ArrayList<Timestamp>();
-            final List<String> fieldDef  = new ArrayList<String>();
-            final List<String> fieldName = new ArrayList<String>();
+            final Connection c = source.getConnection();
+            c.setReadOnly(true);
             try {
-                final PreparedStatement stmt  = c.prepareStatement("SELECT \"value\", \"field_type\", \"uom\", \"time\" ,\"field_definition\", \"field_name\""
-                                                                 + "FROM \"om\".\"mesures\" "
-                                                                 + "WHERE \"id_observation\"=?");
-                final int id;
-                try {
-                    id = Integer.parseInt(identifier);
-                } catch (NumberFormatException ex) {
-                    throw new CstlServiceException("Unable to parse result ID:" + identifier);
-                }
-                stmt.setInt(1, id);
-                final ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    value.add(rs.getDouble(1));
-                    fieldType.add(rs.getString(2));
-                    uom.add(rs.getString(3));
-                    time.add(rs.getTimestamp(4));
-                    fieldDef.add(rs.getString(5));
-                    fieldName.add(rs.getString(6));
-                }
-                rs.close();
-                stmt.close();
+                return getResult(identifier, resultModel, version, c);
             } finally {
                 c.close();
             }
-            final TextBlock encoding = getDefaultTextEncoding(version);
-            final String id =  "dataArray-1"; // TODO
-            final String recordID = "datarecord-0"; // TODO
-            final List<AnyScalar> fields = new ArrayList<AnyScalar>();
-            fields.add(getDefaultTimeField(version));
-            final StringBuilder values = new StringBuilder();
-            int nbValue = 0;
-            Timestamp oldTime = null;
-            for (int i = 0; i < uom.size(); i++) {
+        } catch (SQLException ex) {
+            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
+    private Object getResult(final String identifier, final QName resultModel, final String version, final Connection c) throws CstlServiceException, SQLException {
+        if (resultModel.equals(MEASUREMENT_QNAME)) {
+            return buildMeasureResult(identifier, version, c);
+        } else {
+            return buildComplexResult(identifier, version, c);
+        }
+    }
+    
+    private DataArrayProperty buildComplexResult(final String identifier, final String version, final Connection c) throws CstlServiceException, SQLException {
+        final List<Double> value      = new ArrayList<Double>();
+        final List<String> uom        = new ArrayList<String>();
+        final List<String> fieldType  = new ArrayList<String>();
+        final List<Timestamp> time    = new ArrayList<Timestamp>();
+        final List<String> fieldDef   = new ArrayList<String>();
+        final List<String> fieldNames = new ArrayList<String>();
+        
+        final PreparedStatement stmt  = c.prepareStatement("SELECT \"value\", \"field_type\", \"uom\", \"time\" ,\"field_definition\", \"field_name\""
+                                                         + "FROM \"om\".\"mesures\" "
+                                                         + "WHERE \"id_observation\"=?");
+        final int id;
+        try {
+            id = Integer.parseInt(identifier);
+        } catch (NumberFormatException ex) {
+            throw new CstlServiceException("Unable to parse result ID:" + identifier);
+        }
+        stmt.setInt(1, id);
+        final ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            value.add(rs.getDouble(1));
+            fieldType.add(rs.getString(2));
+            uom.add(rs.getString(3));
+            time.add(rs.getTimestamp(4));
+            fieldDef.add(rs.getString(5));
+            fieldNames.add(rs.getString(6));
+        }
+        rs.close();
+        stmt.close();
+        
+        final TextBlock encoding = getDefaultTextEncoding(version);
+        final String arrayID =  "dataArray-1"; // TODO
+        final String recordID = "datarecord-0"; // TODO
+        final Map<String, AnyScalar> fields = new HashMap<String, AnyScalar>();
+        fields.put("Time", getDefaultTimeField(version));
+        final StringBuilder values = new StringBuilder();
+        int nbValue = 0;
+        Timestamp oldTime = null;
+        for (int i = 0; i < uom.size(); i++) {
+            final String fieldName = fieldNames.get(i);
+            if (!fields.containsKey(fieldName)) {
                 final AbstractDataComponent compo;
                 if ("Quantity".equals(fieldType.get(i))) {
                     final UomProperty uomCode = buildUomProperty(version, uom.get(i), null);
@@ -627,58 +647,48 @@ public class OM2ObservationReader implements ObservationReader {
                 } else {
                     throw new IllegalArgumentException("Unexpected field Type:" + fieldType);
                 }
-                final AnyScalar scalar = buildAnyScalar(version, null, fieldName.get(i), compo);
-                if (!fields.contains(scalar)) {
-                    fields.add(scalar);
-                }
-                final Timestamp currentTime = time.get(i);
-                if (currentTime.equals(oldTime)) {
-                    values.append(encoding.getTokenSeparator()).append(value.get(i));
-                } else {
-                    nbValue++;
-                    if (oldTime != null) {
-                        values.append(encoding.getBlockSeparator());
-                    }
-                    values.append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value.get(i));
-                }
-                oldTime = currentTime;
+                final AnyScalar scalar = buildAnyScalar(version, null, fieldName, compo);
+                fields.put(fieldName, scalar);
             }
-            values.append(encoding.getBlockSeparator());
-            final AbstractDataRecord record = buildSimpleDatarecord(version, null, recordID, null, false, fields);
-            
-            return buildDataArrayProperty(version, id, nbValue, id, record, encoding, values.toString());
-
-        } catch (SQLException ex) {
-            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+            final Timestamp currentTime = time.get(i);
+            if (currentTime.equals(oldTime)) {
+                values.append(encoding.getTokenSeparator()).append(value.get(i));
+            } else {
+                nbValue++;
+                if (oldTime != null) {
+                    values.append(encoding.getBlockSeparator());
+                }
+                values.append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value.get(i));
+            }
+            oldTime = currentTime;
         }
+        values.append(encoding.getBlockSeparator());
+        final AbstractDataRecord record = buildSimpleDatarecord(version, null, recordID, null, false, new ArrayList<AnyScalar>(fields.values()));
+
+        return buildDataArrayProperty(version, arrayID, nbValue, arrayID, record, encoding, values.toString());
     }
     
-    private Object buildMeasureResult(final String identifier, final String version) throws CstlServiceException {
+    private Object buildMeasureResult(final String identifier, final String version, final Connection c) throws CstlServiceException, SQLException {
+        final double value;
+        final String uom;
+        final String name;
         try {
-            final Connection c         = source.getConnection();
-            final double value;
-            final String uom;
-            final String name;
-            try {
-                final PreparedStatement stmt  = c.prepareStatement("SELECT \"id\", \"value\", \"uom\", \"time\" ,\"field_definition\", \"field_name\""
-                                                                 + "FROM \"om\".\"mesures\" "
-                                                                 + "WHERE \"id_observation\"=?");
-                stmt.setString(1, identifier);
-                final ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    name   = "measure-00" + rs.getString(1);
-                    value  = rs.getDouble(2);
-                    uom    = rs.getString(3);
-                } else {
-                    return null;
-                }
-            } finally {
-                c.close();
+            final PreparedStatement stmt  = c.prepareStatement("SELECT \"id\", \"value\", \"uom\", \"time\" ,\"field_definition\", \"field_name\""
+                                                             + "FROM \"om\".\"mesures\" "
+                                                             + "WHERE \"id_observation\"=?");
+            stmt.setString(1, identifier);
+            final ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                name   = "measure-00" + rs.getString(1);
+                value  = rs.getDouble(2);
+                uom    = rs.getString(3);
+            } else {
+                return null;
             }
-            return buildMeasure(version, name, uom, value);
-        } catch (SQLException ex) {
-            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+        } finally {
+            c.close();
         }
+        return buildMeasure(version, name, uom, value);
     }
 
     /**
