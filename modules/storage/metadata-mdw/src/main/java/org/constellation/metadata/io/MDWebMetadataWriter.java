@@ -487,7 +487,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final Collection c = (Collection) object;
             for (Object obj: c) {
                 if (path.getName().equals("geographicElement2") && obj instanceof DefaultGeographicDescription) {
-                    path = mdWriter.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3");
+                    final String parentID = path.getParent().getId();
+                    path = mdWriter.getPath(parentID + ":geographicElement3");
                 }
                 result.addAll(addValueFromObject(record, obj, path, parentValue));
 
