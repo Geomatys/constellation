@@ -2,8 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2013, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,7 +17,6 @@
 
 package org.constellation.sos.io.om2;
 
-
 import java.util.Map;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -26,14 +24,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.ws.CstlServiceException;
@@ -45,7 +41,6 @@ import static org.constellation.sos.ws.SOSConstants.*;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.util.logging.Logging;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -57,36 +52,18 @@ import org.opengis.temporal.Period;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class OM2ObservationFilter implements ObservationFilter {
+public class OM2ObservationFilter extends OM2BaseReader implements ObservationFilter {
 
 
-    private StringBuilder sqlRequest;
+    protected StringBuilder sqlRequest;
 
-    /**
-     *
-     */
-    private final DataSource source;
-
-     /**
-     * use for debugging purpose
-     */
-    protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
-
-    /**
-     * The base for observation id.
-     */
-    protected final String observationIdBase;
-
-    /**
-     * The base for observation id.
-     */
-    protected final String observationTemplateIdBase;
-    
-    protected final String phenomenonIdBase;
+    protected final DataSource source;
 
     protected boolean template = false;
     
     protected boolean firstFilter = true;
+    
+    protected QName resultModel;
     
     /**
      * Clone a new Observation Filter.
@@ -94,19 +71,17 @@ public class OM2ObservationFilter implements ObservationFilter {
      * @param omFilter
      */
     public OM2ObservationFilter(final OM2ObservationFilter omFilter) {
+        super(omFilter);
         this.source                    = omFilter.source;
-        this.observationIdBase         = omFilter.observationIdBase;
-        this.observationTemplateIdBase = omFilter.observationTemplateIdBase;
-        this.phenomenonIdBase          = omFilter.phenomenonIdBase;
         this.template                  = false;
+        resultModel                    = null;
+        
     }
 
     
     public OM2ObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
-        this.observationIdBase         = (String)     properties.get(OMFactory.OBSERVATION_ID_BASE);
-        this.observationTemplateIdBase = (String)     properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
-        this.phenomenonIdBase          = (String)     properties.get(OMFactory.PHENOMENON_ID_BASE);
-        
+        super(properties);
+
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
@@ -115,6 +90,8 @@ public class OM2ObservationFilter implements ObservationFilter {
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
+        isPostgres  = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
+        resultModel = null;
         try {
             this.source = db.getDataSource();
             // try if the connection is valid
@@ -132,10 +109,18 @@ public class OM2ObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) {
-        sqlRequest = new StringBuilder("SELECT \"id\" , \"procedure\" FROM \"om\".\"observations\" WHERE ");
+        firstFilter = false;
         if (ResponseModeType.RESULT_TEMPLATE.equals(requestMode)) {
+             sqlRequest = new StringBuilder("SELECT distinct \"observed_property\", \"procedure\", \"foi\", \"uom\", \"field_type\", \"field_name\", \"field_definition\" "
+                                          + "FROM \"om\".\"observations\" o, \"om\".\"mesures\" m "
+                                          + "WHERE o.\"id\" = m.\"id_observation\"");
             template = true;
+        } else {
+            sqlRequest = new StringBuilder("SELECT o.\"id\", m.\"id\" as resultid, \"observed_property\", \"procedure\", \"foi\", \"time\", \"value\", \"uom\", \"field_type\", \"field_name\", \"field_definition\" "
+                                         + "FROM \"om\".\"observations\" o, \"om\".\"mesures\" m "
+                                         + "WHERE o.\"id\" = m.\"id_observation\"");
         }
+        this.resultModel = resultModel;
     }
 
     /**
@@ -143,10 +128,13 @@ public class OM2ObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterGetResult(final String procedure, final QName resultModel) {
-        sqlRequest = new StringBuilder("SELECT \"id\", \"time_begin\", \"time_end\" FROM \"om\".\"observations\" WHERE ");
+        firstFilter = false;
+        sqlRequest = new StringBuilder("SELECT \"time\", \"value\" "
+                                     + "FROM \"om\".\"observations\" o, \"om\".\"mesures\" m "
+                                     + "WHERE o.\"id\" = m.\"id_observation\"");
         
         //we add to the request the property of the template
-        sqlRequest.append("\"procedure\"='").append(procedure).append("'");
+        sqlRequest.append(" AND \"procedure\"='").append(procedure).append("'");
     }
 
     /**
@@ -155,7 +143,11 @@ public class OM2ObservationFilter implements ObservationFilter {
     @Override
     public void setProcedure(final List<String> procedures, final List<ObservationOffering> offerings) {
         if (!procedures.isEmpty()) {
-            sqlRequest.append(" ( ");
+            if (firstFilter) {
+                sqlRequest.append(" ( ");
+            } else {
+                sqlRequest.append("AND ( ");
+            }
             for (String s : procedures) {
                 if (s != null) {
                     sqlRequest.append(" \"procedure\"='").append(s).append("' OR ");
@@ -166,7 +158,11 @@ public class OM2ObservationFilter implements ObservationFilter {
             firstFilter = false;
         } else if (!offerings.isEmpty()) {
             
-            sqlRequest.append(" ( ");
+            if (firstFilter) {
+                sqlRequest.append(" ( ");
+            } else {
+                sqlRequest.append("AND ( ");
+            }
             //if is not specified we use all the process of the offering
             for (ObservationOffering off : offerings) {
                 for (String proc : off.getProcedures()) {
@@ -390,9 +386,9 @@ public class OM2ObservationFilter implements ObservationFilter {
             final ResultSet result           = currentStatement.executeQuery(sqlRequest.toString());
             final List<String> procedures    = new ArrayList<String>();
             while (result.next()) {
-                final String procedure = result.getString(2);
+                final String procedure = result.getString("procedure");
                 if (!template || !procedures.contains(procedure)) {
-                    results.add(result.getString(1));
+                    results.add(result.getString("id"));
                     procedures.add(procedure);
                 }
             }

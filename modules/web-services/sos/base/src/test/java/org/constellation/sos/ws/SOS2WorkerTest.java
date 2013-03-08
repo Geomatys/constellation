@@ -558,6 +558,9 @@ public abstract class SOS2WorkerTest {
         DataArrayPropertyType expR = (DataArrayPropertyType) expResult.getResult();
         DataArrayPropertyType obsR = (DataArrayPropertyType) obsResult.getResult();
 
+        // do not compare datarray name (ID) because it depends on the implementation
+        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());
+        
         assertTrue(obsR.getDataArray().getElementType().getAbstractRecord() instanceof DataRecordType);
         DataRecordType expSdr = (DataRecordType) expR.getDataArray().getElementType().getAbstractRecord();
         DataRecordType obsSdr = (DataRecordType) obsR.getDataArray().getElementType().getAbstractRecord();
@@ -573,11 +576,6 @@ public abstract class SOS2WorkerTest {
 
         assertEquals(expSdr, obsSdr);
 
-        // do not compare datarray name (ID) because it depends on the implementation
-        expR = (DataArrayPropertyType) expResult.getResult();
-        obsR = (DataArrayPropertyType) obsResult.getResult();
-        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());
-        
         assertEquals(expR.getDataArray().getElementType().getAbstractArray(),     obsR.getDataArray().getElementType().getAbstractArray());
         assertEquals(expR.getDataArray().getElementType(),     obsR.getDataArray().getElementType());
         assertEquals(expR.getDataArray().getEncoding(),        obsR.getDataArray().getEncoding());
@@ -736,7 +734,7 @@ public abstract class SOS2WorkerTest {
         obsResult =  (OMObservationType) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
-        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 15);
+        assertEquals((Integer)14, obsR.getDataArray().getElementCount().getCount().getValue());
 
         /**
          *  Test 7: getObservation with procedure urn:ogc:object:sensor:GEOM:3
@@ -761,7 +759,7 @@ public abstract class SOS2WorkerTest {
         obsResult =  (OMObservationType) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
-        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 10);
+        assertEquals((Integer)5, obsR.getDataArray().getElementCount().getCount().getValue());
 
         /**
          *  Test 8: getObservation with procedure urn:ogc:object:sensor:GEOM:3
@@ -1385,6 +1383,10 @@ public abstract class SOS2WorkerTest {
 
         DataArrayPropertyType arrayP = (DataArrayPropertyType) templateExpResult.getResult();
         DataArrayType array = arrayP.getDataArray();
+        
+        // empty id 
+        array.getElementType().getValue().setId(null);
+        obsCollResult.getResultStructure().setId(null);
 
         assertEquals(array.getEncoding(), obsCollResult.getResultEncoding());
         assertEquals(array.getElementType().getValue(), obsCollResult.getResultStructure());
@@ -1406,9 +1408,9 @@ public abstract class SOS2WorkerTest {
         GetResultType request = new GetResultType(offeringId, null, "2.0.0");
         GetResultResponseType result = (GetResultResponseType) worker.getResult(request);
 
-        String value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" + '\n' +
-                       "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" + '\n' +
-                       "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@" + '\n';
+        String value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" + 
+                       "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" + 
+                       "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@";
         GetResultResponseType expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1427,7 +1429,7 @@ public abstract class SOS2WorkerTest {
         
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@" + '\n';
+        value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1441,7 +1443,7 @@ public abstract class SOS2WorkerTest {
         request.addTemporalFilter(afilter);
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@" + '\n';
+        value = "2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1458,7 +1460,7 @@ public abstract class SOS2WorkerTest {
         request = new GetResultType(offeringId, filters, "2.0.0");
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@" + '\n';
+        value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1476,7 +1478,7 @@ public abstract class SOS2WorkerTest {
         request = new GetResultType(offeringId, filters, "2.0.0");
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T03:59:00,6.56@@" + '\n';
+        value = "2007-05-01T03:59:00,6.56@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1494,7 +1496,7 @@ public abstract class SOS2WorkerTest {
         request = new GetResultType(offeringId, filters, "2.0.0");
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T03:59:00,6.56@@" + '\n';
+        value = "2007-05-01T03:59:00,6.56@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1511,7 +1513,7 @@ public abstract class SOS2WorkerTest {
                 
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@" + '\n';
+        value = "2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1526,7 +1528,7 @@ public abstract class SOS2WorkerTest {
         request.addTemporalFilter(templatefilter);
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T20:59:00,6.55@@" + '\n';
+        value = "2007-05-01T20:59:00,6.55@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1547,9 +1549,9 @@ public abstract class SOS2WorkerTest {
         GetResultType GRrequest = new GetResultType("offering-3", null, "2.0.0");
         GetResultResponseType result = (GetResultResponseType) worker.getResult(GRrequest);
 
-        String value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" + '\n' +
-                       "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" + '\n' +
-                       "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@" + '\n';
+        String value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" + 
+                       "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" + 
+                       "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@";
         
         GetResultResponseType expResult = new GetResultResponseType(value);
 
@@ -1575,10 +1577,10 @@ public abstract class SOS2WorkerTest {
         GRrequest = new GetResultType("offering-3", null, "2.0.0");
         result = (GetResultResponseType) worker.getResult(GRrequest);
 
-        value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" + '\n' +
-                "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" + '\n' +
-                "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@" + '\n' +
-                "2007-06-01T01:01:00,6.56@@2007-06-01T02:00:00,6.55@@2007-06-01T03:00:00,6.55@@" + '\n';
+        value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" +
+                "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" +
+                "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@" +
+                "2007-06-01T01:01:00,6.56@@2007-06-01T02:00:00,6.55@@2007-06-01T03:00:00,6.55@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1663,6 +1665,8 @@ public abstract class SOS2WorkerTest {
         DataRecordType expSdr = (DataRecordType) expR.getDataArray().getElementType().getAbstractRecord();
         DataRecordType obsSdr = (DataRecordType) obsR.getDataArray().getElementType().getAbstractRecord();
 
+        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());        
+        
         Iterator<Field> i1 = expSdr.getField().iterator();
         Iterator<Field> i2 = obsSdr.getField().iterator();
         TimeType expT = (TimeType) i1.next().getTime();
@@ -1673,7 +1677,6 @@ public abstract class SOS2WorkerTest {
         assertEquals(i1.next(), i2.next());
 
         assertEquals(expSdr, obsSdr);
-        emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());        
         
         assertEquals(expR.getDataArray().getElementType().getName(),     obsR.getDataArray().getElementType().getName());
         assertEquals(expR.getDataArray().getElementType().getAbstractArray(),     obsR.getDataArray().getElementType().getAbstractArray());

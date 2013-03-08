@@ -29,6 +29,7 @@ import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.configuration.DataSourceType.*;
+import org.constellation.sos.io.om2.OM2ObservationFilterReader;
 
 /**
   * A postgrid implementation of the SOS factory.
@@ -54,7 +55,7 @@ public class OM2SOSFactory implements OMFactory {
      */
     @Override
     public ObservationFilter getObservationFilter(final DataSourceType type, final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
-       return new OM2ObservationFilter(configuration, properties);
+       return new OM2ObservationFilterReader(configuration, properties);
     }
 
     /**
@@ -62,7 +63,7 @@ public class OM2SOSFactory implements OMFactory {
      */
     @Override
     public ObservationFilter cloneObservationFilter(final ObservationFilter omFilter) throws CstlServiceException {
-       return new OM2ObservationFilter((OM2ObservationFilter)omFilter);
+       return new OM2ObservationFilterReader((OM2ObservationFilter)omFilter);
     }
 
     /**

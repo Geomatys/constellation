@@ -57,6 +57,7 @@ import static org.constellation.api.QueryConstants.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.*;
 import static org.constellation.sos.ws.Normalizer.*;
+import static org.constellation.sos.ws.DatablockParser.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.xml.MarshallerPool;
@@ -101,6 +102,7 @@ import org.geotoolkit.gml.xml.FeatureCollection;
 import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.observation.xml.AbstractObservation;
+import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.observation.xml.ObservationComparator;
 import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.ogc.xml.XMLLiteral;
@@ -1240,7 +1242,31 @@ public class SOSworker extends AbstractWorker {
                 matchingResult = new ArrayList<Observation>();
                 final Set<String> observationIDs = localOmFilter.filterObservation();
                 for (String observationID : observationIDs) {
-                    matchingResult.add(omReader.getObservation(observationID, resultModel, mode, currentVersion));
+                    final Observation obs = OMXmlFactory.cloneObervation(currentVersion, omReader.getObservation(observationID, resultModel, mode, currentVersion));
+                    
+                    // parse result values to eliminate wrong results
+                    final Timestamp tbegin;
+                    final Timestamp tend;
+                    if (obs.getSamplingTime() instanceof Period) {
+                        final Period p = (Period)obs.getSamplingTime();
+                        if (p.getBeginning() != null && p.getBeginning().getPosition() != null && p.getBeginning().getPosition().getDate() != null) {
+                            tbegin = new Timestamp(p.getBeginning().getPosition().getDate().getTime());
+                        } else {
+                            tbegin = null;
+                        }
+                        if (p.getEnding() != null && p.getEnding().getPosition() != null && p.getEnding().getPosition().getDate() != null) {
+                            tend = new Timestamp(p.getEnding().getPosition().getDate().getTime());
+                        } else {
+                            tend = null;
+                        }
+                        if (obs.getResult() instanceof DataArrayProperty) {
+                            final DataArray array = ((DataArrayProperty)obs.getResult()).getDataArray();
+                            final Values result   = getResultValues(tbegin, tend, array, times);
+                            array.setValues(result.values.toString());
+                            array.setElementCount(result.nbBlock);
+                        }
+                    }
+                    matchingResult.add(obs);
                 }
                 Collections.sort(matchingResult, new ObservationComparator());
                 computedBounds         = null;
@@ -1249,9 +1275,9 @@ public class SOSworker extends AbstractWorker {
             } else {
                 final ObservationFilterReader omFR = (ObservationFilterReader) localOmFilter;
                 if (template) {
-                    matchingResult = omFR.getObservationTemplates();
+                    matchingResult = omFR.getObservationTemplates(currentVersion);
                 } else {
-                    matchingResult = omFR.getObservations();
+                    matchingResult = omFR.getObservations(currentVersion);
                 }
                 if (omFR.computeCollectionBound()) {
                     computedBounds = omFR.getCollectionBoundingShape();
@@ -1430,9 +1456,10 @@ public class SOSworker extends AbstractWorker {
                         array = (DataArray)r;
                     }
                     if (array != null) {
-                        final String resultValues = getResultValues(tBegin, tEnd, array, times);
-                        if (!resultValues.isEmpty()) {
-                            datablock.append(resultValues).append('\n');
+                        final Values resultValues = getResultValues(tBegin, tEnd, array, times);
+                        final String brutValues   = resultValues.values.toString();
+                        if (!brutValues.isEmpty()) {
+                            datablock.append(brutValues);
                         }
                     } else {
                         throw new IllegalArgumentException("Array is null");
@@ -1452,146 +1479,6 @@ public class SOSworker extends AbstractWorker {
         return response;
     }
 
-    private String getResultValues(final Timestamp tBegin, final Timestamp tEnd, final DataArray array, final List<Filter> eventTimes) throws CstlServiceException {
-        String values;
-
-        //for multiple observations we parse the brut values (if we got a time constraint)
-        if (tBegin != null && tEnd != null) {
-
-            values = array.getValues();
-
-            for (Filter bound: eventTimes) {
-                LOGGER.log(Level.FINER, " Values: {0}", values);
-                if (bound instanceof TEquals) {
-                    final TEquals filter = (TEquals) bound;
-                    if (filter.getExpression2() instanceof Instant) {
-                        final Instant ti    = (Instant) filter.getExpression2();
-                        final Timestamp boundEquals = getTimestampValue(ti.getPosition());
-
-                        LOGGER.finer("TE case 1");
-                        //case 1 the periods contains a matching values
-                        values = parseDataBlock(values, array.getEncoding(), null, null, boundEquals);
-                    }
-
-                } else if (bound instanceof After) {
-                    final After filter = (After) bound;
-                    final Instant ti   = (Instant) filter.getExpression2();
-                    final Timestamp boundBegin = getTimestampValue(ti.getPosition());
-
-                    // case 1 the period overlaps the bound
-                    if (tBegin.before(boundBegin) && tEnd.after(boundBegin)) {
-                        LOGGER.finer("TA case 1");
-                        values = parseDataBlock(values, array.getEncoding(), boundBegin, null, null);
-                    }
-
-                } else if (bound instanceof Before) {
-                    final Before filter = (Before) bound;
-                    final Instant ti    = (Instant) filter.getExpression2();
-                    final Timestamp boundEnd = getTimestampValue(ti.getPosition());
-
-                    // case 1 the period overlaps the bound
-                    if (tBegin.before(boundEnd) && tEnd.after(boundEnd)) {
-                        LOGGER.finer("TB case 1");
-                        values = parseDataBlock(values, array.getEncoding(), null, boundEnd, null);
-                    }
-
-                } else if (bound instanceof During) {
-                    final During filter = (During) bound;
-                    final Period tp     = (Period)filter.getExpression2();
-                    final Timestamp boundBegin = getTimestampValue(tp.getBeginning().getPosition());
-                    final Timestamp boundEnd   = getTimestampValue(tp.getEnding().getPosition());
-
-                    // case 1 the period overlaps the first bound
-                    if (tBegin.before(boundBegin) && tEnd.before(boundEnd) && tEnd.after(boundBegin)) {
-                        LOGGER.finer("TD case 1");
-                        values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
-
-                    // case 2 the period overlaps the second bound
-                    } else if (tBegin.after(boundBegin) && tEnd.after(boundEnd) && tBegin.before(boundEnd)) {
-                        LOGGER.finer("TD case 2");
-                        values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
-
-                    // case 3 the period totaly overlaps the bounds
-                    } else if (tBegin.before(boundBegin) && tEnd.after(boundEnd)) {
-                        LOGGER.finer("TD case 3");
-                        values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
-                    }
-
-                }
-            }
-
-
-        //if this is a simple observation, or if there is no time bound
-        } else {
-            values = array.getValues();
-        }
-        return values;
-    }
-
-    /**
-     * Parse a data block and return only the values matching the time filter.
-     *
-     * @param brutValues The data block.
-     * @param abstractEncoding The encoding of the data block.
-     * @param boundBegin The begin bound of the time filter.
-     * @param boundEnd The end bound of the time filter.
-     * @param boundEquals An equals time filter (implies boundBegin and boundEnd null).
-     *
-     * @return a datablock containing only the matching observations.
-     */
-    private String parseDataBlock(final String brutValues, final AbstractEncoding abstractEncoding, final Timestamp boundBegin, final Timestamp boundEnd, final Timestamp boundEquals) {
-        String values = "";
-        if (abstractEncoding instanceof TextBlock) {
-                final TextBlock encoding        = (TextBlock) abstractEncoding;
-                final StringTokenizer tokenizer = new StringTokenizer(brutValues, encoding.getBlockSeparator());
-                while (tokenizer.hasMoreTokens()) {
-                    final String block = tokenizer.nextToken();
-                    final String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
-                    Date d = null;
-                    try {
-                        final ISODateParser parser = new ISODateParser();
-                        d = parser.parseToDate(samplingTimeValue);
-                    } catch (NumberFormatException ex) {
-                        LOGGER.log(Level.FINER, "unable to parse the value: {0}", samplingTimeValue);
-                    }
-                    if (d == null) {
-                        LOGGER.log(Level.WARNING, "unable to parse the value: {0}", samplingTimeValue);
-                        continue;
-                    }
-                    final Timestamp t = new Timestamp(d.getTime());
-
-                    // time during case
-                    if (boundBegin != null && boundEnd != null) {
-                        if (t.after(boundBegin) && t.before(boundEnd)) {
-                            values += block + encoding.getBlockSeparator();
-                        }
-
-                    //time after case
-                    } else if (boundBegin != null && boundEnd == null) {
-                        if (t.after(boundBegin)) {
-                            values += block + encoding.getBlockSeparator();
-                        }
-
-                    //time before case
-                    } else if (boundBegin == null && boundEnd != null) {
-                        if (t.before(boundEnd)) {
-                            values += block + encoding.getBlockSeparator();
-                        }
-
-                    //time equals case
-                    } else if (boundEquals != null) {
-                        if (t.equals(boundEquals)) {
-                            values += block + encoding.getBlockSeparator();
-                        }
-                    }
-                }
-            } else {
-                LOGGER.severe("unable to parse datablock unknown encoding");
-                values = brutValues;
-            }
-        return values;
-    }
-    
     public AbstractFeature getFeatureOfInterest(final GetFeatureOfInterest request) throws CstlServiceException {
         verifyBaseRequest(request, true, false);
         LOGGER.log(logLevel, "GetFeatureOfInterest request processing\n");
@@ -1804,7 +1691,7 @@ public class SOSworker extends AbstractWorker {
         // case (2)
         } else {
             final ObservationFilterReader omFR = (ObservationFilterReader) localOmFilter;
-            matchingResult = omFR.getObservationTemplates();
+            matchingResult = omFR.getObservationTemplates(currentVersion);
         }
         final AbstractDataComponent structure;
         final AbstractEncoding encoding;
