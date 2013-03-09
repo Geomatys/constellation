@@ -73,7 +73,7 @@ import java.io.ObjectInputStream;
 
 // Resources
 import org.geotoolkit.math.XMath;
-import org.geotoolkit.util.XArrays;
+import org.apache.sis.util.ArraysExt;
 import org.geotoolkit.util.Utilities;
 import org.geotoolkit.gui.swing.ExceptionMonitor;
 
@@ -183,18 +183,18 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
 
     /**
      * Rectangle to be drawn in the component.  This rectange can be different
-     * to {@link #logicalShape} and the latter is so small that it is 
+     * to {@link #logicalShape} and the latter is so small that it is
      * preferable to draw it a little bit bigger than the user has requested.
      * In this case, {@code drawnShape} will serve as a temporary
      * rectangle with extended coordinates.
-     * Note: this rectangle should be read only, except in the case of 
+     * Note: this rectangle should be read only, except in the case of
      * {@link #update} which is the only method permitted to update it.
      */
     private transient RectangularShape drawnShape;
 
     /**
      * Affine transform which changes logical coordinates into pixel
-     * coordinates.  It is guaranteed that no method except 
+     * coordinates.  It is guaranteed that no method except
      * {@link #setTransform} will modify this transformation.
      */
     private final AffineTransform transform = new AffineTransform();
@@ -273,7 +273,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
 
     /**
      * When the position of the top or bottom edge of the rectangle is
-     * manually edited, this indicates whether the position of the 
+     * manually edited, this indicates whether the position of the
      * opposite edge should be automatically adjusted.  The default value is
      * {@code false}.
      */
@@ -344,7 +344,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      *        coordinates of this shape will be the initial coordinates of the
      *        visor. They are logical coordinates and not pixel coordinates
      *        Note that the constructor retains a direct reference to this
-     *        shape, without creating a clone.  As a consequence, any 
+     *        shape, without creating a clone.  As a consequence, any
      *        modification carried out on the geometric shape will have
      *        repercussions for this objet {@code MouseReshapeTracker}
      *        and vice versa.
@@ -383,7 +383,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
          */
         adjustingLogicalSides = inverseTransform(adjustingSides);
         /*
-         * Obtains the geometric shape to draw.  Normally it will be a 
+         * Obtains the geometric shape to draw.  Normally it will be a
          * {@link #logicalShape}, except if the latter is so small that we
          * have considered it preferable to create a temporary shape which
          * will be slightly bigger.
@@ -418,8 +418,8 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
          * NOTE: the condition 'drawnShape==logicalShape' indicates that it has
          *       not been necessary to modify the shape.  The method
          *      'mouseDragged' will use this information.
-         *      
-         * Now retains the pixel coordinates of the new position of the 
+         *
+         * Now retains the pixel coordinates of the new position of the
          * rectangle.
          */
         double xmin = Double.POSITIVE_INFINITY;
@@ -506,7 +506,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
 
     /**
      * Returns the position and the bounds of the rectangle.  These
-     * bounds can be slightly bigger than those returned by 
+     * bounds can be slightly bigger than those returned by
      * {@link #getFrame} since {@code getBounds2D()} returns the
      * bounds of the rectangle visible on screen, which can have certain
      * minimum bounds.
@@ -517,7 +517,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
 
     /**
      * Returns the position and the bounds of the rectangle.  These
-     * bounds can be slightly bigger than those returned by 
+     * bounds can be slightly bigger than those returned by
      * {@link #getFrame} since {@code getBounds2D()} returns the
      * bounds of the rectangle visible on screen, which can have certain
      * minimum bounds.
@@ -794,7 +794,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * amongst programmers used to <em>Java2D</em> conventions. If you want to
      * specify infinite values (in order to widen the visor's bounds to all
      * possible values along certain axes), you <u>must</u> use
-     * {@link #setClipMinMax setClipMinMax(...)} rather than 
+     * {@link #setClipMinMax setClipMinMax(...)} rather than
      * {@code setClip(...)}.
      */
     public final void setClip(final double x, final double y, final double width,
@@ -804,9 +804,9 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
 
     /**
      * Defines the bounds between which the rectangle can move.  Note that this
-     * method's arguments don't correspond to the normal arguments of 
+     * method's arguments don't correspond to the normal arguments of
      * {@link java.awt.geom.Rectangle2D}. <em>Java2D</em> convention demands
-     * that we specify a rectangle using a quadruplet 
+     * that we specify a rectangle using a quadruplet
      * ({@code x},{@code y},{@code width},{@code height})
      * However, this is a bad choice in the context of almost all the methods
      * in our library.  As well as complicating most calculations (if you need
@@ -856,12 +856,12 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * Method called automatically when a change in the clip is required.
      * This method can be called, for example, when the user manually edits
      * the position of the rectangle in a text field, and the new position
-     * falls outside the current clip.  This method does <u>not</u> have to 
+     * falls outside the current clip.  This method does <u>not</u> have to
      * accept a clip change.  It can do nothing, which is the same as
      * refusing any change.  It can also always unconditionally accept any
-     * change by calling {@link #setClipMinMax}.  Finally, it can reach a 
+     * change by calling {@link #setClipMinMax}.  Finally, it can reach a
      * compromise solution by imposing certain conditions on the changes.
-     * The default implementation does nothing, which means that no 
+     * The default implementation does nothing, which means that no
      * automatic change in the clip will be authorised.
      */
     protected void clipChangeRequested(double xmin, double xmax, double ymin, double ymax) {
@@ -878,7 +878,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     /**
      * Specifies whether the rectangle can be moved with the mouse.  The value
      * {@code false} indicates that the rectangle cannot be moved, but can
-     * still be resized if {@link #setAdjustable} has been called with the 
+     * still be resized if {@link #setAdjustable} has been called with the
      * appropriate parameters.
      */
     public void setMoveable(final boolean moveable) {
@@ -899,7 +899,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * These constants designate the edge which is visible on screen. For
      * example, {@code NORTH} always designates the top edge on the
      * screen.  However, this could correspond to another edge of the logical
-     * shape {@code this} depending on the affine transform which was 
+     * shape {@code this} depending on the affine transform which was
      * specified during the last call to {@link #setTransform}. For example,
      * {@code AffineTransform.getScaleInstance(+1,-1)} has the effect of
      * inverting the y axis so that the <var>y</var><sub>max</sub> values
@@ -924,7 +924,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * These constants designate the edge which is visible on screen. For
      * example, {@code NORTH} always designates the top edge on the
      * screen.  However, this could correspond to another edge of the logical
-     * shape {@code this} depending on the affine transform which was 
+     * shape {@code this} depending on the affine transform which was
      * specified during the last call to {@link #setTransform}. For example,
      * {@code AffineTransform.getScaleInstance(+1,-1)} has the effect of
      * inverting the y axis so that the <var>y</var><sub>max</sub> values
@@ -1006,7 +1006,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
                         }
                     }
                     if (mouseOverRectChanged) {
-                        // Adding and removing listeners worked well, but had 
+                        // Adding and removing listeners worked well, but had
                         // the disadvantage of changing the order of the
                         // listeners. This caused problems when the order was
                         // important.
@@ -1025,7 +1025,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     }
 
     /**
-     * Method called automatically when the user presses a mouse button 
+     * Method called automatically when the user presses a mouse button
      * anywhere within the component.  The default implementation
      * checks if the button was pressed whilst the mouse cursor was
      * within the rectangle.  If so, this object will track the mouse drags
@@ -1224,7 +1224,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
 
     /**
      * Method called automatically <strong>before</strong> the position
-     * or the size of the visor has changed. A call to 
+     * or the size of the visor has changed. A call to
      * {@code stateWillChange} is normally followed by a call to
      * {@link #stateChanged}, <u>except</u> if the expected change
      * didn't ultimately occur.  The derived classes can redefine this method
@@ -1312,7 +1312,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * These constants designate the edge visible on screen.  For example,
      * {@code NORTH} always designates the top edge on the screen.
      * However, this could correspond to another edge of the logical
-     * shape {@code this} depending on the affine transform which was 
+     * shape {@code this} depending on the affine transform which was
      * specified during the last call to {@link #setTransform}. For example,
      * {@code AffineTransform.getScaleInstance(+1,-1)} has the effect of
      * inverting the y axis so that the <var>y</var><sub>max</sub> values
@@ -1375,12 +1375,12 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
          * but it will do because it is unlikely that we will ever add more
          * than 4 editors.
          */
-        final Control control = new Control(editor, (format instanceof DateFormat), 
+        final Control control = new Control(editor, (format instanceof DateFormat),
                                             convertSwingConstant(side), toRepaint);
         if (editors == null) {
             editors = new Control[1];
         } else {
-            editors = (Control[]) XArrays.resize(editors, editors.length + 1);
+            editors = ArraysExt.resize(editors, editors.length + 1);
         }
         editors[editors.length - 1] = control;
         return component;
@@ -1396,9 +1396,9 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
         if (editors != null) {
             for (int i = 0; i < editors.length; i++) {
                 if (editors[i].editor == editor) {
-                    editors = (Control[])  XArrays.remove(editors, i, 1);
+                    editors = ArraysExt.remove(editors, i, 1);
                     /*
-                     * In principal, there should be no more objects to 
+                     * In principal, there should be no more objects to
                      * remove from the table.  But we let the loop continue
                      * anyway, just in case...
                      */
@@ -1407,7 +1407,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
             if (editors.length == 0) {
                 editors = null;
             }
-        }       
+        }
     }
 
     /**
@@ -1417,7 +1417,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      *
      * @param axis {@link SwingConstants#HORIZONTAL} to change the
      *             synchronisation of the left and right edges, or
-     *             {@link SwingConstants#VERTICAL} to change the 
+     *             {@link SwingConstants#VERTICAL} to change the
      *             synchronisation of the top and bottom edges.
      * @param state {@code true} to synchronise the edges, or
      *              {@code false} to desynchronise.
@@ -1464,7 +1464,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
 
     /**
      * Synchronises one of the rectangle's edges with a text field.  Each time
-     * the visor moves, the text will be updated.  If, on the contrary, it is 
+     * the visor moves, the text will be updated.  If, on the contrary, it is
      * the text which is manually edited, the visor will be repositioned.
      *
      * @version 1.0
@@ -1487,9 +1487,9 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
          * Side of the rectangle to be controlled. This field designates the
          * edge which is visible on screen.  For example, {@code NORTH}
          * always designates the top edge on the screen.  However, this could
-         * correspond to another edge of the logical shape 
+         * correspond to another edge of the logical shape
          * {@link MouseReshapeTracker} depending on the affine transform that
-         * was specified during the last call to 
+         * was specified during the last call to
          * {@link MouseReshapeTracker#setTransform}. For example,
          * {@code AffineTransform.getScaleInstance(+1,-1)} has the effect
          * of inverting the y axis so that the <var>y</var><sub>max</sub>
@@ -1515,11 +1515,11 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
          *        designates the edge visible on screen.  For example,
          *        {@code NORTH} always designates the top edge on the
          *        screen.  However, it can correspond to another edge of the
-         *        logical shape {@link MouseReshapeTracker} depending on the 
+         *        logical shape {@link MouseReshapeTracker} depending on the
          *        affine transform which was specified during the last call
          *        to {@link MouseReshapeTracker#setTransform}. For example,
          *        {@code AffineTransform.getScaleInstance(+1,-1)} has the
-         *        effect of making the <var>y</var><sub>max</sub> values 
+         *        effect of making the <var>y</var><sub>max</sub> values
          *        appear to the "North" rather than the
          *        <var>y</var><sub>min</sub> values.
          * @param toRepaint Component to repaint after the field has been
@@ -1551,7 +1551,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
                                      ((Number) value).doubleValue();
                     if (!Double.isNaN(v)) {
                         /*
-                         * Obtains the new coordinates of the rectangle, 
+                         * Obtains the new coordinates of the rectangle,
                          * taking into account the coordinates changed by the
                          * user as well as the old coordinates which have not
                          * changed.
