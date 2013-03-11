@@ -19,7 +19,7 @@ CREATE TABLE "om"."mesures" (
     "id_observation"    integer NOT NULL,
     "id"                integer NOT NULL,
     "time"              timestamp,
-    "value"             double,
+    "value"             character varying(100),
     "uom"               character varying(20),
     "field_type"        character varying(20),
     "field_name"        character varying(30),

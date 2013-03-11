@@ -1,8 +1,9 @@
-CREATE TABLE "version" (
+CREATE TABLE "public"."version" (
     "number"   character varying(10) NOT NULL
 );
 
-INSERT INTO "version" VALUES ('1.0.0');
+INSERT INTO "public"."version" VALUES ('1.0.0');
+
 CREATE SCHEMA "om";
 
 
@@ -19,7 +20,7 @@ CREATE TABLE "om"."mesures" (
     "id_observation"    integer NOT NULL,
     "id"                integer NOT NULL,
     "time"              timestamp,
-    "value"             double precision,
+    "value"             character varying(100),
     "uom"               character varying(20),
     "field_type"        character varying(20),
     "field_name"        character varying(30),

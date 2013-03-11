@@ -61,6 +61,11 @@
       <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- for postgis installer -->
+    <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-coverage-sql</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

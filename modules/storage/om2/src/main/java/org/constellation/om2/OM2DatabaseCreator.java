@@ -16,6 +16,7 @@
  */
 package org.constellation.om2;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -25,16 +26,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.constellation.util.Util;
-//import org.geotoolkit.internal.sql.PostgisInstaller;
+import org.geotoolkit.internal.sql.PostgisInstaller;
 import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.util.logging.Logging;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
- * @since 0.7
+ * @since 0.9
  */
-public class DatabaseCreator {
+public class OM2DatabaseCreator {
     
     private static final Logger LOGGER = Logging.getLogger("org.mdweb.sql");
     
@@ -46,27 +47,29 @@ public class DatabaseCreator {
      * @throws SQLException if an error occurs while filling the database.
      * @throws IllegalArgumentException if the dataSource is null.
      */
-    public static void createObservationDatabase(final DataSource dataSource, final boolean isPostgres) throws SQLException, IOException {
+    public static void createObservationDatabase(final DataSource dataSource, final boolean isPostgres, final File postgisInstall) throws SQLException, IOException {
         if (dataSource == null) {
             throw new IllegalArgumentException("The DataSource is null");
         }
         
         final Connection con  = dataSource.getConnection();
         try {
-            /*final PostgisInstaller pgInstaller = new PostgisInstaller(con);
-            // not needed in pg 9.1
-            try {
-                pgInstaller.run("CREATE TRUSTED PROCEDURAL LANGUAGE 'plpgsql' HANDLER plpgsql_call_handler VALIDATOR plpgsql_validator;");
-            } catch (SQLException ex) {
-                LOGGER.log(Level.FINER, "unable to create plpgsql lanquage", ex);
+            if (isPostgres) {
+                final PostgisInstaller pgInstaller = new PostgisInstaller(con);
+                // not needed in pg 9.1
+                try {
+                    pgInstaller.run("CREATE TRUSTED PROCEDURAL LANGUAGE 'plpgsql' HANDLER plpgsql_call_handler VALIDATOR plpgsql_validator;");
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.FINER, "unable to create plpgsql lanquage", ex);
+                }
+                pgInstaller.run("CREATE SCHEMA postgis;");
+                pgInstaller.run(postgisInstall);
             }
-            pgInstaller.run("CREATE SCHEMA postgis;");
-            pgInstaller.run(postgisInstall);*/
             final ScriptRunner sr = new ScriptRunner(con);
             if (isPostgres) {
-                execute("org/constellation/om2/structure_observations.sql", sr);
-            } else {
                 execute("org/constellation/om2/structure_observations_pg.sql", sr);
+            } else {
+                execute("org/constellation/om2/structure_observations.sql", sr);
             }
             LOGGER.info("O&M 2 database created");
 

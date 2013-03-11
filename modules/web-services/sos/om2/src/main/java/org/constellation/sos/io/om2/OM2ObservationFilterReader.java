@@ -158,8 +158,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         try {
             final Map<String, Observation> observations = new HashMap<String, Observation>();
             final Connection c                          = source.getConnection();
+            c.setReadOnly(true);
             final Statement currentStatement            = c.createStatement();
-            System.out.println(sqlRequest.toString());
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             final TextBlock encoding                    = getDefaultTextEncoding(version);
             final Map<String, AnyScalar> fields         = new HashMap<String, AnyScalar>();
@@ -239,8 +239,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         try {
             final Map<String, Observation> observations = new HashMap<String, Observation>();
             final Connection c                          = source.getConnection();
+            c.setReadOnly(true);
             final Statement currentStatement            = c.createStatement();
-            System.out.println(sqlRequest.toString());
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             
             while (rs.next()) {
@@ -290,7 +290,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final Map<String, Observation> observations = new HashMap<String, Observation>();
             final Connection c                          = source.getConnection();
             final Statement currentStatement            = c.createStatement();
-            System.out.println(sqlRequest.toString());
+            c.setReadOnly(true);
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             final TextBlock encoding                    = getDefaultTextEncoding(version);
             Timestamp oldTime                           = null;
@@ -302,7 +302,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             while (rs.next()) {
                 final String procedure        = rs.getString("procedure");
                 final Timestamp currentTime   = rs.getTimestamp("time");
-                final Double value            = rs.getDouble("value");
+                final String value            = rs.getString("value");
                 final Observation observation = observations.get(procedure);
                 
                 if (observation == null) {
@@ -417,13 +417,14 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         try {
             final List<Observation> observations        = new ArrayList<Observation>();
             final Connection c                          = source.getConnection();
+            c.setReadOnly(true);
             final Statement currentStatement            = c.createStatement();
             System.out.println(sqlRequest.toString());
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             while (rs.next()) {
                 final String procedure        = rs.getString("procedure");
                 final Timestamp currentTime   = rs.getTimestamp("time");
-                final Double value            = rs.getDouble("value");
+                final String value            = rs.getString("value");
                 final int oid                 = rs.getInt("id");
                 final String rid              = rs.getString("resultid");
                 final String name             = observationIdBase + oid;
@@ -438,7 +439,13 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                  *  BUILD RESULT
                  */
                 final String uom        = rs.getString("uom");
-                final Object result = buildMeasureResult(version, value, uom, rid);
+                final Double dValue;
+                try {
+                    dValue = Double.parseDouble(value);
+                } catch (NumberFormatException ex) {
+                    throw new CstlServiceException("Unable ta parse the result value as a double");
+                }
+                final Object result = buildMeasureResult(version, dValue, uom, rid);
                 observations.add(OMXmlFactory.buildMeasurement(version, name, null, prop, phen, procedure, result, time));
 
             }
@@ -462,6 +469,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     public String getResults() throws CstlServiceException {
         try {
             final Connection c                          = source.getConnection();
+            c.setReadOnly(true);
             final Statement currentStatement            = c.createStatement();
             System.out.println(sqlRequest.toString());
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
@@ -471,7 +479,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             boolean first                               = true;
             while (rs.next()) {
                 final Timestamp currentTime   = rs.getTimestamp("time");
-                final Double value            = rs.getDouble("value");
+                final String value            = rs.getString("value");
                 
                 if (!currentTime.equals(oldTime)) {
                     if (!first) {

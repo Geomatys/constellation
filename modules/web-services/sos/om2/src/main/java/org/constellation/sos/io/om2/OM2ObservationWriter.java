@@ -288,7 +288,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             stmt.setInt(1, oid);
             stmt.setInt(2, 1);
             stmt.setNull(3, java.sql.Types.TIMESTAMP);
-            stmt.setDouble(4, measure.getValue());
+            stmt.setString(4, Double.toString(measure.getValue()));
             stmt.setString(5, measure.getUom().getUnitsSystem());
             stmt.setNull(6, java.sql.Types.VARCHAR);
             stmt.setNull(7, java.sql.Types.VARCHAR);
@@ -360,26 +360,17 @@ public class OM2ObservationWriter implements ObservationWriter {
                 }
                 block = block.substring(tokenIndex + 1);
                 for (int i = 0; i < fields.size(); i++) {
-                    Double value;
+                    final String value;
                     if (i == fields.size() - 1) {
-                        try {
-                            value = Double.parseDouble(block);
-                        } catch (NumberFormatException ex) {
-                            throw new CstlServiceException("Bad format of double for:" + block);
-                        }
+                        value     = block;
                         lastDate  = realTime;
                     } else {
-                        final String tmp = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
-                        try {
-                            value = Double.parseDouble(tmp);
-                        } catch (NumberFormatException ex) {
-                            throw new CstlServiceException("Bad format of double for:" + tmp);
-                        }
+                        value = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
                     }
                     stmt.setInt(1, oid);
                     stmt.setInt(2, n);
                     stmt.setTimestamp(3, realTime);
-                    stmt.setDouble(4, value);
+                    stmt.setString(4, value);
                     stmt.setString(5, fields.get(i).fieldUom);
                     stmt.setString(6, fields.get(i).fieldType);
                     stmt.setString(7, fields.get(i).fieldName);

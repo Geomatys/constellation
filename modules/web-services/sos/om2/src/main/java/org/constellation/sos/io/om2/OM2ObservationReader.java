@@ -449,7 +449,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
     }
     
     private DataArrayProperty buildComplexResult(final String identifier, final String version, final Connection c) throws CstlServiceException, SQLException {
-        final List<Double> value      = new ArrayList<Double>();
+        final List<String> value      = new ArrayList<String>();
         final List<String> uom        = new ArrayList<String>();
         final List<String> fieldType  = new ArrayList<String>();
         final List<Timestamp> time    = new ArrayList<Timestamp>();
@@ -468,7 +468,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         stmt.setInt(1, id);
         final ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
-            value.add(rs.getDouble(1));
+            value.add(rs.getString(1));
             fieldType.add(rs.getString(2));
             uom.add(rs.getString(3));
             time.add(rs.getTimestamp(4));
@@ -529,11 +529,13 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             final ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 name   = "measure-00" + rs.getString(1);
-                value  = rs.getDouble(2);
+                value  = Double.parseDouble(rs.getString(2));
                 uom    = rs.getString(3);
             } else {
                 return null;
             }
+        } catch (NumberFormatException ex) {
+            throw new CstlServiceException("Unable ta parse the result value as a double");
         } finally {
             c.close();
         }
