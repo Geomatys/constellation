@@ -22,6 +22,8 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.sos.ws.soap.SOService;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.util.StringUtilities;
@@ -29,11 +31,13 @@ import org.geotoolkit.util.StringUtilities;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class SOSSoapRequestTest extends AbstractGrizzlyServer {
 
     private static final String SOS_DEFAULT = "http://localhost:9191/sos/default?";
@@ -53,6 +57,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
+    @Order(order=1)
     public void testSOSGetCapabilities() throws Exception {
 
         waitForStart();
@@ -78,6 +83,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=2)
     public void testSOSGetFeatureOfInterest() throws Exception {
         // Creates a valid GetObservation url.
         final URL getCapsUrl = new URL(SOS_DEFAULT);

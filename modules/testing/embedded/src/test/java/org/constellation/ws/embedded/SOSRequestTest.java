@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.constellation.sos.ws.soap.SOService;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
@@ -41,11 +43,13 @@ import org.geotoolkit.sos.xml.v200.CapabilitiesType;
 import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class SOSRequestTest extends AbstractGrizzlyServer {
 
     private static String getDefaultURL() {
@@ -79,6 +83,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=1)
     public void testSOSInvalidRequest() throws Exception {
 
         waitForStart();
@@ -102,6 +107,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=2)
     public void testSOSGetCapabilities() throws Exception {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL(getDefaultURL());
@@ -158,6 +164,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
+    @Order(order=3)
     public void testSOSGetCapabilitiesv2() throws Exception {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL(getDefaultURL());
@@ -214,6 +221,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=4)
     public void testSOSDescribeSensor() throws Exception {
         // Creates a valid DescribeSensor url.
         final URL getCapsUrl = new URL(getDefaultURL());
@@ -235,6 +243,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=5)
     public void testSOSGetObservation() throws Exception {
         // Creates a valid GetObservation url.
         final URL getCapsUrl = new URL(getDefaultURL());
@@ -265,6 +274,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=6)
     public void testSOSGetFeatureOfInterest() throws Exception {
         // Creates a valid GetObservation url.
         final URL getCapsUrl = new URL(getDefaultURL());
