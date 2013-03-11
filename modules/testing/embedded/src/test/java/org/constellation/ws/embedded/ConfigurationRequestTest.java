@@ -31,16 +31,20 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.sos.ws.soap.SOService;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class ConfigurationRequestTest extends AbstractGrizzlyServer {
 
     @BeforeClass
@@ -75,6 +79,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=1)
     public void testRestart() throws Exception {
 
         waitForStart();
@@ -100,6 +105,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=2)
     public void testDownloadFile() throws Exception {
 
         URL niUrl = new URL(getConfigurationURL() + "request=download");
@@ -117,6 +123,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=3)
     public void testCSWRefreshIndex() throws Exception {
 
         /*
@@ -185,6 +192,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=4)
     public void testCSWAddToIndex() throws Exception {
 
         // first we make a getRecords request to count the number of record
@@ -241,6 +249,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
+    @Order(order=5)
     public void testCSWRemoveFromIndex() throws Exception {
 
         // first we make a getRecords request to count the number of record
@@ -288,6 +297,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=6)
     public void testListAvailableService() throws Exception {
         URL niUrl = new URL(getConfigurationURL() + "request=ListAvailableService");
 

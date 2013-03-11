@@ -28,6 +28,8 @@ import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.MarshallerPool;
@@ -40,7 +42,7 @@ import org.junit.runner.RunWith;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(FileSystemSOS2WorkerRunner.class)
+@RunWith(TestRunner.class)
 public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
 
     private static final File configDir = new File("LUCSOSWorkerTest");;

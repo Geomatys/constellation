@@ -28,6 +28,8 @@ import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.generic.database.Query;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
@@ -35,11 +37,13 @@ import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.xml.MarshallerPool;
 
 import org.junit.*;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
 
     private static DefaultDataSource ds = null;
@@ -157,6 +161,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=1)
     public void getCapabilitiesErrorTest() throws Exception {
         super.getCapabilitiesErrorTest();
 
@@ -170,6 +175,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=2)
     public void getCapabilitiesTest() throws Exception {
         super.getCapabilitiesTest();
 
@@ -183,6 +189,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=3)
     public void GetObservationErrorTest() throws Exception {
         super.GetObservationErrorTest();
     }
@@ -194,6 +201,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=4)
     public void GetObservationTest() throws Exception {
         super.GetObservationTest();
     }
@@ -205,6 +213,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=5)
     public void GetObservationSamplingCurveTest() throws Exception {
         super.GetObservationSamplingCurveTest();
     }
@@ -216,6 +225,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=6)
     public void GetObservationByIdTest() throws Exception {
         super.GetObservationByIdTest();
     }
@@ -227,6 +237,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=7)
     public void GetResultTemplateTest() throws Exception {
         super.GetResultTemplateTest();
     }
@@ -238,6 +249,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=8)
     public void GetResultErrorTest() throws Exception {
         super.GetResultErrorTest();
     }
@@ -248,6 +260,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      * @throws java.lang.Exception
      */
     @Override
+    @Order(order=9)
     public void GetResultTest() throws Exception {
         super.GetResultTest();
     }
@@ -270,6 +283,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=10)
     public void GetFeatureOfInterestErrorTest() throws Exception {
         super.GetFeatureOfInterestErrorTest();
     }
@@ -281,6 +295,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=11)
     public void GetFeatureOfInterestTest() throws Exception {
         super.GetFeatureOfInterestTest();
     }
@@ -293,6 +308,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
+    @Order(order=12)
     public void destroyTest() throws Exception {
         super.destroyTest();
     }

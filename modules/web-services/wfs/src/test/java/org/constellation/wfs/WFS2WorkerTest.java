@@ -42,6 +42,8 @@ import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.test.CstlDOMComparator;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.util.QNameComparator;
 import org.constellation.util.Util;
 import org.constellation.wfs.ws.DefaultWFSWorker;
@@ -103,6 +105,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 
@@ -111,6 +114,7 @@ import org.opengis.feature.type.Name;
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class WFS2WorkerTest {
 
     private static MarshallerPool pool;
@@ -244,6 +248,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=1)
     public void getCapabilitiesTest() throws Exception {
         final Marshaller marshaller = pool.acquireMarshaller();
 
@@ -359,6 +364,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=2)
     public void getFeatureErrorTest() throws Exception {
         /**
          * Test 1 : empty query => error
@@ -392,6 +398,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=3)
     public void getFeatureOMTest() throws Exception {
 
         /**
@@ -703,6 +710,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=4)
     public void getPropertyValueOMTest() throws Exception {
 
         /**
@@ -778,6 +786,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=5)
     public void getPropertyValueSMLTest() throws Exception {
 
         /**
@@ -838,6 +847,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=6)
     public void getFeatureSMLTest() throws Exception {
 
         /**
@@ -1108,6 +1118,7 @@ public class WFS2WorkerTest {
      *
      */
     @Ignore
+    @Order(order=7)
     public void getFeatureSelfJoinTest() throws Exception {
 
         /**
@@ -1149,6 +1160,7 @@ public class WFS2WorkerTest {
      *
      */
     @Ignore
+    @Order(order=8)
     public void getFeatureJoinTest() throws Exception {
 
         /**
@@ -1190,6 +1202,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=9)
     public void getFeatureShapeFileTest() throws Exception {
 
         /**
@@ -1371,6 +1384,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=10)
     public void DescribeFeatureTest() throws Exception {
         Unmarshaller unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
 
@@ -1433,6 +1447,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=11)
     public void TransactionTest() throws Exception {
 
         /**
@@ -1537,12 +1552,13 @@ public class WFS2WorkerTest {
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3v2.xml"),
                 sresult);
 
-   /* }
+   }
     
     @Test
+    @Order(order=12)
     public void TransactionReplaceTest() throws Exception {
     
-    */
+    
 
         /**
          * Test 1 : transaction replace for Feature type NamedPlaces
@@ -1553,60 +1569,61 @@ public class WFS2WorkerTest {
         fr.getProperties().put(JAXPStreamFeatureReader.BINDING_PACKAGE, "GML");
         final Feature feature = (Feature) fr.read(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlaces.xml"));
         
-        pe = new PropertyIsEqualToType(new LiteralType("Goose Island"), "NAME", Boolean.TRUE);
-        filter   = new FilterType(pe);
-        request  = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new ReplaceType(null, filter, feature, "application/gml+xml; version=3.2", null));
+        PropertyIsEqualToType pe = new PropertyIsEqualToType(new LiteralType("Goose Island"), "NAME", Boolean.TRUE);
+        FilterType filter   = new FilterType(pe);
+        TransactionType request  = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new ReplaceType(null, filter, feature, "application/gml+xml; version=3.2", null));
 
 
-        result = worker.transaction(request);
+        TransactionResponse result = worker.transaction(request);
 
-        sum = new TransactionSummaryType(0, 0, 0, 1);
+        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 0, 1);
         final List<CreatedOrModifiedFeatureType> r = new ArrayList<CreatedOrModifiedFeatureType>();
         r.add(new CreatedOrModifiedFeatureType(new ResourceIdType("NamedPlaces.2"), null));
         ActionResultsType replaced = new ActionResultsType(r);
-        ExpResult = new TransactionResponseType(sum, null, null, replaced, "2.0.0");
+        TransactionResponse ExpResult = new TransactionResponseType(sum, null, null, replaced, "2.0.0");
 
         assertEquals(ExpResult, result);
 
         /**
          * we verify that the feature have been updated
          */
-        queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
-        requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
-        resultGF = worker.getFeature(requestGF);
+        Object resultGF = worker.getFeature(requestGF);
 
         assertTrue(resultGF instanceof FeatureCollectionWrapper);
-        wrapper = (FeatureCollectionWrapper) resultGF;
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
         resultGF = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
 
-        writer = new StringWriter();
+        StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
-        sresult = writer.toString();
+        String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
         
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-4v2.xml"),
                 sresult);
 
-    /*}
+    }
     
     @Test
+    @Order(order=13)
     public void TransactionDeleteTest() throws Exception {
      
     
-   */
+   
         /**
          * Test 1 : transaction delete for Feature type bridges with a bad property in filter
          */
-        typeName          = new QName("http://www.opengis.net/gml/3.2", "Bridges");
-        pe                = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "bad", Boolean.TRUE);
-        filter            = new FilterType(pe);
-        DeleteType delete = new DeleteType(filter, null, typeName);
-        request           = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, delete);
+        QName typeName           = new QName("http://www.opengis.net/gml/3.2", "Bridges");
+        PropertyIsEqualToType pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "bad", Boolean.TRUE);
+        FilterType filter        = new FilterType(pe);
+        DeleteType delete        = new DeleteType(filter, null, typeName);
+        TransactionType request  = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, delete);
 
         try {
             worker.transaction(request);
@@ -1626,9 +1643,9 @@ public class WFS2WorkerTest {
         delete   = new DeleteType(filter, null, typeName);
         request  = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, delete);
 
-        result = worker.transaction(request);
+        TransactionResponse result = worker.transaction(request);
 
-        sum = new TransactionSummaryType(0, 0, 1, 0);
+        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 1, 0);
         TransactionResponseType expresult = new TransactionResponseType(sum, null, null, null,"2.0.0");
 
         assertEquals(expresult, result);
@@ -1636,20 +1653,20 @@ public class WFS2WorkerTest {
         /**
          * we verify that the feature have been deleted
          */
-        queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
-        requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
-        resultGF = worker.getFeature(requestGF);
+        Object resultGF = worker.getFeature(requestGF);
 
         assertTrue(resultGF instanceof FeatureCollectionWrapper);
-        wrapper = (FeatureCollectionWrapper) resultGF;
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
         resultGF = wrapper.getFeatureCollection();
 
-        writer = new StringWriter();
+        StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
-        sresult = writer.toString();
+        String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
         
         domCompare(
@@ -1661,6 +1678,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=14)
     public void TransactionInsertTest() throws Exception {
 
         /**
@@ -1686,6 +1704,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=14)
     public void listStoredQueriesTest() throws Exception {
 
         final ListStoredQueriesType request = new ListStoredQueriesType("WFS", "2.0.0", null);
@@ -1717,6 +1736,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=15)
     public void describeStoredQueriesTest() throws Exception {
         final DescribeStoredQueriesType request = new DescribeStoredQueriesType("WFS", "2.0.0", null, Arrays.asList("nameQuery"));
         final DescribeStoredQueriesResponse resultI = worker.describeStoredQueries(request);
@@ -1749,6 +1769,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=16)
     public void createStoredQueriesTest() throws Exception {
         final List<StoredQueryDescriptionType> desc = new ArrayList<StoredQueryDescriptionType>();
 
@@ -1835,6 +1856,7 @@ public class WFS2WorkerTest {
     }
 
     @Test
+    @Order(order=17)
     public void dropStoredQueriesTest() throws Exception {
         final DropStoredQueryType request = new DropStoredQueryType("WFS", "2.0.0", null, "geomQuery");
         final DropStoredQueryResponse resultI = worker.dropStoredQuery(request);
@@ -1891,6 +1913,7 @@ public class WFS2WorkerTest {
     }
     
     @Test
+    @Order(order=18)
     public void getFeatureOMFeatureIdTest() throws Exception {
 
         /**
@@ -1920,6 +1943,7 @@ public class WFS2WorkerTest {
     }
 
     @Test
+    @Order(order=19)
     public void getFeatureOMStoredQueriesTest() throws Exception {
 
         /**
@@ -2037,6 +2061,7 @@ public class WFS2WorkerTest {
     }
 
     @Test
+    @Order(order=20)
     public void getFeatureMixedStoredIdentifierQueryTest() throws Exception {
         /**
          * Test 1 : query with id parameter
@@ -2069,6 +2094,7 @@ public class WFS2WorkerTest {
     }
     
     @Test
+    @Order(order=21)
     public void schemaLocationTest() throws Exception {
         List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));

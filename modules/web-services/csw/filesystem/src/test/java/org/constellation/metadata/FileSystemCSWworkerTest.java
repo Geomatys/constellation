@@ -27,16 +27,20 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class FileSystemCSWworkerTest extends CSWworkerTest {
 
     private static final File configDir =  new File("FSCSWWorkerTest");
@@ -114,6 +118,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=1)
     public void getCapabilitiesTest() throws Exception {
         super.getCapabilitiesTest();
     }
@@ -125,6 +130,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=2)
     public void getRecordByIdTest() throws Exception {
         super.getRecordByIdTest();
     }
@@ -136,6 +142,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=3)
     public void getRecordByIdErrorTest() throws Exception {
         super.getRecordByIdErrorTest();
     }
@@ -147,12 +154,14 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=4)
     public void getRecordsTest() throws Exception {
         super.getRecordsTest();
     }
 
     @Test
     @Override
+    @Order(order=5)
     public void getRecords191152Test() throws Exception {
         super.getRecords191152Test();
     }
@@ -165,6 +174,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=6)
     public void getRecordsErrorTest() throws Exception {
         super.getRecordsErrorTest();
     }
@@ -176,6 +186,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=7)
     public void getDomainTest() throws Exception {
         super.getDomainTest();
     }
@@ -187,6 +198,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=8)
     public void DescribeRecordTest() throws Exception {
         super.DescribeRecordTest();
     }
@@ -198,6 +210,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=9)
     public void transactionDeleteTest() throws Exception {
         super.transactionDeleteTest();
     }
@@ -209,6 +222,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=10)
     public void transactionInsertTest() throws Exception {
         super.transactionInsertTest();
 
@@ -221,6 +235,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=11)
     public void transactionUpdateTest() throws Exception {
         super.transactionUpdateTest();
 

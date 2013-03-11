@@ -40,6 +40,8 @@ import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.test.CstlDOMComparator;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
@@ -93,6 +95,7 @@ import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -101,6 +104,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class WFSWorkerTest {
 
     private static MarshallerPool pool;
@@ -181,6 +185,7 @@ public class WFSWorkerTest {
      *
      */
     @Test
+    @Order(order=1)
     public void getCapabilitiesTest() throws Exception {
         final Marshaller marshaller = pool.acquireMarshaller();
 
@@ -285,6 +290,7 @@ public class WFSWorkerTest {
      *
      */
     @Test
+    @Order(order=2)
     public void getFeatureErrorTest() throws Exception {
         /**
          * Test 1 : empty query => error
@@ -318,6 +324,7 @@ public class WFSWorkerTest {
      *
      */
     @Test
+    @Order(order=3)
     public void getFeatureOMTest() throws Exception {
 
         /**
@@ -596,6 +603,7 @@ public class WFSWorkerTest {
      *
      */
     @Test
+    @Order(order=4)
     public void getFeatureSMLTest() throws Exception {
 
         /**
@@ -832,6 +840,7 @@ public class WFSWorkerTest {
      *
      */
     @Test
+    @Order(order=5)
     public void getFeatureShapeFileTest() throws Exception {
 
         /**
@@ -1003,6 +1012,7 @@ public class WFSWorkerTest {
      *
      */
     @Test
+    @Order(order=6)
     public void DescribeFeatureTest() throws Exception {
         Unmarshaller unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
 
@@ -1066,6 +1076,7 @@ public class WFSWorkerTest {
      *
      */
     @Test
+    @Order(order=7)
     public void TransactionUpdateTest() throws Exception {
 
         /**
@@ -1172,6 +1183,7 @@ public class WFSWorkerTest {
     }
 
     @Test
+    @Order(order=8)
     public void TransactionDeleteTest() throws Exception {
 
         /**
@@ -1236,6 +1248,7 @@ public class WFSWorkerTest {
      *
      */
     @Test
+    @Order(order=9)
     public void TransactionInsertTest() throws Exception {
 
         /**
@@ -1257,6 +1270,7 @@ public class WFSWorkerTest {
     }
     
     @Test
+    @Order(order=10)
     public void schemaLocationTest() throws Exception {
         List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2010, Geomatys
+ *    (C) 2013, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.sos.ws;
+package org.constellation.test.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,10 +29,10 @@ import org.junit.runners.model.InitializationError;
  * @author Guilhem Legal (Geomatys)
  */
 
-public class FileSystemSOS2WorkerRunner extends BlockJUnit4ClassRunner {
+public class TestRunner extends BlockJUnit4ClassRunner {
 
 
-    public FileSystemSOS2WorkerRunner(Class klass) throws InitializationError {
+    public TestRunner(final Class klass) throws InitializationError {
         super(klass);
     }
 
@@ -46,9 +46,9 @@ public class FileSystemSOS2WorkerRunner extends BlockJUnit4ClassRunner {
                 Order o1 = f1.getAnnotation(Order.class);
                 Order o2 = f2.getAnnotation(Order.class);
 
-                if (o1 == null || o2 == null)
+                if (o1 == null || o2 == null) {
                     return -1;
-
+                }
                 return o1.order() - o2.order();
             }
         });

@@ -28,17 +28,21 @@ import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 
 
 import org.junit.*;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
 
@@ -140,6 +144,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=1)
     public void DescribeSensorErrorTest() throws Exception {
        super.DescribeSensorErrorTest();
     }
@@ -151,6 +156,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=2)
     public void DescribeSensorTest() throws Exception {
        super.DescribeSensorTest();
     }
@@ -162,6 +168,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=3)
     public void RegisterSensorErrorTest() throws Exception {
         super.RegisterSensorErrorTest();
     }
@@ -173,6 +180,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=4)
     public void RegisterSensorTest() throws Exception {
         super.RegisterSensorTest();
     }
@@ -184,6 +192,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=5)
     public void destroyTest() throws Exception {
         super.destroyTest();
     }

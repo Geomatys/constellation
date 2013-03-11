@@ -28,17 +28,21 @@ import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 
 
 import org.junit.*;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
     private static final File configDir = new File("LUCSOSWorkerTest");;
@@ -228,6 +232,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=1)
     public void getCapabilitiesErrorTest() throws Exception {
         super.getCapabilitiesErrorTest();
 
@@ -240,6 +245,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=2)
     public void getCapabilitiesTest() throws Exception {
         super.getCapabilitiesTest();
 
@@ -252,6 +258,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=3)
     public void GetObservationErrorTest() throws Exception {
         super.GetObservationErrorTest();
     }
@@ -263,6 +270,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=4)
     public void GetObservationTest() throws Exception {
         super.GetObservationTest();
     }
@@ -274,6 +282,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=5)
     public void GetObservationSamplingCurveTest() throws Exception {
         super.GetObservationSamplingCurveTest();
     }
@@ -285,6 +294,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=6)
     public void GetObservationByIdTest() throws Exception {
         super.GetObservationByIdTest();
     }
@@ -296,6 +306,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=7)
     public void GetResultErrorTest() throws Exception {
         super.GetResultErrorTest();
     }
@@ -307,6 +318,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=8)
     public void GetResultTest() throws Exception {
         super.GetResultTest();
     }
@@ -318,6 +330,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=9)
     public void insertObservationTest() throws Exception {
         super.insertObservationTest();
     }
@@ -329,6 +342,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=10)
     public void GetFeatureOfInterestErrorTest() throws Exception {
         super.GetFeatureOfInterestErrorTest();
     }
@@ -340,6 +354,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=11)
     public void GetFeatureOfInterestTest() throws Exception {
         super.GetFeatureOfInterestTest();
     }
@@ -351,6 +366,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    @Order(order=12)
     public void destroyTest() throws Exception {
         super.destroyTest();
     }

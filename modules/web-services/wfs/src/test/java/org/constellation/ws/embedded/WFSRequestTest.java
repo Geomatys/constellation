@@ -39,6 +39,8 @@ import org.constellation.util.Util;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.test.CstlDOMComparator;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 
 // Geotoolkit dependencies
 import org.geotoolkit.xsd.xml.v2001.Schema;
@@ -68,6 +70,7 @@ import org.geotoolkit.wfs.xml.v200.ValueCollectionType;
 import org.junit.*;
 import static org.junit.Assume.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 
 // GeoAPI dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -77,6 +80,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class WFSRequestTest extends AbstractGrizzlyServer {
 
     private static boolean datasourceCreated = false;
@@ -235,6 +239,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=1)
     public void testWFSGetCapabilities() throws JAXBException, IOException {
 
         // Creates a valid GetCapabilities url.
@@ -292,6 +297,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
+    @Order(order=2)
     public void testWFSGetFeaturePOST() throws Exception {
 
         // Creates a valid GetCapabilities url.
@@ -311,6 +317,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
+    @Order(order=3)
     public void testWFSGetFeaturePOSTV2() throws Exception {
 
         // Creates a valid GetCapabilities url.
@@ -332,6 +339,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
+    @Order(order=4)
     public void testWFSGetFeatureGET() throws Exception {
         final URL getfeatsUrl;
         try {
@@ -383,6 +391,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
+    @Order(order=5)
     public void testWFSGetFeatureGETStoredQuery() throws Exception {
         final URL getfeatsUrl;
         try {
@@ -406,6 +415,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
+    @Order(order=6)
     public void testWFSDescribeFeatureGET() throws Exception {
         URL getfeatsUrl;
         try {
@@ -441,6 +451,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
+    @Order(order=7)
     public void testWFSTransactionInsert() throws Exception {
 
         // Creates a valid GetCapabilities url.
@@ -573,6 +584,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=8)
     public void testWFSTransactionUpdate() throws Exception {
 
         // Creates a valid GetCapabilities url.
@@ -618,6 +630,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
+    @Order(order=9)
     public void testWFSListStoredQueries() throws Exception {
 
         // Creates a valid GetCapabilities url.
@@ -635,6 +648,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
+    @Order(order=10)
     public void testWFSDescribeStoredQueries() throws Exception {
 
         // Creates a valid GetCapabilities url.
@@ -652,6 +666,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
+    @Order(order=11)
     public void testWFSGetPropertyValue() throws Exception {
 
         // Creates a valid GetCapabilities url.

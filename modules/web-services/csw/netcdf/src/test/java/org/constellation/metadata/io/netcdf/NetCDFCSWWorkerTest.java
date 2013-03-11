@@ -44,14 +44,18 @@ import static org.constellation.test.utils.MetadataUtilities.*;
 
 // JUnit dependencies
 import org.apache.sis.util.ComparisonMode;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import static org.junit.Assert.*;
 import org.junit.*;
+import org.junit.runner.RunWith;
 
 
 /**
  *
  *  @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
      private static final File configDir =  new File("NCCSWWorkerTest");
@@ -121,6 +125,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=1)
     public void getRecordByIdTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         /*
@@ -285,6 +290,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=2)
     public void getRecordsTest() throws Exception {
         //
     }
@@ -298,6 +304,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
      */
     @Test
     @Override
+    @Order(order=3)
     public void getDomainTest() throws Exception {
         //
     }
