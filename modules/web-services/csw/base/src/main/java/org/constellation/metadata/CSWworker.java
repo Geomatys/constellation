@@ -663,6 +663,22 @@ public class CSWworker extends AbstractWorker {
                 sl.setValue(supportedSchemaLanguage);
             }
         }
+        
+        final AbstractOperation hr = om.getOperation("Harvest");
+        if (hr != null) {
+            final AbstractDomain tn = hr.getParameter("ResourceType");
+            if (tn != null) {
+                tn.setValue(acceptedResourceType);
+            }
+        }
+        
+        final AbstractOperation tr = om.getOperation("Transaction");
+        if (tr != null) {
+            final AbstractDomain tn = tr.getParameter("ResourceType");
+            if (tn != null) {
+                tn.setValue(acceptedResourceType);
+            }
+        }
 
         //we add the INSPIRE extend capabilties
         final InspireCapabilitiesType inspireCapa = new InspireCapabilitiesType(Arrays.asList("FRA", "ENG"));

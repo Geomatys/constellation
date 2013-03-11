@@ -188,6 +188,7 @@ public abstract class CSWConstants {
         final List<DomainType> tParameters = new ArrayList<DomainType>();
         tParameters.add(new DomainType("Version", "2.0.2"));
         tParameters.add(new DomainType("Service", "CSW"));
+        tParameters.add(new DomainType("ResourceType", "toUpdate"));
         
         final List<DomainType> tConstraints = new ArrayList<DomainType>();
         tConstraints.add(new DomainType("PostEncoding", "XML"));
@@ -198,6 +199,7 @@ public abstract class CSWConstants {
         final List<DomainType> hParameters = new ArrayList<DomainType>();
         hParameters.add(new DomainType("Version", "2.0.2"));
         hParameters.add(new DomainType("Service", "CSW"));
+        hParameters.add(new DomainType("ResourceType", "toUpdate"));
         
         final List<DomainType> hConstraints = new ArrayList<DomainType>();
         hConstraints.add(new DomainType("PostEncoding", "XML"));
