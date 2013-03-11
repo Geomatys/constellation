@@ -417,10 +417,19 @@ public class BDD {
     private void fillSourceFromURL(final BaseDataSource pgSource) {
          // exemple : jdbc:postgresql://localhost:5432/mdweb-SML
          String url = connectURL.substring(18);
-        final String host = url.substring(0, url.indexOf(':'));
-        url = url.substring(url.indexOf(':') + 1);
-        final String sPort = url.substring(0, url.indexOf('/'));
-        final int port = Integer.parseInt(sPort);
+        final String host;
+        final int port;
+        if (url.indexOf(':') != -1) {
+            host = url.substring(0, url.indexOf(':'));
+            url = url.substring(url.indexOf(':') + 1);
+            final String sPort = url.substring(0, url.indexOf('/'));
+            port = Integer.parseInt(sPort);
+        } else {
+            host = url.substring(0, url.indexOf('/'));
+            port = 5432;
+            LOGGER.finer("Using default postgres post 5432");
+        }
+            
         final String dbName = url.substring(url.indexOf('/') + 1);
 
         pgSource.setServerName(host);
