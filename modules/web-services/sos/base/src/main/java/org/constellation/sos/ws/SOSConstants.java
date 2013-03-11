@@ -50,6 +50,8 @@ import org.geotoolkit.ows.xml.v110.Operation;
 import org.geotoolkit.ows.xml.v110.OperationsMetadata;
 import org.geotoolkit.ows.xml.v110.RangeType;
 import org.geotoolkit.ows.xml.v110.RequestMethodType;
+import org.geotoolkit.sos.xml.v200.InsertionCapabilitiesPropertyType;
+import org.geotoolkit.sos.xml.v200.InsertionCapabilitiesType;
 
 /**
  *
@@ -298,5 +300,39 @@ public final class SOSConstants {
         
         OPERATIONS_METADATA = new OperationsMetadata(operations, null, constraints, null);
     }
+    
+    public static final List<String> PROFILES_V200 = new ArrayList<String>();
+    static {
+        PROFILES_V200.add("http://www.opengis.net/spec/SOS/2.0/conf/gfoi");
+        PROFILES_V200.add("http://www.opengis.net/spec/SOS/2.0/conf/obsByIdRetrieval");
+        PROFILES_V200.add("http://www.opengis.net/spec/SOS/2.0/conf/sensorInsertion");
+        PROFILES_V200.add("http://www.opengis.net/spec/SOS/2.0/conf/sensorDeletion");
+        PROFILES_V200.add("http://www.opengis.net/spec/SOS/2.0/conf/obsInsertion");
+        PROFILES_V200.add("http://www.opengis.net/spec/SOS/2.0/conf/resultInsertion");
+        PROFILES_V200.add("http://www.opengis.net/spec/SOS/2.0/conf/resultRetrieval");
+        PROFILES_V200.add("http://www.opengis.net/spec/SOS/2.0/conf/spatialFilteringProfile");
+        PROFILES_V200.add("http://www.opengis.net/spec/SOS/2.0/conf/soap");
+        //PROFILES_V200.add("http://www.opengis.net/spec/SWE/2.0/conf/uml-block-components");
+        //PROFILES_V200.add("http://www.opengis.net/spec/SWE/2.0/conf/uml-record-components");
+        //PROFILES_V200.add("http://www.opengis.net/spec/SWE/2.0/conf/xsd-record-components");
+        //PROFILES_V200.add("http://www.opengis.net/spec/SWE/2.0/conf/xsd-block-components");
+        PROFILES_V200.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingPoint");
+        PROFILES_V200.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingCurve");
+        PROFILES_V200.add("http://www.opengis.net/spec/OMXML/2.0/conf/observation");
+    }
+    
+    public static final InsertionCapabilitiesPropertyType INSERTION_CAPABILITIES; 
+    
+    static {
+        final List<String> procedureFormat = Arrays.asList("http://www.opengis.net/sensorML/1.0.1");
+        final List<String> featureOfInterestType = Arrays.asList("http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint",
+                                                                 "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingCurve");
+        final List<String> observationType = Arrays.asList("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation",
+                                                           "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement");
+        final List<String> supportedEncoding = Arrays.asList("http://www.opengis.net/swe/2.0/TextEncoding");
+        final InsertionCapabilitiesType icapa = new InsertionCapabilitiesType(procedureFormat, featureOfInterestType, observationType, supportedEncoding);
+        INSERTION_CAPABILITIES = new InsertionCapabilitiesPropertyType(icapa);
+    }
+
 }
 

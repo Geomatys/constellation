@@ -676,9 +676,10 @@ public class SOSworker extends AbstractWorker {
         final AbstractServiceProvider       sp = localCapabilities.getServiceProvider();
         final FilterCapabilities fc;
         if (currentVersion.equals("2.0.0")) {
-            fc = SOSConstants.SOS_FILTER_CAPABILITIES_V200;
+            fc = SOS_FILTER_CAPABILITIES_V200;
+            si.setProfile(PROFILES_V200);
         } else {
-            fc = SOSConstants.SOS_FILTER_CAPABILITIES_V100;
+            fc = SOS_FILTER_CAPABILITIES_V100;
         }
         final AbstractOperationsMetadata    om = OPERATIONS_METADATA.clone();
 
@@ -798,8 +799,9 @@ public class SOSworker extends AbstractWorker {
         }
         
         // we build and normalize the document
-        final Capabilities temp = buildCapabilities(currentVersion, si, sp, om, getCurrentUpdateSequence(), fc, cont);
+        final Capabilities temp = buildCapabilities(currentVersion, si, sp, om, getCurrentUpdateSequence(), fc, cont, Arrays.asList((Object)INSERTION_CAPABILITIES));
         final Capabilities c    = normalizeDocument(temp);
+
         LOGGER.log(logLevel, "getCapabilities processed in {0} ms.\n", (System.currentTimeMillis() - start));
         putCapabilitiesInCache(currentVersion, null, c);
         return (Capabilities) c.applySections(sections);
