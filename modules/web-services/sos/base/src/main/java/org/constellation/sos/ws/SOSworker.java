@@ -675,18 +675,22 @@ public class SOSworker extends AbstractWorker {
         final AbstractServiceIdentification si = localCapabilities.getServiceIdentification();
         final AbstractServiceProvider       sp = localCapabilities.getServiceProvider();
         final FilterCapabilities fc;
+        final AbstractOperationsMetadata om;
         if (currentVersion.equals("2.0.0")) {
             fc = SOS_FILTER_CAPABILITIES_V200;
+            om = OPERATIONS_METADATA_200.clone();
             si.setProfile(PROFILES_V200);
         } else {
             fc = SOS_FILTER_CAPABILITIES_V100;
+            om = OPERATIONS_METADATA_100.clone();
         }
-        final AbstractOperationsMetadata    om = OPERATIONS_METADATA.clone();
 
         //we remove the operation not supported in this profile (transactional/discovery)
         if (profile == DISCOVERY) {
             om.removeOperation("InsertObservation");
             om.removeOperation("RegisterSensor");
+            om.removeOperation("InsertSensor");
+            om.removeOperation("DeleteSensor");
         }
         //we update the URL
         om.updateURL(getServiceUrl());
@@ -844,7 +848,6 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("You must specify the sensor ID!",
                                          MISSING_PARAMETER_VALUE, PROCEDURE);
         }
-
 
         AbstractSensorML result = smlReader.getSensor(sensorId);
         if (result instanceof SensorML && 
@@ -1247,9 +1250,9 @@ public class SOSworker extends AbstractWorker {
                     final Observation obs = OMXmlFactory.cloneObervation(currentVersion, omReader.getObservation(observationID, resultModel, mode, currentVersion));
                     
                     // parse result values to eliminate wrong results
-                    final Timestamp tbegin;
-                    final Timestamp tend;
                     if (obs.getSamplingTime() instanceof Period) {
+                        final Timestamp tbegin;
+                        final Timestamp tend;
                         final Period p = (Period)obs.getSamplingTime();
                         if (p.getBeginning() != null && p.getBeginning().getPosition() != null && p.getBeginning().getPosition().getDate() != null) {
                             tbegin = new Timestamp(p.getBeginning().getPosition().getDate().getTime());
@@ -1999,124 +2002,118 @@ public class SOSworker extends AbstractWorker {
 
         //In template mode  his method return a temporal Object.
         TemporalGeometricPrimitive templateTime = null;
+        for (Filter time: times) {
 
-        if (!times.isEmpty()) {
+            // The operation Time Equals
+            if (time instanceof TEquals) {
+                final TEquals filter = (TEquals) time;
 
-            for (Filter time: times) {
+                // we get the property name (not used for now)
+                //String propertyName = time.getTEquals().getPropertyName();
+                final Object timeFilter   = filter.getExpression2();
 
-                // The operation Time Equals
-                if (time instanceof TEquals) {
-                    final TEquals filter = (TEquals) time;
-                    
-                    // we get the property name (not used for now)
-                    //String propertyName = time.getTEquals().getPropertyName();
-                    final Object timeFilter   = filter.getExpression2();
-
-                    // look for "latest" or "getFirst" filter (52N compatibility)
-                    if (timeFilter instanceof Instant){
-                        final Instant ti = (Instant) timeFilter;
-                        if (ti.getPosition() != null && ti.getPosition().getDateTime() != null &&
-                            ti.getPosition().getDateTime().toString().equalsIgnoreCase("latest")) {
-                            if (!template) {
-                                localOmFilter.setTimeLatest();
-                                continue;
-                            } else {
-                                LOGGER.warning("latest time are not handled with template mode");
-                            }
-                        }
-                        if (ti.getPosition() != null && ti.getPosition().getDateTime() != null &&
-                            ti.getPosition().getDateTime().toString().equalsIgnoreCase("getFirst")) {
-                            if (!template) {
-                                localOmFilter.setTimeFirst();
-                                continue;
-                            } else {
-                                LOGGER.warning("getFirst time are not handled with template mode");
-                            }
+                // look for "latest" or "getFirst" filter (52N compatibility)
+                if (timeFilter instanceof Instant){
+                    final Instant ti = (Instant) timeFilter;
+                    if (ti.getPosition() != null && ti.getPosition().getDateTime() != null &&
+                        ti.getPosition().getDateTime().toString().equalsIgnoreCase("latest")) {
+                        if (!template) {
+                            localOmFilter.setTimeLatest();
+                            continue;
+                        } else {
+                            LOGGER.warning("latest time are not handled with template mode");
                         }
                     }
-
-                    if (!template) {
-                        localOmFilter.setTimeEquals(timeFilter);
-
-                    } else if (timeFilter instanceof TemporalGeometricPrimitive) {
-                        templateTime = (TemporalGeometricPrimitive) timeFilter;
-
-                    } else {
-                        throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
+                    if (ti.getPosition() != null && ti.getPosition().getDateTime() != null &&
+                        ti.getPosition().getDateTime().toString().equalsIgnoreCase("getFirst")) {
+                        if (!template) {
+                            localOmFilter.setTimeFirst();
+                            continue;
+                        } else {
+                            LOGGER.warning("getFirst time are not handled with template mode");
+                        }
                     }
-                    
-
-                // The operation Time before
-                } else if (time instanceof Before) {
-                    final Before filter = (Before) time;
-                    
-                    // we get the property name (not used for now)
-                    // String propertyName = time.getTBefore().getPropertyName();
-                    final Object timeFilter   = filter.getExpression2();
-
-                    if (!template) {
-                        localOmFilter.setTimeBefore(timeFilter);
-                    } else if (timeFilter instanceof Instant) {
-                        final Instant ti = (Instant)timeFilter;
-                        templateTime = buildTimePeriod(version, TimeIndeterminateValueType.BEFORE, ti.getPosition());
-                    } else {
-                        throw new CstlServiceException("TM_Before operation require timeInstant!",
-                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
-                    }
-                    
-
-                // The operation Time after
-                } else if (time instanceof After) {
-                    final After filter = (After) time;
-                    
-                    // we get the property name (not used for now)
-                    //String propertyName = time.getTAfter().getPropertyName();
-                    final Object timeFilter   = filter.getExpression2();
-
-                    if (!template) {
-                        localOmFilter.setTimeAfter(timeFilter);
-                    } else if (timeFilter instanceof Instant) {
-                        final Instant ti = (Instant)timeFilter;
-                        templateTime = buildTimePeriod(version, ti.getPosition(), TimeIndeterminateValueType.NOW);
-
-                    } else {
-                       throw new CstlServiceException("TM_After operation require timeInstant!",
-                                                     INVALID_PARAMETER_VALUE, EVENT_TIME);
-                    }
-                    
-
-                // The time during operation
-                } else if (time instanceof During) {
-                    final During filter = (During) time;
-                    
-                    // we get the property name (not used for now)
-                    //String propertyName = time.getTDuring().getPropertyName();
-                    final Object timeFilter   = filter.getExpression2();
-
-                    if (!template) {
-                        localOmFilter.setTimeDuring(timeFilter);
-                    }
-                    if (timeFilter instanceof Period) {
-                        templateTime = (Period)timeFilter;
-
-                    } else {
-                        throw new CstlServiceException("TM_During operation require TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
-                    }
-                    
-                } else if (time instanceof Begins|| time instanceof BegunBy || time instanceof TContains ||time instanceof EndedBy || time instanceof Ends || time instanceof Meets
-                           || time instanceof TOverlaps|| time instanceof OverlappedBy) {
-                    throw new CstlServiceException("This operation is not take in charge by the Web Service, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
-                                                  OPERATION_NOT_SUPPORTED);
-                } else {
-                    throw new CstlServiceException("Unknow time filter operation, supported one are: TM_Equals, TM_After, TM_Before, TM_During.\n"
-                                                 + "Another possibility is that the content of your time filter is empty or unrecognized.",
-                                                  OPERATION_NOT_SUPPORTED);
                 }
+
+                if (!template) {
+                    localOmFilter.setTimeEquals(timeFilter);
+
+                } else if (timeFilter instanceof TemporalGeometricPrimitive) {
+                    templateTime = (TemporalGeometricPrimitive) timeFilter;
+
+                } else {
+                    throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+                                                  INVALID_PARAMETER_VALUE, EVENT_TIME);
+                }
+
+
+            // The operation Time before
+            } else if (time instanceof Before) {
+                final Before filter = (Before) time;
+
+                // we get the property name (not used for now)
+                // String propertyName = time.getTBefore().getPropertyName();
+                final Object timeFilter   = filter.getExpression2();
+
+                if (!template) {
+                    localOmFilter.setTimeBefore(timeFilter);
+                } else if (timeFilter instanceof Instant) {
+                    final Instant ti = (Instant)timeFilter;
+                    templateTime = buildTimePeriod(version, TimeIndeterminateValueType.BEFORE, ti.getPosition());
+                } else {
+                    throw new CstlServiceException("TM_Before operation require timeInstant!",
+                                                  INVALID_PARAMETER_VALUE, EVENT_TIME);
+                }
+
+
+            // The operation Time after
+            } else if (time instanceof After) {
+                final After filter = (After) time;
+
+                // we get the property name (not used for now)
+                //String propertyName = time.getTAfter().getPropertyName();
+                final Object timeFilter   = filter.getExpression2();
+
+                if (!template) {
+                    localOmFilter.setTimeAfter(timeFilter);
+                } else if (timeFilter instanceof Instant) {
+                    final Instant ti = (Instant)timeFilter;
+                    templateTime = buildTimePeriod(version, ti.getPosition(), TimeIndeterminateValueType.NOW);
+
+                } else {
+                   throw new CstlServiceException("TM_After operation require timeInstant!",
+                                                 INVALID_PARAMETER_VALUE, EVENT_TIME);
+                }
+
+
+            // The time during operation
+            } else if (time instanceof During) {
+                final During filter = (During) time;
+
+                // we get the property name (not used for now)
+                //String propertyName = time.getTDuring().getPropertyName();
+                final Object timeFilter   = filter.getExpression2();
+
+                if (!template) {
+                    localOmFilter.setTimeDuring(timeFilter);
+                }
+                if (timeFilter instanceof Period) {
+                    templateTime = (Period)timeFilter;
+
+                } else {
+                    throw new CstlServiceException("TM_During operation require TimePeriod!",
+                                                  INVALID_PARAMETER_VALUE, EVENT_TIME);
+                }
+
+            } else if (time instanceof Begins|| time instanceof BegunBy || time instanceof TContains ||time instanceof EndedBy || time instanceof Ends || time instanceof Meets
+                       || time instanceof TOverlaps|| time instanceof OverlappedBy) {
+                throw new CstlServiceException("This operation is not take in charge by the Web Service, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
+                                              OPERATION_NOT_SUPPORTED);
+            } else {
+                throw new CstlServiceException("Unknow time filter operation, supported one are: TM_Equals, TM_After, TM_Before, TM_During.\n"
+                                             + "Another possibility is that the content of your time filter is empty or unrecognized.",
+                                              OPERATION_NOT_SUPPORTED);
             }
-        } else {
-            return null;
         }
         return templateTime;
     }
