@@ -362,6 +362,18 @@ public abstract class AbstractWorker implements Worker {
     }
     
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPrintRequestParameter() {
+        final String value = getProperty("printRequestParameter");
+        if (value != null) {
+            return Boolean.parseBoolean(value);
+        }
+        return true;
+    }
+    
+    /**
      * A flag indicating if the transaction methods of the worker are securized.
      */
     protected boolean isTransactionSecurized() {

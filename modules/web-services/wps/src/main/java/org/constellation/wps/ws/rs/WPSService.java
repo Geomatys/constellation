@@ -173,9 +173,6 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 objectRequest = adaptQuery(request);
             }
 
-            //TODO: fix logging of request, which may be in the objectRequest
-            //      and not in the parameter.
-            logParameters();
             if(objectRequest instanceof RequestBaseType){
                 serviceDef = getVersionFromNumber(((RequestBaseType)objectRequest).getVersion());
             }

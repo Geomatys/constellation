@@ -138,7 +138,6 @@ public class CSWService extends OGCWebService<CSWworker> {
             if (worker != null) {
 
                 worker.setServiceUrl(getServiceURL());
-                logParameters();
 
                 // if the request is not an xml request we fill the request parameter.
                 final RequestBase request;

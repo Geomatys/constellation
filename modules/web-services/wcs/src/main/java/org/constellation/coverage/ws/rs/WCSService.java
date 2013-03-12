@@ -145,10 +145,6 @@ public class WCSService extends GridWebService<WCSWorker> {
                 objectRequest = adaptQuery(request);
             }
 
-            //TODO: fix logging of request, which may be in the objectRequest
-            //      and not in the parameter.
-            logParameters();
-
             if (objectRequest instanceof GetCapabilities){
                 final GetCapabilities getcaps = (GetCapabilities)objectRequest;
                 serviceDef              = getVersionFromNumber(getcaps.getVersion());

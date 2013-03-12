@@ -171,17 +171,6 @@ public abstract class WebService {
     private boolean fullRequestLog = false;
     
     /**
-     * @deprecated moved to Worker for dynamic instance related definition
-     */
-    @Deprecated
-    private boolean postRequestLog = false;
-
-    /**
-     * If this flag is set r false the method logParameters() will write nothing in the logs
-     */
-    private boolean printRequestParameter = true;
-
-    /**
      * If this flag is set to true a validator is added to the XML request unmarshaller.
      */
     private boolean requestValidationActivated = false;
@@ -344,7 +333,6 @@ public abstract class WebService {
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
-            Marshaller marshaller     = null;
             final MarshallerPool pool;
             // we look for a configuration query
             final List<String> serviceId = getParameter("serviceId");
@@ -356,7 +344,6 @@ public abstract class WebService {
 
             try {
                 unmarshaller = pool.acquireUnmarshaller();
-                marshaller   = pool.acquireMarshaller();
                 if (requestValidationActivated) {
                     try {
                         final SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -369,9 +356,6 @@ public abstract class WebService {
                     }
                 }
                 request = unmarshallRequest(unmarshaller, is);
-                if (postRequestLog) {
-                    marshaller.marshal(request, System.out);
-                }
             } catch (JAXBException e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg == null) {
@@ -395,9 +379,6 @@ public abstract class WebService {
             } finally {
                 if (unmarshaller != null)  {
                     pool.release(unmarshaller);
-                }
-                if (marshaller != null)  {
-                    pool.release(marshaller);
                 }
             }
 
@@ -561,19 +542,17 @@ public abstract class WebService {
      * It is a debug method.
      */
     protected void logParameters() throws CstlServiceException {
-        if (printRequestParameter) {
-            if (!fullRequestLog) {
-                final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
-                if (!parameters.isEmpty()) {
-                    // we don't write POST request with VERSION parameters automatically put
-                    if (parameters.size() != 1 || !parameters.containsKey("VERSION")) {
-                        LOGGER.info(parameters.toString());
-                    }
+        if (!fullRequestLog) {
+            final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
+            if (!parameters.isEmpty()) {
+                // we don't write POST request with VERSION parameters automatically put
+                if (parameters.size() != 1 || !parameters.containsKey("VERSION")) {
+                    LOGGER.info(parameters.toString());
                 }
-            } else {
-                if (getUriContext().getRequestUri() != null) {
-                    LOGGER.info(getUriContext().getRequestUri().toString());
-                }
+            }
+        } else {
+            if (getUriContext().getRequestUri() != null) {
+                LOGGER.info(getUriContext().getRequestUri().toString());
             }
         }
     }
@@ -664,36 +643,6 @@ public abstract class WebService {
         this.fullRequestLog = fullRequestLog;
     }
     
-    /**
-     * @deprecated moved to Worker for dynamic instance related definition
-     */
-    @Deprecated
-    public boolean isPostRequestLog() {
-        return postRequestLog;
-    }
-
-    /**
-     * @deprecated moved to Worker for dynamic instance related definition
-     */
-    @Deprecated
-    public void setPostRequestLog(final boolean postRequestLog) {
-        this.postRequestLog = postRequestLog;
-    }
-
-    /**
-     * @return the printRequestParameter
-     */
-    public boolean isPrintRequestParameter() {
-        return printRequestParameter;
-    }
-
-    /**
-     * @param printRequestParameter the printRequestParameter to set
-     */
-    public void setPrintRequestParameter(final boolean printRequestParameter) {
-        this.printRequestParameter = printRequestParameter;
-    }
-
     /**
      * Enable the request validation.
      * When a request will arrive, the service will try to validate it against the specified

@@ -129,7 +129,6 @@ public class WMSService extends GridWebService<WMSWorker> {
         ServiceDef version = null;
         try {
             final String request = (String) getParameter(REQUEST_PARAMETER, true);
-            logParameters();
 
             //Handle user's requests.
             if (GETMAP.equalsIgnoreCase(request) || MAP.equalsIgnoreCase(request)) {

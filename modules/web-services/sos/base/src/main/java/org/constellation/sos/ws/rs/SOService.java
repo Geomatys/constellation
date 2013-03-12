@@ -115,7 +115,6 @@ public class SOService extends OGCWebService<SOSworker> {
         ServiceDef serviceDef = null;
         try {
             worker.setServiceUrl(getServiceURL());
-            logParameters();
 
             final RequestBase request;
             if (objectRequest == null) {

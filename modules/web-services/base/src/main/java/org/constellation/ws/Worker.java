@@ -73,6 +73,11 @@ public interface Worker {
     boolean isAuthorized(String ip, String referer);
     
     boolean isPostRequestLog();
+    
+    /**
+     * If this flag is set r false the method logParameters() will write nothing in the logs
+     */
+    boolean isPrintRequestParameter();
 
     /**
      * Return the service URL.
