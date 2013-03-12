@@ -38,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MultivaluedMap;
 import com.sun.jersey.spi.resource.Singleton;
+import javax.xml.bind.JAXBElement;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBException;
@@ -162,7 +163,7 @@ public final class ConfigurationService extends WebService  {
      * Handle the various types of requests made to the service.
      */
     @Override
-    public Response treatIncomingRequest(final Object objectRequest) {
+    public Response treatIncomingRequest(Object objectRequest) {
         Marshaller marshaller = null;
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
@@ -226,6 +227,12 @@ public final class ConfigurationService extends WebService  {
 
             else {
                 for (AbstractConfigurer configurer : configurers) {
+                    if (objectRequest != null) {
+                        if (objectRequest instanceof JAXBElement) {
+                            objectRequest = ((JAXBElement) objectRequest).getValue();
+                        }
+                        LOGGER.log(Level.FINER, "request type:{0}", request.getClass().getName());
+                    }
                     final Object response = configurer.treatRequest(request, getUriContext().getQueryParameters(), objectRequest);
                     if (response != null) {
                         return Response.ok(response, MimeType.TEXT_XML).build();

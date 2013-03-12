@@ -17,7 +17,9 @@
 
 package org.constellation.configuration;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -55,6 +57,8 @@ public class ProcessContext {
      * Instance name of the WMS service linked to current WPS.
      */
     private String wmsInstanceName;
+    
+    private final Map<String, String> customParameters = new HashMap<String, String>();
 
     public ProcessContext() {
 
@@ -165,6 +169,13 @@ public class ProcessContext {
     public void setFileCoverageProviderId(String fileCoverageProviderId) {
         this.fileCoverageProviderId = fileCoverageProviderId;
     }
+    
+    /**
+     * @return the customParameters
+     */
+    public Map<String, String> getCustomParameters() {
+        return customParameters;
+    }
 
     @Override
     public String toString() {
@@ -184,6 +195,12 @@ public class ProcessContext {
         }
         if (fileCoverageProviderId != null) {
             sb.append("FileCoverageStore id :\n").append(fileCoverageProviderId);
+        }
+        if (customParameters != null && !customParameters.isEmpty()) {
+            sb.append("Custom parameters:\n");
+            for (Map.Entry<String, String> entry : customParameters.entrySet()) {
+                sb.append("key:").append(entry.getKey()).append(" value:").append(entry.getValue()).append('\n');
+            }
         }
         return sb.toString();
     }

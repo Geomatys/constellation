@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 
@@ -232,7 +233,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(final Object objectRequest) {
+    public Response treatIncomingRequest(final Object request) {
         try {
               processAuthentication();
         } catch (UnknownAccountException ex) {
@@ -244,6 +245,15 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             SecurityManager.logout();
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+        
+        final Object objectRequest;
+        if (request instanceof JAXBElement) {
+            objectRequest = ((JAXBElement) request).getValue();
+            LOGGER.log(Level.FINER, "request type:{0}", request.getClass().getName());
+        } else {
+            objectRequest = request;
+        }
+        
         try {
             final String serviceID = getParameter("serviceId", false);
             // request is send to the specified worker
@@ -257,6 +267,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                                 new String[]{ip, referer});
                         return Response.status(Response.Status.UNAUTHORIZED).build();
                     }
+                }
+                if (worker.isPostRequestLog()) {
+                    logPostParameters(request);
                 }
                 return treatIncomingRequest(objectRequest, worker);
 

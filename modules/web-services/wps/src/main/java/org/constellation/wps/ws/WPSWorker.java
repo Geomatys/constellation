@@ -161,6 +161,7 @@ public class WPSWorker extends AbstractWorker {
      */
     private final List<ProcessDescriptor> processDescriptorList = new ArrayList<ProcessDescriptor>();
 
+    private ProcessContext configuration;
     /**
      * Constructor.
      *
@@ -1579,6 +1580,13 @@ public class WPSWorker extends AbstractWorker {
             }
         }
     }
-
+    
+    @Override
+    protected String getProperty(final String key) {
+        if (configuration != null && configuration.getCustomParameters() != null) {
+            return configuration.getCustomParameters().get(key);
+        }
+        return null;
+    }
 }
 

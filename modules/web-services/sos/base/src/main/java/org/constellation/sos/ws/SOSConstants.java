@@ -106,8 +106,7 @@ public final class SOSConstants {
     
     static {
         final GeometryOperandsType geom = new GeometryOperandsType(Arrays.asList(_Envelope_QNAME));
-        final SpatialOperator[] spaOps = new SpatialOperator[1];
-        spaOps[0] = new SpatialOperatorType("BBOX", null);
+        final SpatialOperator[] spaOps   = {new SpatialOperatorType("BBOX", null)};
         final SpatialOperatorsType spaOp = new SpatialOperatorsType(spaOps);
         final SpatialCapabilitiesType  spatial = new SpatialCapabilitiesType(geom, spaOp);
         SOS_FILTER_CAPABILITIES_V100.setSpatialCapabilities(spatial);
@@ -118,14 +117,10 @@ public final class SOSConstants {
         temp.getTemporalOperand().add(_TimePeriod_QNAME);
         temporal.setTemporalOperands(temp);
         final TemporalOperatorsType tempOp = new TemporalOperatorsType();
-        final TemporalOperatorType td = new TemporalOperatorType();
-        td.setName(TemporalOperatorNameType.TM_DURING);
-        final TemporalOperatorType te = new TemporalOperatorType();
-        te.setName(TemporalOperatorNameType.TM_EQUALS);
-        final TemporalOperatorType ta = new TemporalOperatorType();
-        ta.setName(TemporalOperatorNameType.TM_AFTER);
-        final TemporalOperatorType tb = new TemporalOperatorType();
-        tb.setName(TemporalOperatorNameType.TM_BEFORE);
+        final TemporalOperatorType td = new TemporalOperatorType(TemporalOperatorNameType.TM_DURING);
+        final TemporalOperatorType te = new TemporalOperatorType(TemporalOperatorNameType.TM_EQUALS);
+        final TemporalOperatorType ta = new TemporalOperatorType(TemporalOperatorNameType.TM_AFTER);
+        final TemporalOperatorType tb = new TemporalOperatorType(TemporalOperatorNameType.TM_BEFORE);
         
         tempOp.getTemporalOperator().add(td);
         tempOp.getTemporalOperator().add(te);
@@ -167,14 +162,10 @@ public final class SOSConstants {
         final org.geotoolkit.ogc.xml.v200.TemporalOperandsType temp = new org.geotoolkit.ogc.xml.v200.TemporalOperandsType(Arrays.asList(_TimeInstant_QNAME, _TimePeriod_QNAME));
         temporal.setTemporalOperands(temp);
         final org.geotoolkit.ogc.xml.v200.TemporalOperatorsType tempOp = new org.geotoolkit.ogc.xml.v200.TemporalOperatorsType();
-        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType td = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType();
-        td.setName("TM_DURING");
-        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType te = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType();
-        te.setName("TM_EQUALS");
-        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType ta = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType();
-        ta.setName("TM_AFTER");
-        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType tb = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType();
-        tb.setName("TM_BEFORE");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType td = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("TM_DURING");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType te = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("TM_EQUALS");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType ta = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("TM_AFTER");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType tb = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("TM_BEFORE");
         
         tempOp.getTemporalOperator().add(td);
         tempOp.getTemporalOperator().add(te);
@@ -182,8 +173,6 @@ public final class SOSConstants {
         tempOp.getTemporalOperator().add(tb);
         
         temporal.setTemporalOperators(tempOp);
-        
-        
         
         final Operator[] compaOperatorList = new Operator[9];
         compaOperatorList[0] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsBetween");
@@ -242,7 +231,7 @@ public final class SOSConstants {
         operations.add(GET_CAPABILITIES);
 
         final List<DomainType> rsParameters = new ArrayList<DomainType>();
-        rsParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
+        rsParameters.add(new DomainType("version", Arrays.asList("1.0.0")));
         rsParameters.add(SERVICE_PARAMETER);
         
         final Operation registerSensor = new Operation(ONLY_POST, rsParameters, null, null, "RegisterSensor");
@@ -291,7 +280,7 @@ public final class SOSConstants {
         
         final List<DomainType> gftParameters = new ArrayList<DomainType>();
         gftParameters.add(new DomainType("featureOfInterestId", "toUpdate"));
-        gftParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
+        gftParameters.add(new DomainType("version", Arrays.asList("1.0.0")));
         gftParameters.add(SERVICE_PARAMETER);
         
         final Operation getFeatureOfInterestTime = new Operation(ONLY_POST, gftParameters, null, null, "GetFeatureOfInterestTime");
@@ -319,35 +308,35 @@ public final class SOSConstants {
         operations.add(GET_CAPABILITIES);
 
         final List<DomainType> rsParameters = new ArrayList<DomainType>();
-        rsParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
+        rsParameters.add(new DomainType("version", Arrays.asList("2.0.0")));
         rsParameters.add(SERVICE_PARAMETER);
         
-        final Operation registerSensor = new Operation(ONLY_POST, rsParameters, null, null, "InsertSensor");
-        operations.add(registerSensor);
+        final Operation insertSensor = new Operation(ONLY_POST, rsParameters, null, null, "InsertSensor");
+        operations.add(insertSensor);
         
         final List<DomainType> irtParameters = new ArrayList<DomainType>();
-        irtParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
+        irtParameters.add(new DomainType("version", Arrays.asList("2.0.0")));
         irtParameters.add(SERVICE_PARAMETER);
         
         final Operation insertResultTemplate = new Operation(ONLY_POST, irtParameters, null, null, "InsertResultTemplate");
         operations.add(insertResultTemplate);
         
         final List<DomainType> irParameters = new ArrayList<DomainType>();
-        irParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
+        irParameters.add(new DomainType("version", Arrays.asList("2.0.0")));
         irParameters.add(SERVICE_PARAMETER);
         
         final Operation insertResult = new Operation(ONLY_POST, irParameters, null, null, "InsertResult");
         operations.add(insertResult);
         
         final List<DomainType> dsParameters = new ArrayList<DomainType>();
-        dsParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
+        dsParameters.add(new DomainType("version", Arrays.asList("2.0.0")));
         dsParameters.add(SERVICE_PARAMETER);
         
         final Operation deleteSensor = new Operation(ONLY_POST, dsParameters, null, null, "DeleteSensor");
         operations.add(deleteSensor);
         
         final List<DomainType> grtParameters = new ArrayList<DomainType>();
-        grtParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
+        grtParameters.add(new DomainType("version", Arrays.asList("2.0.0")));
         grtParameters.add(SERVICE_PARAMETER);
         
         final Operation getResultTemplate = new Operation(ONLY_POST, grtParameters, null, null, "GetResultTemplate");

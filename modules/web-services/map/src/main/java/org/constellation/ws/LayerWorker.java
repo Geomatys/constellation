@@ -94,12 +94,6 @@ public abstract class LayerWorker extends AbstractWorker {
                                 }
                             }
                         }
-                        // look for transaction security
-                        final String ts = candidate.getCustomParameters().get("transactionSecurized");
-                        if (ts != null && !ts.isEmpty()) {
-                            LOGGER.log(Level.INFO, "transaction securized:{0}", ts);
-                            transactionSecurized = Boolean.parseBoolean(ts);
-                        }
                         // look for shiro accessibility
                         final String sa = candidate.getCustomParameters().get("shiroAccessible");
                         if (sa != null && !sa.isEmpty()) {
@@ -347,6 +341,7 @@ public abstract class LayerWorker extends AbstractWorker {
         return (pdp != null);
     }
 
+    @Override
     protected String getProperty(final String key) {
         if (layerContext != null && layerContext.getCustomParameters() != null) {
             return layerContext.getCustomParameters().get(key);

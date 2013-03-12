@@ -158,7 +158,7 @@ public abstract class SOSWorkerTest {
         /*
          *  TEST 1 : minimal getCapabilities
          */
-        GetCapabilities request = new GetCapabilities();
+        GetCapabilities request = new GetCapabilities("1.0.0", null);
         Capabilities result = worker.getCapabilities(request);
 
         assertTrue(result != null);

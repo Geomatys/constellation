@@ -66,11 +66,8 @@ public abstract class AbstractWorker implements Worker {
      */
     protected boolean isStarted;
 
-    /**
-     * A flag indicating if the transaction methods of the worker are securized.
-     */
-    protected boolean transactionSecurized = true;
-
+    protected boolean multipleVersionActivated = true;
+    
     /**
      * A message keeping the reason of the start error of the service
      */
@@ -244,6 +241,8 @@ public abstract class AbstractWorker implements Worker {
         this.shiroAccessible = shiroAccessible;
     }
 
+    protected abstract String getProperty(final String propertyName);
+    
     /**
      * Returns the file where to read the capabilities document for each service.
      * If no such file is found, then this method returns {@code null}.
@@ -348,6 +347,29 @@ public abstract class AbstractWorker implements Worker {
     @Override
     public boolean isStarted() {
         return isStarted;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPostRequestLog() {
+        final String value = getProperty("postRequestLog");
+        if (value != null) {
+            return Boolean.parseBoolean(value);
+        }
+        return false;
+    }
+    
+    /**
+     * A flag indicating if the transaction methods of the worker are securized.
+     */
+    protected boolean isTransactionSecurized() {
+        final String value = getProperty("transactionSecurized");
+        if (value != null) {
+            return Boolean.parseBoolean(value);
+        }
+        return true;
     }
 
     /**

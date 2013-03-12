@@ -140,7 +140,7 @@ public class SOSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!\nCause:Premature end of file.");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause:JAXBException:Premature end of file.");
             exceptionLaunched = true;
         }
 

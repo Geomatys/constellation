@@ -175,8 +175,6 @@ public class SOSworker extends AbstractWorker {
     public static final int DISCOVERY     = 0;
     public static final int TRANSACTIONAL = 1;
 
-    private boolean multipleVersionActivated = true;
-    
     /**
      * A list of temporary ObservationTemplate
      */
@@ -295,6 +293,8 @@ public class SOSworker extends AbstractWorker {
     private Capabilities loadedCapabilities;
 
     private boolean alwaysFeatureCollection;
+    
+    private SOSConfiguration configuration;
 
     /**
      * Initialize the database connection.
@@ -302,8 +302,7 @@ public class SOSworker extends AbstractWorker {
     public SOSworker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.SOS);
         isStarted = true;
-        final SOSConfiguration configuration;
-
+        
         // Database configuration
         Unmarshaller configUM = null;
         try {
@@ -314,21 +313,18 @@ public class SOSworker extends AbstractWorker {
                 if (object instanceof SOSConfiguration) {
                     configuration = (SOSConfiguration) object;
                 } else {
-                    startError = "The generic configuration file is malformed.";
-                    LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
-                    isStarted = false;
+                    startError("The generic configuration file is malformed.", null);
                     return;
                 }
             } else {
-                startError = "The configuration file can't be found.";
-                LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
-                isStarted = false;
+                startError("The configuration file can't be found.", null);
                 return;
             }
 
-            if (configuration.getLogFolder() != null) {
-                initLogger("", configuration.getLogFolder());
-                LOGGER.log(Level.INFO, "Redirecting the log to: {0}", configuration.getLogFolder());
+            final String logFolder = configuration.getLogFolder();
+            if (logFolder != null) {
+                initLogger("", logFolder);
+                LOGGER.log(Level.INFO, "Redirecting the log to: {0}", logFolder);
             }
             this.profile               = configuration.getProfile();
             this.verifySynchronization = configuration.isVerifySynchronization();
@@ -352,23 +348,17 @@ public class SOSworker extends AbstractWorker {
 
             final Automatic smlConfiguration = configuration.getSMLConfiguration();
             if (smlConfiguration == null) {
-                startError = "The configuration file does not contains a SML configuration.";
-                LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
-                isStarted = false;
+                startError("The configuration file does not contains a SML configuration.", null);
                 return;
             }
             smlConfiguration.setConfigurationDirectory(configurationDirectory);
 
             final Automatic omConfiguration = configuration.getOMConfiguration();
             if (omConfiguration == null) {
-                startError = "The configuration file does not contains a O&M configuration.";
-                LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
-                isStarted = false;
+                startError ("The configuration file does not contains a O&M configuration.", null);
                 return;
             }
             omConfiguration.setConfigurationDirectory(configurationDirectory);
-
-
 
             //we initialize the properties attribute
             final String observationIdBase  = configuration.getObservationIdBase() != null ?
@@ -386,14 +376,28 @@ public class SOSworker extends AbstractWorker {
             alwaysFeatureCollection   = configuration.getParameters().containsKey(OMFactory.ALWAYS_FEATURE_COLLECTION) ?
             Boolean.parseBoolean(configuration.getParameters().get(OMFactory.ALWAYS_FEATURE_COLLECTION)) : false;
 
-            final String multiVersProp = configuration.getParameters().get("multipleVersion");
+            final String multiVersProp = getProperty("multipleVersion");
             if (multiVersProp != null) {
                 multipleVersionActivated = Boolean.parseBoolean(multiVersProp);
                 LOGGER.log(Level.INFO, "Multiple version activated:{0}", multipleVersionActivated);
                 if (multipleVersionActivated) {
                     setSupportedVersion(ServiceDef.SOS_2_0_0, ServiceDef.SOS_1_0_0);
                 } else {
-                    setSupportedVersion(ServiceDef.SOS_1_0_0);
+                    final String singleVersionNumber = getProperty("singleVersion");
+                    if (singleVersionNumber != null) {
+                        if (singleVersionNumber.equals("1.0.0")) {
+                            setSupportedVersion(ServiceDef.SOS_1_0_0);
+                        } else if (singleVersionNumber.equals("2.0.0")) {
+                            setSupportedVersion(ServiceDef.SOS_2_0_0);
+                        } else {
+                            startError("Multiple version deactived but invalid single version value:" + singleVersionNumber, null);
+                            return; 
+                        }
+                        LOGGER.log(Level.INFO, "single version activated:{0}", singleVersionNumber);
+                    } else {
+                        startError("Multiple version deactived but missing single version value.", null);
+                        return;
+                    }
                 }
             } else {
                 setSupportedVersion(ServiceDef.SOS_2_0_0, ServiceDef.SOS_1_0_0);
@@ -460,12 +464,6 @@ public class SOSworker extends AbstractWorker {
 
             setLogLevel(configuration.getLogLevel());
 
-            // look for transaction security
-            final String ts = configuration.getParameters().get("transactionSecurized");
-            if (ts != null && !ts.isEmpty()) {
-                transactionSecurized = Boolean.parseBoolean(ts);
-            }
-
             // we log some implementation informations
             logInfos();
 
@@ -481,26 +479,26 @@ public class SOSworker extends AbstractWorker {
                     msg = "no message";
                 }
             }
-            startError = msg;
-            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\n\ncause: JAXBException:{0}", msg);
-            isStarted = false;
+            startError("JAXBException:" + msg, ex);
         } catch (FactoryNotFoundException ex) {
-            startError =  "Unable to find a SOS Factory." + ex.getMessage();
-            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
-            isStarted = false;
+            startError("Unable to find a SOS Factory." + ex.getMessage(), ex);
         } catch (MetadataIoException ex) {
-            startError = "MetadataIOException while initializing the sensor reader/writer:\n" + ex.getMessage();
-            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
-            isStarted = false;
+            startError("MetadataIOException while initializing the sensor reader/writer:\n" + ex.getMessage(), ex);
         } catch (CstlServiceException ex) {
-            startError = ex.getMessage();
-            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause:{0}", startError);
-            LOGGER.log(Level.FINER, "\nThe SOS worker is not running!", ex);
-            isStarted = false;
+            startError(ex.getMessage(), ex);
         } finally {
             if (configUM != null) {
                 GenericDatabaseMarshallerPool.getInstance().release(configUM);
             }
+        }
+    }
+    
+    private void startError(final String msg, final Exception ex) {
+        startError    = msg;
+        isStarted     = false;
+        LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
+        if (ex != null) {
+            LOGGER.log(Level.FINER, "\nThe SOS worker is not running!", ex);
         }
     }
 
@@ -1770,7 +1768,7 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The operation registerSensor is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
         }
-        if (transactionSecurized && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
+        if (isTransactionSecurized() && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform an registerSensor request.");
         }
         LOGGER.log(logLevel, "registerSensor request processing\n");
@@ -1886,7 +1884,7 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The operation insertObservation is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
         }
-        if (transactionSecurized && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
+        if (isTransactionSecurized() && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform an insertObservation request.");
         }
 
@@ -2126,16 +2124,16 @@ public class SOSworker extends AbstractWorker {
         if (request != null) {
             if (request.getService() != null) {
                 if (!request.getService().equals(SOS))  {
-                    throw new CstlServiceException("service must be \"SOS\"!", INVALID_PARAMETER_VALUE, SERVICE_PARAMETER);
+                    throw new CstlServiceException("service must be \"SOS\"!", INVALID_PARAMETER_VALUE, SERVICE_PARAMETER_LC);
                 }
             } else {
-                throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, SERVICE_PARAMETER);
+                throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, SERVICE_PARAMETER_LC);
             }
             if (request.getVersion()!= null) {
                 
-                if (request.getVersion().toString().equals("1.0.0")) {
+                if (request.getVersion().toString().equals("1.0.0") && isSupportedVersion("1.0.0")) {
                     request.setVersion("1.0.0");
-                } else if (multipleVersionActivated && request.getVersion().toString().equals("2.0.0")) {
+                } else if (request.getVersion().toString().equals("2.0.0") && isSupportedVersion("2.0.0")) {
                     request.setVersion("2.0.0");
                 } else {
                     final CodeList code;
@@ -2153,7 +2151,7 @@ public class SOSworker extends AbstractWorker {
                 if (versionMandatory) {
                     throw new CstlServiceException("version must be specified!", MISSING_PARAMETER_VALUE, "version");
                 } else {
-                    request.setVersion("1.0.0");
+                    request.setVersion(getBestVersion(null).version.toString());
                 }
             }
          } else {
@@ -2364,6 +2362,14 @@ public class SOSworker extends AbstractWorker {
     @Override
     protected MarshallerPool getMarshallerPool() {
         return SOSMarshallerPool.getInstance();
+    }
+
+    @Override
+    protected final String getProperty(final String propertyName) {
+        if (configuration != null) {
+            return configuration.getParameters().get(propertyName);
+        }
+        return null;
     }
 
     /**

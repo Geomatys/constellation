@@ -32,7 +32,6 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.imageio.spi.ServiceRegistry;
@@ -203,6 +202,8 @@ public class CSWworker extends AbstractWorker {
     private int profile;
 
     private MetadataSecurityFilter securityFilter;
+    
+    private Automatic configuration;
             
     /**
      * Build a new CSW worker with the specified configuration directory
@@ -220,13 +221,13 @@ public class CSWworker extends AbstractWorker {
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
      *
      */
-    public CSWworker(final String serviceID, final File configDir, Automatic configuration) {
+    public CSWworker(final String serviceID, final File configDir, Automatic candidate) {
         super(serviceID, configDir, ServiceDef.Specification.CSW);
         setSupportedVersion(ServiceDef.CSW_2_0_2);
         isStarted = true;
         try {
             //we look if the configuration have been specified
-            if (configuration == null) {
+            if (candidate == null) {
                 final MarshallerPool pool             = GenericDatabaseMarshallerPool.getInstance();
                 final Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
                 final File configFile                 = new File(configDir, "config.xml");
@@ -236,10 +237,11 @@ public class CSWworker extends AbstractWorker {
                     isStarted = false;
                     return;
                 } else {
-                    configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
+                    candidate = (Automatic) configUnmarshaller.unmarshal(configFile);
                 }
                 pool.release(configUnmarshaller);
             }
+            configuration = candidate;
 
             // we initialize the filterParsers
             init(configuration, "", configDir);
@@ -250,11 +252,6 @@ public class CSWworker extends AbstractWorker {
             // look for log level
             setLogLevel(configuration.getLogLevel());
 
-            // look for transaction security
-            final String ts = configuration.getParameter("transactionSecurized");
-            if (ts != null && !ts.isEmpty()) {
-                transactionSecurized = Boolean.parseBoolean(ts);
-            }
             // look for shiro accessibility
             final String sa = configuration.getParameter("shiroAccessible");
             if (sa != null && !sa.isEmpty()) {
@@ -1333,7 +1330,7 @@ public class CSWworker extends AbstractWorker {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
         }
-        if (shiroAccessible && transactionSecurized && !SecurityManager.isAuthenticated()) {
+        if (shiroAccessible && isTransactionSecurized() && !SecurityManager.isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform a transaction request.");
         }
         final long startTime = System.currentTimeMillis();
@@ -1501,7 +1498,7 @@ public class CSWworker extends AbstractWorker {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
         }
-        if (transactionSecurized && !SecurityManager.isAuthenticated()) {
+        if (isTransactionSecurized() && !SecurityManager.isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform a harvest request.");
         }
         verifyBaseRequest(request);
@@ -1768,5 +1765,13 @@ public class CSWworker extends AbstractWorker {
         } catch (IndexingException ex) {
             throw new CstlServiceException("Error while refreshing cache", ex, NO_APPLICABLE_CODE);
         }
+    }
+
+   @Override
+    protected String getProperty(final String key) {
+        if (configuration != null) {
+            return configuration.getParameter(key);
+        }
+        return null;
     }
 }

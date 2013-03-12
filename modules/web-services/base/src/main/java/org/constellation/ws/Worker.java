@@ -71,6 +71,8 @@ public interface Worker {
      * @return {@code True} if the requestor is authorized, {@code false} otherwise.
      */
     boolean isAuthorized(String ip, String referer);
+    
+    boolean isPostRequestLog();
 
     /**
      * Return the service URL.

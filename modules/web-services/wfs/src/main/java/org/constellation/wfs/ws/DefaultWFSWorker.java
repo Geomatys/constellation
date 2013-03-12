@@ -167,8 +167,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         DEFAULT_CRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
     }
 
-    private boolean multipleVersionActivated = true;
-
     private List<StoredQueryDescription> storedQueries = new ArrayList<StoredQueryDescription>();
     
     public DefaultWFSWorker(final String id, final File configurationDirectory) {
@@ -188,12 +186,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
         } else {
             setSupportedVersion(ServiceDef.WFS_2_0_0, ServiceDef.WFS_1_1_0);
-        }
-        
-        // TODO move to AbstractWorker
-        final String ts = getProperty("transactionSecurized");
-        if (ts != null && !ts.isEmpty()) {
-            transactionSecurized = Boolean.parseBoolean(ts);
         }
 
         // loading stored queries
@@ -961,7 +953,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public TransactionResponse transaction(final Transaction request) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
         final long startTime = System.currentTimeMillis();
-        if (transactionSecurized && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
+        if (isTransactionSecurized() && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform an registerSensor request.");
         }
         verifyBaseRequest(request, true, false);

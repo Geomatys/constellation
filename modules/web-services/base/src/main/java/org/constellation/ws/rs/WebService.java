@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.Map.Entry;
@@ -33,6 +32,7 @@ import org.xml.sax.SAXException;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
+import java.util.logging.Level;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -171,8 +171,9 @@ public abstract class WebService {
     private boolean fullRequestLog = false;
     
     /**
-     * If this flag is set the method logParameters() will marshall the entire request in the logs.
+     * @deprecated moved to Worker for dynamic instance related definition
      */
+    @Deprecated
     private boolean postRequestLog = false;
 
     /**
@@ -406,13 +407,6 @@ public abstract class WebService {
                     getUriContext().getQueryParameters().add("VERSION", ar.getVersion().toString());
                 }
             }
-
-            if (request != null) {
-                if (request instanceof JAXBElement) {
-                    request = ((JAXBElement) request).getValue();
-                }
-                LOGGER.log(Level.FINER, "request type:{0}", request.getClass().getName());
-            }
             return treatIncomingRequest(request);
         } else {
             return Response.ok("This service is not running", MimeType.TEXT_PLAIN).build();
@@ -583,6 +577,22 @@ public abstract class WebService {
             }
         }
     }
+    
+    protected void logPostParameters(final Object request) throws CstlServiceException {
+        final MarshallerPool pool = getMarshallerPool();
+        Marshaller m = null;
+        try {
+            m = pool.acquireMarshaller();
+            m.marshal(request, System.out);
+            
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "Error while marshalling the request", ex);
+        } finally {
+            if (m != null) {
+                pool.release(m);
+            }
+        }
+    }
 
     /**
      * Extract The complex parameter encoded in XML from the query.
@@ -655,15 +665,17 @@ public abstract class WebService {
     }
     
     /**
-     * @return the postRequestLog
+     * @deprecated moved to Worker for dynamic instance related definition
      */
+    @Deprecated
     public boolean isPostRequestLog() {
         return postRequestLog;
     }
 
     /**
-     * @param postRequestLog the postRequestLog to set
+     * @deprecated moved to Worker for dynamic instance related definition
      */
+    @Deprecated
     public void setPostRequestLog(final boolean postRequestLog) {
         this.postRequestLog = postRequestLog;
     }

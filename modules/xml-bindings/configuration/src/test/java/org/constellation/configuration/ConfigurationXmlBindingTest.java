@@ -404,6 +404,7 @@ public class ConfigurationXmlBindingTest {
                 + "        <ns2:ProcessFactory load_all=\"true\" autorityCode=\"source1\"/>" + '\n'
                 + "        <ns2:ProcessFactory load_all=\"true\" autorityCode=\"source2\"/>" + '\n'
                 + "    </ns2:processes>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:ProcessContext>\n";
 
         String result = StringUtilities.removeXmlns(sw.toString());
@@ -441,6 +442,7 @@ public class ConfigurationXmlBindingTest {
                 + "        </ns2:ProcessFactory>" + '\n'
                 + "        <ns2:ProcessFactory load_all=\"true\" autorityCode=\"source2\"/>" + '\n'
                 + "    </ns2:processes>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:ProcessContext>\n";
 
         result =  StringUtilities.removeXmlns(sw.toString());
@@ -477,6 +479,7 @@ public class ConfigurationXmlBindingTest {
                 + "        </ns2:ProcessFactory>" + '\n'
                 + "        <ns2:ProcessFactory load_all=\"true\" autorityCode=\"source2\"/>" + '\n'
                 + "    </ns2:processes>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:ProcessContext>\n";
 
         result =  StringUtilities.removeXmlns(sw.toString());
