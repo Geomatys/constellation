@@ -29,6 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
+import java.lang.reflect.Proxy;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -43,6 +46,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Schema;
 
 // Constellation dependencies
@@ -50,6 +56,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
 import static org.constellation.ws.ExceptionCode.*;
+import org.constellation.xml.PrefixMappingInvocationHandler;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.Versioned;
@@ -320,7 +327,7 @@ public abstract class WebService {
     @Consumes("*/xml")
     public Response doPOSTXml(final InputStream is) {
         if (marshallerPool != null) {
-            Object request = null;
+            final Object request;
             Unmarshaller unmarshaller = null;
             final MarshallerPool pool;
             
@@ -342,14 +349,17 @@ public abstract class WebService {
                 requestValidationActivated = false;
             }
 
+            final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
             try {
                 unmarshaller = pool.acquireUnmarshaller();
                 if (requestValidationActivated) {
                     for (Schema schema : schemas) {
                         unmarshaller.setSchema(schema);
                     }
+                    request = unmarshallRequestWithMapping(unmarshaller, is, prefixMapping);
+                } else {
+                    request = unmarshallRequest(unmarshaller, is);
                 }
-                request = unmarshallRequest(unmarshaller, is);
             } catch (JAXBException e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg == null) {
@@ -365,8 +375,9 @@ public abstract class WebService {
                 } else {
                     codeName = INVALID_REQUEST.name();
                 }
+                final String locator = getValidationLocator(errorMsg, prefixMapping);
 
-                return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, null);
+                return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, locator);
             } catch (CstlServiceException e) {
 
                 return launchException(e.getMessage(), e.getExceptionCode().identifier(), e.getLocator());
@@ -391,6 +402,27 @@ public abstract class WebService {
     protected abstract boolean isRequestValidationActivated(final String workerID);
     
     protected abstract List<Schema> getRequestValidationSchema(final String workerID);
+
+    private String getValidationLocator(final String msg, final Map<String, String> mapping) {
+        if (msg.contains("must appear on element")) {
+            int pos = msg.indexOf("'");
+            String temp = msg.substring(pos + 1);
+            pos = temp.indexOf("'");
+            final String attribute = temp.substring(0, pos);
+            temp = temp.substring(pos + 1);
+            pos  = temp.indexOf("'");
+            temp = temp.substring(pos + 1);
+            pos = temp.indexOf("'");
+            final String element = temp.substring(0, pos);
+            pos = element.indexOf(':');
+            final String prefix = element.substring(0, pos);
+            final String localPart = element.substring(pos + 1);
+            final String namespace = mapping.get(prefix);
+            
+            return "Expected attribute: " + attribute + " in element "+ localPart + '@' + namespace;
+        }
+        return null;
+    }
     
     /**
      * A method simply unmarshalling the request with the specified unmarshaller from the specified inputStream.
@@ -403,6 +435,18 @@ public abstract class WebService {
      */
     protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException, CstlServiceException {
         return unmarshaller.unmarshal(is);
+    }
+    
+    protected Object unmarshallRequestWithMapping(final Unmarshaller unmarshaller, final InputStream is, final Map<String, String> prefixMapping) throws JAXBException {
+        try {
+            final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(is);
+            final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
+                    new Class[]{XMLEventReader.class}, new PrefixMappingInvocationHandler(rootEventReader, prefixMapping));
+
+            return unmarshaller.unmarshal(eventReader);
+        } catch (XMLStreamException ex) {
+            throw new JAXBException(ex);
+        }
     }
 
     /**

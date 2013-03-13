@@ -867,7 +867,7 @@ public class SOSworker extends AbstractWorker {
 
         // we verify that we have a sensor ID.
         final String sensorId = request.getProcedure();
-        if (sensorId == null) {
+        if (sensorId == null || sensorId.isEmpty()) {
             throw new CstlServiceException("You must specify the sensor ID!", MISSING_PARAMETER_VALUE, PROCEDURE);
         }
         final boolean result = smlWriter.deleteSensor(sensorId);
@@ -2122,7 +2122,7 @@ public class SOSworker extends AbstractWorker {
     private void verifyBaseRequest(final RequestBase request, final boolean versionMandatory, final boolean getCapabilities) throws CstlServiceException {
         isWorking();
         if (request != null) {
-            if (request.getService() != null) {
+            if (request.getService() != null && !request.getService().isEmpty()) {
                 if (!request.getService().equals(SOS))  {
                     throw new CstlServiceException("service must be \"SOS\"!", INVALID_PARAMETER_VALUE, SERVICE_PARAMETER_LC);
                 }

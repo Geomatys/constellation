@@ -47,7 +47,6 @@ import javax.xml.stream.events.Namespace;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
-import java.lang.reflect.InvocationTargetException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MediaType;
@@ -65,6 +64,7 @@ import org.constellation.ws.UnauthorizedException;
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wfs.ws.WFSConstants.*;
 import org.constellation.ws.Worker;
+import org.constellation.xml.PrefixMappingInvocationHandler;
 
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;
@@ -320,36 +320,17 @@ public class WFSService extends GridWebService<WFSWorker> {
      */
     @Override
     protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException {
+        final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
+        return unmarshallRequestWithMapping(unmarshaller, is, prefixMapping);
+    }
+    
+    @Override
+    protected Object unmarshallRequestWithMapping(final Unmarshaller unmarshaller, final InputStream is, final Map<String, String> prefixMapping) throws JAXBException {
         try {
-            final JAXBEventHandler handler          = new JAXBEventHandler();
-            unmarshaller.setEventHandler(handler);
-            final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
             final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(is);
             final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
-                    new Class[]{XMLEventReader.class}, new InvocationHandler() {
+                    new Class[]{XMLEventReader.class}, new PrefixMappingInvocationHandler(rootEventReader, prefixMapping));
 
-                @Override
-                public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-                    Object returnVal = null;
-                    try {
-                        returnVal = method.invoke(rootEventReader, args);
-                    } catch (InvocationTargetException ex) {
-                        throw ex.getTargetException();
-                    }
-                    if (method.getName().equals("nextEvent")) {
-                        final XMLEvent evt = (XMLEvent) returnVal;
-                        if (evt.isStartElement()) {
-                            final StartElement startElem = evt.asStartElement();
-                            final Iterator<Namespace> t = startElem.getNamespaces();
-                            while (t.hasNext()) {
-                                final Namespace n = t.next();
-                                prefixMapping.put(n.getPrefix(), n.getNamespaceURI());
-                            }
-                        }
-                    }
-                    return returnVal;
-                }
-            });
             Object request =  unmarshaller.unmarshal(eventReader);
             if (request instanceof JAXBElement) {
                 request = ((JAXBElement)request).getValue();
@@ -357,6 +338,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             if (request instanceof BaseRequest) {
                 ((BaseRequest)request).setPrefixMapping(prefixMapping);
             }
+            System.out.println("PREFIX MAPPINGGG:" + prefixMapping);
             return request;
         } catch (XMLStreamException ex) {
             throw new JAXBException(ex);
