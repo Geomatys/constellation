@@ -28,6 +28,7 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
+import javax.xml.validation.Schema;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 
@@ -229,6 +230,29 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      */
     protected abstract Class getWorkerClass();
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isRequestValidationActivated(final String serviceID) {
+        if (serviceID != null && WSEngine.serviceInstanceExist(serviceName, serviceID)) {
+            final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
+            return worker.isRequestValidationActivated();
+        }
+        return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<Schema> getRequestValidationSchema(final String serviceID) {
+        if (serviceID != null && WSEngine.serviceInstanceExist(serviceName, serviceID)) {
+            final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
+            return worker.getRequestValidationSchema();
+        }
+        return new ArrayList<Schema>();
+    }
     /**
      * {@inheritDoc}
      */

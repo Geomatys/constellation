@@ -17,7 +17,9 @@
 
 package org.constellation.ws;
 
+import java.util.List;
 import java.util.logging.Level;
+import javax.xml.validation.Schema;
 import org.constellation.ServiceDef;
 import org.geotoolkit.util.Version;
 
@@ -103,4 +105,12 @@ public interface Worker {
      * 
      */
     ServiceDef getBestVersion(final String number);
+    
+    /**
+     * if this flag is set the request received will be validated against a XSD schema
+     * @return 
+     */
+    boolean isRequestValidationActivated();
+    
+    List<Schema> getRequestValidationSchema();
 }

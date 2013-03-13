@@ -20,6 +20,8 @@ package org.constellation.ws;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +33,8 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import org.constellation.ServiceDef;
 
 import org.constellation.ServiceDef.Specification;
@@ -38,10 +42,12 @@ import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 
 import org.geotoolkit.ows.xml.OWSExceptionCode;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -124,6 +130,8 @@ public abstract class AbstractWorker implements Worker {
      * A Policy Decision Point (PDP) if some security constraints have been defined.
      */
     protected SimplePDP pdp = null;
+    
+    private List<Schema> schemas = null;
 
     private long currentUpdateSequence = System.currentTimeMillis();
 
@@ -384,6 +392,38 @@ public abstract class AbstractWorker implements Worker {
         return true;
     }
 
+    @Override
+    public boolean isRequestValidationActivated() {
+        final String value = getProperty("requestValidationActivated");
+        if (value != null) {
+            return Boolean.parseBoolean(value);
+        }
+        return false;
+    }
+    
+    @Override
+    public List<Schema> getRequestValidationSchema() {
+        if (schemas == null) {
+            final String value = getProperty("requestValidationSchema");
+            schemas = new ArrayList<Schema>();
+            if (value != null) {
+                final List<String> schemaPaths = StringUtilities.toStringList(value);
+                LOGGER.info("Reading schemas. This may take some times ...");
+                for (String schemaPath : schemaPaths) {
+                    try {
+                        final SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                        schemas.add(sf.newSchema(new URL(schemaPath)));
+                    } catch (SAXException ex) {
+                        LOGGER.warning("SAX exception while adding the Validator to the JAXB unmarshaller");
+                    } catch (MalformedURLException ex) {
+                        LOGGER.warning("MalformedURL exception while adding the Validator to the JAXB unmarshaller");
+                    }
+                }
+            }
+        }
+        return schemas;
+    }
+    
     /**
      * {@inheritDoc}
      */

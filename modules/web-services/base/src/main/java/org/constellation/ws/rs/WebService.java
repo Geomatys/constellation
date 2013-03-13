@@ -20,15 +20,12 @@ package org.constellation.ws.rs;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.ByteArrayInputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import org.xml.sax.SAXException;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
@@ -47,7 +44,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
@@ -167,19 +163,12 @@ public abstract class WebService {
     /**
      * If this flag is set the method logParameters() will write the entire request in the logs
      * instead of the parameters map.
+     * 
+     * @deprecated move to worker
      */
+    @Deprecated
     private boolean fullRequestLog = false;
     
-    /**
-     * If this flag is set to true a validator is added to the XML request unmarshaller.
-     */
-    private boolean requestValidationActivated = false;
-
-    /**
-     * if the flag requestValidationActivated is set to true this attribute must contain the main xsd file.
-     */
-    private String mainXsdPath = null;
-
     /**
      * A pool of JAXB unmarshaller used to create Java objects from XML files.
      */
@@ -334,25 +323,30 @@ public abstract class WebService {
             Object request = null;
             Unmarshaller unmarshaller = null;
             final MarshallerPool pool;
+            
             // we look for a configuration query
+            final boolean requestValidationActivated;
+            final List<Schema> schemas;
             final List<String> serviceId = getParameter("serviceId");
-            if (serviceId != null && !serviceId.isEmpty() && "admin".equals(serviceId.get(0))) {
-                pool = getConfigurationPool();
+            if (serviceId != null && !serviceId.isEmpty()){
+                requestValidationActivated = isRequestValidationActivated(serviceId.get(0));
+                schemas                    = getRequestValidationSchema(serviceId.get(0));
+                if ("admin".equals(serviceId.get(0))) {
+                    pool = getConfigurationPool();
+                } else {
+                    pool = getMarshallerPool();
+                }
             } else {
-                pool = getMarshallerPool();
+                schemas                    = null;
+                pool                       = getMarshallerPool();
+                requestValidationActivated = false;
             }
 
             try {
                 unmarshaller = pool.acquireUnmarshaller();
                 if (requestValidationActivated) {
-                    try {
-                        final SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                        final Schema schema    = sf.newSchema(new URL(mainXsdPath));
+                    for (Schema schema : schemas) {
                         unmarshaller.setSchema(schema);
-                    } catch (SAXException ex) {
-                        LOGGER.warning("SAX exception while adding the Validator to the JAXB unmarshaller");
-                    } catch (MalformedURLException ex) {
-                        LOGGER.warning("MalformedURL exception while adding the Validator to the JAXB unmarshaller");
                     }
                 }
                 request = unmarshallRequest(unmarshaller, is);
@@ -394,6 +388,10 @@ public abstract class WebService {
         }
     }
 
+    protected abstract boolean isRequestValidationActivated(final String workerID);
+    
+    protected abstract List<Schema> getRequestValidationSchema(final String workerID);
+    
     /**
      * A method simply unmarshalling the request with the specified unmarshaller from the specified inputStream.
      * can be overriden by child class in case of specific extractionfrom the stream.
@@ -643,18 +641,6 @@ public abstract class WebService {
         this.fullRequestLog = fullRequestLog;
     }
     
-    /**
-     * Enable the request validation.
-     * When a request will arrive, the service will try to validate it against the specified
-     * XSD specified in mainXsdPath.
-     *
-     * @param mainXsdPath The URL to the xsd.
-     */
-    public void activateRequestValidation(final String mainXsdPath) {
-        this.mainXsdPath                = mainXsdPath;
-        this.requestValidationActivated = true;
-    }
-
     /**
      * Return the Marshaller pool for configuration request
      * @return

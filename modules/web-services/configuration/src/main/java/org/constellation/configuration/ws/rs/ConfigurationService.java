@@ -44,6 +44,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
 
 // Constellation dependencies
 import org.constellation.configuration.ConfigDirectory;
@@ -454,6 +455,16 @@ public final class ConfigurationService extends WebService  {
             }
         }
         return super.unmarshallRequest(unmarshaller, is);
+    }
+
+    @Override
+    protected boolean isRequestValidationActivated(final String workerID) {
+        return false;
+    }
+
+    @Override
+    protected List<Schema> getRequestValidationSchema(String workerID) {
+        return new ArrayList<Schema>();
     }
 
 }

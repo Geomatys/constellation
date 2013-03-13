@@ -122,8 +122,6 @@ public class WFSService extends GridWebService<WFSWorker> {
             LOGGER.warning("The WFS REST service is not running.\ncause  : Error creating XML context.\n error  : " + ex.getMessage()  +
                            "\n details: " + ex.toString());
         }
-
-        //activateRequestValidation("http://schemas.opengis.net/wfs/1.1.0/wfs.xsd");
     }
 
     @Override

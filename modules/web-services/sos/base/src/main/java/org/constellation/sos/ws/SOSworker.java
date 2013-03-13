@@ -929,7 +929,7 @@ public class SOSworker extends AbstractWorker {
                                                "Accepted values are:\n" + arf.toString(),
                                                INVALID_PARAMETER_VALUE, "responseFormat");
             }
-        } else {
+        } else if (currentVersion.equals("1.0.0")) {
             final StringBuilder arf = new StringBuilder();
             for (String s : acceptedResponseFormat) {
                 arf.append(s).append('\n');
