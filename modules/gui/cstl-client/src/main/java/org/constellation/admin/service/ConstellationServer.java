@@ -1202,7 +1202,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         
         public boolean clearCache(final String id) {
             try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CLEAR_CACHE + "&id=" + id;
+                final String url = getURLWithEndSlash() + "csw/admin?request=" + REQUEST_CLEAR_CACHE + "&id=" + id;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
