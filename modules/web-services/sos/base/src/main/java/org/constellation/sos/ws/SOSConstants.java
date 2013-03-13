@@ -18,7 +18,6 @@
 package org.constellation.sos.ws;
 
 import java.util.ArrayList;
-import org.opengis.filter.capability.Operator;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -38,20 +37,25 @@ import org.geotoolkit.ogc.xml.v110.TemporalOperatorNameType;
 import org.geotoolkit.ogc.xml.v110.TemporalOperatorType;
 import org.geotoolkit.ogc.xml.v110.TemporalOperatorsType;
 import org.geotoolkit.sos.xml.v100.FilterCapabilities;
-import org.opengis.filter.capability.SpatialOperator;
-
-import static org.geotoolkit.gml.xml.v311.ObjectFactory.*;
+import org.geotoolkit.ogc.xml.v200.ConformanceType;
 import org.geotoolkit.ows.xml.v110.AllowedValues;
 import org.geotoolkit.ows.xml.v110.AnyValue;
 import org.geotoolkit.ows.xml.v110.DCP;
 import org.geotoolkit.ows.xml.v110.DomainType;
 import org.geotoolkit.ows.xml.v110.HTTP;
+import org.geotoolkit.ows.xml.v110.NoValues;
 import org.geotoolkit.ows.xml.v110.Operation;
 import org.geotoolkit.ows.xml.v110.OperationsMetadata;
 import org.geotoolkit.ows.xml.v110.RangeType;
 import org.geotoolkit.ows.xml.v110.RequestMethodType;
+import org.geotoolkit.ows.xml.v110.ValueType;
 import org.geotoolkit.sos.xml.v200.InsertionCapabilitiesPropertyType;
 import org.geotoolkit.sos.xml.v200.InsertionCapabilitiesType;
+
+import static org.geotoolkit.gml.xml.v311.ObjectFactory.*;
+
+import org.opengis.filter.capability.Operator;
+import org.opengis.filter.capability.SpatialOperator;
 
 /**
  *
@@ -154,7 +158,7 @@ public final class SOSConstants {
                 
         final org.geotoolkit.ogc.xml.v200.GeometryOperandsType geom = new org.geotoolkit.ogc.xml.v200.GeometryOperandsType(Arrays.asList(_Envelope_QNAME));
         final SpatialOperator[] spaOps = new SpatialOperator[1];
-        spaOps[0] = new SpatialOperatorType("BBOX", null);
+        spaOps[0] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("BBOX", null);
         final org.geotoolkit.ogc.xml.v200.SpatialOperatorsType spaOp = new org.geotoolkit.ogc.xml.v200.SpatialOperatorsType(spaOps);
         final org.geotoolkit.ogc.xml.v200.SpatialCapabilitiesType  spatial = new org.geotoolkit.ogc.xml.v200.SpatialCapabilitiesType(geom, spaOp);
         
@@ -162,10 +166,10 @@ public final class SOSConstants {
         final org.geotoolkit.ogc.xml.v200.TemporalOperandsType temp = new org.geotoolkit.ogc.xml.v200.TemporalOperandsType(Arrays.asList(_TimeInstant_QNAME, _TimePeriod_QNAME));
         temporal.setTemporalOperands(temp);
         final org.geotoolkit.ogc.xml.v200.TemporalOperatorsType tempOp = new org.geotoolkit.ogc.xml.v200.TemporalOperatorsType();
-        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType td = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("TM_DURING");
-        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType te = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("TM_EQUALS");
-        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType ta = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("TM_AFTER");
-        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType tb = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("TM_BEFORE");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType td = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("During");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType te = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("TEquals");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType ta = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("After");
+        final org.geotoolkit.ogc.xml.v200.TemporalOperatorType tb = new org.geotoolkit.ogc.xml.v200.TemporalOperatorType("Before");
         
         tempOp.getTemporalOperator().add(td);
         tempOp.getTemporalOperator().add(te);
@@ -188,8 +192,22 @@ public final class SOSConstants {
         final org.geotoolkit.ogc.xml.v200.ComparisonOperatorsType comparisons = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorsType(compaOperatorList);
         final org.geotoolkit.ogc.xml.v200.ScalarCapabilitiesType scalarCapabilities = new org.geotoolkit.ogc.xml.v200.ScalarCapabilitiesType(comparisons, true);
         
+         final List<org.geotoolkit.ows.xml.v110.DomainType> constraints = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsQuery",             new NoValues(), new ValueType("false")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsAdHocQuery",        new NoValues(), new ValueType("false")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsFunctions",         new NoValues(), new ValueType("false")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsMinStandardFilter", new NoValues(), new ValueType("false")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsStandardFilter",    new NoValues(), new ValueType("false")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsMinSpatialFilter",  new NoValues(), new ValueType("true")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsSpatialFilter",     new NoValues(), new ValueType("true")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsMinTemporalFilter", new NoValues(), new ValueType("true")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsTemporalFilter",    new NoValues(), new ValueType("true")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsVersionNav",        new NoValues(), new ValueType("false")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsSorting",           new NoValues(), new ValueType("false")));
+        constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsExtendedOperators", new NoValues(), new ValueType("false")));
+        final org.geotoolkit.ogc.xml.v200.ConformanceType conformance = new ConformanceType(constraints);
         
-        final org.geotoolkit.ogc.xml.v200.FilterCapabilities capa = new org.geotoolkit.ogc.xml.v200.FilterCapabilities(scalarCapabilities, spatial, temporal, null);
+        final org.geotoolkit.ogc.xml.v200.FilterCapabilities capa = new org.geotoolkit.ogc.xml.v200.FilterCapabilities(scalarCapabilities, spatial, temporal, conformance);
         SOS_FILTER_CAPABILITIES_V200.setFilterCapabilities(capa);
     }
     

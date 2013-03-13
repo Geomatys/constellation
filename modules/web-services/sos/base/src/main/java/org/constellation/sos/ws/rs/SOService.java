@@ -127,6 +127,12 @@ public class SOService extends OGCWebService<SOSworker> {
             }
 
             serviceDef = getVersionFromNumber(request.getVersion());
+            final String currentVersion;
+            if (request.getVersion() != null) {
+                currentVersion = request.getVersion().toString();
+            } else {
+                currentVersion = null;
+            }
 
              if (request instanceof GetObservation) {
                 final GetObservation go = (GetObservation) request;
@@ -142,7 +148,7 @@ public class SOService extends OGCWebService<SOSworker> {
                 }
                 Object marshalled;
                 if (response instanceof ObservationCollection) {
-                    marshalled = new SOSResponseWrapper(response);
+                    marshalled = new SOSResponseWrapper(response, currentVersion);
                 } else if (response instanceof String) {
                     marshalled = (String) response;
                 } else {
@@ -163,7 +169,7 @@ public class SOService extends OGCWebService<SOSworker> {
 
              if (request instanceof GetFeatureOfInterest) {
                 final GetFeatureOfInterest gf     = (GetFeatureOfInterest)request;
-                final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterest(gf));
+                final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterest(gf), currentVersion);
                 return Response.ok(response, MimeType.TEXT_XML).build();
              }
 
@@ -204,7 +210,7 @@ public class SOService extends OGCWebService<SOSworker> {
 
              if (request instanceof GetFeatureOfInterestTime) {
                 final GetFeatureOfInterestTime gft = (GetFeatureOfInterestTime)request;
-                final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterestTime(gft));
+                final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterestTime(gft), currentVersion);
                 return Response.ok(response, MimeType.TEXT_XML).build();
              }
 
