@@ -293,10 +293,11 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
 
             //static part
-            final List<String> responseFormat  = Arrays.asList(MimeType.APPLICATION_XML);
-            final List<QName> resultModel      = Arrays.asList(OBSERVATION_QNAME, MEASUREMENT_QNAME);
-            final List<String> resultModelV200 = Arrays.asList(OBSERVATION_MODEL);
+            final List<String> responseFormat         = Arrays.asList(MimeType.APPLICATION_XML);
+            final List<QName> resultModel             = Arrays.asList(OBSERVATION_QNAME, MEASUREMENT_QNAME);
+            final List<String> resultModelV200        = Arrays.asList(OBSERVATION_MODEL);
             final List<ResponseModeType> responseMode = Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
+            final List<String> procedureDescription   = Arrays.asList(SENSORML_100_FORMAT_V200, SENSORML_101_FORMAT_V200);
             return buildOffering(version, 
                                  offeringName, 
                                  offeringName, 
@@ -310,7 +311,8 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                                  responseFormat, 
                                  resultModel, 
                                  resultModelV200, 
-                                 responseMode);
+                                 responseMode,
+                                 procedureDescription);
                     
             
         } catch (MetadataIoException ex) {

@@ -374,7 +374,14 @@ public final class Utils {
             boolean first = true;
             while (tokenizer.hasMoreTokens()) {
                 final String block = tokenizer.nextToken();
-                String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
+                final int tokenEnd = block.indexOf(encoding.getTokenSeparator());
+                String samplingTimeValue;
+                if (tokenEnd != -1) {
+                    samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
+                // only one field
+                } else {
+                    samplingTimeValue = block;
+                }
                 if (first) {
                     result[0] = samplingTimeValue;
                     first = false;

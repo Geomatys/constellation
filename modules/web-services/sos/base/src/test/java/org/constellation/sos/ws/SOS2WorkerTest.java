@@ -308,7 +308,7 @@ public abstract class SOS2WorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), "outputFormat");
+            assertEquals(ex.getLocator(), "procedureDescriptionFormat");
         }
         assertTrue(exLaunched);
 
@@ -398,12 +398,12 @@ public abstract class SOS2WorkerTest {
         assertTrue(exLaunched);
 
         /**
-         *  Test 2: getObservation with missinf response format
+         *  Test 2: getObservation with missing response format => optionnal so no error
          */
         request  = new GetObservationType("2.0.0",
                                       "offering-1",
                                       null,
-                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:1"),
                                       null,
                                       nullList,
                                       null);
@@ -415,7 +415,7 @@ public abstract class SOS2WorkerTest {
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), RESPONSE_FORMAT);
         }
-        assertTrue(exLaunched);
+        assertTrue(!exLaunched);
 
         /**
          *  Test 6: getObservation with procedure urn:ogc:object:sensor:GEOM:3
@@ -1230,7 +1230,7 @@ public abstract class SOS2WorkerTest {
         assertTrue(exLaunched);
 
         /**
-         * Test 2 : no filter
+         * Test 2 : no filter => not an error in v2
          */
         exLaunched = false;
         request = new GetFeatureOfInterestType("2.0.0", "SOS", new ArrayList<String>());
@@ -1241,7 +1241,7 @@ public abstract class SOS2WorkerTest {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
         }
-        assertTrue(exLaunched);
+        assertTrue(!exLaunched);
 
         /**
          * Test 3 : malformed BBOX filter
@@ -1250,12 +1250,11 @@ public abstract class SOS2WorkerTest {
         BBOXType bbox = new BBOXType();
         request = new GetFeatureOfInterestType("2.0.0", "SOS", bbox);
 
-
         try {
             worker.getFeatureOfInterest(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
         }
         assertTrue(exLaunched);
     }

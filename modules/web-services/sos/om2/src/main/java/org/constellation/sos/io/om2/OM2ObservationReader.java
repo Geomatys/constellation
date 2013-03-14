@@ -36,6 +36,7 @@ import java.util.HashMap;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.ws.SOSConstants;
 import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.sos.ws.SOSConstants.*;
@@ -203,6 +204,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             final List<QName> resultModel             = Arrays.asList(OBSERVATION_QNAME, MEASUREMENT_QNAME);
             final List<String> resultModelV200        = Arrays.asList(OBSERVATION_MODEL);
             final List<ResponseModeType> responseMode = Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
+            final List<String> procedureDescription   = Arrays.asList(SENSORML_100_FORMAT_V200, SENSORML_101_FORMAT_V200);
             return buildOffering(version, 
                                  id, 
                                  name, 
@@ -216,7 +218,8 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                                  responseFormat, 
                                  resultModel, 
                                  resultModelV200, 
-                                 responseMode);
+                                 responseMode,
+                                 procedureDescription);
             
         } catch (SQLException e) {
             throw new CstlServiceException("Error while retrieving offering names.", e, NO_APPLICABLE_CODE);

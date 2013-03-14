@@ -2303,7 +2303,7 @@ public abstract class SOSWorkerTest {
             worker.getFeatureOfInterest(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
         }
         assertTrue(exLaunched);
     }

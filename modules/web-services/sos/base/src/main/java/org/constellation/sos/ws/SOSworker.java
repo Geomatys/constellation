@@ -651,6 +651,8 @@ public class SOSworker extends AbstractWorker {
         Sections sections = request.getSections();
         if (sections == null) {
             sections = OWSXmlFactory.buildSections("1.1.0", Arrays.asList("All"));
+        } else if (!request.isValidSections()){
+            throw new CstlServiceException("Invalid sections values", INVALID_PARAMETER_VALUE, "section");
         }
         
         // If the getCapabilities response is in cache, we just return it.
@@ -824,7 +826,7 @@ public class SOSworker extends AbstractWorker {
 
         //we verify that the output format is good.
         final String out = request.getOutputFormat();
-        if (out != null) {
+        if (out != null && !out.isEmpty()) {
             if (!StringUtilities.containsIgnoreCase(ACCEPTED_SENSORML_FORMATS.get(currentVersion), request.getOutputFormat())) {
                 final StringBuilder msg = new StringBuilder("Accepted values for outputFormat:");
                 for (String s : ACCEPTED_SENSORML_FORMATS.get(currentVersion)) {
@@ -837,14 +839,19 @@ public class SOSworker extends AbstractWorker {
             for (String s : ACCEPTED_SENSORML_FORMATS.get(currentVersion)) {
                 msg.append('\n').append(s);
             }
-            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, "outputFormat");
+            final String locator;
+            if (currentVersion.equals("2.0.0")) {
+                locator = "procedureDescriptionFormat";
+            } else {
+                locator = "outputFormat";
+            }
+            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, locator);
         }
 
         // we verify that we have a sensor ID.
         final String sensorId = request.getProcedure();
-        if (sensorId == null) {
-            throw new CstlServiceException("You must specify the sensor ID!",
-                                         MISSING_PARAMETER_VALUE, PROCEDURE);
+        if (sensorId == null || sensorId.isEmpty()) {
+            throw new CstlServiceException("You must specify the sensor ID!", MISSING_PARAMETER_VALUE, PROCEDURE);
         }
 
         AbstractSensorML result = smlReader.getSensor(sensorId);
@@ -891,6 +898,15 @@ public class SOSworker extends AbstractWorker {
      
         final List<Observation> observation = new ArrayList<Observation>();
         for (String oid : request.getObservation()) {
+            if (oid.isEmpty()) {
+                final String locator;
+                if (currentVersion.equals("2.0.0")) {
+                    locator = "observation";
+                } else {
+                    locator = "observationId";
+                }
+                throw new CstlServiceException("Empty observation id", MISSING_PARAMETER_VALUE, locator);
+            }
             observation.add(omReader.getObservation(oid, OBSERVATION_QNAME, INLINE, currentVersion));
         }
         final ObservationCollection response = buildGetObservationByIdResponse(currentVersion, "collection-1", null, observation);
@@ -919,7 +935,7 @@ public class SOSworker extends AbstractWorker {
 
         //we verify that the output format is good.
         final String responseFormat = requestObservation.getResponseFormat();
-        if (responseFormat != null) {
+        if (responseFormat != null && !responseFormat.isEmpty()) {
             if (!acceptedResponseFormat.contains(responseFormat)) {
                 final StringBuilder arf = new StringBuilder();
                 for (String s : acceptedResponseFormat) {
@@ -929,7 +945,7 @@ public class SOSworker extends AbstractWorker {
                                                "Accepted values are:\n" + arf.toString(),
                                                INVALID_PARAMETER_VALUE, "responseFormat");
             }
-        } else if (currentVersion.equals("1.0.0")) {
+        } else if (currentVersion.equals("1.0.0") || (responseFormat != null && responseFormat.isEmpty())) {
             final StringBuilder arf = new StringBuilder();
             for (String s : acceptedResponseFormat) {
                 arf.append(s).append('\n');
@@ -994,6 +1010,10 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("Offering must be specify!", MISSING_PARAMETER_VALUE, OFFERING);
         } else {
             for (String offeringName : offeringNames) {
+                // CITE
+                if (offeringName.isEmpty()) {
+                    throw new CstlServiceException("This offering name is empty", MISSING_PARAMETER_VALUE, OFFERING);
+                }
                 final ObservationOffering offering = omReader.getObservationOffering(offeringName, currentVersion);
                 if (offering == null) {
                     throw new CstlServiceException("This offering is not registered in the service", INVALID_PARAMETER_VALUE, OFFERING);
@@ -1080,7 +1100,7 @@ public class SOSworker extends AbstractWorker {
             if (!phenomenons.isEmpty()) {
                 localOmFilter.setObservedProperties(phenomenons);
             }
-        } else {
+        } else if (currentVersion.equals("1.0.0")){
             throw new CstlServiceException("You must specify at least One phenomenon", MISSING_PARAMETER_VALUE, "observedProperty");
         }
 
@@ -1488,8 +1508,8 @@ public class SOSworker extends AbstractWorker {
         final long start = System.currentTimeMillis();
         final String currentVersion = request.getVersion().toString();
         
-        // if there is no filter we throw an exception
-        if (request.getTemporalFilters().isEmpty() && request.getFeatureOfInterestId().isEmpty() && request.getSpatialFilters().isEmpty()) {
+        // if there is no filter we throw an exception v 1.0.0
+        if (currentVersion.equals("1.0.0") && request.getTemporalFilters().isEmpty() && request.getFeatureOfInterestId().isEmpty() && request.getSpatialFilters().isEmpty()) {
             throw new CstlServiceException("You must choose a filter parameter: eventTime, featureId or location", MISSING_PARAMETER_VALUE);
         }
 
@@ -1498,13 +1518,48 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
         }
 
-        AbstractFeature result = null;
+        if (request.getObservedProperty() != null && !request.getObservedProperty().isEmpty()) {
+            for (String observedProperty : request.getObservedProperty()) {
+                // CITE
+                if (observedProperty.isEmpty()) {
+                    throw new CstlServiceException("The observedProperty name is empty", MISSING_PARAMETER_VALUE, "observedProperty");
+                } else if (!omReader.existPhenomenon(observedProperty)){
+                    throw new CstlServiceException("This observedProperty is not registered", INVALID_PARAMETER_VALUE, "observedProperty");
+                }
+                // TODO
+                throw new CstlServiceException("The observedProperty parameter is not yet supported in this request");
+            }
+        }
+        
+        if (request.getProcedure() != null && !request.getProcedure().isEmpty()) {
+            for (String procedure : request.getProcedure()) {
+                // CITE
+                if (procedure.isEmpty()) {
+                    throw new CstlServiceException("The procedure name is empty", MISSING_PARAMETER_VALUE, PROCEDURE);
+                } else if (!omReader.existProcedure(procedure)){
+                    throw new CstlServiceException("This procedure is not registered", INVALID_PARAMETER_VALUE, PROCEDURE);
+                }
+                // TODO
+                throw new CstlServiceException("The procedure parameter is not yet supported in this request");
+            }
+        }
 
+        AbstractFeature result = null;
         // we return a single result
+        final String locatorFID;
+        if (currentVersion.equals("2.0.0")) {
+            locatorFID = "featureOfInterest";
+        } else {
+            locatorFID = "featureOfInterestId";
+        }
         if (request.getFeatureOfInterestId().size() == 1) {
+            // CITE
+            if (request.getFeatureOfInterestId().get(0).isEmpty()) {
+                throw new CstlServiceException("The foi name is empty", MISSING_PARAMETER_VALUE, locatorFID);
+            }
             final SamplingFeature singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0), currentVersion);
             if (singleResult == null) {
-                throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
+                throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE, locatorFID);
             } else {
                 if (!alwaysFeatureCollection) {
                     return (AbstractFeature) singleResult;
@@ -1523,7 +1578,7 @@ public class SOSworker extends AbstractWorker {
             for (String featureID : request.getFeatureOfInterestId()) {
                 final SamplingFeature feature = omReader.getFeatureOfInterest(featureID, currentVersion);
                 if (feature == null) {
-                    throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
+                    throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE, locatorFID);
                 } else {
                     features.add(buildFeatureProperty(currentVersion, feature));
                 }
@@ -1536,7 +1591,19 @@ public class SOSworker extends AbstractWorker {
         if (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty()) {
             final Filter spatialFilter = request.getSpatialFilters().get(0); // TODO handle multiple filters (SOS 2.0.0)
             if (spatialFilter instanceof BBOX) {
-                final List<SamplingFeature> results = spatialFiltering((BBOX) spatialFilter, currentVersion);
+                final BBOX bboxFilter = (BBOX) spatialFilter;
+                // CITE
+                if (bboxFilter.getPropertyName() == null || bboxFilter.getPropertyName().isEmpty()) {
+                    final String locator;
+                    if (currentVersion.equals("2.0.0")) {
+                        locator = "ValueReference";
+                    } else {
+                        locator = "propertyName";
+                    }
+                    throw new CstlServiceException("The spatial filter property name is empty", MISSING_PARAMETER_VALUE, locator);
+                } 
+                
+                final List<SamplingFeature> results = spatialFiltering(bboxFilter, currentVersion);
 
                 // we return a single result
                 if (results.size() == 1) {
@@ -1554,7 +1621,8 @@ public class SOSworker extends AbstractWorker {
 
                 // if there is no response we send an error
                 } else {
-                    throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
+                    //throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
+                    result = buildFeatureCollection(currentVersion, "feature-collection-empty", null, null, null);
                 }
             } else {
                 throw new CstlServiceException("Only the filter BBOX is upported for now", OPERATION_NOT_SUPPORTED);
@@ -1625,7 +1693,7 @@ public class SOSworker extends AbstractWorker {
         final String currentVersion = request.getVersion().toString();
         
         final String templateID = request.getTemplate();
-        if (templateID == null) {
+        if (templateID == null || templateID.isEmpty()) {
             throw new CstlServiceException("template ID missing.", MISSING_PARAMETER_VALUE, "template");
         }
         final ResultTemplate template = resultTemplates.get(templateID);
@@ -1635,6 +1703,9 @@ public class SOSworker extends AbstractWorker {
         final AbstractObservation obs   = (AbstractObservation) template.getObservationTemplate();
         final AbstractEncoding encoding = template.getResultEncoding();
         final String values             = request.getResultValues();
+        if (values == null || values.isEmpty()) {
+            throw new CstlServiceException("ResultValues is empty", MISSING_PARAMETER_VALUE, "resultValues");
+        }
         int count = 0;
         if (encoding instanceof TextBlock) {
             final String separator = ((TextBlock)encoding).getBlockSeparator();
@@ -2129,7 +2200,7 @@ public class SOSworker extends AbstractWorker {
             } else {
                 throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, SERVICE_PARAMETER_LC);
             }
-            if (request.getVersion()!= null) {
+            if (request.getVersion()!= null && !request.getVersion().toString().isEmpty()) {
                 
                 if (request.getVersion().toString().equals("1.0.0") && isSupportedVersion("1.0.0")) {
                     request.setVersion("1.0.0");
@@ -2305,7 +2376,8 @@ public class SOSworker extends AbstractWorker {
                                             offeringOutputFormat,
                                             resultModel,
                                             resultModelV200,
-                                            responses));
+                                            responses,
+                                            ACCEPTED_SENSORML_FORMATS.get(version)));
     }
 
     /**
