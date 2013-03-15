@@ -297,9 +297,8 @@ public abstract class AbstractWorker implements Worker {
             } else {
                 f = null;
             }
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = getMarshallerPool().acquireUnmarshaller();
+                final Unmarshaller unmarshaller = getMarshallerPool().acquireUnmarshaller();
                 // If the file is not present in the configuration directory, take the one in resource.
                 if (f == null || !f.exists()) {
                     final InputStream in = getClass().getResourceAsStream(fileName);
@@ -312,7 +311,8 @@ public abstract class AbstractWorker implements Worker {
                 } else {
                     response = unmarshaller.unmarshal(f);
                 }
-
+                getMarshallerPool().release(unmarshaller);
+                
                 if (response instanceof JAXBElement) {
                     response = ((JAXBElement)response).getValue();
                 }
@@ -322,10 +322,6 @@ public abstract class AbstractWorker implements Worker {
                 throw new CstlServiceException("Unable to close the skeleton capabilities input stream.", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
                 throw new CstlServiceException("JAXB exception while unmarshaling static capabilities file", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
-            } finally {
-                if (unmarshaller != null) {
-                    getMarshallerPool().release(unmarshaller);
-                }
             }
         }
         return response;
@@ -409,9 +405,10 @@ public abstract class AbstractWorker implements Worker {
             if (value != null) {
                 final List<String> schemaPaths = StringUtilities.toStringList(value);
                 LOGGER.info("Reading schemas. This may take some times ...");
+                final SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 for (String schemaPath : schemaPaths) {
+                    LOGGER.log(Level.INFO, "Reading {0}", schemaPath);
                     try {
-                        final SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
                         schemas.add(sf.newSchema(new URL(schemaPath)));
                     } catch (SAXException ex) {
                         LOGGER.warning("SAX exception while adding the Validator to the JAXB unmarshaller");

@@ -536,19 +536,16 @@ public class WPSUtils {
         final MarshallerPool marshallerPool = WPSMarshallerPool.getInstance();
         boolean success = false;
 
-        Marshaller marshaller = null;
         try {
 
             final File outputFile = new File(folderPath, fileName);
-            marshaller = marshallerPool.acquireMarshaller();
+            final Marshaller marshaller = marshallerPool.acquireMarshaller();
             marshaller.marshal(obj, outputFile);
-
+            marshallerPool.release(marshaller);
             success = outputFile.exists();
 
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Error during unmarshalling", ex);
-        } finally {
-            marshallerPool.release(marshaller);
         }
         return success;
     }

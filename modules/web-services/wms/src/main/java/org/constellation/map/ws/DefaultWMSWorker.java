@@ -215,16 +215,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final File portrayalFile = new File(configurationDirectory, "WMSPortrayal.xml");
         if (portrayalFile.exists()) {
             final MarshallerPool marshallerPool = GenericDatabaseMarshallerPool.getInstance();
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 mapPortrayal = (WMSPortrayal) unmarshaller.unmarshal(portrayalFile);
+                marshallerPool.release(unmarshaller);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
-            } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
-                }
             }
         }
 

@@ -63,9 +63,8 @@ public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWrit
 
     @Override
     public void writeTo(final T t, Class<?> type, final Type type1, Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
-        Marshaller m = null;
         try {
-            m = SOSMarshallerPool.getInstance().acquireMarshaller();
+            Marshaller m = SOSMarshallerPool.getInstance().acquireMarshaller();
             if ("2.0.0".equals(t.getSpecificationVersion())) {
                 m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, SCHEMA_LOCATION_V200);
             } else {
@@ -76,12 +75,9 @@ public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWrit
             } else {
                 m.marshal(t, out);
             }
+             SOSMarshallerPool.getInstance().release(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the SOSResponse File", ex);
-        } finally {
-            if (m != null) {
-                SOSMarshallerPool.getInstance().release(m);
-            }
         }
     }
 

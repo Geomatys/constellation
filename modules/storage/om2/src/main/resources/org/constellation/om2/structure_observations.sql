@@ -10,9 +10,9 @@ CREATE TABLE "om"."observations" (
     "id"                integer NOT NULL,
     "time_begin"        timestamp,
     "time_end"          timestamp,
-    "observed_property" character varying(100),
-    "procedure"         character varying(100),
-    "foi"               character varying(100)
+    "observed_property" character varying(200),
+    "procedure"         character varying(200),
+    "foi"               character varying(200)
 );
 
 CREATE TABLE "om"."mesures" (
@@ -21,44 +21,44 @@ CREATE TABLE "om"."mesures" (
     "time"              timestamp,
     "value"             character varying(100),
     "uom"               character varying(20),
-    "field_type"        character varying(20),
+    "field_type"        character varying(30),
     "field_name"        character varying(30),
-    "field_definition"  character varying(100)
+    "field_definition"  character varying(200)
 );
 
 CREATE TABLE "om"."offerings" (
     "identifier"       character varying(100) NOT NULL,
-    "description"      character varying(100),
-    "name"             character varying(100),
+    "description"      character varying(200),
+    "name"             character varying(200),
     "time_begin"       timestamp,
     "time_end"         timestamp,
-    "procedure"        character varying(100)
+    "procedure"        character varying(200)
 );
 
 CREATE TABLE "om"."offering_observed_properties" (
     "id_offering" character varying(100) NOT NULL,
-    "phenomenon"  character varying(100) NOT NULL
+    "phenomenon"  character varying(200) NOT NULL
 );
 
 CREATE TABLE "om"."offering_foi" (
     "id_offering" character varying(100) NOT NULL,
-    "foi"         character varying(100) NOT NULL
+    "foi"         character varying(200) NOT NULL
 );
 
 CREATE TABLE "om"."observed_properties" (
-    "id" character varying(100) NOT NULL
+    "id" character varying(200) NOT NULL
 );
 
 CREATE TABLE "om"."procedures" (
-    "id"     character varying(100) NOT NULL,
+    "id"     character varying(200) NOT NULL,
     "shape"  varchar (200) for bit data
 );
 
 CREATE TABLE "om"."sampling_features" (
-    "id"               character varying(100) NOT NULL,
-    "name"             character varying(100),
-    "description"      character varying(100),
-    "sampledfeature"   character varying(100),
+    "id"               character varying(200) NOT NULL,
+    "name"             character varying(200),
+    "description"      character varying(200),
+    "sampledfeature"   character varying(200),
     "shape"            varchar (200) for bit data,
     "crs"              integer
 );
@@ -67,8 +67,8 @@ CREATE TABLE "om"."sampling_features" (
 -- USED ONLY FOR V100 SOS --
 
 CREATE TABLE "om"."components" (
-    "phenomenon" character varying(100) NOT NULL,
-    "component"  character varying(100) NOT NULL
+    "phenomenon" character varying(200) NOT NULL,
+    "component"  character varying(200) NOT NULL
 );
 
 ALTER TABLE "version" ADD CONSTRAINT version_pk PRIMARY KEY ("number");

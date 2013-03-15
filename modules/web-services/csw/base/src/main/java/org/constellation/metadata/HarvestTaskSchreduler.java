@@ -93,13 +93,13 @@ public class HarvestTaskSchreduler {
      * @param configDirectory The configuration directory containing the file "HarvestTask.xml"
      */
     private void initializeHarvestTask() {
-        Unmarshaller unmarshaller = null;
         try {
             // we get the saved harvest task file
             final File f = new File(configDir, HARVEST_TASK_FILE_NAME);
             if (f.exists()) {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 final Object obj = unmarshaller.unmarshal(f);
+                marshallerPool.release(unmarshaller);
                 final Timer t = new Timer();
                 if (obj instanceof HarvestTasks) {
                     final HarvestTasks tasks = (HarvestTasks) obj;
@@ -129,10 +129,6 @@ public class HarvestTaskSchreduler {
         } catch (JAXBException e) {
             LOGGER.info("JAXB Exception while unmarshalling the file HarvestTask.xml");
 
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
-            }
         }
     }
 
@@ -152,13 +148,12 @@ public class HarvestTaskSchreduler {
     private void saveSchreduledHarvestTask(final String sourceURL, final String resourceType, final int mode, final List<String> emails, final long period, final long lastHarvest) {
         final HarvestTask newTask = new HarvestTask(sourceURL, resourceType, mode, emails, period, lastHarvest);
         final File f              = new File(configDir, HARVEST_TASK_FILE_NAME);
-        Marshaller marshaller     = null;
-        Unmarshaller unmarshaller = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            final Marshaller marshaller = marshallerPool.acquireMarshaller();
             if (f.exists()) {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 final Object obj   = unmarshaller.unmarshal(f);
+                marshallerPool.release(unmarshaller);
                 if (obj instanceof HarvestTasks) {
                     final HarvestTasks tasks = (HarvestTasks) obj;
                     tasks.addTask(newTask);
@@ -176,19 +171,13 @@ public class HarvestTaskSchreduler {
                     marshaller.marshal(tasks, f);
                 }
             }
+             marshallerPool.release(marshaller);
 
         } catch (IOException ex) {
             LOGGER.severe("unable to create a file for schreduled harvest task");
         } catch (JAXBException ex) {
             LOGGER.severe("A JAXB exception occurs when trying to marshall the shreduled harvest task");
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
-            }
-            if (marshaller != null) {
-                marshallerPool.release(marshaller);
-            }
         }
     }
 
@@ -201,13 +190,12 @@ public class HarvestTaskSchreduler {
      */
      private void updateSchreduledHarvestTask(final String sourceURL, final long lastHarvest) {
         final File f              = new File(configDir, HARVEST_TASK_FILE_NAME);
-        Marshaller marshaller     = null;
-        Unmarshaller unmarshaller = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            final Marshaller marshaller = marshallerPool.acquireMarshaller();
             if (f.exists()) {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 final Object obj   = unmarshaller.unmarshal(f);
+                marshallerPool.release(unmarshaller);
                 if (obj instanceof HarvestTasks) {
                     final HarvestTasks tasks = (HarvestTasks) obj;
                     final HarvestTask task   = tasks.getTaskFromSource(sourceURL);
@@ -221,17 +209,11 @@ public class HarvestTaskSchreduler {
             } else {
                 LOGGER.severe("There is no Harvest task file to update");
             }
+            marshallerPool.release(marshaller);
 
         } catch (JAXBException ex) {
             LOGGER.severe("A JAXB exception occurs when trying to marshall the shreduled harvest task (update)");
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
-            }
-            if (marshaller != null) {
-                marshallerPool.release(marshaller);
-            }
         }
     }
 

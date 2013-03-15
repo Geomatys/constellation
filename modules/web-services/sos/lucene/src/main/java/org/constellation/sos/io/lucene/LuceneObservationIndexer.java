@@ -113,9 +113,8 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
         final long time = System.currentTimeMillis();
         int nbObservation = 0;
         int nbTemplate    = 0;
-        Unmarshaller unmarshaller = null;
         try {
-            unmarshaller = SOSMarshallerPool.getInstance().acquireUnmarshaller();
+            final Unmarshaller unmarshaller = SOSMarshallerPool.getInstance().acquireUnmarshaller();
             final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_36, analyzer);
             final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
 
@@ -145,6 +144,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
                      LOGGER.info("The template observation file " + observationFile.getName() + " does not contains an observation:" + observation);
                 }
             }
+            SOSMarshallerPool.getInstance().release(unmarshaller);
             template = false;
             // writer.optimize(); no longer justified
             writer.close();
@@ -165,12 +165,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
             }
             LOGGER.log(Level.SEVERE, "JAXB Exception while indexing: {0}", msg);
             throw new IndexingException("JAXBException while indexing documents.", ex);
-        } finally {
-            if (unmarshaller != null) {
-                SOSMarshallerPool.getInstance().release(unmarshaller);
-            }
         }
-
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\nObservations indexed: "
                 + nbObservation + ". Template indexed:" + nbTemplate + ".");
     }

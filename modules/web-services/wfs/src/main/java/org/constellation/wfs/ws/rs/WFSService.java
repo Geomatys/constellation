@@ -892,12 +892,8 @@ public class WFSService extends GridWebService<WFSWorker> {
      * overriden for extract namespace mapping.
      */
     @Override
-    protected Object getComplexParameter(final String parameterName, final boolean mandatory)
-                                                                  throws CstlServiceException
-    {
-        Unmarshaller unmarshaller = null;
+    protected Object getComplexParameter(final String parameterName, final boolean mandatory) throws CstlServiceException {
         try {
-            unmarshaller = getMarshallerPool().acquireUnmarshaller();
             final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
             List<String> list = parameters.get(parameterName);
             if (list == null) {
@@ -921,26 +917,10 @@ public class WFSService extends GridWebService<WFSWorker> {
             final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
             final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(sr);
             final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
-                    new Class[]{XMLEventReader.class}, new InvocationHandler() {
-
-                @Override
-                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    Object returnVal = method.invoke(rootEventReader, args);
-                    if (method.getName().equals("nextEvent")) {
-                        XMLEvent evt = (XMLEvent) returnVal;
-                        if (evt.isStartElement()) {
-                            StartElement startElem = evt.asStartElement();
-                            Iterator<Namespace> t = startElem.getNamespaces();
-                            while (t.hasNext()) {
-                                Namespace n = t.next();
-                                prefixMapping.put(n.getPrefix(), n.getNamespaceURI());
-                            }
-                        }
-                    }
-                    return returnVal;
-                }
-            });
+                    new Class[]{XMLEventReader.class}, new PrefixMappingInvocationHandler(rootEventReader, prefixMapping));
+            final Unmarshaller unmarshaller = getMarshallerPool().acquireUnmarshaller();
             Object result = unmarshaller.unmarshal(eventReader);
+            getMarshallerPool().release(unmarshaller);
             if (result instanceof JAXBElement) {
                 result = ((JAXBElement)result).getValue();
             }
@@ -954,10 +934,6 @@ public class WFSService extends GridWebService<WFSWorker> {
         } catch (XMLStreamException ex) {
              throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
                             ex, INVALID_PARAMETER_VALUE);
-        } finally {
-            if (unmarshaller != null) {
-                getMarshallerPool().release(unmarshaller);
-            }
         }
     }
 

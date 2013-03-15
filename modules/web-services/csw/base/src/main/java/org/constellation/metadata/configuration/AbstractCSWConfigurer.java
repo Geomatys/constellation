@@ -595,12 +595,12 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         } else {
             throw new CstlServiceException("Unexpected file extension, accepting zip or xml");
         }
-        Unmarshaller u = null;
         try {
-            u = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
+            final Unmarshaller u = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
             for (File importedFile: files) {
                 if (importedFile != null) {
                     Object unmarshalled = u.unmarshal(importedFile);
+                    EBRIMMarshallerPool.getInstance().release(u);
                     if (unmarshalled instanceof JAXBElement) {
                         unmarshalled = ((JAXBElement)unmarshalled).getValue();
                     }
@@ -615,10 +615,6 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             LOGGER.log(Level.WARNING, "Exception while unmarshalling imported file", ex);
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
-        } finally {
-            if (u != null) {
-                EBRIMMarshallerPool.getInstance().release(u);
-            }
         }
         return new AcknowlegementType("Error", "An error occurs during the process");
     }

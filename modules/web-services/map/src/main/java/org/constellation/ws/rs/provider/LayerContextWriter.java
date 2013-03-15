@@ -58,17 +58,13 @@ public final class LayerContextWriter implements MessageBodyWriter {
     @Override
     public void writeTo(Object r, Class type, Type type1, Annotation[] antns, MediaType mt,
             MultivaluedMap mm, OutputStream out) throws IOException, WebApplicationException {
-        Marshaller m = null;
         try {
-            m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+            final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(r, out);
+            GenericDatabaseMarshallerPool.getInstance().release(m);
 
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the layerContext", ex);
-        } finally {
-            if (m != null) {
-                GenericDatabaseMarshallerPool.getInstance().release(m);
-            }
         }
     }
 }

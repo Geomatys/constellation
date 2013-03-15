@@ -163,7 +163,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                         final Timestamp e  = rs.getTimestamp(5);
                         procedure          = rs.getString(6);
                         if (b != null && e == null) {
-                            time = buildTimeInstant(version, b);
+                            time = buildTimePeriod(version, b, null);
                         } else if (b != null && e != null) {
                             time = buildTimePeriod(version, b, e);
                         } else {

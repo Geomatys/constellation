@@ -74,10 +74,10 @@ public abstract class LayerWorker extends AbstractWorker {
         if (configurationDirectory != null) {
             final File lcFile = new File(configurationDirectory, "layerContext.xml");
             if (lcFile.exists()) {
-                Unmarshaller unmarshaller = null;
                 try {
-                    unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    Object obj   = unmarshaller.unmarshal(lcFile);
+                    final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    final Object obj   = unmarshaller.unmarshal(lcFile);
+                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
                     if (obj instanceof LayerContext) {
                         candidate = (LayerContext) obj;
                         final String sec = candidate.getSecurity();
@@ -119,10 +119,6 @@ public abstract class LayerWorker extends AbstractWorker {
                     startError = ex.getMessage();
                     isStarted  = false;
                     LOGGER.log(Level.WARNING, startError, ex);
-                } finally {
-                    if (unmarshaller != null) {
-                        GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                    }
                 }
             } else {
                 startError = "The configuration file layerContext.xml has not been found";

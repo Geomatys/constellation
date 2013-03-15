@@ -328,7 +328,6 @@ public abstract class WebService {
     public Response doPOSTXml(final InputStream is) {
         if (marshallerPool != null) {
             final Object request;
-            Unmarshaller unmarshaller = null;
             final MarshallerPool pool;
             
             // we look for a configuration query
@@ -351,7 +350,7 @@ public abstract class WebService {
 
             final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
             try {
-                unmarshaller = pool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
                 if (requestValidationActivated) {
                     for (Schema schema : schemas) {
                         unmarshaller.setSchema(schema);
@@ -360,6 +359,7 @@ public abstract class WebService {
                 } else {
                     request = unmarshallRequest(unmarshaller, is);
                 }
+                pool.release(unmarshaller);
             } catch (JAXBException e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg == null) {
@@ -381,10 +381,6 @@ public abstract class WebService {
             } catch (CstlServiceException e) {
 
                 return launchException(e.getMessage(), e.getExceptionCode().identifier(), e.getLocator());
-            } finally {
-                if (unmarshaller != null)  {
-                    pool.release(unmarshaller);
-                }
             }
 
             if (request instanceof Versioned) {
@@ -600,17 +596,14 @@ public abstract class WebService {
     }
     
     protected void logPostParameters(final Object request) throws CstlServiceException {
-        final MarshallerPool pool = getMarshallerPool();
-        Marshaller m = null;
-        try {
-            m = pool.acquireMarshaller();
-            m.marshal(request, System.out);
-            
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "Error while marshalling the request", ex);
-        } finally {
-            if (m != null) {
+        if (request != null) {
+            final MarshallerPool pool = getMarshallerPool();
+            try {
+                final Marshaller m = pool.acquireMarshaller();
+                m.marshal(request, System.out);
                 pool.release(m);
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, "Error while marshalling the request", ex);
             }
         }
     }
@@ -626,12 +619,9 @@ public abstract class WebService {
      * @return the parameter or null if not specified
      * @throw CstlServiceException
      */
-    protected Object getComplexParameter(final String parameterName, final boolean mandatory)
-                                                                  throws CstlServiceException
-    {
-        Unmarshaller unmarshaller = null;
+    protected Object getComplexParameter(final String parameterName, final boolean mandatory) throws CstlServiceException {
         try {
-            unmarshaller = marshallerPool.acquireUnmarshaller();
+            final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
             List<String> list = parameters.get(parameterName);
             if (list == null) {
@@ -647,6 +637,7 @@ public abstract class WebService {
             }
             final StringReader sr = new StringReader(list.get(0));
             Object result = unmarshaller.unmarshal(sr);
+            marshallerPool.release(unmarshaller);
             if (result instanceof JAXBElement) {
                 result = ((JAXBElement)result).getValue();
             }
@@ -654,10 +645,6 @@ public abstract class WebService {
         } catch (JAXBException ex) {
              throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
                             ex, INVALID_PARAMETER_VALUE);
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
-            }
         }
     }
 

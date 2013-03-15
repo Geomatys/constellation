@@ -51,16 +51,6 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        final String url = "jdbc:derby:memory:Test2;create=true";
-        ds = new DefaultDataSource(url);
-
-        Connection con = ds.getConnection();
-
-        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-        sr.setEncoding("UTF-8");
-        sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
-
 
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
@@ -72,6 +62,18 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
 
         if (!configDir.exists()) {
             configDir.mkdir();
+            
+            final File dbDirectory = new File(configDir, "PGDBSOS");
+            final String url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/') + ";create=true";
+            //final String url = "jdbc:derby:memory:Test2;create=true";
+            ds = new DefaultDataSource(url);
+
+            Connection con = ds.getConnection();
+
+            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+            sr.setEncoding("UTF-8");
+            sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
 
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");

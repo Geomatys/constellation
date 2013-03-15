@@ -372,7 +372,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
      * @throws MD_IOException
      */
     public static List<Value> getValuesFromPathID(String fullPathID, final FullRecord record) throws MD_IOException {
-        String pathID            = null;
+        String pathID;
         String conditionalPathID = null;
         String conditionalValue  = null;
         int ordinal              = -1;

@@ -67,45 +67,45 @@ INSERT INTO "om"."observations"  VALUES (507, '2007-05-01 12:59:00.0', '2007-05-
 INSERT INTO "om"."observations"  VALUES (801, '2007-05-01 12:59:00.0', '2007-05-01 16:59:00.0', 'urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon', 'urn:ogc:object:sensor:GEOM:8', 'station-006');
 INSERT INTO "om"."observations"  VALUES (802,  NULL,                   NULL,                    'urn:ogc:def:phenomenon:GEOM:temperature',         'urn:ogc:object:sensor:GEOM:7', 'station-002');
 
-INSERT INTO "om"."mesures" VALUES (406, 1, '2007-05-01 12:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (406, 2, '2007-05-01 13:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (406, 3, '2007-05-01 14:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (406, 4, '2007-05-01 15:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (406, 5, '2007-05-01 16:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (406, 1, '2007-05-01 12:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (406, 2, '2007-05-01 13:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (406, 3, '2007-05-01 14:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (406, 4, '2007-05-01 15:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (406, 5, '2007-05-01 16:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
 
-INSERT INTO "om"."mesures" VALUES (304, 1, '2007-05-01 02:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (304, 2, '2007-05-01 03:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (304, 3, '2007-05-01 04:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (304, 4, '2007-05-01 05:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (304, 5, '2007-05-01 06:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (304, 1, '2007-05-01 02:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (304, 2, '2007-05-01 03:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (304, 3, '2007-05-01 04:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (304, 4, '2007-05-01 05:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (304, 5, '2007-05-01 06:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
 
-INSERT INTO "om"."mesures" VALUES (305, 1, '2007-05-01 07:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (305, 2, '2007-05-01 08:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (305, 3, '2007-05-01 09:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (305, 4, '2007-05-01 10:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (305, 5, '2007-05-01 11:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (305, 1, '2007-05-01 07:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (305, 2, '2007-05-01 08:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (305, 3, '2007-05-01 09:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (305, 4, '2007-05-01 10:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (305, 5, '2007-05-01 11:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
 
-INSERT INTO "om"."mesures" VALUES (307, 1, '2007-05-01 17:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (307, 2, '2007-05-01 18:59:00','6.55', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (307, 3, '2007-05-01 19:59:00','6.55', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (307, 4, '2007-05-01 20:59:00','6.55', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (307, 5, '2007-05-01 21:59:00','6.55', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (307, 1, '2007-05-01 17:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (307, 2, '2007-05-01 18:59:00','6.55', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (307, 3, '2007-05-01 19:59:00','6.55', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (307, 4, '2007-05-01 20:59:00','6.55', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (307, 5, '2007-05-01 21:59:00','6.55', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
 
-INSERT INTO "om"."mesures" VALUES (507, 1, '2007-05-01 12:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (507, 2, '2007-05-01 13:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (507, 3, '2007-05-01 14:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (507, 4, '2007-05-01 15:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (507, 5, '2007-05-01 16:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:x-ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (507, 1, '2007-05-01 12:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (507, 2, '2007-05-01 13:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (507, 3, '2007-05-01 14:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (507, 4, '2007-05-01 15:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (507, 5, '2007-05-01 16:59:00','6.56', 'm', 'Quantity', 'depth', 'urn:ogc:def:phenomenon:GEOM:depth');
 
-INSERT INTO "om"."mesures" VALUES (801, 1,  '2007-05-01 12:59:00','6.56', 'm',  'Quantity', 'depth',       'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (801, 2,  '2007-05-01 12:59:00','12.0', '°C', 'Quantity', 'temperature', 'urn:x-ogc:def:phenomenon:GEOM:temperature');
-INSERT INTO "om"."mesures" VALUES (801, 3,  '2007-05-01 13:59:00','6.56', 'm',  'Quantity', 'depth',       'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (801, 4,  '2007-05-01 13:59:00','13.0', '°C', 'Quantity', 'temperature', 'urn:x-ogc:def:phenomenon:GEOM:temperature');
-INSERT INTO "om"."mesures" VALUES (801, 5,  '2007-05-01 14:59:00','6.56', 'm',  'Quantity', 'depth',       'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (801, 6,  '2007-05-01 14:59:00','14.0', '°C', 'Quantity', 'temperature', 'urn:x-ogc:def:phenomenon:GEOM:temperature');
-INSERT INTO "om"."mesures" VALUES (801, 7,  '2007-05-01 15:59:00','6.56', 'm',  'Quantity', 'depth',       'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (801, 8,  '2007-05-01 15:59:00','15.0', '°C', 'Quantity', 'temperature', 'urn:x-ogc:def:phenomenon:GEOM:temperature');
-INSERT INTO "om"."mesures" VALUES (801, 9,  '2007-05-01 16:59:00','6.56', 'm',  'Quantity', 'depth',       'urn:x-ogc:def:phenomenon:GEOM:depth');
-INSERT INTO "om"."mesures" VALUES (801, 10, '2007-05-01 16:59:00','16.0', '°C', 'Quantity', 'temperature', 'urn:x-ogc:def:phenomenon:GEOM:temperature');
+INSERT INTO "om"."mesures" VALUES (801, 1,  '2007-05-01 12:59:00','6.56', 'm',  'Quantity', 'depth',       'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (801, 2,  '2007-05-01 12:59:00','12.0', '°C', 'Quantity', 'temperature', 'urn:ogc:def:phenomenon:GEOM:temperature');
+INSERT INTO "om"."mesures" VALUES (801, 3,  '2007-05-01 13:59:00','6.56', 'm',  'Quantity', 'depth',       'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (801, 4,  '2007-05-01 13:59:00','13.0', '°C', 'Quantity', 'temperature', 'urn:ogc:def:phenomenon:GEOM:temperature');
+INSERT INTO "om"."mesures" VALUES (801, 5,  '2007-05-01 14:59:00','6.56', 'm',  'Quantity', 'depth',       'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (801, 6,  '2007-05-01 14:59:00','14.0', '°C', 'Quantity', 'temperature', 'urn:ogc:def:phenomenon:GEOM:temperature');
+INSERT INTO "om"."mesures" VALUES (801, 7,  '2007-05-01 15:59:00','6.56', 'm',  'Quantity', 'depth',       'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (801, 8,  '2007-05-01 15:59:00','15.0', '°C', 'Quantity', 'temperature', 'urn:ogc:def:phenomenon:GEOM:temperature');
+INSERT INTO "om"."mesures" VALUES (801, 9,  '2007-05-01 16:59:00','6.56', 'm',  'Quantity', 'depth',       'urn:ogc:def:phenomenon:GEOM:depth');
+INSERT INTO "om"."mesures" VALUES (801, 10, '2007-05-01 16:59:00','16.0', '°C', 'Quantity', 'temperature', 'urn:ogc:def:phenomenon:GEOM:temperature');
 
-INSERT INTO "om"."mesures" VALUES (802, 1,  '2007-05-01 16:59:00','6.56', '°C',  'Quantity', 'temperature', 'urn:x-ogc:def:phenomenon:GEOM:temperature');
+INSERT INTO "om"."mesures" VALUES (802, 1,  '2007-05-01 16:59:00','6.56', '°C',  'Quantity', 'temperature', 'urn:ogc:def:phenomenon:GEOM:temperature');

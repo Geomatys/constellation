@@ -104,17 +104,12 @@ public class WPSService extends OGCWebService<WPSWorker> {
     protected void configureInstance(File instanceDirectory, Object configuration) throws CstlServiceException {
         if (configuration instanceof ProcessContext) {
             final File configurationFile = new File(instanceDirectory, "processContext.xml");
-            Marshaller marshaller = null;
             try {
-                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(configuration, configurationFile);
-
+                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
             } catch (JAXBException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (marshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-                }
             }
         } else {
             throw new CstlServiceException("The configuration Object is not a process context", INVALID_PARAMETER_VALUE);
@@ -125,10 +120,10 @@ public class WPSService extends OGCWebService<WPSWorker> {
     protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
         final File configurationFile = new File(instanceDirectory, "processContext.xml");
         if (configurationFile.exists()) {
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(configurationFile);
+                final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                final Object obj = unmarshaller.unmarshal(configurationFile);
+                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
                 if (obj instanceof ProcessContext) {
                     return obj;
                 } else {
@@ -136,10 +131,6 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 }
             } catch (JAXBException ex) {
                 throw new CstlServiceException(ex);
-            } finally {
-                if (unmarshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                }
             }
         } else {
             throw new CstlServiceException("Unable to find a file processContext.xml");

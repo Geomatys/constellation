@@ -541,11 +541,23 @@ public class OM2ObservationWriter implements ObservationWriter {
             stmt.setString(3, offering.getName());
             if (offering.getTime() instanceof Period) {
                 final Period period = (Period)offering.getTime();
-                stmt.setTimestamp(4, new Timestamp(period.getBeginning().getPosition().getDate().getTime()));
-                stmt.setTimestamp(5, new Timestamp(period.getEnding().getPosition().getDate().getTime()));
+                if (period.getBeginning() != null && period.getBeginning().getPosition() != null && period.getBeginning().getPosition().getDate() != null) {
+                    stmt.setTimestamp(4, new Timestamp(period.getBeginning().getPosition().getDate().getTime()));
+                } else {
+                    stmt.setNull(4, java.sql.Types.TIMESTAMP);
+                }
+                if (period.getEnding() != null && period.getEnding().getPosition() != null && period.getEnding().getPosition().getDate() != null) {
+                    stmt.setTimestamp(5, new Timestamp(period.getEnding().getPosition().getDate().getTime()));
+                } else {
+                    stmt.setNull(5, java.sql.Types.TIMESTAMP);
+                }
             } else if (offering.getTime() instanceof Instant) {
                 final Instant instant = (Instant)offering.getTime();
-                stmt.setTimestamp(4, new Timestamp(instant.getPosition().getDate().getTime()));
+                if (instant.getPosition() != null && instant.getPosition().getDate() != null) {
+                    stmt.setTimestamp(4, new Timestamp(instant.getPosition().getDate().getTime()));
+                } else {
+                    stmt.setNull(4, java.sql.Types.TIMESTAMP);
+                }
                 stmt.setNull(5, java.sql.Types.TIMESTAMP);
             } else {
                 stmt.setNull(4, java.sql.Types.TIMESTAMP);
@@ -573,7 +585,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             c.close();
             return offering.getId();
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while retrieving offering names.", ex, NO_APPLICABLE_CODE);
+            throw new CstlServiceException("Error while inserting offering.", ex, NO_APPLICABLE_CODE);
         }
     }
 
@@ -622,20 +634,22 @@ public class OM2ObservationWriter implements ObservationWriter {
      */
     @Override
     public void recordProcedureLocation(final String physicalID, final DirectPosition position) throws CstlServiceException {
-        try {
-            final Connection c     = source.getConnection();
-            final WKBWriter writer = new WKBWriter();
-            PreparedStatement ps   = c.prepareStatement("INSERT INTO \"om\".\"procedures\" VALUES (?,?)");
-            ps.setString(1, physicalID);
-            final org.geotoolkit.gml.xml.Point gmlPt = SOSXmlFactory.buildPoint("2.0.0", null, (org.geotoolkit.gml.xml.DirectPosition)position);
-            final Point pt = (Point) GeometrytoJTS.toJTS(gmlPt);
-            ps.setBytes(3, writer.write(pt));
-            ps.execute();
-            c.close();
-        } catch (SQLException e) {
-            throw new CstlServiceException(e.getMessage(), e, NO_APPLICABLE_CODE);
-        } catch (FactoryException e) {
-            throw new CstlServiceException(e.getMessage(), e, NO_APPLICABLE_CODE);
+        if (position != null) {
+            try {
+                final Connection c     = source.getConnection();
+                final WKBWriter writer = new WKBWriter();
+                PreparedStatement ps   = c.prepareStatement("INSERT INTO \"om\".\"procedures\" VALUES (?,?)");
+                ps.setString(1, physicalID);
+                final org.geotoolkit.gml.xml.Point gmlPt = SOSXmlFactory.buildPoint("2.0.0", null, (org.geotoolkit.gml.xml.DirectPosition)position);
+                final Point pt = (Point) GeometrytoJTS.toJTS(gmlPt);
+                ps.setBytes(3, writer.write(pt));
+                ps.execute();
+                c.close();
+            } catch (SQLException e) {
+                throw new CstlServiceException(e.getMessage(), e, NO_APPLICABLE_CODE);
+            } catch (FactoryException e) {
+                throw new CstlServiceException(e.getMessage(), e, NO_APPLICABLE_CODE);
+            }
         }
     }
 

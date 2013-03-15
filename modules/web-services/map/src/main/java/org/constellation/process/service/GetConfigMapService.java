@@ -93,10 +93,10 @@ public class GetConfigMapService extends AbstractProcess {
             //get layerContext.xml file.
             final File configurationFile = new File(instanceDirectory, "layerContext.xml");
             if (configurationFile.exists()) {
-                Unmarshaller unmarshaller = null;
                 try {
-                    unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    Object obj = unmarshaller.unmarshal(configurationFile);
+                    final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    final Object obj = unmarshaller.unmarshal(configurationFile);
+                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
                     if (obj instanceof LayerContext) {
                         getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
                     } else {
@@ -104,10 +104,6 @@ public class GetConfigMapService extends AbstractProcess {
                     }
                 } catch (JAXBException ex) {
                     throw new ProcessException(ex.getMessage(), this, ex);
-                } finally {
-                    if (unmarshaller != null) {
-                        GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                    }
                 }
             } else {
                 throw new ProcessException("Service instance " + identifier + " doesn't have any configuration file.", this, null);

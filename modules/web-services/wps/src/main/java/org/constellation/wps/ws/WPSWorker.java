@@ -175,10 +175,10 @@ public class WPSWorker extends AbstractWorker {
         if (configurationDirectory != null) {
             final File lcFile = new File(configurationDirectory, "processContext.xml");
             if (lcFile.exists()) {
-                Unmarshaller unmarshaller = null;
                 try {
-                    unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                     Object obj = unmarshaller.unmarshal(lcFile);
+                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
                     if (obj instanceof ProcessContext) {
                         candidate = (ProcessContext) obj;
                         isStarted = true;
@@ -191,11 +191,7 @@ public class WPSWorker extends AbstractWorker {
                     startError = "JAXBExeception while unmarshalling the process context File";
                     isStarted = false;
                     LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, ex);
-                } finally {
-                    if (unmarshaller != null) {
-                        GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                    }
-                }
+                } 
             } else {
                 startError = "The configuration file processContext.xml has not been found";
                 isStarted = false;
@@ -429,17 +425,13 @@ public class WPSWorker extends AbstractWorker {
         webdavCtx.setId(webDavName);
         final File webdavConfig = new File(webDavInstanceDir, "WebdavContext.xml");
         if (!webdavConfig.exists()) {
-            Marshaller marshaller = null;
             try {
-                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(webdavCtx, new File(webDavInstanceDir, "WebdavContext.xml"));
+                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;
-            } finally {
-                if (marshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-                }
             }
         }
 

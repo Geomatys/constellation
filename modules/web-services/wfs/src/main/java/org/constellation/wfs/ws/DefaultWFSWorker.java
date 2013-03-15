@@ -197,10 +197,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (configurationDirectory != null) {
             final File sqFile = new File(configurationDirectory, "StoredQueries.xml");
             if (sqFile.exists()) {
-                Unmarshaller unmarshaller = null;
                 try {
-                    unmarshaller = getMarshallerPool().acquireUnmarshaller();
-                    Object obj   = unmarshaller.unmarshal(sqFile);
+                    final Unmarshaller unmarshaller = getMarshallerPool().acquireUnmarshaller();
+                    final Object obj   = unmarshaller.unmarshal(sqFile);
+                    getMarshallerPool().release(unmarshaller);
                     if (obj instanceof StoredQueries) {
                         StoredQueries candidate = (StoredQueries) obj;
                         this.storedQueries = candidate.getStoredQuery();
@@ -209,10 +209,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     }
                 } catch (JAXBException ex) {
                     LOGGER.log(Level.WARNING, "JAXBExeception while unmarshalling the stored queries File", ex);
-                } finally {
-                    if (unmarshaller != null) {
-                        getMarshallerPool().release(unmarshaller);
-                    }
                 }
             }
         }
@@ -260,19 +256,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         // loading stored queries
         if (configurationDirectory != null) {
             final File sqFile = new File(configurationDirectory, "StoredQueries.xml");
-            Marshaller marshaller = null;
             try {
-                marshaller = getMarshallerPool().acquireMarshaller();
+                final Marshaller marshaller = getMarshallerPool().acquireMarshaller();
                 marshaller.marshal(new StoredQueries(storedQueries), sqFile);
-
+                getMarshallerPool().release(marshaller);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "JAXBExeception while marshalling the stored queries File", ex);
-            } finally {
-                if (marshaller != null) {
-                    getMarshallerPool().release(marshaller);
-                }
-            }
-
+            } 
         }
     }
 

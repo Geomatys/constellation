@@ -113,7 +113,6 @@ import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
-import org.geotoolkit.swe.xml.AbstractDataRecord;
 import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swes.xml.DeleteSensor;
 import org.geotoolkit.swes.xml.DeleteSensorResponse;
@@ -129,6 +128,7 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+import org.geotoolkit.swe.xml.DataRecord;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -304,12 +304,12 @@ public class SOSworker extends AbstractWorker {
         isStarted = true;
         
         // Database configuration
-        Unmarshaller configUM = null;
         try {
-            configUM = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
             final File configFile = new File(configurationDirectory, "config.xml");
             if (configFile.exists()) {
+                final Unmarshaller configUM = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 final Object object = configUM.unmarshal(configFile);
+                GenericDatabaseMarshallerPool.getInstance().release(configUM);
                 if (object instanceof SOSConfiguration) {
                     configuration = (SOSConfiguration) object;
                 } else {
@@ -486,10 +486,6 @@ public class SOSworker extends AbstractWorker {
             startError("MetadataIOException while initializing the sensor reader/writer:\n" + ex.getMessage(), ex);
         } catch (CstlServiceException ex) {
             startError(ex.getMessage(), ex);
-        } finally {
-            if (configUM != null) {
-                GenericDatabaseMarshallerPool.getInstance().release(configUM);
-            }
         }
     }
     
@@ -590,24 +586,18 @@ public class SOSworker extends AbstractWorker {
     private void loadCachedCapabilities(final File configurationDirectory) throws JAXBException {
         //we fill the cachedCapabilities if we have to
         LOGGER.info("adding capabilities document in cache");
-        Unmarshaller capaUM = null;
-        try {
-            capaUM = SOSMarshallerPool.getInstance().acquireUnmarshaller();
-            final File configFile = new File(configurationDirectory, "cached-offerings.xml");
-            if (configFile.exists()) {
-                Object object = capaUM.unmarshal(configFile);
-                if (object instanceof JAXBElement) {
-                    object = ((JAXBElement)object).getValue();
-                }
-                if (object instanceof Capabilities) {
-                    loadedCapabilities = (Capabilities) object;
-                } else {
-                    LOGGER.severe("cached capabilities file does not contains Capablities object.");
-                }
+        final File configFile = new File(configurationDirectory, "cached-offerings.xml");
+        if (configFile.exists()) {
+            final Unmarshaller capaUM = SOSMarshallerPool.getInstance().acquireUnmarshaller();
+            Object object = capaUM.unmarshal(configFile);
+            SOSMarshallerPool.getInstance().release(capaUM);
+            if (object instanceof JAXBElement) {
+                object = ((JAXBElement)object).getValue();
             }
-        } finally {
-            if (capaUM != null) {
-                SOSMarshallerPool.getInstance().release(capaUM);
+            if (object instanceof Capabilities) {
+                loadedCapabilities = (Capabilities) object;
+            } else {
+                LOGGER.severe("cached capabilities file does not contains Capablities object.");
             }
         }
     }
@@ -856,7 +846,7 @@ public class SOSworker extends AbstractWorker {
 
         AbstractSensorML result = smlReader.getSensor(sensorId);
         if (result instanceof SensorML && 
-            out.equalsIgnoreCase(SENSORML_101_FORMAT_V100) || out.equalsIgnoreCase(SENSORML_101_FORMAT_V200)) {
+            (out.equalsIgnoreCase(SENSORML_101_FORMAT_V100) || out.equalsIgnoreCase(SENSORML_101_FORMAT_V200))) {
             result = SmlFactory.convertTo101((SensorML)result);
         }
 
@@ -1057,6 +1047,11 @@ public class SOSworker extends AbstractWorker {
         for (String procedure : procedures) {
             if (procedure != null) {
                 LOGGER.log(logLevel, "process ID: {0}", procedure);
+                // CITE
+                if (procedure.isEmpty()) {
+                    throw new CstlServiceException(" the procedure parameter is empty", MISSING_PARAMETER_VALUE, PROCEDURE);
+                }
+                
                 if (!omReader.existProcedure(procedure)) {
                     throw new CstlServiceException(" this process is not registred in the table", INVALID_PARAMETER_VALUE, PROCEDURE);
                 }
@@ -1074,8 +1069,7 @@ public class SOSworker extends AbstractWorker {
             } else {
                 //if there is only one proccess null we return error (we'll see)
                 if (procedures.size() == 1) {
-                    throw new CstlServiceException("the process is null",
-                            INVALID_PARAMETER_VALUE, PROCEDURE);
+                    throw new CstlServiceException("the procedure is null", INVALID_PARAMETER_VALUE, PROCEDURE);
                 }
             }
         }
@@ -1385,6 +1379,7 @@ public class SOSworker extends AbstractWorker {
         final String observationTemplateID    = request.getObservationTemplateId();
         
         final String procedure;
+        final String observedProperty;
         final TemporalObject time;
         final QName resultModel;
         if (observationTemplateID != null) {
@@ -1393,20 +1388,19 @@ public class SOSworker extends AbstractWorker {
                 throw new CstlServiceException("this template does not exist or is no longer usable",
                                               INVALID_PARAMETER_VALUE, "ObservationTemplateId");
             }
-            procedure = ((Process) template.getProcedure()).getHref();
-            time      = template.getSamplingTime();
+            procedure        = ((Process) template.getProcedure()).getHref();
+            time             = template.getSamplingTime();
+            observedProperty = null;
             if (template instanceof Measurement) {
                 resultModel = MEASUREMENT_QNAME;
             } else {
                 resultModel = OBSERVATION_QNAME;
             }
         } else if (currentVersion.equals("1.0.0")){
-            throw new CstlServiceException("ObservationTemplateID must be specified",
-                                          MISSING_PARAMETER_VALUE, "ObservationTemplateId");
+            throw new CstlServiceException("ObservationTemplateID must be specified", MISSING_PARAMETER_VALUE, "ObservationTemplateId");
         } else {
-            if (request.getOffering() == null) {
-                throw new CstlServiceException("The offering parameter must be specified",
-                                              MISSING_PARAMETER_VALUE, "offering");
+            if (request.getOffering() == null || request.getOffering().isEmpty()) {
+                throw new CstlServiceException("The offering parameter must be specified", MISSING_PARAMETER_VALUE, "offering");
             } else {
                 final ObservationOffering off = omReader.getObservationOffering(request.getOffering(), currentVersion);
                 if (off== null) {
@@ -1415,6 +1409,14 @@ public class SOSworker extends AbstractWorker {
                 } 
                 procedure = off.getProcedures().get(0);
             }
+            if (request.getObservedProperty() == null || request.getObservedProperty().isEmpty()) {
+                throw new CstlServiceException("The observedProperty parameter must be specified", MISSING_PARAMETER_VALUE, "observedProperty");
+            } else {
+                if (!omReader.existPhenomenon(request.getObservedProperty())) {
+                    throw new CstlServiceException("The observedProperty parameter is invalid", INVALID_PARAMETER_VALUE, "observedProperty");
+                } 
+                observedProperty = request.getObservedProperty();
+            }
             time = null;
             resultModel = OBSERVATION_QNAME;
         }
@@ -1422,6 +1424,11 @@ public class SOSworker extends AbstractWorker {
         //we begin to create the sql request
         localOmFilter.initFilterGetResult(procedure, resultModel);
 
+        // phenomenon property
+        if (observedProperty !=  null) {
+            localOmFilter.setObservedProperties(Arrays.asList(observedProperty));
+        }
+        
         //we treat the time constraint
         final List<Filter> times = request.getTemporalFilter();
 
@@ -1706,16 +1713,32 @@ public class SOSworker extends AbstractWorker {
         if (values == null || values.isEmpty()) {
             throw new CstlServiceException("ResultValues is empty", MISSING_PARAMETER_VALUE, "resultValues");
         }
+        if (!(template.getResultStructure() instanceof DataRecord)) {
+            throw new CstlServiceException("Only DataRecord is supported for a resultStructure");
+        }
+        final DataRecord structure =  (DataRecord) template.getResultStructure();
         int count = 0;
         if (encoding instanceof TextBlock) {
-            final String separator = ((TextBlock)encoding).getBlockSeparator();
+            
+            final TextBlock textEnc = ((TextBlock)encoding);
+            final String separator  = textEnc.getBlockSeparator();
             count = values.split(separator).length;
+            
+            // verify the structure
+            final StringTokenizer tokenizer = new StringTokenizer(values, textEnc.getBlockSeparator());
+            while (tokenizer.hasMoreTokens()) {
+                final String block = tokenizer.nextToken();
+                final int nbToken = block.split(textEnc.getTokenSeparator()).length;
+                if (nbToken != structure.getField().size()) {
+                    throw new CstlServiceException("ResultValues is empty", INVALID_PARAMETER_VALUE, "resultValues");
+                }
+            }
         }
         final DataArrayProperty array = buildDataArrayProperty(currentVersion, 
                                                null, 
                                                count, 
                                                null, 
-                                               (AbstractDataRecord)template.getResultStructure(), 
+                                               structure, 
                                                encoding, 
                                                values);
         obs.setName(omReader.getNewObservationId());
@@ -1733,7 +1756,7 @@ public class SOSworker extends AbstractWorker {
         final long start = System.currentTimeMillis();
         verifyBaseRequest(request, true, false);
         final String currentVersion = request.getVersion().toString();
-        if (request.getOffering() == null) {
+        if (request.getOffering() == null || request.getOffering().isEmpty()) {
             throw new CstlServiceException("offering parameter is missing.", MISSING_PARAMETER_VALUE, "offering");
         }
         final ObservationOffering offering = omReader.getObservationOffering(request.getOffering(), currentVersion);
@@ -1745,7 +1768,7 @@ public class SOSworker extends AbstractWorker {
         
         localOmFilter.initFilterObservation(RESULT_TEMPLATE, OBSERVATION_QNAME);
         localOmFilter.setProcedure(offering.getProcedures(), Arrays.asList(offering));
-        if (request.getObservedProperty() == null) {
+        if (request.getObservedProperty() == null || request.getObservedProperty().isEmpty()) {
             throw new CstlServiceException("observedProperty parameter is missing.", MISSING_PARAMETER_VALUE, "observedProperty");
         }
         if (!omReader.existPhenomenon(request.getObservedProperty())) {
@@ -1858,6 +1881,7 @@ public class SOSworker extends AbstractWorker {
         }
         boolean success = false;
         String id = "";
+        String assignedOffering = null;
         try {
             //we begin a transaction
             smlWriter.startTransaction();
@@ -1925,7 +1949,7 @@ public class SOSworker extends AbstractWorker {
                 
                 //we write the observation template in the O&M database
                 omWriter.writeObservationTemplate(temp);
-                addSensorToOffering(process, temp, currentVersion);
+                assignedOffering = addSensorToOffering(process, num, temp, currentVersion);
             } else {
                 LOGGER.warning("unable to record Sensor template and location in O&M datasource: no O&M writer");
             }
@@ -1941,7 +1965,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         LOGGER.log(logLevel, "registerSensor processed in {0}ms", (System.currentTimeMillis() - start));
-        return buildInsertSensorResponse(currentVersion, id, null);
+        return buildInsertSensorResponse(currentVersion, id, assignedOffering);
     }
 
     /**
@@ -2259,32 +2283,30 @@ public class SOSworker extends AbstractWorker {
      *
      * @throws CstlServiceException If an error occurs during the the storage of offering in the datasource.
      */
-    private void addSensorToOffering(final AbstractSensorML sensor, final ObservationTemplate template, final String version) throws CstlServiceException {
+    private String addSensorToOffering(final AbstractSensorML sensor, final String num, final ObservationTemplate template, final String version) throws CstlServiceException {
 
-        //we search which are the networks binded to this sensor TODO remove
-        final List<String> networkNames = getNetworkNames(sensor);
+        final String offeringName          = "offering-" + num;
+        final ObservationOffering offering = omReader.getObservationOffering(offeringName, version);
 
-        // for each network we create (or update) an offering
-        for (String networkName : networkNames) {
-            final String offeringName          = "offering-" + networkName;
-            final ObservationOffering offering = omReader.getObservationOffering(offeringName, version);
-
-            if (offering != null) {
-                updateOffering(offering, template);
-            } else {
-                createOffering(version, offeringName, template);
-            }
-        }
-
-        /*
-         * then  we add the sensor to the global offering containing all the sensor
-         */
-        final ObservationOffering offering = omReader.getObservationOffering("offering-allSensor", version);
         if (offering != null) {
             updateOffering(offering, template);
         } else {
-            createOffering(version, "allSensor", template);
+            createOffering(version, offeringName, template);
         }
+
+        /*
+         * then  we add the sensor to the global offering containing all the sensor (v 1.0.0)
+         * TODO remove ?
+         */
+        if (version.equals("1.0.0")) {
+            final ObservationOffering offeringAll = omReader.getObservationOffering("offering-allSensor", version);
+            if (offering != null) {
+                updateOffering(offeringAll, template);
+            } else {
+                createOffering(version, "allSensor", template);
+            }
+        }
+        return offeringName;
     }
 
     /**

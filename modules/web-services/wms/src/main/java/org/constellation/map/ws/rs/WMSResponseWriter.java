@@ -61,10 +61,10 @@ public class WMSResponseWriter<T extends WMSResponse> implements MessageBodyWrit
 
     @Override
     public void writeTo(final T t, Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
-        Marshaller m = null;
-        MarshallerPool pool = null;
         try {
             //workaround because 1.1.1 is defined with a DTD rather than an XSD
+            final MarshallerPool pool;
+            final Marshaller m;
             if (t instanceof WMT_MS_Capabilities) {
                 final String enc = "UTF8";
                 final CapabilitiesFilterWriter swCaps = new CapabilitiesFilterWriter(out, enc);
@@ -95,12 +95,9 @@ public class WMSResponseWriter<T extends WMSResponse> implements MessageBodyWrit
                 m = pool.acquireMarshaller();
                 m.marshal(t, out);
             } 
+            pool.release(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the WMS response", ex);
-        } finally {
-            if (pool != null && m != null) {
-                 pool.release(m);
-            }
         }
     }
 }

@@ -404,21 +404,17 @@ public class CSWworker extends AbstractWorker {
      * @throws CstlServiceException if there is a JAXBException while using the unmarshaller.
      */
     private void initializeRecordSchema() throws CstlServiceException {
-        Unmarshaller unmarshaller = null;
         try {
-            unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
+            final Unmarshaller unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
 
-            schemas.put(RECORD_QNAME,            unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/record.xsd")));
-            schemas.put(METADATA_QNAME,          unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/metadata.xsd")));
+            schemas.put(RECORD_QNAME,              unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/record.xsd")));
+            schemas.put(METADATA_QNAME,            unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/metadata.xsd")));
             schemas.put(EXTRINSIC_OBJECT_QNAME,    unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd")));
             schemas.put(EXTRINSIC_OBJECT_25_QNAME, unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd")));
+             XSDMarshallerPool.getInstance().release(unmarshaller);
 
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB Exception when trying to parse xsd file", ex, NO_APPLICABLE_CODE);
-        } finally {
-            if (unmarshaller != null) {
-                XSDMarshallerPool.getInstance().release(unmarshaller);
-            }
         }
     }
 

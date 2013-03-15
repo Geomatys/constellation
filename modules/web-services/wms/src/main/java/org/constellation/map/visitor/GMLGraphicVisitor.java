@@ -169,22 +169,18 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor implements GetFe
                     if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
                         GeometryAttribute geomProp = (GeometryAttribute) prop;
                         builder.append(margin).append('<').append(pPrefix).append(pLocal).append(">\n");
-                        Marshaller m = null;
                         try {
-                             m = pool.acquireMarshaller();
+                             Marshaller m = pool.acquireMarshaller();
                              StringWriter sw = new StringWriter();
                              org.opengis.geometry.Geometry gmlGeometry =  JTSUtils.toISO((Geometry) prop.getValue(),geomProp.getType().getCoordinateReferenceSystem());
                              ObjectFactory factory =  new ObjectFactory();
                              m.setProperty(Marshaller.JAXB_FRAGMENT, true);
                              m.marshal(factory.buildAnyGeometry(gmlGeometry), sw);
+                             pool.release(m);
                              builder.append(sw.toString());
                         } catch (JAXBException ex) {
                             LOGGER.log(Level.WARNING, "JAXB exception while marshalling the geometry", ex);
-                        } finally {
-                            if (m != null) {
-                                pool.release(m);
-                            }
-                        }
+                        } 
                         builder.append(margin).append("</").append(pPrefix).append(pLocal).append(">\n");
                     } else {
                         final Object value = prop.getValue();

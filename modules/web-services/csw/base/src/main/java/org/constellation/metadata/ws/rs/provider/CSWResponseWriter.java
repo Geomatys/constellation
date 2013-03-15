@@ -63,10 +63,9 @@ public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWrit
 
     @Override
     public void writeTo(final T t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
-        Marshaller m = null;
         final MarshallWarnings warnings = new MarshallWarnings();
         try {
-            m = CSWMarshallerPool.getInstance().acquireMarshaller();
+            final Marshaller m = CSWMarshallerPool.getInstance().acquireMarshaller();
             m.setProperty(XML.CONVERTERS, warnings);
             if (t instanceof SerializerResponse) {
                 final SerializerResponse response = (SerializerResponse) t;
@@ -82,13 +81,11 @@ public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWrit
             } else {
                 m.marshal(t, out);
             }
+            CSWMarshallerPool.getInstance().release(m);
 
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the CSW response", ex);
         } finally {
-            if (m != null) {
-                 CSWMarshallerPool.getInstance().release(m);
-            }
             if (!warnings.isEmpty()) {
                for (String message : warnings.getMessages()) {
                    LOGGER.warning(message);

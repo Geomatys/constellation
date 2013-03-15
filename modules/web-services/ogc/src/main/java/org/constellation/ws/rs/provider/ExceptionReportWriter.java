@@ -62,9 +62,8 @@ public class ExceptionReportWriter<T extends ExceptionResponse> implements Messa
 
     @Override
     public void writeTo(T t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
-        Marshaller m = null;
         try {
-            m = ExceptionReportMarshallerPool.getInstance().acquireMarshaller();
+            final Marshaller m = ExceptionReportMarshallerPool.getInstance().acquireMarshaller();
             if (t instanceof org.geotoolkit.ows.xml.v100.ExceptionReport) {
                 m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, OWS_100_XSD);
             } else if (t instanceof org.geotoolkit.ows.xml.v110.ExceptionReport) {
@@ -99,13 +98,9 @@ public class ExceptionReportWriter<T extends ExceptionResponse> implements Messa
                 throw new IllegalArgumentException("unexpected type:" + t.getClass().getName());
             }
             m.marshal(t, out);
-            
+            ExceptionReportMarshallerPool.getInstance().release(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the exception report", ex);
-        } finally {
-            if (m != null) {
-                 ExceptionReportMarshallerPool.getInstance().release(m);
-            }
         }
     }
 }

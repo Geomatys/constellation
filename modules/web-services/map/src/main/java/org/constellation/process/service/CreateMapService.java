@@ -106,10 +106,10 @@ public class CreateMapService extends AbstractProcess {
             //get configuration if aleady exist.
             if (configurationFile.exists()) {
                 createConfig = false;
-                Unmarshaller unmarshaller = null;
                 try {
-                    unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    Object obj = unmarshaller.unmarshal(configurationFile);
+                    final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    final Object obj = unmarshaller.unmarshal(configurationFile);
+                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
                     if (obj instanceof LayerContext) {
                         configuration = (LayerContext) obj;
                     } else {
@@ -117,27 +117,18 @@ public class CreateMapService extends AbstractProcess {
                     }
                 } catch (JAXBException ex) {
                     throw new ProcessException(ex.getMessage(), this, ex);
-                } finally {
-                    if (unmarshaller != null) {
-                        GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                    }
                 }
             }
             
             if (serviceName.equalsIgnoreCase("WMS")) {
                 //create default portrayal file if not exist ONLY for WMS services
                 if (!portrayalFile.exists()) {
-                    Marshaller marshaller = null;
                     try {
-                        marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                        final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                         marshaller.marshal(new WMSPortrayal(), portrayalFile);
-
+                        GenericDatabaseMarshallerPool.getInstance().release(marshaller);
                     } catch (JAXBException ex) {
                         throw new ProcessException(ex.getMessage(), this, ex);
-                    } finally {
-                        if (marshaller != null) {
-                            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-                        }
                     }
                 }
             }
@@ -150,17 +141,13 @@ public class CreateMapService extends AbstractProcess {
 
         if (createConfig) {
             //create layerContext.xml file for the default configuration.
-            Marshaller marshaller = null;
             try {
-                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(configuration, configurationFile);
+                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
 
             } catch (JAXBException ex) {
                 throw new ProcessException(ex.getMessage(), this, ex);
-            } finally {
-                if (marshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-                }
             }
         }
             
