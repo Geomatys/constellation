@@ -36,7 +36,6 @@ import java.util.HashMap;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.ws.SOSConstants;
 import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.sos.ws.SOSConstants.*;
@@ -57,6 +56,7 @@ import org.geotoolkit.swe.xml.DataArrayProperty;
 
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.util.StringUtilities;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -74,6 +74,14 @@ import org.opengis.temporal.TemporalPrimitive;
 public class OM2ObservationReader extends OM2BaseReader implements ObservationReader {
 
     protected final DataSource source;
+    
+    private static final Map<String, List<String>> RESPONSE_FORMAT = new HashMap<String, List<String>>();
+    static {
+        RESPONSE_FORMAT.put("1.0.0", Arrays.asList(RESPONSE_FORMAT_V100));
+        RESPONSE_FORMAT.put("2.0.0", Arrays.asList(RESPONSE_FORMAT_V200));
+    }
+    
+    private final Map<String, List<String>> acceptedSensorMLFormats = new HashMap<String, List<String>>();
     
     /**
      *
@@ -98,6 +106,21 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.close();
         } catch (SQLException ex) {
             throw new CstlServiceException(ex);
+        }
+        final String smlFormats100 = (String) properties.get("smlFormats100");
+        if (smlFormats100 != null) {
+            acceptedSensorMLFormats.put("1.0.0", StringUtilities.toStringList(smlFormats100));
+        } else {
+            acceptedSensorMLFormats.put("1.0.0", Arrays.asList(SENSORML_100_FORMAT_V100,
+                                                               SENSORML_101_FORMAT_V100));
+        }
+        
+        final String smlFormats200 = (String) properties.get("smlFormats200");
+        if (smlFormats200 != null) {
+            acceptedSensorMLFormats.put("2.0.0", StringUtilities.toStringList(smlFormats200));
+        } else {
+            acceptedSensorMLFormats.put("2.0.0", Arrays.asList(SENSORML_100_FORMAT_V200,
+                                                               SENSORML_101_FORMAT_V200));
         }
     }
 
@@ -200,11 +223,11 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             } finally {
                 c.close();
             }
-            final List<String> responseFormat         = Arrays.asList(RESPONSE_FORMAT_V100, RESPONSE_FORMAT_V200);
+            final List<String> responseFormat         = RESPONSE_FORMAT.get(version);
             final List<QName> resultModel             = Arrays.asList(OBSERVATION_QNAME, MEASUREMENT_QNAME);
             final List<String> resultModelV200        = Arrays.asList(OBSERVATION_MODEL);
             final List<ResponseModeType> responseMode = Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
-            final List<String> procedureDescription   = Arrays.asList(SENSORML_100_FORMAT_V200, SENSORML_101_FORMAT_V200);
+            final List<String> procedureDescription   = acceptedSensorMLFormats.get("2.0.0");
             return buildOffering(version, 
                                  id, 
                                  name, 

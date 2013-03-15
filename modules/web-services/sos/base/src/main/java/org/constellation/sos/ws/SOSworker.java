@@ -218,14 +218,8 @@ public class SOSworker extends AbstractWorker {
     /**
      * A list of supported SensorML version
      */
-    private static final Map<String, List<String>> ACCEPTED_SENSORML_FORMATS = new HashMap<String, List<String>>();
-    static {
-        ACCEPTED_SENSORML_FORMATS.put("1.0.0", Arrays.asList(SENSORML_100_FORMAT_V100,
-                                                             SENSORML_101_FORMAT_V100));
-        ACCEPTED_SENSORML_FORMATS.put("2.0.0", Arrays.asList(SENSORML_100_FORMAT_V200,
-                                                             SENSORML_101_FORMAT_V200));
-    }
-
+    private Map<String, List<String>> acceptedSensorMLFormats;
+    
     /**
      * The profile of the SOS service (transational/discovery).
      */
@@ -439,6 +433,10 @@ public class SOSworker extends AbstractWorker {
                 smlFactory = getSMLFactory(smlType);
                 smlReader  = smlFactory.getSensorReader(smlType, smlConfiguration, properties);
                 smlWriter  = smlFactory.getSensorWriter(smlType, smlConfiguration, properties);
+                
+                this.acceptedSensorMLFormats = smlReader.getAcceptedSensorMLFormats();
+            } else {
+                this.acceptedSensorMLFormats = new HashMap<String, List<String>>();
             }
 
             // we initialize the O&M reader/writer/filter
@@ -762,8 +760,11 @@ public class SOSworker extends AbstractWorker {
             } else {
                 ds.updateParameter(PROCEDURE, procNames);
             }
-
-            ds.updateParameter("outputFormat", ACCEPTED_SENSORML_FORMATS.get(currentVersion));
+            
+            final List<String> smlformats = acceptedSensorMLFormats.get(currentVersion);
+            if (smlformats != null) {
+                ds.updateParameter("outputFormat", smlformats);
+            }
 
             final AbstractOperation gfoi = om.getOperation("GetFeatureOfInterest");
             if (gfoi != null) {
@@ -817,16 +818,16 @@ public class SOSworker extends AbstractWorker {
         //we verify that the output format is good.
         final String out = request.getOutputFormat();
         if (out != null && !out.isEmpty()) {
-            if (!StringUtilities.containsIgnoreCase(ACCEPTED_SENSORML_FORMATS.get(currentVersion), request.getOutputFormat())) {
+            if (!StringUtilities.containsIgnoreCase(acceptedSensorMLFormats.get(currentVersion), request.getOutputFormat())) {
                 final StringBuilder msg = new StringBuilder("Accepted values for outputFormat:");
-                for (String s : ACCEPTED_SENSORML_FORMATS.get(currentVersion)) {
+                for (String s : acceptedSensorMLFormats.get(currentVersion)) {
                     msg.append('\n').append(s);
                 }
                 throw new CstlServiceException(msg.toString(), INVALID_PARAMETER_VALUE, "outputFormat");
             }
         } else {
             final StringBuilder msg = new StringBuilder("output format must be specify, accepted value are:");
-            for (String s : ACCEPTED_SENSORML_FORMATS.get(currentVersion)) {
+            for (String s : acceptedSensorMLFormats.get(currentVersion)) {
                 msg.append('\n').append(s);
             }
             final String locator;
@@ -1875,7 +1876,7 @@ public class SOSworker extends AbstractWorker {
         if (currentVersion.equals("2.0.0")) {
             if (request.getProcedureDescriptionFormat() == null) {
                 throw new CstlServiceException("Procedure description format must be specified" , MISSING_PARAMETER_VALUE, PROCEDURE_DESCRIPTION_FORMAT);
-            } else if (!ACCEPTED_SENSORML_FORMATS.get("2.0.0").contains(request.getProcedureDescriptionFormat())){
+            } else if (!acceptedSensorMLFormats.get("2.0.0").contains(request.getProcedureDescriptionFormat())){
                 throw new CstlServiceException("This procedure description format is not supported" , INVALID_PARAMETER_VALUE, PROCEDURE_DESCRIPTION_FORMAT);
             }
         }
@@ -2399,7 +2400,7 @@ public class SOSworker extends AbstractWorker {
                                             resultModel,
                                             resultModelV200,
                                             responses,
-                                            ACCEPTED_SENSORML_FORMATS.get(version)));
+                                            acceptedSensorMLFormats.get(version)));
     }
 
     /**

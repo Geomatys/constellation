@@ -20,7 +20,10 @@ package org.constellation.sos.io.filesystem;
 // J2SE dependencies
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
@@ -33,12 +36,16 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
 
+import static org.constellation.sos.ws.SOSConstants.*;
+
 // Geotoolkit dependendies
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.util.logging.Logging;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.util.StringUtilities;
 
 /**
  *
@@ -58,7 +65,9 @@ public class FileSensorReader implements SensorReader {
      */
     private final File dataDirectory;
     
-    public FileSensorReader(final Automatic configuration) throws MetadataIoException  {
+    private final Map<String, List<String>> acceptedSensorMLFormats = new HashMap<String, List<String>>();
+    
+    public FileSensorReader(final Automatic configuration, final Map<String, Object> properties) throws MetadataIoException  {
         //we initialize the unmarshaller
         dataDirectory  = configuration.getDataDirectory();
         if (dataDirectory == null) {
@@ -69,6 +78,26 @@ public class FileSensorReader implements SensorReader {
                 throw new MetadataIoException("unable to build the directory:" + dataDirectory.getPath(), NO_APPLICABLE_CODE);
             }
         }
+        final String smlFormats100 = (String) properties.get("smlFormats100");
+        if (smlFormats100 != null) {
+            acceptedSensorMLFormats.put("1.0.0", StringUtilities.toStringList(smlFormats100));
+        } else {
+            acceptedSensorMLFormats.put("1.0.0", Arrays.asList(SENSORML_100_FORMAT_V100,
+                                                               SENSORML_101_FORMAT_V100));
+        }
+        
+        final String smlFormats200 = (String) properties.get("smlFormats200");
+        if (smlFormats200 != null) {
+            acceptedSensorMLFormats.put("2.0.0", StringUtilities.toStringList(smlFormats200));
+        } else {
+            acceptedSensorMLFormats.put("2.0.0", Arrays.asList(SENSORML_100_FORMAT_V200,
+                                                               SENSORML_101_FORMAT_V200));
+        }
+    }
+    
+    @Override
+    public Map<String, List<String>> getAcceptedSensorMLFormats() {
+        return acceptedSensorMLFormats;
     }
 
     /**

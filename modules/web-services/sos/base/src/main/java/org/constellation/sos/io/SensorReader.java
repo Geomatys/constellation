@@ -18,6 +18,8 @@
 package org.constellation.sos.io;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
 
@@ -26,6 +28,8 @@ import org.constellation.ws.CstlServiceException;
  * @author Guilhem Legal (Geomatys)
  */
 public interface SensorReader {
+    
+    Map<String, List<String>> getAcceptedSensorMLFormats();
     
     /**
      * Return the specified sensor description from the specified ID.
