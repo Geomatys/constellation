@@ -1552,6 +1552,8 @@ public class SOSworker extends AbstractWorker {
             }
         }
 
+        boolean filter = false;
+        
         AbstractFeature result = null;
         // we return a single result
         final String locatorFID;
@@ -1577,6 +1579,7 @@ public class SOSworker extends AbstractWorker {
                     final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
                     collection.computeBounds();
                     result = collection;
+                    filter = true;
                 }
             }
 
@@ -1594,6 +1597,7 @@ public class SOSworker extends AbstractWorker {
             final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
             collection.computeBounds();
             result = collection;
+            filter = true;
         }
 
         if (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty()) {
@@ -1635,6 +1639,19 @@ public class SOSworker extends AbstractWorker {
             } else {
                 throw new CstlServiceException("Only the filter BBOX is upported for now", OPERATION_NOT_SUPPORTED);
             }
+            filter = true;
+        }
+        
+        // request for all foi
+        if (!filter) {
+            final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
+            for (String foid : omReader.getFeatureOfInterestNames()) {
+                final SamplingFeature feature = omReader.getFeatureOfInterest(foid, currentVersion);
+                features.add(buildFeatureProperty(currentVersion, feature));
+            }
+            final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
+            collection.computeBounds();
+            result = collection;
         }
 
         LOGGER.log(logLevel, "GetFeatureOfInterest processed in {0}ms", (System.currentTimeMillis() - start));
