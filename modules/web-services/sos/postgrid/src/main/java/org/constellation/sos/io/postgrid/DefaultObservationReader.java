@@ -62,6 +62,7 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.ResponseModeType;
@@ -91,6 +92,8 @@ public class DefaultObservationReader implements ObservationReader {
      * The base for observation id.
      */
     protected final String observationIdBase;
+    
+    protected final String observationTemplateIdBase;
 
     protected final String phenomenonIdBase;
     
@@ -141,6 +144,7 @@ public class DefaultObservationReader implements ObservationReader {
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
         this.phenomenonIdBase  = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
         this.sensorIdBase      = (String) properties.get(OMFactory.SENSOR_ID_BASE);
+        this.observationTemplateIdBase = (String) properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
@@ -397,11 +401,18 @@ public class DefaultObservationReader implements ObservationReader {
     @Override
     public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
         try {
+            final AbstractObservation result;
             if (resultModel.equals(MEASUREMENT_QNAME)) {
-                return OMXmlFactory.convert(version, measTable.getEntry(identifier));
+                result = OMXmlFactory.convert(version, measTable.getEntry(identifier));
             } else {
-                return OMXmlFactory.convert(version, obsTable.getEntry(identifier));
+                result = OMXmlFactory.convert(version, obsTable.getEntry(identifier));
             }
+            if (identifier.startsWith(observationIdBase)) {
+                result.setId("obs-" + identifier.substring(observationIdBase.length()));
+            } else if (identifier.startsWith(observationTemplateIdBase)) {
+                result.setId("obs-" + identifier.substring(observationTemplateIdBase.length()));
+            }
+            return result;
         } catch (CatalogException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             String msg = " null";

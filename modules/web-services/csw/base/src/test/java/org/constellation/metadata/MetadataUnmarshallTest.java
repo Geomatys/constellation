@@ -521,7 +521,7 @@ public class MetadataUnmarshallTest {
 
         TimePosition Instant begin = new DefaultInstant(new DefaultPosition(start));
         TimePosition end = new DefaultInstant(new DefaultPosition(stop));*/
-        TimePeriodType period = new TimePeriodType("1990-06-05", "1990-07-02");
+        TimePeriodType period = new TimePeriodType(null, "1990-06-05", "1990-07-02");
         tempExtent.setExtent(period);
 
         set = new HashSet();
@@ -1361,7 +1361,7 @@ public class MetadataUnmarshallTest {
 
         DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
         DefaultInstant end = new DefaultInstant(new DefaultPosition(stop));*/
-        TimePeriodType period = new TimePeriodType("1990-06-05", "1990-07-02");
+        TimePeriodType period = new TimePeriodType(null, "1990-06-05", "1990-07-02");
         GMLAdapter.IDs.setUUID(period, "extent");
         tempExtent.setExtent(period);
 

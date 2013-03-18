@@ -392,6 +392,8 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                 } catch (NumberFormatException ex) {
                     throw new CstlServiceException("observation id can't be parsed as an integer:" + idToParse);
                 }
+                final String obsID = "obs-" + idToParse;
+                final String timeID = "time-" + idToParse;
                 final String observedProperty;
                 final String procedure;
                 final String foi;
@@ -404,9 +406,9 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                     final String b  = rs.getString(2);
                     final String e  = rs.getString(3);
                     if (b != null && e == null) {
-                        time = buildTimeInstant(version, b.replace(' ', 'T'));
+                        time = buildTimeInstant(version, timeID, b.replace(' ', 'T'));
                     } else if (b != null && e != null) {
-                        time = buildTimePeriod(version, b.replace(' ', 'T'), e.replace(' ', 'T'));
+                        time = buildTimePeriod(version, timeID, b.replace(' ', 'T'), e.replace(' ', 'T'));
                     } else {
                         time = null;
                     }
@@ -434,10 +436,10 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
 
                 if (resultModel.equals(MEASUREMENT_QNAME)) {
                     final Object result = getResult(identifier, resultModel, version); 
-                    return OMXmlFactory.buildMeasurement(version, name, null, prop, phen, procedure, result, time);
+                    return OMXmlFactory.buildMeasurement(version, obsID, name, null, prop, phen, procedure, result, time);
                 } else {
                     final Object result = getResult(idToParse, resultModel, version);
-                    return OMXmlFactory.buildObservation(version, name, null, prop, phen, procedure, result, time);
+                    return OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, result, time);
                 }
             } finally {
                 c.close();

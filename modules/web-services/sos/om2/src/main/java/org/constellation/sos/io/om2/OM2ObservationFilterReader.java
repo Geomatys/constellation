@@ -179,6 +179,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     }
                     
                     final String procedureID      = procedure.substring(sensorIdBase.length());
+                    final String obsID           = "obs-" + procedureID;
                     final String name             = observationTemplateIdBase + procedureID;
                     final String featureID        = rs.getString("foi");
                     final String observedProperty = rs.getString("observed_property");
@@ -199,7 +200,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     final AnyScalar scalar = buildField(version, fieldName, fieldType, uom, fieldDef);
                     fields.put(fieldName, scalar);
                         
-                    currentObservation = OMXmlFactory.buildObservation(version, name, null, prop, phen, procedure, null, null);
+                    currentObservation = OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, null, null);
                     observations.put(procedure, currentObservation);
                 } else {
                     
@@ -250,6 +251,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 if (observation == null) {
                     
                     final String procedureID      = procedure.substring(sensorIdBase.length());
+                    final String obsID            = "obs-" + procedureID;
                     final String name             = observationTemplateIdBase + procedureID;
                     final String featureID        = rs.getString("foi");
                     final String observedProperty = rs.getString("observed_property");
@@ -263,7 +265,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     final String uom        = rs.getString("uom");
                     
                     final Object result = buildMeasureResult(version, 0, uom, "1");
-                    observations.put(procedure, OMXmlFactory.buildMeasurement(version, name, null, prop, phen, procedure, result, null));
+                    observations.put(procedure, OMXmlFactory.buildMeasurement(version, obsID, name, null, prop, phen, procedure, result, null));
                 } else {
                     
                    LOGGER.log(Level.WARNING, "multiple fields on Mesurement for :{0}", procedure);
@@ -320,13 +322,15 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     }
                     
                     final int oid                 = rs.getInt("id");
+                    final String obsID            = "obs-"  + oid;
+                    final String timeID           = "time-" + oid;
                     final String name             = observationIdBase + oid;
                     final String featureID        = rs.getString("foi");
                     final String observedProperty = rs.getString("observed_property");
                     final SamplingFeature feature = getFeatureOfInterest(featureID, version, c);
                     final FeatureProperty prop    = buildFeatureProperty(version, feature); 
                     final Phenomenon phen         = getPhenomenon(version, observedProperty, c);
-                    final TemporalGeometricPrimitive time = buildTimeInstant(version, format2.format(currentTime));
+                    final TemporalGeometricPrimitive time = buildTimeInstant(version, timeID, format2.format(currentTime));
                     
                     /*
                      *  BUILD RESULT
@@ -344,7 +348,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     values.append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value);
                     nbValue++;
                     
-                    currentObservation = OMXmlFactory.buildObservation(version, name, null, prop, phen, procedure, null, time);
+                    currentObservation = OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, null, time);
                     observations.put(procedure, currentObservation);
                 } else {
                     
@@ -428,12 +432,14 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 final int oid                 = rs.getInt("id");
                 final String rid              = rs.getString("resultid");
                 final String name             = observationIdBase + oid;
+                final String obsID            = "obs-"  + oid;
+                final String timeID           = "time-" + oid;
                 final String featureID        = rs.getString("foi");
                 final String observedProperty = rs.getString("observed_property");
                 final SamplingFeature feature = getFeatureOfInterest(featureID, version, c);
                 final FeatureProperty prop    = buildFeatureProperty(version, feature); 
                 final Phenomenon phen         = getPhenomenon(version, observedProperty, c);
-                final TemporalGeometricPrimitive time = buildTimeInstant(version, format2.format(currentTime));
+                final TemporalGeometricPrimitive time = buildTimeInstant(version, timeID, format2.format(currentTime));
 
                 /*
                  *  BUILD RESULT
@@ -446,7 +452,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     throw new CstlServiceException("Unable ta parse the result value as a double");
                 }
                 final Object result = buildMeasureResult(version, dValue, uom, rid);
-                observations.add(OMXmlFactory.buildMeasurement(version, name, null, prop, phen, procedure, result, time));
+                observations.add(OMXmlFactory.buildMeasurement(version, obsID, name, null, prop, phen, procedure, result, time));
 
             }
             rs.close();

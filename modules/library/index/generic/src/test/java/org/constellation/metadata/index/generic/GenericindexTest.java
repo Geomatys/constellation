@@ -1011,7 +1011,7 @@ public class GenericindexTest {
         DefaultMetadata meta4 = new DefaultMetadata();
         DefaultDataIdentification ident4 = new DefaultDataIdentification();
 
-        TimePeriodType tp1 = new TimePeriodType("2008-11-01", "2008-12-01");
+        TimePeriodType tp1 = new TimePeriodType("id", "2008-11-01", "2008-12-01");
         tp1.setId("007-all");
         DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
         tempExtent.setExtent(tp1);

@@ -48,7 +48,7 @@ public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWrit
 
     private static final String SCHEMA_LOCATION_V100 =  "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd";
     
-    private static final String SCHEMA_LOCATION_V200 =  "http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd";
+    private static final String SCHEMA_LOCATION_V200 =  "http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd http://www.opengis.net/samplingSpatial/2.0 http://schemas.opengis.net/samplingSpatial/2.0/spatialSamplingFeature.xsd";
    
 
     @Override

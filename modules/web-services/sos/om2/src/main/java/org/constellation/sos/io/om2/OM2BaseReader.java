@@ -138,10 +138,12 @@ public class OM2BaseReader {
                 final org.geotoolkit.gml.xml.Point point = JTStoGeometry.toGML(gmlVersion, (Point)geom, crs);
                 // little hack fo unit test
                 point.setSrsName(null);
+                point.setId("pt-" + id);
                 return buildSamplingPoint(version, id, name, description, prop, point);
             } else if (geom instanceof LineString) {
                 final org.geotoolkit.gml.xml.LineString line = JTStoGeometry.toGML(gmlVersion, (LineString)geom, crs);
                 line.emptySrsNameOnChild();
+                line.setId("line-" + id);
                 final Envelope bound = line.getBounds();
                 return buildSamplingCurve(version, id, name, description, prop, line, null, null, bound);
             } else if (geom != null) {

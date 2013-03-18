@@ -392,7 +392,7 @@ public final class Utils {
         } else {
             LOGGER.warning("unable to parse datablock unknown encoding");
         }
-        return SOSXmlFactory.buildTimePeriod(version, result[0], result[1]);
+        return SOSXmlFactory.buildTimePeriod(version, null, result[0], result[1]);
     }
     
     /**

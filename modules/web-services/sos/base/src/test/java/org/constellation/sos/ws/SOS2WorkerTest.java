@@ -1654,6 +1654,10 @@ public abstract class SOS2WorkerTest {
         assertTrue(obsResult != null);
         obsResult.setName(null);
         expResult.setName(null);
+        
+        obsResult.setId(null);
+        expResult.setId(null);
+        
         assertEquals(expResult.getName(), obsResult.getName());
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());

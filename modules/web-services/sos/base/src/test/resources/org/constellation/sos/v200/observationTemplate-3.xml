@@ -6,10 +6,12 @@
                    xmlns:sams="http://www.opengis.net/samplingSpatial/2.0"
                    xmlns:sf="http://www.opengis.net/sampling/2.0" 
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xmlns:xlink="http://www.w3.org/1999/xlink">
+                   xmlns:xlink="http://www.w3.org/1999/xlink"
+                   gml:id="obs-3">
     <gml:name>urn:ogc:object:observation:template:GEOM:3</gml:name>
     <om:type xlink:href="http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_ComplexObservation"/>
     <om:phenomenonTime/>
+    <om:resultTime/>
     <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:3"/>
     <om:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:depth"/>
     <om:featureOfInterest>
@@ -35,7 +37,9 @@
             <swe:elementType name="dataArray-5">
                 <swe:DataRecord id="datarecord-5">
                     <swe:field name="Time">
-                        <swe:Time definition="urn:ogc:data:time:iso8601"/>
+                        <swe:Time definition="urn:ogc:data:time:iso8601">
+                            <swe:uom/>
+                        </swe:Time>
                     </swe:field>
                     <swe:field name="depth">
                         <swe:Quantity definition="urn:ogc:def:phenomenon:GEOM:depth">

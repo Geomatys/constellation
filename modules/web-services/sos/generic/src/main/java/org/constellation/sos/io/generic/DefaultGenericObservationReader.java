@@ -79,6 +79,8 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      */
     protected final String observationIdBase;
     
+    protected final String observationIdTemplateBase;
+    
     protected final String phenomenonIdBase;
     
     protected final String sensorIdBase;
@@ -88,6 +90,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
         this.phenomenonIdBase  = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
         this.sensorIdBase      = (String) properties.get(OMFactory.SENSOR_ID_BASE);
+        this.observationIdTemplateBase = (String) properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
     }
 
     /**
@@ -248,7 +251,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             if (offeringEnd != null) {
                 offeringEnd          = offeringEnd.replace(' ', 'T');
             }
-            time  = GMLXmlFactory.createTimePeriod(gmlVersion, offeringBegin, offeringEnd);
+            time  = GMLXmlFactory.createTimePeriod(gmlVersion, null, offeringBegin, offeringEnd);
             
             // procedure
             final List<String> procedures;
@@ -548,11 +551,20 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             if (end != null) {
                 end = end.replace(' ', 'T');
             }
-            final Period samplingTime = SOSXmlFactory.buildTimePeriod(version, begin, end);
+            final Period samplingTime = SOSXmlFactory.buildTimePeriod(version, null, begin, end);
             final String proc             = values.getVariable(variables.get(4));
             final String phenomenon       = values.getVariable(variables.get(2));
             final String phenomenonComp   = values.getVariable(variables.get(3));
             final String resultID         = values.getVariable(variables.get(7));
+            final String obsID;
+            if (identifier.startsWith(observationIdBase)) {
+                obsID = "obs-" + identifier.substring(observationIdBase.length());
+            } else if (identifier.startsWith(observationIdTemplateBase)) {
+                obsID = "obs-" + identifier.substring(observationIdTemplateBase.length());
+            } else {
+                obsID = "obs-?";
+            }
+            
             final Phenomenon observedProperty;
             if (phenomenon != null) {
                 observedProperty = getPhenomenon(phenomenon);
@@ -568,6 +580,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 if (resultModel.equals(OBSERVATION_QNAME)) {
                     
                     return OMXmlFactory.buildObservation(version,
+                                                         obsID,
                                                          identifier,
                                                          null,
                                                          foi,
@@ -577,6 +590,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                                                          samplingTime);
                 } else if (resultModel.equals(MEASUREMENT_QNAME)) {
                     return OMXmlFactory.buildMeasurement(version,
+                                                         obsID,
                                                          identifier,
                                                          null,
                                                          foi,
@@ -589,6 +603,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 }
             } else if (version.equals("2.0.0")) {
                 return OMXmlFactory.buildObservation(version,
+                                                     obsID,
                                                      identifier,
                                                      null,
                                                      foi,

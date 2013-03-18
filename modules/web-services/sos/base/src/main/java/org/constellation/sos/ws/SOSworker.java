@@ -2363,7 +2363,7 @@ public class SOSworker extends AbstractWorker {
 
         // for the eventime of the offering we take the time of now.
         final Timestamp t = new Timestamp(System.currentTimeMillis());
-        final Period time = buildTimePeriod(version, t.toString(), null);
+        final Period time = buildTimePeriod(version, null, t.toString(), null);
 
         //we add the template process
         final String process = template.getProcedure();
