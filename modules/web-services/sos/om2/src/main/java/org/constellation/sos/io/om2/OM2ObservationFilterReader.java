@@ -498,11 +498,14 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 first = false;
                 oldTime = currentTime;
             }
-            values.append(encoding.getBlockSeparator());
+            // empty result 
+            if (first) {
+                values.append(encoding.getBlockSeparator());
+            }
             rs.close();
             currentStatement.close();
             c.close();
-            return  values.toString();
+            return values.toString();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),

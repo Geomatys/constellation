@@ -128,6 +128,7 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+import org.geotoolkit.sos.xml.SosInsertionMetadata;
 import org.geotoolkit.swe.xml.DataRecord;
 
 // GeoAPI dependencies
@@ -1897,6 +1898,27 @@ public class SOSworker extends AbstractWorker {
                 throw new CstlServiceException("This procedure description format is not supported" , INVALID_PARAMETER_VALUE, PROCEDURE_DESCRIPTION_FORMAT);
             }
         }
+        
+        // verify the sensorMetadata
+        if (request.getInsertionMetadata() instanceof SosInsertionMetadata) {
+            final SosInsertionMetadata insMetadata = (SosInsertionMetadata) request.getInsertionMetadata();
+            for (String foiType : insMetadata.getFeatureOfInterestType()) {
+                if (foiType == null || foiType.isEmpty()) {
+                    throw new CstlServiceException("The feature Of Interest type is missing.", MISSING_PARAMETER_VALUE, "featureOfInterestType");
+                } else if (!SUPPORTED_FOI_TYPES.contains(foiType)) {
+                    throw new CstlServiceException("The feature Of Interest type is not supported.", INVALID_PARAMETER_VALUE, "featureOfInterestType");
+                }
+            }
+            
+            for (String obsType : insMetadata.getObservationType()) {
+                if (obsType == null || obsType.isEmpty()) {
+                    throw new CstlServiceException("The observation type is missing.", MISSING_PARAMETER_VALUE, "observationType");
+                } else if (!SUPPORTED_OBS_TYPES.contains(obsType)) {
+                    throw new CstlServiceException("The observation type is not supported.", INVALID_PARAMETER_VALUE, "observationType");
+                }
+            }
+        }
+            
         boolean success = false;
         String id = "";
         String assignedOffering = null;
@@ -1905,7 +1927,7 @@ public class SOSworker extends AbstractWorker {
             smlWriter.startTransaction();
 
             //we get the SensorML file who describe the Sensor to insert.
-            final Object d = request.getSensorMetadata();
+            final Object d = request.getSensorDescription();
             AbstractSensorML process;
             if (d instanceof AbstractSensorML) {
                 process = (AbstractSensorML) d;

@@ -433,15 +433,16 @@ public final class SOSConstants {
     }
     
     public static final InsertionCapabilitiesPropertyType INSERTION_CAPABILITIES; 
-    
+    public static final List<String> SUPPORTED_FOI_TYPES;
+    public static final List<String> SUPPORTED_OBS_TYPES;
     static {
         final List<String> procedureFormat = Arrays.asList("http://www.opengis.net/sensorML/1.0.1");
-        final List<String> featureOfInterestType = Arrays.asList("http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint",
+        SUPPORTED_FOI_TYPES = Arrays.asList("http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint",
                                                                  "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingCurve");
-        final List<String> observationType = Arrays.asList("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation",
+        SUPPORTED_OBS_TYPES = Arrays.asList("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation",
                                                            "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement");
         final List<String> supportedEncoding = Arrays.asList("http://www.opengis.net/swe/2.0/TextEncoding");
-        final InsertionCapabilitiesType icapa = new InsertionCapabilitiesType(procedureFormat, featureOfInterestType, observationType, supportedEncoding);
+        final InsertionCapabilitiesType icapa = new InsertionCapabilitiesType(procedureFormat, SUPPORTED_FOI_TYPES, SUPPORTED_OBS_TYPES, supportedEncoding);
         INSERTION_CAPABILITIES = new InsertionCapabilitiesPropertyType(icapa);
     }
 
