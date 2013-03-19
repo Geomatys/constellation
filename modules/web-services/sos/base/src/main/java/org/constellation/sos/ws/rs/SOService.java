@@ -35,6 +35,7 @@ import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -92,7 +93,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * Build a new Restfull SOS service.
      */
     public SOService() throws CstlServiceException {
-        super(ServiceDef.SOS_1_0_0, ServiceDef.SOS_2_0_0);
+        super(Specification.SOS);
         setXMLContext(SOSMarshallerPool.getInstance());
         LOGGER.log(Level.INFO, "SOS REST service running ({0} instances)\n", getWorkerMapSize());
     }
@@ -224,7 +225,7 @@ public class SOService extends OGCWebService<SOSworker> {
 
 
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, serviceDef);
+            return processExceptionResponse(ex, serviceDef, worker);
 
         }
     }
@@ -245,7 +246,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker w) {
          // asking for authentication
         if (ex instanceof UnauthorizedException) {
             return Response.status(Response.Status.UNAUTHORIZED).header("WWW-Authenticate", " Basic").build();
@@ -253,7 +254,7 @@ public class SOService extends OGCWebService<SOSworker> {
         logException(ex);
 
         if (serviceDef == null) {
-            serviceDef = getBestVersion(null);
+            serviceDef = w.getBestVersion(null);
         }
         final String exceptionCode   = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),

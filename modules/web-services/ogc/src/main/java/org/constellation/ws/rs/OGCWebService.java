@@ -57,15 +57,14 @@ import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.collection.UnmodifiableArrayList;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.xml.MarshallerPool;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
-import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.CodeList;
 import org.opengis.util.NoSuchIdentifierException;
@@ -98,14 +97,6 @@ import sun.misc.BASE64Decoder;
  */
 public abstract class OGCWebService<W extends Worker> extends WebService {
 
-    /**
-     * The supported supportedVersions supported by this web serviceType.
-     * avoid modification after instantiation.
-     * @deprecated move to abstract worker
-     */
-    @Deprecated
-    private final UnmodifiableArrayList<ServiceDef> supportedVersions;
-
     final String serviceName;
 
     /**
@@ -115,20 +106,14 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      *                          The first version specified <strong>MUST</strong> be the highest
      *                          one, the best one.
      */
-    public OGCWebService(final ServiceDef... supportedVersions) {
+    public OGCWebService(final ServiceDef.Specification specification) {
         super();
-
-        if (supportedVersions == null || supportedVersions.length == 0 ||
-                (supportedVersions.length == 1 && supportedVersions[0] == null)){
-            throw new IllegalArgumentException("It is compulsory for a web service to have " +
-                    "at least one version specified.");
+        if (specification == null){
+            throw new IllegalArgumentException("It is compulsory for a web service to have a specification.");
         }
-        serviceName = supportedVersions[0].specification.name();
+        serviceName = specification.name();
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
         WSEngine.registerService(serviceName, "REST", getWorkerClass());
-
-        //guarantee it will not be modified
-        this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
 
         /*
          * build the map of Workers, by scanning the sub-directories of its
@@ -706,12 +691,11 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * In both ways, the exception is then marshalled and returned to the client.
      *
      * @param ex         The exception that has been generated during the web-service operation requested.
-     * @param marshaller The marshaller to use for the exception report.
      * @param serviceDef The service definition, from which the version number of exception report will
      *                   be extracted.
      * @return An XML representing the exception.
      */
-    protected abstract Response processExceptionResponse(final CstlServiceException ex, final ServiceDef serviceDef);
+    protected abstract Response processExceptionResponse(final CstlServiceException ex, final ServiceDef serviceDef, final Worker w);
 
     /**
      * The shared method to build a service ExceptionReport.
@@ -724,18 +708,16 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     protected Response launchException(final String message, String codeName, final String locator) {
         final String serviceID = getSafeParameter("serviceId");
         final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
-        final ServiceDef mainVersion;
+        ServiceDef mainVersion = null;
         if (worker != null) {
             mainVersion = worker.getBestVersion(null);
-        } else {
-            mainVersion = supportedVersions.get(0);
-        }
-        if (mainVersion.owsCompliant) {
-            codeName = StringUtilities.transformCodeName(codeName);
+            if (mainVersion.owsCompliant) {
+                codeName = StringUtilities.transformCodeName(codeName);
+            }
         }
         final OWSExceptionCode code   = CodeLists.valueOf(OWSExceptionCode.class, codeName);
         final CstlServiceException ex = new CstlServiceException(message, code, locator);
-        return processExceptionResponse(ex, mainVersion);
+        return processExceptionResponse(ex, mainVersion, worker);
     }
 
     /**
@@ -752,56 +734,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             codeRepresentation = exceptionCode.name();
         }
         return codeRepresentation;
-    }
-
-    /**
-     * Return a Version Object from the version number.
-     * if the version number is not correct return the default version.
-     *
-     * @param number the version number.
-     * @return
-     * 
-     * @deprecated use Worker.getVersionFromNumber()
-     */
-    @Deprecated
-    protected ServiceDef getVersionFromNumber(final String number) {
-        for (ServiceDef v : supportedVersions) {
-            if (v.version.toString().equals(number)){
-                return v;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * If the requested version number is not available we choose the best version to return.
-     *
-     * @param number A version number, which will be compared to the ones specified.
-     *               Can be {@code null}, in this case the best version specified is just returned.
-     * @return The best version (the highest one) specified for this web service.
-     * 
-     * @deprecated move to AbstractWorker
-     */
-    @Deprecated
-    protected ServiceDef getBestVersion(final String number) {
-        for (ServiceDef v : supportedVersions) {
-            if (v.version.toString().equals(number)){
-                return v;
-            }
-        }
-        final ServiceDef firstSpecifiedVersion = supportedVersions.get(0);
-        if (number == null || number.isEmpty()) {
-            return firstSpecifiedVersion;
-        }
-        final ServiceDef.Version wrongVersion = new ServiceDef.Version(number);
-        if (wrongVersion.compareTo(firstSpecifiedVersion.version) > 0) {
-            return firstSpecifiedVersion;
-        } else {
-            if (wrongVersion.compareTo(supportedVersions.get(supportedVersions.size() - 1).version) < 0) {
-                return supportedVersions.get(supportedVersions.size() - 1);
-            }
-        }
-        return firstSpecifiedVersion;
     }
 
     /**

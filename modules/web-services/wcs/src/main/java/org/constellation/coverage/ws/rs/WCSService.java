@@ -34,6 +34,7 @@ import javax.ws.rs.core.UriInfo;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -105,7 +106,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * Build a new instance of the webService and initialize the JAXB context.
      */
     public WCSService() {
-        super(ServiceDef.WCS_1_1_1, ServiceDef.WCS_1_0_0);
+        super(Specification.WCS);
 
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
@@ -210,7 +211,7 @@ public class WCSService extends GridWebService<WCSWorker> {
              * for the protocol stream which JAXB, in this case, will then
              * marshall and serialize into an XML message HTTP response.
              */
-            return processExceptionResponse(ex, serviceDef);
+            return processExceptionResponse(ex, serviceDef, worker);
 
         }
     }
@@ -253,7 +254,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker w) {
         logException(ex);
 
         // SEND THE HTTP RESPONSE

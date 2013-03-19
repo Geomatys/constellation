@@ -17,11 +17,9 @@
  */
 package org.constellation.ws.rs;
 
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import java.io.File;
-import javax.xml.bind.JAXBException;
 
-import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.SetConfigMapServiceDescriptor;
@@ -49,8 +47,8 @@ import org.opengis.util.NoSuchIdentifierException;
  */
 public abstract class GridWebService<W extends Worker> extends OGCWebService<W> {
 
-    public GridWebService(final ServiceDef... supportedVersions) {
-        super(supportedVersions);
+    public GridWebService(final Specification specification) {
+        super(specification);
     }
 
     /**

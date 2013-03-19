@@ -45,10 +45,12 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.ws.Worker;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wps.ws.WPSConstant.*;
-import org.constellation.ws.Worker;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.RequestBase;
 
@@ -70,7 +72,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * Build a new instance of the webService and initialize the JAXB context.
      */
     public WPSService() {
-        super(ServiceDef.WPS_1_0_0);
+        super(Specification.WPS);
 
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
@@ -161,7 +163,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
             final RequestBase request;
             if (objectRequest == null) {
                 //build objectRequest from parameters
-                version = getVersionFromNumber(getParameter(VERSION_PARAMETER, false)); // needed if exception is launch before request build
+                version = worker.getVersionFromNumber(getParameter(VERSION_PARAMETER, false)); // needed if exception is launch before request build
                 final String requestName = getParameter(REQUEST_PARAMETER, true);
                 request = adaptQuery(requestName, worker);
             } else if (objectRequest instanceof RequestBase) {
@@ -228,7 +230,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
              * This block handles all the exceptions which have been generated anywhere in the service and transforms them to a response
              * message for the protocol stream which JAXB, in this case, will then marshall and serialize into an XML message HTTP response.
              */
-            return processExceptionResponse(ex, version);
+            return processExceptionResponse(ex, version, worker);
 
         }
 
@@ -238,7 +240,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker worker) {
         logException(ex);
 
         // SEND THE HTTP RESPONSE

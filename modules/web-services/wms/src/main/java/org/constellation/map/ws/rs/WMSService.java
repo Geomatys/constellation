@@ -40,6 +40,7 @@ import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.map.ws.QueryContext;
 import org.constellation.map.ws.WMSConstant;
@@ -104,7 +105,7 @@ public class WMSService extends GridWebService<WMSWorker> {
      * Build a new instance of the webService and initialize the JAXB context.
      */
     public WMSService() {
-        super(ServiceDef.WMS_1_3_0_SLD, ServiceDef.WMS_1_1_1_SLD);
+        super(Specification.WMS);
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WMSMarshallerPool.getInstance());
@@ -221,7 +222,7 @@ public class WMSService extends GridWebService<WMSWorker> {
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                            OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(queryContext, ex, version);
+            return processExceptionResponse(queryContext, ex, version, worker);
         }
     }
 
@@ -229,7 +230,7 @@ public class WMSService extends GridWebService<WMSWorker> {
      * Generate an error response in image if query asks it.
      * Otherwise this call will fallback on normal xml error.
      */
-    private Response processExceptionResponse(final QueryContext queryContext, final CstlServiceException ex, ServiceDef serviceDef) {
+    private Response processExceptionResponse(final QueryContext queryContext, final CstlServiceException ex, ServiceDef serviceDef, final Worker w) {
         logException(ex);
 
         // Now handle in image response or exception report.
@@ -237,7 +238,7 @@ public class WMSService extends GridWebService<WMSWorker> {
             final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400), queryContext.isOpaque());
             return Response.ok(image, queryContext.getExceptionImageFormat()).build();
         } else {
-            return processExceptionResponse(ex, serviceDef);
+            return processExceptionResponse(ex, serviceDef, w);
         }
     }
 
@@ -245,10 +246,10 @@ public class WMSService extends GridWebService<WMSWorker> {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker w) {
 
         if (serviceDef == null) {
-            serviceDef = getBestVersion(null);
+            serviceDef = w.getBestVersion(null);
         }
         final Version version = serviceDef.exceptionVersion;
         final String locator = ex.getLocator();

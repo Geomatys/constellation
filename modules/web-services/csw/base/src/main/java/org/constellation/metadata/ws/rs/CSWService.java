@@ -43,6 +43,7 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.generic.database.Automatic;
 import org.constellation.jaxb.CstlXMLSerializer;
 import org.constellation.ws.CstlServiceException;
@@ -106,7 +107,7 @@ public class CSWService extends OGCWebService<CSWworker> {
      * Build a new Restful CSW service.
      */
     public CSWService() {
-        super(ServiceDef.CSW_2_0_2);
+        super(Specification.CSW);
         setXMLContext(EBRIMMarshallerPool.getInstance());
         LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", getWorkerMapSize());
     }
@@ -206,7 +207,7 @@ public class CSWService extends OGCWebService<CSWworker> {
             }
 
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, serviceDef);
+            return processExceptionResponse(ex, serviceDef, worker);
 
         }
     }
@@ -247,14 +248,14 @@ public class CSWService extends OGCWebService<CSWworker> {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker w) {
         // asking for authentication
         if (ex instanceof UnauthorizedException) {
             return Response.status(Status.UNAUTHORIZED).header("WWW-Authenticate", " Basic").build();
         }
         logException(ex);
         if (serviceDef == null) {
-            serviceDef = getBestVersion(null);
+            serviceDef = w.getBestVersion(null);
         }
         final String version         = serviceDef.exceptionVersion.toString();
         final String code            = getOWSExceptionCodeRepresentation(ex.getExceptionCode());

@@ -50,6 +50,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.constellation.ws.rs.GridWebService;
 import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
@@ -100,7 +101,7 @@ public class WFSService extends GridWebService<WFSWorker> {
      * Build a new Restful WFS service.
      */
     public WFSService() {
-        super(ServiceDef.WFS_2_0_0, ServiceDef.WFS_1_1_0);
+        super(Specification.WFS);
         try {
             final MarshallerPool pool = new MarshallerPool(
                            "org.geotoolkit.wfs.xml.v110"   +
@@ -138,7 +139,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             // if the request is not an xml request we fill the request parameter.
             final RequestBase request;
             if (objectRequest == null) {
-                version = getVersionFromNumber(getParameter(VERSION_PARAMETER, false)); // needed if exception is launch before request build
+                version = worker.getVersionFromNumber(getParameter(VERSION_PARAMETER, false)); // needed if exception is launch before request build
                 request = adaptQuery(getParameter(REQUEST_PARAMETER, true), worker);
             } else if (objectRequest instanceof RequestBase) {
                 request = (RequestBase) objectRequest;
@@ -244,18 +245,11 @@ public class WFSService extends GridWebService<WFSWorker> {
         }
     }
 
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker w) {
-        if (serviceDef == null) {
-            serviceDef = w.getBestVersion(null);
-        }
-        return processExceptionResponse(ex, serviceDef);
-    }
-    
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker worker) {
          // asking for authentication
         if (ex instanceof UnauthorizedException) {
             return Response.status(Response.Status.UNAUTHORIZED).header("WWW-Authenticate", " Basic").build();
@@ -263,7 +257,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         logException(ex);
 
         if (serviceDef == null) {
-            serviceDef = getBestVersion(null);
+            serviceDef = worker.getBestVersion(null);
         }
         final String version         = serviceDef.exceptionVersion.toString();
         final String exceptionCode   = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
@@ -277,6 +271,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             return Response.ok(report, "text/xml").status(port).build();
         }
     }
+    
     private int getHttpCodeFromErrorCode(final String exceptionCode) {
         if ("CannotLockAllFeatures".equals(exceptionCode) ||
             "FeaturesNotLocked".equals(exceptionCode) ||
