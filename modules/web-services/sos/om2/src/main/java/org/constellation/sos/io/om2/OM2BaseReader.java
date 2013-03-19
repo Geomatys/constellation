@@ -78,7 +78,7 @@ public class OM2BaseReader {
      */
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
     
-    private static final CoordinateReferenceSystem defaultCRS;
+    protected static final CoordinateReferenceSystem defaultCRS;
     static {
         CoordinateReferenceSystem candidate = null;
         try {
@@ -126,36 +126,41 @@ public class OM2BaseReader {
             } else {
                 geom = null;
             } 
-
-            final String gmlVersion = getGMLVersion(version);
-            final FeatureProperty prop;
-            if (sampledFeature != null) {
-                prop = buildFeatureProperty(version, sampledFeature);
-            } else {
-                prop = null;
-            }
-            if (geom instanceof Point) {
-                final org.geotoolkit.gml.xml.Point point = JTStoGeometry.toGML(gmlVersion, (Point)geom, crs);
-                // little hack fo unit test
-                point.setSrsName(null);
-                point.setId("pt-" + id);
-                return buildSamplingPoint(version, id, name, description, prop, point);
-            } else if (geom instanceof LineString) {
-                final org.geotoolkit.gml.xml.LineString line = JTStoGeometry.toGML(gmlVersion, (LineString)geom, crs);
-                line.emptySrsNameOnChild();
-                line.setId("line-" + id);
-                final Envelope bound = line.getBounds();
-                return buildSamplingCurve(version, id, name, description, prop, line, null, null, bound);
-            } else if (geom != null) {
-                return buildSamplingFeature(version, id, name, description, prop);   
-            } else {
-                throw new IllegalArgumentException("Unexpected geometry type:" + geom.getClass());
-            }
+            return buildFoi(version, id, name, description, sampledFeature, geom, crs);
             
         } catch (ParseException ex) {
             throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
         } catch (FactoryException ex) {
             throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
+    protected SamplingFeature buildFoi(final String version, final String id, final String name, final String description, final String sampledFeature, 
+            final Geometry geom, final CoordinateReferenceSystem crs) throws FactoryException {
+        
+        final String gmlVersion = getGMLVersion(version);
+        final FeatureProperty prop;
+        if (sampledFeature != null) {
+            prop = buildFeatureProperty(version, sampledFeature);
+        } else {
+            prop = null;
+        }
+        if (geom instanceof Point) {
+            final org.geotoolkit.gml.xml.Point point = JTStoGeometry.toGML(gmlVersion, (Point)geom, crs);
+            // little hack fo unit test
+            point.setSrsName(null);
+            point.setId("pt-" + id);
+            return buildSamplingPoint(version, id, name, description, prop, point);
+        } else if (geom instanceof LineString) {
+            final org.geotoolkit.gml.xml.LineString line = JTStoGeometry.toGML(gmlVersion, (LineString)geom, crs);
+            line.emptySrsNameOnChild();
+            line.setId("line-" + id);
+            final Envelope bound = line.getBounds();
+            return buildSamplingCurve(version, id, name, description, prop, line, null, null, bound);
+        } else if (geom != null) {
+            return buildSamplingFeature(version, id, name, description, prop);   
+        } else {
+            throw new IllegalArgumentException("Unexpected geometry type:" + geom.getClass());
         }
     }
     

@@ -17,6 +17,9 @@
 
 package org.constellation.sos.io.om2;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKBReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -49,13 +52,16 @@ import org.geotoolkit.swe.xml.UomProperty;
 
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.referencing.CRS;
 
 import org.opengis.observation.Observation;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
+import org.opengis.util.FactoryException;
 
 
 /**
@@ -510,6 +516,56 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
+        }
+    }
+    
+    @Override
+    public List<SamplingFeature> getFeatureOfInterests(final String version) throws CstlServiceException {
+        try {
+            final List<SamplingFeature> features = new ArrayList<SamplingFeature>();
+            final Connection c = source.getConnection();
+            c.setReadOnly(true);
+            final Statement currentStatement = c.createStatement();
+            System.out.println(sqlRequest.toString());
+            final ResultSet rs = currentStatement.executeQuery(sqlRequest.toString());
+            while (rs.next()) {
+                final String id   = rs.getString("id");
+                final String name = rs.getString("name");
+                final String desc = rs.getString("description");
+                final String sf   = rs.getString("sampledfeature");
+                final int srid    = rs.getInt("crs");
+                final byte[] b    = rs.getBytes("shape");
+                final CoordinateReferenceSystem crs;
+                if (srid != 0) {
+                    crs = CRS.decode("urn:ogc:def:crs:EPSG:" + srid);
+                } else {
+                    crs = defaultCRS;
+                }
+                final Geometry geom;
+                if (b != null) {
+                    WKBReader reader = new WKBReader();
+                    geom             = reader.read(b);
+                } else {
+                    geom = null;
+                }
+                features.add(buildFoi(version, id, name, desc, sf, geom, crs));
+            }
+            rs.close();
+            currentStatement.close();
+            c.close();
+            return features;
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(), ex,
+                    NO_APPLICABLE_CODE);
+        }catch (FactoryException ex) {
+            LOGGER.log(Level.SEVERE, "FactoryException while executing the query: {0}", sqlRequest.toString());
+            throw new CstlServiceException("the service has throw a Factory Exception:" + ex.getMessage(), ex,
+                    NO_APPLICABLE_CODE);
+        }catch (ParseException ex) {
+            LOGGER.log(Level.SEVERE, "ParseException while executing the query: {0}", sqlRequest.toString());
+            throw new CstlServiceException("the service has throw a Parse Exception:" + ex.getMessage(), ex,
+                    NO_APPLICABLE_CODE);
         }
     }
 

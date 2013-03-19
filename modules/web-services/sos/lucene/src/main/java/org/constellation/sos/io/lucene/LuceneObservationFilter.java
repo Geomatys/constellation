@@ -378,4 +378,14 @@ public class LuceneObservationFilter implements ObservationFilter {
     public boolean isDefaultTemplateTime() {
         return true;
     }
+
+    @Override
+    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
+        throw new CstlServiceException("initFilterGetFeatureOfInterest is not supported by this ObservationFilter implementation.");
+    }
+
+    @Override
+    public Set<String> filterFeatureOfInterest() throws CstlServiceException {
+        throw new CstlServiceException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
+    }
 }

@@ -21,6 +21,7 @@ import java.util.List;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.Envelope;
 import org.opengis.observation.Observation;
+import org.opengis.observation.sampling.SamplingFeature;
 
 /**
  *
@@ -43,6 +44,9 @@ public interface ObservationFilterReader extends ObservationFilter {
      * @throws CstlServiceException
      */
     List<Observation> getObservations(final String version) throws CstlServiceException;
+    
+    
+    List<SamplingFeature> getFeatureOfInterests(final String version) throws CstlServiceException;
 
     /**
      * Return an encoded block of data in a string.

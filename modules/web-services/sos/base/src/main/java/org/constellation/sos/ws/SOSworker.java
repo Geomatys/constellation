@@ -1522,11 +1522,17 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("You must choose a filter parameter: eventTime, featureId or location", MISSING_PARAMETER_VALUE);
         }
 
+        // we clone the filter for this request
+        final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
+        localOmFilter.initFilterGetFeatureOfInterest();
+        
         // for now we don't support time filter on FOI
         if (request.getTemporalFilters().size() > 0) {
             throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
         }
 
+        boolean ofilter = false;
+        
         if (request.getObservedProperty() != null && !request.getObservedProperty().isEmpty()) {
             for (String observedProperty : request.getObservedProperty()) {
                 // CITE
@@ -1535,9 +1541,9 @@ public class SOSworker extends AbstractWorker {
                 } else if (!omReader.existPhenomenon(observedProperty)){
                     throw new CstlServiceException("This observedProperty is not registered", INVALID_PARAMETER_VALUE, "observedProperty");
                 }
-                // TODO
-                throw new CstlServiceException("The observedProperty parameter is not yet supported in this request");
             }
+            localOmFilter.setObservedProperties(request.getObservedProperty());
+            ofilter = true;
         }
         
         if (request.getProcedure() != null && !request.getProcedure().isEmpty()) {
@@ -1548,9 +1554,9 @@ public class SOSworker extends AbstractWorker {
                 } else if (!omReader.existProcedure(procedure)){
                     throw new CstlServiceException("This procedure is not registered", INVALID_PARAMETER_VALUE, PROCEDURE);
                 }
-                // TODO
-                throw new CstlServiceException("The procedure parameter is not yet supported in this request");
             }
+            localOmFilter.setProcedure(request.getProcedure(), null);
+            ofilter = true;
         }
 
         boolean filter = false;
@@ -1643,8 +1649,29 @@ public class SOSworker extends AbstractWorker {
             filter = true;
         }
         
+        if (ofilter) {
+            if (localOmFilter instanceof ObservationFilterReader) {
+                final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
+                final List<SamplingFeature> sfeatures = ((ObservationFilterReader)localOmFilter).getFeatureOfInterests(currentVersion);
+                for (SamplingFeature sf : sfeatures) {
+                    features.add(buildFeatureProperty(currentVersion, sf));
+                }
+                final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
+                collection.computeBounds();
+                result = collection;
+            } else {
+                final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
+                final Set<String> fid = localOmFilter.filterFeatureOfInterest();
+                for (String foid : fid) {
+                    final SamplingFeature feature = omReader.getFeatureOfInterest(foid, currentVersion);
+                    features.add(buildFeatureProperty(currentVersion, feature));
+                }
+                final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
+                collection.computeBounds();
+                result = collection;
+            }
         // request for all foi
-        if (!filter) {
+        } else if (!filter) {
             final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
             for (String foid : omReader.getFeatureOfInterestNames()) {
                 final SamplingFeature feature = omReader.getFeatureOfInterest(foid, currentVersion);

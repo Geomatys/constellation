@@ -34,6 +34,7 @@ import org.constellation.test.utils.MetadataUtilities;
 
 import static org.constellation.sos.ws.SOSConstants.*;
 import org.geotoolkit.gml.xml.AbstractFeature;
+import org.geotoolkit.gml.xml.v321.FeatureCollectionType;
 import org.geotoolkit.gml.xml.v321.TimeInstantType;
 import org.geotoolkit.gml.xml.v321.TimePeriodType;
 import org.geotoolkit.gml.xml.v321.TimePositionType;
@@ -1260,7 +1261,7 @@ public abstract class SOS2WorkerTest {
     }
 
     /**
-     * Tests the RegisterSensor method
+     * Tests the GetFeatureOfInterest method
      *
      * @throws java.lang.Exception
      */
@@ -1312,6 +1313,42 @@ public abstract class SOS2WorkerTest {
 
 
 
+        marshallerPool.release(unmarshaller);
+    }
+    
+    public void GetFeatureOfInterestObservedPropertiesTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        
+        GetFeatureOfInterestType request = new GetFeatureOfInterestType("2.0.0", "SOS", Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"), null);
+        
+        AbstractFeature result = worker.getFeatureOfInterest(request);
+        
+        assertTrue(result instanceof FeatureCollectionType);
+        
+        FeatureCollectionType collection = (FeatureCollectionType)result;
+        assertEquals(2, collection.getFeatureMember().size());
+        
+        assertTrue(collection.getFeatureMember().get(0).getAbstractFeature() instanceof SFSpatialSamplingFeatureType);
+        
+        SFSpatialSamplingFeatureType sf1 = (SFSpatialSamplingFeatureType) collection.getFeatureMember().get(0).getAbstractFeature();
+        assertEquals("station-002", sf1.getId());
+        SFSpatialSamplingFeatureType sf2 = (SFSpatialSamplingFeatureType) collection.getFeatureMember().get(1).getAbstractFeature();
+        assertEquals("station-006", sf2.getId());
+        
+        request = new GetFeatureOfInterestType("2.0.0", "SOS", Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"), Arrays.asList("urn:ogc:object:sensor:GEOM:8"));
+        
+        result = worker.getFeatureOfInterest(request);
+        
+        assertTrue(result instanceof FeatureCollectionType);
+        
+        collection = (FeatureCollectionType)result;
+        assertEquals(1, collection.getFeatureMember().size());
+        
+        assertTrue(collection.getFeatureMember().get(0).getAbstractFeature() instanceof SFSpatialSamplingFeatureType);
+        
+        sf1 = (SFSpatialSamplingFeatureType) collection.getFeatureMember().get(0).getAbstractFeature();
+        assertEquals("station-006", sf1.getId());
+        
         marshallerPool.release(unmarshaller);
     }
 

@@ -434,12 +434,12 @@ public class DefaultObservationFilter implements ObservationFilter {
 
     @Override
     public void setTimeLatest() throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new CstlServiceException("setTimeLatest is not supported by this ObservationFilter implementation.");
     }
 
     @Override
     public void setTimeFirst() throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new CstlServiceException("setTimeFirst is not supported by this ObservationFilter implementation.");
     }
 
     @Override
@@ -450,5 +450,15 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public boolean isDefaultTemplateTime() {
         return true;
+    }
+
+    @Override
+    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
+        throw new CstlServiceException("initFilterGetFeatureOfInterest is not supported by this ObservationFilter implementation.");
+    }
+
+    @Override
+    public Set<String> filterFeatureOfInterest() throws CstlServiceException {
+        throw new CstlServiceException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
     }
 }

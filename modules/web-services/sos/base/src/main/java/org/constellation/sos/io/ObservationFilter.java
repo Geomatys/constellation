@@ -43,6 +43,11 @@ public interface ObservationFilter {
      * Initialize the query for a restricted to the results request.
      */
     void initFilterGetResult(final String procedure, final QName resultModel) throws CstlServiceException;
+    
+    /**
+     * Initialize the query for a restricted to the results request.
+     */
+    void initFilterGetFeatureOfInterest() throws CstlServiceException;
 
     /**
      * Add some procedure filter to the request.
@@ -163,6 +168,14 @@ public interface ObservationFilter {
      * @throws org.constellation.ws.CstlServiceException
      */
     Set<String> filterObservation() throws CstlServiceException;
+    
+    
+    /**
+     * Execute the current query and return a list of FOI ID.
+     * @return
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    Set<String> filterFeatureOfInterest() throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.

@@ -290,6 +290,13 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
         super.insertResultTest();
     }
     
+    @Test
+    @Override
+    @Order(order=14)
+    public void GetFeatureOfInterestObservedPropertiesTest() throws Exception {
+        super.GetFeatureOfInterestObservedPropertiesTest();
+    }
+    
     /**
      * Tests the destroy method
      *
@@ -297,7 +304,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
-    @Order(order=14)
+    @Order(order=15)
     public void destroyTest() throws Exception {
         super.destroyTest();
     }

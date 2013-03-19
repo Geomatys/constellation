@@ -32,6 +32,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
+import static org.constellation.sos.io.om2.OM2BaseReader.LOGGER;
 import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.sos.ws.Utils.*;
@@ -136,13 +137,23 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
         //we add to the request the property of the template
         sqlRequest.append(" AND \"procedure\"='").append(procedure).append("'");
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initFilterGetFeatureOfInterest() {
+        firstFilter = false;
+        sqlRequest = new StringBuilder("SELECT distinct sf.* FROM \"om\".\"observations\" o, \"om\".\"sampling_features\" sf "
+                                     + "WHERE o.\"foi\" = sf.\"id\"");
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void setProcedure(final List<String> procedures, final List<ObservationOffering> offerings) {
-        if (!procedures.isEmpty()) {
+        if (procedures != null && !procedures.isEmpty()) {
             if (firstFilter) {
                 sqlRequest.append(" ( ");
             } else {
@@ -156,7 +167,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
             sqlRequest.append(") ");
             firstFilter = false;
-        } else if (!offerings.isEmpty()) {
+        } else if (offerings != null && !offerings.isEmpty()) {
             
             if (firstFilter) {
                 sqlRequest.append(" ( ");
@@ -401,7 +412,31 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
-
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<String> filterFeatureOfInterest() throws CstlServiceException {
+        LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
+        try {
+            final Set<String> results        = new LinkedHashSet<String>();
+            final Connection c               = source.getConnection();
+            final Statement currentStatement = c.createStatement();
+            final ResultSet result           = currentStatement.executeQuery(sqlRequest.toString());
+            while (result.next()) {
+                results.add(result.getString("id"));
+            }
+            result.close();
+            currentStatement.close();
+            c.close();
+            return results;
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
+        }
     }
 
     /**
