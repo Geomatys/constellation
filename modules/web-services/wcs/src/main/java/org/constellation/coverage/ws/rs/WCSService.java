@@ -44,6 +44,7 @@ import static org.constellation.api.QueryConstants.*;
 import org.constellation.coverage.ws.DefaultWCSWorker;
 import static org.constellation.coverage.ws.WCSConstant.*;
 import org.constellation.ws.ExceptionCode;
+import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.CodeType;
@@ -142,12 +143,12 @@ public class WCSService extends GridWebService<WCSWorker> {
             // if the request is not an xml request we fill the request parameter.
             if (objectRequest == null) {
                 request = getParameter(REQUEST_PARAMETER, true);
-                objectRequest = adaptQuery(request);
+                objectRequest = adaptQuery(request, worker);
             }
 
             if (objectRequest instanceof GetCapabilities){
                 final GetCapabilities getcaps = (GetCapabilities)objectRequest;
-                serviceDef              = getVersionFromNumber(getcaps.getVersion());
+                serviceDef              = worker.getVersionFromNumber(getcaps.getVersion());
 
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
                 return Response.ok(capsResponse, MimeType.TEXT_XML).build();
@@ -170,7 +171,7 @@ public class WCSService extends GridWebService<WCSWorker> {
                     throw new CstlServiceException("The parameter version must be specified",
                         MISSING_PARAMETER_VALUE, "version");
                 }
-                serviceDef = getVersionFromNumber(desccov.getVersion());
+                serviceDef = worker.getVersionFromNumber(desccov.getVersion());
                 final DescribeCoverageResponse describeResponse = worker.describeCoverage(desccov);
                 return Response.ok(describeResponse, MimeType.TEXT_XML).build();
             }
@@ -187,7 +188,7 @@ public class WCSService extends GridWebService<WCSWorker> {
                     throw new CstlServiceException("The parameter format must be specified",
                         MISSING_PARAMETER_VALUE, "format");
                 }
-                serviceDef = getVersionFromNumber(getcov.getVersion());
+                serviceDef = worker.getVersionFromNumber(getcov.getVersion());
                 String format = getcov.getFormat();
                 if (!isSupportedFormat(format)){
                     throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
@@ -280,13 +281,13 @@ public class WCSService extends GridWebService<WCSWorker> {
         return Response.ok(report, MimeType.APP_SE_XML).build();
     }
 
-    public RequestBase adaptQuery(final String request) throws CstlServiceException {
+    public RequestBase adaptQuery(final String request, final Worker w) throws CstlServiceException {
         if (GETCAPABILITIES.equalsIgnoreCase(request)) {
             return adaptKvpGetCapabilitiesRequest();
         } else if (GETCOVERAGE.equalsIgnoreCase(request)) {
-            return adaptKvpGetCoverageRequest();
+            return adaptKvpGetCoverageRequest(w);
         } else if (DESCRIBECOVERAGE.equalsIgnoreCase(request)) {
-            return adaptKvpDescribeCoverageRequest();
+            return adaptKvpDescribeCoverageRequest(w);
         }
         throw new CstlServiceException("The operation " + request + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
@@ -366,9 +367,9 @@ public class WCSService extends GridWebService<WCSWorker> {
      * @return a marshallable DescribeCoverage request.
      * @throws CstlServiceException
      */
-    private DescribeCoverage adaptKvpDescribeCoverageRequest() throws CstlServiceException {
+    private DescribeCoverage adaptKvpDescribeCoverageRequest(final Worker w) throws CstlServiceException {
         final String strVersion = getParameter(KEY_VERSION, true);
-        isVersionSupported(strVersion);
+        w.checkVersionSupported(strVersion);
         final String coverage;
         if ("1.0.0".equals(strVersion)) {
             coverage = getParameter(KEY_COVERAGE, true);
@@ -388,10 +389,10 @@ public class WCSService extends GridWebService<WCSWorker> {
      * @return a marshallable GetCoverage request.
      * @throws CstlServiceException
      */
-    private GetCoverage adaptKvpGetCoverageRequest() throws CstlServiceException {
+    private GetCoverage adaptKvpGetCoverageRequest(final Worker w) throws CstlServiceException {
         final String strVersion = getParameter(VERSION_PARAMETER, true);
-        isVersionSupported(strVersion);
-        final ServiceDef serviceDef = getVersionFromNumber(strVersion);
+        w.checkVersionSupported(strVersion);
+        final ServiceDef serviceDef = w.getVersionFromNumber(strVersion);
         if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {
             return adaptKvpGetCoverageRequest100();
          } else if (serviceDef.equals(ServiceDef.WCS_1_1_1)) {

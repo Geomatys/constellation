@@ -96,6 +96,8 @@ public interface Worker {
      */
     ServiceDef getVersionFromNumber(final Version number);
     
+    ServiceDef getVersionFromNumber(final String number);
+    
     /**
      * If the requested version number is not available we choose the best version to return.
      *
@@ -113,4 +115,6 @@ public interface Worker {
     boolean isRequestValidationActivated();
     
     List<Schema> getRequestValidationSchema();
+    
+    void checkVersionSupported(final String version) throws CstlServiceException;
 }

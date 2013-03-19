@@ -579,7 +579,7 @@ public abstract class WebService {
      * Extract all The parameters from the query and write it in the console.
      * It is a debug method.
      */
-    protected void logParameters() throws CstlServiceException {
+    protected void logParameters() {
         if (!fullRequestLog) {
             final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
             if (!parameters.isEmpty()) {
@@ -595,7 +595,7 @@ public abstract class WebService {
         }
     }
     
-    protected void logPostParameters(final Object request) throws CstlServiceException {
+    protected void logPostParameters(final Object request) {
         if (request != null) {
             final MarshallerPool pool = getMarshallerPool();
             try {

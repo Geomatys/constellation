@@ -557,7 +557,7 @@ public class WPSWorker extends AbstractWorker {
         }
 
         //check mandatory version is not missing.
-        if (request.getVersion() == null || request.getVersion().isEmpty()) {
+        if (request.getVersion() == null || request.getVersion().toString().isEmpty()) {
             throw new CstlServiceException("The parameter " + VERSION_PARAMETER + " must be specified.",
                     MISSING_PARAMETER_VALUE, VERSION_PARAMETER.toLowerCase());
         }
@@ -839,7 +839,7 @@ public class WPSWorker extends AbstractWorker {
         }
 
         //check mandatory version is not missing.
-        if (request.getVersion() == null || request.getVersion().isEmpty()) {
+        if (request.getVersion() == null || request.getVersion().toString().isEmpty()) {
             throw new CstlServiceException("The parameter " + VERSION_PARAMETER + " must be specified.",
                     MISSING_PARAMETER_VALUE, VERSION_PARAMETER.toLowerCase());
         }

@@ -59,6 +59,7 @@ import org.constellation.configuration.AcknowlegementType;
 import static org.constellation.metadata.CSWConstants.*;
 import org.constellation.ws.UnauthorizedException;
 import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWResponse;
@@ -131,7 +132,7 @@ public class CSWService extends OGCWebService<CSWworker> {
      * {@inheritDoc}
      */
     @Override
-    protected Response treatIncomingRequest(final Object objectRequest, CSWworker worker) {
+    protected Response treatIncomingRequest(final Object objectRequest, final CSWworker worker) {
         ServiceDef serviceDef = null;
 
         try {
@@ -142,7 +143,7 @@ public class CSWService extends OGCWebService<CSWworker> {
                 // if the request is not an xml request we fill the request parameter.
                 final RequestBase request;
                 if (objectRequest == null) {
-                    request = adaptQuery(getParameter("REQUEST", true));
+                    request = adaptQuery(getParameter("REQUEST", true), worker);
                 } else if (objectRequest instanceof RequestBase) {
                     request = (RequestBase) objectRequest;
                 } else {
@@ -150,7 +151,7 @@ public class CSWService extends OGCWebService<CSWworker> {
                         INVALID_PARAMETER_VALUE, "request");
                 }
 
-                serviceDef = getVersionFromNumber(request.getVersion());
+                serviceDef = worker.getVersionFromNumber(request.getVersion());
 
                 if (request instanceof GetCapabilities) {
 
@@ -321,10 +322,10 @@ public class CSWService extends OGCWebService<CSWworker> {
      * @return
      * @throws CstlServiceException
      */
-    private RequestBase adaptQuery(String request) throws CstlServiceException {
+    private RequestBase adaptQuery(final String request, final Worker w) throws CstlServiceException {
 
         if ("GetCapabilities".equalsIgnoreCase(request)) {
-            return createNewGetCapabilitiesRequest();
+            return createNewGetCapabilitiesRequest(w);
         } else if ("GetRecords".equalsIgnoreCase(request)) {
             return createNewGetRecordsRequest();
         } else if ("GetRecordById".equalsIgnoreCase(request)) {
@@ -345,7 +346,7 @@ public class CSWService extends OGCWebService<CSWworker> {
     /**
      * Build a new GetCapabilities request object with the url parameters
      */
-    private GetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
+    private GetCapabilities createNewGetCapabilitiesRequest(final Worker w) throws CstlServiceException {
 
         final String service = getParameter(SERVICE_PARAMETER, true);
         
@@ -357,7 +358,7 @@ public class CSWService extends OGCWebService<CSWworker> {
                 acceptVersion = acceptVersion.substring(0, acceptVersion.indexOf(','));
             }
             version = acceptVersion;
-            isVersionSupported(version);
+            w.checkVersionSupported(version);
             versions = CswXmlFactory.buildAcceptVersion(version, Arrays.asList(acceptVersion));
         } else {
             version = "2.0.2";

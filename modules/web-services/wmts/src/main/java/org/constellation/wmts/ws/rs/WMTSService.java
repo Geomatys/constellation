@@ -110,7 +110,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
                 throw new CstlServiceException("The operation " + objectRequest.getClass().getName() + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
             }
-            serviceDef = getVersionFromNumber(request.getVersion());
+            serviceDef = worker.getVersionFromNumber(request.getVersion());
 
             if (request instanceof GetCapabilities) {
                 final GetCapabilities gc = (GetCapabilities) request;

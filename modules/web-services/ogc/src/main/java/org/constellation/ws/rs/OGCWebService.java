@@ -57,7 +57,6 @@ import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -277,40 +276,37 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         } else {
             objectRequest = request;
         }
+
+        final String serviceID = getSafeParameter("serviceId");
         
-        try {
-            final String serviceID = getParameter("serviceId", false);
-            // request is send to the specified worker
-            if (serviceID != null && WSEngine.serviceInstanceExist(serviceName, serviceID)) {
-                final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
-                if (worker.isSecured()) {
-                    final String ip = getHttpServletRequest().getRemoteAddr();
-                    final String referer = getHttpContext().getRequest().getHeaderValue("referer");
-                    if (!worker.isAuthorized(ip, referer)) {
-                        LOGGER.log(Level.INFO, "Received a request from unauthorized ip:{0} or referer:{1}",
-                                new String[]{ip, referer});
-                        return Response.status(Response.Status.UNAUTHORIZED).build();
-                    }
+        // request is send to the specified worker
+        if (serviceID != null && WSEngine.serviceInstanceExist(serviceName, serviceID)) {
+            final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
+            if (worker.isSecured()) {
+                final String ip = getHttpServletRequest().getRemoteAddr();
+                final String referer = getHttpContext().getRequest().getHeaderValue("referer");
+                if (!worker.isAuthorized(ip, referer)) {
+                    LOGGER.log(Level.INFO, "Received a request from unauthorized ip:{0} or referer:{1}",
+                            new String[]{ip, referer});
+                    return Response.status(Response.Status.UNAUTHORIZED).build();
                 }
-                if (worker.isPostRequestLog()) {
-                    logPostParameters(request);
-                }
-                if (worker.isPrintRequestParameter()) {
-                    logParameters();
-                }
-                return treatIncomingRequest(objectRequest, worker);
-
-            // administration a the instance
-            } else if ("admin".equals(serviceID)){
-                return treatAdminRequest(objectRequest);
-
-            // unbounded URL
-            } else {
-                LOGGER.log(Level.WARNING, "Received request on undefined instance identifier:{0}", serviceID);
-                return Response.status(Response.Status.NOT_FOUND).build();
             }
-        } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, supportedVersions.get(0));
+            if (worker.isPostRequestLog()) {
+                logPostParameters(request);
+            }
+            if (worker.isPrintRequestParameter()) {
+                logParameters();
+            }
+            return treatIncomingRequest(objectRequest, worker);
+
+        // administration a the instance
+        } else if ("admin".equals(serviceID)){
+            return treatAdminRequest(objectRequest);
+
+        // unbounded URL
+        } else {
+            LOGGER.log(Level.WARNING, "Received request on undefined instance identifier:{0}", serviceID);
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
 
@@ -634,8 +630,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      */
     @PUT
     public Response uploadFile(final InputStream in) {
-        try  {
-            final String serviceID = getParameter("serviceId", false);
+        final String serviceID = getSafeParameter("serviceId");
+        try {
             // allow this method only for admin
             if ("admin".equals(serviceID)) {
                 final File tmp          = File.createTempFile("cstl-", null);
@@ -652,9 +648,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             launchException("error while uploading the file", NO_APPLICABLE_CODE.name(), null);
             // should never happen
             return null;
-        } catch (CstlServiceException ex) {
-            final ServiceDef mainVersion = supportedVersions.get(0);
-            return processExceptionResponse(ex, mainVersion);
         }
     }
 
@@ -701,26 +694,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @return an xml response.
      */
     protected abstract Response treatIncomingRequest(final Object objectRequest,final  W worker);
-
-    /**
-     * Verify if the version is supported by this serviceType.
-     * <p>
-     * If the version is not accepted we send an exception.
-     * </p>
-     * @Deprecated move to abstractWorker
-     */
-    @Deprecated
-    protected void isVersionSupported(final String versionNumber) throws CstlServiceException {
-        if (getVersionFromNumber(versionNumber) == null) {
-            final StringBuilder messageb = new StringBuilder("The parameter ");
-            for (ServiceDef vers : supportedVersions) {
-                messageb.append("VERSION=").append(vers.version.toString()).append(" OR ");
-            }
-            messageb.delete(messageb.length()-4, messageb.length()-1);
-            messageb.append(" must be specified");
-            throw new CstlServiceException(messageb.toString(), VERSION_NEGOTIATION_FAILED, "version");
-        }
-    }
 
     /**
      * Handle all exceptions returned by a web service operation in two ways:
@@ -795,27 +768,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         for (ServiceDef v : supportedVersions) {
             if (v.version.toString().equals(number)){
                 return v;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Return a Version Object from the version number.
-     * if the version number is not correct return the default version.
-     *
-     * @param number the version number.
-     * @return
-     * 
-     * @deprecated use Worker.getVersionFromNumber()
-     */
-    @Deprecated
-    protected ServiceDef getVersionFromNumber(final Version number) {
-        if (number != null) {
-            for (ServiceDef v : supportedVersions) {
-                if (v.version.toString().equals(number.toString())){
-                    return v;
-                }
             }
         }
         return null;

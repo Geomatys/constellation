@@ -126,7 +126,7 @@ public class SOService extends OGCWebService<SOSworker> {
                         INVALID_PARAMETER_VALUE, "request");
             }
 
-            serviceDef = getVersionFromNumber(request.getVersion());
+            serviceDef = worker.getVersionFromNumber(request.getVersion());
             final String currentVersion;
             if (request.getVersion() != null) {
                 currentVersion = request.getVersion().toString();
@@ -354,7 +354,7 @@ public class SOService extends OGCWebService<SOSworker> {
         if (currentVersion == null) {
             currentVersion = worker.getBestVersion(null).version.toString();
         }
-        isVersionSupported(currentVersion);
+        worker.checkVersionSupported(currentVersion);
 
         final List<String> versions = new ArrayList<String>();
         if (version != null) {

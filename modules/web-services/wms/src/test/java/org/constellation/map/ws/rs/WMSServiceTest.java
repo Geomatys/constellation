@@ -31,6 +31,8 @@ import org.constellation.map.ws.QueryContext;
 import org.constellation.ws.rs.WebService;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
+import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
 
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.display2d.GO2Utilities;
@@ -85,6 +87,7 @@ public class WMSServiceTest {
 
     private GetMap callGetMap() throws IllegalAccessException, IllegalArgumentException,
                                        InvocationTargetException, NoSuchMethodException{
+        
         //do not use this in real code, just for testing
         final Method adaptGetMapMethod = WMSService.class.getDeclaredMethod(
                 "adaptGetMap", String.class, boolean.class, QueryContext.class);
@@ -96,10 +99,11 @@ public class WMSServiceTest {
     private GetFeatureInfo callGetFeatureInfo() throws IllegalAccessException, IllegalArgumentException,
                                        InvocationTargetException, NoSuchMethodException{
         //do not use this in real code, just for testing
+        final Worker worker = WSEngine.getInstance("WMS", "default");
         final Method adaptGetMapMethod = WMSService.class.getDeclaredMethod(
-                "adaptGetFeatureInfo", String.class, QueryContext.class);
+                "adaptGetFeatureInfo", String.class, QueryContext.class, Worker.class);
         adaptGetMapMethod.setAccessible(true);
-        final GetFeatureInfo getFI = (GetFeatureInfo)adaptGetMapMethod.invoke(service, "1.3.0",new QueryContext());
+        final GetFeatureInfo getFI = (GetFeatureInfo)adaptGetMapMethod.invoke(service, "1.3.0",new QueryContext(), worker);
         return getFI;
     }
 

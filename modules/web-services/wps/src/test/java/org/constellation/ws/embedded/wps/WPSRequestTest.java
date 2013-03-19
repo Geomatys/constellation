@@ -76,7 +76,7 @@ public class WPSRequestTest  extends AbstractGrizzlyServer {
         // Try to marshall something from the response returned by the server.
         // The response should be a WPSCapabilitiesType.
         Object obj = unmarshallResponse(getCapsUrl);
-        assertTrue(obj instanceof WPSCapabilitiesType);
+        assertTrue("was " + obj, obj instanceof WPSCapabilitiesType);
 
         WPSCapabilitiesType responseCaps = (WPSCapabilitiesType)obj;
 

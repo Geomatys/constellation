@@ -82,6 +82,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
 import static org.constellation.api.QueryConstants.*;
+import org.constellation.ws.Worker;
 
 /**
  * The REST facade to an OGC Web Map Service, implementing versions 1.1.1 and
@@ -123,7 +124,7 @@ public class WMSService extends GridWebService<WMSWorker> {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest, WMSWorker worker) {
+    public Response treatIncomingRequest(final Object objectRequest, final WMSWorker worker) {
         final QueryContext queryContext = new QueryContext();
 
         ServiceDef version = null;
@@ -140,10 +141,10 @@ public class WMSService extends GridWebService<WMSWorker> {
                     throw new CstlServiceException("The parameter version must be specified",
                         MISSING_PARAMETER_VALUE, "version");
                 }
-                isVersionSupported(versionSt);
+                worker.checkVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final GetMap requestMap = adaptGetMap(versionSt, true, queryContext);
-                version = getVersionFromNumber(requestMap.getVersion());
+                version = worker.getVersionFromNumber(requestMap.getVersion());
                 final PortrayalResponse map = worker.getMap(requestMap);
                 return Response.ok(map, requestMap.getFormat()).build();
             }
@@ -156,10 +157,10 @@ public class WMSService extends GridWebService<WMSWorker> {
                     throw new CstlServiceException("The parameter version must be specified",
                         MISSING_PARAMETER_VALUE, "version");
                 }
-                isVersionSupported(versionSt);
+                worker.checkVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
-                final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo(versionSt, queryContext);
-                version = getVersionFromNumber(requestFeatureInfo.getVersion());
+                final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo(versionSt, queryContext, worker);
+                version = worker.getVersionFromNumber(requestFeatureInfo.getVersion());
                 final GetFeatureInfoVisitor visitor = worker.getFeatureInfo(requestFeatureInfo);
                 final Object result = visitor.getResult();
                 //Need to reset the GML mime format to XML for browsers
@@ -185,9 +186,9 @@ public class WMSService extends GridWebService<WMSWorker> {
                         versionSt = getParameter(KEY_WMTVER, false);
                     }
                 }
-                final GetCapabilities requestCapab = adaptGetCapabilities(versionSt);
+                final GetCapabilities requestCapab = adaptGetCapabilities(versionSt, worker);
                 if (version == null) {
-                    version = getVersionFromNumber(requestCapab.getVersion());
+                    version = worker.getVersionFromNumber(requestCapab.getVersion());
                 }
                 worker.setServiceUrl(getServiceURL());
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
@@ -196,7 +197,7 @@ public class WMSService extends GridWebService<WMSWorker> {
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 final GetLegendGraphic requestLegend = adaptGetLegendGraphic();
-                version = getVersionFromNumber(requestLegend.getVersion());
+                version = worker.getVersionFromNumber(requestLegend.getVersion());
                 final PortrayalResponse legend = worker.getLegendGraphic(requestLegend);
                 return Response.ok(legend, requestLegend.getFormat()).build();
             }
@@ -209,10 +210,10 @@ public class WMSService extends GridWebService<WMSWorker> {
                     throw new CstlServiceException("The parameter version must be specified",
                         MISSING_PARAMETER_VALUE, "version");
                 }
-                isVersionSupported(versionSt);
+                worker.checkVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
-                final DescribeLayer describeLayer = adaptDescribeLayer(versionSt);
-                version = getVersionFromNumber(describeLayer.getVersion());
+                final DescribeLayer describeLayer = adaptDescribeLayer(versionSt, worker);
+                version = worker.getVersionFromNumber(describeLayer.getVersion());
                 worker.setServiceUrl(getServiceURL());
                 final DescribeLayerResponseType response = worker.describeLayer(describeLayer);
                 return Response.ok(response, MimeType.TEXT_XML).build();
@@ -275,12 +276,12 @@ public class WMSService extends GridWebService<WMSWorker> {
      * @return The DescribeLayer request.
      * @throws CstlServiceException
      */
-    private DescribeLayer adaptDescribeLayer(final String version) throws CstlServiceException {
-        ServiceDef serviceDef = getVersionFromNumber(version);
+    private DescribeLayer adaptDescribeLayer(final String version, final Worker worker) throws CstlServiceException {
+        ServiceDef serviceDef = worker.getVersionFromNumber(version);
         if (serviceDef == null) {
-            serviceDef = getBestVersion(null);
+            serviceDef = worker.getBestVersion(null);
         }
-        isVersionSupported(version);
+        worker.checkVersionSupported(version);
         final String strLayer  = getParameter(KEY_LAYERS,  true);
         final List<String> layers = StringUtilities.toStringList(strLayer);
         return new DescribeLayer(layers, serviceDef.version);
@@ -294,7 +295,7 @@ public class WMSService extends GridWebService<WMSWorker> {
      * @return A GetCapabilities request.
      * @throws CstlServiceException
      */
-    private GetCapabilities adaptGetCapabilities(final String version) throws CstlServiceException {
+    private GetCapabilities adaptGetCapabilities(final String version, final Worker worker) throws CstlServiceException {
         final String service = getParameter(SERVICE_PARAMETER, true);
         if (!ServiceDef.Specification.WMS.toString().equalsIgnoreCase(service)) {
             throw new CstlServiceException("Invalid service specified. Should be WMS.",
@@ -302,7 +303,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         }
         final String language = getParameter(KEY_LANGUAGE, false);
         if (version == null) {
-            final ServiceDef capsService = getBestVersion(null);
+            final ServiceDef capsService = worker.getBestVersion(null);
             String format = getParameter(KEY_FORMAT, false);
             // Verify that the format is not null, and is not something totally different from the known
             // output formats. If it is the case, choose the default output format according to the version.
@@ -315,7 +316,7 @@ public class WMSService extends GridWebService<WMSWorker> {
             }
             return new GetCapabilities(capsService.version, format, language);
         }
-        final ServiceDef bestVersion = getBestVersion(version);
+        final ServiceDef bestVersion = worker.getBestVersion(version);
         String format = getParameter(KEY_FORMAT, false);
         // Verify that the format is not null, and is not something totally different from the known
         // output formats. If it is the case, choose the default output format according to the version.
@@ -339,9 +340,9 @@ public class WMSService extends GridWebService<WMSWorker> {
      * @return A GetFeatureInfo request.
      * @throws CstlServiceException
      */
-    private GetFeatureInfo adaptGetFeatureInfo(final String version, final QueryContext queryContext) throws CstlServiceException, NumberFormatException {
+    private GetFeatureInfo adaptGetFeatureInfo(final String version, final QueryContext queryContext, final Worker worker) throws CstlServiceException, NumberFormatException {
         final GetMap getMap  = adaptGetMap(version, false, queryContext);
-        isVersionSupported(version);
+        worker.checkVersionSupported(version);
         final String strX    = getParameter(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_I_V111 : KEY_I_V130, true);
         final String strY    = getParameter(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_J_V111 : KEY_J_V130, true);
         final String strQueryLayers = getParameter(KEY_QUERY_LAYERS, true);

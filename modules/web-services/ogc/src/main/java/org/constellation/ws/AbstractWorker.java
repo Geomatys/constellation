@@ -42,6 +42,7 @@ import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 
 import org.geotoolkit.ows.xml.OWSExceptionCode;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
@@ -166,6 +167,25 @@ public abstract class AbstractWorker implements Worker {
     }
     
     /**
+     * Verify if the version is supported by this serviceType.
+     * <p>
+     * If the version is not accepted we send an exception.
+     * </p>
+     */
+    @Override
+    public void checkVersionSupported(final String versionNumber) throws CstlServiceException {
+        if (getVersionFromNumber(versionNumber) == null) {
+            final StringBuilder messageb = new StringBuilder("The parameter ");
+            for (ServiceDef vers : supportedVersions) {
+                messageb.append("VERSION=").append(vers.version.toString()).append(" OR ");
+            }
+            messageb.delete(messageb.length()-4, messageb.length()-1);
+            messageb.append(" must be specified");
+            throw new CstlServiceException(messageb.toString(), VERSION_NEGOTIATION_FAILED, "version");
+        }
+    }
+    
+    /**
      * Return a Version Object from the version number.
      * if the version number is not correct return the default version.
      *
@@ -179,6 +199,24 @@ public abstract class AbstractWorker implements Worker {
                 if (v.version.toString().equals(number.toString())){
                     return v;
                 }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Return a Version Object from the version number.
+     * if the version number is not correct return the default version.
+     *
+     * @param number the version number.
+     * @return
+     * 
+     */
+    @Override
+    public ServiceDef getVersionFromNumber(final String number) {
+        for (ServiceDef v : supportedVersions) {
+            if (v.version.toString().equals(number)){
+                return v;
             }
         }
         return null;

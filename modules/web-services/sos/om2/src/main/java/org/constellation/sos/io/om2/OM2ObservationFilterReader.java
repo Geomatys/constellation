@@ -499,7 +499,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 oldTime = currentTime;
             }
             // empty result 
-            if (first) {
+            if (!first) {
                 values.append(encoding.getBlockSeparator());
             }
             rs.close();

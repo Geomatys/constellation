@@ -48,7 +48,9 @@ import java.util.logging.Level;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wps.ws.WPSConstant.*;
+import org.constellation.ws.Worker;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.RequestBase;
 
 /**
  * WPS web service class.
@@ -143,10 +145,10 @@ public class WPSService extends OGCWebService<WPSWorker> {
     }
 
     @Override
-    protected Response treatIncomingRequest(Object objectRequest, WPSWorker worker) {
+    protected Response treatIncomingRequest(final Object objectRequest, final WPSWorker worker) {
         final UriInfo uriContext = getUriContext();
 
-        ServiceDef serviceDef = null;
+        ServiceDef version = null;
 
         worker.setServiceUrl(getServiceURL());
         try {
@@ -156,23 +158,26 @@ public class WPSService extends OGCWebService<WPSWorker> {
             }
 
             // if the request is not an xml request we fill the request parameter.
+            final RequestBase request;
             if (objectRequest == null) {
-
-
                 //build objectRequest from parameters
-                final String request = getParameter(REQUEST_PARAMETER, true);
-                objectRequest = adaptQuery(request);
+                version = getVersionFromNumber(getParameter(VERSION_PARAMETER, false)); // needed if exception is launch before request build
+                final String requestName = getParameter(REQUEST_PARAMETER, true);
+                request = adaptQuery(requestName, worker);
+            } else if (objectRequest instanceof RequestBase) {
+                request = (RequestBase) objectRequest;
+            } else {
+                throw new CstlServiceException("The operation " + objectRequest.getClass().getName() + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
             }
 
-            if(objectRequest instanceof RequestBaseType){
-                serviceDef = getVersionFromNumber(((RequestBaseType)objectRequest).getVersion());
-            }
+            version = worker.getVersionFromNumber(request.getVersion());
 
             /*
              * GetCapabilities request
              */
-            if (objectRequest instanceof GetCapabilities) {
-                final GetCapabilities getcaps = (GetCapabilities) objectRequest;
+            if (request instanceof GetCapabilities) {
+                final GetCapabilities getcaps = (GetCapabilities) request;
                 final WPSCapabilitiesType capsResponse = worker.getCapabilities(getcaps);
                 return Response.ok(capsResponse, MimeType.TEXT_XML).build();
             }
@@ -180,8 +185,8 @@ public class WPSService extends OGCWebService<WPSWorker> {
             /*
              * DescribeProcess request
              */
-            if (objectRequest instanceof DescribeProcess) {
-                final DescribeProcess descProc = (DescribeProcess) objectRequest;
+            if (request instanceof DescribeProcess) {
+                final DescribeProcess descProc = (DescribeProcess) request;
                 final ProcessDescriptions describeResponse = worker.describeProcess(descProc);
                 return Response.ok(describeResponse, MimeType.TEXT_XML).build();
             }
@@ -189,8 +194,8 @@ public class WPSService extends OGCWebService<WPSWorker> {
             /*
              * Execute request
              */
-            if (objectRequest instanceof Execute) {
-                final Execute exec = (Execute) objectRequest;
+            if (request instanceof Execute) {
+                final Execute exec = (Execute) request;
                 final Object executeResponse = worker.execute(exec);
 
                 boolean isTextPlain = false;
@@ -215,7 +220,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
 
             }
 
-            throw new CstlServiceException("This service can not handle the requested operation: " + objectRequest + ".",
+            throw new CstlServiceException("This service can not handle the requested operation: " + request + ".",
                     OPERATION_NOT_SUPPORTED, REQUEST_PARAMETER.toLowerCase());
 
         } catch (CstlServiceException ex) {
@@ -223,7 +228,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
              * This block handles all the exceptions which have been generated anywhere in the service and transforms them to a response
              * message for the protocol stream which JAXB, in this case, will then marshall and serialize into an XML message HTTP response.
              */
-            return processExceptionResponse(ex, serviceDef);
+            return processExceptionResponse(ex, version);
 
         }
 
@@ -253,12 +258,12 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * @return GetCapabilities or DescribeProcess or Execute object.
      * @throws CstlServiceException if request is unknow.
      */
-    public Object adaptQuery(final String request) throws CstlServiceException {
+    public RequestBase adaptQuery(final String request, final Worker w) throws CstlServiceException {
 
         if (GETCAPABILITIES.equalsIgnoreCase(request)) {
             return adaptKvpGetCapabilitiesRequest();
         } else if (DESCRIBEPROCESS.equalsIgnoreCase(request)) {
-            return adaptKvpDescribeProcessRequest();
+            return adaptKvpDescribeProcessRequest(w);
         } else if (EXECUTE.equalsIgnoreCase(request)) {
             return adaptKvpExecuteRequest();
         }
@@ -293,10 +298,10 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * @return DescribeProcess object.
      * @throws CstlServiceException if mandatory parameters are missing.
      */
-    private DescribeProcess adaptKvpDescribeProcessRequest() throws CstlServiceException {
+    private DescribeProcess adaptKvpDescribeProcessRequest(final Worker w) throws CstlServiceException {
 
         final String strVersion = getParameter(VERSION_PARAMETER, true);
-        isVersionSupported(strVersion);
+        w.checkVersionSupported(strVersion);
 
         final DescribeProcess describe = new DescribeProcess();
         describe.setService(getParameter(SERVICE_PARAMETER, true));

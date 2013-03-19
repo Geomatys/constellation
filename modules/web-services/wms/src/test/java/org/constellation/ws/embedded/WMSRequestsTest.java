@@ -397,7 +397,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
         Object obj = unmarshallResponse(getCapsUrl);
-        assertTrue(obj instanceof WMT_MS_Capabilities);
+        assertTrue("was:" + obj, obj instanceof WMT_MS_Capabilities);
 
         WMT_MS_Capabilities responseCaps = (WMT_MS_Capabilities)obj;
         Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.getLocalPart());

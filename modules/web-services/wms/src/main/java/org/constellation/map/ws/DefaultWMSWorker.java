@@ -208,7 +208,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     public DefaultWMSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WMS);
-        setSupportedVersion(ServiceDef.WMS_1_3_0, ServiceDef.WMS_1_0_0);
+        setSupportedVersion(ServiceDef.WMS_1_3_0_SLD, ServiceDef.WMS_1_1_1_SLD);
 
         mapPortrayal = new WMSPortrayal();
 
