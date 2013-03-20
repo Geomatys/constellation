@@ -201,7 +201,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
                     srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
                     srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
                     srcconfig.parameter(USER.getName().getCode()).setValue("test");
-                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");
+                    srcconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
                     srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
 
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);

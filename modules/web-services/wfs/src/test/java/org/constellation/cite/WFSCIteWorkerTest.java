@@ -207,7 +207,7 @@ public class WFSCIteWorkerTest {
                     srcconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
                     srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
                     srcconfig.parameter(USER.getName().getCode()).setValue("test");
-                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");
+                    srcconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
                     srcconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("src");
