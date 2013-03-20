@@ -89,10 +89,11 @@ public class WMSServiceTest {
                                        InvocationTargetException, NoSuchMethodException{
         
         //do not use this in real code, just for testing
+        final Worker worker = WSEngine.getInstance("WMS", "default");
         final Method adaptGetMapMethod = WMSService.class.getDeclaredMethod(
-                "adaptGetMap", String.class, boolean.class, QueryContext.class);
+                "adaptGetMap", boolean.class, QueryContext.class, Worker.class);
         adaptGetMapMethod.setAccessible(true);
-        final GetMap getMap = (GetMap)adaptGetMapMethod.invoke(service, "1.3.0",true,new QueryContext());
+        final GetMap getMap = (GetMap)adaptGetMapMethod.invoke(service, true, new QueryContext(), worker);
         return getMap;
     }
 
@@ -101,9 +102,9 @@ public class WMSServiceTest {
         //do not use this in real code, just for testing
         final Worker worker = WSEngine.getInstance("WMS", "default");
         final Method adaptGetMapMethod = WMSService.class.getDeclaredMethod(
-                "adaptGetFeatureInfo", String.class, QueryContext.class, Worker.class);
+                "adaptGetFeatureInfo", QueryContext.class, Worker.class);
         adaptGetMapMethod.setAccessible(true);
-        final GetFeatureInfo getFI = (GetFeatureInfo)adaptGetMapMethod.invoke(service, "1.3.0",new QueryContext(), worker);
+        final GetFeatureInfo getFI = (GetFeatureInfo)adaptGetMapMethod.invoke(service, new QueryContext(), worker);
         return getFI;
     }
 
@@ -129,6 +130,7 @@ public class WMSServiceTest {
         queryParameters.putSingle("STYLES", "");
         queryParameters.putSingle("TIME", "2007-06-23T14:31:56");
         queryParameters.putSingle("WIDTH", "800");
+        queryParameters.putSingle("VERSION", "1.3.0");
 
         final GetMap parsedQuery = callGetMap();
 
@@ -208,6 +210,7 @@ public class WMSServiceTest {
         queryParameters.putSingle("STYLES", "");
         queryParameters.putSingle("TIME", "2007-06-23T14:31:56");
         queryParameters.putSingle("WIDTH", "800");
+        queryParameters.putSingle("VERSION", "1.3.0");
 
         final GetFeatureInfo parsedQuery = callGetFeatureInfo();
 

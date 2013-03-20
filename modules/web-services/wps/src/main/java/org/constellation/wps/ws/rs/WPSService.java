@@ -202,9 +202,9 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 boolean isTextPlain = false;
                 boolean isImage = false;
                 //if response is a literal
-                if (executeResponse instanceof String || executeResponse instanceof Double
-                        || executeResponse instanceof Float || executeResponse instanceof Integer
-                        || executeResponse instanceof Boolean || executeResponse instanceof Long) {
+                if (executeResponse instanceof String  || executeResponse instanceof Double
+                 || executeResponse instanceof Float   || executeResponse instanceof Integer
+                 || executeResponse instanceof Boolean || executeResponse instanceof Long) {
                     isTextPlain = true;
                 }
                 if (executeResponse instanceof RenderedImage || executeResponse instanceof BufferedImage
@@ -221,7 +221,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
 
             }
 
-            throw new CstlServiceException("This service can not handle the requested operation: " + request + ".",
+            throw new CstlServiceException("This service can not handle the requested operation: " + request.getClass().getName() + ".",
                     OPERATION_NOT_SUPPORTED, REQUEST_PARAMETER.toLowerCase());
 
         } catch (CstlServiceException ex) {
