@@ -40,6 +40,7 @@ import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
+import org.geotoolkit.ogc.xml.v110.TemporalOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -362,5 +363,10 @@ public class SQLFilterParser extends FilterParser {
             }
         } 
         return null;
+    }
+
+    @Override
+    protected Filter treatTemporalOperator(JAXBElement<? extends TemporalOpsType> jbTemporalOps) throws FilterParserException {
+        throw new UnsupportedOperationException("TODO");
     }
 }

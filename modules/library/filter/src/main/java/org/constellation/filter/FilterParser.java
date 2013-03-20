@@ -69,6 +69,7 @@ import org.geotoolkit.ogc.xml.v110.PropertyIsLessThanType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsGreaterThanType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLessThanOrEqualToType;
 import org.geotoolkit.ogc.xml.v110.UpperBoundaryType;
+import org.geotoolkit.ogc.xml.v110.TemporalOpsType;
 import org.geotoolkit.util.logging.Logging;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -177,6 +178,16 @@ public abstract class FilterParser {
      * @throws FilterParserException
      */
     protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws FilterParserException;
+    
+    /**
+     * Build a piece of query with the specified temporal filter.
+     *
+     * @param jbTemporalOps A temporal filter.
+     * @return
+     * @throws FilterParserException
+     */
+    protected abstract Filter treatTemporalOperator(final JAXBElement<? extends TemporalOpsType> jbTemporalOps) throws FilterParserException;
+    
     
     /**
      * Build a piece of query with the specified Comparison filter.
