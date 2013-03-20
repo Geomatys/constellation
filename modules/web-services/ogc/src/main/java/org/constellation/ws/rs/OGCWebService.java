@@ -29,6 +29,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.validation.Schema;
+import net.iharder.Base64;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 
@@ -68,7 +69,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.CodeList;
 import org.opengis.util.NoSuchIdentifierException;
-import sun.misc.BASE64Decoder;
 
 
 /**
@@ -303,9 +303,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             if (authorization != null) {
                 if (authorization.startsWith("Basic ")) {
                     final String toDecode = authorization.substring(6);
-                    final BASE64Decoder decoder = new BASE64Decoder();
                     try {
-                        final String logPass = new String(decoder.decodeBuffer(toDecode));
+                        final String logPass = new String(Base64.decode(toDecode));
                         final int separatorIndex = logPass.indexOf(":");
                         if (separatorIndex != -1) {
                             final String login = logPass.substring(0, separatorIndex);
