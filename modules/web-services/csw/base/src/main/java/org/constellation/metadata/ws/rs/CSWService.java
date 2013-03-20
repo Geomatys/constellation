@@ -137,74 +137,67 @@ public class CSWService extends OGCWebService<CSWworker> {
         ServiceDef serviceDef = null;
 
         try {
-            if (worker != null) {
 
-                worker.setServiceUrl(getServiceURL());
-
-                // if the request is not an xml request we fill the request parameter.
-                final RequestBase request;
-                if (objectRequest == null) {
-                    request = adaptQuery(getParameter("REQUEST", true), worker);
-                } else if (objectRequest instanceof RequestBase) {
-                    request = (RequestBase) objectRequest;
-                } else {
-                    throw new CstlServiceException("The operation " +  objectRequest.getClass().getName() + " is not supported by the service",
-                        INVALID_PARAMETER_VALUE, "request");
-                }
-
-                serviceDef = worker.getVersionFromNumber(request.getVersion());
-
-                if (request instanceof GetCapabilities) {
-
-                    return Response.ok(worker.getCapabilities((GetCapabilities)request), worker.getOutputFormat()).build();
-                }
-
-                if (request instanceof GetRecordsRequest) {
-
-                    final GetRecordsRequest gr = (GetRecordsRequest)request;
-
-                    // we pass the serializer to the messageBodyWriter
-                    final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecords(gr), getXMLSerializer());
-                    return Response.ok(response, worker.getOutputFormat()).build();
-
-                }
-
-                if (request instanceof GetRecordById) {
-
-                    final GetRecordById grbi = (GetRecordById)request;
-
-                    // we pass the serializer to the messageBodyWriter
-                    final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecordById(grbi), getXMLSerializer());
-                    return Response.ok(response, worker.getOutputFormat()).build();
-
-                }
-
-                if (request instanceof DescribeRecord) {
-
-                    return Response.ok(worker.describeRecord((DescribeRecord)request), worker.getOutputFormat()).build();
-                }
-
-                if (request instanceof GetDomain) {
-
-                    return Response.ok(worker.getDomain((GetDomain)request), worker.getOutputFormat()).build();
-                }
-
-                if (request instanceof Transaction) {
-
-                    return Response.ok(worker.transaction( (Transaction)request), worker.getOutputFormat()).build();
-                }
-
-                if (request instanceof Harvest) {
-
-                    return Response.ok(worker.harvest((Harvest)request), worker.getOutputFormat()).build();
-                }
-
-                throw new CstlServiceException("The operation " +  request.getClass().getName() + " is not supported by the service",
-                        INVALID_PARAMETER_VALUE, "request");
-
+            // if the request is not an xml request we fill the request parameter.
+            final RequestBase request;
+            if (objectRequest == null) {
+                request = adaptQuery(getParameter("REQUEST", true), worker);
+            } else if (objectRequest instanceof RequestBase) {
+                request = (RequestBase) objectRequest;
             } else {
-                throw new CstlServiceException("The CSW service is not running", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("The operation " +  objectRequest.getClass().getName() + " is not supported by the service",
+                    INVALID_PARAMETER_VALUE, "request");
             }
+
+            serviceDef = worker.getVersionFromNumber(request.getVersion());
+
+            if (request instanceof GetCapabilities) {
+
+                return Response.ok(worker.getCapabilities((GetCapabilities)request), worker.getOutputFormat()).build();
+            }
+
+            if (request instanceof GetRecordsRequest) {
+
+                final GetRecordsRequest gr = (GetRecordsRequest)request;
+
+                // we pass the serializer to the messageBodyWriter
+                final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecords(gr), getXMLSerializer());
+                return Response.ok(response, worker.getOutputFormat()).build();
+
+            }
+
+            if (request instanceof GetRecordById) {
+
+                final GetRecordById grbi = (GetRecordById)request;
+
+                // we pass the serializer to the messageBodyWriter
+                final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecordById(grbi), getXMLSerializer());
+                return Response.ok(response, worker.getOutputFormat()).build();
+
+            }
+
+            if (request instanceof DescribeRecord) {
+
+                return Response.ok(worker.describeRecord((DescribeRecord)request), worker.getOutputFormat()).build();
+            }
+
+            if (request instanceof GetDomain) {
+
+                return Response.ok(worker.getDomain((GetDomain)request), worker.getOutputFormat()).build();
+            }
+
+            if (request instanceof Transaction) {
+
+                return Response.ok(worker.transaction( (Transaction)request), worker.getOutputFormat()).build();
+            }
+
+            if (request instanceof Harvest) {
+
+                return Response.ok(worker.harvest((Harvest)request), worker.getOutputFormat()).build();
+            }
+
+            throw new CstlServiceException("The operation " +  request.getClass().getName() + " is not supported by the service",
+                    INVALID_PARAMETER_VALUE, "request");
 
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef, worker);

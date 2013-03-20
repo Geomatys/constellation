@@ -132,8 +132,6 @@ public class WFSService extends GridWebService<WFSWorker> {
 
         ServiceDef version    = null;
 
-        worker.setServiceUrl(getServiceURL());
-
         try {
 
             // if the request is not an xml request we fill the request parameter.

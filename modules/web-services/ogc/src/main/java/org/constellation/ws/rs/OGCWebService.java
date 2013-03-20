@@ -282,6 +282,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             if (worker.isPrintRequestParameter()) {
                 logParameters();
             }
+            worker.setServiceUrl(getServiceURL());
+            
             return treatIncomingRequest(objectRequest, worker);
 
         // administration a the instance

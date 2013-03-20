@@ -115,8 +115,6 @@ public class SOService extends OGCWebService<SOSworker> {
     public Response treatIncomingRequest(final Object objectRequest, final SOSworker worker) {
         ServiceDef serviceDef = null;
         try {
-            worker.setServiceUrl(getServiceURL());
-
             final RequestBase request;
             if (objectRequest == null) {
                 request = adaptQuery(getParameter(REQUEST_PARAMETER, true), worker);

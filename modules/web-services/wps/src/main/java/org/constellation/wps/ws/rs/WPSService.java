@@ -152,7 +152,6 @@ public class WPSService extends OGCWebService<WPSWorker> {
 
         ServiceDef version = null;
 
-        worker.setServiceUrl(getServiceURL());
         try {
             // Handle an empty request by sending a basic web page.
             if ((null == objectRequest) && (0 == uriContext.getQueryParameters().size())) {

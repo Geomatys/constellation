@@ -191,7 +191,6 @@ public class WMSService extends GridWebService<WMSWorker> {
                 if (version == null) {
                     version = worker.getVersionFromNumber(requestCapab.getVersion());
                 }
-                worker.setServiceUrl(getServiceURL());
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
 
                 return Response.ok(capabilities, requestCapab.getFormat()).build();
@@ -215,7 +214,6 @@ public class WMSService extends GridWebService<WMSWorker> {
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final DescribeLayer describeLayer = adaptDescribeLayer(versionSt, worker);
                 version = worker.getVersionFromNumber(describeLayer.getVersion());
-                worker.setServiceUrl(getServiceURL());
                 final DescribeLayerResponseType response = worker.describeLayer(describeLayer);
                 return Response.ok(response, MimeType.TEXT_XML).build();
             }

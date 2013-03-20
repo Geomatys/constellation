@@ -96,12 +96,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
     public Response treatIncomingRequest(final Object objectRequest, final WMTSWorker worker) {
         ServiceDef serviceDef = null;
         try {
-            if (worker == null) {
-                throw new CstlServiceException(NOT_WORKING,
-                                              NO_APPLICABLE_CODE);
-            }
-            worker.setServiceUrl(getServiceURL());
-
+            
             // if the request is not an xml request we fill the request parameter.
             final RequestBase request;
             if (objectRequest == null) {
