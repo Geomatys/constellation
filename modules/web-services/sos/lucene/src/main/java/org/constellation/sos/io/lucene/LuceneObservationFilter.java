@@ -98,6 +98,14 @@ public class LuceneObservationFilter implements ObservationFilter {
             luceneRequest = new StringBuilder("type:observation AND template:FALSE AND procedure:\"" + procedure + "\" ");
         }
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
+        // do nothing no implementes
+    }
 
     /**
      * {@inheritDoc}
@@ -377,11 +385,6 @@ public class LuceneObservationFilter implements ObservationFilter {
     @Override
     public boolean isDefaultTemplateTime() {
         return true;
-    }
-
-    @Override
-    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
-        throw new CstlServiceException("initFilterGetFeatureOfInterest is not supported by this ObservationFilter implementation.");
     }
 
     @Override

@@ -123,6 +123,14 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
+    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
+        // do nothing no implemented
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setProcedure(final List<String> procedures, final List<ObservationOffering> offerings) {
         if (!procedures.isEmpty()) {
             for (String s : procedures) {
@@ -358,11 +366,6 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     @Override
     public void setTimeFirst() throws CstlServiceException {
         throw new CstlServiceException("setTimeFirst is not supported by this ObservationFilter implementation.");
-    }
-
-    @Override
-    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
-        throw new CstlServiceException("initFilterGetFeatureOfInterest is not supported by this ObservationFilter implementation.");
     }
 
     @Override

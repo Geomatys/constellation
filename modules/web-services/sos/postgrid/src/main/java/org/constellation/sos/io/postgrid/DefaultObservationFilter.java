@@ -158,6 +158,14 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
+    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
+        // do nothing not implemented
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setProcedure(final List<String> procedures, final List<ObservationOffering> offerings) {
         if (!procedures.isEmpty()) {
             sqlRequest.append("AND ( ");
@@ -450,11 +458,6 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public boolean isDefaultTemplateTime() {
         return true;
-    }
-
-    @Override
-    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
-        throw new CstlServiceException("initFilterGetFeatureOfInterest is not supported by this ObservationFilter implementation.");
     }
 
     @Override
