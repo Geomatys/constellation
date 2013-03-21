@@ -19,11 +19,11 @@
     Module description.
   -->
   <groupId>org.constellation.storage</groupId>
-  <artifactId>cstl-store-data-datastore</artifactId>
+  <artifactId>cstl-store-data-featurestore</artifactId>
   <packaging>jar</packaging>
-  <name>Provider for data : Data Store</name>
+  <name>Provider for data : Feature Store</name>
   <description>
-    These packages provide access to Data Store datas.
+    These packages provide access to Feature Store datas.
   </description>
 
 

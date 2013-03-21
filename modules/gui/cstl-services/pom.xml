@@ -169,7 +169,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-datastore</artifactId>
+                    <artifactId>cstl-store-data-featurestore</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>

@@ -28,7 +28,6 @@ import org.constellation.provider.LayerProviderService;
 import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
 import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
-import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -70,7 +69,7 @@ public class DataStoreProviderService extends AbstractProviderService
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
 
     public DataStoreProviderService(){
-        super("data-store");
+        super("feature-store");
     }
 
     @Override
@@ -90,7 +89,7 @@ public class DataStoreProviderService extends AbstractProviderService
         }
 
         final DataStoreProvider provider = new DataStoreProvider(this,ps);
-        getLogger().log(Level.INFO, "[PROVIDER]> data-store provider created.");
+        getLogger().log(Level.INFO, "[PROVIDER]> feature-store provider created.");
         return provider;
     }
 
