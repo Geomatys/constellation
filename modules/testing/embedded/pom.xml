@@ -139,11 +139,6 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-om</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>

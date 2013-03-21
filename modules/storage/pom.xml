@@ -111,7 +111,6 @@
         <module>provider-data-serverstore</module>
         <module>provider-data-postgis</module>
         <module>provider-data-shapefile</module>
-        <module>provider-data-sml</module>
         <module>provider-style-sld</module>
         <module>provider-style-unnormalize</module>
       </modules>
@@ -139,7 +138,6 @@
         <module>provider-data-coveragestore</module>
         <module>provider-data-postgis</module>
         <module>provider-data-shapefile</module>
-        <module>provider-data-sml</module>
         <module>provider-style-sld</module>
         <module>provider-style-unnormalize</module>
       </modules>
@@ -154,7 +152,6 @@
         <module>provider-data-coveragestore</module>
         <module>provider-data-postgis</module>
         <module>provider-data-shapefile</module>
-        <module>provider-data-sml</module>
         <module>provider-style-sld</module>
         <module>provider-style-unnormalize</module>
       </modules>

@@ -184,16 +184,6 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-sml</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-om</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-style-sld</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -245,16 +235,6 @@
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-data-shapefile</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-sml</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-om</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -391,16 +371,6 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-sml</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-om</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-style-sld</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -431,16 +401,6 @@
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-data-shapefile</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-sml</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-om</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
