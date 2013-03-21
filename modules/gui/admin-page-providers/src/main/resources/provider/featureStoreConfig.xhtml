@@ -19,26 +19,26 @@
         
         <div class="rounded">
             <mf:namer>
-                <mf:parametereditor value="#{datastoreBean.edited.idParameter}" rootVisible="true"/>
+                <mf:parametereditor value="#{featurestoreBean.edited.idParameter}" rootVisible="true"/>
             </mf:namer>
         </div>
         <div style="color:#FF0000;">
-            #{datastoreBean.edited.errorMessage}
+            #{featurestoreBean.edited.errorMessage}
         </div>
         
         <div class="rounded">
             <mf:namer>
-                <mf:parametereditor value="#{datastoreBean.edited.choiceParameter}" width="100%" rootVisible="false"/>
+                <mf:parametereditor value="#{featurestoreBean.edited.choiceParameter}" width="100%" rootVisible="false"/>
             </mf:namer>
         </div>
         <br/>
         
         <div style="text-align: right;">
-            <h:commandLink styleClass="logout" action="#{datastoreBean.gotoMainPage}">
-                #{datastoreBean.i18n['return']}
+            <h:commandLink styleClass="logout" action="#{featurestoreBean.gotoMainPage}">
+                #{featurestoreBean.i18n['return']}
             </h:commandLink>
-            <h:commandLink styleClass="logout" action="#{datastoreBean.edited.apply}">
-                #{datastoreBean.i18n['save']}
+            <h:commandLink styleClass="logout" action="#{featurestoreBean.edited.apply}">
+                #{featurestoreBean.i18n['save']}
             </h:commandLink>
         </div>
         

@@ -14,19 +14,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.datastore;
+package org.constellation.provider.featurestore;
 
-import java.util.Collections;
-import java.util.Set;
 import java.util.logging.Level;
-import org.constellation.provider.AbstractLayerProvider;
-import org.constellation.provider.DefaultDataStoreLayerDetails;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.AbstractDataStoreProvider;
+import static org.constellation.provider.AbstractProvider.getLogger;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.storage.DataStoreException;
-import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -34,20 +30,14 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class DataStoreProvider extends AbstractLayerProvider{
+public class FeatureStoreProvider extends AbstractDataStoreProvider{
 
-    private FeatureStore store;
-    private Set<Name> names;
-
-    public DataStoreProvider(ProviderService service, ParameterValueGroup param){
+    public FeatureStoreProvider(ProviderService service, ParameterValueGroup param) throws DataStoreException{
         super(service,param);
     }
 
     @Override
-    public synchronized void reload() {
-        super.reload();
-        dispose();
-
+    protected FeatureStore createBaseFeatureStore() {
         //parameter is a choice of different types
         //extract the first one
         ParameterValueGroup param = getSource();
@@ -60,55 +50,22 @@ public class DataStoreProvider extends AbstractLayerProvider{
             }
         }
 
+        FeatureStore store = null;
         if(factoryconfig == null){
-            getLogger().log(Level.WARNING, "No configuration for data store source.");
-            names = Collections.EMPTY_SET;
-            return;
+            getLogger().log(Level.WARNING, "No configuration for feature store source.");
+            return null;
         }
         try {
             //create the store
             store = FeatureStoreFinder.open(factoryconfig);
             if(store == null){
-                throw new DataStoreException("Could not create data store for parameters : "+factoryconfig);
+                throw new DataStoreException("Could not create feature store for parameters : "+factoryconfig);
             }
-            names = store.getNames();
         } catch (DataStoreException ex) {
-            names = Collections.EMPTY_SET;
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
-
-    }
-
-    public synchronized FeatureStore getStore() {
-        if(store == null) reload();
+        
         return store;
     }
     
-    @Override
-    public synchronized void dispose() {
-        super.dispose();
-        if(store != null){
-            store.dispose();
-            store = null;
-            names = null;
-        }
-    }
-
-    @Override
-    public Set<Name> getKeys() {
-        if(names == null){
-            reload();
-        }
-        return names;
-    }
-
-    @Override
-    public LayerDetails get(Name key) {
-        key = fullyQualified(key);
-        if(!contains(key)){
-            return null;
-        }
-        return new DefaultDataStoreLayerDetails(key, store, null);
-    }
-
 }

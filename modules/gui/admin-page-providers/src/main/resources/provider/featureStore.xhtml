@@ -10,18 +10,18 @@
                 xmlns:mf="http://mapfaces.org/taglib"
                 template="/pages/base.xhtml">
 
-    <ui:param name="pageTitle" value="Data-Store"/>
+    <ui:param name="pageTitle" value="Feature-Store"/>
 
     <ui:define name="content">
 
         <mf:Div id="sources">
-        <ui:repeat value="#{datastoreBean.choices}" var="choice">
+        <ui:repeat value="#{featurestoreBean.choices}" var="choice">
             
             <div class="header2">
                 #{choice.name}
                 <span style="float: right;">
                     <h:commandLink action="#{choice.newInstance}">
-                        #{datastoreBean.i18n['addSource']}
+                        #{featurestoreBean.i18n['addSource']}
                     </h:commandLink>
                 </span>
             </div>
@@ -33,15 +33,15 @@
                     #{node.id}
                 </mf:DataTableColumn>
                  <mf:DataTableColumn width="75px">
-                     <h:commandLink action="#{datastoreBean.update}">
+                     <h:commandLink action="#{featurestoreBean.update}">
                         <f:param name="PROVIDER_ID" value="#{node.id}" />
                         <img src="#{facesContext.externalContext.requestContextPath}/provider.edit.png.mfRes" style="border:none;"/>
                     </h:commandLink>
-                    <h:commandLink action="#{datastoreBean.reload}">
+                    <h:commandLink action="#{featurestoreBean.reload}">
                         <f:param name="PROVIDER_ID" value="#{node.id}" />
                         <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
                     </h:commandLink>
-                    <h:commandLink action="#{datastoreBean.delete}">
+                    <h:commandLink action="#{featurestoreBean.delete}">
                         <f:param name="PROVIDER_ID" value="#{node.id}" />
                         <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
                     </h:commandLink>

@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.spi.ImageWriterSpi;
@@ -34,7 +35,6 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.sld.SLDProviderService;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
 
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
@@ -46,8 +46,8 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
-import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.geotoolkit.parameter.ParametersExt.*;
 
 
 /**
@@ -119,79 +119,79 @@ public final class GrizzlyServer {
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgridSrc");
 
-                }else if("shapefile".equals(serviceName)){
-                    // Defines a ShapeFile data provider
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.FALSE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
-                    srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
-                            .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
-                    srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
-                            .setValue("cite");
-
-
-                    ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("BasicPolygons");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_BasicPolygons");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Bridges");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Bridges");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("BuildingCenters");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_BuildingCenters");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Buildings");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Buildings");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("DividedRoutes");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_DividedRoutes");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Forests");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Forests");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Lakes");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Lakes");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("MapNeatline");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_MapNeatLine");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Ponds");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Ponds");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("RoadSegments");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_RoadSegments");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Streams");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Streams");
-
-                }else if("postgis".equals(serviceName)){
-                    // Defines a PostGis data provider
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs-2");
-                    srcconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
-                    srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
-                    srcconfig.parameter(USER.getName().getCode()).setValue("test");
-                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");
-                    srcconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+                }else if("feature-store".equals(serviceName)){
+                    try{ 
+                                                
+                        {//SHAPEFILE
+                        final File outputDir = initDataDirectory();
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("shapeSrc");
+                        getOrCreateValue(source, "load_all").setValue(false);    
+                        
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup shpconfig = createGroup(choice, "shapefile-folder");
+                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                        getOrCreateValue(shpconfig, "namespace").setValue("cite");        
+                        
+                        ParameterValueGroup layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("BasicPolygons");
+                        getOrCreateValue(layer, "style").setValue("cite_style_BasicPolygons");     
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Bridges");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Bridges");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("BuildingCenters");
+                        getOrCreateValue(layer, "style").setValue("cite_style_BuildingCenters");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Buildings");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Buildings");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("DividedRoutes");
+                        getOrCreateValue(layer, "style").setValue("cite_style_DividedRoutes");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Forests");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Forests");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Lakes");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Lakes");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("MapNeatline");
+                        getOrCreateValue(layer, "style").setValue("cite_style_MapNeatLine");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Ponds");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Ponds");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("RoadSegments");
+                        getOrCreateValue(layer, "style").setValue("cite_style_RoadSegments");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Streams");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Streams");
+                        }
+                        
+                        {//POSTGIS
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("postgisSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);                        
+                        
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup pgconfig = createGroup(choice, "postgis");
+                        getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
+                        getOrCreateValue(pgconfig,"port").setValue(5432);
+                        getOrCreateValue(pgconfig,"database").setValue("cite-wfs-2");
+                        getOrCreateValue(pgconfig,"schema").setValue("public");
+                        getOrCreateValue(pgconfig,"user").setValue("test");
+                        getOrCreateValue(pgconfig,"password").setValue("test");
+                        getOrCreateValue(pgconfig,"namespace").setValue("http://cite.opengeospatial.org/gmlsf");                     
+                        }
+                                                
+                    }catch(Exception ex){
+                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                    }
                 }
+                
 
                 return config;
             }

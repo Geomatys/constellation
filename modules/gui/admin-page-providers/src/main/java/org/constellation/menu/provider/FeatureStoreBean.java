@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2011, Geomatys
+ *    (C) 2012, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,20 +18,20 @@
 package org.constellation.menu.provider;
 
 /**
- * Shapefile configuration bean.
+ * Feature-Store configuration bean.
  *
  * @author Johann Sorel (Geomatys)
  */
-public class ShapefileBean extends AbstractProviderConfigBean{
+public class FeatureStoreBean extends StoreBean{
 
-    public static final String SERVICE_NAME = "shapefile";
-    
-    public ShapefileBean(){
+    public static final String SERVICE_NAME = "feature-store";
+            
+    public FeatureStoreBean(){
         super(SERVICE_NAME,
-              "/provider/shapefile.xhtml",
-              "/provider/shapefileConfig.xhtml",
-              "/provider/shapefileLayerConfig.xhtml");
-        addBundle("provider.shapefile");
+              "/provider/featureStore.xhtml",
+              "/provider/featureStoreConfig.xhtml",
+              "provider.overview",
+              "provider.featureStore");
     }
 
 }

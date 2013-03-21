@@ -68,7 +68,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         ProviderService service = null;
         final Collection<LayerProviderService> availableLayerServices = LayerProviderProxy.getInstance().getServices();
         for (LayerProviderService tmpService: availableLayerServices) {
-            if ("data-store".equals(tmpService.getName())) {
+            if ("feature-store".equals(tmpService.getName())) {
                 service = tmpService;
             }
         }

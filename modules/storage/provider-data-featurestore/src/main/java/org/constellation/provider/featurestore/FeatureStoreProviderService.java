@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.datastore;
+package org.constellation.provider.featurestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,9 +40,10 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class DataStoreProviderService extends AbstractProviderService
+public class FeatureStoreProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
+    private static final String ERROR_MSG = "[PROVIDER]> Invalid featurestore provider config";
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR;
 
     static {
@@ -68,7 +69,7 @@ public class DataStoreProviderService extends AbstractProviderService
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
 
-    public DataStoreProviderService(){
+    public FeatureStoreProviderService(){
         super("feature-store");
     }
 
@@ -88,9 +89,16 @@ public class DataStoreProviderService extends AbstractProviderService
             return null;
         }
 
-        final DataStoreProvider provider = new DataStoreProvider(this,ps);
-        getLogger().log(Level.INFO, "[PROVIDER]> feature-store provider created.");
-        return provider;
+        try {
+            final FeatureStoreProvider provider = new FeatureStoreProvider(this,ps);
+            getLogger().log(Level.INFO, "[PROVIDER]> feature-store provider created.");
+            return provider;
+        } catch (Exception ex) {
+            // we should not catch exception, but here it's better to start all source we can
+            // rather than letting a potential exception block the provider proxy
+            getLogger().log(Level.SEVERE, ERROR_MSG, ex);
+        }
+        return null;
     }
 
 }

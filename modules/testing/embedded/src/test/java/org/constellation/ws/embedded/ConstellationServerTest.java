@@ -68,7 +68,7 @@ public class ConstellationServerTest extends AbstractGrizzlyServer {
 
         final ConstellationServer administrator = ConstellationServer.login("http://localhost:" + grizzly.getCurrentPort(), "", "");
         assertNotNull(administrator);
-        GeneralParameterDescriptor desc = administrator.providers.getServiceDescriptor("shapefile");
+        GeneralParameterDescriptor desc = administrator.providers.getServiceDescriptor("feature-store");
         assertNotNull(desc);
     }
 
