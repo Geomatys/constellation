@@ -2123,7 +2123,7 @@ public class WFS2WorkerTest {
                     try{ 
                         
                         {//OBSERVATION
-                        final String url = "jdbc:derby:memory:TestEmbeddedWFSWorker";
+                        final String url = "jdbc:derby:memory:TestWFS2WorkerOM";
                         final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
@@ -2137,7 +2137,7 @@ public class WFS2WorkerTest {
                         getOrCreateValue(source, "load_all").setValue(true);    
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup omconfig = createGroup(choice, "om");
+                        final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
                         getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                         getOrCreateValue(omconfig, "derbyurl").setValue(url);
                         }
@@ -2149,9 +2149,9 @@ public class WFS2WorkerTest {
                         getOrCreateValue(source, "load_all").setValue(true);    
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup shpconfig = createGroup(choice, "shapefile-folder");
+                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
                         getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");        
+                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml/3.2");        
                         
                         ParameterValueGroup layer = createGroup(source, "Layer");
                         getOrCreateValue(layer, "name").setValue("BasicPolygons");
@@ -2193,7 +2193,7 @@ public class WFS2WorkerTest {
                         }
                         
                         {//SENSORML
-                        final String url2 = "jdbc:derby:memory:TestWFSWorkerSMl";
+                        final String url2 = "jdbc:derby:memory:TestWFSWorker2SMl";
                         ds2 = new DefaultDataSource(url2 + ";create=true");
                         Connection con = ds2.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
@@ -2212,7 +2212,7 @@ public class WFS2WorkerTest {
                         getOrCreateValue(source, "load_all").setValue(true);             
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup omconfig = createGroup(choice, "sml");
+                        final ParameterValueGroup omconfig = createGroup(choice, "SMLParameters");
                         getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                         getOrCreateValue(omconfig, "derbyurl").setValue(url2);                      
                         }

@@ -1299,7 +1299,7 @@ public class WFSWorkerTest {
                     try{ 
                         
                         {//OBSERVATION
-                        final String url = "jdbc:derby:memory:TestEmbeddedWFSWorker";
+                        final String url = "jdbc:derby:memory:TestWFSWorkerOM";
                         final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
@@ -1313,7 +1313,7 @@ public class WFSWorkerTest {
                         getOrCreateValue(source, "load_all").setValue(true);    
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup omconfig = createGroup(choice, "om");
+                        final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
                         getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                         getOrCreateValue(omconfig, "derbyurl").setValue(url);
                         }
@@ -1325,7 +1325,7 @@ public class WFSWorkerTest {
                         getOrCreateValue(source, "load_all").setValue(true);    
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup shpconfig = createGroup(choice, "shapefile-folder");
+                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
                         getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
                         getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");        
                         
@@ -1388,7 +1388,7 @@ public class WFSWorkerTest {
                         getOrCreateValue(source, "load_all").setValue(true);             
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup omconfig = createGroup(choice, "sml");
+                        final ParameterValueGroup omconfig = createGroup(choice, "SMLParameters");
                         getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                         getOrCreateValue(omconfig, "derbyurl").setValue(url2);                      
                         }

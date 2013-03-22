@@ -37,6 +37,7 @@ import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.provider.featurestore.FeatureStoreProviderService;
+import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
 import org.geotoolkit.data.shapefile.ShapefileFolderDataStoreFactory;
 
 // Geotoolkit dependencies
@@ -56,6 +57,9 @@ import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.parameter.Parameters;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 
 // JUnit dependencies
 
@@ -162,27 +166,22 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
 
-                }else if("shapefile".equals(serviceName)){
+                }else if("feature-store".equals(serviceName)){
                     try{
                         final File outputDir = initDataDirectory();
-
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        Parameters.getOrCreate(SOURCE_LOADALL_DESCRIPTOR, source).setValue(Boolean.TRUE);
-                        Parameters.getOrCreate(SOURCE_ID_DESCRIPTOR, source).setValue("shapeSrc");
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("shapeSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);    
                         
-                        final String namespace = "http://www.opengis.net/gml";
-                        final URL url = new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");        
                         
-                        final ParameterValueGroup choice = getOrCreate(FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
-                        final ParameterValueGroup shapefileConfig = ShapefileFolderDataStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
-                        Parameters.getOrCreate(ShapefileFolderDataStoreFactory.URLFOLDER, shapefileConfig).setValue(url);
-                        Parameters.getOrCreate(ShapefileFolderDataStoreFactory.NAMESPACE, shapefileConfig).setValue(namespace);
-                        choice.values().add(shapefileConfig);
-
-                        ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                        layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
-                        layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
-
+                        final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");     
+                        
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(),ex);
                     }

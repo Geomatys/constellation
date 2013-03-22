@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="no namespace">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
     <xsd:import schemaLocation="http://schemas.opengis.net/gml/3.1.1/base/gml.xsd" namespace="http://www.opengis.net/gml"/>
-    <xsd:element xmlns="no namespace" name="CustomSQLQuery" type="CustomSQLQueryType" substitutionGroup="gml:_Feature" xmlns:gml="http://www.opengis.net/gml"/>
+    <xsd:element xmlns="" name="CustomSQLQuery" type="CustomSQLQueryType" substitutionGroup="gml:_Feature" xmlns:gml="http://www.opengis.net/gml"/>
     <xsd:complexType name="CustomSQLQueryType">
         <xsd:complexContent>
             <xsd:extension xmlns:gml="http://www.opengis.net/gml" base="gml:AbstractFeatureType">
