@@ -189,6 +189,32 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         response = (GetRecordsResponseType) obj;
 
         assertEquals(14, response.getSearchResults().getNumberOfRecordsMatched());
+        
+        // remove data
+        f.delete();
+        f2.delete();
+        
+        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
+
+        // for a POST request
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof AcknowlegementType);
+        expResult = new AcknowlegementType("Success",  "CSW index succefully recreated");
+        assertEquals(expResult, obj);
+
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof GetRecordsResponseType);
+        response = (GetRecordsResponseType) obj;
+
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
     }
 
     @Test
@@ -205,7 +231,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertTrue(obj instanceof GetRecordsResponseType);
         GetRecordsResponseType response = (GetRecordsResponseType) obj;
 
-        assertEquals(14, response.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
 
         // build a new metadata file
         RecordType record = new RecordType();
@@ -245,7 +271,31 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertTrue(obj instanceof GetRecordsResponseType);
         response = (GetRecordsResponseType) obj;
 
-        assertEquals(15, response.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(13, response.getSearchResults().getNumberOfRecordsMatched());
+        
+        // restore previous context
+        f.delete();
+        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
+
+        // for a POST request
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof AcknowlegementType);
+        expResult = new AcknowlegementType("Success",  "CSW index succefully recreated");
+        assertEquals(expResult, obj);
+
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof GetRecordsResponseType);
+        response = (GetRecordsResponseType) obj;
+
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
     }
     
     @Test
@@ -262,10 +312,10 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertTrue(obj instanceof GetRecordsResponseType);
         GetRecordsResponseType response = (GetRecordsResponseType) obj;
 
-        assertEquals(15, response.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
 
         // remove metadata from the index
-        niUrl = new URL(getConfigurationURL() + "request=removeFromIndex&id=default&identifiers=urn_test");
+        niUrl = new URL(getConfigurationURL() + "request=removeFromIndex&id=default&identifiers=urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
 
         // for a POST request
         conec = niUrl.openConnection();
@@ -293,7 +343,30 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertTrue(obj instanceof GetRecordsResponseType);
         response = (GetRecordsResponseType) obj;
 
-        assertEquals(14, response.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(11, response.getSearchResults().getNumberOfRecordsMatched());
+        
+        // restore previous context
+        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
+
+        // for a POST request
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof AcknowlegementType);
+        expResult = new AcknowlegementType("Success",  "CSW index succefully recreated");
+        assertEquals(expResult, obj);
+
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof GetRecordsResponseType);
+        response = (GetRecordsResponseType) obj;
+
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
     }
 
     @Test
