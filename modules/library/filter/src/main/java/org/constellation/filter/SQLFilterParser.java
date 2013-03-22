@@ -40,7 +40,6 @@ import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
-import org.geotoolkit.ogc.xml.v110.TemporalOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -110,6 +109,10 @@ public class SQLFilterParser extends FilterParser {
             } else if (filter.getSpatialOps() != null) {
                 response = new SQLQuery(treatSpatialOperator(filter.getSpatialOps()));
                 
+            // we treat time operator: TimeAfter, TimeBefore, TimeDuring, ...
+            } else if (filter.getTemporalOps()!= null) {
+                response = new SQLQuery(treatTemporalOperator(filter.getTemporalOps().getValue()));
+
             } else if (filter.getId() != null) {
                 response = new SQLQuery(treatIDOperator(filter.getId()));
             }  
@@ -363,10 +366,5 @@ public class SQLFilterParser extends FilterParser {
             }
         } 
         return null;
-    }
-
-    @Override
-    protected Filter treatTemporalOperator(JAXBElement<? extends TemporalOpsType> jbTemporalOps) throws FilterParserException {
-        throw new UnsupportedOperationException("TODO");
     }
 }

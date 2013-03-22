@@ -90,6 +90,11 @@ import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.opengis.filter.PropertyIsNotEqualTo;
 import org.opengis.util.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.filter.temporal.After;
+import org.opengis.filter.temporal.Before;
+import org.opengis.filter.temporal.BinaryTemporalOperator;
+import org.opengis.filter.temporal.During;
+import org.opengis.filter.temporal.TEquals;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
@@ -178,16 +183,6 @@ public abstract class FilterParser {
      * @throws FilterParserException
      */
     protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws FilterParserException;
-    
-    /**
-     * Build a piece of query with the specified temporal filter.
-     *
-     * @param jbTemporalOps A temporal filter.
-     * @return
-     * @throws FilterParserException
-     */
-    protected abstract Filter treatTemporalOperator(final JAXBElement<? extends TemporalOpsType> jbTemporalOps) throws FilterParserException;
-    
     
     /**
      * Build a piece of query with the specified Comparison filter.
@@ -279,6 +274,50 @@ public abstract class FilterParser {
                 } else {
                     final String operator = bc.getClass().getSimpleName();
                     throw new FilterParserException("Unkwnow comparison operator: " + operator,
+                                                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+                }
+            }
+        }
+        return response.toString();
+    }
+    
+    /**
+     * Build a piece of query with the specified Comparison filter.
+     *
+     * @param jbComparisonOps A comparison filter.
+     * @return
+     * @throws org.constellation.coverage.web.FilterParserException
+     */
+    protected String treatTemporalOperator(final TemporalOpsType temporalOps) throws FilterParserException {
+        final StringBuilder response = new StringBuilder();
+
+        if (temporalOps instanceof BinaryTemporalOperator) {
+
+            final BinaryTemporalOperator bc = (BinaryTemporalOperator) temporalOps;
+            final PropertyName propertyName = (PropertyName) bc.getExpression1();
+            final Literal literal           = (Literal) bc.getExpression2();
+
+            if (propertyName == null || literal == null) {
+                throw new FilterParserException("A binary temporal operator must be constitued of a TimeObject and a property name.",
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+            } else {
+                final Object literalValue = literal.getValue();
+
+                if (bc instanceof TEquals) {
+                    addComparisonFilter(response, propertyName, literalValue, "=");
+
+                } else if (bc instanceof After) {
+                    addComparisonFilter(response, propertyName, literalValue, ">");
+
+                } else if (bc instanceof Before) {
+                    addComparisonFilter(response, propertyName, literalValue, "<");
+
+                } else if (bc instanceof During) {
+                    
+                    throw new FilterParserException("TODO during", INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+                } else {
+                    final String operator = bc.getClass().getSimpleName();
+                    throw new FilterParserException("Unsupported temporal operator: " + operator,
                                                      INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                 }
             }
@@ -387,8 +426,8 @@ public abstract class FilterParser {
                 LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 throw new FilterParserException("JAXBException while parsing CQL query: " + ex.getMessage(), NO_APPLICABLE_CODE, QUERY_CONSTRAINT);
             } catch (CQLException ex) {
-                throw new FilterParserException("The CQL query is malformed: " + ex.getMessage() + '\n'
-                                                 + "syntax Error: " + ex.getSyntaxError(),
+                throw new FilterParserException("The CQL query is malformed: " + ex.getMessage() + '\n',
+                                            //     + "syntax Error: " + ex.getSyntaxError(),
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
             

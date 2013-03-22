@@ -44,7 +44,6 @@ import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
-import org.geotoolkit.ogc.xml.v110.TemporalOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -96,7 +95,7 @@ public class LuceneFilterParser extends FilterParser {
 
             // we treat time operator: TimeAfter, TimeBefore, TimeDuring, ...
             } else if (filter.getTemporalOps()!= null) {
-                response = new SpatialQuery("", treatTemporalOperator(filter.getTemporalOps()), SerialChainFilter.AND);
+                response = new SpatialQuery(treatTemporalOperator(filter.getTemporalOps().getValue()), null, SerialChainFilter.AND);
 
             } else if (filter.getId() != null && !filter.getId().isEmpty()) {
                 response = new SpatialQuery(treatIDOperator(filter.getId()), null, SerialChainFilter.AND);
@@ -338,10 +337,5 @@ public class LuceneFilterParser extends FilterParser {
             }
         }
         return s;
-    }
-
-    @Override
-    protected Filter treatTemporalOperator(JAXBElement<? extends TemporalOpsType> jbTemporalOps) throws FilterParserException {
-        throw new UnsupportedOperationException("TODO");
     }
 }
