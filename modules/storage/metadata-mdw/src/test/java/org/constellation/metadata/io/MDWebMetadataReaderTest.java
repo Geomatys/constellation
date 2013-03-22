@@ -98,6 +98,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.5.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-8.sql"));
 
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
@@ -511,5 +512,27 @@ public class MDWebMetadataReaderTest {
         pool.release(unmarshaller);
 
         ebrimEquals(expResult, result);
+    }
+    
+    /**
+     * Tests the getMetadata method for ISO 19115 data with id on responsible party
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getMetadataResponsibleIDTest() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("meta-id", AbstractMetadataReader.ISO_19115);
+
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta12.xml"));
+
+        assertTrue(result instanceof DefaultMetadata);
+        //pool.acquireMarshaller().marshal(expResult, System.out);
+        //assertEquals(expResult.getId(), ((DefaultMetadata)result).getId());
+        metadataEquals(expResult, (DefaultMetadata)result);
+        
+
+        pool.release(unmarshaller);
     }
 }

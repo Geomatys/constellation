@@ -417,9 +417,9 @@ public final class MetadataUtilities {
                         assertEquals(expConst, resConst);
                     }
                     assertEquals(expId.getResourceConstraints(), resId.getResourceConstraints());
-                    assertEquals(expId.getResourceFormats(), expId.getResourceFormats());
-                    assertEquals(expId.getResourceMaintenances(), expId.getResourceMaintenances());
-                    assertEquals(expId.getResourceSpecificUsages(), expId.getResourceSpecificUsages());
+                    assertEquals(expId.getResourceFormats(), resId.getResourceFormats());
+                    assertEquals(expId.getResourceMaintenances(), resId.getResourceMaintenances());
+                    assertEquals(expId.getResourceSpecificUsages(), resId.getResourceSpecificUsages());
                     assertEquals(expId.getStatus(), resId.getStatus());
 
                 if (expId instanceof DefaultDataIdentification) {
@@ -434,6 +434,7 @@ public final class MetadataUtilities {
                     assertEquals(idExpResult.getStandard(), idResult.getStandard());
                     assertEquals(idExpResult.getSupplementalInformation(), idResult.getSupplementalInformation());
                     assertEquals(idExpResult.getTopicCategories(), idResult.getTopicCategories());
+                    
                     assertEquals(idExpResult, idResult);
                 } else if (expId instanceof ServiceIdentificationImpl) {
                     ServiceIdentificationImpl expService = (ServiceIdentificationImpl) expId;

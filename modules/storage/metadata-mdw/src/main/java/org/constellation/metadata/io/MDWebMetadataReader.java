@@ -758,7 +758,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
                 boolean putSuceed = false;
                 if (isMeta) {
-                    putSuceed = putMeta(metaMap, attribName, param, result, path);
+                    putSuceed = putMeta(metaMap, attribName, param, (MetadataEntity)result, path);
                 }
 
                 if (!putSuceed) {
@@ -790,7 +790,12 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     }
 
 
-    private boolean putMeta(final Map<String, Object> metaMap, String attribName, final Object param, final Object result, final Path path) {
+    private boolean putMeta(final Map<String, Object> metaMap, String attribName, final Object param, final MetadataEntity result, final Path path) {
+        // special case for identifier
+        if ("id".equals(attribName)) {
+            result.getIdentifierMap().putSpecialized(IdentifierSpace.ID, (String)param);
+            return true;
+        }
         boolean tryAgain = true;
         int casee = 0;
         while (tryAgain) {

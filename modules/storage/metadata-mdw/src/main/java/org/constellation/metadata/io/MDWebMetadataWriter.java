@@ -39,6 +39,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.metadata.iso.MetadataEntity;
 
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription;
@@ -708,7 +709,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             return result;
                         }
 
-                    // special case for xlink
+                    // special case for id
+                    } else if ("id".equals(propName) && object instanceof IdentifiedObject) {
+                        final Object propertyValue = ((IdentifiedObject)object).getIdentifierMap().getSpecialized(IdentifierSpace.ID);
+                        if (propertyValue != null) {
+                            final Path childPath = new Path(path, prop);
+
+                            //if the path is not already in the database we write it
+                            if (mdWriter.getPath(childPath.getId()) == null) {
+                                mdWriter.writePath(childPath);
+                            }
+                            result.addAll(addValueFromObject(record, propertyValue, childPath, value));
+                        }
                     } else if ("xLink".equals(propName) && object instanceof IdentifiedObject) {
                         final Object propertyValue = ((IdentifiedObject)object).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK);
                         if (propertyValue != null) {

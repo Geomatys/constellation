@@ -215,7 +215,7 @@
                     <gmd:geographicElement>
                         <gmd:EX_BoundingPolygon>
                             <gmd:polygon>
-                                <gml:MultiSurface gml:id="polygon.IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959" srsName="http://librairies.ign.fr/geoportail/resources/RIG.xml#xpointer(//*[@gml:id='LAMBE'])">
+                                <gml:MultiSurface gml:id="polygon.IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959" srsName="EPSG:27572">
                                     <gml:surfaceMember>
                                         <gml:Surface gml:id="s.IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.1">
                                             <gml:patches>
