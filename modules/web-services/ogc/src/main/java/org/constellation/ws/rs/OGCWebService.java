@@ -54,7 +54,7 @@ import org.constellation.ws.security.SecurityManager;
 
 // Geotoolkit dependencies
 import org.constellation.ws.Worker;
-import org.geotoolkit.internal.CodeLists;
+import org.apache.sis.util.iso.Types;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
@@ -225,7 +225,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
         return false;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -253,7 +253,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             SecurityManager.logout();
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        
+
         final Object objectRequest;
         if (request instanceof JAXBElement) {
             objectRequest = ((JAXBElement) request).getValue();
@@ -263,7 +263,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
 
         final String serviceID = getSafeParameter("serviceId");
-        
+
         // request is send to the specified worker
         if (serviceID != null && WSEngine.serviceInstanceExist(serviceName, serviceID)) {
             final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
@@ -283,7 +283,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 logParameters();
             }
             worker.setServiceUrl(getServiceURL());
-            
+
             return treatIncomingRequest(objectRequest, worker);
 
         // administration a the instance
@@ -716,7 +716,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 codeName = StringUtilities.transformCodeName(codeName);
             }
         }
-        final OWSExceptionCode code   = CodeLists.valueOf(OWSExceptionCode.class, codeName);
+        final OWSExceptionCode code   = Types.forCodeName(OWSExceptionCode.class, codeName, true);
         final CstlServiceException ex = new CstlServiceException(message, code, locator);
         return processExceptionResponse(ex, mainVersion, worker);
     }

@@ -56,7 +56,7 @@ import org.mdweb.io.Reader;
 
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
-import org.geotoolkit.internal.CodeLists;
+import org.apache.sis.util.iso.Types;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.naming.DefaultLocalName;
 import org.geotoolkit.naming.DefaultNameFactory;
@@ -145,7 +145,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * A list of package containing the Ebrim V2.5 implementation
      */
     private List<String> ebrimV25Package;
-    
+
     /**
      * A list of package containing various implementation
      */
@@ -448,7 +448,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     } else {
                         Method method;
                         if (classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) {
-                            result = CodeLists.valueOf(classe, element.getName());
+                            result = Types.forCodeName(classe, element.getName(), true);
 
                         } else if (classe.isEnum()) {
                             method = ReflectionUtilities.getMethod("fromValue", classe, String.class);
@@ -954,7 +954,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         } else if ("ISO 19115-2".equals(standardName)) {
             packagesName.addAll(geotkAcquisitionPackage);
-        
+
         } else if ("MDWEB".equals(standardName)) {
             packagesName.addAll(otherPackage);
 
