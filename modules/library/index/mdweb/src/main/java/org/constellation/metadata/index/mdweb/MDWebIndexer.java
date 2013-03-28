@@ -253,10 +253,18 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
      * {@inheritDoc}
      */
     @Override
+    protected boolean isFeatureCatalogue(FullRecord record) {
+        return record.getRoot().getType().getName().equals("FC_FeatureCatalogue");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected String getType(FullRecord f) {
         return f.getRoot().getType().getName();
     }
-
+    
     /**
      * {@inheritDoc}
      */

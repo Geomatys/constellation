@@ -195,6 +195,13 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         return ReflectionUtilities.instanceOf("org.geotoolkit.ebrim.xml.v300.IdentifiableType", meta.getClass());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isFeatureCatalogue(Object meta) {
+        return ReflectionUtilities.instanceOf("org.geotoolkit.feature.catalog.FeatureCatalogueImpl", meta.getClass());
+    }
 
     /**
      * {@inheritDoc}
