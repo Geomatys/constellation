@@ -128,7 +128,10 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         } else if (isFeatureCatalogue(metadata)) {
             // TODO
             doc.add(new Field("objectType", "FC_FeatureCatalogue", Field.Store.YES, Field.Index.ANALYZED));
-        } else if (!isDublinCore(metadata)) {
+        } else if (isDublinCore(metadata)) {
+            
+            doc.add(new Field("objectType", "Record", Field.Store.YES, Field.Index.ANALYZED));
+        } else {
             LOGGER.log(Level.WARNING, "unknow Object classe unable to index: {0}", getType(metadata));
         }
 
