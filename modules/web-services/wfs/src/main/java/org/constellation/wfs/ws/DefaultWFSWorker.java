@@ -63,13 +63,13 @@ import org.geotoolkit.feature.FeatureTypeUtilities;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
+import org.geotoolkit.filter.binding.Binding;
+import org.geotoolkit.filter.binding.Bindings;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
-import org.geotoolkit.filter.accessor.Accessors;
-import org.geotoolkit.filter.accessor.PropertyAccessor;
 import org.geotoolkit.filter.visitor.FillCrsVisitor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
 import org.geotoolkit.filter.visitor.IsValidSpatialFilterVisitor;
@@ -1138,7 +1138,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     // we verify that the update property are contained in the feature type
                     for (final Property updateProperty : updateRequest.getProperty()) {
                         final String updatePropertyName = updateProperty.getLocalName();
-                        final PropertyAccessor pa = Accessors.getAccessor(Feature.class, updatePropertyName, null);
+                        final Binding pa = Bindings.getBinding(Feature.class, updatePropertyName);
                         if (pa == null || pa.get(ft, updatePropertyName, null) == null) {
                             throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyName, INVALID_VALUE);
                         }
@@ -1459,7 +1459,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         }
                     }
                 }
-                final PropertyAccessor pa = Accessors.getAccessor(Feature.class, filterProperty, null);
+                final Binding pa = Bindings.getBinding(Feature.class, filterProperty);
                 if (pa == null || pa.get(ft, filterProperty, null) == null) {
                     throw new CstlServiceException("The feature Type " + ft.getName() + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
                 }
