@@ -1138,7 +1138,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     // we verify that the update property are contained in the feature type
                     for (final Property updateProperty : updateRequest.getProperty()) {
                         final String updatePropertyName = updateProperty.getLocalName();
-                        final Binding pa = Bindings.getBinding(Feature.class, updatePropertyName);
+                        final Binding pa = Bindings.getBinding(FeatureType.class, updatePropertyName);
                         if (pa == null || pa.get(ft, updatePropertyName, null) == null) {
                             throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyName, INVALID_VALUE);
                         }
@@ -1459,7 +1459,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         }
                     }
                 }
-                final Binding pa = Bindings.getBinding(Feature.class, filterProperty);
+                final Binding pa = Bindings.getBinding(FeatureType.class, filterProperty);
                 if (pa == null || pa.get(ft, filterProperty, null) == null) {
                     throw new CstlServiceException("The feature Type " + ft.getName() + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
                 }
