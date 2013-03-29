@@ -366,7 +366,9 @@ public class CSWworker extends AbstractWorker {
             supportedTypeNames.addAll(EBRIM30_TYPE_NAMES);
             supportedTypeNames.addAll(EBRIM25_TYPE_NAMES);
         }
-
+        if (supportedDataTypes.contains(ISO_19110)) {
+            supportedTypeNames.addAll(FC_TYPE_NAMES);
+        }
     }
 
     /**
@@ -743,7 +745,7 @@ public class CSWworker extends AbstractWorker {
                     if (type != null) {
                         prefixs.put(type.getPrefix(), type.getNamespaceURI());
                         //for ebrim mode the user can put variable after the Qname
-                        if (type.getLocalPart().indexOf('_') != -1 && !type.getLocalPart().startsWith("MD")) {
+                        if (type.getLocalPart().indexOf('_') != -1 && !(type.getLocalPart().startsWith("MD") || type.getLocalPart().startsWith("FC"))) {
                             final StringTokenizer tokenizer = new StringTokenizer(type.getLocalPart(), "_;");
                             type = new QName(type.getNamespaceURI(), tokenizer.nextToken());
                             while (tokenizer.hasMoreTokens()) {
@@ -807,7 +809,7 @@ public class CSWworker extends AbstractWorker {
             // build the sql query from the specified filter
             final SQLQuery sqlQuery;
             try {
-                sqlQuery = (SQLQuery) sqlFilterParser.getQuery(query.getConstraint(), variables, prefixs);
+                sqlQuery = (SQLQuery) sqlFilterParser.getQuery(query.getConstraint(), variables, prefixs, getConvertibleTypeNames(typeNames));
             } catch (FilterParserException ex) {
                 throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
             }
@@ -830,7 +832,7 @@ public class CSWworker extends AbstractWorker {
             // build the lucene query from the specified filter
             final SpatialQuery luceneQuery;
             try {
-                luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(query.getConstraint(), variables, prefixs);
+                luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(query.getConstraint(), variables, prefixs, getConvertibleTypeNames(typeNames));
             } catch (FilterParserException ex) {
                 throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
             }
@@ -1020,6 +1022,23 @@ public class CSWworker extends AbstractWorker {
             throw new CstlServiceException("The service has throw an exception while making identifier lucene request",
                                           NO_APPLICABLE_CODE);
         }
+    }
+    
+    /**
+     * Add the convertible typeName to the list.
+     * Example : MD_Metadata can be converted to a csw:Record
+     * @param typeNames
+     * @return 
+     */
+    private List<QName> getConvertibleTypeNames(final List<QName> typeNames) {
+        final List<QName> result = new ArrayList<QName>();
+        for (QName typeName : typeNames) {
+            if (typeName.equals(RECORD_QNAME) && !result.contains(METADATA_QNAME)) {
+                result.add(METADATA_QNAME);
+            }
+            result.add(typeName);
+        }
+        return result;
     }
 
     /**
@@ -1366,16 +1385,23 @@ public class CSWworker extends AbstractWorker {
             } else if (transaction instanceof Delete) {
                 if (mdWriter.deleteSupported()) {
                     final Delete deleteRequest = (Delete)transaction;
-                    //String dataType = deleteRequest.getTypeName();
                     if (deleteRequest.getConstraint() == null) {
                         throw new CstlServiceException("A constraint must be specified.",
                                                       MISSING_PARAMETER_VALUE, "constraint");
                     }
-
+                    final List<QName> typeNames = new ArrayList<QName>();
+                    final String dataType = deleteRequest.getTypeName();
+                    if (dataType != null && !dataType.isEmpty()) {
+                        try {
+                            typeNames.add(TypeNames.valueOf(dataType));
+                        } catch (IllegalArgumentException ex) {
+                            throw new CstlServiceException("Unexpected value for typeName:" + dataType, INVALID_PARAMETER_VALUE, "typeName");
+                        }
+                    }
                     // build the lucene query from the specified filter
                     final SpatialQuery luceneQuery;
                     try {
-                        luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(deleteRequest.getConstraint(), null, null);
+                        luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(deleteRequest.getConstraint(), null, null, getConvertibleTypeNames(typeNames));
                     } catch (FilterParserException ex) {
                         throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
                     }
@@ -1419,11 +1445,12 @@ public class CSWworker extends AbstractWorker {
                         throw new CstlServiceException("You must choose between the any part or a list of RecordProperty, you can't specify both.",
                                 MISSING_PARAMETER_VALUE, "MD_Metadata");
                     }
-
+                    
+                    final List<QName> typeNames = new ArrayList<QName>();
                     // build the lucene query from the specified filter
                     final SpatialQuery luceneQuery;
                     try {
-                        luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(updateRequest.getConstraint(), null, null);
+                        luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(updateRequest.getConstraint(), null, null, getConvertibleTypeNames(typeNames));
                     } catch (FilterParserException ex) {
                         throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
                     }

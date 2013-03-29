@@ -32,6 +32,7 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
 
 import static org.constellation.metadata.CSWQueryable.*;
+import static org.constellation.metadata.io.AbstractMetadataReader.ISO_19110;
 
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
@@ -730,7 +731,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      */
     @Override
     public List<Integer> getSupportedDataTypes() {
-        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM, SENSORML);
+        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM, SENSORML, ISO_19110);
     }
 
     /**

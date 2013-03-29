@@ -776,7 +776,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public List<Integer> getSupportedDataTypes() {
-        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM);
+        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM, ISO_19110);
     }
 
     /**

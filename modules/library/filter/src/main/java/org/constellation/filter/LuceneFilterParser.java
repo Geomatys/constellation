@@ -39,10 +39,15 @@ import org.opengis.filter.expression.PropertyName;
 // geotoolkit dependencies
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
+import org.geotoolkit.ogc.xml.v110.AndType;
 import org.geotoolkit.ogc.xml.v110.BinaryLogicOpType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
+import org.geotoolkit.ogc.xml.v110.OrType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
+import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
@@ -68,17 +73,58 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected SpatialQuery getNullFilter() {
+    protected SpatialQuery getNullFilter(final List<QName> typeNames) {
         final Filter nullFilter = null;
-        return new SpatialQuery(DEFAULT_FIELD, nullFilter, SerialChainFilter.AND);
+        if (typeNames == null || typeNames.isEmpty()) {
+            return new SpatialQuery(DEFAULT_FIELD, nullFilter, SerialChainFilter.AND);
+        } else {
+            final String query = getTypeQuery(typeNames);
+            return new SpatialQuery(query, nullFilter, SerialChainFilter.AND);
+        }
+    }
+    
+    private String getTypeQuery(final List<QName> typeNames) {
+        if (typeNames != null && !typeNames.isEmpty()) {
+            StringBuilder query = new StringBuilder();
+            for (QName typeName : typeNames) {
+                query.append("objectType:").append(typeName.getLocalPart()).append(" OR ");
+            }
+            final int length = query.length();
+            query.delete(length -3, length);
+            return query.toString();
+        }
+        return "";
+    }
+    
+    private Object getTypeFilter(final List<QName> typeNames) {
+        if (typeNames != null && !typeNames.isEmpty()) {
+            if (typeNames.size() == 1) {
+                final QName typeName = typeNames.get(0);
+                return new PropertyIsEqualToType(new LiteralType(typeName.getLocalPart()), new PropertyNameType("objectType"), Boolean.FALSE);
+            } else {
+                final List<Object> operators = new ArrayList<Object>();
+                for (QName typeName : typeNames) {
+                    operators.add(new PropertyIsEqualToType(new LiteralType(typeName.getLocalPart()), new PropertyNameType("objectType"), Boolean.FALSE));
+                }
+                return new OrType(operators.toArray());
+            }
+        }
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected SpatialQuery getQuery(final FilterType filter, final Map<String, QName> variables, final Map<String, String> prefixs) throws FilterParserException {
+    protected SpatialQuery getQuery(final FilterType queryFilter, final Map<String, QName> variables, final Map<String, String> prefixs, final List<QName> typeNames) throws FilterParserException {
 
+        final Object typeFilter =  getTypeFilter(typeNames);
+        final FilterType filter;
+        if (typeFilter != null) {
+            filter = new FilterType(new AndType(queryFilter, typeFilter));
+        } else {
+            filter = queryFilter;
+        }
         SpatialQuery response = null;
         if (filter != null) {
             // we treat logical Operators like AND, OR, ...
@@ -165,17 +211,16 @@ public class LuceneFilterParser extends FilterParser {
                 filters.add(treatSpatialOperator((JAXBElement<? extends SpatialOpsType>)jb));
             }
 
-          // we remove the last Operator and add a ') '
-          final int pos = queryBuilder.length()- (operator.length() + 2);
-          if (pos > 0) {
-            queryBuilder.delete(queryBuilder.length()- (operator.length() + 2), queryBuilder.length());
-          }
+            // we remove the last Operator and add a ') '
+            final int pos = queryBuilder.length()- (operator.length() + 2);
+            if (pos > 0) {
+                queryBuilder.delete(queryBuilder.length()- (operator.length() + 2), queryBuilder.length());
+            }
 
-          queryBuilder.append(')');
+            queryBuilder.append(')');
 
         } else if (logicOps instanceof UnaryLogicOpType) {
             final UnaryLogicOpType unary = (UnaryLogicOpType) logicOps;
-
 
             // we treat comparison operator: PropertyIsLike, IsNull, IsBetween, ...
             if (unary.getComparisonOps() != null) {
@@ -213,8 +258,8 @@ public class LuceneFilterParser extends FilterParser {
         if ("()".equals(query)) {
             query = "";
         }
-
-        int logicalOperand        = SerialChainFilter.valueOf(operator);
+        
+        int logicalOperand          = SerialChainFilter.valueOf(operator);
         final Filter spatialFilter  = getSpatialFilterFromList(logicalOperand, filters);
 
         // here the logical operand NOT is contained in the spatial filter

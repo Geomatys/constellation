@@ -149,13 +149,13 @@ public abstract class FilterParser {
      *
      * @param constraint a constraint expressed in CQL or FilterType
      */
-    public Object getQuery(final QueryConstraint constraint, final Map<String, QName> variables, final Map<String, String> prefixs) throws FilterParserException {
+    public Object getQuery(final QueryConstraint constraint, final Map<String, QName> variables, final Map<String, String> prefixs, final List<QName> typeNames) throws FilterParserException {
         //if the constraint is null we make a null filter
         if (constraint == null)  {
-            return getNullFilter();
+            return getNullFilter(typeNames);
         } else {
             final FilterType filter = getFilterFromConstraint(constraint);
-            return getQuery(filter, variables, prefixs);
+            return getQuery(filter, variables, prefixs, typeNames);
         }
     }
 
@@ -164,9 +164,9 @@ public abstract class FilterParser {
      * 
      * @return a filter matching for all the records.
      */
-    protected abstract Object getNullFilter();
+    protected abstract Object getNullFilter(final List<QName> typeNames);
     
-    protected abstract Object getQuery(final FilterType constraint, final Map<String, QName> variables, final Map<String, String> prefixs) throws FilterParserException;
+    protected abstract Object getQuery(final FilterType constraint, final Map<String, QName> variables, final Map<String, String> prefixs, final List<QName> typeNames) throws FilterParserException;
 
     /**
      * Build a piece of query with the specified logical filter.

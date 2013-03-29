@@ -117,17 +117,17 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             //we add the geometry parts
             alreadySpatiallyIndexed = indexSpatialPart(doc, metadata, isoQueryable, 268435540);
             
-            doc.add(new Field("objectType", "MD_Metadata", Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field("objectType", "MD_Metadata", Field.Store.YES, Field.Index.ANALYZED));
 
         } else if (isEbrim30(metadata)) {
            // TODO
-            doc.add(new Field("objectType", "Ebrim", Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field("objectType", "Ebrim", Field.Store.YES, Field.Index.ANALYZED));
         } else if (isEbrim25(metadata)) {
             // TODO
-            doc.add(new Field("objectType", "Ebrim", Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field("objectType", "Ebrim", Field.Store.YES, Field.Index.ANALYZED));
         } else if (isFeatureCatalogue(metadata)) {
             // TODO
-            doc.add(new Field("objectType", "FC_FeatureCatalogue", Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field("objectType", "FC_FeatureCatalogue", Field.Store.YES, Field.Index.ANALYZED));
         } else if (!isDublinCore(metadata)) {
             LOGGER.log(Level.WARNING, "unknow Object classe unable to index: {0}", getType(metadata));
         }
