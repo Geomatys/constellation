@@ -36,8 +36,8 @@ import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.util.DataReference;
-import org.geotoolkit.filter.text.cql2.CQL;
-import org.geotoolkit.filter.text.cql2.CQLException;
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.util.logging.Logging;
@@ -141,7 +141,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
                     final FilterType filterType = layer.getFilter();
                     final StyleXmlIO xmlUtils = new StyleXmlIO();
                     final Filter filter = xmlUtils.getTransformer110().visitFilter(filterType);
-                    guiFilterArea.setText(CQL.toCQL(filter));
+                    guiFilterArea.setText(CQL.write(filter));
                 } catch (FactoryException ex) {
                     LOGGER.log(Level.INFO, ex.getMessage(),ex);
                 }
@@ -311,10 +311,9 @@ public class JEditLayerPane extends javax.swing.JPanel {
         //filter
         final String cql = guiFilterArea.getText();
         if (cql != null && !cql.trim().isEmpty()) {
-            FilterType filterType = null;
-            final Filter filter = CQL.toFilter(cql);
+            final Filter filter = CQL.parseFilter(cql);
             final StyleXmlIO xmlUtils = new StyleXmlIO();
-            filterType = xmlUtils.getTransformerXMLv110().visit(filter);
+            final FilterType filterType = xmlUtils.getTransformerXMLv110().visit(filter);
             layerModel.getLayer().setFilter(filterType);
         } else {
             layerModel.getLayer().setFilter(null);

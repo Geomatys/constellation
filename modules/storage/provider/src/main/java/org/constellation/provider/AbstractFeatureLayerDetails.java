@@ -36,8 +36,8 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.filter.text.cql2.CQL;
-import org.geotoolkit.filter.text.cql2.CQLException;
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
@@ -149,7 +149,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
                             break;
                         }
                         try {
-                            final Filter filter = CQL.toFilter(cqlFilter);
+                            final Filter filter = CQL.parseFilter(cqlFilter);
                             if(filter != null){
                                 final FeatureMapLayer fml = (FeatureMapLayer) layer;
                                 fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filter));

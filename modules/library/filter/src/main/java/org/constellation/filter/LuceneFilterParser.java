@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -49,6 +50,7 @@ import org.geotoolkit.ogc.xml.v110.OrType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
+import org.geotoolkit.ogc.xml.v110.TemporalOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -171,6 +173,13 @@ public class LuceneFilterParser extends FilterParser {
                 queryBuilder.append(treatComparisonOperator(jb.getValue()));
                 queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
             }
+            
+            // we treat temporal constraint : TAfter, TBefore, ...
+            for (JAXBElement<? extends TemporalOpsType> jb: binary.getTemporalOps()) {
+
+                queryBuilder.append(treatTemporalOperator(jb.getValue()));
+                queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
+            }
 
             // we treat logical Operators like AND, OR, ...
             for (JAXBElement<? extends LogicOpsType> jb: binary.getLogicOps()) {
@@ -210,7 +219,7 @@ public class LuceneFilterParser extends FilterParser {
                 //for the spatial filter we don't need to write into the lucene query
                 filters.add(treatSpatialOperator((JAXBElement<? extends SpatialOpsType>)jb));
             }
-
+            
             // we remove the last Operator and add a ') '
             final int pos = queryBuilder.length()- (operator.length() + 2);
             if (pos > 0) {
@@ -282,7 +291,7 @@ public class LuceneFilterParser extends FilterParser {
         if (isNumber) {
             literal = literalValue.toString();
         } else if ( isDate && !"LIKE".equals(operator)) {
-            literal = extractDateValue(literalValue.toString());
+            literal = extractDateValue(literalValue);
         } else if ( literalValue == null) {
             literal = "null";
         } else {
@@ -352,17 +361,21 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected String extractDateValue(final String literal) throws FilterParserException {
+    protected String extractDateValue(final Object literal) throws FilterParserException {
         try {
             synchronized(LUCENE_DATE_FORMAT) {
-                return LUCENE_DATE_FORMAT.format(TemporalUtilities.parseDate(literal));
+                if (literal instanceof Date) {
+                    return LUCENE_DATE_FORMAT.format((Date)literal);
+                } else {
+                    return LUCENE_DATE_FORMAT.format(TemporalUtilities.parseDate(String.valueOf(literal)));
+                }
             }
         } catch (ParseException ex) {
             throw new FilterParserException(PARSE_ERROR_MSG + literal,
                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         }
     }
-
+    
     /**
      * {@inheritDoc}
      */

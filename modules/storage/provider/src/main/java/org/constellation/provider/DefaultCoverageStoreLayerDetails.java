@@ -29,8 +29,8 @@ import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.filter.text.cql2.CQL;
-import org.geotoolkit.filter.text.cql2.CQLException;
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.map.DefaultCoverageMapLayer;
@@ -125,7 +125,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
                             break;
                         }
                         try {
-                            final Filter filter = CQL.toFilter(cqlFilter);
+                            final Filter filter = CQL.parseFilter(cqlFilter);
                             if(filter != null){
                                 final DefaultCoverageMapLayer cml = (DefaultCoverageMapLayer) layer;
                                 cml.setQuery(QueryBuilder.filtered(cml.getCoverageName(), filter));

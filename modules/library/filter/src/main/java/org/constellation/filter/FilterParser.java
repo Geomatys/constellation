@@ -34,8 +34,8 @@ import org.apache.lucene.search.Filter;
 import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.filter.text.cql2.CQL;
-import org.geotoolkit.filter.text.cql2.CQLException;
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.filter.FilterFactoryImpl;
 import org.geotoolkit.filter.SpatialFilterType;
 import org.geotoolkit.geometry.jts.SRIDGenerator;
@@ -125,7 +125,7 @@ public abstract class FilterParser {
      */
     public static FilterType cqlToFilter(final String cqlQuery) throws CQLException, JAXBException {
         final FilterType result;
-        final Object newFilter = CQL.toFilter(cqlQuery, new FilterFactoryImpl());
+        final Object newFilter = CQL.parseFilter(cqlQuery, new FilterFactoryImpl());
 
         if (!(newFilter instanceof FilterType)) {
             result = new FilterType(newFilter);
@@ -141,7 +141,7 @@ public abstract class FilterParser {
      * @param filter A well-formed Filter .
      */
     public static String filterToCql(final FilterType filter) throws CQLException, JAXBException {
-        return CQL.toCQL(filter);
+        return CQL.write(filter);
     }
 
     /**
@@ -338,7 +338,7 @@ public abstract class FilterParser {
      * @return A formatted date representation.
      * @throws FilterParserException if the specified string can not be parsed.
      */
-    protected abstract String extractDateValue(final String literal) throws FilterParserException;
+    protected abstract String extractDateValue(final Object literal) throws FilterParserException;
 
     /**
      * Replace The special character in a literal value for a propertyIsLike filter,

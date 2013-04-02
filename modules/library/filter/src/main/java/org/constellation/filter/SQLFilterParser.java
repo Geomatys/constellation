@@ -277,13 +277,13 @@ public class SQLFilterParser extends FilterParser {
     protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, Object literalValue, String operator) throws FilterParserException {
         response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName.getPropertyName())).append("' AND ");
         response.append('v').append(nbField).append(".\"value\" ").append(operator);
+        if (isDateField(propertyName)) {
+            literalValue = extractDateValue(literalValue);
+        }
         if (literalValue != null) {
             literalValue = literalValue.toString();
         } else {
             literalValue = "null";
-        }
-        if (isDateField(propertyName)) {
-            literalValue = extractDateValue((String)literalValue);
         }
         if (!"IS NULL ".equals(operator)) {
             response.append("'").append(literalValue).append("' ");
@@ -296,10 +296,15 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected String extractDateValue(final String literal) throws FilterParserException {
+    protected String extractDateValue(final Object literal) throws FilterParserException {
         try {
             synchronized (DATE_FORMATTER) {
-                final Date d = TemporalUtilities.parseDate(literal);
+                final Date d;
+                if (literal instanceof Date) {
+                    d = (Date)literal;
+                } else {
+                    d = TemporalUtilities.parseDate(String.valueOf(literal));
+                }
                 return DATE_FORMATTER.format(d);
             }
         } catch (ParseException ex) {
