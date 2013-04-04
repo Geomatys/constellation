@@ -17,21 +17,23 @@
  */
 package org.constellation.sos.ws.rs;
 
-// Jersey dependencies
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.Marshaller;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.io.File;
+
+// Jersey dependencies
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
 
 //JAXB dependencies
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringTokenizer;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
@@ -74,12 +76,17 @@ import org.geotoolkit.sos.xml.GetObservationById;
 import org.geotoolkit.sos.xml.GetResultTemplate;
 import org.geotoolkit.sos.xml.InsertResult;
 import org.geotoolkit.sos.xml.InsertResultTemplate;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swes.xml.DeleteSensor;
 
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.opengis.observation.ObservationCollection;
+import org.opengis.filter.Filter;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 
 /**
  *
@@ -324,17 +331,25 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws CstlServiceException
      */
     private RequestBase adaptQuery(String request, final Worker w) throws CstlServiceException {
-         if ("GetObservation"    .equalsIgnoreCase(request) ||
-             "InsertObservation" .equalsIgnoreCase(request) ||
-             "GetResult"         .equalsIgnoreCase(request) ||
+         if ("InsertObservation" .equalsIgnoreCase(request) ||
              "RegisterSensor"    .equalsIgnoreCase(request)
          ){
              throwUnsupportedGetMethod(request);
 
          } else if ("GetFeatureOfInterest".equalsIgnoreCase(request)) {
-             return createGetFeatureOfInterest();
+             return createGetFeatureOfInterest(w);
+         } else if ("GetObservation".equalsIgnoreCase(request)) {
+             return createGetObservation(w);
+         } else if ("GetResult".equalsIgnoreCase(request)) {
+             return createGetResult(w);
          } else if ("DescribeSensor".equalsIgnoreCase(request)) {
-             return createDescribeSensor();
+             return createDescribeSensor(w);
+         } else if ("DeleteSensor".equalsIgnoreCase(request)) {
+             return createDeleteSensor(w);
+         } else if ("GetResultTemplate".equalsIgnoreCase(request)) {
+             return createGetResultTemplate(w);
+         } else if ("GetObservationById".equalsIgnoreCase(request)) {
+             return createGetObservationById(w);
          } else if ("GetCapabilities".equalsIgnoreCase(request)) {
              return createNewGetCapabilities(w);
          }
@@ -418,18 +433,325 @@ public class SOService extends OGCWebService<SOSworker> {
     /**
      * Build a new getCapabilities request from kvp encoding
      */
-    private DescribeSensor createDescribeSensor() throws CstlServiceException {
-        return buildDescribeSensor(getParameter(VERSION_PARAMETER, true),
-                                  getParameter(SERVICE_PARAMETER, true),
-                                  getParameter(PROCEDURE, true),
-                                  getParameter(OUTPUT_FORMAT, true));
-
-
+    private DescribeSensor createDescribeSensor(final Worker worker) throws CstlServiceException {
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        if (service.isEmpty()) {
+            throw new CstlServiceException("The parameter service must be specified", MISSING_PARAMETER_VALUE, "service");
+        } else if (!"SOS".equals(service)) {
+            throw new CstlServiceException("The parameter service value must be \"SOS\"", INVALID_PARAMETER_VALUE, "service");
+        }
+        final String currentVersion = getParameter(VERSION_PARAMETER, true);
+        if (currentVersion.isEmpty()) {
+            throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
+        }
+        worker.checkVersionSupported(currentVersion);
+        final String procedure = getParameter(PROCEDURE, true);
+        if (procedure.isEmpty()) {
+            throw new CstlServiceException("The parameter procedure must be specified", MISSING_PARAMETER_VALUE, "procedure");
+        }
+        final String varName;
+        if (currentVersion.equals("1.0.0")) {
+            varName = OUTPUT_FORMAT;
+        } else {
+            varName = PROCEDURE_DESCRIPTION_FORMAT;
+        }
+        final String outputFormat = getParameter(varName, true); 
+        if (outputFormat.isEmpty()) {
+            throw new CstlServiceException("The parameter " + varName + " must be specified", MISSING_PARAMETER_VALUE, varName);
+        }
+        return buildDescribeSensor(currentVersion,
+                                   service,
+                                   procedure,
+                                   outputFormat);
     }
 
-    private GetFeatureOfInterest createGetFeatureOfInterest() throws CstlServiceException {
-        final String featureID = getParameter("FeatureOfInterestId", true);
-        final List<String> fidList = StringUtilities.toStringList(featureID);
-        return buildGetFeatureOfInterest(getParameter(VERSION_PARAMETER, true),getParameter(SERVICE_PARAMETER, true), fidList);
+    private GetFeatureOfInterest createGetFeatureOfInterest(final Worker worker) throws CstlServiceException {
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        if (service.isEmpty()) {
+            throw new CstlServiceException("The parameter service must be specified", MISSING_PARAMETER_VALUE, "service");
+        } else if (!"SOS".equals(service)) {
+            throw new CstlServiceException("The parameter service value must be \"SOS\"", INVALID_PARAMETER_VALUE, "service");
+        }
+        final String currentVersion = getParameter(VERSION_PARAMETER, true);
+        if (currentVersion.isEmpty()) {
+            throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
+        }
+        worker.checkVersionSupported(currentVersion);
+        if (currentVersion.equals("1.0.0")) {
+            final String featureID = getParameter("FeatureOfInterestId", true);
+            final List<String> fidList = StringUtilities.toStringList(featureID);
+            return buildGetFeatureOfInterest(getParameter(VERSION_PARAMETER, true),getParameter(SERVICE_PARAMETER, true), fidList);
+        } else {
+            final String obpList = getParameter(OBSERVED_PROPERTY, false);
+            final List<String> observedProperties;
+            if (obpList != null) {
+                observedProperties = StringUtilities.toStringList(obpList);
+            } else {
+                observedProperties = new ArrayList<String>();
+            }
+            final String prList = getParameter(PROCEDURE, false);
+            final List<String> procedures;
+            if (prList != null) {
+                procedures = StringUtilities.toStringList(prList);
+            } else {
+                procedures = new ArrayList<String>();
+            }
+            final String foList = getParameter(FEATURE_OF_INTEREST, false);
+            final List<String> foids;
+            if (foList != null) {
+                foids = StringUtilities.toStringList(foList);
+            } else {
+                foids = new ArrayList<String>();
+            }
+            final String bboxStr = getParameter("spatialFilter", false);
+            final Filter spatialFilter;
+            if (bboxStr != null) {
+                spatialFilter = parseBBoxFilter(bboxStr);
+            } else {
+                spatialFilter = null;
+            }
+            return buildGetFeatureOfInterest(currentVersion, service, foids, observedProperties, procedures, spatialFilter);
+        }
+    }
+    
+    private DeleteSensor createDeleteSensor(final Worker worker) throws CstlServiceException {
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        if (service.isEmpty()) {
+            throw new CstlServiceException("The parameter service must be specified", MISSING_PARAMETER_VALUE, "service");
+        } else if (!"SOS".equals(service)) {
+            throw new CstlServiceException("The parameter service value must be \"SOS\"", INVALID_PARAMETER_VALUE, "service");
+        }
+        final String currentVersion = getParameter(VERSION_PARAMETER, true);
+        if (currentVersion.isEmpty()) {
+            throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
+        }
+        worker.checkVersionSupported(currentVersion);
+        final String procedure = getParameter(PROCEDURE, true);
+        if (procedure.isEmpty()) {
+            throw new CstlServiceException("The parameter procedure must be specified", MISSING_PARAMETER_VALUE, "procedure");
+        }
+        return buildDeleteSensor(currentVersion,
+                                 service,
+                                 procedure);
+    }
+    
+    private GetResult createGetResult(final Worker worker) throws CstlServiceException {
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        if (service.isEmpty()) {
+            throw new CstlServiceException("The parameter service must be specified", MISSING_PARAMETER_VALUE, "service");
+        } else if (!"SOS".equals(service)) {
+            throw new CstlServiceException("The parameter service value must be \"SOS\"", INVALID_PARAMETER_VALUE, "service");
+        }
+        final String currentVersion = getParameter(VERSION_PARAMETER, true);
+        if (currentVersion.isEmpty()) {
+            throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
+        }
+        worker.checkVersionSupported(currentVersion);
+        if (currentVersion.equals("2.0.0")) {
+            final String offering = getParameter(OFFERING, true);
+            if (offering.isEmpty()) {
+                throw new CstlServiceException("The parameter offering must be specified", MISSING_PARAMETER_VALUE, OFFERING);
+            }
+            final String observedProperty = getParameter(OBSERVED_PROPERTY, true);
+            if (observedProperty.isEmpty()) {
+                throw new CstlServiceException("The parameter observedProperty must be specified", MISSING_PARAMETER_VALUE, OBSERVED_PROPERTY);
+            }
+            final String foList = getParameter(FEATURE_OF_INTEREST, false);
+            final List<String> foids;
+            if (foList != null) {
+                foids = StringUtilities.toStringList(foList);
+            } else {
+                foids = new ArrayList<String>();
+            }
+            final String bboxStr = getParameter("spatialFilter", false);
+            final Filter spatialFilter;
+            if (bboxStr != null) {
+                spatialFilter = parseBBoxFilter(bboxStr);
+            } else {
+                spatialFilter = null;
+            }
+            final String tempStr = getParameter("temporalFilter", false);
+            final List<Filter> temporalFilters = new ArrayList<Filter>();
+            if (tempStr != null) {
+                temporalFilters.add(parseTemporalFilter(tempStr));
+            }
+            return buildGetResult(currentVersion, service, offering, observedProperty, foids, spatialFilter, temporalFilters);
+        } else {
+            throwUnsupportedGetMethod("GetResult");
+            return null;
+        }
+    }
+    
+    private GetResultTemplate createGetResultTemplate(final Worker worker) throws CstlServiceException {
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        if (service.isEmpty()) {
+            throw new CstlServiceException("The parameter service must be specified", MISSING_PARAMETER_VALUE, "service");
+        } else if (!"SOS".equals(service)) {
+            throw new CstlServiceException("The parameter service value must be \"SOS\"", INVALID_PARAMETER_VALUE, "service");
+        }
+        final String currentVersion = getParameter(VERSION_PARAMETER, true);
+        if (currentVersion.isEmpty()) {
+            throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
+        }
+        worker.checkVersionSupported(currentVersion);
+        final String offering = getParameter(OFFERING, true);
+        if (offering.isEmpty()) {
+            throw new CstlServiceException("The parameter offering must be specified", MISSING_PARAMETER_VALUE, OFFERING);
+        }
+        final String observedProperty = getParameter(OBSERVED_PROPERTY, true);
+        if (observedProperty.isEmpty()) {
+            throw new CstlServiceException("The parameter observedProperty must be specified", MISSING_PARAMETER_VALUE, OBSERVED_PROPERTY);
+        }
+        return buildGetResultTemplate(currentVersion, service, offering, observedProperty);
+    }
+    
+    private GetObservationById createGetObservationById(final Worker worker) throws CstlServiceException {
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        if (service.isEmpty()) {
+            throw new CstlServiceException("The parameter service must be specified", MISSING_PARAMETER_VALUE, "service");
+        } else if (!"SOS".equals(service)) {
+            throw new CstlServiceException("The parameter service value must be \"SOS\"", INVALID_PARAMETER_VALUE, "service");
+        }
+        final String currentVersion = getParameter(VERSION_PARAMETER, true);
+        if (currentVersion.isEmpty()) {
+            throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
+        }
+        worker.checkVersionSupported(currentVersion);
+        final List<String> observations;
+        final String srsName;
+        final QName resultModel;
+        final ResponseModeType responseMode;
+        final String responseFormat;
+        if (currentVersion.equals("2.0.0")) {
+            final String observationList = getParameter(OBSERVATION, true);
+            if (observationList.isEmpty()) {
+                throw new CstlServiceException("The parameter observation must be specified", MISSING_PARAMETER_VALUE, OBSERVATION);
+            } else {
+                observations = StringUtilities.toStringList(observationList);
+            }
+            srsName        = null;
+            resultModel    = null;
+            responseMode   = null;
+            responseFormat = null;
+        } else {
+            final String observationList = getParameter(OBSERVATION_ID, true);
+            if (observationList.isEmpty()) {
+                throw new CstlServiceException("The parameter observationID must be specified", MISSING_PARAMETER_VALUE, OBSERVATION_ID);
+            } else {
+                observations = StringUtilities.toStringList(observationList);
+            }
+            srsName = getParameter(SRS_NAME, false);
+            responseFormat = getParameter(RESPONSE_FORMAT, true);
+            final String rm = getParameter(RESULT_MODEL, false);
+            if (rm != null && rm.indexOf(':') != -1) {
+                resultModel = new QName(OM_NAMESPACE, rm.substring(rm.indexOf(':')));
+            } else if (rm != null){
+                resultModel = new QName(rm);
+            } else {
+                resultModel = null;
+            }
+            final String rmd = getParameter(RESPONSE_MODE, false);
+            if (rmd != null) {
+                responseMode = ResponseModeType.fromValue(rm);
+            } else {
+                responseMode = null;
+            }
+        }
+        return buildGetObservationById(currentVersion, service, observations, resultModel, responseMode, srsName, responseFormat);
+    }
+    
+    private GetObservation createGetObservation(final Worker worker) throws CstlServiceException {
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        if (service.isEmpty()) {
+            throw new CstlServiceException("The parameter service must be specified", MISSING_PARAMETER_VALUE, "service");
+        } else if (!"SOS".equals(service)) {
+            throw new CstlServiceException("The parameter service value must be \"SOS\"", INVALID_PARAMETER_VALUE, "service");
+        }
+        final String currentVersion = getParameter(VERSION_PARAMETER, true);
+        if (currentVersion.isEmpty()) {
+            throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
+        }
+        worker.checkVersionSupported(currentVersion);
+        
+        if (currentVersion.equals("2.0.0")) {
+            final String offList = getParameter(OFFERING, false);
+            final List<String> offering;
+            if (offList != null) {
+                offering = StringUtilities.toStringList(offList);
+            } else {
+                offering = new ArrayList<String>();
+            }
+            final String obpList = getParameter(OBSERVED_PROPERTY, false);
+            final List<String> observedProperties;
+            if (obpList != null) {
+                observedProperties = StringUtilities.toStringList(obpList);
+            } else {
+                observedProperties = new ArrayList<String>();
+            }
+            final String prList = getParameter(PROCEDURE, false);
+            final List<String> procedures;
+            if (prList != null) {
+                procedures = StringUtilities.toStringList(prList);
+            } else {
+                procedures = new ArrayList<String>();
+            }
+            final String foList = getParameter(FEATURE_OF_INTEREST, false);
+            final List<String> foids;
+            if (foList != null) {
+                foids = StringUtilities.toStringList(foList);
+            } else {
+                foids = new ArrayList<String>();
+            }
+            final String responseFormat = getParameter(RESPONSE_FORMAT, false);
+            final String bboxStr = getParameter("spatialFilter", false);
+            final Filter spatialFilter;
+            if (bboxStr != null) {
+                spatialFilter = parseBBoxFilter(bboxStr);
+            } else {
+                spatialFilter = null;
+            }
+            final String tempStr = getParameter("temporalFilter", false);
+            final List<Filter> temporalFilters = new ArrayList<Filter>();
+            if (tempStr != null) {
+                temporalFilters.add(parseTemporalFilter(tempStr));
+            }
+            return buildGetObservation(currentVersion, service, offering, observedProperties, procedures, foids, responseFormat, temporalFilters, spatialFilter);
+        } else {
+            throwUnsupportedGetMethod("GetObservation");
+            return null;
+        }
+    }
+    
+    private BBOX parseBBoxFilter(final String bboxStr) {
+        final String[] part = bboxStr.split(",");
+        final String valueReference = part[0];
+        final double[] coord = new double[4];
+        int j = 0;
+        for (int i=1; i < 5; i++) {
+            coord[j] = Double.parseDouble(part[i]);
+            j++;
+        }
+        final String srsName;
+        if (part.length > 5) {
+            srsName = part[5];
+        } else {
+            srsName = "urn:ogc:def:crs:EPSG::4326";
+        }
+        return buildBBOX("2.0.0", valueReference, coord[0], coord[1], coord[2], coord[3], srsName);
+    }
+    
+    private Filter parseTemporalFilter(final String tempStr) {
+        final String[] part = tempStr.split(",");
+        final String valueReference = part[0];
+        final int slash = part[1].indexOf('/');
+        if (slash != -1) {
+            final String dateBegin = part[1].substring(0, slash);
+            final String dateEnd   = part[1].substring(slash + 1);
+            final Period period    = buildTimePeriod("2.0.0", null, dateBegin, dateEnd);
+            return buildTimeDuring("2.0.0", valueReference, period);
+        } else {
+            final Instant instant = buildTimeInstant("2.0.0", null, part[1]);
+            return buildTimeEquals("2.0.0", valueReference, instant);
+        }
     }
 }

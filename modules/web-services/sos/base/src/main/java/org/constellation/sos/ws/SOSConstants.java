@@ -69,13 +69,19 @@ public final class SOSConstants {
     public static final String SOS = "SOS";
     public static final String ALL = "All";
     public static final String OFFERING = "offering";
+    public static final String OBSERVED_PROPERTY = "observedProperty";
     public static final String EVENT_TIME = "eventTime";
     public static final String PROCEDURE = "procedure";
+    public static final String SRS_NAME = "srsName";
+    public static final String OBSERVATION = "observation";
+    public static final String FEATURE_OF_INTEREST = "featureOfInterest";
+    public static final String OBSERVATION_ID = "observationId";
     public static final String OUTPUT_FORMAT = "OUTPUTFORMAT";
     public static final String OBSERVATION_TEMPLATE = "observationTemplate";
     public static final String PROCEDURE_DESCRIPTION_FORMAT = "ProcedureDescriptionFormat";
     public static final String RESPONSE_MODE = "responseMode";
     public static final String RESPONSE_FORMAT = "responseFormat";
+    public static final String RESULT_MODEL = "resultModel";
     public static final String NOT_SUPPORTED = "This operation is not take in charge by the Web Service";
     public static final String SENSORML_100_FORMAT_V100 = "text/xml;subtype=\"sensorML/1.0.0\"";
     public static final String SENSORML_101_FORMAT_V100 = "text/xml;subtype=\"sensorML/1.0.1\"";
@@ -84,10 +90,12 @@ public final class SOSConstants {
     public static final String RESPONSE_FORMAT_V100     = "text/xml; subtype=\"om/1.0.0\"";
     public static final String RESPONSE_FORMAT_V200     = "http://www.opengis.net/om/2.0";
 
+    public static final String OM_NAMESPACE = "http://www.opengis.net/om/1.0";
+    
     /**
      * The base Qname for complex observation.
      */
-    public static final QName OBSERVATION_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
+    public static final QName OBSERVATION_QNAME = new QName(OM_NAMESPACE, "Observation", "om");
     
     public static final String OBSERVATION_MODEL = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation";
 
@@ -104,7 +112,7 @@ public final class SOSConstants {
     /**
      * The base Qname for measurement observation.
      */
-    public static final QName MEASUREMENT_QNAME = new QName("http://www.opengis.net/om/1.0", "Measurement", "om");
+    public static final QName MEASUREMENT_QNAME = new QName(OM_NAMESPACE, "Measurement", "om");
     
     public static final FilterCapabilities SOS_FILTER_CAPABILITIES_V100 = new FilterCapabilities();
     
@@ -239,7 +247,7 @@ public final class SOSConstants {
         gobidParameters.add(SERVICE_PARAMETER);
         gobidParameters.add(new DomainType("observation", new AnyValue()));
         
-        GETOBSERVATION_BY_ID = new Operation(ONLY_POST, gobidParameters, null, null, "GetObservationById");
+        GETOBSERVATION_BY_ID = new Operation(GET_AND_POST, gobidParameters, null, null, "GetObservationById");
     }
     
     public static final OperationsMetadata OPERATIONS_METADATA_100;
@@ -276,7 +284,7 @@ public final class SOSConstants {
         goParameters.add(new DomainType("resultModel", "om:Observation"));
         goParameters.add(new DomainType("responseMode", Arrays.asList("resultTemplate","inline")));
         
-        final Operation getObservation = new Operation(ONLY_POST, goParameters, null, null, "GetObservation");
+        final Operation getObservation = new Operation(GET_AND_POST, goParameters, null, null, "GetObservation");
         operations.add(getObservation);
         
         operations.add(GETOBSERVATION_BY_ID);
@@ -350,14 +358,14 @@ public final class SOSConstants {
         dsParameters.add(new DomainType("version", Arrays.asList("2.0.0")));
         dsParameters.add(SERVICE_PARAMETER);
         
-        final Operation deleteSensor = new Operation(ONLY_POST, dsParameters, null, null, "DeleteSensor");
+        final Operation deleteSensor = new Operation(GET_AND_POST, dsParameters, null, null, "DeleteSensor");
         operations.add(deleteSensor);
         
         final List<DomainType> grtParameters = new ArrayList<DomainType>();
         grtParameters.add(new DomainType("version", Arrays.asList("2.0.0")));
         grtParameters.add(SERVICE_PARAMETER);
         
-        final Operation getResultTemplate = new Operation(ONLY_POST, grtParameters, null, null, "GetResultTemplate");
+        final Operation getResultTemplate = new Operation(GET_AND_POST, grtParameters, null, null, "GetResultTemplate");
         operations.add(getResultTemplate);
         
         final List<DomainType> grParameters = new ArrayList<DomainType>();

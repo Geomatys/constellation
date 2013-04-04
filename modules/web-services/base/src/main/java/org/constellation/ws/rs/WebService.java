@@ -537,19 +537,6 @@ public abstract class WebService {
         } else {
             final String value = values.get(0);
             if (value == null && mandatory) {
-                /* For the STYLE/STYLES parameters, they are mandatory in the GetMap request.
-                 * Nevertheless we do not know what to put in for raster, that's why for these
-                 * parameters we will just return the value, even if it is empty.
-                 *
-                 * According to the WMS standard, if STYLES="" is set, then the default style
-                 * should be applied.
-                 *
-                 * todo: fix the style parameter.
-                 *
-                if (parameterName.equalsIgnoreCase("STYLE") ||
-                    parameterName.equalsIgnoreCase("STYLES")) {
-                    return value;
-                }*/
                 throw new CstlServiceException("The parameter " + parameterName + " should have a value",
                         MISSING_PARAMETER_VALUE, parameterName.toLowerCase());
             } else {

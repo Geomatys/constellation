@@ -1319,7 +1319,7 @@ public abstract class SOS2WorkerTest {
     public void GetFeatureOfInterestObservedPropertiesTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         
-        GetFeatureOfInterestType request = new GetFeatureOfInterestType("2.0.0", "SOS", Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"), null);
+        GetFeatureOfInterestType request = new GetFeatureOfInterestType("2.0.0", "SOS", Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"), null, null, null);
         
         AbstractFeature result = worker.getFeatureOfInterest(request);
         
@@ -1335,7 +1335,7 @@ public abstract class SOS2WorkerTest {
         SFSpatialSamplingFeatureType sf2 = (SFSpatialSamplingFeatureType) collection.getFeatureMember().get(1).getAbstractFeature();
         assertEquals("station-006", sf2.getId());
         
-        request = new GetFeatureOfInterestType("2.0.0", "SOS", Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"), Arrays.asList("urn:ogc:object:sensor:GEOM:8"));
+        request = new GetFeatureOfInterestType("2.0.0", "SOS", Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"), Arrays.asList("urn:ogc:object:sensor:GEOM:8"), null, null);
         
         result = worker.getFeatureOfInterest(request);
         
@@ -1363,7 +1363,7 @@ public abstract class SOS2WorkerTest {
          */
         String offeringId = null;
         String observedProperty = "urn:ogc:def:phenomenon:GEOM:depth";
-        GetResultType request = new GetResultType(offeringId, observedProperty, null, "3.0.0");
+        GetResultType request = new GetResultType("3.0.0", "SOS", offeringId, observedProperty, null, null, null);
         boolean exLaunched = false;
         try {
             worker.getResult(request);
@@ -1377,7 +1377,7 @@ public abstract class SOS2WorkerTest {
          * Test 2:  null offering ID
          */
         offeringId = null;
-        request = new GetResultType(offeringId, observedProperty, null, "2.0.0");
+        request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, null, null, null);
         exLaunched = false;
         try {
             worker.getResult(request);
@@ -1392,7 +1392,7 @@ public abstract class SOS2WorkerTest {
          * Test 3:  bad offering ID
          */
         offeringId = "some id";
-        request = new GetResultType(offeringId, observedProperty, null, "2.0.0");
+        request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, null, null, null);
         exLaunched = false;
         try {
             worker.getResult(request);
@@ -1443,7 +1443,7 @@ public abstract class SOS2WorkerTest {
          */
         String offeringId = "offering-3";
         String observedProperty = "urn:ogc:def:phenomenon:GEOM:depth";
-        GetResultType request = new GetResultType(offeringId, observedProperty, null, "2.0.0");
+        GetResultType request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, null, null, null);
         GetResultResponseType result = (GetResultResponseType) worker.getResult(request);
 
         String value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" + 
@@ -1458,7 +1458,7 @@ public abstract class SOS2WorkerTest {
          * Test 2:  getResult with no TimeFilter
          */
         offeringId = "offering-3";
-        request = new GetResultType(offeringId, observedProperty, null, "2.0.0");
+        request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, null, null, null);
         
         // template filter
         TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T05:00:00.0"));
@@ -1495,7 +1495,7 @@ public abstract class SOS2WorkerTest {
         List<TemporalOpsType> filters = new ArrayList<TemporalOpsType>();
         filters.add(templatefilter);
         filters.add(bfilter);        
-        request = new GetResultType(offeringId, observedProperty, filters, "2.0.0");
+        request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, filters, null, null);
         result = (GetResultResponseType) worker.getResult(request);
 
         value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@";
@@ -1513,7 +1513,7 @@ public abstract class SOS2WorkerTest {
         filters.add(templatefilter);
         filters.add(efilter);  
 
-        request = new GetResultType(offeringId, observedProperty, filters, "2.0.0");
+        request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, filters, null, null);
         result = (GetResultResponseType) worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.56@@";
@@ -1531,7 +1531,7 @@ public abstract class SOS2WorkerTest {
         filters.add(templatefilter);
         filters.add(dfilter);  
         
-        request = new GetResultType(offeringId, observedProperty, filters, "2.0.0");
+        request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, filters, null, null);
         result = (GetResultResponseType) worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.56@@";
@@ -1544,7 +1544,7 @@ public abstract class SOS2WorkerTest {
         /**
          * Test 7:  getResult with no TimeFilter
          */
-        request = new GetResultType(offeringId, observedProperty, null, "2.0.0");
+        request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, null, null, null);
         instant = new TimeInstantType(new TimePositionType("2007-05-01T19:00:00.0"));
         templatefilter = new TimeAfterType(null, instant);
         request.addTemporalFilter(templatefilter);
@@ -1562,7 +1562,7 @@ public abstract class SOS2WorkerTest {
          */
         instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.0"));
         templatefilter = new TimeEqualsType(null, instant);
-        request = new GetResultType(offeringId, observedProperty, null, "2.0.0");
+        request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, null, null, null);
         request.addTemporalFilter(templatefilter);
         result = (GetResultResponseType) worker.getResult(request);
 
@@ -1586,7 +1586,7 @@ public abstract class SOS2WorkerTest {
         
         String observedProperty = "urn:ogc:def:phenomenon:GEOM:depth";
         
-        GetResultType GRrequest = new GetResultType("offering-3", observedProperty, null, "2.0.0");
+        GetResultType GRrequest = new GetResultType("2.0.0", "SOS", "offering-3", observedProperty, null, null, null);
         GetResultResponseType result = (GetResultResponseType) worker.getResult(GRrequest);
 
         String value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" + 
@@ -1614,7 +1614,7 @@ public abstract class SOS2WorkerTest {
         InsertObservationType request = new InsertObservationType("2.0.0", Arrays.asList("offering-3"), Arrays.asList(template));
         worker.insertObservation(request);
 
-        GRrequest = new GetResultType("offering-3", observedProperty, null, "2.0.0");
+        GRrequest = new GetResultType("2.0.0", "SOS", "offering-3", observedProperty, null, null, null);
         result = (GetResultResponseType) worker.getResult(GRrequest);
 
         value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" +
