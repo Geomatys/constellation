@@ -145,7 +145,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
                 for(String key : extras.keySet()){
                     if(key.equalsIgnoreCase("cql_filter")){
                         final String cqlFilter = ((List)extras.get(key)).get(0).toString();
-                        if(cqlFilter == null){
+                        if(cqlFilter == null || cqlFilter.isEmpty()){
                             break;
                         }
                         try {
