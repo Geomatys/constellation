@@ -1199,4 +1199,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     public void removeFromCache(String identifier) {
         super.removeFromCache(identifier);
     }
+
+    @Override
+    public void clearCache() {
+        super.clearCache();
+        mdReader.clearStorageCache();
+    }
 }

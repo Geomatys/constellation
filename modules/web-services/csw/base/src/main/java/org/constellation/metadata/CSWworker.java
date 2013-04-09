@@ -1785,6 +1785,7 @@ public class CSWworker extends AbstractWorker {
     public void clearCache() throws CstlServiceException {
         try {
             indexSearcher.refresh();
+            mdReader.clearCache();
         } catch (IndexingException ex) {
             throw new CstlServiceException("Error while refreshing cache", ex, NO_APPLICABLE_CODE);
         }

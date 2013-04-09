@@ -69,6 +69,11 @@ public interface MetadataReader {
      */
     void removeFromCache(final String identifier);
     
+    /**
+     * Remove all metadata from the cache.
+     */
+    void clearCache();
+    
     
     /**
      * Return true is the cache mecanism is enabled.

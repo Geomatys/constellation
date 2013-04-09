@@ -109,10 +109,16 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * {@inheritDoc}
      */
     @Override
+    public void clearCache() {
+        metadatas.clear();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void removeFromCache(final String identifier) {
-        if (cacheEnabled) {
-            metadatas.remove(identifier);
-        }
+        metadatas.remove(identifier);
     }
 
     /**
