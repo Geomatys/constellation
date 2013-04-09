@@ -369,7 +369,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      */
     private DescribeCoverage adaptKvpDescribeCoverageRequest(final Worker w) throws CstlServiceException {
         final String strVersion = getParameter(KEY_VERSION, true);
-        w.checkVersionSupported(strVersion);
+        w.checkVersionSupported(strVersion, false);
         final String coverage;
         if ("1.0.0".equals(strVersion)) {
             coverage = getParameter(KEY_COVERAGE, true);
@@ -391,7 +391,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      */
     private GetCoverage adaptKvpGetCoverageRequest(final Worker w) throws CstlServiceException {
         final String strVersion = getParameter(VERSION_PARAMETER, true);
-        w.checkVersionSupported(strVersion);
+        w.checkVersionSupported(strVersion, false);
         final ServiceDef serviceDef = w.getVersionFromNumber(strVersion);
         if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {
             return adaptKvpGetCoverageRequest100();

@@ -185,10 +185,10 @@ public class OM2ObservationWriter implements ObservationWriter {
             final org.geotoolkit.sampling.xml.SamplingFeature foi = (org.geotoolkit.sampling.xml.SamplingFeature)observation.getFeatureOfInterest();
             if (foi != null) {
                 stmt.setString(6, foi.getId());
+                writeFeatureOfInterest(foi, c);
             } else {
                 stmt.setNull(6, java.sql.Types.VARCHAR);
             }
-            writeFeatureOfInterest(foi, c);
             
             stmt.executeUpdate();
             stmt.close();
@@ -390,10 +390,14 @@ public class OM2ObservationWriter implements ObservationWriter {
     }
     
     private void updateOrCreateOffering(final String procedureID, final TemporalObject samplingTime, final String phenoID, final Connection c) throws SQLException {
-        
-       final String offeringID  = "offering-" + procedureID.substring(sensorIdBase.length());
+        final String offeringID;
+        if (procedureID.startsWith(sensorIdBase)) {
+            offeringID  = "offering-" + procedureID.substring(sensorIdBase.length());
+        } else {
+            offeringID  = "offering-" + procedureID;
+        }
        
-       final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"offerings\" WHERE \"identifier\"=?");
+        final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"offerings\" WHERE \"identifier\"=?");
         stmtExist.setString(1, offeringID);
         final ResultSet rs = stmtExist.executeQuery();
         

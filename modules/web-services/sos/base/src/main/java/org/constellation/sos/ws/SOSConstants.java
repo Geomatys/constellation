@@ -267,7 +267,7 @@ public final class SOSConstants {
         grParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
         grParameters.add(SERVICE_PARAMETER);
         
-        final Operation getResult = new Operation(ONLY_POST, grParameters, null, null, "GetResult");
+        final Operation getResult = new Operation(GET_AND_POST, grParameters, null, null, "GetResult");
         operations.add(getResult);
         
         final List<DomainType> goParameters = new ArrayList<DomainType>();
@@ -372,7 +372,7 @@ public final class SOSConstants {
         grParameters.add(new DomainType("version", Arrays.asList("1.0.0", "2.0.0")));
         grParameters.add(SERVICE_PARAMETER);
         
-        final Operation getResult = new Operation(ONLY_POST, grParameters, null, null, "GetResult");
+        final Operation getResult = new Operation(GET_AND_POST, grParameters, null, null, "GetResult");
         operations.add(getResult);
         
         final List<DomainType> goParameters = new ArrayList<DomainType>();
@@ -385,7 +385,7 @@ public final class SOSConstants {
         goParameters.add(new DomainType("featureOfInterest", "toUpdate"));
         goParameters.add(new DomainType("responseFormat", "http://www.opengis.net/om/2.0"));
         
-        final Operation getObservation = new Operation(ONLY_POST, goParameters, null, null, "GetObservation");
+        final Operation getObservation = new Operation(GET_AND_POST, goParameters, null, null, "GetObservation");
         operations.add(getObservation);
         
         operations.add(GETOBSERVATION_BY_ID);

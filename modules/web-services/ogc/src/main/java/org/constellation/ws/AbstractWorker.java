@@ -42,14 +42,15 @@ import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 
 import org.geotoolkit.ows.xml.OWSExceptionCode;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.util.CodeList;
 import org.xml.sax.SAXException;
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * Abstract definition of a {@code Web Map Service} worker called by a facade
@@ -173,7 +174,7 @@ public abstract class AbstractWorker implements Worker {
      * </p>
      */
     @Override
-    public void checkVersionSupported(final String versionNumber) throws CstlServiceException {
+    public void checkVersionSupported(final String versionNumber, final boolean getCapabilities) throws CstlServiceException {
         if (getVersionFromNumber(versionNumber) == null) {
             final StringBuilder messageb = new StringBuilder("The parameter ");
             for (ServiceDef vers : supportedVersions) {
@@ -181,7 +182,13 @@ public abstract class AbstractWorker implements Worker {
             }
             messageb.delete(messageb.length()-4, messageb.length()-1);
             messageb.append(" must be specified");
-            throw new CstlServiceException(messageb.toString(), VERSION_NEGOTIATION_FAILED, "version");
+            final CodeList code;
+            if (getCapabilities) {
+                code = VERSION_NEGOTIATION_FAILED;
+            } else {
+                code = INVALID_PARAMETER_VALUE;
+            }
+            throw new CstlServiceException(messageb.toString(), code, "version");
         }
     }
     

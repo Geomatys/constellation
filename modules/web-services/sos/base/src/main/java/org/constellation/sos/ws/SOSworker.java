@@ -817,6 +817,12 @@ public class SOSworker extends AbstractWorker {
         final String currentVersion = request.getVersion().toString();
 
         //we verify that the output format is good.
+        final String locator;
+        if (currentVersion.equals("2.0.0")) {
+            locator = PROCEDURE_DESCRIPTION_FORMAT;
+        } else {
+            locator = OUTPUT_FORMAT;
+        }
         final String out = request.getOutputFormat();
         if (out != null && !out.isEmpty()) {
             if (!StringUtilities.containsIgnoreCase(acceptedSensorMLFormats.get(currentVersion), request.getOutputFormat())) {
@@ -824,18 +830,12 @@ public class SOSworker extends AbstractWorker {
                 for (String s : acceptedSensorMLFormats.get(currentVersion)) {
                     msg.append('\n').append(s);
                 }
-                throw new CstlServiceException(msg.toString(), INVALID_PARAMETER_VALUE, "outputFormat");
+                throw new CstlServiceException(msg.toString(), INVALID_PARAMETER_VALUE, locator);
             }
         } else {
             final StringBuilder msg = new StringBuilder("output format must be specify, accepted value are:");
             for (String s : acceptedSensorMLFormats.get(currentVersion)) {
                 msg.append('\n').append(s);
-            }
-            final String locator;
-            if (currentVersion.equals("2.0.0")) {
-                locator = "procedureDescriptionFormat";
-            } else {
-                locator = "outputFormat";
             }
             throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, locator);
         }

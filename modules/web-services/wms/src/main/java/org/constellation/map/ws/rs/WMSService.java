@@ -274,7 +274,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         if (serviceDef == null) {
             serviceDef = worker.getBestVersion(null);
         }
-        worker.checkVersionSupported(version);
+        worker.checkVersionSupported(version, false);
         final String strLayer  = getParameter(KEY_LAYERS,  true);
         final List<String> layers = StringUtilities.toStringList(strLayer);
         return new DescribeLayer(layers, serviceDef.version);
@@ -485,7 +485,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         if (version == null) {
             throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
         }
-        w.checkVersionSupported(version);
+        w.checkVersionSupported(version, false);
         
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
         /*

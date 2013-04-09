@@ -368,7 +368,7 @@ public class SOService extends OGCWebService<SOSworker> {
         if (currentVersion == null) {
             currentVersion = worker.getBestVersion(null).version.toString();
         }
-        worker.checkVersionSupported(currentVersion);
+        worker.checkVersionSupported(currentVersion, true);
 
         final List<String> versions = new ArrayList<String>();
         if (version != null) {
@@ -444,7 +444,7 @@ public class SOService extends OGCWebService<SOSworker> {
         if (currentVersion.isEmpty()) {
             throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
         }
-        worker.checkVersionSupported(currentVersion);
+        worker.checkVersionSupported(currentVersion, false);
         final String procedure = getParameter(PROCEDURE, true);
         if (procedure.isEmpty()) {
             throw new CstlServiceException("The parameter procedure must be specified", MISSING_PARAMETER_VALUE, "procedure");
@@ -476,7 +476,7 @@ public class SOService extends OGCWebService<SOSworker> {
         if (currentVersion.isEmpty()) {
             throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
         }
-        worker.checkVersionSupported(currentVersion);
+        worker.checkVersionSupported(currentVersion, false);
         if (currentVersion.equals("1.0.0")) {
             final String featureID = getParameter("FeatureOfInterestId", true);
             final List<String> fidList = StringUtilities.toStringList(featureID);
@@ -525,7 +525,7 @@ public class SOService extends OGCWebService<SOSworker> {
         if (currentVersion.isEmpty()) {
             throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
         }
-        worker.checkVersionSupported(currentVersion);
+        worker.checkVersionSupported(currentVersion, false);
         final String procedure = getParameter(PROCEDURE, true);
         if (procedure.isEmpty()) {
             throw new CstlServiceException("The parameter procedure must be specified", MISSING_PARAMETER_VALUE, "procedure");
@@ -546,7 +546,7 @@ public class SOService extends OGCWebService<SOSworker> {
         if (currentVersion.isEmpty()) {
             throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
         }
-        worker.checkVersionSupported(currentVersion);
+        worker.checkVersionSupported(currentVersion, false);
         if (currentVersion.equals("2.0.0")) {
             final String offering = getParameter(OFFERING, true);
             if (offering.isEmpty()) {
@@ -593,7 +593,7 @@ public class SOService extends OGCWebService<SOSworker> {
         if (currentVersion.isEmpty()) {
             throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
         }
-        worker.checkVersionSupported(currentVersion);
+        worker.checkVersionSupported(currentVersion, false);
         final String offering = getParameter(OFFERING, true);
         if (offering.isEmpty()) {
             throw new CstlServiceException("The parameter offering must be specified", MISSING_PARAMETER_VALUE, OFFERING);
@@ -616,7 +616,7 @@ public class SOService extends OGCWebService<SOSworker> {
         if (currentVersion.isEmpty()) {
             throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
         }
-        worker.checkVersionSupported(currentVersion);
+        worker.checkVersionSupported(currentVersion, false);
         final List<String> observations;
         final String srsName;
         final QName resultModel;
@@ -671,7 +671,7 @@ public class SOService extends OGCWebService<SOSworker> {
         if (currentVersion.isEmpty()) {
             throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
         }
-        worker.checkVersionSupported(currentVersion);
+        worker.checkVersionSupported(currentVersion, false);
         
         if (currentVersion.equals("2.0.0")) {
             final String offList = getParameter(OFFERING, false);

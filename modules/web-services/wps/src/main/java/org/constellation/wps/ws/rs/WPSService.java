@@ -302,7 +302,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
     private DescribeProcess adaptKvpDescribeProcessRequest(final Worker w) throws CstlServiceException {
 
         final String strVersion = getParameter(VERSION_PARAMETER, true);
-        w.checkVersionSupported(strVersion);
+        w.checkVersionSupported(strVersion, false);
 
         final DescribeProcess describe = new DescribeProcess();
         describe.setService(getParameter(SERVICE_PARAMETER, true));

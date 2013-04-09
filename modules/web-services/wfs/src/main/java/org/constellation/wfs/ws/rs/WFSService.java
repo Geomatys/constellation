@@ -365,7 +365,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         final String handle   = getParameter(HANDLE, false);
         final String service  = getParameter(SERVICE_PARAMETER, true);
         final String version  = getParameter(VERSION_PARAMETER, true);
-        w.checkVersionSupported(version);
+        w.checkVersionSupported(version, false);
 
         final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
@@ -383,7 +383,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         if (currentVersion == null) {
             currentVersion = w.getBestVersion(null).version.toString();
         }
-        w.checkVersionSupported(currentVersion);
+        w.checkVersionSupported(currentVersion, true);
 
         final List<String> versions = new ArrayList<String>();
         if (version != null) {
@@ -443,7 +443,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         }
         final String service = getParameter(SERVICE_PARAMETER, true);
         final String version = getParameter(VERSION_PARAMETER, true);
-        worker.checkVersionSupported(version);
+        worker.checkVersionSupported(version, false);
         final String handle  = getParameter(HANDLE,  false);
         final String outputFormat  = getParameter("outputFormat", false);
 
@@ -621,7 +621,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         final String handle  = getParameter(HANDLE,  false);
         final String outputFormat  = getParameter("outputFormat", false);
 
-        worker.checkVersionSupported(version);
+        worker.checkVersionSupported(version, false);
         
         final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
@@ -747,7 +747,7 @@ public class WFSService extends GridWebService<WFSWorker> {
     private GetGmlObject createNewGetGmlObjectRequest(final Worker worker) throws CstlServiceException {
         final String service      = getParameter(SERVICE_PARAMETER, true);
         final String version      = getParameter(VERSION_PARAMETER, true);
-        worker.checkVersionSupported(version);
+        worker.checkVersionSupported(version, false);
         final String handle       = getParameter(HANDLE,  false);
         final String outputFormat = getParameter("outputFormat", false);
         final String id           = getParameter("gmlobjectid", true);
@@ -758,7 +758,7 @@ public class WFSService extends GridWebService<WFSWorker> {
     private LockFeature createNewLockFeatureRequest(final Worker worker) throws CstlServiceException {
         final String service  = getParameter(SERVICE_PARAMETER, true);
         final String version  = getParameter(VERSION_PARAMETER, true);
-        worker.checkVersionSupported(version);
+        worker.checkVersionSupported(version, false);
         final String handle   = getParameter(HANDLE,  false);
 
         final String lockAct  = getParameter("lockAction",  false);
@@ -805,7 +805,7 @@ public class WFSService extends GridWebService<WFSWorker> {
     private Transaction createNewTransactionRequest(final Worker worker) throws CstlServiceException {
         final String service      = getParameter(SERVICE_PARAMETER, true);
         final String version      = getParameter(VERSION_PARAMETER, true);
-        worker.checkVersionSupported(version);
+        worker.checkVersionSupported(version, false);
         final String handle       = getParameter(HANDLE,  false);
         final String relAct       = getParameter("releaseAction",  false);
         AllSomeType releaseAction = null;
@@ -927,7 +927,7 @@ public class WFSService extends GridWebService<WFSWorker> {
     private DescribeStoredQueries createNewDescribeStoredQueriesRequest(final Worker worker) throws CstlServiceException {
         final String service      = getParameter(SERVICE_PARAMETER, true);
         final String version      = getParameter(VERSION_PARAMETER, true);
-        worker.checkVersionSupported(version);
+        worker.checkVersionSupported(version, false);
         final String handle       = getParameter(HANDLE,  false);
 
         final String storedQueryIdParam = getParameter("StoredQueryId", false);
@@ -945,7 +945,7 @@ public class WFSService extends GridWebService<WFSWorker> {
     private ListStoredQueries createNewListStoredQueriesRequest(final Worker worker) throws CstlServiceException {
         final String service      = getParameter(SERVICE_PARAMETER, true);
         final String version      = getParameter(VERSION_PARAMETER, true);
-        worker.checkVersionSupported(version);
+        worker.checkVersionSupported(version, false);
         final String handle       = getParameter(HANDLE,  false);
 
         return buildListStoredQueries(version, service, handle);
@@ -958,7 +958,7 @@ public class WFSService extends GridWebService<WFSWorker> {
     private DropStoredQuery createNewDropStoredQueryRequest(final Worker worker) throws CstlServiceException {
         final String service      = getParameter(SERVICE_PARAMETER, true);
         final String version      = getParameter(VERSION_PARAMETER, true);
-        worker.checkVersionSupported(version);
+        worker.checkVersionSupported(version, false);
         final String handle       = getParameter(HANDLE,  false);
         final String id           = getParameter("id",  true);
 

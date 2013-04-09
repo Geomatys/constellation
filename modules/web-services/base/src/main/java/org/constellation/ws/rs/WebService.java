@@ -56,6 +56,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
 import static org.constellation.ws.ExceptionCode.*;
+import org.constellation.ws.WebServiceUtilities;
 import org.constellation.xml.PrefixMappingInvocationHandler;
 
 // Geotoolkit dependencies
@@ -375,7 +376,7 @@ public abstract class WebService {
                 } else {
                     codeName = INVALID_REQUEST.name();
                 }
-                final String locator = getValidationLocator(errorMsg, prefixMapping);
+                final String locator = WebServiceUtilities.getValidationLocator(errorMsg, prefixMapping);
 
                 return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, locator);
             } catch (CstlServiceException e) {
@@ -399,27 +400,6 @@ public abstract class WebService {
     
     protected abstract List<Schema> getRequestValidationSchema(final String workerID);
 
-    private String getValidationLocator(final String msg, final Map<String, String> mapping) {
-        if (msg.contains("must appear on element")) {
-            int pos = msg.indexOf("'");
-            String temp = msg.substring(pos + 1);
-            pos = temp.indexOf("'");
-            final String attribute = temp.substring(0, pos);
-            temp = temp.substring(pos + 1);
-            pos  = temp.indexOf("'");
-            temp = temp.substring(pos + 1);
-            pos = temp.indexOf("'");
-            final String element = temp.substring(0, pos);
-            pos = element.indexOf(':');
-            final String prefix = element.substring(0, pos);
-            final String localPart = element.substring(pos + 1);
-            final String namespace = mapping.get(prefix);
-            
-            return "Expected attribute: " + attribute + " in element "+ localPart + '@' + namespace;
-        }
-        return null;
-    }
-    
     /**
      * A method simply unmarshalling the request with the specified unmarshaller from the specified inputStream.
      * can be overriden by child class in case of specific extractionfrom the stream.
