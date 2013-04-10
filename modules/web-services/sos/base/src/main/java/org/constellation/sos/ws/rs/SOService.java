@@ -258,12 +258,18 @@ public class SOService extends OGCWebService<SOSworker> {
         }
         logException(ex);
 
+        final String exceptionVersion;
         if (serviceDef == null) {
-            serviceDef = w.getBestVersion(null);
+            if  (w != null) {
+                exceptionVersion = w.getBestVersion(null).exceptionVersion.toString();
+            } else {
+                exceptionVersion = null;
+            }
+        } else {
+            exceptionVersion = serviceDef.exceptionVersion.toString();
         }
         final String exceptionCode   = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
-        final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
-                                                     serviceDef.exceptionVersion.toString());
+        final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(), exceptionVersion);
         return Response.ok(report, MimeType.TEXT_XML).build();
     }
 
