@@ -76,9 +76,9 @@ public final class SOSConstants {
     public static final String OBSERVATION = "observation";
     public static final String FEATURE_OF_INTEREST = "featureOfInterest";
     public static final String OBSERVATION_ID = "observationId";
-    public static final String OUTPUT_FORMAT = "OUTPUTFORMAT";
+    public static final String OUTPUT_FORMAT = "outputFormat";
     public static final String OBSERVATION_TEMPLATE = "observationTemplate";
-    public static final String PROCEDURE_DESCRIPTION_FORMAT = "ProcedureDescriptionFormat";
+    public static final String PROCEDURE_DESCRIPTION_FORMAT = "procedureDescriptionFormat";
     public static final String RESPONSE_MODE = "responseMode";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String RESULT_MODEL = "resultModel";

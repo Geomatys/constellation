@@ -295,7 +295,7 @@ public abstract class SOS2WorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), "outputFormat");
+            assertEquals(ex.getLocator(), "procedureDescriptionFormat");
         }
         assertTrue(exLaunched);
 

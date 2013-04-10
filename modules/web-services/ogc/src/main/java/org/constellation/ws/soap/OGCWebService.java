@@ -18,15 +18,34 @@ package org.constellation.ws.soap;
 
 // J2SE dependencies
 import java.io.File;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
-import javax.jws.WebService;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPConstants;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
+import javax.xml.ws.Provider;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
@@ -35,10 +54,19 @@ import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
+import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ws.Worker;
+import org.constellation.xml.PrefixMappingInvocationHandler;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.util.CodeList;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXParseException;
 
 
 // GeoAPI dependencies
@@ -65,7 +93,7 @@ import org.geotoolkit.util.logging.Logging;
  * @author Guilhem Legal (Geomatys)
  * @since 0.7
  */
-public abstract class OGCWebService<W extends Worker> {
+public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMessage> {//Source>  {
 
     /**
      * use for debugging purpose
@@ -73,6 +101,13 @@ public abstract class OGCWebService<W extends Worker> {
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws.soap");
 
     private final Specification specification;
+    
+    protected static final QName SENDER_CODE = new QName("http://www.w3.org/2003/05/soap-envelope", "Sender");
+    protected static final QName RECEIVER_CODE = new QName("http://www.w3.org/2003/05/soap-envelope", "Receiver");
+    /**
+     * A pool of JAXB unmarshaller used to create Java objects from XML files.
+     */
+    private MarshallerPool marshallerPool;
 
     @Resource
     private volatile WebServiceContext context;
@@ -98,6 +133,18 @@ public abstract class OGCWebService<W extends Worker> {
         } else {
             LOGGER.log(Level.INFO, "Workers already set for {0}", specification.name());
         }
+    }
+    
+    /**
+     * Initialize the JAXB context.
+     */
+    protected synchronized void setXMLContext(final MarshallerPool pool) {
+        LOGGER.finer("SETTING XML CONTEXT: marshaller Pool version");
+        marshallerPool = pool;
+    }
+    
+    protected synchronized MarshallerPool getMarshallerPool() {
+        return marshallerPool;
     }
 
     private File getServiceDirectory() {
@@ -187,6 +234,33 @@ public abstract class OGCWebService<W extends Worker> {
             return null;
         }
     }
+    
+    /**
+     * This method is used in adition to a 
+     * @SchemaValidation(handler = ValidationHandler.class) annotations on a JAX-WS service class
+     * 
+     * @throws CstlServiceException 
+     */
+    protected void verifyValidation() throws CstlServiceException {
+        final SAXParseException e = (SAXParseException) context.getMessageContext().get(ValidationHandler.ERROR);
+        if (e != null) {
+            String errorMsg = e.getMessage();
+            if (errorMsg == null) {
+                if (e.getCause() != null && e.getCause().getMessage() != null) {
+                    errorMsg = e.getCause().getMessage();
+                }
+            }
+            final CodeList codeName;
+            if (errorMsg != null && errorMsg.startsWith("unexpected element")) {
+                codeName = OPERATION_NOT_SUPPORTED;
+            } else {
+                codeName = INVALID_REQUEST;
+            }
+            final String locator = WebServiceUtilities.getValidationLocator(errorMsg, WebServiceUtilities.DUMMY_MAPPING);
+
+            throw new CstlServiceException("The XML request is not valid.\nCause:" + errorMsg, codeName, locator);
+        }
+    }
 
     /**
      * Return the current worker specified by the URL.
@@ -225,4 +299,114 @@ public abstract class OGCWebService<W extends Worker> {
         WSEngine.destroyInstances(specification.name());
     }
 
+    @Override
+    public SOAPMessage invoke(final SOAPMessage requestMsg) {
+        final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
+        try {
+
+            final W worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
+            
+            /*
+             * Unmarshal Request
+             */
+            final Unmarshaller ummarshaller = marshallerPool.acquireUnmarshaller();
+            final Node requestNode = requestMsg.getSOAPBody().extractContentAsDocument();
+            Object request;
+            if (worker.isRequestValidationActivated()) {
+                final List<Schema> schemas = worker.getRequestValidationSchema();
+                for (Schema schema : schemas) {
+                    ummarshaller.setSchema(schema);
+                }
+                request = unmarshallRequestWithMapping(ummarshaller, requestNode, prefixMapping);
+            } else {
+                request = unmarshallRequest(ummarshaller, requestNode);
+            }
+            
+            if (request instanceof JAXBElement) {
+                request = ((JAXBElement) request).getValue();
+            }
+            marshallerPool.release(ummarshaller);
+            
+            final Object result = treatIncomingRequest(request, worker);
+            
+            final Marshaller m = marshallerPool.acquireMarshaller();
+            final DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
+            final Document resultNode             = dfactory.newDocumentBuilder().newDocument();
+            m.marshal(result, resultNode);
+            marshallerPool.release(m);
+            
+            final MessageFactory factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+            final SOAPMessage response = factory.createMessage();
+            response.getSOAPBody().addDocument(resultNode);
+
+            return response;
+        } catch (CstlServiceException e) {
+            return processExceptionResponse(e.getMessage(), e.getExceptionCode().name(), e.getLocator());
+        } catch (JAXBException e) {
+            String errorMsg = e.getMessage();
+            if (errorMsg == null) {
+                if (e.getCause() != null && e.getCause().getMessage() != null) {
+                    errorMsg = e.getCause().getMessage();
+                } else if (e.getLinkedException() != null && e.getLinkedException().getMessage() != null) {
+                    errorMsg = e.getLinkedException().getMessage();
+                }
+            }
+            final String codeName;
+            if (errorMsg != null && errorMsg.startsWith("unexpected element")) {
+                codeName = OPERATION_NOT_SUPPORTED.name();
+            } else {
+                codeName = INVALID_REQUEST.name();
+            }
+            final String locator = WebServiceUtilities.getValidationLocator(errorMsg, prefixMapping);
+
+            return processExceptionResponse("The XML request is not valid.\nCause:" + errorMsg, codeName, locator);
+        } catch (SOAPException e) {
+            return processExceptionResponse(e.getMessage(), NO_APPLICABLE_CODE.name(), null);
+        }  catch (ParserConfigurationException e) {
+            return processExceptionResponse(e.getMessage(), NO_APPLICABLE_CODE.name(), null);
+        }
+    }
+    
+    /**
+     * A method simply unmarshalling the request with the specified unmarshaller from the specified inputStream.
+     * can be overriden by child class in case of specific extractionfrom the stream.
+     *
+     * @param unmarshaller A JAXB Unmarshaller correspounding to the service context.
+     * @param is The request input stream.
+     * @return
+     * @throws JAXBException
+     */
+    protected Object unmarshallRequest(final Unmarshaller unmarshaller, final Node is) throws JAXBException, CstlServiceException {
+        return unmarshaller.unmarshal(is);
+    }
+    
+    protected Object unmarshallRequestWithMapping(final Unmarshaller unmarshaller, final Node is, final Map<String, String> prefixMapping) throws JAXBException {
+        try {
+            final DOMSource source = new DOMSource(is);
+            final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(source);
+            final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
+                    new Class[]{XMLEventReader.class}, new PrefixMappingInvocationHandler(rootEventReader, prefixMapping));
+
+            return unmarshaller.unmarshal(eventReader);
+        } catch (XMLStreamException ex) {
+            throw new JAXBException(ex);
+        }
+    }
+    
+    protected abstract SOAPMessage processExceptionResponse(final String message, final String code, final String locator);
+    
+    
+    /**
+     * Treat the incoming request and call the right function.
+     *
+     * @param objectRequest if the server receive a POST request in XML,
+     *        this object contain the request. Else for a GET or a POST kvp
+     *        request this parameter is {@code null}
+     *
+     * @param worker the selected worker on which apply the request.
+     *
+     * @return an xml response.
+     */
+    protected abstract Object treatIncomingRequest(final Object objectRequest,final  W worker) throws CstlServiceException;
 }

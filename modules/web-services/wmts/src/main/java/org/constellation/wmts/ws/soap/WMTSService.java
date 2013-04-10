@@ -28,6 +28,7 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingType;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
@@ -160,5 +161,15 @@ public class WMTSService extends OGCWebService<WMTSWorker>{
         } catch (IOException ex) {
             throw new SOAPServiceException(ex.getMessage(), ExceptionCode.NO_APPLICABLE_CODE.name(), requestTile.getVersion());
         }
+    }
+
+    @Override
+    protected Object treatIncomingRequest(Object objectRequest, WMTSWorker worker) throws CstlServiceException {
+        throw new UnsupportedOperationException("TODO."); 
+    }
+
+    @Override
+    protected SOAPMessage processExceptionResponse(String message, String code, String locator) {
+        throw new UnsupportedOperationException("TODO."); 
     }
 }

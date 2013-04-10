@@ -12,13 +12,13 @@
         <gco:CharacterString>42292_5p_19900609195600</gco:CharacterString>
     </gmd:fileIdentifier>
     <gmd:language>
-        <gmd:LanguageCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="eng">English</gmd:LanguageCode>
+        <gmd:LanguageCode codeListValue="eng" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/ML_gmxCodelists.xml#LanguageCode">English</gmd:LanguageCode>
     </gmd:language>
     <gmd:characterSet>
-        <gmd:MD_CharacterSetCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">UTF-8</gmd:MD_CharacterSetCode>
+        <gmd:MD_CharacterSetCode codeListValue="utf8" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode">UTF-8</gmd:MD_CharacterSetCode>
     </gmd:characterSet>
     <gmd:hierarchyLevel>
-        <gmd:MD_ScopeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset" codeSpace="eng">Dataset</gmd:MD_ScopeCode>
+        <gmd:MD_ScopeCode codeSpace="eng" codeListValue="dataset" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_ScopeCode">Dataset</gmd:MD_ScopeCode>
     </gmd:hierarchyLevel>
     <gmd:hierarchyLevelName>
         <gmx:Anchor xlink:href="SDN:L231:3:CDI">Common Data Index record</gmx:Anchor>
@@ -72,7 +72,7 @@
                 </gmd:CI_Contact>
             </gmd:contactInfo>
             <gmd:role>
-                <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="author">Author</gmd:CI_RoleCode>
+                <gmd:CI_RoleCode codeListValue="author" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode">Author</gmd:CI_RoleCode>
             </gmd:role>
         </gmd:CI_ResponsibleParty>
     </gmd:contact>
@@ -84,7 +84,7 @@
             <gmd:geometricObjects>
                 <gmd:MD_GeometricObjects>
                     <gmd:geometricObjectType>
-                        <gmd:MD_GeometricObjectTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_GeometricObjectTypeCode" codeListValue="point">Point</gmd:MD_GeometricObjectTypeCode>
+                        <gmd:MD_GeometricObjectTypeCode codeListValue="point" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_GeometricObjectTypeCode">Point</gmd:MD_GeometricObjectTypeCode>
                     </gmd:geometricObjectType>
                 </gmd:MD_GeometricObjects>
             </gmd:geometricObjects>
@@ -135,7 +135,7 @@
                         <gco:CharacterString>http://www.seadatanet.org/urnurl/</gco:CharacterString>
                     </gmd:definition>
                     <gmd:dataType>
-                        <gmd:MD_DatatypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_DatatypeCode" codeListValue="codelist">Codelist</gmd:MD_DatatypeCode>
+                        <gmd:MD_DatatypeCode codeListValue="codelist" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_DatatypeCode">Codelist</gmd:MD_DatatypeCode>
                     </gmd:dataType>
                     <gmd:parentEntity>
                         <gco:CharacterString>SeaDataNet</gco:CharacterString>
@@ -160,7 +160,7 @@
                                 <gco:Date>1990-06-05</gco:Date>
                             </gmd:date>
                             <gmd:dateType>
-                                <gmd:CI_DateTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="eng">Revision</gmd:CI_DateTypeCode>
+                                <gmd:CI_DateTypeCode codeSpace="eng" codeListValue="revision" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode">Revision</gmd:CI_DateTypeCode>
                             </gmd:dateType>
                         </gmd:CI_Date>
                     </gmd:date>
@@ -170,7 +170,7 @@
                                 <gco:Date>1979-08-03</gco:Date>
                             </gmd:date>
                             <gmd:dateType>
-                                <gmd:CI_DateTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="creation" codeSpace="eng">Creation</gmd:CI_DateTypeCode>
+                                <gmd:CI_DateTypeCode codeSpace="eng" codeListValue="creation" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode">Creation</gmd:CI_DateTypeCode>
                             </gmd:dateType>
                         </gmd:CI_Date>
                     </gmd:date>
@@ -220,7 +220,7 @@
                                 </gmd:CI_Contact>
                             </gmd:contactInfo>
                             <gmd:role>
-                                <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="originator">Originator</gmd:CI_RoleCode>
+                                <gmd:CI_RoleCode codeListValue="originator" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode">Originator</gmd:CI_RoleCode>
                             </gmd:role>
                         </gmd:CI_ResponsibleParty>
                     </gmd:citedResponsibleParty>
@@ -278,7 +278,7 @@
                         </gmd:CI_Contact>
                     </gmd:contactInfo>
                     <gmd:role>
-                        <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="custodian">Custodian</gmd:CI_RoleCode>
+                        <gmd:CI_RoleCode codeListValue="custodian" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode">Custodian</gmd:CI_RoleCode>
                     </gmd:role>
                 </gmd:CI_ResponsibleParty>
             </gmd:pointOfContact>
@@ -298,7 +298,7 @@
                         <gmx:Anchor xlink:href="SDN:P021:35:ATTN">Transmittance and attenuance of the water column</gmx:Anchor>
                     </gmd:keyword>
                     <gmd:type>
-                        <gmd:MD_KeywordTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="parameter">Parameter</gmd:MD_KeywordTypeCode>
+                        <gmd:MD_KeywordTypeCode codeListValue="parameter" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode">Parameter</gmd:MD_KeywordTypeCode>
                     </gmd:type>
                     <gmd:thesaurusName>
                         <gmd:CI_Citation>
@@ -314,7 +314,7 @@
                                         <gco:DateTime>2008-11-26T00:00:00+02:00</gco:DateTime>
                                     </gmd:date>
                                     <gmd:dateType>
-                                        <gmd:CI_DateTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="eng">Revision</gmd:CI_DateTypeCode>
+                                        <gmd:CI_DateTypeCode codeSpace="eng" codeListValue="revision" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode">Revision</gmd:CI_DateTypeCode>
                                     </gmd:dateType>
                                 </gmd:CI_Date>
                             </gmd:date>
@@ -335,7 +335,7 @@
             <gmd:resourceConstraints>
                 <gmd:MD_LegalConstraints>
                     <gmd:accessConstraints>
-                        <gmd:MD_RestrictionCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode" codeListValue="license">License</gmd:MD_RestrictionCode>
+                        <gmd:MD_RestrictionCode codeListValue="license" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode">License</gmd:MD_RestrictionCode>
                     </gmd:accessConstraints>
                 </gmd:MD_LegalConstraints>
             </gmd:resourceConstraints>
@@ -355,22 +355,22 @@
                                         <gco:Date>1990-06-05</gco:Date>
                                     </gmd:date>
                                     <gmd:dateType>
-                                        <gmd:CI_DateTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="eng">Revision</gmd:CI_DateTypeCode>
+                                        <gmd:CI_DateTypeCode codeSpace="eng" codeListValue="revision" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode">Revision</gmd:CI_DateTypeCode>
                                     </gmd:dateType>
                                 </gmd:CI_Date>
                             </gmd:date>
                         </gmd:CI_Citation>
                     </gmd:aggregateDataSetName>
                     <gmd:associationType>
-                        <gmd:DS_AssociationTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#DS_AssociationTypeCode" codeListValue="largerWorkCitation">Larger work citation</gmd:DS_AssociationTypeCode>
+                        <gmd:DS_AssociationTypeCode codeListValue="largerWorkCitation" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#DS_AssociationTypeCode">Larger work citation</gmd:DS_AssociationTypeCode>
                     </gmd:associationType>
                     <gmd:initiativeType>
-                        <gmd:DS_InitiativeTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#DS_InitiativeTypeCode" codeListValue="campaign">Campaign</gmd:DS_InitiativeTypeCode>
+                        <gmd:DS_InitiativeTypeCode codeListValue="campaign" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#DS_InitiativeTypeCode">Campaign</gmd:DS_InitiativeTypeCode>
                     </gmd:initiativeType>
                 </gmd:MD_AggregateInformation>
             </gmd:aggregationInfo>
             <gmd:language>
-                <gmd:LanguageCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="eng">English</gmd:LanguageCode>
+                <gmd:LanguageCode codeListValue="eng" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/ML_gmxCodelists.xml#LanguageCode">English</gmd:LanguageCode>
             </gmd:language>
             <gmd:topicCategory>
                 <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
@@ -507,7 +507,7 @@
                                 </gmd:CI_Contact>
                             </gmd:contactInfo>
                             <gmd:role>
-                                <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="distributor">Distributor</gmd:CI_RoleCode>
+                                <gmd:CI_RoleCode codeListValue="distributor" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode">Distributor</gmd:CI_RoleCode>
                             </gmd:role>
                         </gmd:CI_ResponsibleParty>
                     </gmd:distributorContact>
@@ -530,7 +530,7 @@
                                 <gco:CharacterString>CTDF02</gco:CharacterString>
                             </gmd:description>
                             <gmd:function>
-                                <gmd:CI_OnLineFunctionCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="eng">Download</gmd:CI_OnLineFunctionCode>
+                                <gmd:CI_OnLineFunctionCode codeSpace="eng" codeListValue="download" codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode">Download</gmd:CI_OnLineFunctionCode>
                             </gmd:function>
                         </gmd:CI_OnlineResource>
                     </gmd:onLine>

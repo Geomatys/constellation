@@ -31,6 +31,7 @@ import javax.jws.soap.SOAPBinding.ParameterStyle;
 
 // constellation dependencies
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingType;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.CstlServiceException;
@@ -231,6 +232,16 @@ public class CSWService extends OGCWebService<CSWworker>{
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                            requestTransaction.getVersion());
         }
+    }
+
+    @Override
+    protected Object treatIncomingRequest(Object objectRequest, CSWworker worker) throws CstlServiceException {
+        throw new UnsupportedOperationException("TODO.");
+    }
+
+    @Override
+    protected SOAPMessage processExceptionResponse(String message, String code, String locator) {
+        throw new UnsupportedOperationException("TODO");
     }
 }
 
