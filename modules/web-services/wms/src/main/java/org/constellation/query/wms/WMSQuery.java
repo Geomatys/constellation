@@ -21,7 +21,7 @@ import net.jcip.annotations.Immutable;
 import org.constellation.query.Query;
 import org.constellation.query.DefaultQueryRequest;
 import org.constellation.query.QueryRequest;
-import org.geotoolkit.util.Version;
+import org.apache.sis.util.Version;
 
 
 /**

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.logging.Level;
 import javax.xml.validation.Schema;
 import org.constellation.ServiceDef;
-import org.geotoolkit.util.Version;
+import org.apache.sis.util.Version;
 
 /**
  * Generic definition of a worker.

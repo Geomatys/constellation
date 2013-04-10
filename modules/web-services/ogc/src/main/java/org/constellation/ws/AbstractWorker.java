@@ -43,8 +43,8 @@ import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.Version;
-import org.geotoolkit.util.collection.UnmodifiableArrayList;
+import org.apache.sis.util.Version;
+import org.apache.sis.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.util.CodeList;

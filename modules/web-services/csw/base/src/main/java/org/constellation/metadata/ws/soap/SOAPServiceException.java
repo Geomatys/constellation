@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.ws.WebServiceException;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
-import org.geotoolkit.util.Version;
+import org.apache.sis.util.Version;
 
 
 /**

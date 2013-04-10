@@ -17,7 +17,7 @@
 package org.constellation.process.service;
 
 import java.util.List;
-import org.geotoolkit.util.collection.UnmodifiableArrayList;
+import org.apache.sis.util.collection.UnmodifiableArrayList;
 
 /**
  *

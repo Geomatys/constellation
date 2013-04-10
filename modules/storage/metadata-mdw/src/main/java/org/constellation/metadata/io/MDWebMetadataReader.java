@@ -66,7 +66,7 @@ import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.UnlimitedInteger;
 import org.geotoolkit.xml.IdentifierSpace;
-import org.geotoolkit.xml.XLink;
+import org.apache.sis.xml.XLink;
 
 // GeoAPI dependencies
 import org.geotoolkit.xml.IdentifiedObject;
@@ -848,7 +848,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 params[0] = (CoordinateSystemAxis) param;
                 field.set(result, params);
             } else if ("type".equals(attribName)) {
-                final Object typeValue = Enum.valueOf(org.geotoolkit.xml.XLink.Type.class, ((String)param).toUpperCase(Locale.US));
+                final Object typeValue = Enum.valueOf(org.apache.sis.xml.XLink.Type.class, ((String)param).toUpperCase(Locale.US));
                 field.set(result, typeValue);
             } else if (field.getType().isArray()) {
                 // todo find how to build a typed array

@@ -23,7 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.admin.service.ConstellationServer;
 import org.apache.sis.util.ArgumentChecks;
-import org.geotoolkit.util.collection.UnmodifiableArrayList;
+import org.apache.sis.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.util.logging.Logging;
 
 /**

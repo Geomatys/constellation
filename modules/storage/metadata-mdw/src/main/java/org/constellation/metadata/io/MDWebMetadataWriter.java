@@ -47,8 +47,8 @@ import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.IdentifierSpace;
 import org.geotoolkit.xml.IdentifiedObject;
-import org.geotoolkit.xml.XLink;
-import org.geotoolkit.xml.XLink.Type;
+import org.apache.sis.xml.XLink;
+import org.apache.sis.xml.XLink.Type;
 
 // MDWeb dependencies
 import org.mdweb.model.profiles.Profile;

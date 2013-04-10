@@ -18,7 +18,7 @@
 package org.constellation.query;
 
 import net.jcip.annotations.Immutable;
-import org.geotoolkit.util.Version;
+import org.apache.sis.util.Version;
 
 /**
  * Default Implementation of a Query.

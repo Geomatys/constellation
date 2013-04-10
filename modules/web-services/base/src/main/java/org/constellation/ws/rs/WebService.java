@@ -171,12 +171,12 @@ public abstract class WebService {
     /**
      * If this flag is set the method logParameters() will write the entire request in the logs
      * instead of the parameters map.
-     * 
+     *
      * @deprecated move to worker
      */
     @Deprecated
     private boolean fullRequestLog = false;
-    
+
     /**
      * A pool of JAXB unmarshaller used to create Java objects from XML files.
      */
@@ -330,7 +330,7 @@ public abstract class WebService {
         if (marshallerPool != null) {
             final Object request;
             final MarshallerPool pool;
-            
+
             // we look for a configuration query
             final boolean requestValidationActivated;
             final List<Schema> schemas;
@@ -397,7 +397,7 @@ public abstract class WebService {
     }
 
     protected abstract boolean isRequestValidationActivated(final String workerID);
-    
+
     protected abstract List<Schema> getRequestValidationSchema(final String workerID);
 
     /**
@@ -412,7 +412,7 @@ public abstract class WebService {
     protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException, CstlServiceException {
         return unmarshaller.unmarshal(is);
     }
-    
+
     protected Object unmarshallRequestWithMapping(final Unmarshaller unmarshaller, final InputStream is, final Map<String, String> prefixMapping) throws JAXBException {
         try {
             final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(is);
@@ -524,7 +524,7 @@ public abstract class WebService {
             }
         }
     }
-    
+
     protected String getSafeParameter(final String parameterName) {
         final List<String> values = getParameter(parameterName);
         if (values == null) {
@@ -561,7 +561,7 @@ public abstract class WebService {
             }
         }
     }
-    
+
     protected void logPostParameters(final Object request) {
         if (request != null) {
             final MarshallerPool pool = getMarshallerPool();
@@ -638,7 +638,7 @@ public abstract class WebService {
     public void setFullRequestLog(final boolean fullRequestLog) {
         this.fullRequestLog = fullRequestLog;
     }
-    
+
     /**
      * Return the Marshaller pool for configuration request
      * @return
