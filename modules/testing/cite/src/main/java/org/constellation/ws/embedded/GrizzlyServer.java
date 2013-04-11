@@ -129,7 +129,7 @@ public final class GrizzlyServer {
                         getOrCreateValue(source, "load_all").setValue(false);    
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup shpconfig = createGroup(choice, "shapefile-folder");
+                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
                         getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
                         getOrCreateValue(shpconfig, "namespace").setValue("cite");        
                         
@@ -177,7 +177,7 @@ public final class GrizzlyServer {
                         getOrCreateValue(source, "load_all").setValue(true);                        
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup pgconfig = createGroup(choice, "postgis");
+                        final ParameterValueGroup pgconfig = createGroup(choice, "PostGISParameters");
                         getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
                         getOrCreateValue(pgconfig,"port").setValue(5432);
                         getOrCreateValue(pgconfig,"database").setValue("cite-wfs-2");

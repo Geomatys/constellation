@@ -134,8 +134,8 @@ public class WMSService extends GridWebService<WMSWorker> {
             
             final RequestBase request;
             if (objectRequest == null) {
-                final String requestName = (String) getParameter(REQUEST_PARAMETER, true);
-                request = adaptQuery(requestName, worker, queryContext);
+                version = worker.getVersionFromNumber(getParameter(VERSION_PARAMETER, false)); // needed if exception is launch before request build
+                request = adaptQuery(getParameter(REQUEST_PARAMETER, true), worker, queryContext);
             } else if (objectRequest instanceof RequestBase) {
                 request = (RequestBase) objectRequest;
             } else {
