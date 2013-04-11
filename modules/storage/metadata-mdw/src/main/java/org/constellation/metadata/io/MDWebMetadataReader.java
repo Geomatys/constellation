@@ -1027,7 +1027,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 packageName = "org.geotoolkit.internal.jaxb.gmx";
                 className = "GMX_Anchor";
             } else if ("XLink".equals(className)) {
-                packageName = "org.geotoolkit.xml";
+                packageName = "org.apache.sis.xml";
                 className = "XLink";
             }
             String name  = className;
