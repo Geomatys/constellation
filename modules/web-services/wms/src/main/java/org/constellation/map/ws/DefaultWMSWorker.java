@@ -138,7 +138,7 @@ import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.referencing.datum.AbstractDatum;
 import org.apache.sis.measure.Range;
-import org.apache.sis.util.collection.UnmodifiableArrayList;
+import org.apache.sis.internal.util.UnmodifiableArrayList;
 
 import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;

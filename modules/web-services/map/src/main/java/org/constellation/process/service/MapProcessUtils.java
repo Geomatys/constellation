@@ -17,13 +17,13 @@
 package org.constellation.process.service;
 
 import java.util.List;
-import org.apache.sis.util.collection.UnmodifiableArrayList;
+import org.apache.sis.internal.util.UnmodifiableArrayList;
 
 /**
  *
  * @author Quentin Boileau (Geomatys)
  */
 final class MapProcessUtils {
-    
+
     public static final List<String> SUPPORTED_SERVICE_TYPE = UnmodifiableArrayList.wrap("WMS", "WFS", "WMTS", "WCS");
 }
