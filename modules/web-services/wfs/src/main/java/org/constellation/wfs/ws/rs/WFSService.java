@@ -313,6 +313,8 @@ public class WFSService extends GridWebService<WFSWorker> {
     
     @Override
     protected Object unmarshallRequestWithMapping(final Unmarshaller unmarshaller, final InputStream is, final Map<String, String> prefixMapping) throws JAXBException {
+        final JAXBEventHandler handler          = new JAXBEventHandler();
+         unmarshaller.setEventHandler(handler);
         try {
             final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(is);
             final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
@@ -325,7 +327,6 @@ public class WFSService extends GridWebService<WFSWorker> {
             if (request instanceof BaseRequest) {
                 ((BaseRequest)request).setPrefixMapping(prefixMapping);
             }
-            System.out.println("PREFIX MAPPINGGG:" + prefixMapping);
             return request;
         } catch (XMLStreamException ex) {
             throw new JAXBException(ex);

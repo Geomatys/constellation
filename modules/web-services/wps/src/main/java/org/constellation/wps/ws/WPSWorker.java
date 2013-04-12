@@ -563,7 +563,7 @@ public class WPSWorker extends AbstractWorker {
         }
 
         //check VERSION=1.0.0
-        if (request.getVersion().equals(ServiceDef.WPS_1_0_0.version.toString())) {
+        if (request.getVersion().toString().equals(ServiceDef.WPS_1_0_0.version.toString())) {
             return describeProcess100((org.geotoolkit.wps.xml.v100.DescribeProcess) request);
         } else {
             throw new CstlServiceException("The specified " + VERSION_PARAMETER + " number is not handled by the service.",
@@ -845,7 +845,7 @@ public class WPSWorker extends AbstractWorker {
         }
 
         //check VERSION=1.0.0
-        if (request.getVersion().equals(ServiceDef.WPS_1_0_0.version.toString())) {
+        if (request.getVersion().toString().equals(ServiceDef.WPS_1_0_0.version.toString())) {
             return execute100((org.geotoolkit.wps.xml.v100.Execute) request);
         } else {
             throw new CstlServiceException("The specified " + VERSION_PARAMETER + " number is not handled by the service.",

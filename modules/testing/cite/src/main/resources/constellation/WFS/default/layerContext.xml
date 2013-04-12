@@ -12,14 +12,14 @@
             <key>transactionSecurized</key>
             <value>false</value>
         </entry>
-        <!--entry>
+        <entry>
             <key>requestValidationActivated</key>
             <value>true</value>
         </entry>
         <entry>
             <key>requestValidationSchema</key>
             <value>http://schemas.opengis.net/wfs/1.1.0/wfs.xsd</value>
-        </entry-->
+        </entry>
         <entry>
             <key>shiroAccessible</key>
             <value>false</value>

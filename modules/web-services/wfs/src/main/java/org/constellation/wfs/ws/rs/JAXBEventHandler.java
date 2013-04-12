@@ -33,7 +33,7 @@ public class JAXBEventHandler implements ValidationEventHandler {
     @Override
     public boolean handleEvent(final ValidationEvent ve) {
         if (ve.getSeverity() == ve.FATAL_ERROR || ve.getSeverity() == ve.ERROR) {
-            if (ve.getMessage() != null && ve.getMessage().startsWith("unexpected element")) {
+            if (ve.getMessage() != null && !ve.getMessage().contains("xml:base") && !ve.getMessage().contains("One of '{\"http://www.opengis.net/gml\":_Feature}")) {
                 level = ve.getSeverity();
                 return false;
             }

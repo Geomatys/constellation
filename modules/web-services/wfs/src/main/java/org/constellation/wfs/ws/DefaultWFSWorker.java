@@ -1484,6 +1484,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
             filter = (Filter) filter.accept(new AliasFilterVisitor(aliases), null);
             filter = (Filter) filter.accept(new UnprefixerFilterVisitor(ft), null);
+            filter = (Filter) filter.accept(new DefaultGeomPropertyVisitor(ft), null);
             filter = (Filter) filter.accept(new GMLNamespaceVisitor(), null);
             
             if (!CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)) {
