@@ -44,7 +44,7 @@ import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.util.Version;
-import org.apache.sis.util.collection.UnmodifiableArrayList;
+import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.util.CodeList;
@@ -75,7 +75,7 @@ public abstract class AbstractWorker implements Worker {
     protected boolean isStarted;
 
     protected boolean multipleVersionActivated = true;
-    
+
     /**
      * A message keeping the reason of the start error of the service
      */
@@ -105,7 +105,7 @@ public abstract class AbstractWorker implements Worker {
      * Output responses of a GetCapabilities request.
      */
     private static final Map<String,AbstractCapabilitiesCore> CAPS_RESPONSE = new HashMap<String, AbstractCapabilitiesCore>();
-    
+
     /**
      * The identifier of the worker.
      */
@@ -115,24 +115,24 @@ public abstract class AbstractWorker implements Worker {
      * The specification for this worker.
      */
     private final Specification specification;
-    
+
     protected UnmodifiableArrayList<ServiceDef> supportedVersions;
 
     /**
      * use this flag to pass the shiro security when using the worker in a non web context.
      */
     protected boolean shiroAccessible = true;
-    
+
     /**
      * use this flag to pass the shiro security when using the worker in a non web context.
      */
     protected boolean cacheCapabilities = true;
-    
+
     /**
      * A Policy Decision Point (PDP) if some security constraints have been defined.
      */
     protected SimplePDP pdp = null;
-    
+
     private List<Schema> schemas = null;
 
     private long currentUpdateSequence = System.currentTimeMillis();
@@ -142,7 +142,7 @@ public abstract class AbstractWorker implements Worker {
         this.configurationDirectory = configurationDirectory;
         this.specification = specification;
     }
-    
+
     protected String getUserLogin() {
         final String userLogin;
         if (shiroAccessible) {
@@ -156,7 +156,7 @@ public abstract class AbstractWorker implements Worker {
     protected void setSupportedVersion(final ServiceDef... supportedVersions) {
          this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
     }
-    
+
     protected boolean isSupportedVersion(final String version) {
         final ServiceDef.Version vv = new ServiceDef.Version(version);
         for (ServiceDef sd : supportedVersions) {
@@ -166,7 +166,7 @@ public abstract class AbstractWorker implements Worker {
         }
         return false;
     }
-    
+
     /**
      * Verify if the version is supported by this serviceType.
      * <p>
@@ -191,7 +191,7 @@ public abstract class AbstractWorker implements Worker {
             throw new CstlServiceException(messageb.toString(), code, "version");
         }
     }
-    
+
     /**
      * Return a Version Object from the version number.
      * if the version number is not correct return the default version.
@@ -210,14 +210,14 @@ public abstract class AbstractWorker implements Worker {
         }
         return null;
     }
-    
+
     /**
      * Return a Version Object from the version number.
      * if the version number is not correct return the default version.
      *
      * @param number the version number.
      * @return
-     * 
+     *
      */
     @Override
     public ServiceDef getVersionFromNumber(final String number) {
@@ -228,14 +228,14 @@ public abstract class AbstractWorker implements Worker {
         }
         return null;
     }
-    
+
     /**
      * If the requested version number is not available we choose the best version to return.
      *
      * @param number A version number, which will be compared to the ones specified.
      *               Can be {@code null}, in this case the best version specified is just returned.
      * @return The best version (the highest one) specified for this web service.
-     * 
+     *
      */
     @Override
     public ServiceDef getBestVersion(final String number) {
@@ -258,7 +258,7 @@ public abstract class AbstractWorker implements Worker {
         }
         return firstSpecifiedVersion;
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -288,14 +288,14 @@ public abstract class AbstractWorker implements Worker {
     public void setLogLevel(final Level logLevel) {
         this.logLevel = logLevel;
     }
-    
+
     @Override
     public void setShiroAccessible(final boolean shiroAccessible) {
         this.shiroAccessible = shiroAccessible;
     }
 
     protected abstract String getProperty(final String propertyName);
-    
+
     /**
      * Returns the file where to read the capabilities document for each service.
      * If no such file is found, then this method returns {@code null}.
@@ -357,7 +357,7 @@ public abstract class AbstractWorker implements Worker {
                     response = unmarshaller.unmarshal(f);
                 }
                 getMarshallerPool().release(unmarshaller);
-                
+
                 if (response instanceof JAXBElement) {
                     response = ((JAXBElement)response).getValue();
                 }
@@ -397,7 +397,7 @@ public abstract class AbstractWorker implements Worker {
     public boolean isStarted() {
         return isStarted;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -409,7 +409,7 @@ public abstract class AbstractWorker implements Worker {
         }
         return false;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -421,7 +421,7 @@ public abstract class AbstractWorker implements Worker {
         }
         return true;
     }
-    
+
     /**
      * A flag indicating if the transaction methods of the worker are securized.
      */
@@ -441,7 +441,7 @@ public abstract class AbstractWorker implements Worker {
         }
         return false;
     }
-    
+
     @Override
     public List<Schema> getRequestValidationSchema() {
         if (schemas == null) {
@@ -465,7 +465,7 @@ public abstract class AbstractWorker implements Worker {
         }
         return schemas;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -512,10 +512,10 @@ public abstract class AbstractWorker implements Worker {
             throw new CstlServiceException("The update sequence must be an integer", ex, OWSExceptionCode.INVALID_PARAMETER_VALUE, "updateSequence");
         }
     }
-    
+
     /**
      * Return a cached capabilities response.
-     * 
+     *
      * @param version
      * @return r
      */
@@ -523,13 +523,13 @@ public abstract class AbstractWorker implements Worker {
         final String keyCache = specification.name() + '-' + id + '-' + version + '-' + language;
         return CAPS_RESPONSE.get(keyCache);
     }
-    
+
     /**
      * Add the capabilities object to the cache.
-     * 
+     *
      * @param version
      * @param language
-     * @param capabilities 
+     * @param capabilities
      */
     protected void putCapabilitiesInCache(final String version, final String language, final AbstractCapabilitiesCore capabilities) {
         if (cacheCapabilities) {
@@ -537,7 +537,7 @@ public abstract class AbstractWorker implements Worker {
             CAPS_RESPONSE.put(keyCache, capabilities);
         }
     }
-    
+
     protected void clearCapabilitiesCache() {
         final List<String> toClear = new ArrayList<String>();
         for (String key: CAPS_RESPONSE.keySet()) {
@@ -549,7 +549,7 @@ public abstract class AbstractWorker implements Worker {
             CAPS_RESPONSE.remove(key);
         }
     }
-    
+
     @Override
     public void destroy() {
         clearCapabilitiesCache();

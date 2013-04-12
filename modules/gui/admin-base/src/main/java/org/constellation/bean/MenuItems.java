@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.imageio.spi.ServiceRegistry;
-import org.apache.sis.util.collection.UnmodifiableArrayList;
+import org.apache.sis.internal.util.UnmodifiableArrayList;
 
 /**
  *

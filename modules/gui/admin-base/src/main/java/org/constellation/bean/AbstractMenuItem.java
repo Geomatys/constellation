@@ -23,7 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.admin.service.ConstellationServer;
 import org.apache.sis.util.ArgumentChecks;
-import org.apache.sis.util.collection.UnmodifiableArrayList;
+import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.geotoolkit.util.logging.Logging;
 
 /**
@@ -33,7 +33,7 @@ import org.geotoolkit.util.logging.Logging;
 public abstract class AbstractMenuItem implements MenuItem {
 
     protected static final Logger LOGGER = Logging.getLogger(AbstractMenuItem.class);
-    
+
     public static final Path SERVICES_PATH       = new Path(null, "services", "/base/services.xhtml", "org.constellation.icons.socket.png.mfRes",400);
     public static final Path PROVIDERS_PATH      = new Path(null, "providers", "/base/providers.xhtml", "org.constellation.icons.nfs_unmount.png.mfRes",300);
     //public static final Path STYLE_PATH          = new Path(null, "styles", null, "org.constellation.icons.colors.png.mfRes",250);
@@ -56,7 +56,7 @@ public abstract class AbstractMenuItem implements MenuItem {
     public boolean isAvailable(final ConstellationServer server) {
         return true;
     }
-    
+
     protected boolean serviceAvailable(final ConstellationServer server, final String serviceName) {
         if (server != null) {
             final Map<String, List<String>> availableService = server.services.getAvailableService();
@@ -68,12 +68,12 @@ public abstract class AbstractMenuItem implements MenuItem {
         }
         return false;
     }
-    
+
     @Override
     public String getId() {
         return path.i18nKey;
     }
-    
+
     @Override
     public String getTitle() {
         return path.i18nKey;
@@ -93,7 +93,7 @@ public abstract class AbstractMenuItem implements MenuItem {
     public Path getPath() {
         return path;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[").append(this.getClass().getSimpleName()).append("]");
