@@ -114,6 +114,12 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         return get(key, null);
     }
 
+    public CoverageStore getStore() {
+        if (store == null) {
+            reload();
+        }
+        return store;
+    }
     /**
      * {@inheritDoc }
      */
