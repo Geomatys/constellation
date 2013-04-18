@@ -46,6 +46,22 @@ public final class CSWQueryable {
 
      private CSWQueryable() {}
 
+     /**
+     * The queryable element from ISO 19110 and their path id.
+     */
+    public static final Map<String, List<String>> ISO_FC_QUERYABLE;
+    static {
+        ISO_FC_QUERYABLE = new HashMap<String, List<String>>();
+        List<String> paths;
+
+        /*
+         * The core queryable of ISO 19115
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19110:FC_FeatureCatalogue:featureType:carrierOfCharacteristics:memberName");
+        ISO_FC_QUERYABLE.put("attributeName", paths);
+    }
+    
     /**
      * The queryable element from ISO 19115 and their path id.
      */

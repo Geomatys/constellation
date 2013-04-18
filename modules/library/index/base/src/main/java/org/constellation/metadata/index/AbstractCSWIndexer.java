@@ -126,7 +126,9 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             // TODO
             doc.add(new Field("objectType", "Ebrim", Field.Store.YES, Field.Index.ANALYZED));
         } else if (isFeatureCatalogue(metadata)) {
-            // TODO
+            final Map<String, List<String>> fcQueryable = removeOverridenField(ISO_FC_QUERYABLE);
+            indexQueryableSet(doc, metadata, fcQueryable, anyText);
+            
             doc.add(new Field("objectType", "FC_FeatureCatalogue", Field.Store.YES, Field.Index.ANALYZED));
         } else if (isDublinCore(metadata)) {
             
