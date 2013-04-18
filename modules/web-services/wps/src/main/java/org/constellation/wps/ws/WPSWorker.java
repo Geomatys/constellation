@@ -868,16 +868,48 @@ public class WPSWorker extends AbstractWorker {
                     MISSING_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
         }
 
+        //Find the process
+        final ProcessDescriptor processDesc = WPSUtils.getProcessDescriptor(request.getIdentifier().getValue());
+
+        if (!WPSUtils.isSupportedProcess(processDesc)) {
+            throw new CstlServiceException("Process " + request.getIdentifier().getValue() + " not supported by the service.",
+                    INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
+        }
+
+        //check requested INPUT/OUTPUT. Throw a CstlException otherwise.
+        WPSUtils.checkValidInputOuputRequest(processDesc, request);
+
         /*
          * Get the requested output form
          */
         final ResponseFormType responseForm = request.getResponseForm();
-        if (responseForm == null) {
-            throw new CstlServiceException("The response form should be defined.", MISSING_PARAMETER_VALUE, "responseForm");
-        }
+        OutputDefinitionType rawData = null;
+        ResponseDocumentType respDoc = null;
 
-        final OutputDefinitionType rawData = responseForm.getRawDataOutput();
-        final ResponseDocumentType respDoc = responseForm.getResponseDocument();
+        if (responseForm == null) {
+            //create default response form if not define
+            final List<DocumentOutputDefinitionType> outputs = new ArrayList<DocumentOutputDefinitionType>();
+
+            for (GeneralParameterDescriptor gpd : processDesc.getOutputDescriptor().descriptors()) {
+                if (gpd instanceof ParameterDescriptor) {
+                    final DocumentOutputDefinitionType docOutDef = new DocumentOutputDefinitionType();
+                    docOutDef.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, gpd, WPSIO.IOType.OUTPUT)));
+                    docOutDef.setAsReference(false);
+                    outputs.add(docOutDef);
+                }
+                //TODO handle sub levels of ParameterDescriptors
+            }
+
+            respDoc = new ResponseDocumentType();
+            respDoc.setLineage(false);
+            respDoc.setStatus(false);
+            respDoc.setStoreExecuteResponse(false);
+            respDoc.getOutput().addAll(outputs);
+
+        } else {
+            rawData = responseForm.getRawDataOutput();
+            respDoc = responseForm.getResponseDocument();
+        }
 
 
         boolean isOutputRaw = rawData != null; // the default output is a ResponseDocument
@@ -894,16 +926,6 @@ public class WPSWorker extends AbstractWorker {
 
         StatusType status = new StatusType();
         LOGGER.log(Level.INFO, "Process Execute : {0}", request.getIdentifier().getValue());
-        //Find the process
-        final ProcessDescriptor processDesc = WPSUtils.getProcessDescriptor(request.getIdentifier().getValue());
-
-        if (!WPSUtils.isSupportedProcess(processDesc)) {
-            throw new CstlServiceException("Process " + request.getIdentifier().getValue() + " not supported by the service.",
-                    INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
-        }
-
-        //check requested INPUT/OUTPUT. Throw a CstlException otherwise.
-        WPSUtils.checkValidInputOuputRequest(processDesc, request);
 
         /*
          * ResponseDocument attributes
