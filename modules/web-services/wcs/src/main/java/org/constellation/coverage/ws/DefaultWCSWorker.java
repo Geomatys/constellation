@@ -888,7 +888,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 if (envelope.getMaximum(i) < axis.getMinimumValue() ||
                     envelope.getMinimum(i) > axis.getMaximumValue())
                 {
-                    throw new CstlServiceException(Errors.format(Errors.Keys.ILLEGAL_RANGE_$2,
+                    throw new CstlServiceException(Errors.format(Errors.Keys.ILLEGAL_RANGE_2,
                             envelope.getMinimum(i), envelope.getMaximum(i)),
                             INVALID_DIMENSION_VALUE, KEY_BBOX.toLowerCase());
                 }
