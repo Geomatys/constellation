@@ -19,6 +19,7 @@ package org.constellation.coverage.ws;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.v110.AllowedValues;
 import org.geotoolkit.ows.xml.v110.DCP;
 import org.geotoolkit.ows.xml.v110.DomainType;
@@ -183,7 +184,16 @@ public final class WCSConstant {
         final List<DomainType> constraints = new ArrayList<DomainType>();
         constraints.add(new DomainType("PostEncoding", new AllowedValues(Arrays.asList("XML"))));
         
-        OPERATIONS_METADATA_111 = new OperationsMetadata(operations, null, null, null);
+        OPERATIONS_METADATA_111 = new OperationsMetadata(operations, null, constraints, null);
     }
 
+    public static AbstractOperationsMetadata getOperationMetadata(final String version) {
+        if (version.equals("1.0.0")) {
+            return OPERATIONS_METADATA_100.clone();
+        } else if (version.equals("1.1.1")){
+            return OPERATIONS_METADATA_111.clone();
+        } else {
+            throw new IllegalArgumentException("unexpected version:" + version);
+        }
+    }
 }

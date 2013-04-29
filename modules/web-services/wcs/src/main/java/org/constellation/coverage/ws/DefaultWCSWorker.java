@@ -587,21 +587,9 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             }
         }
         
-        // If the getCapabilities response is in cache, we just return it.
-        final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache(version, null);
-        if (cachedCapabilities != null) {
-            return (GetCapabilitiesResponse) cachedCapabilities.applySections(sections);
-        }
-        
-        // We unmarshall the static capabilities document.
-        final GetCapabilitiesResponse staticCapabilities = (GetCapabilitiesResponse) getStaticCapabilitiesObject(version, "WCS");
-
+        // if the user have specified one format accepted (only one for now != spec)
         final String format;
-        final GetCapabilitiesResponse response;
-        if (version.equals("1.0.0")) {
-            response = getCapabilities100(staticCapabilities, userLogin);
-        } else if (version.equals("1.1.1")) {
-            // if the user have specified one format accepted (only one for now != spec)
+        if (version.equals("1.1.1")) {
             final AcceptFormats formats = request.getAcceptFormats();
             if (formats == null || formats.getOutputFormat().isEmpty()) {
                 format = MimeType.TEXT_XML;
@@ -612,13 +600,73 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                             INVALID_FORMAT, KEY_FORMAT.toLowerCase());
                 }
             }
-
-            response = getCapabilities111(staticCapabilities, userLogin);
-        } else {
-            throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
+        
+        // If the getCapabilities response is in cache, we just return it.
+        final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache(version, null);
+        if (cachedCapabilities != null) {
+            return (GetCapabilitiesResponse) cachedCapabilities.applySections(sections);
+        }
+        
+        // We unmarshall the static capabilities document.
+        final GetCapabilitiesResponse staticCapabilities = (GetCapabilitiesResponse) getStaticCapabilitiesObject(version, "WCS");
 
+        final AbstractServiceIdentification si  = staticCapabilities.getServiceIdentification();
+        final AbstractServiceProvider sp        = staticCapabilities.getServiceProvider();
+        final AbstractOperationsMetadata om     = WCSConstant.getOperationMetadata(version);
+        om.updateURL(getServiceUrl());
+        
+        
+        final List<CoverageInfo> offBrief = new ArrayList<CoverageInfo>();
+        final Map<Name,Layer> layers = getLayers(userLogin);
+        try {
+            for (Name name : layers.keySet()) {
+                final LayerDetails layer = getLayerReference(userLogin, name);
+                final Layer configLayer  = layers.get(name);
+
+                if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
+                    continue;
+                }
+                if (!layer.isQueryable(ServiceDef.Query.WCS_ALL)) {
+                    continue;
+                }
+                if (layer.getGeographicBoundingBox() == null) {
+                    // The coverage does not contain geometric information, we do not want this coverage
+                    // in the capabilities response.
+                    continue;
+                }
+                
+                final CoverageInfo co;
+                if (version.equals("1.0.0")) {
+                    co = getCoverageInfo100(layer, configLayer);
+                } else if (version.equals("1.1.1")) {
+                    co = getCoverageInfo111(layer, configLayer);
+                } else {
+                    throw new CstlServiceException("The version number specified for this request " +
+                            "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                }
+                /*
+                * coverage brief customisation
+                */
+                if (configLayer.getTitle() != null) {
+                   co.setTitle(configLayer.getTitle());
+                }
+                if (configLayer.getAbstrac() != null) {
+                   co.setAbstract(configLayer.getAbstrac());
+                }
+                if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
+                   co.setKeywordValues(configLayer.getKeywords());
+                }
+                if (configLayer.getMetadataURL() != null && configLayer.getMetadataURL().getOnlineResource() != null) {
+                    co.setMetadata(configLayer.getMetadataURL().getOnlineResource().getValue());
+                }
+                offBrief.add(co);
+            }
+        }   catch (DataStoreException exception) {
+            throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
+        }
+        final Content contents = WCSXmlFactory.createContent("1.0.0", offBrief);
+        final GetCapabilitiesResponse response = WCSXmlFactory.createCapabilitiesResponse(version, si, sp, om, contents, getCurrentUpdateSequence());
         putCapabilitiesInCache(version, null, response);
         return (GetCapabilitiesResponse) response.applySections(sections);
     }
@@ -633,86 +681,39 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private GetCapabilitiesResponse getCapabilities100(final GetCapabilitiesResponse staticCapabilities, final String userLogin) throws CstlServiceException {
+    private CoverageInfo getCoverageInfo100(final LayerDetails layer, final Layer configLayer) throws DataStoreException {
         
-        //we update the url in the static part.
-        final AbstractOperationsMetadata ca = WCSConstant.OPERATIONS_METADATA_100.clone();
-        final String url  = getServiceUrl() + "SERVICE=WCS&";
-        ca.updateURL(url);
-
-        final AbstractServiceIdentification service  = staticCapabilities.getServiceIdentification();
-        final Content contentMetadata;
-        final List<CoverageInfo> offBrief = new ArrayList<CoverageInfo>();
-        final Map<Name,Layer> layers = getLayers(userLogin);
-        try {
-            for (Name name : layers.keySet()) {
-                final LayerDetails layer = getLayerReference(userLogin, name);
-                final Layer configLayer  = layers.get(name);
-
-                if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
-                    continue;
-                }
-                if (!layer.isQueryable(ServiceDef.Query.WCS_ALL)) {
-                    continue;
-                }
-                final Name fullLayerName = layer.getName();
-                final String layerName;
-                if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
-                    layerName = configLayer.getAlias().trim().replaceAll(" ", "_");
-                } else {
-                    if (fullLayerName.getNamespaceURI() != null && !fullLayerName.getNamespaceURI().isEmpty()) {
-                        layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
-                    } else {
-                        layerName = fullLayerName.getLocalPart();
-                    }
-                }
-                final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
-                if (inputGeoBox == null) {
-                    // The coverage does not contain geometric information, we do not want this coverage
-                    // in the capabilities response.
-                    continue;
-                }
-                final List<DirectPositionType> pos = buildPositions(inputGeoBox, layer.getAvailableElevations());
-                final LonLatEnvelopeType outputBBox = new LonLatEnvelopeType(pos, "urn:ogc:def:crs:OGC:1.3:CRS84");
-
-                final SortedSet<Date> dates = layer.getAvailableTimes();
-                if (dates != null && dates.size() >= 2) {
-                    /*
-                     * Adds the first and last date available, since in the WCS GetCapabilities,
-                     * it is a brief description of the capabilities.
-                     * To get the whole available values, the describeCoverage request has to be
-                     * done on a specific coverage.
-                     */
-                    final Date firstDate = dates.first();
-                    final Date lastDate = dates.last();
-                    final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-                    df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    outputBBox.addTimePosition(df.format(firstDate), df.format(lastDate));
-                }
-
-                final CoverageInfo co = WCSXmlFactory.createCoverageInfo("1.0.0", layerName, layerName, null, outputBBox);
-                /*
-                 * coverage brief customisation
-                 */
-                 if (configLayer.getTitle() != null) {
-                    co.setTitle(configLayer.getTitle());
-                 }
-                 if (configLayer.getAbstrac() != null) {
-                    co.setAbstract(configLayer.getAbstrac());
-                 }
-                 if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-                    co.setKeywordValues(configLayer.getKeywords());
-                 }
-                 if (configLayer.getMetadataURL() != null && configLayer.getMetadataURL().getOnlineResource() != null) {
-                     co.setMetadata(configLayer.getMetadataURL().getOnlineResource().getValue());
-                 }
-                offBrief.add(co);
+        final Name fullLayerName = layer.getName();
+        final String layerName;
+        if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
+            layerName = configLayer.getAlias().trim().replaceAll(" ", "_");
+        } else {
+            if (fullLayerName.getNamespaceURI() != null && !fullLayerName.getNamespaceURI().isEmpty()) {
+                layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
+            } else {
+                layerName = fullLayerName.getLocalPart();
             }
-            contentMetadata = WCSXmlFactory.createContent("1.0.0", offBrief);
-        } catch (DataStoreException exception) {
-            throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
-        return WCSXmlFactory.createCapabilitiesResponse("1.0.0", service, null, ca, contentMetadata, getCurrentUpdateSequence());
+        final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
+        final List<DirectPositionType> pos      = buildPositions(inputGeoBox, layer.getAvailableElevations());
+        final LonLatEnvelopeType outputBBox     = new LonLatEnvelopeType(pos, "urn:ogc:def:crs:OGC:1.3:CRS84");
+
+        final SortedSet<Date> dates = layer.getAvailableTimes();
+        if (dates != null && dates.size() >= 2) {
+            /*
+             * Adds the first and last date available, since in the WCS GetCapabilities,
+             * it is a brief description of the capabilities.
+             * To get the whole available values, the describeCoverage request has to be
+             * done on a specific coverage.
+             */
+            final Date firstDate = dates.first();
+            final Date lastDate = dates.last();
+            final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            outputBBox.addTimePosition(df.format(firstDate), df.format(lastDate));
+        }
+
+        return WCSXmlFactory.createCoverageInfo("1.0.0", layerName, layerName, null, outputBBox);
     }
 
     /**
@@ -724,67 +725,23 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private GetCapabilitiesResponse getCapabilities111(final GetCapabilitiesResponse staticCapabilities, final String userLogin) throws CstlServiceException {
+    private CoverageInfo getCoverageInfo111(final LayerDetails layer, final Layer configLayer) throws DataStoreException {
        
-
-        final AbstractServiceIdentification si = staticCapabilities.getServiceIdentification();
-        final AbstractServiceProvider sp       = staticCapabilities.getServiceProvider();
-        final AbstractOperationsMetadata om    = WCSConstant.OPERATIONS_METADATA_111.clone();
-        //we update the url in the static part.
-        om.updateURL(getServiceUrl());
-            
-        // Generate the Contents part of the GetCapabilities.
-        final Content contents;
-        final List<CoverageInfo> summary = new ArrayList<CoverageInfo>();
-        final Map<Name,Layer> layers = getLayers(userLogin);
-        try {
-            for (Name name : layers.keySet()) {
-                final LayerDetails layer = getLayerReference(userLogin, name);
-                final Layer configLayer  = layers.get(name);
-
-                if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
-                    continue;
-                }
-                if (!layer.isQueryable(ServiceDef.Query.WCS_ALL)) {
-                    continue;
-                }
-                final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
-                final String identifier = coverageLayer.getName().getLocalPart();
-                final String title      = coverageLayer.getName().getLocalPart();
-                final String remark     = StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks());
-
-                final GeographicBoundingBox inputGeoBox = coverageLayer.getGeographicBoundingBox();
-                if (inputGeoBox == null) {
-                    // The coverage does not contain geometric information, we do not want this coverage
-                    // in the capabilities response.
-                    continue;
-                }
-                final WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(inputGeoBox);
-
-                final CoverageInfo co = WCSXmlFactory.createCoverageInfo("1.1.1", identifier, title, remark, outputBBox);
-                /*
-                 * coverage brief customisation
-                 */
-                 if (configLayer.getTitle() != null) {
-                    co.setTitle(configLayer.getTitle());
-                 }
-                 if (configLayer.getAbstrac() != null) {
-                    co.setAbstract(configLayer.getAbstrac());
-                 }
-                 if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-                    co.setKeywordValues(configLayer.getKeywords());
-                 }
-                 if (configLayer.getMetadataURL() != null && configLayer.getMetadataURL().getOnlineResource() != null) {
-                    co.setMetadata(configLayer.getMetadataURL().getOnlineResource().getValue());
-                 }
-                summary.add(co);
-            }
-
-            contents = WCSXmlFactory.createContent("1.1.1", summary);
-        } catch (DataStoreException exception) {
-            throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
+        final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
+        final String identifier;
+        if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
+            identifier = configLayer.getAlias().trim().replaceAll(" ", "_");
+        } else {
+            identifier = coverageLayer.getName().getLocalPart();
         }
-        return WCSXmlFactory.createCapabilitiesResponse("1.1.1", si, sp, om, contents, getCurrentUpdateSequence());
+         
+        final String title      = coverageLayer.getName().getLocalPart();
+        final String remark     = StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks());
+
+        final GeographicBoundingBox inputGeoBox = coverageLayer.getGeographicBoundingBox();
+        final WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(inputGeoBox);
+
+        return WCSXmlFactory.createCoverageInfo("1.1.1", identifier, title, remark, outputBBox);
     }
     
 
