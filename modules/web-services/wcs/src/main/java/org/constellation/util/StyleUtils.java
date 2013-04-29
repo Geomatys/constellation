@@ -24,8 +24,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedSet;
 import org.geotoolkit.display2d.ext.pattern.PatternSymbolizer;
 import org.geotoolkit.filter.DefaultFilterFactory2;
+import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
@@ -36,6 +38,7 @@ import org.geotoolkit.wcs.xml.v100.TypedLiteralType;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
+import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.style.FeatureTypeStyle;
 import org.opengis.style.Rule;
 import org.opengis.style.Symbolizer;
@@ -205,4 +208,27 @@ public final class StyleUtils {
 
     }
 
+    /**
+     * Transform a geographicBoundingBox into a list of direct positions.
+     *
+     * @param inputGeoBox
+     * @param elevations
+     * @return
+     */
+    public static List<DirectPositionType> buildPositions(final GeographicBoundingBox inputGeoBox, final SortedSet<Number> elevations) {
+        final List<Double> pos1 = new ArrayList<Double>();
+        pos1.add(inputGeoBox.getWestBoundLongitude());
+        pos1.add(inputGeoBox.getSouthBoundLatitude());
+        final List<Double> pos2 = new ArrayList<Double>();
+        pos2.add(inputGeoBox.getEastBoundLongitude());
+        pos2.add(inputGeoBox.getNorthBoundLatitude());
+        if (elevations != null && elevations.size() >= 2) {
+            pos1.add(elevations.first().doubleValue());
+            pos2.add(elevations.last().doubleValue());
+        }
+        final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+        pos.add(new DirectPositionType(pos1));
+        pos.add(new DirectPositionType(pos2));
+        return pos;
+    }
 }

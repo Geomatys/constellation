@@ -19,6 +19,8 @@ package org.constellation.coverage.ws;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.constellation.ws.MimeType;
+import org.geotoolkit.gml.xml.v311.CodeListType;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.v110.AllowedValues;
 import org.geotoolkit.ows.xml.v110.DCP;
@@ -131,6 +133,53 @@ public final class WCSConstant {
     /** Format value used in getCoverage */
     public static final String TIFF       = "TIFF";
 
+    /*
+     * A list supported formats
+     *
+     */
+     public static final List<CodeListType> SUPPORTED_FORMATS_100 = new ArrayList<CodeListType>();
+     static {
+        SUPPORTED_FORMATS_100.add(new CodeListType("png"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("gif"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("jpeg"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("bmp"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("tiff"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("geotiff"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("matrix"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("ascii-grid"));
+    }
+     
+     public static final List<String> SUPPORTED_FORMATS_111 = new ArrayList<String>();
+     static {
+         SUPPORTED_FORMATS_111.add(MimeType.IMAGE_PNG);
+         SUPPORTED_FORMATS_111.add(MimeType.IMAGE_GIF);
+         SUPPORTED_FORMATS_111.add(MimeType.IMAGE_JPEG);
+         SUPPORTED_FORMATS_111.add(MimeType.IMAGE_BMP);
+         SUPPORTED_FORMATS_111.add("matrix");
+         SUPPORTED_FORMATS_111.add("ascii-grid");
+    }
+     
+    /**
+     * A list of supported interpolation
+     */
+    public static final List<org.geotoolkit.wcs.xml.v100.InterpolationMethod> SUPPORTED_INTERPOLATIONS_V100 =
+            new ArrayList<org.geotoolkit.wcs.xml.v100.InterpolationMethod>();
+    static {
+            SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BILINEAR);
+            SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BICUBIC);
+            SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR);
+    }
+
+    /**
+     * A list of supported interpolation
+     */
+    public static final List<org.geotoolkit.wcs.xml.v111.InterpolationMethod> SUPPORTED_INTERPOLATIONS_V111 =
+            new ArrayList<org.geotoolkit.wcs.xml.v111.InterpolationMethod>();
+    static {
+            SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BILINEAR);
+            SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC);
+            SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR);
+    }
     
     public static final WCSCapabilityType OPERATIONS_METADATA_100;
     static {
