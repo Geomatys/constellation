@@ -64,10 +64,7 @@ import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
-import org.geotoolkit.ows.xml.v110.OperationsMetadata;
 import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.ows.xml.v110.ServiceIdentification;
-import org.geotoolkit.ows.xml.v110.ServiceProvider;
 import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
@@ -82,9 +79,9 @@ import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
 import org.geotoolkit.wcs.xml.GetCapabilities;
 import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
-import org.geotoolkit.wcs.xml.v100.ContentMetadata;
-import org.geotoolkit.wcs.xml.v100.CoverageDescription;
-import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
+import org.geotoolkit.wcs.xml.Content;
+import org.geotoolkit.wcs.xml.CoverageInfo;
+import org.geotoolkit.wcs.xml.WCSXmlFactory;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
 import org.geotoolkit.wcs.xml.v100.DomainSetType;
 import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
@@ -92,30 +89,26 @@ import org.geotoolkit.wcs.xml.v100.RangeSetType;
 import org.geotoolkit.wcs.xml.v100.SupportedCRSsType;
 import org.geotoolkit.wcs.xml.v100.SupportedFormatsType;
 import org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType;
-import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
-import org.geotoolkit.wcs.xml.v100.Request;
 import org.geotoolkit.wcs.xml.v111.GridCrsType;
-import org.geotoolkit.wcs.xml.v111.Capabilities;
-import org.geotoolkit.wcs.xml.v111.Contents;
 import org.geotoolkit.wcs.xml.v111.CoverageDescriptionType;
-import org.geotoolkit.wcs.xml.v111.CoverageDescriptions;
 import org.geotoolkit.wcs.xml.v111.CoverageDomainType;
-import org.geotoolkit.wcs.xml.v111.CoverageSummaryType;
 import org.geotoolkit.wcs.xml.v111.FieldType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
 import org.geotoolkit.wcs.xml.v111.RangeType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.wcs.xml.v100.InterpolationMethod;
-import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.gml.xml.v311.RectifiedGridType;
 import org.geotoolkit.gml.xml.v311.GridType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.Sections;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.wcs.xml.WCSXmlFactory;
+
 
 
 // GeoAPI dependencies
@@ -228,9 +221,9 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                            MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
         }
 
-        if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
+        if (version.equals("1.0.0")) {
             return describeCoverage100(request, userLogin);
-        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
+        } else if (version.equals("1.1.1")) {
             return describeCoverage111(request, userLogin);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
@@ -255,7 +248,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     MISSING_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
         }
 
-        final List<CoverageOfferingType> coverageOfferings = new ArrayList<CoverageOfferingType>();
+        final List<CoverageInfo> coverageOfferings = new ArrayList<CoverageInfo>();
         for (String coverage : request.getIdentifier()) {
             final Name tmpName = parseCoverageName(coverage);
             final LayerDetails layerRef = getLayerReference(userLogin, tmpName);
@@ -393,7 +386,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             coverageOfferings.add(coverageOffering);
         }
 
-        return new CoverageDescription(coverageOfferings, ServiceDef.WCS_1_0_0.version.toString());
+        return WCSXmlFactory.createDescribeCoverageResponse("1.0.0", coverageOfferings);
     }
 
 
@@ -436,7 +429,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     MISSING_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
         }
 
-        final List<CoverageDescriptionType> coverageDescriptions = new ArrayList<CoverageDescriptionType>();
+        final List<CoverageInfo> coverageDescriptions = new ArrayList<CoverageInfo>();
         for (String coverage : request.getIdentifier()) {
             final Name tmpName = parseCoverageName(coverage);
             final LayerDetails layerRef = getLayerReference(userLogin, tmpName);
@@ -552,7 +545,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             coverageDescriptions.add(coverageDescription);
         }
 
-        return new CoverageDescriptions(coverageDescriptions);
+        return WCSXmlFactory.createDescribeCoverageResponse("1.1.1", coverageDescriptions);
     }
 
     /**
@@ -601,13 +594,13 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         }
         
         // We unmarshall the static capabilities document.
-        final GetCapabilitiesResponse staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(version, "WCS");
+        final GetCapabilitiesResponse staticCapabilities = (GetCapabilitiesResponse) getStaticCapabilitiesObject(version, "WCS");
 
         final String format;
         final GetCapabilitiesResponse response;
-        if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
-            response = getCapabilities100((WCSCapabilitiesType)staticCapabilities, userLogin);
-        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
+        if (version.equals("1.0.0")) {
+            response = getCapabilities100(staticCapabilities, userLogin);
+        } else if (version.equals("1.1.1")) {
             // if the user have specified one format accepted (only one for now != spec)
             final AcceptFormats formats = request.getAcceptFormats();
             if (formats == null || formats.getOutputFormat().isEmpty()) {
@@ -620,7 +613,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 }
             }
 
-            response = getCapabilities111((Capabilities)staticCapabilities, userLogin);
+            response = getCapabilities111(staticCapabilities, userLogin);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
@@ -631,7 +624,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     }
 
     /**
-     * Returns the {@linkplain WCSCapabilitiesType GetCapabilities} response of the request
+     * Returns the {@linkplain GetCapabilitiesResponse GetCapabilities} response of the request
      * given by parameter, in version 1.0.0 of WCS.
      *
      * @param request The request done by the user, in version 1.0.0.
@@ -640,18 +633,16 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private GetCapabilitiesResponse getCapabilities100(final WCSCapabilitiesType staticCapabilities, final String userLogin) throws CstlServiceException {
+    private GetCapabilitiesResponse getCapabilities100(final GetCapabilitiesResponse staticCapabilities, final String userLogin) throws CstlServiceException {
         
         //we update the url in the static part.
-        final Request req = WCSConstant.REQUEST_100.clone();
+        final AbstractOperationsMetadata ca = WCSConstant.OPERATIONS_METADATA_100.clone();
         final String url  = getServiceUrl() + "SERVICE=WCS&";
-        req.updateURL(url);
-        staticCapabilities.getCapability().setRequest(req);
-        
-        final org.geotoolkit.wcs.xml.v100.WCSCapabilityType ca = staticCapabilities.getCapability();
-        final org.geotoolkit.wcs.xml.v100.ServiceType service  = staticCapabilities.getService();
-        final ContentMetadata contentMetadata;
-        final List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
+        ca.updateURL(url);
+
+        final AbstractServiceIdentification service  = staticCapabilities.getServiceIdentification();
+        final Content contentMetadata;
+        final List<CoverageInfo> offBrief = new ArrayList<CoverageInfo>();
         final Map<Name,Layer> layers = getLayers(userLogin);
         try {
             for (Name name : layers.keySet()) {
@@ -699,33 +690,33 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     outputBBox.addTimePosition(df.format(firstDate), df.format(lastDate));
                 }
 
-                final CoverageOfferingBriefType co = new CoverageOfferingBriefType(null, layerName, layerName, null, outputBBox, new ArrayList<String>());
+                final CoverageInfo co = WCSXmlFactory.createCoverageInfo("1.0.0", layerName, layerName, null, outputBBox);
                 /*
                  * coverage brief customisation
                  */
                  if (configLayer.getTitle() != null) {
-                    co.setLabel(configLayer.getTitle());
+                    co.setTitle(configLayer.getTitle());
                  }
                  if (configLayer.getAbstrac() != null) {
-                    co.setDescription(configLayer.getAbstrac());
+                    co.setAbstract(configLayer.getAbstrac());
                  }
                  if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-                    co.setKeywords(configLayer.getKeywords());
+                    co.setKeywordValues(configLayer.getKeywords());
                  }
                  if (configLayer.getMetadataURL() != null && configLayer.getMetadataURL().getOnlineResource() != null) {
-                     co.setMetadataLink(configLayer.getMetadataURL().getOnlineResource().getValue());
+                     co.setMetadata(configLayer.getMetadataURL().getOnlineResource().getValue());
                  }
                 offBrief.add(co);
             }
-            contentMetadata = new ContentMetadata(offBrief);
+            contentMetadata = WCSXmlFactory.createContent("1.0.0", offBrief);
         } catch (DataStoreException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
-        return new WCSCapabilitiesType(service, ca, contentMetadata, getCurrentUpdateSequence());
+        return WCSXmlFactory.createCapabilitiesResponse("1.0.0", service, null, ca, contentMetadata, getCurrentUpdateSequence());
     }
 
     /**
-     * Returns the {@linkplain Capabilities GetCapabilities} response of the request given
+     * Returns the {@linkplain GetCapabilitiesResponse GetCapabilities} response of the request given
      * by parameter, in version 1.1.1 of WCS.
      *
      * @param request The request done by the user, in version 1.1.1.
@@ -733,18 +724,18 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private Capabilities getCapabilities111(final Capabilities staticCapabilities, final String userLogin) throws CstlServiceException {
+    private GetCapabilitiesResponse getCapabilities111(final GetCapabilitiesResponse staticCapabilities, final String userLogin) throws CstlServiceException {
        
 
-        final ServiceIdentification si = staticCapabilities.getServiceIdentification();
-        final ServiceProvider sp       = staticCapabilities.getServiceProvider();
-        final OperationsMetadata om    = WCSConstant.OPERATIONS_METADATA_111.clone();
+        final AbstractServiceIdentification si = staticCapabilities.getServiceIdentification();
+        final AbstractServiceProvider sp       = staticCapabilities.getServiceProvider();
+        final AbstractOperationsMetadata om    = WCSConstant.OPERATIONS_METADATA_111.clone();
         //we update the url in the static part.
         om.updateURL(getServiceUrl());
             
         // Generate the Contents part of the GetCapabilities.
-        final Contents contents;
-        final List<CoverageSummaryType> summary = new ArrayList<CoverageSummaryType>();
+        final Content contents;
+        final List<CoverageInfo> summary = new ArrayList<CoverageInfo>();
         final Map<Name,Layer> layers = getLayers(userLogin);
         try {
             for (Name name : layers.keySet()) {
@@ -768,37 +759,32 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     // in the capabilities response.
                     continue;
                 }
-                //final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
-                final WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
-                        inputGeoBox.getWestBoundLongitude(),
-                        inputGeoBox.getSouthBoundLatitude(),
-                        inputGeoBox.getEastBoundLongitude(),
-                        inputGeoBox.getNorthBoundLatitude());
+                final WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(inputGeoBox);
 
-                final CoverageSummaryType cs = new CoverageSummaryType(identifier, title, remark, outputBBox);
+                final CoverageInfo co = WCSXmlFactory.createCoverageInfo("1.1.1", identifier, title, remark, outputBBox);
                 /*
                  * coverage brief customisation
                  */
                  if (configLayer.getTitle() != null) {
-                    cs.setTitle(configLayer.getTitle());
+                    co.setTitle(configLayer.getTitle());
                  }
                  if (configLayer.getAbstrac() != null) {
-                    cs.setAbstract(configLayer.getAbstrac());
+                    co.setAbstract(configLayer.getAbstrac());
                  }
                  if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-                    cs.setKeywordValues(configLayer.getKeywords());
+                    co.setKeywordValues(configLayer.getKeywords());
                  }
                  if (configLayer.getMetadataURL() != null && configLayer.getMetadataURL().getOnlineResource() != null) {
-                    cs.setMetadata(configLayer.getMetadataURL().getOnlineResource().getValue());
+                    co.setMetadata(configLayer.getMetadataURL().getOnlineResource().getValue());
                  }
-                summary.add(cs);
+                summary.add(co);
             }
 
-            contents = new Contents(summary, null, null, null);
+            contents = WCSXmlFactory.createContent("1.1.1", summary);
         } catch (DataStoreException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
-        return new Capabilities(si, sp, om, "1.1.1", getCurrentUpdateSequence(), contents);
+        return WCSXmlFactory.createCapabilitiesResponse("1.1.1", si, sp, om, contents, getCurrentUpdateSequence());
     }
     
 
@@ -1071,23 +1057,6 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
             return img;
         }
-    }
-
-    /**
-     * Parse a Name from a string.
-     * @param layerName
-     * @return
-     */
-    private Name parseCoverageName(final String layerName) {
-        final Name namedLayerName;
-        if (layerName != null && layerName.lastIndexOf(':') != -1) {
-            final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));
-            final String localPart = layerName.substring(layerName.lastIndexOf(':') + 1);
-            namedLayerName = new DefaultName(namespace, localPart);
-        } else {
-            namedLayerName = new DefaultName(layerName);
-        }
-        return namedLayerName;
     }
 
     /**

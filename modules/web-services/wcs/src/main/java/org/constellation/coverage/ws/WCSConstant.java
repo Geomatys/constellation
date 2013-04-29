@@ -31,6 +31,7 @@ import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Post;
 import org.geotoolkit.wcs.xml.v100.OnlineResourceType;
 import org.geotoolkit.wcs.xml.v100.Request;
+import org.geotoolkit.wcs.xml.v100.WCSCapabilityType;
 
 /**
  *  WCS Constants
@@ -130,18 +131,20 @@ public final class WCSConstant {
     public static final String TIFF       = "TIFF";
 
     
-    public static final Request REQUEST_100;
+    public static final WCSCapabilityType OPERATIONS_METADATA_100;
     static {
         final Get get         = new DCPTypeType.HTTP.Get(new OnlineResourceType("someurl"));
         final Post post       = new DCPTypeType.HTTP.Post(new OnlineResourceType("someurl"));
         final DCPTypeType dcp = new DCPTypeType(new DCPTypeType.HTTP(get, post));
-        REQUEST_100 = new Request();
+        final Request REQUEST_100 = new Request();
         final Request.DescribeCoverage describeCoverage = new Request.DescribeCoverage(Arrays.asList(dcp));
         REQUEST_100.setDescribeCoverage(describeCoverage);
         final Request.GetCapabilities getCapabilities = new Request.GetCapabilities(Arrays.asList(dcp));
         REQUEST_100.setGetCapabilities(getCapabilities);
         final Request.GetCoverage getCoverage = new Request.GetCoverage(Arrays.asList(dcp));
         REQUEST_100.setGetCoverage(getCoverage);
+        final WCSCapabilityType.Exception ex = new WCSCapabilityType.Exception(Arrays.asList("application/vnd.ogc.se_xml", "text/xml"));
+        OPERATIONS_METADATA_100 = new WCSCapabilityType(REQUEST_100, ex);
     }
 
     public static final OperationsMetadata OPERATIONS_METADATA_111;

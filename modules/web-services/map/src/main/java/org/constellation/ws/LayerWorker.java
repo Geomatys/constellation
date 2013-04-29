@@ -46,6 +46,7 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.feature.DefaultName;
 import org.opengis.feature.type.Name;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.style.MutableStyle;
@@ -343,5 +344,22 @@ public abstract class LayerWorker extends AbstractWorker {
             return layerContext.getCustomParameters().get(key);
         }
         return null;
+    }
+    
+    /**
+     * Parse a Name from a string.
+     * @param layerName
+     * @return
+     */
+    protected Name parseCoverageName(final String layerName) {
+        final Name namedLayerName;
+        if (layerName != null && layerName.lastIndexOf(':') != -1) {
+            final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));
+            final String localPart = layerName.substring(layerName.lastIndexOf(':') + 1);
+            namedLayerName = new DefaultName(namespace, localPart);
+        } else {
+            namedLayerName = new DefaultName(layerName);
+        }
+        return namedLayerName;
     }
 }

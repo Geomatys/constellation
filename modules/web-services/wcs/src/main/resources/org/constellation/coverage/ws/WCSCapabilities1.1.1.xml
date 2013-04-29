@@ -47,6 +47,4 @@ version="1.1.1" updateSequence="">
             <ows:Role>TBD</ows:Role>
         </ows:ServiceContact>
     </ows:ServiceProvider>
-    <Contents>
-    </Contents>
 </Capabilities>
