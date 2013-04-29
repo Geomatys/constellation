@@ -69,7 +69,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testGetCapabilities() throws JAXBException, CstlServiceException {
-        GetCapabilities request = new GetCapabilitiesType(null, null);
+        GetCapabilities request = new GetCapabilitiesType("1.0.0", "WCS", null, null);
         GetCapabilitiesResponse response = WORKER.getCapabilities(request);
 
         assertNotNull(response);
@@ -95,21 +95,21 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
             fail("Unable to find the layer "+ LAYER_TEST +" in the GetCapabilities document.");
         }
         
-        request = new GetCapabilitiesType("/WCS_Capabilities/Capability", null);
+        request = new GetCapabilitiesType("1.0.0", "WCS", "/WCS_Capabilities/Capability", null);
         getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
         
         assertNotNull(getCaps.getCapability());
         assertNull(getCaps.getContentMetadata());
         assertNull(getCaps.getService());
         
-        request = new GetCapabilitiesType("/WCS_Capabilities/Service", null);
+        request = new GetCapabilitiesType("1.0.0", "WCS", "/WCS_Capabilities/Service", null);
         getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
         
         assertNull(getCaps.getCapability());
         assertNull(getCaps.getContentMetadata());
         assertNotNull(getCaps.getService());
         
-        request = new GetCapabilitiesType("/WCS_Capabilities/ContentMetadata", null);
+        request = new GetCapabilitiesType("1.0.0", "WCS", "/WCS_Capabilities/ContentMetadata", null);
         getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
         
         assertNull(getCaps.getCapability());

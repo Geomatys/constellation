@@ -310,7 +310,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             throw new AssertionError("The layer \""+ LAYER_TEST +"\" was not found in the returned GetCapabilities.");
         }
 
-        Get get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0);
+        Get get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCP().get(0).getHTTP().getRealGetOrPost().get(0);
         assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&", get.getOnlineResource().getHref());
 
         try {
@@ -327,7 +327,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
         responseCaps = (WCSCapabilitiesType)obj;
 
-        get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0);
+        get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCP().get(0).getHTTP().getRealGetOrPost().get(0);
         assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/test?SERVICE=WCS&", get.getOnlineResource().getHref());
 
 
@@ -345,7 +345,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
         responseCaps = (WCSCapabilitiesType)obj;
 
-        get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0);
+        get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCP().get(0).getHTTP().getRealGetOrPost().get(0);
         assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&", get.getOnlineResource().getHref());
     }
 

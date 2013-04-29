@@ -18,19 +18,18 @@
 package org.constellation.coverage.ws.rs;
 
 // Jersey dependencies
-import java.util.logging.Level;
-import org.geotoolkit.ows.xml.RequestBase;
-import org.geotoolkit.ows.xml.ExceptionResponse;
 import com.sun.jersey.spi.resource.Singleton;
-
-// J2SE dependencies
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringTokenizer;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+// J2SE dependencies
+import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
@@ -40,12 +39,13 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
-import static org.constellation.query.Query.*;
-import static org.constellation.api.QueryConstants.*;
 import org.constellation.coverage.ws.DefaultWCSWorker;
-import static org.constellation.coverage.ws.WCSConstant.*;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.Worker;
+
+import static org.constellation.coverage.ws.WCSConstant.*;
+import static org.constellation.query.Query.*;
+import static org.constellation.api.QueryConstants.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.CodeType;
@@ -53,10 +53,7 @@ import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.GridLimitsType;
 import org.geotoolkit.gml.xml.v311.GridType;
-import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
-import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
-import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.client.util.RequestsUtilities;
@@ -72,10 +69,19 @@ import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.geotoolkit.wcs.xml.v111.RangeSubsetType.FieldSubset;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
+import org.geotoolkit.ows.xml.AcceptFormats;
+import org.geotoolkit.ows.xml.AcceptVersions;
+import org.geotoolkit.ows.xml.RequestBase;
+import org.geotoolkit.ows.xml.ExceptionResponse;
 import org.geotoolkit.wcs.xml.WCSMarshallerPool;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.ows.xml.Sections;
+import org.geotoolkit.wcs.xml.WCSXmlFactory;
+import org.geotoolkit.wcs.xml.DomainSubset;
+import org.geotoolkit.wcs.xml.TimeSequence;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.wcs.xml.WCSXmlFactory;
+
 
 
 /**
@@ -157,16 +163,6 @@ public class WCSService extends GridWebService<WCSWorker> {
             if (objectRequest instanceof DescribeCoverage) {
                 final DescribeCoverage desccov = (DescribeCoverage)objectRequest;
 
-                //TODO: move me into the worker.
-                //verifyBaseParameter(0);
-                //TODO: move me into the worker.
-                //The Constellation WCS does not currently implement the "store" mechanism.
-                /*String store = getParameter(KEY_STORE, false);
-                if (  store != null  &&  store.trim().equalsIgnoreCase("true")  ) {
-                    throw new CstlServiceException("The service does not implement the store mechanism.",
-                                   NO_APPLICABLE_CODE, "store");
-                }*/
-
                 if (desccov.getVersion() == null) {
                     throw new CstlServiceException("The parameter version must be specified",
                         MISSING_PARAMETER_VALUE, "version");
@@ -178,8 +174,6 @@ public class WCSService extends GridWebService<WCSWorker> {
 
             if (objectRequest instanceof GetCoverage) {
                 final GetCoverage getcov = (GetCoverage)objectRequest;
-                //TODO: move me into the worker.
-                //verifyBaseParameter(0);
 
                 if (getcov.getVersion() == null) {
                     throw new CstlServiceException("The parameter version must be specified",
@@ -302,8 +296,8 @@ public class WCSService extends GridWebService<WCSWorker> {
      * @throws CstlServiceException
      */
     private GetCapabilities adaptKvpGetCapabilitiesRequest() throws CstlServiceException {
-
-        if (!getParameter(KEY_SERVICE, true).equalsIgnoreCase("WCS")) {
+        final String service = getParameter(KEY_SERVICE, true);
+        if (!service.equalsIgnoreCase("WCS")) {
             throw new CstlServiceException("The parameter SERVICE must be specified as WCS",
                     MISSING_PARAMETER_VALUE, KEY_SERVICE.toLowerCase());
         }
@@ -325,11 +319,14 @@ public class WCSService extends GridWebService<WCSWorker> {
 
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
-        final ServiceDef finalVersion = ServiceDef.WCS_1_0_0;
-        if (finalVersion.equals(ServiceDef.WCS_1_0_0)) {
-            return new org.geotoolkit.wcs.xml.v100.GetCapabilitiesType(getParameter(KEY_SECTION, false), updateSequence);
-        } else if (finalVersion.equals(ServiceDef.WCS_1_1_1)) {
-            final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
+        final String finalVersion = ServiceDef.WCS_1_0_0.version.toString();
+        if (finalVersion.equals("1.0.0")) {
+            final String section = getParameter(KEY_SECTION, false);
+            final Sections sections = OWSXmlFactory.buildSections(finalVersion, Arrays.asList(section));
+            return WCSXmlFactory.createGetCapabilities(finalVersion, null, sections, null, updateSequence, service);
+        } else if (finalVersion.equals("1.1.1")) {
+            final String acceptformat = getParameter(ACCEPT_FORMATS_PARAMETER, false);
+            final AcceptFormats formats = OWSXmlFactory.buildAcceptFormat(updateSequence, Arrays.asList(acceptformat));
 
             //We transform the String of sections in a list.
             //In the same time we verify that the requested sections are valid.
@@ -351,9 +348,9 @@ public class WCSService extends GridWebService<WCSWorker> {
                 //if there is no requested Sections we add all the sections
                 requestedSections = SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
             }
-            final SectionsType sections = new SectionsType(requestedSections);
-            final AcceptVersionsType versions = new AcceptVersionsType(ServiceDef.WCS_1_1_1.version.toString());
-            return new org.geotoolkit.wcs.xml.v111.GetCapabilitiesType(versions, sections, formats, updateSequence);
+            final Sections sections = OWSXmlFactory.buildSections(finalVersion, requestedSections);
+            final AcceptVersions versions = OWSXmlFactory.buildAcceptVersion(finalVersion, Arrays.asList(ServiceDef.WCS_1_1_1.version.toString()));
+            return WCSXmlFactory.createGetCapabilities(finalVersion, versions, sections, formats, updateSequence, service);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
@@ -379,7 +376,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
-        return WCSXmlFactory.createDescribeCoverage(strVersion, coverage);
+        return WCSXmlFactory.createDescribeCoverage(strVersion, Arrays.asList(coverage));
     }
 
     /**
@@ -392,10 +389,9 @@ public class WCSService extends GridWebService<WCSWorker> {
     private GetCoverage adaptKvpGetCoverageRequest(final Worker w) throws CstlServiceException {
         final String strVersion = getParameter(VERSION_PARAMETER, true);
         w.checkVersionSupported(strVersion, false);
-        final ServiceDef serviceDef = w.getVersionFromNumber(strVersion);
-        if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {
+        if (strVersion.equals("1.0.0")) {
             return adaptKvpGetCoverageRequest100();
-         } else if (serviceDef.equals(ServiceDef.WCS_1_1_1)) {
+         } else if (strVersion.equals("1.1.1")) {
             return adaptKvpGetCoverageRequest111();
          } else {
             throw new CstlServiceException("The version number specified for this request " +
@@ -410,9 +406,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * @return The GetCoverage request in version 1.0.0
      * @throws CstlServiceException
      */
-    private org.geotoolkit.wcs.xml.v100.GetCoverageType adaptKvpGetCoverageRequest100()
-                                                    throws CstlServiceException
-    {
+    private GetCoverage adaptKvpGetCoverageRequest100() throws CstlServiceException {
         final String width  = getParameter(KEY_WIDTH,  false);
         final String height = getParameter(KEY_HEIGHT, false);
         final String depth  = getParameter(KEY_DEPTH,  false);
@@ -422,11 +416,10 @@ public class WCSService extends GridWebService<WCSWorker> {
         final String resz   = getParameter(KEY_RESZ,   false);
 
         // temporal subset
-        org.geotoolkit.wcs.xml.v100.TimeSequenceType temporal = null;
+        TimeSequence temporal = null;
         final String time = getParameter(KEY_TIME, false);
         if (time != null) {
-            final TimePositionType timePosition = new TimePositionType(time);
-            temporal = new org.geotoolkit.wcs.xml.v100.TimeSequenceType(timePosition);
+            temporal = WCSXmlFactory.createTimeSequence("1.0.0", time);
         }
 
         /*
@@ -509,8 +502,7 @@ public class WCSService extends GridWebService<WCSWorker> {
                 new org.geotoolkit.wcs.xml.v100.SpatialSubsetType(envelope, grid);
 
         //domain subset
-        final org.geotoolkit.wcs.xml.v100.DomainSubsetType domain =
-                new org.geotoolkit.wcs.xml.v100.DomainSubsetType(temporal, spatial);
+        final DomainSubset domain = WCSXmlFactory.createDomainSubset("1.0.0", temporal, spatial);
 
         //range subset
         final org.geotoolkit.wcs.xml.v100.RangeSubsetType rangeSubset;
@@ -556,8 +548,7 @@ public class WCSService extends GridWebService<WCSWorker> {
                                                            getParameter(KEY_RESPONSE_CRS, false),
                                                            resolutions);
 
-        return new org.geotoolkit.wcs.xml.v100.GetCoverageType(
-                getParameter(KEY_COVERAGE, true), domain, rangeSubset, interpolation, output);
+        return WCSXmlFactory.createGetCoverage("1.0.0", getParameter(KEY_COVERAGE, true), domain, rangeSubset, interpolation, output);
     }
 
     /**
@@ -567,15 +558,13 @@ public class WCSService extends GridWebService<WCSWorker> {
      * @return The GetCoverage request in version 1.1.1
      * @throws CstlServiceException
      */
-    private org.geotoolkit.wcs.xml.v111.GetCoverageType adaptKvpGetCoverageRequest111()
-                                                    throws CstlServiceException
-    {
+    private GetCoverage adaptKvpGetCoverageRequest111() throws CstlServiceException {
         // temporal subset
-        org.geotoolkit.wcs.xml.v111.TimeSequenceType temporal = null;
+        TimeSequence temporal = null;
         final String timeParameter = getParameter(KEY_TIMESEQUENCE, false);
         if (timeParameter != null) {
             if (timeParameter.indexOf('/') == -1) {
-                temporal = new org.geotoolkit.wcs.xml.v111.TimeSequenceType(new TimePositionType(timeParameter));
+                temporal = WCSXmlFactory.createTimeSequence("1.1.1", timeParameter);
             } else {
                 throw new CstlServiceException("The service does not handle TimePeriod",
                         INVALID_PARAMETER_VALUE);
@@ -615,8 +604,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         }
 
         //domain subset
-        final org.geotoolkit.wcs.xml.v111.DomainSubsetType domain =
-                new org.geotoolkit.wcs.xml.v111.DomainSubsetType(temporal, envelope);
+        final DomainSubset domain = WCSXmlFactory.createDomainSubset("1.1.1", temporal, envelope);
 
         //range subset.
         org.geotoolkit.wcs.xml.v111.RangeSubsetType range = null;
@@ -682,9 +670,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         final org.geotoolkit.wcs.xml.v111.OutputType output =
                 new org.geotoolkit.wcs.xml.v111.OutputType(grid, getParameter(KEY_FORMAT, true));
 
-        return new org.geotoolkit.wcs.xml.v111.GetCoverageType(
-                new org.geotoolkit.ows.xml.v110.CodeType(getParameter(KEY_IDENTIFIER, true)),
-                domain, range, output);
+        return WCSXmlFactory.createGetCoverage("1.1.1", getParameter(KEY_IDENTIFIER, true), domain, range, null, output);
     }
 
     /**
