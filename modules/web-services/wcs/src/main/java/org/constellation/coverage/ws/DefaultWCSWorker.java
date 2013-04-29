@@ -25,9 +25,7 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.TimeZone;
 
 // Constellation dependencies
 import org.constellation.Cstl;
@@ -43,7 +40,7 @@ import org.constellation.ServiceDef;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
-import org.constellation.util.StyleUtils;
+import org.constellation.util.WCSUtils;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.configuration.Layer;
@@ -60,7 +57,6 @@ import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -138,10 +134,7 @@ import org.opengis.coverage.grid.RectifiedGrid;
  * @since 0.3
  */
 public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
-    /**
-     * The date format to match.
-     */
-    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    
 
     public DefaultWCSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WCS);
@@ -243,107 +236,83 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      */
     private  CoverageInfo describeCoverage100(final String coverageName, final CoverageLayerDetails coverageRef) throws CstlServiceException {
 
-        final GeographicBoundingBox inputGeoBox;
         try {
-            inputGeoBox = coverageRef.getGeographicBoundingBox();
-        } catch (DataStoreException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-        }
-        final LonLatEnvelopeType llenvelope;
-        final EnvelopeType envelope;
-        if (inputGeoBox != null) {
-            final SortedSet<Number> elevations;
-            try {
-                elevations = coverageRef.getAvailableElevations();
-            } catch (DataStoreException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            final GeographicBoundingBox inputGeoBox = coverageRef.getGeographicBoundingBox();
+        
+            final LonLatEnvelopeType llenvelope;
+            final EnvelopeType envelope;
+            if (inputGeoBox != null) {
+                final SortedSet<Number> elevations = coverageRef.getAvailableElevations();
+                final List<DirectPositionType> pos = WCSUtils.buildPositions(inputGeoBox, elevations);
+                llenvelope = new LonLatEnvelopeType(pos, "urn:ogc:def:crs:OGC:1.3:CRS84");
+                envelope   = new EnvelopeType(pos, "EPSG:4326");
+            } else {
+                throw new CstlServiceException("The geographic bbox for the layer is null !",
+                        NO_APPLICABLE_CODE);
             }
+            final List<String> keywords = Arrays.asList(ServiceDef.Specification.WCS.toString(), coverageName);
 
-            final List<DirectPositionType> pos = StyleUtils.buildPositions(inputGeoBox, elevations);
-            llenvelope = new LonLatEnvelopeType(pos, "urn:ogc:def:crs:OGC:1.3:CRS84");
-            envelope   = new EnvelopeType(pos, "EPSG:4326");
-        } else {
-            throw new CstlServiceException("The geographic bbox for the layer is null !",
-                    NO_APPLICABLE_CODE);
-        }
-        final List<String> keywords = Arrays.asList(ServiceDef.Specification.WCS.toString(), coverageName);
+            /*
+             * Spatial metadata
+             */
+            final EnvelopeType nativeEnvelope = new EnvelopeType(coverageRef.getEnvelope());
 
-        /*
-         * Spatial metadata
-         */
-        final EnvelopeType nativeEnvelope;
-        try {
-            nativeEnvelope = new EnvelopeType(coverageRef.getEnvelope());
-        } catch (DataStoreException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-        }
-        GridType grid = null;
-        try {
-            SpatialMetadata meta = coverageRef.getSpatialMetadata();
-            if (meta != null) {
-                RectifiedGrid brutGrid =  meta.getInstanceForType(RectifiedGrid.class);
-                if (brutGrid != null) {
-                    grid = new RectifiedGridType(brutGrid);
-                    /*
-                     * UGLY PATCH : remove it when geotk will fill this data
-                     */
-                    if (grid.getDimension() == 0) {
-                        int dimension = brutGrid.getOffsetVectors().size();
-                        grid.setDimension(dimension);
-                    }
-                    if (grid.getAxisName().isEmpty()) {
-                        if (grid.getDimension() == 2) {
-                            grid.setAxisName(Arrays.asList("x", "y"));
-                        } else if (grid.getDimension() == 3) {
-                            grid.setAxisName(Arrays.asList("x", "y", "z"));
+            GridType grid = null;
+            try {
+                SpatialMetadata meta = coverageRef.getSpatialMetadata();
+                if (meta != null) {
+                    RectifiedGrid brutGrid =  meta.getInstanceForType(RectifiedGrid.class);
+                    if (brutGrid != null) {
+                        grid = new RectifiedGridType(brutGrid);
+                        /*
+                         * UGLY PATCH : remove it when geotk will fill this data
+                         */
+                        if (grid.getDimension() == 0) {
+                            int dimension = brutGrid.getOffsetVectors().size();
+                            grid.setDimension(dimension);
+                        }
+                        if (grid.getAxisName().isEmpty()) {
+                            if (grid.getDimension() == 2) {
+                                grid.setAxisName(Arrays.asList("x", "y"));
+                            } else if (grid.getDimension() == 3) {
+                                grid.setAxisName(Arrays.asList("x", "y", "z"));
+                            }
                         }
                     }
                 }
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.WARNING, "Unable to get coverage spatial metadata", ex);
             }
-        } catch (DataStoreException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
 
-        final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
+            final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
                 new org.geotoolkit.wcs.xml.v100.SpatialDomainType(Arrays.asList(envelope, nativeEnvelope), Arrays.asList(grid));
 
-        // temporal metadata
-        final SortedSet<Date> dates;
-        try {
-            dates = coverageRef.getAvailableTimes();
+            // temporal metadata
+            final List<Object> times = WCSUtils.formatDateList(coverageRef.getAvailableTimes());
+            final DomainSetType domainSet = new DomainSetType(spatialDomain, times);
+            //TODO complete
+            final RangeSetType rangeSet   = new RangeSetType(null, coverageName, coverageName, null, null, null, null);
+            //supported CRS
+            final SupportedCRSsType supCRS = new SupportedCRSsType("EPSG:4326");
+            supCRS.addNativeCRSs(nativeEnvelope.getSrsName());
+
+            // supported formats
+            String nativeFormat = coverageRef.getImageFormat();
+            if (nativeFormat == null || nativeFormat.isEmpty()) {
+                nativeFormat = "unknown";
+            }
+            final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, SUPPORTED_FORMATS_100);
+
+            //supported interpolations
+            final SupportedInterpolationsType supInt = INTERPOLATION_V100;
+
+            //we build the coverage offering for this layer/coverage
+            return new CoverageOfferingType(null, coverageName,
+                    coverageName, StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks()), llenvelope,
+                    keywords, domainSet, rangeSet, supCRS, supForm, supInt);
         } catch (DataStoreException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
-        final List<Object> times = new ArrayList<Object>();
-        if (dates != null && !dates.isEmpty()) {
-            final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            for (Date d : dates) {
-                times.add(new TimePositionType(df.format(d)));
-            }
-        }
-        final DomainSetType domainSet = new DomainSetType(spatialDomain, times);
-        //TODO complete
-        final RangeSetType rangeSet   = new RangeSetType(null, coverageName, coverageName, null, null, null, null);
-        //supported CRS
-        final SupportedCRSsType supCRS = new SupportedCRSsType("EPSG:4326");
-        supCRS.addNativeCRSs(nativeEnvelope.getSrsName());
-
-        // supported formats
-        String nativeFormat = coverageRef.getImageFormat();
-        if (nativeFormat == null || nativeFormat.isEmpty()) {
-            nativeFormat = "unknown";
-        }
-        final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, SUPPORTED_FORMATS_100);
-
-        //supported interpolations
-        final SupportedInterpolationsType supInt = new SupportedInterpolationsType(
-                org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, SUPPORTED_INTERPOLATIONS_V100);
-
-        //we build the coverage offering for this layer/coverage
-        return new CoverageOfferingType(null, coverageName,
-                coverageName, StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks()), llenvelope,
-                keywords, domainSet, rangeSet, supCRS, supForm, supInt);
     }
 
 
@@ -357,74 +326,57 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      * @throws CstlServiceException
      */
     private  CoverageInfo describeCoverage111(final String coverageName, final CoverageLayerDetails coverageRef) throws CstlServiceException {
+        try {
+            final GeographicBoundingBox inputGeoBox = coverageRef.getGeographicBoundingBox();
         
-        final GeographicBoundingBox inputGeoBox;
-        try {
-            inputGeoBox = coverageRef.getGeographicBoundingBox();
-        } catch (DataStoreException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_BOUNDINGBOX.toLowerCase());
-        }
-        WGS84BoundingBoxType outputBBox = null;
-        if (inputGeoBox != null) {
-            outputBBox = new WGS84BoundingBoxType(inputGeoBox);
-        }
-        /*
-         * Spatial metadata
-         */
-        final BoundingBoxType nativeEnvelope;
-        try {
-            nativeEnvelope = new BoundingBoxType(coverageRef.getEnvelope());
-        } catch (DataStoreException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-        }
-        GridCrsType grid = null;
-        try {
-            SpatialMetadata meta = coverageRef.getSpatialMetadata();
-            if (meta != null) {
-                RectifiedGrid brutGrid =  meta.getInstanceForType(RectifiedGrid.class);
-                if (brutGrid != null) {
-                    grid = new GridCrsType(brutGrid);
-                }
+            WGS84BoundingBoxType outputBBox = null;
+            if (inputGeoBox != null) {
+                outputBBox = new WGS84BoundingBoxType(inputGeoBox);
             }
-        } catch (DataStoreException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
+            /*
+             * Spatial metadata
+             */
+            final BoundingBoxType nativeEnvelope = new BoundingBoxType(coverageRef.getEnvelope());
 
-        // spatial metadata
-        final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
-                new org.geotoolkit.wcs.xml.v111.SpatialDomainType(outputBBox,nativeEnvelope, grid, null, null, null);
+            GridCrsType grid = null;
+            try {
+                SpatialMetadata meta = coverageRef.getSpatialMetadata();
+                if (meta != null) {
+                    RectifiedGrid brutGrid =  meta.getInstanceForType(RectifiedGrid.class);
+                    if (brutGrid != null) {
+                        grid = new GridCrsType(brutGrid);
+                    }
+                }
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.WARNING, "Unable to get coverage spatial metadata", ex);
+            }
 
-        //general metadata
-        final String title     = coverageName;
-        final String abstractt = StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks());
-        final List<String> keywords = Arrays.asList(ServiceDef.Specification.WCS.toString(), coverageName);
+            // spatial metadata
+            final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
+                    new org.geotoolkit.wcs.xml.v111.SpatialDomainType(outputBBox,nativeEnvelope, grid, null, null, null);
 
-        // temporal metadata
-        final List<Object> times = new ArrayList<Object>();
-        final SortedSet<Date> dates;
-        try {
-            dates = coverageRef.getAvailableTimes();
+            //general metadata
+            final String title     = coverageName;
+            final String abstractt = StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks());
+            final List<String> keywords = Arrays.asList(ServiceDef.Specification.WCS.toString(), coverageName);
+
+            // temporal metadata
+            final List<Object> times = WCSUtils.formatDateList(coverageRef.getAvailableTimes());
+            final CoverageDomainType domain = new CoverageDomainType(spatial, times);
+
+            //supported interpolations
+            final InterpolationMethods interpolations = INTERPOLATION_V111;
+            
+            final RangeType range = new RangeType(new FieldType(StringUtilities.cleanSpecialCharacter(coverageRef.getThematic()),
+                    null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
+
+            //supported CRS
+            final List<String> supportedCRS = Arrays.asList("EPSG:4326");
+
+            return new CoverageDescriptionType(title, abstractt, keywords, coverageName, domain, range, supportedCRS, SUPPORTED_FORMATS_111);
         } catch (DataStoreException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
-        final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        for (Date d : dates) {
-            times.add(new TimePositionType(df.format(d)));
-        }
-
-        final CoverageDomainType domain = new CoverageDomainType(spatial, times);
-
-        //supported interpolations
-        final InterpolationMethods interpolations = new InterpolationMethods(SUPPORTED_INTERPOLATIONS_V111 , org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
-        final RangeType range = new RangeType(new FieldType(StringUtilities.cleanSpecialCharacter(coverageRef.getThematic()),
-                null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
-
-        //supported CRS
-        final List<String> supportedCRS = new ArrayList<String>();
-        supportedCRS.add("EPSG:4326");
-
-        return new CoverageDescriptionType(title, abstractt, keywords, coverageName, domain, range, supportedCRS, SUPPORTED_FORMATS_111);
     }
 
     /**
@@ -492,7 +444,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
         final AbstractServiceIdentification si  = staticCapabilities.getServiceIdentification();
         final AbstractServiceProvider sp        = staticCapabilities.getServiceProvider();
-        final AbstractOperationsMetadata om     = WCSConstant.getOperationMetadata(version);
+        final AbstractOperationsMetadata om     = getOperationMetadata(version);
         om.updateURL(getServiceUrl());
         
         
@@ -574,7 +526,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             }
         }
         final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
-        final List<DirectPositionType> pos      = StyleUtils.buildPositions(inputGeoBox, layer.getAvailableElevations());
+        final List<DirectPositionType> pos      = WCSUtils.buildPositions(inputGeoBox, layer.getAvailableElevations());
         final LonLatEnvelopeType outputBBox     = new LonLatEnvelopeType(pos, "urn:ogc:def:crs:OGC:1.3:CRS84");
 
         final SortedSet<Date> dates = layer.getAvailableTimes();
@@ -587,9 +539,9 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
              */
             final Date firstDate = dates.first();
             final Date lastDate = dates.last();
-            final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            outputBBox.addTimePosition(df.format(firstDate), df.format(lastDate));
+            synchronized(WCSUtils.FORMATTER) {
+                outputBBox.addTimePosition(WCSUtils.FORMATTER.format(firstDate), WCSUtils.FORMATTER.format(lastDate));
+            }
         }
 
         return WCSXmlFactory.createCoverageInfo("1.0.0", layerName, layerName, null, outputBBox);
@@ -852,7 +804,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             if (!styleNames.isEmpty()) {
                 final String styleName = styleNames.get(0);
                 final MutableStyle incomingStyle = getStyle(styleName);
-                style = StyleUtils.filterStyle(incomingStyle, request.getRangeSubset());
+                style = WCSUtils.filterStyle(incomingStyle, request.getRangeSubset());
             } else {
                 style = null;
             }

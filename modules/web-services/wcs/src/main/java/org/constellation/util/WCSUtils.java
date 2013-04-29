@@ -17,17 +17,22 @@
 
 package org.constellation.util;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import org.geotoolkit.display2d.ext.pattern.PatternSymbolizer;
 import org.geotoolkit.filter.DefaultFilterFactory2;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
@@ -47,12 +52,21 @@ import org.opengis.style.Symbolizer;
  *
  * @author Johann Sorel (Geomatys)
  */
-public final class StyleUtils {
+public final class WCSUtils {
 
     private static final MutableStyleFactory SF = new DefaultStyleFactory();
     private static final FilterFactory2 FF = new DefaultFilterFactory2();
 
-    private StyleUtils(){}
+    /**
+     * The date format to match.
+     */
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final DateFormat FORMATTER = new SimpleDateFormat(DATE_FORMAT);
+    static {
+        FORMATTER.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+    
+    private WCSUtils(){}
 
     /**
      * Generates a style from a list of categories to highlight.
@@ -230,5 +244,15 @@ public final class StyleUtils {
         pos.add(new DirectPositionType(pos1));
         pos.add(new DirectPositionType(pos2));
         return pos;
+    }
+    
+    public static List<Object> formatDateList(final SortedSet<Date> dates) {
+        final List<Object> times = new ArrayList<Object>();
+        synchronized(FORMATTER) {
+            for (Date d : dates) {
+                times.add(new TimePositionType(FORMATTER.format(d)));
+            }
+        }
+        return times;
     }
 }

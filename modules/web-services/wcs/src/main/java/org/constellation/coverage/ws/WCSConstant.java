@@ -169,7 +169,9 @@ public final class WCSConstant {
             SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BICUBIC);
             SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR);
     }
-
+    public static final org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType INTERPOLATION_V100 = new org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType(
+                    org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, SUPPORTED_INTERPOLATIONS_V100);
+    
     /**
      * A list of supported interpolation
      */
@@ -180,6 +182,8 @@ public final class WCSConstant {
             SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC);
             SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR);
     }
+    public static final org.geotoolkit.wcs.xml.v111.InterpolationMethods INTERPOLATION_V111 = 
+            new org.geotoolkit.wcs.xml.v111.InterpolationMethods(SUPPORTED_INTERPOLATIONS_V111 , org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
     
     public static final WCSCapabilityType OPERATIONS_METADATA_100;
     static {
