@@ -25,5 +25,5 @@ import org.apache.sis.internal.util.UnmodifiableArrayList;
  */
 final class MapProcessUtils {
 
-    public static final List<String> SUPPORTED_SERVICE_TYPE = UnmodifiableArrayList.wrap("WMS", "WFS", "WMTS", "WCS");
+    public static final List<String> SUPPORTED_SERVICE_TYPE = UnmodifiableArrayList.wrap(new String[] {"WMS", "WFS", "WMTS", "WCS"});
 }

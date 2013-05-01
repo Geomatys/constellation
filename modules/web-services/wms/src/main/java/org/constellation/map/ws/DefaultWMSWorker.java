@@ -199,10 +199,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     /**
      * AxisDirection name for Lat/Long, Elevation, temporal dimensions.
      */
-    private static final List<String> COMMONS_DIM = UnmodifiableArrayList.wrap(
+    private static final List<String> COMMONS_DIM = UnmodifiableArrayList.wrap(new String[] {
             "NORTH", "EAST", "SOUTH", "WEST",
             "UP", "DOWN",
-            "FUTURE", "PAST");
+            "FUTURE", "PAST"});
 
     private WMSPortrayal mapPortrayal;
 
