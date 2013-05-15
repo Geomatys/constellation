@@ -51,6 +51,7 @@ import org.opengis.filter.Filter;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -175,7 +176,13 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
                     final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
                     final int nbOrdinate = discretAxis.length();
                     for (int j = 0; j < nbOrdinate; j++) {
-                        dates.add((Date) discretAxis.getOrdinateAt(j));
+                        Object value = discretAxis.getOrdinateAt(j);
+                        if(value instanceof Date){
+                            dates.add((Date)value);
+                        }else{                            
+                            Number n = (Number) value;
+                            dates.add(new Date(n.longValue()));
+                        }
                     }
                 } else {
                     final Double min = Double.valueOf(axis.getMinimumValue());
