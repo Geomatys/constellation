@@ -361,6 +361,41 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     }
 
     /**
+     * Fire event that a service has been created.
+     *
+     * @param instanceName Instance name for this service.
+     * @param serviceType Type of the service (WMS, CSW, SOS, ...).
+     */
+    private void fireServiceCreated(final String instanceName, final String serviceType) {
+        for (ConstellationListener listener : listeners.getListeners(ConstellationListener.class)) {
+            listener.serviceCreated(instanceName, serviceType);
+        }
+    }
+
+    /**
+     * Fire event that a service has been deleted.
+     *
+     * @param id Identifier of the service to delete.
+     */
+    private void fireServiceDeleted(final String instanceName, final String serviceType) {
+        for (ConstellationListener listener : listeners.getListeners(ConstellationListener.class)) {
+            listener.serviceDeleted(instanceName, serviceType);
+        }
+    }
+
+    /**
+     * Fire event that a provider has been updated.
+     * @param instanceName Service name for this provider.
+     * @param id Identifier of the provider to delete.
+     * @param config Configuration of the provider.
+     */
+    private void fireServiceUpdated(final String instanceName, final String id, final Object config) {
+        for (ConstellationListener listener : listeners.getListeners(ConstellationListener.class)) {
+            listener.serviceUpdated(instanceName, id, config);
+        }
+    }
+
+    /**
      * Configuration methods for services
      */
     public final class Services{
@@ -454,15 +489,19 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         /**
          * Create a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
          *
-         * @param service The service name to restart (wms, wfs, csw,...).
+         * @param service The service type to create (wms, wfs, csw,...).
          * @param instanceId The instance identifier to create.
          *
          * @return true if the operation succeed
          */
-        public boolean newInstance(String service, String instanceId) {
+        public boolean newInstance(final String service, final String instanceId) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
-                return sendRequestAck(url, null);
+                final boolean succeed = sendRequestAck(url, null);
+                if (succeed) {
+                    fireServiceCreated(instanceId, service);
+                }
+                return succeed;
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -516,7 +555,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean deleteInstance(final String service, final String instanceId) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
-                return sendRequestAck(url, null);
+                final boolean succeed = sendRequestAck(url, null);
+                if (succeed) {
+                    fireServiceDeleted(instanceId, service);
+                }
+                return succeed;
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -561,7 +604,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean configureInstance(final String service, final String instanceId, final Object configuration) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
-                return sendRequestAck(url, configuration);
+                final boolean succeed = sendRequestAck(url, configuration);
+                if (succeed) {
+                    fireServiceUpdated(instanceId, service, configuration);
+                }
+                return succeed;
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
