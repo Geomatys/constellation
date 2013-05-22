@@ -17,7 +17,9 @@
 package org.constellation.swing;
 
 import java.awt.BorderLayout;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -25,6 +27,8 @@ import javax.swing.JPanel;
  */
 public abstract class JServiceEditionPane extends JPanel {
 
+    protected static final Logger LOGGER = Logging.getLogger(JServiceEditionPane.class);
+    
     public JServiceEditionPane() {
         setLayout(new BorderLayout());
     }

@@ -243,6 +243,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
     /**
      * {@inheritDoc }
      */
+    @Override
     public Object getConfiguration() {
         updateConfiguration();
         return configuration;
