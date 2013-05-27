@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>gui</artifactId>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
+
+    <groupId>org.constellation.gui</groupId>
+    <artifactId>cstl-web-client</artifactId>
+    <version>0.9-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Constellation web client</name>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>common</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>wms</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <phase>install</phase>
+                                <configuration>
+                                    <target name="copy.on.webapp">
+                                        <delete file="${tomcat.webapp.dir}${project.build.finalName}.war" />
+                                        <delete dir="${tomcat.webapp.dir}${project.build.finalName}"/>
+                                        <copy file="${project.build.directory}/${project.build.finalName}.war"
+                                              todir="${tomcat.webapp.dir}"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <properties>
+        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.6</maven.compiler.source>
+    </properties>
+
+    <build>
+        <finalName>constellation</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <compilerArguments>
+                        <sourcepath>${project.basedir}/src/main/java</sourcepath>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.juzu</groupId>
+                        <artifactId>juzu-bom-core</artifactId>
+                        <version>${juzu.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <attach>true</attach>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <finalName>${project.build.finalName}</finalName>
+                            <descriptorRefs>
+                                <descriptorRef>tomcat</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

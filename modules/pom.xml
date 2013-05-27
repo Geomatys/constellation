@@ -84,6 +84,7 @@
         <module>engine</module>
         <module>web-services</module>
         <module>testing</module>
+        <module>cstl-client</module>
     </modules>
 
 </project>

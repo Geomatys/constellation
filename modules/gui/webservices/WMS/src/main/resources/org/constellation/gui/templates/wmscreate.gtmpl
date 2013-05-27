@@ -1,0 +1,42 @@
+#{decorate path=menu.gtmpl/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="images/constellation.png"/>
+    </div>
+</div>
+<form class="form-horizontal">
+    #{include path=wmsdescription.gtmpl/}
+    #{include path=wmsmetadata.gtmpl/}
+</form>
+<script type="text/javascript">
+    jQuery('#metadata').fadeToggle();
+    $('#planned').datepicker();
+
+    function goToDescription(){
+        jQuery('#metadata').fadeToggle(toggleDescription);
+    }
+
+    function toggleDescription(){
+        jQuery('#description').fadeToggle();
+    }
+
+    function goToMetadata(){
+        //show or hide fax div
+        if(!jQuery('#v111').is(':checked')){
+            jQuery('#faxDiv').hide();
+        }
+        else{
+            jQuery('#faxDiv').show();
+
+        }
+
+        //add service name on top left div
+        $('#NewServiceName').append($('#name').val())
+        jQuery('#description').fadeToggle(toggleMetadata);
+    }
+
+    function toggleMetadata(){
+        jQuery('#metadata').fadeToggle();
+    }
+</script>

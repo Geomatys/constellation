@@ -1,0 +1,91 @@
+#{decorate path=menu.gtmpl/}
+
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span4">
+        <img src="images/constellation.png"/>
+    </div>
+    <div class="span6 offset1">
+        <h2>&{homepage.title}</h2>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span6 well">
+        <div class="row-fluid">
+            <div class="span4">
+                <img src="images/services.png" style="display: block; margin: 0 auto;"/>
+                <p><h3 class="text-center">&{homepage.webservices.title.label}</h3></p>
+                <a href="cstl-client/createws" class="btn" style="display: block; margin: 0 auto;">&{homepage.webservices.button.label}</a>
+            </div>
+            <div class="span7 offset1" style="font-size:14px">
+                &{homepage.webservices.summary}
+                <div class="span3">
+                    CSW <br/>SOS
+                </div>
+                <div class="span3">
+                    WPS <br/>WCS
+                </div>
+                <div class="span3">
+                    WFS <br/>WMS
+                </div>
+                <div class="span2">
+                    WMTS
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="span6 well">
+        <div class="row-fluid">
+            <div class="span4">
+                <img src="images/data.png" style="display: block; margin: 0 auto;"/>
+                <p><h3 class="text-center">&{homepage.data.title.label}</h3></p>
+                <a href="cstl-client/createdata" class="btn" style="display: block; margin: 0 auto;">&{homepage.data.button.label}</a>
+            </div>
+            <div class="span7 offset1" style="font-size:14px;vertical-align:middle;display:inline-block;">
+                &{homepage.data.summary}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span6 well">
+        <div class="row-fluid">
+            <div class="span4">
+                <img src="images/mapcontext.png" style="display: block; margin: 0 auto;"/>
+                <p><h3 class="text-center">&{homepage.mapcontext.title.label}</h3></p>
+                <a href="cstl-client/createmapcontext" class="btn" style="display: block; margin: 0 auto;">&{homepage.mapcontext.button.label}</a>
+            </div>
+            <div class="span7 offset1" style="font-size:14px">
+                &{homepage.mapcontext.summary}
+            </div>
+        </div>
+    </div>
+    <div class="span6 well">
+        <div class="row-fluid">
+            <div class="span4">
+                <img src="images/geoviewer.png" style="display: block; margin: 0 auto;"/>
+                <p><h3 class="text-center">&{homepage.geoviewer.title.label}</h3></p>
+                <a href="cstl-client/showgeoviewer" class="btn" style="display: block; margin: 0 auto;">&{homepage.geoviewer.button.label}</a>
+            </div>
+            <div class="span7 offset1" style="font-size:14px;">
+                &{homepage.geoviewer.summary}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span12 well">
+        <div class="row-fluid">
+            <div style="display: table;width: 100%;">
+                <div class="span2">
+                    <img src="images/stat.png" style="display: block; margin: 0 auto;"/>
+                    <p><h3 class="text-center">&{homepage.stat.title.label}</h3></p>
+                    <a href="cstl-client/showstatistics" class="btn" style="display: block; margin: 0 auto;">&{homepage.stat.button.label}</a>
+                </div>
+                <div class="span7 offset1" style="font-size:14px;">
+                    <img src="images/stat_temp.png" style="display: block; margin: 0 auto;height:215px"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
