@@ -5,11 +5,7 @@
          version="3.0">
     <context-param>
         <param-name>juzu.run_mode</param-name>
-        <param-value>live</param-value>
-    </context-param>
-    <context-param>
-        <param-name>juzu.src_path</param-name>
-        <param-value>/Users/bgarcia/projet/oss/constellation/modules/gui/cstl-client/src/main/java/</param-value>
+        <param-value>prod</param-value>
     </context-param>
     <context-param>
         <param-name>juzu.inject</param-name>

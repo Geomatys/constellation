@@ -11,7 +11,19 @@
 </form>
 <script type="text/javascript">
     jQuery('#metadata').fadeToggle();
-    $('#planned').datepicker();
+    jQuery('#layerlimitGroup').tooltip({
+        html:true,
+        placement: "bottom",
+        trigger: "hover"});
+    jQuery('#maxWidthGroup').tooltip({
+        html:true,
+        placement: "bottom",
+        trigger: "hover"});
+    jQuery('#maxHeightGroup').tooltip({
+        html:true,
+        placement: "bottom",
+        trigger: "hover"});
+
 
     function goToDescription(){
         jQuery('#metadata').fadeToggle(toggleDescription);
@@ -22,15 +34,6 @@
     }
 
     function goToMetadata(){
-        //show or hide fax div
-        if(!jQuery('#v111').is(':checked')){
-            jQuery('#faxDiv').hide();
-        }
-        else{
-            jQuery('#faxDiv').show();
-
-        }
-
         //add service name on top left div
         $('#NewServiceName').append($('#name').val())
         jQuery('#description').fadeToggle(toggleMetadata);

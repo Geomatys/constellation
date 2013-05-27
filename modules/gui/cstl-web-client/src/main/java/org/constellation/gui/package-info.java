@@ -29,6 +29,7 @@
 @Assets(stylesheets = @Stylesheet(src = "bootstrap/bootstrap.css"),
         scripts = {@Script(id = "jQuery", src = "js/jquery-2.0.0.js"),
                 @Script(id = "collapse", src = "js/bootstrap-collapse.js", depends = "jQuery"),
+                @Script(id = "tooltip", src = "js/bootstrap-tooltip.js", depends = "jQuery"),
                 @Script(id = "dropdown", src = "js/bootstrap-dropdown.js", depends = "jQuery")}) package org.constellation.gui;
 
 import juzu.Alias;

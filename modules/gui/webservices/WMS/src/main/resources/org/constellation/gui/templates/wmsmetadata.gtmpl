@@ -63,13 +63,6 @@
                 <legend>&{wms.create.contact.address.legend}</legend>
 
                 <div class="control-group">
-                    <label class="control-label" for="contactaddresstype">&{wms.create.contact.address.type.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactAddressType"/>
-                    </div>
-                </div>
-
-                <div class="control-group">
                     <label class="control-label" for="contactAddress">&{wms.create.contact.address.label}</label>
                     <div class="controls">
                         <input type="text" id="contactAddress"/>
@@ -120,25 +113,27 @@
                 <div class="control-group">
                     <label class="control-label" for="accessConstraints">&{wms.create.accessconstraint.label}</label>
                     <div class="controls">
-                        <input id="accessConstraints" type="text"/>
+                        <textarea id="accessConstraints" ></textarea>
                     </div>
                 </div>
 
-                <div class="control-group">
+                <div class="control-group" data-toggle="tooltip" title="&{wms.create.accessconstraint.layerlimit.tooltip}" id="layerlimitGroup">
                     <label class="control-label" for="layerLimit">&{wms.create.accessconstraint.layerlimit.label}</label>
                     <div class="controls">
-                        <input type="text" id="layerLimit"/>
+                        <input type="text" id="layerLimit" />
                     </div>
+
                 </div>
 
-                <div class="control-group">
+                <div class="control-group" data-toggle="tooltip" title="&{wms.create.accessconstraint.maxwidth.tooltip}" id="maxWidthGroup">
                     <label class="control-label" for="maxWidth">&{wms.create.accessconstraint.maxwidth.label}</label>
-                    <div class="controls">
-                        <input type="text" id="maxWidth"/>
+                    <div class="controls" >
+                        <input type="text" id="maxWidth" />
                     </div>
                 </div>
 
-                <div class="control-group">
+
+                <div class="control-group" data-toggle="tooltip" title="&{wms.create.accessconstraint.maxheight.tooltip}" id="maxHeightGroup">
                     <label class="control-label" for="maxHeight">&{wms.create.accessconstraint.maxheight.label}</label>
                     <div class="controls">
                         <input type="text" id="maxHeight"/>
@@ -152,7 +147,7 @@
             </br>
                 <a href="@{webservices()}">&{wms.create.cancel.label}</a>
                 <button class="btn btn-primary" onclick="goToDescription();" type="button">&{wms.create.previous.label}</button>
-                <button class="btn btn-primary" type="submit">&{wms.create.save.label}</button>
+                <button class="btn btn-primary" type="submit" data-toggle="tooltip" title="&{wms.create.accessconstraint.layerlimit.tooltip}" id="buttonSubmit">&{wms.create.save.label}</button>
             </div>
         </div>
     </div>
