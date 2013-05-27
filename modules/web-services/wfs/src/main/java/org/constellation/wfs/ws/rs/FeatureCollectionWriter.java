@@ -59,7 +59,7 @@ public class FeatureCollectionWriter<T extends FeatureCollectionWrapper> impleme
             final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         try {
             final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter(t.getGmlVersion(), t.getWfsVersion(), t.getSchemaLocations());
-            featureWriter.write(t.getFeatureCollection(), out);
+            featureWriter.write(t.getFeatureCollection(), out, t.getNbMatched());
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.SEVERE, "Stax exception while writing the feature collection", ex);
         } catch (DataStoreException ex) {

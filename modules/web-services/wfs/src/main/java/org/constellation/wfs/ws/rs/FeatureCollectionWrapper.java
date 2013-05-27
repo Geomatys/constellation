@@ -26,17 +26,21 @@ public class FeatureCollectionWrapper {
 
     private final FeatureCollection featureCollection;
 
+    private final int nbMatched;
+    
     private final Map<String, String> schemaLocations;
 
     private final String gmlVersion;
 
     private final String wfsVersion;
 
-    public FeatureCollectionWrapper(final FeatureCollection featureCollection, final Map<String, String> schemaLocations, final String gmlVersion, final String wfsVersion) {
+    public FeatureCollectionWrapper(final FeatureCollection featureCollection, final Map<String, String> schemaLocations, final String gmlVersion,
+            final String wfsVersion, final int nbMatched) {
         this.featureCollection = featureCollection;
         this.gmlVersion = gmlVersion;
         this.wfsVersion = wfsVersion;
         this.schemaLocations = schemaLocations;
+        this.nbMatched = nbMatched;
     }
 
     /**
@@ -65,6 +69,13 @@ public class FeatureCollectionWrapper {
      */
     public String getWfsVersion() {
         return wfsVersion;
+    }
+
+    /**
+     * @return the nbMatched
+     */
+    public int getNbMatched() {
+        return nbMatched;
     }
 
 

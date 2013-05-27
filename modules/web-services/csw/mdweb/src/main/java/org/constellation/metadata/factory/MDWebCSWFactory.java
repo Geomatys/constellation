@@ -46,6 +46,8 @@ import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 import static org.constellation.generic.database.Automatic.*;
+import org.constellation.metadata.security.MetadataSecurityFilter;
+import org.constellation.metadata.security.NoMetadataSecurityFilter;
 
 /**
  * A default implementation of the CSW factory.
@@ -109,8 +111,9 @@ public class MDWebCSWFactory implements AbstractCSWFactory {
     @Override
     public CatalogueHarvester getCatalogueHarvester(Automatic configuration, MetadataWriter writer) throws MetadataIoException {
         int type = -1;
-        if (configuration != null)
+        if (configuration != null) {
             type = configuration.getHarvestType();
+        }
         switch (type) {
             case DEFAULT:
                 return new DefaultCatalogueHarvester(writer);
@@ -137,5 +140,10 @@ public class MDWebCSWFactory implements AbstractCSWFactory {
     @Override
     public FilterParser getSQLFilterParser() {
         return new SQLFilterParser();
+    }
+
+    @Override
+    public MetadataSecurityFilter getSecurityFilter() {
+        return new NoMetadataSecurityFilter();
     }
 }

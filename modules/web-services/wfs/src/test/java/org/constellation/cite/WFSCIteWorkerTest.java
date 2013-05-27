@@ -53,7 +53,7 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.junit.Assert.*;
-import static org.constellation.provider.postgis.PostGisProviderService.*;
+import static org.constellation.provider.featurestore.FeatureStoreProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
@@ -84,6 +84,7 @@ public class WFSCIteWorkerTest {
                 configDir.mkdir();
                 Source s1 = new Source("src", Boolean.TRUE, null, null);
                 LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
+                lc.getCustomParameters().put("shiroAccessible", "false");
 
                 //we write the configuration file
                 File configFile = new File(configDir, "layerContext.xml");
@@ -198,18 +199,21 @@ public class WFSCIteWorkerTest {
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
                 final ParameterValueGroup config = desc.createValue();
 
-                if("postgis".equals(serviceName)){
+                if("feature-store".equals(serviceName)){
                     // Defines a PostGis data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
-                    srcconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
-                    srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
-                    srcconfig.parameter(USER.getName().getCode()).setValue("test");
-                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");
-                    srcconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("src");
+                    
+                    final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);                    
+                    final ParameterValueGroup pgconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    pgconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
+                    pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                    pgconfig.parameter(USER.getName().getCode()).setValue("test");
+                    pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
+                    pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                    choice.values().add(pgconfig);
                 }
 
                 return config;

@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -61,14 +62,18 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.observation.xml.v100.MeasurementType;
-import org.geotoolkit.observation.xml.v100.ObservationType;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
+import org.geotoolkit.observation.xml.AbstractObservation;
+import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
-import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.sos.xml.ObservationOffering;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.SOSXmlFactory;
+import org.geotoolkit.swe.xml.v101.AnyResultType;
+
+import org.opengis.observation.Observation;
+import org.opengis.observation.sampling.SamplingFeature;
 
 
 /**
@@ -87,7 +92,13 @@ public class DefaultObservationReader implements ObservationReader {
      * The base for observation id.
      */
     protected final String observationIdBase;
+    
+    protected final String observationTemplateIdBase;
 
+    protected final String phenomenonIdBase;
+    
+    protected final String sensorIdBase;
+    
     /**
      * A Database object for the O&M dataBase.
      */
@@ -131,6 +142,9 @@ public class DefaultObservationReader implements ObservationReader {
      */
     public DefaultObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
+        this.phenomenonIdBase  = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
+        this.sensorIdBase      = (String) properties.get(OMFactory.SENSOR_ID_BASE);
+        this.observationTemplateIdBase = (String) properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
@@ -162,14 +176,13 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> getOfferingNames() throws CstlServiceException {
+    public Collection<String> getOfferingNames(final String version) throws CstlServiceException {
         try {
             return offTable.getIdentifiers();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
-
         }
     }
 
@@ -177,9 +190,26 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
+        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
+        for (String offeringName : offeringNames) {
+            offerings.add(getObservationOffering(offeringName, version));
+        }
+        return offerings;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
         try {
-            return offTable.getEntry(offeringName);
+            final ObservationOfferingType off = new ObservationOfferingType(offTable.getEntry(offeringName));
+            if (version.equals("2.0.0")) {
+                off.setName(offeringName);
+                off.setProcedures(Arrays.asList(sensorIdBase + offeringName.substring(9)));
+            }
+            return SOSXmlFactory.convert(version, off);
         } catch (NoSuchRecordException ex) {
             return null;
         } catch (CatalogException ex) {
@@ -191,16 +221,23 @@ public class DefaultObservationReader implements ObservationReader {
                                              NO_APPLICABLE_CODE);
         }
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOfferingType> getObservationOfferings() throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
         try {
-            final List<ObservationOfferingType> loo = new ArrayList<ObservationOfferingType>();
-            final Set<ObservationOfferingType> set  = offTable.getEntries();
-            loo.addAll(set);
+            final List<ObservationOffering> loo = new ArrayList<ObservationOffering>();
+            if (version.equals("2.0.0")) {
+                final Collection<String> offeringNames = getOfferingNames(version);
+                for (String offeringName : offeringNames) {
+                    loo.add(getObservationOffering(offeringName, version));
+                }
+            } else {
+                final Set<ObservationOfferingType> set  = offTable.getEntries();
+                loo.addAll(set);
+            }
             return loo;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -229,7 +266,6 @@ public class DefaultObservationReader implements ObservationReader {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
-
         }
     }
 
@@ -258,7 +294,11 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public PhenomenonType getPhenomenon(final String phenomenonName) throws CstlServiceException {
+    public boolean existPhenomenon(String phenomenonName) throws CstlServiceException {
+        // we remove the phenomenon id base
+        if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+            phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
+        }
         try {
             final CompositePhenomenonTable compositePhenomenonTable = omDatabase.getTable(CompositePhenomenonTable.class);
             CompositePhenomenonType cphen = null;
@@ -268,13 +308,13 @@ public class DefaultObservationReader implements ObservationReader {
             //we let continue to look if it is a phenomenon (simple)
             }
             if (cphen != null) {
-                return cphen;
+                return true;
             }
             final PhenomenonTable phenomenonTable = omDatabase.getTable(PhenomenonTable.class);
-            return (PhenomenonType) phenomenonTable.getEntry(phenomenonName);
+            return phenomenonTable.getEntry(phenomenonName) != null;
 
         } catch (NoSuchRecordException ex) {
-            return null;
+            return false;
 
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -311,19 +351,19 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeatureType getFeatureOfInterest(final String samplingFeatureName) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws CstlServiceException {
         //TODO remove those duplicated catch block
         try {
             final SamplingPointTable pointTable = omDatabase.getTable(SamplingPointTable.class);
-            return pointTable.getEntry(samplingFeatureName);
+            return OMXmlFactory.convert(version, pointTable.getEntry(samplingFeatureName));
         } catch (NoSuchRecordException ex) {
             try {
                 final SamplingFeatureTable foiTable = omDatabase.getTable(SamplingFeatureTable.class);
-                return foiTable.getEntry(samplingFeatureName);
+                return OMXmlFactory.convert(version, foiTable.getEntry(samplingFeatureName));
             } catch (NoSuchRecordException ex2) {
                 try {
                     final SamplingCurveTable curveTable = omDatabase.getTable(SamplingCurveTable.class);
-                    return curveTable.getEntry(samplingFeatureName);
+                    return OMXmlFactory.convert(version, curveTable.getEntry(samplingFeatureName));
                 } catch (NoSuchRecordException ex3) {
                     return null;
                 }  catch (CatalogException ex3) {
@@ -354,18 +394,25 @@ public class DefaultObservationReader implements ObservationReader {
                     NO_APPLICABLE_CODE);
         }
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public ObservationType getObservation(final String identifier, final QName resultModel) throws CstlServiceException {
+    public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
         try {
+            final AbstractObservation result;
             if (resultModel.equals(MEASUREMENT_QNAME)) {
-                return (MeasurementType) measTable.getEntry(identifier);
+                result = OMXmlFactory.convert(version, measTable.getEntry(identifier));
             } else {
-                return (ObservationType) obsTable.getEntry(identifier);
+                result = OMXmlFactory.convert(version, obsTable.getEntry(identifier));
             }
+            if (identifier.startsWith(observationIdBase)) {
+                result.setId("obs-" + identifier.substring(observationIdBase.length()));
+            } else if (identifier.startsWith(observationTemplateIdBase)) {
+                result.setId("obs-" + identifier.substring(observationTemplateIdBase.length()));
+            }
+            return result;
         } catch (CatalogException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             String msg = " null";
@@ -383,12 +430,12 @@ public class DefaultObservationReader implements ObservationReader {
                     NO_APPLICABLE_CODE);
         }
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public Object getResult(final String identifier, final QName resultModel) throws CstlServiceException {
+    public Object getResult(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
         try {
             if (resultModel.equals(MEASUREMENT_QNAME)) {
                 final MeasureTable meaTable = omDatabase.getTable(MeasureTable.class);
@@ -396,7 +443,8 @@ public class DefaultObservationReader implements ObservationReader {
             } else {
                 final AnyResultTable resTable = omDatabase.getTable(AnyResultTable.class);
                 final Integer id = Integer.parseInt(identifier);
-                return resTable.getEntry(id);
+                final AnyResultType result = resTable.getEntry(id);
+                return result.getPropertyArray();
             }
 
         } catch (CatalogException ex) {
@@ -416,7 +464,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ReferenceType getReference(final String href) throws CstlServiceException {
+    public boolean existProcedure(final String href) throws CstlServiceException {
         try {
             final Set<ReferenceType> references = refTable.getEntries();
             if (references != null) {
@@ -424,21 +472,19 @@ public class DefaultObservationReader implements ObservationReader {
                 while (it.hasNext()) {
                     final ReferenceType ref = it.next();
                     if (ref != null && ref.getHref() != null && ref.getHref().equals(href)) {
-                        return ref;
+                        return true;
                     }
                 }
             }
-            return null;
+            return false;
 
         } catch (NoSuchRecordException ex) {
             LOGGER.info("NoSuchRecordException in getReferences");
-            return null;
-
+            return false;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                 NO_APPLICABLE_CODE);
-
         }
     }
 
@@ -479,9 +525,9 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException {
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws CstlServiceException {
         try {
-            List<Date> bounds = specialTable.getTimeForStation(samplingFeatureName);
+            final List<Date> bounds = specialTable.getTimeForStation(samplingFeatureName);
             return new TimePeriodType(new TimePositionType(bounds.get(0)), new TimePositionType(bounds.get(1)));
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);

@@ -16,8 +16,7 @@
  */
 package org.constellation.portrayal;
 
-import java.awt.Dimension;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import org.geotoolkit.display.exception.PortrayalException;
@@ -104,4 +103,16 @@ public interface PortrayalServiceIF {
      * @return       An image of the exception message text. TODO: verify this.
      */
     BufferedImage writeInImage(Exception e, Dimension dim);
+
+
+    /**
+     *  Creates a blank image fill with given color. This is useful for
+     *  several OGC web services which need to return blank image/tile
+     *  when an exception occurred
+     *
+     * @param color The color of output image.
+     * @param dim   The dimension in pixels of the generated image.
+     * @return      An image with all pixel at the same color.
+     */
+    BufferedImage writeBlankImage(Color color, Dimension dim);
 }

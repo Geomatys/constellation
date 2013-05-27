@@ -31,16 +31,20 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.sos.ws.soap.SOService;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class ConfigurationRequestTest extends AbstractGrizzlyServer {
 
     @BeforeClass
@@ -75,6 +79,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=1)
     public void testRestart() throws Exception {
 
         waitForStart();
@@ -100,6 +105,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=2)
     public void testDownloadFile() throws Exception {
 
         URL niUrl = new URL(getConfigurationURL() + "request=download");
@@ -117,6 +123,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=3)
     public void testCSWRefreshIndex() throws Exception {
 
         /*
@@ -182,9 +189,36 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         response = (GetRecordsResponseType) obj;
 
         assertEquals(14, response.getSearchResults().getNumberOfRecordsMatched());
+        
+        // remove data
+        f.delete();
+        f2.delete();
+        
+        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
+
+        // for a POST request
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof AcknowlegementType);
+        expResult = new AcknowlegementType("Success",  "CSW index succefully recreated");
+        assertEquals(expResult, obj);
+
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof GetRecordsResponseType);
+        response = (GetRecordsResponseType) obj;
+
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
     }
 
     @Test
+    @Order(order=4)
     public void testCSWAddToIndex() throws Exception {
 
         // first we make a getRecords request to count the number of record
@@ -197,7 +231,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertTrue(obj instanceof GetRecordsResponseType);
         GetRecordsResponseType response = (GetRecordsResponseType) obj;
 
-        assertEquals(14, response.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
 
         // build a new metadata file
         RecordType record = new RecordType();
@@ -221,8 +255,8 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertEquals(expResult, obj);
 
 
-        //normally we don't have to restart the CSW TODO
-        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=restart&id=default");
+        //clear the csw cache
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=clearCache&id=default");
         conec = niUrl.openConnection();
         obj = unmarshallResponse(conec);
 
@@ -237,10 +271,106 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertTrue(obj instanceof GetRecordsResponseType);
         response = (GetRecordsResponseType) obj;
 
-        assertEquals(15, response.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(13, response.getSearchResults().getNumberOfRecordsMatched());
+        
+        // restore previous context
+        f.delete();
+        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
+
+        // for a POST request
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof AcknowlegementType);
+        expResult = new AcknowlegementType("Success",  "CSW index succefully recreated");
+        assertEquals(expResult, obj);
+
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof GetRecordsResponseType);
+        response = (GetRecordsResponseType) obj;
+
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
+    }
+    
+    @Test
+    @Order(order=5)
+    public void testCSWRemoveFromIndex() throws Exception {
+
+        // first we make a getRecords request to count the number of record
+        URL niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+
+        URLConnection conec = niUrl.openConnection();
+
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof GetRecordsResponseType);
+        GetRecordsResponseType response = (GetRecordsResponseType) obj;
+
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
+
+        // remove metadata from the index
+        niUrl = new URL(getConfigurationURL() + "request=removeFromIndex&id=default&identifiers=urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+
+        // for a POST request
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof AcknowlegementType);
+        AcknowlegementType expResult = new AcknowlegementType("Success",  "The specified record have been remove from the CSW index");
+        assertEquals(expResult, obj);
+
+
+        //clear the csw cache
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=clearCache&id=default");
+        conec = niUrl.openConnection();
+        obj = unmarshallResponse(conec);
+
+
+         // verify that the number of record have increased
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof GetRecordsResponseType);
+        response = (GetRecordsResponseType) obj;
+
+        assertEquals(11, response.getSearchResults().getNumberOfRecordsMatched());
+        
+        // restore previous context
+        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
+
+        // for a POST request
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof AcknowlegementType);
+        expResult = new AcknowlegementType("Success",  "CSW index succefully recreated");
+        assertEquals(expResult, obj);
+
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof GetRecordsResponseType);
+        response = (GetRecordsResponseType) obj;
+
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
     }
 
     @Test
+    @Order(order=6)
     public void testListAvailableService() throws Exception {
         URL niUrl = new URL(getConfigurationURL() + "request=ListAvailableService");
 

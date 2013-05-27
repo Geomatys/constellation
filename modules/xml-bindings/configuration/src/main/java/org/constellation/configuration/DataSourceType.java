@@ -46,6 +46,8 @@ public class DataSourceType {
     public static final DataSourceType GENERIC = new DataSourceType("generic");
 
     public static final DataSourceType LUCENE = new DataSourceType("lucene");
+    
+    public static final DataSourceType OM2 = new DataSourceType("om2");
 
     public static final DataSourceType NONE = new DataSourceType("none");
 

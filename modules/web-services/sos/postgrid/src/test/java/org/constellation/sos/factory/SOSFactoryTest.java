@@ -22,12 +22,10 @@ import javax.imageio.spi.ServiceRegistry;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Properties;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -77,8 +75,6 @@ public class SOSFactoryTest {
         parameters.put(OMFactory.OBSERVATION_ID_BASE, "idbase");
         parameters.put(OMFactory.OBSERVATION_TEMPLATE_ID_BASE, "templateIdBase");
         parameters.put(OMFactory.SENSOR_ID_BASE, "sensorBase");
-        parameters.put(OMFactory.IDENTIFIER_MAPPING, new Properties());
-
         boolean exLaunched = false;
         try  {
             ObservationFilter of = omFactory.getObservationFilter(DataSourceType.POSTGRID, config, parameters);

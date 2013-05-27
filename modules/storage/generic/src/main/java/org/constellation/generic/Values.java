@@ -104,6 +104,10 @@ public class Values {
      * @return
      */
     public List<String> getVariables(final String variable) {
+        return getVariables(variable, false);
+    }
+    
+    public List<String> getVariables(final String variable, final boolean acceptNull) {
         if (values != null) {
             final List<Object> typedResults = values.get(variable);
             if (typedResults == null) {
@@ -114,6 +118,8 @@ public class Values {
             for (Object typedResult : typedResults) {
                 if (typedResult != null) {
                     result.add(typedResult.toString());
+                } else if (acceptNull){
+                    result.add(null);
                 }
             }
             return result;

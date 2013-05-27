@@ -42,7 +42,7 @@ import org.apache.lucene.document.StringField;
 // geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.util.NullArgumentException;
+import org.apache.sis.util.NullArgumentException;
 
 import static org.constellation.metadata.CSWQueryable.*;
 /**
@@ -116,12 +116,24 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
             //we add the geometry parts
             alreadySpatiallyIndexed = indexSpatialPart(doc, metadata, isoQueryable, 268435540);
+            
+            doc.add(new Field("objectType", "MD_Metadata", Field.Store.YES, Field.Index.ANALYZED));
 
         } else if (isEbrim30(metadata)) {
            // TODO
+            doc.add(new Field("objectType", "Ebrim", Field.Store.YES, Field.Index.ANALYZED));
         } else if (isEbrim25(metadata)) {
             // TODO
-        } else if (!isDublinCore(metadata)) {
+            doc.add(new Field("objectType", "Ebrim", Field.Store.YES, Field.Index.ANALYZED));
+        } else if (isFeatureCatalogue(metadata)) {
+            final Map<String, List<String>> fcQueryable = removeOverridenField(ISO_FC_QUERYABLE);
+            indexQueryableSet(doc, metadata, fcQueryable, anyText);
+            
+            doc.add(new Field("objectType", "FC_FeatureCatalogue", Field.Store.YES, Field.Index.ANALYZED));
+        } else if (isDublinCore(metadata)) {
+            
+            doc.add(new Field("objectType", "Record", Field.Store.YES, Field.Index.ANALYZED));
+        } else {
             LOGGER.log(Level.WARNING, "unknow Object classe unable to index: {0}", getType(metadata));
         }
 
@@ -370,5 +382,13 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      * @return true if the metadata object is a Ebrim version 3.0 object.
      */
     protected abstract boolean isEbrim30(A meta);
+    
+    /**
+     * Return true if the metadata object is a FeatureCatalogue object.
+     *
+     * @param meta The object to index
+     * @return true if the metadata object is a FeatureCatalogue object.
+     */
+    protected abstract boolean isFeatureCatalogue(A meta);
 
 }

@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:sml="http://www.opengis.net/sml/1.0">
+<wfs:FeatureCollection gml:id="id" numberReturned="3" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:sml="http://www.opengis.net/sml/1.0">
     <gml:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
             <gml:lowerCorner>65300.0 1731368.0</gml:lowerCorner>
             <gml:upperCorner>67300.0 1851848.0</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
-    <gml:featureMember>
+    <wfs:member>
         <sml:System gml:id="12">
             <gml:description>information about the piezometer</gml:description>
             <gml:name>Piezometer Test</gml:name>
@@ -19,14 +19,14 @@
             </sml:keywords>
             <sml:location>
                 <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <ns3:pos srsDimension="2" srsName="EPSG:27582">65400.0 1731368.0</ns3:pos>
+                    <ns3:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">65400.0 1731368.0</ns3:pos>
                 </ns3:Point>
             </sml:location>
             <sml:phenomenons>time</sml:phenomenons>
             <sml:phenomenons>depth</sml:phenomenons>
             <sml:phenomenons>validity</sml:phenomenons>
             <sml:smltype>System</sml:smltype>
-            <sml:smlref>http://ades.eaufrance.fr/FichePtEau.aspx?code=10972X0137/PONT</sml:smlref>
+            <sml:smlref>Well Test</sml:smlref>
             <sml:inputs>
                 <sml:InputList>
                     <sml:input>
@@ -61,8 +61,8 @@
             </sml:outputs>
             <sml:producer name="BRGM">BLAISE Marion (BRGM)</sml:producer>
         </sml:System>
-    </gml:featureMember>
-    <gml:featureMember>
+    </wfs:member>
+    <wfs:member>
         <sml:System gml:id="14">
             <gml:description>a well in south africa</gml:description>
             <gml:name>Well Test</gml:name>
@@ -75,7 +75,7 @@
             </sml:keywords>
             <sml:location>
                 <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <ns3:pos srsDimension="2" srsName="EPSG:27582">67300.0 1851848.0</ns3:pos>
+                    <ns3:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">67300.0 1851848.0</ns3:pos>
                 </ns3:Point>
             </sml:location>
             <sml:phenomenons>time</sml:phenomenons>
@@ -117,8 +117,8 @@
             </sml:outputs>
             <sml:producer name="BRGM">BLAISE Marion (BRGM)</sml:producer>
         </sml:System>
-    </gml:featureMember>
-    <gml:featureMember>
+    </wfs:member>
+    <wfs:member>
         <sml:System gml:id="16">
             <gml:description>Flotting plot</gml:description>
             <gml:name>Plot Test</gml:name>
@@ -131,7 +131,7 @@
             </sml:keywords>
             <sml:location>
                 <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <ns3:pos srsDimension="2" srsName="EPSG:27582">65300.0 1741257.0</ns3:pos>
+                    <ns3:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">65300.0 1741257.0</ns3:pos>
                 </ns3:Point>
             </sml:location>
             <sml:phenomenons>time</sml:phenomenons>
@@ -143,8 +143,8 @@
                 <sml:InputList>
                     <sml:input>
                         <sml:Input>
-                            <gml:name>level</gml:name>
-                            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+                            <gml:name>height</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:OGC:height</gml:description>
                         </sml:Input>
                     </sml:input>
                 </sml:InputList>
@@ -173,5 +173,5 @@
             </sml:outputs>
             <sml:producer name="COnservatoire de france">Alfred Musset</sml:producer>
         </sml:System>
-    </gml:featureMember>
+    </wfs:member>
 </wfs:FeatureCollection>

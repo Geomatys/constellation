@@ -71,7 +71,7 @@ public final class ConvertersJaxbToGeotk {
             if (currentMapItem instanceof org.geotoolkit.providers.xml.MapLayer) {
                 final MapItem layer = convertsMapLayer((org.geotoolkit.providers.xml.MapLayer)currentMapItem);
                 if (layer != null) {
-                    layer.setUserPropertie("original_config", currentMapItem);
+                    layer.setUserProperty("original_config", currentMapItem);
                     mi.items().add(layer);
                 }
             } else {

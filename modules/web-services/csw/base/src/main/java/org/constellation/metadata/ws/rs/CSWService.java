@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
+import java.util.Arrays;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -42,6 +43,7 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.generic.database.Automatic;
 import org.constellation.jaxb.CstlXMLSerializer;
 import org.constellation.ws.CstlServiceException;
@@ -58,10 +60,14 @@ import org.constellation.configuration.AcknowlegementType;
 import static org.constellation.metadata.CSWConstants.*;
 import org.constellation.ws.UnauthorizedException;
 import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWResponse;
+import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.DescribeRecord;
+import org.geotoolkit.csw.xml.DistributedSearch;
+import org.geotoolkit.csw.xml.ElementSetName;
 import org.geotoolkit.csw.xml.GetCapabilities;
 import org.geotoolkit.csw.xml.GetDomain;
 import org.geotoolkit.csw.xml.GetRecordById;
@@ -69,29 +75,23 @@ import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.csw.xml.Transaction;
 import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.v202.DescribeRecordType;
-import org.geotoolkit.csw.xml.v202.DistributedSearchType;
-import org.geotoolkit.csw.xml.v202.ElementSetNameType;
-import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
-import org.geotoolkit.csw.xml.v202.GetDomainType;
-import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
-import org.geotoolkit.csw.xml.v202.GetRecordsType;
-import org.geotoolkit.csw.xml.v202.HarvestType;
-import org.geotoolkit.csw.xml.v202.QueryConstraintType;
-import org.geotoolkit.csw.xml.v202.QueryType;
+import org.geotoolkit.csw.xml.Harvest;
+import org.geotoolkit.csw.xml.Query;
+import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
-import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
-import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
+import org.geotoolkit.ows.xml.AcceptFormats;
+import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.xml.Namespaces;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.util.StringUtilities;
 
 /**
@@ -107,18 +107,7 @@ public class CSWService extends OGCWebService<CSWworker> {
      * Build a new Restful CSW service.
      */
     public CSWService() {
-        super(ServiceDef.CSW_2_0_2);
-        setXMLContext(EBRIMMarshallerPool.getInstance());
-        LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", getWorkerMapSize());
-    }
-
-    /**
-     * Build a new restful CSW service with multiple workers.
-     * used by subClasses.
-     */
-    @Deprecated
-    protected CSWService(final Map<String, CSWworker> workers) {
-        super(workers, ServiceDef.CSW_2_0_2);
+        super(Specification.CSW);
         setXMLContext(EBRIMMarshallerPool.getInstance());
         LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", getWorkerMapSize());
     }
@@ -144,82 +133,74 @@ public class CSWService extends OGCWebService<CSWworker> {
      * {@inheritDoc}
      */
     @Override
-    protected Response treatIncomingRequest(final Object objectRequest, CSWworker worker) {
+    protected Response treatIncomingRequest(final Object objectRequest, final CSWworker worker) {
         ServiceDef serviceDef = null;
 
         try {
-            if (worker != null) {
 
-                worker.setServiceUrl(getServiceURL());
-                logParameters();
-
-                // if the request is not an xml request we fill the request parameter.
-                final RequestBase request;
-                if (objectRequest == null) {
-                    request = adaptQuery(getParameter("REQUEST", true));
-                } else if (objectRequest instanceof RequestBase) {
-                    request = (RequestBase) objectRequest;
-                } else {
-                    throw new CstlServiceException("The operation " +  objectRequest.getClass().getName() + " is not supported by the service",
-                        INVALID_PARAMETER_VALUE, "request");
-                }
-
-                serviceDef = getVersionFromNumber(request.getVersion());
-
-                if (request instanceof GetCapabilities) {
-
-                    return Response.ok(worker.getCapabilities((GetCapabilities)request), worker.getOutputFormat()).build();
-                }
-
-                if (request instanceof GetRecordsRequest) {
-
-                    final GetRecordsRequest gr = (GetRecordsRequest)request;
-
-                    // we pass the serializer to the messageBodyWriter
-                    final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecords(gr), getXMLSerializer());
-                    return Response.ok(response, worker.getOutputFormat()).build();
-
-                }
-
-                if (request instanceof GetRecordById) {
-
-                    final GetRecordById grbi = (GetRecordById)request;
-
-                    // we pass the serializer to the messageBodyWriter
-                    final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecordById(grbi), getXMLSerializer());
-                    return Response.ok(response, worker.getOutputFormat()).build();
-
-                }
-
-                if (request instanceof DescribeRecord) {
-
-                    return Response.ok(worker.describeRecord((DescribeRecord)request), worker.getOutputFormat()).build();
-                }
-
-                if (request instanceof GetDomain) {
-
-                    return Response.ok(worker.getDomain((GetDomain)request), worker.getOutputFormat()).build();
-                }
-
-                if (request instanceof Transaction) {
-
-                    return Response.ok(worker.transaction( (Transaction)request), worker.getOutputFormat()).build();
-                }
-
-                if (request instanceof HarvestType) {
-
-                    return Response.ok(worker.harvest((HarvestType)request), worker.getOutputFormat()).build();
-                }
-
-                throw new CstlServiceException("The operation " +  request.getClass().getName() + " is not supported by the service",
-                        INVALID_PARAMETER_VALUE, "request");
-
+            // if the request is not an xml request we fill the request parameter.
+            final RequestBase request;
+            if (objectRequest == null) {
+                request = adaptQuery(getParameter("REQUEST", true), worker);
+            } else if (objectRequest instanceof RequestBase) {
+                request = (RequestBase) objectRequest;
             } else {
-                throw new CstlServiceException("The CSW service is not running", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("The operation " +  objectRequest.getClass().getName() + " is not supported by the service",
+                    INVALID_PARAMETER_VALUE, "request");
             }
 
+            serviceDef = worker.getVersionFromNumber(request.getVersion());
+
+            if (request instanceof GetCapabilities) {
+
+                return Response.ok(worker.getCapabilities((GetCapabilities)request), worker.getOutputFormat()).build();
+            }
+
+            if (request instanceof GetRecordsRequest) {
+
+                final GetRecordsRequest gr = (GetRecordsRequest)request;
+
+                // we pass the serializer to the messageBodyWriter
+                final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecords(gr), getXMLSerializer());
+                return Response.ok(response, worker.getOutputFormat()).build();
+
+            }
+
+            if (request instanceof GetRecordById) {
+
+                final GetRecordById grbi = (GetRecordById)request;
+
+                // we pass the serializer to the messageBodyWriter
+                final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecordById(grbi), getXMLSerializer());
+                return Response.ok(response, worker.getOutputFormat()).build();
+
+            }
+
+            if (request instanceof DescribeRecord) {
+
+                return Response.ok(worker.describeRecord((DescribeRecord)request), worker.getOutputFormat()).build();
+            }
+
+            if (request instanceof GetDomain) {
+
+                return Response.ok(worker.getDomain((GetDomain)request), worker.getOutputFormat()).build();
+            }
+
+            if (request instanceof Transaction) {
+
+                return Response.ok(worker.transaction( (Transaction)request), worker.getOutputFormat()).build();
+            }
+
+            if (request instanceof Harvest) {
+
+                return Response.ok(worker.harvest((Harvest)request), worker.getOutputFormat()).build();
+            }
+
+            throw new CstlServiceException("The operation " +  request.getClass().getName() + " is not supported by the service",
+                    INVALID_PARAMETER_VALUE, "request");
+
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, serviceDef);
+            return processExceptionResponse(ex, serviceDef, worker);
 
         }
     }
@@ -240,8 +221,18 @@ public class CSWService extends OGCWebService<CSWworker> {
                 throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
                         INVALID_PARAMETER_VALUE, "id");
             }
+        } else if ("clearCache".equals(request)) {
+            final String identifier = getParameter("id", true);
+            final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", identifier);
+            if (worker != null) {
+                worker.clearCache();
+                return Response.ok(new AcknowlegementType("Success", "CSW cache cleared"), "text/xml").build();
+            } else {
+                throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
+                        INVALID_PARAMETER_VALUE, "id");
+            }
         } else {
-            throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
+            throw new CstlServiceException("The operation " + request + " is not supported by the CSW administration service",
                         INVALID_PARAMETER_VALUE, "request");
         }
     }
@@ -250,14 +241,14 @@ public class CSWService extends OGCWebService<CSWworker> {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker w) {
         // asking for authentication
         if (ex instanceof UnauthorizedException) {
             return Response.status(Status.UNAUTHORIZED).header("WWW-Authenticate", " Basic").build();
         }
         logException(ex);
         if (serviceDef == null) {
-            serviceDef = getBestVersion(null);
+            serviceDef = w.getBestVersion(null);
         }
         final String version         = serviceDef.exceptionVersion.toString();
         final String code            = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
@@ -273,17 +264,12 @@ public class CSWService extends OGCWebService<CSWworker> {
     protected void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException {
         if (configuration instanceof Automatic) {
             final File configurationFile = new File(instanceDirectory, "config.xml");
-            Marshaller marshaller = null;
             try {
-                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(configuration, configurationFile);
-
+                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
             } catch(JAXBException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (marshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-                }
             }
         } else {
             throw new CstlServiceException("The configuration Object is not an Automatic object", INVALID_PARAMETER_VALUE);
@@ -306,10 +292,10 @@ public class CSWService extends OGCWebService<CSWworker> {
     protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
         final File configurationFile = new File(instanceDirectory, "config.xml");
         if (configurationFile.exists()) {
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(configurationFile);
+                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
                 if (obj instanceof Automatic) {
                     return obj;
                 } else {
@@ -317,10 +303,6 @@ public class CSWService extends OGCWebService<CSWworker> {
                 }
             } catch (JAXBException ex) {
                 throw new CstlServiceException(ex);
-            } finally {
-                if (unmarshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                }
             }
         } else {
             throw new CstlServiceException("Unable to find a file config.xml");
@@ -334,10 +316,10 @@ public class CSWService extends OGCWebService<CSWworker> {
      * @return
      * @throws CstlServiceException
      */
-    private RequestBase adaptQuery(String request) throws CstlServiceException {
+    private RequestBase adaptQuery(final String request, final Worker w) throws CstlServiceException {
 
         if ("GetCapabilities".equalsIgnoreCase(request)) {
-            return createNewGetCapabilitiesRequest();
+            return createNewGetCapabilitiesRequest(w);
         } else if ("GetRecords".equalsIgnoreCase(request)) {
             return createNewGetRecordsRequest();
         } else if ("GetRecordById".equalsIgnoreCase(request)) {
@@ -358,21 +340,26 @@ public class CSWService extends OGCWebService<CSWworker> {
     /**
      * Build a new GetCapabilities request object with the url parameters
      */
-    private GetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
+    private GetCapabilities createNewGetCapabilitiesRequest(final Worker w) throws CstlServiceException {
 
-        String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
-        AcceptVersionsType versions;
-        if (version != null) {
-            if (version.indexOf(',') != -1) {
-                version = version.substring(0, version.indexOf(','));
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        
+        String acceptVersion = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
+        final AcceptVersions versions;
+        final String version;
+        if (acceptVersion != null) {
+            if (acceptVersion.indexOf(',') != -1) {
+                acceptVersion = acceptVersion.substring(0, acceptVersion.indexOf(','));
             }
-            versions = new AcceptVersionsType(version);
+            version = acceptVersion;
+            w.checkVersionSupported(version, true);
+            versions = CswXmlFactory.buildAcceptVersion(version, Arrays.asList(acceptVersion));
         } else {
-             versions = new AcceptVersionsType("2.0.2");
+            version = "2.0.2";
+            versions = CswXmlFactory.buildAcceptVersion(version, Arrays.asList("2.0.2"));
         }
 
-        final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
-
+        final AcceptFormats formats = CswXmlFactory.buildAcceptFormat(version, Arrays.asList(getParameter(ACCEPT_FORMATS_PARAMETER, false)));
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
         //We transform the String of sections in a list.
@@ -394,20 +381,15 @@ public class CSWService extends OGCWebService<CSWworker> {
             //if there is no requested Sections we add all the sections
             requestedSections = SectionsType.getExistingSections();
         }
-        final SectionsType sections     = new SectionsType(requestedSections);
-        return new GetCapabilitiesType(versions,
-                                       sections,
-                                       formats,
-                                       updateSequence,
-                                       getParameter(SERVICE_PARAMETER, true));
-
+        final Sections sections = CswXmlFactory.buildSections(version, requestedSections);
+        return CswXmlFactory.createGetCapabilities(version, versions, sections, formats, updateSequence, service);
     }
 
 
     /**
      * Build a new GetRecords request object with the url parameters
      */
-    private GetRecordsType createNewGetRecordsRequest() throws CstlServiceException {
+    private GetRecordsRequest createNewGetRecordsRequest() throws CstlServiceException {
 
         final String version    = getParameter(VERSION_PARAMETER, true);
         final String service    = getParameter(SERVICE_PARAMETER, true);
@@ -501,6 +483,7 @@ public class CSWService extends OGCWebService<CSWworker> {
                                                 INVALID_PARAMETER_VALUE, "ElementSetName");
             }
         }
+        final ElementSetName setName = CswXmlFactory.createElementSetName(version, elementSet);
 
         //we get the list of sort by object
         final String sort                  = getParameter("SORTBY", false);
@@ -533,8 +516,8 @@ public class CSWService extends OGCWebService<CSWworker> {
         /*
          * here we build the constraint object
          */
-        final String constLanguage     = getParameter("CONSTRAINTLANGUAGE", false);
-        QueryConstraintType constraint = null;
+        final String constLanguage = getParameter("CONSTRAINTLANGUAGE", false);
+        QueryConstraint constraint = null;
         if (constLanguage != null) {
             final String languageVersion  = getParameter("CONSTRAINT_LANGUAGE_VERSION", true);
 
@@ -544,15 +527,14 @@ public class CSWService extends OGCWebService<CSWworker> {
                 if (constraintObject == null) {
                     constraintObject = "AnyText LIKE '%%'";
                 }
-                constraint = new QueryConstraintType(constraintObject, languageVersion);
+                constraint = CswXmlFactory.createQueryConstraint(version, constraintObject, languageVersion);
 
             } else if (constLanguage.equalsIgnoreCase("FILTER")) {
                 final Object constraintObject = getComplexParameter("CONSTRAINT", false);
                 if (constraintObject == null) {
-                    //final PropertyIsLikeType filter = new PropertyIsLikeType(new PropertyNameType("AnyText"), "%%", "%", "?", "\\");
-                    //constraintObject = new FilterType(filter);
+                    // do nothing
                 } else if (constraintObject instanceof FilterType){
-                    constraint = new QueryConstraintType((FilterType)constraintObject, languageVersion);
+                    constraint = CswXmlFactory.createQueryConstraint(version, (FilterType)constraintObject, languageVersion);
                 } else {
                     throw new CstlServiceException("The filter type is not supported:" + constraintObject.getClass().getName(),
                                                  INVALID_PARAMETER_VALUE, "Constraint");
@@ -564,16 +546,13 @@ public class CSWService extends OGCWebService<CSWworker> {
             }
         }
 
-        final QueryType query = new QueryType(typeNames,
-                                        new ElementSetNameType(elementSet),
-                                        sortBy,
-                                        constraint);
-
+        final Query query = CswXmlFactory.createQuery(version, typeNames, setName, sortBy, constraint);
+        
         /*
          * here we build a optionnal ditributed search object
          */
         final String distrib = getParameter("DISTRIBUTEDSEARCH", false);
-        DistributedSearchType distribSearch = null;
+        DistributedSearch distribSearch = null;
         if (distrib != null && distrib.equalsIgnoreCase("true")) {
             final String count = getParameter("HOPCOUNT", false);
             Integer hopCount   = 2;
@@ -585,29 +564,19 @@ public class CSWService extends OGCWebService<CSWworker> {
                                                   INVALID_PARAMETER_VALUE, "HopCount");
                 }
             }
-            distribSearch = new DistributedSearchType(hopCount);
+            distribSearch = CswXmlFactory.createDistributedSearch(version, hopCount);
         }
 
         // TODO not implemented yet
         // String handler = getParameter("RESPONSEHANDLER", false);
 
-        return new GetRecordsType(service,
-                                  version,
-                                  resultType,
-                                  requestID,
-                                  outputFormat,
-                                  outputSchema,
-                                  startPosition,
-                                  maxRecords,
-                                  query,
-                                  distribSearch);
-
+        return CswXmlFactory.createGetRecord(version, service, resultType, requestID, outputFormat, outputSchema, startPosition, maxRecords, query, distribSearch);
     }
 
     /**
      * Build a new GetRecordById request object with the url parameters
      */
-    private GetRecordByIdType createNewGetRecordByIdRequest() throws CstlServiceException {
+    private GetRecordById createNewGetRecordByIdRequest() throws CstlServiceException {
 
         final String version    = getParameter(VERSION_PARAMETER, true);
         final String service    = getParameter(SERVICE_PARAMETER, true);
@@ -624,6 +593,7 @@ public class CSWService extends OGCWebService<CSWworker> {
                                              INVALID_PARAMETER_VALUE, "ElementSetName");
             }
         }
+        final ElementSetName setName = CswXmlFactory.createElementSetName(version, elementSet);
 
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
@@ -643,20 +613,13 @@ public class CSWService extends OGCWebService<CSWworker> {
             id.add(token);
         }
 
-        return new GetRecordByIdType(service,
-                                     version,
-                                     new ElementSetNameType(elementSet),
-                                     outputFormat,
-                                     outputSchema,
-                                     id);
-
-
+        return CswXmlFactory.createGetRecordById(version, service, setName, outputFormat, outputSchema, id);
     }
 
     /**
      * Build a new DescribeRecord request object with the url parameters
      */
-    private DescribeRecordType createNewDescribeRecordRequest() throws CstlServiceException {
+    private DescribeRecord createNewDescribeRecordRequest() throws CstlServiceException {
 
         final String version    = getParameter(VERSION_PARAMETER, true);
         final String service    = getParameter(SERVICE_PARAMETER, true);
@@ -700,19 +663,13 @@ public class CSWService extends OGCWebService<CSWworker> {
             }
         }
 
-        return new DescribeRecordType(service,
-                                     version,
-                                     typeNames,
-                                     outputFormat,
-                                     schemaLanguage);
-
-
+        return CswXmlFactory.createDescribeRecord(version, service, typeNames, outputFormat, schemaLanguage);
     }
 
     /**
      * Build a new GetDomain request object with the url parameters
      */
-    private GetDomainType createNewGetDomainRequest() throws CstlServiceException {
+    private GetDomain createNewGetDomainRequest() throws CstlServiceException {
 
         final String version    = getParameter(VERSION_PARAMETER, true);
         final String service    = getParameter(SERVICE_PARAMETER, true);
@@ -725,14 +682,13 @@ public class CSWService extends OGCWebService<CSWworker> {
             throw new CstlServiceException("One of propertyName or parameterName must be null",
                                           INVALID_PARAMETER_VALUE, "parameterName");
         }
-
-        return new GetDomainType(service, version, propertyName, parameterName);
+        return CswXmlFactory.createGetDomain(version, service, propertyName, parameterName);
     }
 
     /**
      * Build a new GetDomain request object with the url parameters
      */
-    private HarvestType createNewHarvestRequest() throws CstlServiceException {
+    private Harvest createNewHarvestRequest() throws CstlServiceException {
 
         final String version      = getParameter(VERSION_PARAMETER, true);
         final String service      = getParameter(SERVICE_PARAMETER, true);
@@ -754,13 +710,6 @@ public class CSWService extends OGCWebService<CSWworker> {
                                               INVALID_PARAMETER_VALUE, "HarvestInsterval");
             }
         }
-
-        return new HarvestType(service,
-                               version,
-                               source,
-                               resourceType,
-                               resourceFormat,
-                               handler,
-                               harvestInterval);
+        return CswXmlFactory.createHarvest(version, service, source, resourceType, resourceFormat, handler, harvestInterval);
     }
 }

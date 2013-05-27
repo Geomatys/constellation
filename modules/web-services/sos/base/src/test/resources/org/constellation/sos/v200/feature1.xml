@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sams:SF_SpatialSamplingFeature
+    gml:id="station-001"
+    xmlns:sf="http://www.opengis.net/sampling/2.0"
+    xmlns:sams="http://www.opengis.net/samplingSpatial/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xsi:schemaLocation="http://www.opengis.net/samplingSpatial/2.0 http://schemas.opengis.net/samplingSpatial/2.0/spatialSamplingFeature.xsd">
+    <gml:description>Point d'eau BSSS</gml:description>
+    <gml:name>10972X0137-PONT</gml:name>
+    <sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/>
+    <sf:sampledFeature xlink:href="urn:-sandre:object:bdrhf:123X"/>
+    <sams:shape>
+        <gml:Point gml:id="STATION-LOCALISATION">
+            <gml:pos srsName="urn:ogc:def:crs:epsg:7.9:27582">65400.0 1731368.0</gml:pos>
+        </gml:Point>
+    </sams:shape>
+</sams:SF_SpatialSamplingFeature>

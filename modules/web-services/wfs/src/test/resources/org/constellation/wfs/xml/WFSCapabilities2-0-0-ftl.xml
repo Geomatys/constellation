@@ -169,7 +169,7 @@
         <ns8:FeatureType>
             <ns8:Name xmlns:sampling="http://www.opengis.net/sampling/1.0">sampling:SamplingPoint</ns8:Name>
             <ns8:Title>SamplingPoint</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:27582</ns8:DefaultCRS>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
             <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
@@ -201,6 +201,64 @@
         </ns8:FeatureType>
     </ns8:FeatureTypeList>
     <fes:Filter_Capabilities>
+        <fes:Conformance>
+            <fes:Constraint name="ImplementsQuery">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsAdHocQuery">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsFunctions">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsMinStandardFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsStandardFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsMinSpatialFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsSpatialFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsMinTemporalFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsTemporalFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsVersionNav">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsSorting">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsExtendedOperators">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsResourceId">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsMinimumXPath">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+        </fes:Conformance>
         <fes:Id_Capabilities>
             <fes:ResourceIdentifier name="fes:ResourceId"/>
         </fes:Id_Capabilities>
@@ -210,9 +268,9 @@
                 <fes:ComparisonOperator name="PropertyIsBetween"/>
                 <fes:ComparisonOperator name="PropertyIsEqualTo"/>
                 <fes:ComparisonOperator name="PropertyIsGreaterThan"/>
-                <fes:ComparisonOperator name="PropertyIsGReaterThanEqualTo"/>
+                <fes:ComparisonOperator name="PropertyIsGreaterThanOrEqualTo"/>
                 <fes:ComparisonOperator name="PropertyIsLessThan"/>
-                <fes:ComparisonOperator name="PropertyIsLessThanEqualTo"/>
+                <fes:ComparisonOperator name="PropertyIsLessThanOrEqualTo"/>
                 <fes:ComparisonOperator name="PropertyIsLike"/>
                 <fes:ComparisonOperator name="PropertyIsNotEqualTo"/>
                 <fes:ComparisonOperator name="PropertyIsNull"/>
@@ -226,15 +284,15 @@
                 <fes:GeometryOperand name="ns11:Polygon" xmlns:ns11="http://www.opengis.net/gml/3.2"/>
             </fes:GeometryOperands>
             <fes:SpatialOperators>
-                <fes:SpatialOperator name="DISJOINT"/>
-                <fes:SpatialOperator name="EQUALS"/>
-                <fes:SpatialOperator name="D_WITHIN"/>
-                <fes:SpatialOperator name="BEYOND"/>
-                <fes:SpatialOperator name="INTERSECTS"/>
-                <fes:SpatialOperator name="TOUCHES"/>
-                <fes:SpatialOperator name="CROSSES"/>
-                <fes:SpatialOperator name="CONTAINS"/>
-                <fes:SpatialOperator name="OVERLAPS"/>
+                <fes:SpatialOperator name="Disjoint"/>
+                <fes:SpatialOperator name="Equals"/>
+                <fes:SpatialOperator name="DWithin"/>
+                <fes:SpatialOperator name="Beyond"/>
+                <fes:SpatialOperator name="Intersects"/>
+                <fes:SpatialOperator name="Touches"/>
+                <fes:SpatialOperator name="Crosses"/>
+                <fes:SpatialOperator name="Contains"/>
+                <fes:SpatialOperator name="Overlaps"/>
                 <fes:SpatialOperator name="BBOX"/>
             </fes:SpatialOperators>
         </fes:Spatial_Capabilities>

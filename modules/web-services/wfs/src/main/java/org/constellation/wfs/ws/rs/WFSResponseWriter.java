@@ -57,20 +57,16 @@ public class WFSResponseWriter<T extends WFSResponse> implements MessageBodyWrit
 
     @Override
     public void writeTo(final T t, Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
-        Marshaller m = null;
         try {
-            m = WFSMarshallerPool.getInstance().acquireMarshaller();
+            final Marshaller m = WFSMarshallerPool.getInstance().acquireMarshaller();
             if (t instanceof WFSResponseWrapper) {
                 m.marshal(((WFSResponseWrapper)t).getResponse(), out);
             } else {
                 m.marshal(t, out);
             }
+             WFSMarshallerPool.getInstance().release(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the WFS response", ex);
-        } finally {
-            if (m != null) {
-                 WFSMarshallerPool.getInstance().release(m);
-            }
         }
     }
 }

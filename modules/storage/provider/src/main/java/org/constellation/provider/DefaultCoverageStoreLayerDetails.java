@@ -29,8 +29,8 @@ import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.filter.text.cql2.CQL;
-import org.geotoolkit.filter.text.cql2.CQLException;
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.map.DefaultCoverageMapLayer;
@@ -45,12 +45,13 @@ import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.util.MeasurementRange;
-import org.geotoolkit.util.converter.Numbers;
+import org.apache.sis.util.Numbers;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -125,7 +126,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
                             break;
                         }
                         try {
-                            final Filter filter = CQL.toFilter(cqlFilter);
+                            final Filter filter = CQL.parseFilter(cqlFilter);
                             if(filter != null){
                                 final DefaultCoverageMapLayer cml = (DefaultCoverageMapLayer) layer;
                                 cml.setQuery(QueryBuilder.filtered(cml.getCoverageName(), filter));
@@ -175,7 +176,13 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
                     final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
                     final int nbOrdinate = discretAxis.length();
                     for (int j = 0; j < nbOrdinate; j++) {
-                        dates.add((Date) discretAxis.getOrdinateAt(j));
+                        Object value = discretAxis.getOrdinateAt(j);
+                        if(value instanceof Date){
+                            dates.add((Date)value);
+                        }else{                            
+                            Number n = (Number) value;
+                            dates.add(new Date(n.longValue()));
+                        }
                     }
                 } else {
                     final Double min = Double.valueOf(axis.getMinimumValue());

@@ -61,7 +61,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
- * Abstract Datastore service configuration bean.
+ * Abstract featurestore service configuration bean.
  *
  * @author Johann Sorel (Geomatys)
  */
@@ -601,7 +601,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         }
 
         /**
-         * @return true if this configured layer is in the datastore
+         * @return true if this configured layer is in the featurestore
          */
         public boolean isExist(){
             return exist;

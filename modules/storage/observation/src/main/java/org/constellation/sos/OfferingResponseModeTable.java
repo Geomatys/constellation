@@ -26,8 +26,8 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.sos.xml.v100.OfferingResponseModeType;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
-import java.util.Objects;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -35,13 +35,13 @@ import java.util.Objects;
  */
 public class OfferingResponseModeTable extends SingletonTable<OfferingResponseModeType> implements Cloneable {
 
-
+        
     /**
      * identifiant secondaire de la table.
      */
     private String idOffering;
-
-
+    
+    
     /**
      * Construit une table des mode de reponse.
      *
@@ -50,21 +50,21 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
     public OfferingResponseModeTable(final Database database) {
         this(new OfferingResponseModeQuery(database));
     }
-
+    
    /**
      * Construit une nouvelle table non partagée
      */
     private OfferingResponseModeTable(final OfferingResponseModeTable table) {
         super(table);
     }
-
+    
     /**
      * Initialise l'identifiant de la table.
      */
     private OfferingResponseModeTable(final OfferingResponseModeQuery query) {
         super(query, query.byMode);
     }
-
+    
     /**
      * Returns a copy of this table. This is a copy constructor used for obtaining
      * a new instance to be used concurrently with the original instance.
@@ -77,13 +77,13 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
     @Override
     protected OfferingResponseModeType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingResponseModeQuery query = (OfferingResponseModeQuery) super.query;
-
-
+        
+        
         final ResponseModeType mode = ResponseModeType.valueOf(results.getString(indexOf(query.mode)));
         return new OfferingResponseModeType(results.getString(indexOf(query.idOffering)),
                                           mode);
     }
-
+    
     /**
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
@@ -93,22 +93,22 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
         final OfferingResponseModeQuery query = (OfferingResponseModeQuery) super.query;
         if (! type.equals(QueryType.INSERT))
             statement.setString(indexOf(query.byOffering), idOffering);
-
+        
     }
-
-
+    
+    
     public synchronized String getIdOffering() {
         return idOffering;
     }
-
+    
     public synchronized void setIdOffering(String idOffering) {
-        if (!Objects.equals(this.idOffering, idOffering)) {
+        if (!Utilities.equals(this.idOffering, idOffering)) {
             this.idOffering = idOffering;
             fireStateChanged("idOffering");
         }
-
+        
     }
-
+    
      /**
      * Insere un nouveau capteur a un offering dans la base de donnée.
      *
@@ -144,5 +144,5 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
             }
         }
     }
-
+    
 }

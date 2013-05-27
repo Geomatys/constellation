@@ -19,8 +19,9 @@ package org.constellation.sos.io;
 
 import java.util.List;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.Envelope;
 import org.opengis.observation.Observation;
+import org.opengis.observation.sampling.SamplingFeature;
 
 /**
  *
@@ -34,7 +35,7 @@ public interface ObservationFilterReader extends ObservationFilter {
      * @return A list of Observation templates matching the builded filter.
      * @throws CstlServiceException
      */
-    List<Observation> getObservationTemplates() throws CstlServiceException;
+    List<Observation> getObservationTemplates(final String version) throws CstlServiceException;
 
      /**
      * Return a list of Observation matching the builded filter.
@@ -42,7 +43,10 @@ public interface ObservationFilterReader extends ObservationFilter {
      * @return A list of Observation matching the builded filter.
      * @throws CstlServiceException
      */
-    List<Observation> getObservations() throws CstlServiceException;
+    List<Observation> getObservations(final String version) throws CstlServiceException;
+    
+    
+    List<SamplingFeature> getFeatureOfInterests(final String version) throws CstlServiceException;
 
     /**
      * Return an encoded block of data in a string.
@@ -84,5 +88,5 @@ public interface ObservationFilterReader extends ObservationFilter {
      * this methode return the current shape.
      * @return 
      */
-    EnvelopeType getCollectionBoundingShape();
+    Envelope getCollectionBoundingShape();
 }

@@ -20,7 +20,12 @@ package org.constellation.ws;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,14 +33,24 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import org.constellation.ServiceDef;
 
 import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.security.SimplePDP;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 
 import org.geotoolkit.ows.xml.OWSExceptionCode;
+import org.geotoolkit.util.StringUtilities;
+import org.apache.sis.util.Version;
+import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.util.CodeList;
+import org.xml.sax.SAXException;
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * Abstract definition of a {@code Web Map Service} worker called by a facade
@@ -59,10 +74,7 @@ public abstract class AbstractWorker implements Worker {
      */
     protected boolean isStarted;
 
-    /**
-     * A flag indicating if the transaction methods of the worker are securized.
-     */
-    protected boolean transactionSecurized = true;
+    protected boolean multipleVersionActivated = true;
 
     /**
      * A message keeping the reason of the start error of the service
@@ -87,7 +99,12 @@ public abstract class AbstractWorker implements Worker {
     /**
      * A map containing the Capabilities Object already loaded from file.
      */
-    private final Map<String,Object> capabilities = new HashMap<String,Object>();
+    private final Map<String,Object> capabilities = Collections.synchronizedMap(new HashMap<String,Object>());
+
+    /**
+     * Output responses of a GetCapabilities request.
+     */
+    private static final Map<String,AbstractCapabilitiesCore> CAPS_RESPONSE = new HashMap<String, AbstractCapabilitiesCore>();
 
     /**
      * The identifier of the worker.
@@ -99,10 +116,24 @@ public abstract class AbstractWorker implements Worker {
      */
     private final Specification specification;
 
+    protected UnmodifiableArrayList<ServiceDef> supportedVersions;
+
+    /**
+     * use this flag to pass the shiro security when using the worker in a non web context.
+     */
+    protected boolean shiroAccessible = true;
+
+    /**
+     * use this flag to pass the shiro security when using the worker in a non web context.
+     */
+    protected boolean cacheCapabilities = true;
+
     /**
      * A Policy Decision Point (PDP) if some security constraints have been defined.
      */
     protected SimplePDP pdp = null;
+
+    private List<Schema> schemas = null;
 
     private long currentUpdateSequence = System.currentTimeMillis();
 
@@ -110,6 +141,122 @@ public abstract class AbstractWorker implements Worker {
         this.id = id;
         this.configurationDirectory = configurationDirectory;
         this.specification = specification;
+    }
+
+    protected String getUserLogin() {
+        final String userLogin;
+        if (shiroAccessible) {
+            userLogin = org.constellation.ws.security.SecurityManager.getCurrentUserLogin();
+        } else {
+            userLogin = null;
+        }
+        return userLogin;
+    }
+
+    protected void setSupportedVersion(final ServiceDef... supportedVersions) {
+         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
+    }
+
+    protected boolean isSupportedVersion(final String version) {
+        final ServiceDef.Version vv = new ServiceDef.Version(version);
+        for (ServiceDef sd : supportedVersions) {
+            if (sd.version.equals(vv)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Verify if the version is supported by this serviceType.
+     * <p>
+     * If the version is not accepted we send an exception.
+     * </p>
+     */
+    @Override
+    public void checkVersionSupported(final String versionNumber, final boolean getCapabilities) throws CstlServiceException {
+        if (getVersionFromNumber(versionNumber) == null) {
+            final StringBuilder messageb = new StringBuilder("The parameter ");
+            for (ServiceDef vers : supportedVersions) {
+                messageb.append("VERSION=").append(vers.version.toString()).append(" OR ");
+            }
+            messageb.delete(messageb.length()-4, messageb.length()-1);
+            messageb.append(" must be specified");
+            final CodeList code;
+            if (getCapabilities) {
+                code = VERSION_NEGOTIATION_FAILED;
+            } else {
+                code = INVALID_PARAMETER_VALUE;
+            }
+            throw new CstlServiceException(messageb.toString(), code, "version");
+        }
+    }
+
+    /**
+     * Return a Version Object from the version number.
+     * if the version number is not correct return the default version.
+     *
+     * @param number the version number.
+     * @return
+     */
+    @Override
+    public ServiceDef getVersionFromNumber(final Version number) {
+        if (number != null) {
+            for (ServiceDef v : supportedVersions) {
+                if (v.version.toString().equals(number.toString())){
+                    return v;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return a Version Object from the version number.
+     * if the version number is not correct return the default version.
+     *
+     * @param number the version number.
+     * @return
+     *
+     */
+    @Override
+    public ServiceDef getVersionFromNumber(final String number) {
+        for (ServiceDef v : supportedVersions) {
+            if (v.version.toString().equals(number)){
+                return v;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * If the requested version number is not available we choose the best version to return.
+     *
+     * @param number A version number, which will be compared to the ones specified.
+     *               Can be {@code null}, in this case the best version specified is just returned.
+     * @return The best version (the highest one) specified for this web service.
+     *
+     */
+    @Override
+    public ServiceDef getBestVersion(final String number) {
+        for (ServiceDef v : supportedVersions) {
+            if (v.version.toString().equals(number)){
+                return v;
+            }
+        }
+        final ServiceDef firstSpecifiedVersion = supportedVersions.get(0);
+        if (number == null || number.isEmpty()) {
+            return firstSpecifiedVersion;
+        }
+        final ServiceDef.Version wrongVersion = new ServiceDef.Version(number);
+        if (wrongVersion.compareTo(firstSpecifiedVersion.version) > 0) {
+            return firstSpecifiedVersion;
+        } else {
+            if (wrongVersion.compareTo(supportedVersions.get(supportedVersions.size() - 1).version) < 0) {
+                return supportedVersions.get(supportedVersions.size() - 1);
+            }
+        }
+        return firstSpecifiedVersion;
     }
 
     /**
@@ -141,6 +288,13 @@ public abstract class AbstractWorker implements Worker {
     public void setLogLevel(final Level logLevel) {
         this.logLevel = logLevel;
     }
+
+    @Override
+    public void setShiroAccessible(final boolean shiroAccessible) {
+        this.shiroAccessible = shiroAccessible;
+    }
+
+    protected abstract String getProperty(final String propertyName);
 
     /**
      * Returns the file where to read the capabilities document for each service.
@@ -188,9 +342,8 @@ public abstract class AbstractWorker implements Worker {
             } else {
                 f = null;
             }
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = getMarshallerPool().acquireUnmarshaller();
+                final Unmarshaller unmarshaller = getMarshallerPool().acquireUnmarshaller();
                 // If the file is not present in the configuration directory, take the one in resource.
                 if (f == null || !f.exists()) {
                     final InputStream in = getClass().getResourceAsStream(fileName);
@@ -198,25 +351,22 @@ public abstract class AbstractWorker implements Worker {
                         response = unmarshaller.unmarshal(in);
                         in.close();
                     } else {
-                        LOGGER.info("unable to find static capabilities from resource:" + fileName);
+                        throw new CstlServiceException("Unable to find the capabilities skeleton from resource:" + fileName, OWSExceptionCode.NO_APPLICABLE_CODE);
                     }
                 } else {
                     response = unmarshaller.unmarshal(f);
                 }
+                getMarshallerPool().release(unmarshaller);
 
-                if(response instanceof JAXBElement){
+                if (response instanceof JAXBElement) {
                     response = ((JAXBElement)response).getValue();
                 }
 
                 capabilities.put(fileName, response);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "Unable to close the skeleton capabilities input stream.", ex);
+                throw new CstlServiceException("Unable to close the skeleton capabilities input stream.", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                throw new CstlServiceException("JAXb exception while unmarshaling static capabilities file", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
-            } finally {
-                if (unmarshaller != null) {
-                    getMarshallerPool().release(unmarshaller);
-                }
+                throw new CstlServiceException("JAXB exception while unmarshaling static capabilities file", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
             }
         }
         return response;
@@ -246,6 +396,74 @@ public abstract class AbstractWorker implements Worker {
     @Override
     public boolean isStarted() {
         return isStarted;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPostRequestLog() {
+        final String value = getProperty("postRequestLog");
+        if (value != null) {
+            return Boolean.parseBoolean(value);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPrintRequestParameter() {
+        final String value = getProperty("printRequestParameter");
+        if (value != null) {
+            return Boolean.parseBoolean(value);
+        }
+        return true;
+    }
+
+    /**
+     * A flag indicating if the transaction methods of the worker are securized.
+     */
+    protected boolean isTransactionSecurized() {
+        final String value = getProperty("transactionSecurized");
+        if (value != null) {
+            return Boolean.parseBoolean(value);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isRequestValidationActivated() {
+        final String value = getProperty("requestValidationActivated");
+        if (value != null) {
+            return Boolean.parseBoolean(value);
+        }
+        return false;
+    }
+
+    @Override
+    public List<Schema> getRequestValidationSchema() {
+        if (schemas == null) {
+            final String value = getProperty("requestValidationSchema");
+            schemas = new ArrayList<Schema>();
+            if (value != null) {
+                final List<String> schemaPaths = StringUtilities.toStringList(value);
+                LOGGER.info("Reading schemas. This may take some times ...");
+                final SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                for (String schemaPath : schemaPaths) {
+                    LOGGER.log(Level.INFO, "Reading {0}", schemaPath);
+                    try {
+                        schemas.add(sf.newSchema(new URL(schemaPath)));
+                    } catch (SAXException ex) {
+                        LOGGER.warning("SAX exception while adding the Validator to the JAXB unmarshaller");
+                    } catch (MalformedURLException ex) {
+                        LOGGER.warning("MalformedURL exception while adding the Validator to the JAXB unmarshaller");
+                    }
+                }
+            }
+        }
+        return schemas;
     }
 
     /**
@@ -293,5 +511,47 @@ public abstract class AbstractWorker implements Worker {
         } catch(NumberFormatException ex) {
             throw new CstlServiceException("The update sequence must be an integer", ex, OWSExceptionCode.INVALID_PARAMETER_VALUE, "updateSequence");
         }
+    }
+
+    /**
+     * Return a cached capabilities response.
+     *
+     * @param version
+     * @return r
+     */
+    protected AbstractCapabilitiesCore getCapabilitiesFromCache(final String version, final String language) {
+        final String keyCache = specification.name() + '-' + id + '-' + version + '-' + language;
+        return CAPS_RESPONSE.get(keyCache);
+    }
+
+    /**
+     * Add the capabilities object to the cache.
+     *
+     * @param version
+     * @param language
+     * @param capabilities
+     */
+    protected void putCapabilitiesInCache(final String version, final String language, final AbstractCapabilitiesCore capabilities) {
+        if (cacheCapabilities) {
+            final String keyCache = specification.name() + '-' + id + '-' + version + '-' + language;
+            CAPS_RESPONSE.put(keyCache, capabilities);
+        }
+    }
+
+    protected void clearCapabilitiesCache() {
+        final List<String> toClear = new ArrayList<String>();
+        for (String key: CAPS_RESPONSE.keySet()) {
+            if (key.startsWith(specification.name() + '-')) {
+                toClear.add(key);
+            }
+        }
+        for (String key : toClear) {
+            CAPS_RESPONSE.remove(key);
+        }
+    }
+
+    @Override
+    public void destroy() {
+        clearCapabilitiesCache();
     }
 }

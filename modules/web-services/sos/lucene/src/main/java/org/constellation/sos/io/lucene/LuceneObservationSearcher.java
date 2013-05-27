@@ -212,12 +212,18 @@ public class LuceneObservationSearcher extends LuceneIndexSearcher {
         Timestamp begin = null;
         Timestamp end   = null;
         try {
-            begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
+            final String timeBegin = d.get("sampling_time_begin");
+            if (timeBegin != null) {
+                begin = Timestamp.valueOf(unLuceneTimeValue(timeBegin));
+            }
         } catch (IllegalArgumentException ex) {
             LOGGER.log(logLevel, "unable  to parse the timestamp");
         }
         try {
-            end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
+            final String timeEnd = d.get("sampling_time_end");
+            if (timeEnd != null) {
+                end = Timestamp.valueOf(unLuceneTimeValue(timeEnd));
+            }
         } catch (IllegalArgumentException ex) {
             LOGGER.log(logLevel, "unable  to parse the timestamp");
         }

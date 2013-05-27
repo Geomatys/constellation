@@ -574,17 +574,13 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                 conec.setRequestProperty("Content-Type", MimeType.TEXT_XML);
                 final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
                 final StringWriter sw = new StringWriter();
-                Marshaller marshaller = null;
                 try {
-                    marshaller = marshallerPool.acquireMarshaller();
+                    final Marshaller marshaller = marshallerPool.acquireMarshaller();
                     marshaller.marshal(request, sw);
+                    marshallerPool.release(marshaller);
                 } catch (JAXBException ex) {
                     throw new CstlServiceException("Unable to marshall the request: " + ex.getMessage(),
                                                  NO_APPLICABLE_CODE);
-                } finally {
-                    if (marshaller != null) {
-                        marshallerPool.release(marshaller);
-                    }
                 }
                 String xmlRequest = sw.toString();
 
@@ -672,10 +668,10 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                 decodedString = decodedString.replace("xmlns:csw=\"http://www.opengis.net/csw\"", "xmlns:csw=\"http://www.opengis.net/cat/csw\"");
             }
 
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 harvested = unmarshaller.unmarshal(new StringReader(decodedString));
+                marshallerPool.release(unmarshaller);
                 if (harvested instanceof JAXBElement) {
                     harvested = ((JAXBElement) harvested).getValue();
                 }
@@ -683,10 +679,6 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             }  catch (IllegalAccessError ex) {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
-            } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
-                }
             }
         } catch (IOException ex) {
             LOGGER.severe("The Distant service have made an error");

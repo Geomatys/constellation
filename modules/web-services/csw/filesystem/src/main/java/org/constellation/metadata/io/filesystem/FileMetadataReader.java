@@ -46,6 +46,7 @@ import org.constellation.util.ReflectionUtilities;
 
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
+import static org.constellation.metadata.io.AbstractMetadataReader.ISO_19110;
 
 // geoAPI dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -708,7 +709,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public List<Integer> getSupportedDataTypes() {
-        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM);
+        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM, ISO_19110);
     }
 
     /**

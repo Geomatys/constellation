@@ -33,10 +33,12 @@ import org.constellation.configuration.WMSPortrayal;
 import org.constellation.test.ImageTesting;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.provider.featurestore.FeatureStoreProviderService;
+import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
+import org.geotoolkit.data.shapefile.ShapefileFolderDataStoreFactory;
 
 // Geotoolkit dependencies
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
@@ -54,6 +56,10 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
+import org.geotoolkit.parameter.Parameters;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 
 // JUnit dependencies
 
@@ -160,23 +166,22 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
 
-                }else if("shapefile".equals(serviceName)){
+                }else if("feature-store".equals(serviceName)){
                     try{
                         final File outputDir = initDataDirectory();
-
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
-                        srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
-                                .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
-                        srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
-                                .setValue("http://www.opengis.net/gml");
-
-                        ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                        layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
-                        layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
-
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("shapeSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);    
+                        
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");        
+                        
+                        final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");     
+                        
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(),ex);
                     }
@@ -397,7 +402,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
         Object obj = unmarshallResponse(getCapsUrl);
-        assertTrue(obj instanceof WMT_MS_Capabilities);
+        assertTrue("was:" + obj, obj instanceof WMT_MS_Capabilities);
 
         WMT_MS_Capabilities responseCaps = (WMT_MS_Capabilities)obj;
         Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.getLocalPart());

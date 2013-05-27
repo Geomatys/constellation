@@ -5,17 +5,15 @@
     <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:8"/>
     <om:observedProperty>
         <swe:CompositePhenomenon dimension="2" gml:id="aggregatePhenomenon">
-            <gml:name>urn:ogc:def:phenomenon:GEOM:aggregate</gml:name>
+            <gml:name>urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon</gml:name>
             <swe:component>
                  <swe:Phenomenon gml:id="depth">
                     <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
-                    <gml:description>profondeur</gml:description>
                  </swe:Phenomenon>
             </swe:component>
             <swe:component>
                 <swe:Phenomenon gml:id="temperature">
                     <gml:name>urn:ogc:def:phenomenon:GEOM:temperature</gml:name>
-                    <gml:description>temperature</gml:description>
                 </swe:Phenomenon>>
             </swe:component>
         </swe:CompositePhenomenon>
@@ -25,13 +23,13 @@
             <gml:description>Geology traverse</gml:description>
             <gml:name>cycle1</gml:name>
             <gml:boundedBy>
-                <gml:Envelope gml:id="bound-1" srsName="urn:ogc:def:crs:EPSG:6.8:4283">
+                <gml:Envelope gml:id="bound-1" srsName="urn:ogc:def:crs:epsg:7.9:27582">
                     <gml:lowerCorner>-30.711 134.196</gml:lowerCorner>
                     <gml:upperCorner>-30.702 134.205</gml:upperCorner>
                 </gml:Envelope>
             </gml:boundedBy>
             <sa:shape>
-                <gml:LineString gml:id="pr1_ls1" srsName="urn:ogc:def:crs:EPSG:27582">
+                <gml:LineString gml:id="pr1_ls1" srsName="urn:ogc:def:crs:epsg:7.9:27582">
                     <gml:pos>-30.711 134.205</gml:pos>
                     <gml:pos>-30.710 134.204</gml:pos>
                     <gml:pos>-30.709 134.203</gml:pos>
@@ -41,7 +39,7 @@
                     <gml:pos>-30.702 134.199</gml:pos>
                 </gml:LineString>
             </sa:shape>
-            <sa:length uom="m">750</sa:length>
+            <sa:length/>
         </sa:SamplingCurve>
     </om:featureOfInterest>
     <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
@@ -57,19 +55,19 @@
                         <swe:Time definition="urn:ogc:data:time:iso8601"/>
                     </swe:field>
                     <swe:field name="depth">
-                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:depth">
+                        <swe:Quantity definition="urn:ogc:def:phenomenon:GEOM:depth">
                             <swe:uom code="m"/>
                         </swe:Quantity>
                     </swe:field>
                     <swe:field name="temperature">
-                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:temperature">
+                        <swe:Quantity definition="urn:ogc:def:phenomenon:GEOM:temperature">
                             <swe:uom code="°C"/>
                         </swe:Quantity>
                     </swe:field>
                 </swe:SimpleDataRecord>
             </swe:elementType>
             <swe:encoding>
-                <swe:TextBlock blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="textblock"/>
+                <swe:TextBlock blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
             </swe:encoding>
             <swe:values></swe:values>
         </swe:DataArray>

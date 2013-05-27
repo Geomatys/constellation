@@ -191,6 +191,12 @@ public class Source {
         final StringBuilder sb = new StringBuilder("Source ");
         sb.append(" id=").append(id);
         sb.append(" LoadAll=").append(loadAll);
+        if (include != null) {
+            sb.append("include:\n").append(include);
+        }
+        if (exclude != null) {
+            sb.append("exclude:\n").append(exclude);
+        }
         return sb.toString();
     }
 

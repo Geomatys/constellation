@@ -21,10 +21,18 @@
     <cstl:SMLConfiguration>
         <dataDirectory>sensor</dataDirectory>
     </cstl:SMLConfiguration>
-    <cstl:customParameters>
+    <cstl:parameters>
         <entry>
             <key>transactionSecurized</key>
             <value>false</value>
         </entry>
-    </cstl:customParameters>
+        <entry>
+            <key>multipleVersion</key>
+            <value>false</value>
+        </entry>
+        <entry>
+            <key>singleVersion</key>
+            <value>1.0.0</value>
+        </entry>
+    </cstl:parameters>
 </cstl:SOSConfiguration>

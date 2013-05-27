@@ -60,5 +60,34 @@ public final class WebServiceUtilities {
         }
         return namespaces;
     }
-
+    
+    public static String getValidationLocator(final String msg, final Map<String, String> mapping) {
+        if (msg.contains("must appear on element")) {
+            int pos = msg.indexOf("'");
+            String temp = msg.substring(pos + 1);
+            pos = temp.indexOf("'");
+            final String attribute = temp.substring(0, pos);
+            temp = temp.substring(pos + 1);
+            pos  = temp.indexOf("'");
+            temp = temp.substring(pos + 1);
+            pos = temp.indexOf("'");
+            final String element = temp.substring(0, pos);
+            pos = element.indexOf(':');
+            final String prefix = element.substring(0, pos);
+            final String localPart = element.substring(pos + 1);
+            final String namespace = mapping.get(prefix);
+            
+            return "Expected attribute: " + attribute + " in element "+ localPart + '@' + namespace;
+        }
+        return null;
+    }
+    
+    /*
+     * This map is temporary while we don't know how to extract the request mapping from JAX-WS
+     */
+    public static final Map<String, String> DUMMY_MAPPING = new HashMap<String, String>();
+    static {
+        DUMMY_MAPPING.put("swes", "http://www.opengis.net/swes/2.0");
+        DUMMY_MAPPING.put("sos", "http://www.opengis.net/sos/2.0");
+    }
 }

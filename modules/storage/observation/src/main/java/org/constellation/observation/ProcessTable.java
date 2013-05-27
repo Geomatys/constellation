@@ -26,7 +26,7 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.observation.xml.v100.ProcessType;
-
+import org.geotoolkit.observation.xml.Process;
 
 /**
  * Connexion vers la table des {@linkplain Procedure procédures}.
@@ -85,7 +85,7 @@ public class ProcessTable extends SingletonTable<ProcessType> implements Cloneab
      *
      * @param proc le capteur a inserer dans la base de donnée.
      */
-    public String getIdentifier(final ProcessType proc) throws SQLException, CatalogException {
+    public String getIdentifier(final Process proc) throws SQLException, CatalogException {
         final ProcessQuery query  = (ProcessQuery) super.query;
         String id;
         boolean success = false;
@@ -93,17 +93,17 @@ public class ProcessTable extends SingletonTable<ProcessType> implements Cloneab
         synchronized (lc) {
             transactionBegin(lc);
             try {
-                if (proc.getName() != null) {
+                if (proc.getHref() != null) {
                     final Stmt statement = getStatement(lc, QueryType.EXISTS);
-                    statement.statement.setString(indexOf(query.name), proc.getName());
+                    statement.statement.setString(indexOf(query.name), proc.getHref());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
                         release(lc, statement);
-                        return proc.getName();
+                        return proc.getHref();
                     } else {
-                        id = proc.getName();
+                        id = proc.getHref();
                     }
                     result.close();
                     release(lc, statement);

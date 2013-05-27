@@ -21,12 +21,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URL;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -35,11 +37,13 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.test.CstlDOMComparator;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.util.QNameComparator;
 import org.constellation.util.Util;
 import org.constellation.wfs.ws.DefaultWFSWorker;
@@ -47,22 +51,25 @@ import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.data.om.OMDataStoreFactory;
-import org.geotoolkit.data.sml.SMLDataStoreFactory;
+import org.geotoolkit.feature.DefaultName;
+import static org.geotoolkit.parameter.ParametersExt.*;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamValueCollectionWriter;
 import org.geotoolkit.gml.xml.v321.DirectPositionType;
 import org.geotoolkit.gml.xml.v321.EnvelopeType;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.ogc.xml.v200.AndType;
 import org.geotoolkit.ogc.xml.v200.BBOXType;
 import org.geotoolkit.ogc.xml.v200.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v200.FilterType;
 import org.geotoolkit.ogc.xml.v200.LiteralType;
+import org.geotoolkit.ogc.xml.v200.LogicOpsType;
 import org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType;
+import org.geotoolkit.ogc.xml.v200.ResourceIdType;
 import org.geotoolkit.ogc.xml.v200.SortByType;
 import org.geotoolkit.ogc.xml.v200.SortOrderType;
 import org.geotoolkit.ogc.xml.v200.SortPropertyType;
@@ -71,7 +78,18 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.geotoolkit.wfs.xml.*;
+import org.geotoolkit.wfs.xml.AllSomeType;
+import org.geotoolkit.wfs.xml.CreateStoredQueryResponse;
+import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.DropStoredQueryResponse;
+import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.ResultTypeType;
+import org.geotoolkit.wfs.xml.StoredQueries;
+import org.geotoolkit.wfs.xml.StoredQueryDescription;
+import org.geotoolkit.wfs.xml.TransactionResponse;
+import org.geotoolkit.wfs.xml.ValueCollection;
+import org.geotoolkit.wfs.xml.WFSCapabilities;
+import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v200.*;
 import org.geotoolkit.wfs.xml.v200.Title;
 import org.geotoolkit.xml.MarshallerPool;
@@ -79,16 +97,23 @@ import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
-import org.junit.*;
-import static org.junit.Assert.*;
+
+import org.opengis.feature.Feature;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+
+import org.junit.*;
+import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class WFS2WorkerTest {
 
     private static MarshallerPool pool;
@@ -184,6 +209,7 @@ public class WFS2WorkerTest {
         worker = new DefaultWFSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+        worker.setShiroAccessible(false);
     }
 
     @AfterClass
@@ -221,21 +247,35 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=1)
     public void getCapabilitiesTest() throws Exception {
         final Marshaller marshaller = pool.acquireMarshaller();
 
-        org.geotoolkit.wfs.xml.v200.GetCapabilitiesType request = new org.geotoolkit.wfs.xml.v200.GetCapabilitiesType();
-        request.setAcceptVersions(new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0"));
+        org.geotoolkit.ows.xml.v110.AcceptVersionsType acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0");
+        org.geotoolkit.ows.xml.v110.SectionsType sections       = new org.geotoolkit.ows.xml.v110.SectionsType("featureTypeList");
+        org.geotoolkit.wfs.xml.v200.GetCapabilitiesType request = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
+
         WFSCapabilities result = worker.getCapabilities(request);
+
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(result, sw);
 
-        domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0.xml"),
+        domCompare(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-ftl.xml"),
+                sw.toString());
+        
+        
+        request = new org.geotoolkit.wfs.xml.v200.GetCapabilitiesType();
+        request.setAcceptVersions(new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0"));
+        result = worker.getCapabilities(request);
+
+        sw = new StringWriter();
+        marshaller.marshal(result, sw);
+
+        domCompare(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0.xml"),
                 sw.toString());
 
-        org.geotoolkit.ows.xml.v110.AcceptVersionsType acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.3.0");
+        acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.3.0");
         request = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
 
         try {
@@ -269,20 +309,6 @@ public class WFS2WorkerTest {
 
 
         acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0");
-        org.geotoolkit.ows.xml.v110.SectionsType sections = new org.geotoolkit.ows.xml.v110.SectionsType("featureTypeList");
-        request       = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
-
-        result = worker.getCapabilities(request);
-
-
-        sw = new StringWriter();
-        marshaller.marshal(result, sw);
-
-        domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-ftl.xml"),
-                sw.toString());
-
-        acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0");
         sections      = new org.geotoolkit.ows.xml.v110.SectionsType("operationsMetadata");
         request       = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
 
@@ -291,8 +317,7 @@ public class WFS2WorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-om.xml"),
+        domCompare(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-om.xml"),
                 sw.toString());
 
         acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0");
@@ -304,8 +329,7 @@ public class WFS2WorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-si.xml"),
+        domCompare(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-si.xml"),
                 sw.toString());
 
         acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0");
@@ -317,8 +341,18 @@ public class WFS2WorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-sp.xml"),
+        domCompare(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-sp.xml"),
+                sw.toString());
+        
+        acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("10.0.0","2.0.0","1.1.0");
+        request       = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
+
+        result = worker.getCapabilities(request);
+
+
+        sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        domCompare(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0.xml"),
                 sw.toString());
 
         pool.release(marshaller);
@@ -329,6 +363,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=2)
     public void getFeatureErrorTest() throws Exception {
         /**
          * Test 1 : empty query => error
@@ -362,6 +397,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=3)
     public void getFeatureOMTest() throws Exception {
 
         /**
@@ -379,11 +415,14 @@ public class WFS2WorkerTest {
         assertEquals("3.2.1", wrapper.getGmlVersion());
 
         StringWriter writer = new StringWriter();
-        featureWriter.write((FeatureCollection)result,writer);
+        featureWriter.write((FeatureCollection)result,writer, 5);
 
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
-        domCompare(expectedResult, writer.toString());
+        
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 2 : query on typeName samplingPoint whith HITS result type
@@ -421,8 +460,10 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
-
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 4 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
@@ -446,7 +487,10 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 5 : query on typeName samplingPoint whith a filter xpath //gml:name = 10972X0137-PONT
@@ -470,7 +514,10 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 6 : query on typeName samplingPoint whith a spatial filter BBOX
@@ -494,7 +541,10 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-8v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 7 : query on typeName samplingPoint whith a spatial filter BBOX () with no namespace
@@ -517,8 +567,11 @@ public class WFS2WorkerTest {
 
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-8v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+        
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
 
-        domCompare(expectedResult, writer.toString());
+        domCompare(expectedResult, sresult);
 
 
         /**
@@ -541,11 +594,13 @@ public class WFS2WorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6v2.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
-
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 9 : query on typeName samplingPoint with sort on gml:name
@@ -566,10 +621,13 @@ public class WFS2WorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7v2.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 10 : query on typeName samplingPoint with sort on gml:name and startIndex and maxFeature
@@ -590,10 +648,13 @@ public class WFS2WorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-9v2.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-9v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 11 : query on typeName samplingPoint whith HITS result type
@@ -648,6 +709,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=4)
     public void getPropertyValueOMTest() throws Exception {
 
         /**
@@ -655,8 +717,7 @@ public class WFS2WorkerTest {
          */
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         String valueReference = "sampledFeature";
-        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
-        request.setValueReference(valueReference);
+        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1", valueReference);
 
         Object result = worker.getPropertyValue(request);
 
@@ -702,6 +763,21 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.ValueCollectionOM2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
         domCompare(expectedResult, writer.toString());
+        
+        /**
+         * Test 4 : empty value reference
+         */
+        valueReference = "";
+        request.setValueReference(valueReference);
+        
+        boolean exLaunched = false;
+        try {
+            worker.getPropertyValue(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+        }
+        
+        assertTrue(exLaunched);
     }
 
     /**
@@ -709,6 +785,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=5)
     public void getPropertyValueSMLTest() throws Exception {
 
         /**
@@ -716,8 +793,7 @@ public class WFS2WorkerTest {
          */
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
         String valueReference = "inputs";
-        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
-        request.setValueReference(valueReference);
+        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1", valueReference);
 
         Object result = worker.getPropertyValue(request);
 
@@ -770,6 +846,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=6)
     public void getFeatureSMLTest() throws Exception {
 
         /**
@@ -793,7 +870,10 @@ public class WFS2WorkerTest {
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
          * Test 2 : query on typeName sml:System avec srsName = EPSG:4326
@@ -818,12 +898,14 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        //System.out.println(writer.toString());
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
+
         /**
          * Test 3 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
          */
-
         queries = new ArrayList<QueryType>();
         query   = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("http://www.opengis.net/sml/1.0", "keywords"))));
@@ -845,6 +927,272 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-2v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
+        
+        /**
+         * Test 4 : query on typeName sml:System filter on name = 'Piezometer Test'
+         */
+        ComparisonOpsType pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), "name", Boolean.TRUE);
+        FilterType filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-4v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
+        
+        /**
+         * Test 5 : same test xpath style
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), "/name", Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-4v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
+        
+        /**
+         * Test 6 : query on typeName sml:System filter on input name = 'height' (xpath style)
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), "/inputs/input/name", Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
+        
+        /**
+         * Test 7 : query on typeName sml:System with bad xpath NOT WORKING
+        
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), "/inputs/inputation/namein", Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+         */
+        
+        /**
+         * Test 8 : query on typeName sml:System filter on input name = 'height' (xpath style) prefixed with featureType name
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), "{http://www.opengis.net/sml/1.0}System/inputs/input/name", Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
+        
+         /**
+         * Test 8 : query on typeName sml:System aliased as "a" filter on input name = 'height' (xpath style) prefixed with featureType name
+         */
+        pe1     = new PropertyIsEqualToType(new LiteralType("height"), "a/inputs/input/name", Boolean.TRUE);
+        filter         = new FilterType(pe1);
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+        query.setAliases(Arrays.asList("a"));
+
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-5v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
+    }
+    
+     /**
+     * test the feature marshall
+     *
+     */
+    @Ignore
+    @Order(order=7)
+    public void getFeatureSelfJoinTest() throws Exception {
+
+        /**
+         * Test 1 : query on typeName sml:System
+         */
+
+        ComparisonOpsType pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), "a/name", Boolean.TRUE);
+        PropertyIsEqualToType pe2 = new PropertyIsEqualToType();
+        pe2.addValueReference("a/smlref");
+        pe2.addValueReference("b/name");
+        LogicOpsType le           = new AndType(pe1, pe2);
+        FilterType filter         = new FilterType(le);
+
+        List<QueryType> queries = new ArrayList<QueryType>();
+        QueryType selfJoinQuery = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System"), new QName("http://www.opengis.net/sml/1.0", "System")), null);
+        selfJoinQuery.getAliases().add("a");
+        selfJoinQuery.getAliases().add("b");
+        queries.add(selfJoinQuery);
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+
+        Object result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollectionSelfJoin.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+    }
+    
+    /**
+     * test the feature marshall
+     *
+     */
+    @Ignore
+    @Order(order=8)
+    public void getFeatureJoinTest() throws Exception {
+
+        /**
+         * Test 1 : query on typeName sml:System
+         */
+
+        ComparisonOpsType pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), "{http://www.opengis.net/sml/1.0}System/name", Boolean.TRUE);
+        PropertyIsEqualToType pe2 = new PropertyIsEqualToType();
+        pe2.addValueReference("{http://www.opengis.net/sml/1.0}System/smlref");
+        pe2.addValueReference("{http://www.opengis.net/sml/1.0}System/name");
+        LogicOpsType le           = new AndType(pe1, pe2);
+        FilterType filter         = new FilterType(le);
+
+        List<QueryType> queries = new ArrayList<QueryType>();
+        QueryType selfJoinQuery = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System"), new QName("http://www.opengis.net/sml/1.0", "System")), null);
+        selfJoinQuery.getAliases().add("a");
+        selfJoinQuery.getAliases().add("b");
+        queries.add(selfJoinQuery);
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+
+        Object result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollectionSelfJoin.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
         domCompare(expectedResult, writer.toString());
     }
 
@@ -853,6 +1201,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=9)
     public void getFeatureShapeFileTest() throws Exception {
 
         /**
@@ -873,9 +1222,12 @@ public class WFS2WorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollectionv2.xml"),
-                writer.toString());
+                sresult);
 
         /**
          * Test 2 : query on typeName bridges with propertyName = {FID}
@@ -896,9 +1248,12 @@ public class WFS2WorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection-2v2.xml"),
-                writer.toString());
+                sresult);
 
         /**
          * Test 3 : query on typeName NamedPlaces
@@ -918,9 +1273,12 @@ public class WFS2WorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1v2.xml"),
-                writer.toString());
+                sresult);
 
         /**
          * Test 4 : query on typeName NamedPlaces with resultType = HITS
@@ -956,9 +1314,12 @@ public class WFS2WorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1_reprojv2.xml"),
-                writer.toString());
+                sresult);
 
         /**
          * Test 6 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
@@ -970,23 +1331,27 @@ public class WFS2WorkerTest {
         queries.add(query);
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
-        try {
-            result = worker.getFeature(request);
-            assertTrue(result instanceof FeatureCollectionWrapper);
-            wrapper = (FeatureCollectionWrapper) result;
-            result = wrapper.getFeatureCollection();
-            assertEquals("3.2.1", wrapper.getGmlVersion());
+        
+        result = worker.getFeature(request);
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
 
-            writer = new StringWriter();
-            featureWriter.write((FeatureCollection)result,writer);
-            String xmlResult = writer.toString();
-            fail("Should have raised an error.");
-        } catch (FeatureStoreRuntimeException ex) {
-            //ok
-        }
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+        
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-5v2.xml"),
+                sresult);
+            
+        
 
         /**
-         * Test 7 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
+         * Test 7 : query on typeName NamedPlaces with ASC sortBy on NAME property (not supported)
          */
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null);
@@ -994,21 +1359,22 @@ public class WFS2WorkerTest {
         queries.add(query);
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
-        try {
-            result = worker.getFeature(request);
+        result = worker.getFeature(request);
 
-            assertTrue(result instanceof FeatureCollectionWrapper);
-            wrapper = (FeatureCollectionWrapper) result;
-            result = wrapper.getFeatureCollection();
-            assertEquals("3.2.1", wrapper.getGmlVersion());
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
 
-            writer = new StringWriter();
-            featureWriter.write((FeatureCollection)result,writer);
-            String xmlResult = writer.toString();
-            fail("Should have raised an error.");
-        } catch (FeatureStoreRuntimeException ex) {
-            //ok
-        }
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+        
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1v2.xml"),
+                sresult);
 
     }
 
@@ -1017,6 +1383,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=10)
     public void DescribeFeatureTest() throws Exception {
         Unmarshaller unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
 
@@ -1079,7 +1446,8 @@ public class WFS2WorkerTest {
      *
      */
     @Test
-    public void TransactionUpdateTest() throws Exception {
+    @Order(order=11)
+    public void TransactionTest() throws Exception {
 
         /**
          * Test 1 : transaction update for Feature type bridges with a bad inputFormat
@@ -1115,7 +1483,7 @@ public class WFS2WorkerTest {
             worker.transaction(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getExceptionCode(), INVALID_VALUE);
             assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml/3.2}Bridges does not has such a property: whatever");
         }
 
@@ -1154,8 +1522,8 @@ public class WFS2WorkerTest {
 
         TransactionResponse result = worker.transaction(request);
 
-        TransactionSummaryType sum = new TransactionSummaryType(0, 1, 0);
-        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, "2.0.0");
+        TransactionSummaryType sum = new TransactionSummaryType(0, 1, 0, 0);
+        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, null, "2.0.0");
 
         assertEquals(ExpResult, result);
 
@@ -1176,22 +1544,84 @@ public class WFS2WorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3v2.xml"),
-                writer.toString());
+                sresult);
+
+   }
+    
+    @Test
+    @Order(order=12)
+    public void TransactionReplaceTest() throws Exception {
+    
+    
+
+        /**
+         * Test 1 : transaction replace for Feature type NamedPlaces
+         */
+        final Name tName = new DefaultName("http://www.opengis.net/gml/3.2", "NamedPlaces");
+        final FeatureType ft = ((FeatureLayerDetails) LayerProviderProxy.getInstance().get(tName)).getStore().getFeatureType(tName);
+        final JAXPStreamFeatureReader fr = new JAXPStreamFeatureReader(ft);
+        fr.getProperties().put(JAXPStreamFeatureReader.BINDING_PACKAGE, "GML");
+        final Feature feature = (Feature) fr.read(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlaces.xml"));
+        
+        PropertyIsEqualToType pe = new PropertyIsEqualToType(new LiteralType("Goose Island"), "NAME", Boolean.TRUE);
+        FilterType filter   = new FilterType(pe);
+        TransactionType request  = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new ReplaceType(null, filter, feature, "application/gml+xml; version=3.2", null));
+
+
+        TransactionResponse result = worker.transaction(request);
+
+        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 0, 1);
+        final List<CreatedOrModifiedFeatureType> r = new ArrayList<CreatedOrModifiedFeatureType>();
+        r.add(new CreatedOrModifiedFeatureType(new ResourceIdType("NamedPlaces.2"), null));
+        ActionResultsType replaced = new ActionResultsType(r);
+        TransactionResponse ExpResult = new TransactionResponseType(sum, null, null, replaced, "2.0.0");
+
+        assertEquals(ExpResult, result);
+
+        /**
+         * we verify that the feature have been updated
+         */
+        List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+
+        Object resultGF = worker.getFeature(requestGF);
+
+        assertTrue(resultGF instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
+        resultGF = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)resultGF,writer);
+
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-4v2.xml"),
+                sresult);
 
     }
-
+    
     @Test
+    @Order(order=13)
     public void TransactionDeleteTest() throws Exception {
-
+     
+    
+   
         /**
          * Test 1 : transaction delete for Feature type bridges with a bad property in filter
          */
         QName typeName           = new QName("http://www.opengis.net/gml/3.2", "Bridges");
-        ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "bad", Boolean.TRUE);
+        PropertyIsEqualToType pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "bad", Boolean.TRUE);
         FilterType filter        = new FilterType(pe);
-        DeleteType delete = new DeleteType(filter, null, typeName);
+        DeleteType delete        = new DeleteType(filter, null, typeName);
         TransactionType request  = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, delete);
 
         try {
@@ -1214,8 +1644,8 @@ public class WFS2WorkerTest {
 
         TransactionResponse result = worker.transaction(request);
 
-        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 1);
-        TransactionResponseType expresult = new TransactionResponseType(sum, null, null, "2.0.0");
+        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 1, 0);
+        TransactionResponseType expresult = new TransactionResponseType(sum, null, null, null,"2.0.0");
 
         assertEquals(expresult, result);
 
@@ -1235,15 +1665,19 @@ public class WFS2WorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
-         domCompare(
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2v2.xml"),
-                writer.toString());
+                sresult);
     }
     /**
      *
      *
      */
     @Test
+    @Order(order=14)
     public void TransactionInsertTest() throws Exception {
 
         /**
@@ -1269,6 +1703,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=14)
     public void listStoredQueriesTest() throws Exception {
 
         final ListStoredQueriesType request = new ListStoredQueriesType("WFS", "2.0.0", null);
@@ -1280,10 +1715,11 @@ public class WFS2WorkerTest {
 
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
-        items.add(new StoredQueryListItemType("identifierQuery", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
         final ListStoredQueriesResponseType expResult = new ListStoredQueriesResponseType(items);
 
-        assertEquals(2, result.getStoredQuery().size());
+        assertEquals(3, result.getStoredQuery().size());
         for (int i = 0; i < result.getStoredQuery().size(); i++) {
             final StoredQueryListItemType expIt = items.get(i);
             final StoredQueryListItemType resIt = result.getStoredQuery().get(i);
@@ -1299,6 +1735,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=15)
     public void describeStoredQueriesTest() throws Exception {
         final DescribeStoredQueriesType request = new DescribeStoredQueriesType("WFS", "2.0.0", null, Arrays.asList("nameQuery"));
         final DescribeStoredQueriesResponse resultI = worker.describeStoredQueries(request);
@@ -1331,6 +1768,7 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    @Order(order=16)
     public void createStoredQueriesTest() throws Exception {
         final List<StoredQueryDescriptionType> desc = new ArrayList<StoredQueryDescriptionType>();
 
@@ -1379,12 +1817,19 @@ public class WFS2WorkerTest {
 
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery",     Arrays.asList(new Title("Name query")),     Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
-        items.add(new StoredQueryListItemType("identifierQuery", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
         items.add(new StoredQueryListItemType("geomQuery",     Arrays.asList(new Title("Geom query")),     Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges"))));
         items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
 
-        assertEquals(4, resultlsq.getStoredQuery().size());
+        assertEquals(5, resultlsq.getStoredQuery().size());
+        for (int i = 0; i < resultlsq.getStoredQuery().size(); i++) {
+            assertEquals(expResultlsq.getStoredQuery().get(i).getId(), resultlsq.getStoredQuery().get(i).getId());
+            assertEquals(expResultlsq.getStoredQuery().get(i).getReturnFeatureType(), resultlsq.getStoredQuery().get(i).getReturnFeatureType());
+            assertEquals(expResultlsq.getStoredQuery().get(i).getTitle(), resultlsq.getStoredQuery().get(i).getTitle());
+            assertEquals(expResultlsq.getStoredQuery().get(i), resultlsq.getStoredQuery().get(i));
+        }
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1394,6 +1839,7 @@ public class WFS2WorkerTest {
         worker = new DefaultWFSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+        worker.setShiroAccessible(false);
 
         resultlsqI = worker.listStoredQueries(requestlsq);
 
@@ -1401,7 +1847,7 @@ public class WFS2WorkerTest {
         resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
 
-        assertEquals(4, resultlsq.getStoredQuery().size());
+        assertEquals(5, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1409,6 +1855,7 @@ public class WFS2WorkerTest {
     }
 
     @Test
+    @Order(order=17)
     public void dropStoredQueriesTest() throws Exception {
         final DropStoredQueryType request = new DropStoredQueryType("WFS", "2.0.0", null, "geomQuery");
         final DropStoredQueryResponse resultI = worker.dropStoredQuery(request);
@@ -1429,11 +1876,18 @@ public class WFS2WorkerTest {
 
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
-        items.add(new StoredQueryListItemType("identifierQuery", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
         items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
 
-        assertEquals(3, resultlsq.getStoredQuery().size());
+        assertEquals(4, resultlsq.getStoredQuery().size());
+        for (int i = 0; i < resultlsq.getStoredQuery().size(); i++) {
+            assertEquals(expResultlsq.getStoredQuery().get(i).getId(), resultlsq.getStoredQuery().get(i).getId());
+            assertEquals(expResultlsq.getStoredQuery().get(i).getReturnFeatureType(), resultlsq.getStoredQuery().get(i).getReturnFeatureType());
+            assertEquals(expResultlsq.getStoredQuery().get(i).getTitle(), resultlsq.getStoredQuery().get(i).getTitle());
+            assertEquals(expResultlsq.getStoredQuery().get(i), resultlsq.getStoredQuery().get(i));
+        }
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1443,6 +1897,7 @@ public class WFS2WorkerTest {
         worker = new DefaultWFSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+        worker.setShiroAccessible(false);
 
         resultlsqI = worker.listStoredQueries(requestlsq);
 
@@ -1450,13 +1905,44 @@ public class WFS2WorkerTest {
         resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
 
-        assertEquals(3, resultlsq.getStoredQuery().size());
+        assertEquals(4, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
     }
+    
+    @Test
+    @Order(order=18)
+    public void getFeatureOMFeatureIdTest() throws Exception {
+
+        /**
+         * Test 1 : query on typeName samplingPoint with name parameter
+         */
+        final FilterType filter = new org.geotoolkit.ogc.xml.v200.FilterType(new org.geotoolkit.ogc.xml.v200.ResourceIdType("station-001"));
+        final QueryType query = new QueryType(filter, null, "2.0.0");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, Arrays.asList(query), ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        
+        Object result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
+    }
 
     @Test
+    @Order(order=19)
     public void getFeatureOMStoredQueriesTest() throws Exception {
 
         /**
@@ -1482,10 +1968,40 @@ public class WFS2WorkerTest {
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
+        
+        /**
+         * Test 2 : query on typeName samplingPoint with id parameter
+         */
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        params = new ArrayList<ParameterType>();
+        params.add(new ParameterType("id", "station-001"));
+        query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", null, params);
+        request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
         /**
-         * Test 2 : query on typeName samplingPoint with a BBOX parameter
+         * Test 3 : query on typeName samplingPoint with a BBOX parameter
          */
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         params = new ArrayList<ParameterType>();
@@ -1510,10 +2026,41 @@ public class WFS2WorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-8v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
+        
+        /**
+         * Test 4 : query with typeName parameter
+         */
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        params = new ArrayList<ParameterType>();
+        params.add(new ParameterType("typeName", new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")));
+        query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", null, params);
+        request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
     }
 
     @Test
+    @Order(order=20)
     public void getFeatureMixedStoredIdentifierQueryTest() throws Exception {
         /**
          * Test 1 : query with id parameter
@@ -1521,8 +2068,8 @@ public class WFS2WorkerTest {
         GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         ObjectFactory factory = new ObjectFactory();
         List<ParameterType> params = new ArrayList<ParameterType>();
-        params.add(new ParameterType("@id", "station-001"));
-        StoredQueryType query = new StoredQueryType("identifierQuery", null, params);
+        params.add(new ParameterType("id", "station-001"));
+        StoredQueryType query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", null, params);
         request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
 
         Object result = worker.getFeature(request);
@@ -1538,8 +2085,29 @@ public class WFS2WorkerTest {
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        domCompare(expectedResult, writer.toString());
+        String sresult = writer.toString();
+        sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(expectedResult, sresult);
 
+    }
+    
+    @Test
+    @Order(order=21)
+    public void schemaLocationTest() throws Exception {
+        List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        Object resultGF = worker.getFeature(requestGF);
+
+        assertTrue(resultGF instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
+        
+        final Map<String, String> expResult = new HashMap<String, String>();
+        expResult.put("http://www.opengis.net/gml/3.2", "http://geomatys.com/constellation/WS/wfs/default?request=DescribeFeatureType&version=2.0.0&service=WFS&namespace=xmlns(ns1=http://www.opengis.net/gml/3.2)&typenames=ns1:NamedPlaces");
+        assertEquals(wrapper.getSchemaLocations(), expResult);
+        
     }
 
     private static void initFeatureSource() throws Exception {
@@ -1551,87 +2119,80 @@ public class WFS2WorkerTest {
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
                 final ParameterValueGroup config = desc.createValue();
 
-                if("shapefile".equals(serviceName)){
-
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
-                    srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
-                            .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
-                    srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
-                            .setValue("http://www.opengis.net/gml/3.2");
-
-
-                    ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("BasicPolygons");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_BasicPolygons");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Bridges");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Bridges");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("BuildingCenters");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_BuildingCenters");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Buildings");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Buildings");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("DividedRoutes");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_DividedRoutes");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Forests");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Forests");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Lakes");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Lakes");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("MapNeatline");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_MapNeatLine");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Ponds");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Ponds");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("RoadSegments");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_RoadSegments");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Streams");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Streams");
-
-                }else if("observation".equals(serviceName)){
-                    try{
-                        final String url = "jdbc:derby:memory:TestWFSWorker2";
-                        ds = new DefaultDataSource(url + ";create=true");
+                if("feature-store".equals(serviceName)){
+                    try{ 
+                        
+                        {//OBSERVATION
+                        final String url = "jdbc:derby:memory:TestWFS2WorkerOM";
+                        final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
                         sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
                         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
                         con.close();
-
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        final ParameterValueGroup srcconfig = getOrCreate(OMDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
-                        srcconfig.parameter(OMDataStoreFactory.SGBDTYPE.getName().getCode()).setValue("derby");
-                        srcconfig.parameter(OMDataStoreFactory.DERBYURL.getName().getCode()).setValue(url);
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("omSrc");
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(), ex);
-                    }
-                }else if("sensorML".equals(serviceName)){
-                    try{
+                        ds.shutdown();
+                        
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("omSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);    
+                        
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
+                        getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
+                        getOrCreateValue(omconfig, "derbyurl").setValue(url);
+                        }
+                        
+                        {//SHAPEFILE
+                        final File outputDir = initDataDirectory();
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("shapeSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);    
+                        
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml/3.2");        
+                        
+                        ParameterValueGroup layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("BasicPolygons");
+                        getOrCreateValue(layer, "style").setValue("cite_style_BasicPolygons");     
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Bridges");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Bridges");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("BuildingCenters");
+                        getOrCreateValue(layer, "style").setValue("cite_style_BuildingCenters");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Buildings");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Buildings");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("DividedRoutes");
+                        getOrCreateValue(layer, "style").setValue("cite_style_DividedRoutes");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Forests");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Forests");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Lakes");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Lakes");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("MapNeatline");
+                        getOrCreateValue(layer, "style").setValue("cite_style_MapNeatLine");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Ponds");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Ponds");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("RoadSegments");
+                        getOrCreateValue(layer, "style").setValue("cite_style_RoadSegments");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Streams");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Streams");                        
+                        
+                        }
+                        
+                        {//SENSORML
                         final String url2 = "jdbc:derby:memory:TestWFSWorker2SMl";
                         ds2 = new DefaultDataSource(url2 + ";create=true");
                         Connection con = ds2.getConnection();
@@ -1645,15 +2206,19 @@ public class WFS2WorkerTest {
                         sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML.sql"));
                         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
                         con.close();
-
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        final ParameterValueGroup srcconfig = getOrCreate(SMLDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("smlSrc");
-                        srcconfig.parameter(SMLDataStoreFactory.SGBDTYPE.getName().getCode()).setValue("derby");
-                        srcconfig.parameter(SMLDataStoreFactory.DERBYURL.getName().getCode()).setValue(url2);
+                            
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("smlSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);             
+                        
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup omconfig = createGroup(choice, "SMLParameters");
+                        getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
+                        getOrCreateValue(omconfig, "derbyurl").setValue(url2);                      
+                        }
+                        
                     }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(), ex);
+                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
                     }
                 }
 

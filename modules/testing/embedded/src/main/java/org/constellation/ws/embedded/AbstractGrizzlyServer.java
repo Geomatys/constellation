@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
@@ -158,9 +159,15 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         }
     }
 
-    protected static String getStringResponse(URLConnection conec) throws UnsupportedEncodingException, IOException {
+    protected static String getStringResponse(final URLConnection conec) throws UnsupportedEncodingException, IOException {
+        InputStream is;
+        if (((HttpURLConnection)conec).getResponseCode() == 200) {
+            is = conec.getInputStream();
+        } else {
+            is = ((HttpURLConnection)conec).getErrorStream();
+        }
         final StringWriter sw     = new StringWriter();
-        final BufferedReader in   = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
+        final BufferedReader in   = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         char [] buffer = new char[1024];
         int size;
         while ((size = in.read(buffer, 0, 1024)) > 0) {
@@ -301,7 +308,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         wr.flush();
     }
 
-    protected static Object unmarshallResponse(URLConnection conec) throws JAXBException, IOException {
+    protected static Object unmarshallResponse(final URLConnection conec) throws JAXBException, IOException {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(conec.getInputStream());
 
@@ -313,9 +320,17 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         return obj;
     }
 
-    protected static Object unmarshallResponse(URL conec) throws JAXBException, IOException {
+    protected static Object unmarshallResponse(final URL url) throws JAXBException, IOException {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(conec.openStream());
+        final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        
+        InputStream is;
+        if (conn.getResponseCode() == 200) {
+            is = conn.getInputStream();
+        } else {
+            is = conn.getErrorStream();
+        }
+        Object obj = unmarshaller.unmarshal(is);
 
         pool.release(unmarshaller);
 

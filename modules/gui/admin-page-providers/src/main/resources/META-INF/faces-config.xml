@@ -20,35 +20,7 @@
         <managed-bean-class>org.constellation.menu.provider.CoverageMosaicBean</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
-    
-    <!-- om provider -->
-    <managed-bean>
-        <managed-bean-name>omBean</managed-bean-name>
-        <managed-bean-class>org.constellation.menu.provider.OMBean</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
-    
-    <!-- postgis provider -->
-    <managed-bean>
-        <managed-bean-name>postgisBean</managed-bean-name>
-        <managed-bean-class>org.constellation.menu.provider.PostGISBean</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
-    
-    <!-- sensorml provider -->
-    <managed-bean>
-        <managed-bean-name>sensormlBean</managed-bean-name>
-        <managed-bean-class>org.constellation.menu.provider.SensorMLBean</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
-    
-    <!-- shapefile provider -->
-    <managed-bean>
-        <managed-bean-name>shapefileBean</managed-bean-name>
-        <managed-bean-class>org.constellation.menu.provider.ShapefileBean</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
-    
+        
     <!-- store provider -->
     <managed-bean>
         <managed-bean-name>coveragestoreBean</managed-bean-name>
@@ -56,8 +28,8 @@
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-        <managed-bean-name>datastoreBean</managed-bean-name>
-        <managed-bean-class>org.constellation.menu.provider.DataStoreBean</managed-bean-class>
+        <managed-bean-name>featurestoreBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.FeatureStoreBean</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
     <managed-bean>

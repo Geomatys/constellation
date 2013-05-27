@@ -11,6 +11,7 @@
             <ns9:Parameter name="AcceptVersions">
                 <ns9:AllowedValues>
                     <ns9:Value>2.0.0</ns9:Value>
+                    <ns9:Value>1.1.0</ns9:Value>
                 </ns9:AllowedValues>
             </ns9:Parameter>
             <ns9:Parameter name="AcceptFormats">
@@ -33,7 +34,7 @@
             </ns9:DCP>
             <ns9:Parameter name="outputFormat">
                 <ns9:AllowedValues>
-                    <ns9:Value>text/xml; subtype=gml/3.1.1</ns9:Value>
+                    <ns9:Value>application/gml+xml; version=3.2</ns9:Value>
                 </ns9:AllowedValues>
             </ns9:Parameter>
             <ns9:Parameter name="Service">
@@ -62,7 +63,7 @@
             </ns9:Parameter>
             <ns9:Parameter name="outputFormat">
                 <ns9:AllowedValues>
-                    <ns9:Value>text/xml; subtype=gml/3.1.1</ns9:Value>
+                    <ns9:Value>application/gml+xml; version=3.2</ns9:Value>
                 </ns9:AllowedValues>
             </ns9:Parameter>
             <ns9:Parameter name="Service">
@@ -89,7 +90,7 @@
             </ns9:DCP>
             <ns9:Parameter name="inputFormat">
                 <ns9:AllowedValues>
-                    <ns9:Value>text/xml; subtype=gml/3.1.1</ns9:Value>
+                    <ns9:Value>application/gml+xml; version=3.2</ns9:Value>
                 </ns9:AllowedValues>
             </ns9:Parameter>
             <ns9:Parameter name="idgen">
@@ -116,8 +117,221 @@
                 </ns9:AllowedValues>
             </ns9:Parameter>
         </ns9:Operation>
+        <ns9:Operation name="ListStoredQueries">
+            <ns9:DCP>
+                <ns9:HTTP>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                </ns9:HTTP>
+            </ns9:DCP>
+            <ns9:Parameter name="Service">
+                <ns9:AllowedValues>
+                    <ns9:Value>WFS</ns9:Value>
+                </ns9:AllowedValues>
+            </ns9:Parameter>
+            <ns9:Parameter name="Version">
+                <ns9:AllowedValues>
+                    <ns9:Value>2.0.0</ns9:Value>
+                </ns9:AllowedValues>
+            </ns9:Parameter>
+        </ns9:Operation>
+        <ns9:Operation name="DescribeStoredQueries">
+            <ns9:DCP>
+                <ns9:HTTP>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                </ns9:HTTP>
+            </ns9:DCP>
+            <ns9:Parameter name="Service">
+                <ns9:AllowedValues>
+                    <ns9:Value>WFS</ns9:Value>
+                </ns9:AllowedValues>
+            </ns9:Parameter>
+            <ns9:Parameter name="Version">
+                <ns9:AllowedValues>
+                    <ns9:Value>2.0.0</ns9:Value>
+                </ns9:AllowedValues>
+            </ns9:Parameter>
+        </ns9:Operation>
+        <ns9:Operation name="GetPropertyValue">
+            <ns9:DCP>
+                <ns9:HTTP>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                </ns9:HTTP>
+            </ns9:DCP>
+            <ns9:Parameter name="Service">
+                <ns9:AllowedValues>
+                    <ns9:Value>WFS</ns9:Value>
+                </ns9:AllowedValues>
+            </ns9:Parameter>
+            <ns9:Parameter name="Version">
+                <ns9:AllowedValues>
+                    <ns9:Value>2.0.0</ns9:Value>
+                </ns9:AllowedValues>
+            </ns9:Parameter>
+        </ns9:Operation>
+        <ns9:Operation name="CreateStoredQuery">
+            <ns9:DCP>
+                <ns9:HTTP>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                </ns9:HTTP>
+            </ns9:DCP>
+            <ns9:Parameter name="Service">
+                <ns9:AllowedValues>
+                    <ns9:Value>WFS</ns9:Value>
+                </ns9:AllowedValues>
+            </ns9:Parameter>
+            <ns9:Parameter name="Version">
+                <ns9:AllowedValues>
+                    <ns9:Value>2.0.0</ns9:Value>
+                </ns9:AllowedValues>
+            </ns9:Parameter>
+        </ns9:Operation>
+        <ns9:Operation name="DropStoredQuery">
+            <ns9:DCP>
+                <ns9:HTTP>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                </ns9:HTTP>
+            </ns9:DCP>
+            <ns9:Parameter name="Service">
+                <ns9:AllowedValues>
+                    <ns9:Value>WFS</ns9:Value>
+                </ns9:AllowedValues>
+            </ns9:Parameter>
+            <ns9:Parameter name="Version">
+                <ns9:AllowedValues>
+                    <ns9:Value>2.0.0</ns9:Value>
+                </ns9:AllowedValues>
+            </ns9:Parameter>
+        </ns9:Operation>
+        <ns9:Parameter name="version">
+            <ns9:AllowedValues>
+                <ns9:Value>2.0.0</ns9:Value>
+            </ns9:AllowedValues>
+        </ns9:Parameter>
+        <ns9:Constraint name="ImplementsSimpleWFS">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ImplementsBasicWFS">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ImplementsTransactionalWFS">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ImplementsLockingWFS">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="KVPEncoding">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="XMLEncoding">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="SOAPEncoding">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ImplementsInheritance">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ImplementsRemoteResolve">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ImplementsResultPaging">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ImplementsStandardJoins">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ImplementsSpatialJoins">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ImplementsTemporalJoins">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ImplementsFeatureVersioning">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+        </ns9:Constraint>
+        <ns9:Constraint name="ManageStoredQueries">
+            <ns9:NoValues/>
+            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+        </ns9:Constraint>
     </ns9:OperationsMetadata>
     <fes:Filter_Capabilities>
+        <fes:Conformance>
+            <fes:Constraint name="ImplementsQuery">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsAdHocQuery">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsFunctions">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsMinStandardFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsStandardFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsMinSpatialFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsSpatialFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsMinTemporalFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsTemporalFilter">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsVersionNav">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsSorting">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsExtendedOperators">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>FALSE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsResourceId">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+            <fes:Constraint name="ImplementsMinimumXPath">
+                <ns9:NoValues/>
+                <ns9:DefaultValue>TRUE</ns9:DefaultValue>
+            </fes:Constraint>
+        </fes:Conformance>
         <fes:Id_Capabilities>
             <fes:ResourceIdentifier name="fes:ResourceId"/>
         </fes:Id_Capabilities>
@@ -127,9 +341,9 @@
                 <fes:ComparisonOperator name="PropertyIsBetween"/>
                 <fes:ComparisonOperator name="PropertyIsEqualTo"/>
                 <fes:ComparisonOperator name="PropertyIsGreaterThan"/>
-                <fes:ComparisonOperator name="PropertyIsGReaterThanEqualTo"/>
+                <fes:ComparisonOperator name="PropertyIsGreaterThanOrEqualTo"/>
                 <fes:ComparisonOperator name="PropertyIsLessThan"/>
-                <fes:ComparisonOperator name="PropertyIsLessThanEqualTo"/>
+                <fes:ComparisonOperator name="PropertyIsLessThanOrEqualTo"/>
                 <fes:ComparisonOperator name="PropertyIsLike"/>
                 <fes:ComparisonOperator name="PropertyIsNotEqualTo"/>
                 <fes:ComparisonOperator name="PropertyIsNull"/>
@@ -143,15 +357,15 @@
                 <fes:GeometryOperand name="ns11:Polygon" xmlns:ns11="http://www.opengis.net/gml/3.2"/>
             </fes:GeometryOperands>
             <fes:SpatialOperators>
-                <fes:SpatialOperator name="DISJOINT"/>
-                <fes:SpatialOperator name="EQUALS"/>
-                <fes:SpatialOperator name="D_WITHIN"/>
-                <fes:SpatialOperator name="BEYOND"/>
-                <fes:SpatialOperator name="INTERSECTS"/>
-                <fes:SpatialOperator name="TOUCHES"/>
-                <fes:SpatialOperator name="CROSSES"/>
-                <fes:SpatialOperator name="CONTAINS"/>
-                <fes:SpatialOperator name="OVERLAPS"/>
+                <fes:SpatialOperator name="Disjoint"/>
+                <fes:SpatialOperator name="Equals"/>
+                <fes:SpatialOperator name="DWithin"/>
+                <fes:SpatialOperator name="Beyond"/>
+                <fes:SpatialOperator name="Intersects"/>
+                <fes:SpatialOperator name="Touches"/>
+                <fes:SpatialOperator name="Crosses"/>
+                <fes:SpatialOperator name="Contains"/>
+                <fes:SpatialOperator name="Overlaps"/>
                 <fes:SpatialOperator name="BBOX"/>
             </fes:SpatialOperators>
         </fes:Spatial_Capabilities>

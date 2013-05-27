@@ -20,7 +20,7 @@ package org.constellation.bean;
 import java.io.Serializable;
 import java.util.Locale;
 import javax.faces.context.FacesContext;
-import org.geotoolkit.util.ArgumentChecks;
+import org.apache.sis.util.ArgumentChecks;
 
 /**
  * Managed bean of locale for the user session.

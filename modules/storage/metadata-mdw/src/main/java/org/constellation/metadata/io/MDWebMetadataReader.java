@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -43,7 +42,6 @@ import org.constellation.generic.database.BDD;
 import org.constellation.util.ReflectionUtilities;
 
 // MDWeb dependencies
-import org.constellation.util.Util;
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.Path;
@@ -58,7 +56,7 @@ import org.mdweb.io.Reader;
 
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
-import org.geotoolkit.internal.CodeLists;
+import org.apache.sis.util.iso.Types;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.naming.DefaultLocalName;
 import org.geotoolkit.naming.DefaultNameFactory;
@@ -68,10 +66,9 @@ import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.UnlimitedInteger;
 import org.geotoolkit.xml.IdentifierSpace;
-import org.geotoolkit.xml.XLink;
+import org.apache.sis.xml.XLink;
 
 // GeoAPI dependencies
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.IdentifiedObject;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
@@ -148,6 +145,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * A list of package containing the Ebrim V2.5 implementation
      */
     private List<String> ebrimV25Package;
+
+    /**
+     * A list of package containing various implementation
+     */
+    private List<String> otherPackage;
 
     /**
      * A List of the already see object for the current metadata read
@@ -258,7 +260,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                                  "org.geotoolkit.metadata.fra", "org.geotoolkit.util", "org.geotoolkit.xml");
         this.sensorMLPackage    = FileUtilities.searchSubPackage("org.geotoolkit.sml.xml.v100");
         this.swePackage         = FileUtilities.searchSubPackage("org.geotoolkit.swe.xml.v100");
-        this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311");
+        this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311","org.geotoolkit.gml.xml");
 
         this.opengisPackage     = FileUtilities.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                                "org.opengis.service", "org.opengis.feature.catalog");
@@ -270,24 +272,12 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                                       "org.geotoolkit.metadata.iso.quality", "org.geotoolkit.metadata.iso.spatial",
                                                                       "org.geotoolkit.metadata.iso.lineage", "org.geotoolkit.metadata.iso.content",
                                                                       "org.opengis.metadata.acquisition", "org.opengis.metadata.content");
-        // we add the extra binding extracted from a properties file
-        try {
-            final InputStream extraIn = Util.getResourceAsStream("org/constellation/metadata/io/extra-package.properties");
-            if (extraIn != null) {
-                final Properties extraProperties = new Properties();
-                extraProperties.load(extraIn);
-                extraIn.close();
-                for (Entry<Object, Object> entry : extraProperties.entrySet()) {
-                    final String standardName = (String) entry.getKey();
-                    List<String> packageList  = StringUtilities.toStringList((String) entry.getValue());
-                    packageList               = FileUtilities.searchSubPackage(packageList.toArray(new String[packageList.size()]));
-                    extraPackage.put(standardName, packageList);
-                }
-            } else {
-                LOGGER.warning("Unable to find the extra-package properties file");
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "IO exception while reading extra package properties for MDW meta reader", ex);
+        this.otherPackage       = FileUtilities.searchSubPackage("org.geotoolkit.gts.xml");
+        // we add the extra binding
+        final Iterator<ExtraMappingFactory> ite = ServiceRegistry.lookupProviders(ExtraMappingFactory.class);
+        while (ite.hasNext()) {
+            final ExtraMappingFactory currentFactory = ite.next();
+            extraPackage.putAll(currentFactory.getExtraPackage());
         }
     }
 
@@ -349,7 +339,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
             if (result == null) {
                 final FullRecord f = mdReader.getRecord(identifier);
-                result       = getObjectFromRecord(identifier, f, mode);
+                if (mode == NATIVE) {
+                    result = f;
+                } else {
+                    result = getObjectFromRecord(identifier, f, mode);
+                }
             } else {
                 LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
             }
@@ -454,7 +448,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     } else {
                         Method method;
                         if (classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) {
-                            result = CodeLists.valueOf(classe, element.getName());
+                            result = Types.forCodeName(classe, element.getName(), true);
 
                         } else if (classe.isEnum()) {
                             method = ReflectionUtilities.getMethod("fromValue", classe, String.class);
@@ -764,7 +758,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
                 boolean putSuceed = false;
                 if (isMeta) {
-                    putSuceed = putMeta(metaMap, attribName, param, result, path);
+                    putSuceed = putMeta(metaMap, attribName, param, (MetadataEntity)result, path);
                 }
 
                 if (!putSuceed) {
@@ -796,7 +790,12 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     }
 
 
-    private boolean putMeta(final Map<String, Object> metaMap, String attribName, final Object param, final Object result, final Path path) {
+    private boolean putMeta(final Map<String, Object> metaMap, String attribName, final Object param, final MetadataEntity result, final Path path) {
+        // special case for identifier
+        if ("id".equals(attribName)) {
+            result.getIdentifierMap().putSpecialized(IdentifierSpace.ID, (String)param);
+            return true;
+        }
         boolean tryAgain = true;
         int casee = 0;
         while (tryAgain) {
@@ -849,7 +848,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 params[0] = (CoordinateSystemAxis) param;
                 field.set(result, params);
             } else if ("type".equals(attribName)) {
-                final Object typeValue = Enum.valueOf(org.geotoolkit.xml.XLink.Type.class, ((String)param).toUpperCase(Locale.US));
+                final Object typeValue = Enum.valueOf(org.apache.sis.xml.XLink.Type.class, ((String)param).toUpperCase(Locale.US));
                 field.set(result, typeValue);
             } else if (field.getType().isArray()) {
                 // todo find how to build a typed array
@@ -956,6 +955,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else if ("ISO 19115-2".equals(standardName)) {
             packagesName.addAll(geotkAcquisitionPackage);
 
+        } else if ("MDWEB".equals(standardName)) {
+            packagesName.addAll(otherPackage);
+
         } else if (extraPackage.containsKey(standardName)) {
             packagesName.addAll(extraPackage.get(standardName));
 
@@ -1025,7 +1027,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 packageName = "org.geotoolkit.internal.jaxb.gmx";
                 className = "GMX_Anchor";
             } else if ("XLink".equals(className)) {
-                packageName = "org.geotoolkit.xml";
+                packageName = "org.apache.sis.xml";
                 className = "XLink";
             }
             String name  = className;
@@ -1196,5 +1198,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     @Override
     public void removeFromCache(String identifier) {
         super.removeFromCache(identifier);
+    }
+
+    @Override
+    public void clearCache() {
+        super.clearCache();
+        mdReader.clearStorageCache();
     }
 }

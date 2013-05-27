@@ -102,6 +102,11 @@
                     <artifactId>cstl-web-sos-postgrid</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+		<dependency>
+                    <groupId>org.constellation.web-services</groupId>
+                    <artifactId>cstl-web-sos-om2</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
                 <dependency>
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-csw-mdw</artifactId>
@@ -144,11 +149,6 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-postgis</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-data-coveragefile</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -164,27 +164,12 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-datastore</artifactId>
+                    <artifactId>cstl-store-data-featurestore</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-data-serverstore</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-shapefile</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-sml</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-om</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -219,7 +204,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-postgis</artifactId>
+                    <artifactId>cstl-store-data-featurestore</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -235,21 +220,6 @@
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-data-coveragestore</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-shapefile</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-sml</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-om</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -361,7 +331,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-postgis</artifactId>
+                    <artifactId>cstl-store-data-featurestore</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -377,21 +347,6 @@
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-data-coveragesql</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-shapefile</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-sml</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-om</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -420,22 +375,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-postgis</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-shapefile</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-sml</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.constellation.storage</groupId>
-                    <artifactId>cstl-store-data-om</artifactId>
+                    <artifactId>cstl-store-data-featurestore</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
@@ -466,6 +406,11 @@
                 <dependency>
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-sos-postgrid</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.web-services</groupId>
+                    <artifactId>cstl-web-sos-om2</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
@@ -562,6 +507,7 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

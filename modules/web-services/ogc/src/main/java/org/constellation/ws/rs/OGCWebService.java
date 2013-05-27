@@ -27,6 +27,9 @@ import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
+import javax.xml.validation.Schema;
+import net.iharder.Base64;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 
@@ -51,24 +54,21 @@ import org.constellation.ws.security.SecurityManager;
 
 // Geotoolkit dependencies
 import org.constellation.ws.Worker;
-import org.geotoolkit.internal.CodeLists;
+import org.apache.sis.util.iso.Types;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.Version;
-import org.geotoolkit.util.collection.UnmodifiableArrayList;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.xml.MarshallerPool;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
-import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.CodeList;
 import org.opengis.util.NoSuchIdentifierException;
-import sun.misc.BASE64Decoder;
 
 
 /**
@@ -97,12 +97,6 @@ import sun.misc.BASE64Decoder;
  */
 public abstract class OGCWebService<W extends Worker> extends WebService {
 
-    /**
-     * The supported supportedVersions supported by this web serviceType.
-     * avoid modification after instantiation.
-     */
-    private final UnmodifiableArrayList<ServiceDef> supportedVersions;
-
     final String serviceName;
 
     /**
@@ -112,20 +106,14 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      *                          The first version specified <strong>MUST</strong> be the highest
      *                          one, the best one.
      */
-    public OGCWebService(final ServiceDef... supportedVersions) {
+    public OGCWebService(final ServiceDef.Specification specification) {
         super();
-
-        if (supportedVersions == null || supportedVersions.length == 0 ||
-                (supportedVersions.length == 1 && supportedVersions[0] == null)){
-            throw new IllegalArgumentException("It is compulsory for a web service to have " +
-                    "at least one version specified.");
+        if (specification == null){
+            throw new IllegalArgumentException("It is compulsory for a web service to have a specification.");
         }
-        serviceName = supportedVersions[0].specification.name();
+        serviceName = specification.name();
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
         WSEngine.registerService(serviceName, "REST", getWorkerClass());
-
-        //guarantee it will not be modified
-        this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
 
         /*
          * build the map of Workers, by scanning the sub-directories of its
@@ -139,34 +127,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     }
 
     /**
-     * Initialize the basic attributes of a web serviceType.
-     * the worker Map here is fill by the subClasse, this is not the best behavior.
-     * This constructor is here to keep compatibility with old version.
-     *
-     * @param supportedVersions A list of the supported version of this serviceType.
-     *                          The first version specified <strong>MUST</strong> be the highest
-     *                          one, the best one.
-     * @param workers A map of worker id / worker.
-     */
-    @Deprecated
-    public OGCWebService(Map<String, W> workersMap, final ServiceDef... supportedVersions) {
-        super();
-
-        if (supportedVersions == null || supportedVersions.length == 0 ||
-                (supportedVersions.length == 1 && supportedVersions[0] == null)){
-            throw new IllegalArgumentException("It is compulsory for a web service to have " +
-                    "at least one version specified.");
-        }
-        serviceName = supportedVersions[0].specification.name();
-        LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
-        WSEngine.registerService(serviceName, "REST", getWorkerClass());
-
-        //guarantee it will not be modified
-        this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
-        WSEngine.setServiceInstances(serviceName, (Map<String, Worker>)workersMap);
-    }
-
-    /**
      * Return the dedicated Web-service configuration directory.
      *
      * @return
@@ -174,7 +134,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     protected File getServiceDirectory() {
         final File configDirectory   = ConfigDirectory.getConfigDirectory();
         if (configDirectory != null && configDirectory.isDirectory()) {
-            final File serviceDirectory = new File(configDirectory, supportedVersions.get(0).specification.name());
+            final File serviceDirectory = new File(configDirectory, serviceName);
             if (serviceDirectory.isDirectory()) {
                 return serviceDirectory;
             } else {
@@ -258,7 +218,30 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(final Object objectRequest) {
+    protected boolean isRequestValidationActivated(final String serviceID) {
+        if (serviceID != null && WSEngine.serviceInstanceExist(serviceName, serviceID)) {
+            final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
+            return worker.isRequestValidationActivated();
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<Schema> getRequestValidationSchema(final String serviceID) {
+        if (serviceID != null && WSEngine.serviceInstanceExist(serviceName, serviceID)) {
+            final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
+            return worker.getRequestValidationSchema();
+        }
+        return new ArrayList<Schema>();
+    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Response treatIncomingRequest(final Object request) {
         try {
               processAuthentication();
         } catch (UnknownAccountException ex) {
@@ -270,33 +253,47 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             SecurityManager.logout();
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        try {
-            final String serviceID = getParameter("serviceId", false);
-            // request is send to the specified worker
-            if (serviceID != null && WSEngine.serviceInstanceExist(serviceName, serviceID)) {
-                final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
-                if (worker.isSecured()) {
-                    final String ip = getHttpServletRequest().getRemoteAddr();
-                    final String referer = getHttpContext().getRequest().getHeaderValue("referer");
-                    if (!worker.isAuthorized(ip, referer)) {
-                        LOGGER.log(Level.INFO, "Received a request from unauthorized ip:{0} or referer:{1}",
-                                new String[]{ip, referer});
-                        return Response.status(Response.Status.UNAUTHORIZED).build();
-                    }
+
+        final Object objectRequest;
+        if (request instanceof JAXBElement) {
+            objectRequest = ((JAXBElement) request).getValue();
+            LOGGER.log(Level.FINER, "request type:{0}", request.getClass().getName());
+        } else {
+            objectRequest = request;
+        }
+
+        final String serviceID = getSafeParameter("serviceId");
+
+        // request is send to the specified worker
+        if (serviceID != null && WSEngine.serviceInstanceExist(serviceName, serviceID)) {
+            final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
+            if (worker.isSecured()) {
+                final String ip = getHttpServletRequest().getRemoteAddr();
+                final String referer = getHttpContext().getRequest().getHeaderValue("referer");
+                if (!worker.isAuthorized(ip, referer)) {
+                    LOGGER.log(Level.INFO, "Received a request from unauthorized ip:{0} or referer:{1}",
+                            new String[]{ip, referer});
+                    return Response.status(Response.Status.UNAUTHORIZED).build();
                 }
-                return treatIncomingRequest(objectRequest, worker);
-
-            // administration a the instance
-            } else if ("admin".equals(serviceID)){
-                return treatAdminRequest(objectRequest);
-
-            // unbounded URL
-            } else {
-                LOGGER.log(Level.WARNING, "Received request on undefined instance identifier:{0}", serviceID);
-                return Response.status(Response.Status.NOT_FOUND).build();
             }
-        } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, supportedVersions.get(0));
+            if (worker.isPostRequestLog()) {
+                logPostParameters(request);
+            }
+            if (worker.isPrintRequestParameter()) {
+                logParameters();
+            }
+            worker.setServiceUrl(getServiceURL());
+
+            return treatIncomingRequest(objectRequest, worker);
+
+        // administration a the instance
+        } else if ("admin".equals(serviceID)){
+            return treatAdminRequest(objectRequest);
+
+        // unbounded URL
+        } else {
+            LOGGER.log(Level.WARNING, "Received request on undefined instance identifier:{0}", serviceID);
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
 
@@ -306,9 +303,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             if (authorization != null) {
                 if (authorization.startsWith("Basic ")) {
                     final String toDecode = authorization.substring(6);
-                    final BASE64Decoder decoder = new BASE64Decoder();
                     try {
-                        final String logPass = new String(decoder.decodeBuffer(toDecode));
+                        final String logPass = new String(Base64.decode(toDecode));
                         final int separatorIndex = logPass.indexOf(":");
                         if (separatorIndex != -1) {
                             final String login = logPass.substring(0, separatorIndex);
@@ -620,8 +616,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      */
     @PUT
     public Response uploadFile(final InputStream in) {
-        try  {
-            final String serviceID = getParameter("serviceId", false);
+        final String serviceID = getSafeParameter("serviceId");
+        try {
             // allow this method only for admin
             if ("admin".equals(serviceID)) {
                 final File tmp          = File.createTempFile("cstl-", null);
@@ -638,9 +634,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             launchException("error while uploading the file", NO_APPLICABLE_CODE.name(), null);
             // should never happen
             return null;
-        } catch (CstlServiceException ex) {
-            final ServiceDef mainVersion = supportedVersions.get(0);
-            return processExceptionResponse(ex, mainVersion);
         }
     }
 
@@ -689,24 +682,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     protected abstract Response treatIncomingRequest(final Object objectRequest,final  W worker);
 
     /**
-     * Verify if the version is supported by this serviceType.
-     * <p>
-     * If the version is not accepted we send an exception.
-     * </p>
-     */
-    protected void isVersionSupported(final String versionNumber) throws CstlServiceException {
-        if (getVersionFromNumber(versionNumber) == null) {
-            final StringBuilder messageb = new StringBuilder("The parameter ");
-            for (ServiceDef vers : supportedVersions) {
-                messageb.append("VERSION=").append(vers.version.toString()).append(" OR ");
-            }
-            messageb.delete(messageb.length()-4, messageb.length()-1);
-            messageb.append(" must be specified");
-            throw new CstlServiceException(messageb.toString(), VERSION_NEGOTIATION_FAILED);
-        }
-    }
-
-    /**
      * Handle all exceptions returned by a web service operation in two ways:
      * <ul>
      *   <li>if the exception code indicates a mistake done by the user, just display a single
@@ -717,12 +692,11 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * In both ways, the exception is then marshalled and returned to the client.
      *
      * @param ex         The exception that has been generated during the web-service operation requested.
-     * @param marshaller The marshaller to use for the exception report.
      * @param serviceDef The service definition, from which the version number of exception report will
      *                   be extracted.
      * @return An XML representing the exception.
      */
-    protected abstract Response processExceptionResponse(final CstlServiceException ex, final ServiceDef serviceDef);
+    protected abstract Response processExceptionResponse(final CstlServiceException ex, final ServiceDef serviceDef, final Worker w);
 
     /**
      * The shared method to build a service ExceptionReport.
@@ -733,13 +707,18 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      */
     @Override
     protected Response launchException(final String message, String codeName, final String locator) {
-        final ServiceDef mainVersion = supportedVersions.get(0);
-        if (mainVersion.owsCompliant) {
-            codeName = StringUtilities.transformCodeName(codeName);
+        final String serviceID = getSafeParameter("serviceId");
+        final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
+        ServiceDef mainVersion = null;
+        if (worker != null) {
+            mainVersion = worker.getBestVersion(null);
+            if (mainVersion.owsCompliant) {
+                codeName = StringUtilities.transformCodeName(codeName);
+            }
         }
-        final OWSExceptionCode code   = CodeLists.valueOf(OWSExceptionCode.class, codeName);
+        final OWSExceptionCode code   = Types.forCodeName(OWSExceptionCode.class, codeName, true);
         final CstlServiceException ex = new CstlServiceException(message, code, locator);
-        return processExceptionResponse(ex, mainVersion);
+        return processExceptionResponse(ex, mainVersion, worker);
     }
 
     /**
@@ -756,68 +735,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             codeRepresentation = exceptionCode.name();
         }
         return codeRepresentation;
-    }
-
-    /**
-     * Return a Version Object from the version number.
-     * if the version number is not correct return the default version.
-     *
-     * @param number the version number.
-     * @return
-     */
-    protected ServiceDef getVersionFromNumber(final String number) {
-        for (ServiceDef v : supportedVersions) {
-            if (v.version.toString().equals(number)){
-                return v;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Return a Version Object from the version number.
-     * if the version number is not correct return the default version.
-     *
-     * @param number the version number.
-     * @return
-     */
-    protected ServiceDef getVersionFromNumber(final Version number) {
-        if (number != null) {
-            for (ServiceDef v : supportedVersions) {
-                if (v.version.toString().equals(number.toString())){
-                    return v;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * If the requested version number is not available we choose the best version to return.
-     *
-     * @param number A version number, which will be compared to the ones specified.
-     *               Can be {@code null}, in this case the best version specified is just returned.
-     * @return The best version (the highest one) specified for this web service.
-     */
-    protected ServiceDef getBestVersion(final String number) {
-        for (ServiceDef v : supportedVersions) {
-            if (v.version.toString().equals(number)){
-                return v;
-            }
-        }
-        final ServiceDef firstSpecifiedVersion = supportedVersions.get(0);
-        if (number == null || number.isEmpty()) {
-            return firstSpecifiedVersion;
-        }
-        final ServiceDef.Version wrongVersion = new ServiceDef.Version(number);
-        if (wrongVersion.compareTo(firstSpecifiedVersion.version) > 0) {
-            return firstSpecifiedVersion;
-        } else {
-            if (wrongVersion.compareTo(supportedVersions.get(supportedVersions.size() - 1).version) < 0) {
-                return supportedVersions.get(supportedVersions.size() - 1);
-            }
-        }
-        return firstSpecifiedVersion;
     }
 
     /**
@@ -838,6 +755,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             !ex.getExceptionCode().equals(LAYER_NOT_DEFINED)          && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED) &&
             !ex.getExceptionCode().equals(INVALID_REQUEST)            && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_REQUEST) &&
             !ex.getExceptionCode().equals(INVALID_UPDATE_SEQUENCE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_UPDATE_SEQUENCE) &&
+            !ex.getExceptionCode().equals(INVALID_VALUE) &&
             !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_SRS)) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         } else {
@@ -859,7 +777,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     @Override
     public void destroy() {
         super.destroy();
-        LOGGER.log(Level.INFO, "Shutting down the REST {0} service facade.", supportedVersions.get(0).specification.name());
+        LOGGER.log(Level.INFO, "Shutting down the REST {0} service facade.", serviceName);
         WSEngine.destroyInstances(serviceName);
     }
 

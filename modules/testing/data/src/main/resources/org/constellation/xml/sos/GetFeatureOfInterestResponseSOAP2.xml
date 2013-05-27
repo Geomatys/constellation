@@ -5,7 +5,7 @@
             <ns4:description>Geology traverse</ns4:description>
             <ns4:name>cycle1</ns4:name>
             <ns4:boundedBy>
-                <ns4:Envelope srsName="urn:ogc:def:crs:EPSG:6.8:4283" ns4:id="bound-1">
+                <ns4:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582" ns4:id="bound-1">
                     <ns4:lowerCorner>-30.711 134.196</ns4:lowerCorner>
                     <ns4:upperCorner>-30.702 134.205</ns4:upperCorner>
                 </ns4:Envelope>
@@ -21,7 +21,7 @@
                     <ns4:pos>-30.702 134.199</ns4:pos>
                 </ns4:LineString>
             </ns11:shape>
-            <ns11:length uom="m">750.0</ns11:length>
+            <ns11:length>NaN</ns11:length>
         </ns16:getFeatureOfInterestResponse>
     </S:Body>
 </S:Envelope>

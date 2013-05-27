@@ -32,10 +32,12 @@ import org.geotoolkit.util.logging.Logging;
  */
 public abstract class AbstractMetadataReader implements MetadataReader {
     
-    public static final int DUBLINCORE = 0;
+    public static final int DUBLINCORE  = 0;
     public static final int ISO_19115   = 1;
     public static final int EBRIM       = 2;
-    public static final int SENSORML   = 3;
+    public static final int SENSORML    = 3;
+    public static final int NATIVE      = 4;
+    public static final int ISO_19110   = 5;
     
     /**
      * A debugging logger
@@ -107,10 +109,16 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * {@inheritDoc}
      */
     @Override
+    public void clearCache() {
+        metadatas.clear();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void removeFromCache(final String identifier) {
-        if (cacheEnabled) {
-            metadatas.remove(identifier);
-        }
+        metadatas.remove(identifier);
     }
 
     /**

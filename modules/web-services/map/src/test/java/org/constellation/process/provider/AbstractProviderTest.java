@@ -45,7 +45,7 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
     static {
         final Collection<LayerProviderService> availableLayerServices = LayerProviderProxy.getInstance().getServices();
         for (LayerProviderService tmpService: availableLayerServices) {
-            if ("data-store".equals(tmpService.getName())) {
+            if ("feature-store".equals(tmpService.getName())) {
                 DATASTORE_SERVICE = tmpService;
             }
         }

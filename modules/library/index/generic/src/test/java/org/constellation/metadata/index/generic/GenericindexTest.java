@@ -18,6 +18,8 @@
 package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.util.logging.Logging;
 import java.io.File;
@@ -56,6 +58,7 @@ import org.geotoolkit.metadata.iso.extent.DefaultTemporalExtent;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
+import org.junit.runner.RunWith;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //Junit dependencies
@@ -69,6 +72,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class GenericindexTest {
 
     protected static final FilterFactory2 FF = (FilterFactory2)
@@ -117,6 +121,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 1)
     public void simpleSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -160,6 +165,7 @@ public class GenericindexTest {
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        expectedResult.add("meta_NaN_id");
 
 
         assertEquals(expectedResult, result);
@@ -243,6 +249,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 2)
     public void wildCharSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -280,7 +287,6 @@ public class GenericindexTest {
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
-
 
         assertEquals(expectedResult, result);
 
@@ -387,6 +393,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 3)
     public void numericComparisonSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -489,6 +496,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 4)
     public void dateSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -638,6 +646,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 5)
     public void sortedSearchTest() throws Exception {
 
         Filter nullFilter   = null;
@@ -667,6 +676,7 @@ public class GenericindexTest {
         expectedResult.add("CTDF02");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         assertEquals(expectedResult, result);
 
@@ -688,6 +698,7 @@ public class GenericindexTest {
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("CTDF02");
@@ -719,6 +730,7 @@ public class GenericindexTest {
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("CTDF02");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
@@ -751,6 +763,7 @@ public class GenericindexTest {
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("CTDF02");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
@@ -814,6 +827,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 6)
     public void spatialSearchTest() throws Exception {
 
         String resultReport = "";
@@ -872,7 +886,7 @@ public class GenericindexTest {
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-
+        expectedResult.add("meta_NaN_id");
         assertEquals("CRS URN are not working", expectedResult, result);
     }
 
@@ -883,6 +897,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 7)
     public void TermQueryTest() throws Exception {
 
         /**
@@ -919,6 +934,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 8)
     public void DeleteDocumentTest() throws Exception {
         indexer.removeDocument("CTDF02");
 
@@ -953,6 +969,7 @@ public class GenericindexTest {
 
 
     @Test
+    @Order(order = 9)
     public void extractValuesTest() throws Exception {
         DefaultMetadata meta = new DefaultMetadata();
         DefaultDataIdentification ident = new DefaultDataIdentification();
@@ -1002,12 +1019,13 @@ public class GenericindexTest {
     }
 
     @Test
+    @Order(order = 10)
     public void extractValuesTest2() throws Exception {
 
         DefaultMetadata meta4 = new DefaultMetadata();
         DefaultDataIdentification ident4 = new DefaultDataIdentification();
 
-        TimePeriodType tp1 = new TimePeriodType("2008-11-01", "2008-12-01");
+        TimePeriodType tp1 = new TimePeriodType("id", "2008-11-01", "2008-12-01");
         tp1.setId("007-all");
         DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
         tempExtent.setExtent(tp1);
@@ -1053,6 +1071,9 @@ public class GenericindexTest {
         result.add(obj);
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/imageMetadata.xml"));
+        result.add(obj);
+        
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/metaNan.xml"));
         result.add(obj);
 
         CSWMarshallerPool.getInstance().release(unmarshaller);

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wfs:ValueCollection numberReturned="11" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:sampling="http://www.opengis.net/sampling/1.0">
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">65400.0 1731368.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">65400.0 1731368.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">70800.0 1891659.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">41945.0 2567987.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">62500.0 1625236.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">59563.0 2521478.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">95800.0 1591753.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">21400.0 2001368.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">23400.0 2001368.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">45900.0 2001214.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">87400.0 2001654.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+</wfs:ValueCollection>

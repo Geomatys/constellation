@@ -19,6 +19,9 @@ package org.constellation.coverage.ws;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.constellation.ws.MimeType;
+import org.geotoolkit.gml.xml.v311.CodeListType;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.v110.AllowedValues;
 import org.geotoolkit.ows.xml.v110.DCP;
 import org.geotoolkit.ows.xml.v110.DomainType;
@@ -30,7 +33,8 @@ import org.geotoolkit.wcs.xml.v100.DCPTypeType;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Post;
 import org.geotoolkit.wcs.xml.v100.OnlineResourceType;
-import org.geotoolkit.wcs.xml.v100.WCSCapabilityType.Request;
+import org.geotoolkit.wcs.xml.v100.Request;
+import org.geotoolkit.wcs.xml.v100.WCSCapabilityType;
 
 /**
  *  WCS Constants
@@ -129,19 +133,72 @@ public final class WCSConstant {
     /** Format value used in getCoverage */
     public static final String TIFF       = "TIFF";
 
+    /*
+     * A list supported formats
+     *
+     */
+     public static final List<CodeListType> SUPPORTED_FORMATS_100 = new ArrayList<CodeListType>();
+     static {
+        SUPPORTED_FORMATS_100.add(new CodeListType("png"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("gif"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("jpeg"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("bmp"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("tiff"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("geotiff"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("matrix"));
+        SUPPORTED_FORMATS_100.add(new CodeListType("ascii-grid"));
+    }
+     
+     public static final List<String> SUPPORTED_FORMATS_111 = new ArrayList<String>();
+     static {
+         SUPPORTED_FORMATS_111.add(MimeType.IMAGE_PNG);
+         SUPPORTED_FORMATS_111.add(MimeType.IMAGE_GIF);
+         SUPPORTED_FORMATS_111.add(MimeType.IMAGE_JPEG);
+         SUPPORTED_FORMATS_111.add(MimeType.IMAGE_BMP);
+         SUPPORTED_FORMATS_111.add("matrix");
+         SUPPORTED_FORMATS_111.add("ascii-grid");
+    }
+     
+    /**
+     * A list of supported interpolation
+     */
+    public static final List<org.geotoolkit.wcs.xml.v100.InterpolationMethod> SUPPORTED_INTERPOLATIONS_V100 =
+            new ArrayList<org.geotoolkit.wcs.xml.v100.InterpolationMethod>();
+    static {
+            SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BILINEAR);
+            SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BICUBIC);
+            SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR);
+    }
+    public static final org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType INTERPOLATION_V100 = new org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType(
+                    org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, SUPPORTED_INTERPOLATIONS_V100);
     
-    public static final Request REQUEST_100;
+    /**
+     * A list of supported interpolation
+     */
+    public static final List<org.geotoolkit.wcs.xml.v111.InterpolationMethod> SUPPORTED_INTERPOLATIONS_V111 =
+            new ArrayList<org.geotoolkit.wcs.xml.v111.InterpolationMethod>();
+    static {
+            SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BILINEAR);
+            SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC);
+            SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR);
+    }
+    public static final org.geotoolkit.wcs.xml.v111.InterpolationMethods INTERPOLATION_V111 = 
+            new org.geotoolkit.wcs.xml.v111.InterpolationMethods(SUPPORTED_INTERPOLATIONS_V111 , org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
+    
+    public static final WCSCapabilityType OPERATIONS_METADATA_100;
     static {
         final Get get         = new DCPTypeType.HTTP.Get(new OnlineResourceType("someurl"));
         final Post post       = new DCPTypeType.HTTP.Post(new OnlineResourceType("someurl"));
         final DCPTypeType dcp = new DCPTypeType(new DCPTypeType.HTTP(get, post));
-        REQUEST_100 = new Request();
+        final Request REQUEST_100 = new Request();
         final Request.DescribeCoverage describeCoverage = new Request.DescribeCoverage(Arrays.asList(dcp));
         REQUEST_100.setDescribeCoverage(describeCoverage);
         final Request.GetCapabilities getCapabilities = new Request.GetCapabilities(Arrays.asList(dcp));
         REQUEST_100.setGetCapabilities(getCapabilities);
         final Request.GetCoverage getCoverage = new Request.GetCoverage(Arrays.asList(dcp));
         REQUEST_100.setGetCoverage(getCoverage);
+        final WCSCapabilityType.Exception ex = new WCSCapabilityType.Exception(Arrays.asList("application/vnd.ogc.se_xml", "text/xml"));
+        OPERATIONS_METADATA_100 = new WCSCapabilityType(REQUEST_100, ex);
     }
 
     public static final OperationsMetadata OPERATIONS_METADATA_111;
@@ -180,7 +237,16 @@ public final class WCSConstant {
         final List<DomainType> constraints = new ArrayList<DomainType>();
         constraints.add(new DomainType("PostEncoding", new AllowedValues(Arrays.asList("XML"))));
         
-        OPERATIONS_METADATA_111 = new OperationsMetadata(operations, null, null, null);
+        OPERATIONS_METADATA_111 = new OperationsMetadata(operations, null, constraints, null);
     }
 
+    public static AbstractOperationsMetadata getOperationMetadata(final String version) {
+        if (version.equals("1.0.0")) {
+            return OPERATIONS_METADATA_100.clone();
+        } else if (version.equals("1.1.1")){
+            return OPERATIONS_METADATA_111.clone();
+        } else {
+            throw new IllegalArgumentException("unexpected version:" + version);
+        }
+    }
 }

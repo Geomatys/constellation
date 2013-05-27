@@ -16,58 +16,43 @@
  */
 package org.constellation.wps.ws.rs;
 
-import java.util.logging.Level;
-import javax.ws.rs.Path;
 import com.sun.jersey.spi.resource.Singleton;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
 import org.constellation.ServiceDef;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.configuration.Processes;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
-
-import static org.constellation.api.QueryConstants.*;
-import org.constellation.configuration.ProcessContext;
-import org.constellation.configuration.Processes;
-import static org.constellation.wps.ws.WPSConstant.*;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-
-import org.geotoolkit.wps.xml.v100.DataInputsType;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
-import org.geotoolkit.wps.xml.v100.DataType;
-import org.geotoolkit.wps.xml.v100.DescribeProcess;
-import org.geotoolkit.wps.xml.v100.DocumentOutputDefinitionType;
-import org.geotoolkit.wps.xml.v100.Execute;
-import org.geotoolkit.wps.xml.v100.GetCapabilities;
-import org.geotoolkit.wps.xml.v100.InputReferenceType;
-import org.geotoolkit.wps.xml.v100.InputType;
-import org.geotoolkit.wps.xml.v100.OutputDefinitionType;
-import org.geotoolkit.wps.xml.v100.ProcessDescriptions;
-import org.geotoolkit.wps.xml.v100.RequestBaseType;
-import org.geotoolkit.wps.xml.v100.ResponseDocumentType;
-import org.geotoolkit.wps.xml.v100.ResponseFormType;
-import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
+import org.geotoolkit.wps.xml.v100.*;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.ws.Worker;
+
+import static org.constellation.api.QueryConstants.*;
+import static org.constellation.wps.ws.WPSConstant.*;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.RequestBase;
 
 /**
  * WPS web service class.
@@ -87,7 +72,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * Build a new instance of the webService and initialize the JAXB context.
      */
     public WPSService() {
-        super(ServiceDef.WPS_1_0_0);
+        super(Specification.WPS);
 
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
@@ -106,6 +91,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         super.destroy();
 
         //Shutdown the WPS scheduler.
+        LOGGER.log(Level.INFO, "Shutdown executor pool");
         if (EXECUTOR != null) {
             EXECUTOR.shutdown();
         }
@@ -122,17 +108,12 @@ public class WPSService extends OGCWebService<WPSWorker> {
     protected void configureInstance(File instanceDirectory, Object configuration) throws CstlServiceException {
         if (configuration instanceof ProcessContext) {
             final File configurationFile = new File(instanceDirectory, "processContext.xml");
-            Marshaller marshaller = null;
             try {
-                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(configuration, configurationFile);
-
+                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
             } catch (JAXBException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (marshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-                }
             }
         } else {
             throw new CstlServiceException("The configuration Object is not a process context", INVALID_PARAMETER_VALUE);
@@ -143,10 +124,10 @@ public class WPSService extends OGCWebService<WPSWorker> {
     protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
         final File configurationFile = new File(instanceDirectory, "processContext.xml");
         if (configurationFile.exists()) {
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(configurationFile);
+                final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                final Object obj = unmarshaller.unmarshal(configurationFile);
+                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
                 if (obj instanceof ProcessContext) {
                     return obj;
                 } else {
@@ -154,10 +135,6 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 }
             } catch (JAXBException ex) {
                 throw new CstlServiceException(ex);
-            } finally {
-                if (unmarshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                }
             }
         } else {
             throw new CstlServiceException("Unable to find a file processContext.xml");
@@ -170,12 +147,11 @@ public class WPSService extends OGCWebService<WPSWorker> {
     }
 
     @Override
-    protected Response treatIncomingRequest(Object objectRequest, WPSWorker worker) {
+    protected Response treatIncomingRequest(final Object objectRequest, final WPSWorker worker) {
         final UriInfo uriContext = getUriContext();
 
-        ServiceDef serviceDef = null;
+        ServiceDef version = null;
 
-        worker.setServiceUrl(getServiceURL());
         try {
             // Handle an empty request by sending a basic web page.
             if ((null == objectRequest) && (0 == uriContext.getQueryParameters().size())) {
@@ -183,26 +159,26 @@ public class WPSService extends OGCWebService<WPSWorker> {
             }
 
             // if the request is not an xml request we fill the request parameter.
+            final RequestBase request;
             if (objectRequest == null) {
-
-
                 //build objectRequest from parameters
-                final String request = getParameter(REQUEST_PARAMETER, true);
-                objectRequest = adaptQuery(request);
+                version = worker.getVersionFromNumber(getParameter(VERSION_PARAMETER, false)); // needed if exception is launch before request build
+                final String requestName = getParameter(REQUEST_PARAMETER, true);
+                request = adaptQuery(requestName, worker);
+            } else if (objectRequest instanceof RequestBase) {
+                request = (RequestBase) objectRequest;
+            } else {
+                throw new CstlServiceException("The operation " + objectRequest.getClass().getName() + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
             }
 
-            //TODO: fix logging of request, which may be in the objectRequest
-            //      and not in the parameter.
-            logParameters();
-            if(objectRequest instanceof RequestBaseType){
-                serviceDef = getVersionFromNumber(((RequestBaseType)objectRequest).getVersion());
-            }
+            version = worker.getVersionFromNumber(request.getVersion());
 
             /*
              * GetCapabilities request
              */
-            if (objectRequest instanceof GetCapabilities) {
-                final GetCapabilities getcaps = (GetCapabilities) objectRequest;
+            if (request instanceof GetCapabilities) {
+                final GetCapabilities getcaps = (GetCapabilities) request;
                 final WPSCapabilitiesType capsResponse = worker.getCapabilities(getcaps);
                 return Response.ok(capsResponse, MimeType.TEXT_XML).build();
             }
@@ -210,8 +186,8 @@ public class WPSService extends OGCWebService<WPSWorker> {
             /*
              * DescribeProcess request
              */
-            if (objectRequest instanceof DescribeProcess) {
-                final DescribeProcess descProc = (DescribeProcess) objectRequest;
+            if (request instanceof DescribeProcess) {
+                final DescribeProcess descProc = (DescribeProcess) request;
                 final ProcessDescriptions describeResponse = worker.describeProcess(descProc);
                 return Response.ok(describeResponse, MimeType.TEXT_XML).build();
             }
@@ -219,16 +195,16 @@ public class WPSService extends OGCWebService<WPSWorker> {
             /*
              * Execute request
              */
-            if (objectRequest instanceof Execute) {
-                final Execute exec = (Execute) objectRequest;
+            if (request instanceof Execute) {
+                final Execute exec = (Execute) request;
                 final Object executeResponse = worker.execute(exec);
 
                 boolean isTextPlain = false;
                 boolean isImage = false;
                 //if response is a literal
-                if (executeResponse instanceof String || executeResponse instanceof Double
-                        || executeResponse instanceof Float || executeResponse instanceof Integer
-                        || executeResponse instanceof Boolean || executeResponse instanceof Long) {
+                if (executeResponse instanceof String  || executeResponse instanceof Double
+                 || executeResponse instanceof Float   || executeResponse instanceof Integer
+                 || executeResponse instanceof Boolean || executeResponse instanceof Long) {
                     isTextPlain = true;
                 }
                 if (executeResponse instanceof RenderedImage || executeResponse instanceof BufferedImage
@@ -245,7 +221,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
 
             }
 
-            throw new CstlServiceException("This service can not handle the requested operation: " + objectRequest + ".",
+            throw new CstlServiceException("This service can not handle the requested operation: " + request.getClass().getName() + ".",
                     OPERATION_NOT_SUPPORTED, REQUEST_PARAMETER.toLowerCase());
 
         } catch (CstlServiceException ex) {
@@ -253,7 +229,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
              * This block handles all the exceptions which have been generated anywhere in the service and transforms them to a response
              * message for the protocol stream which JAXB, in this case, will then marshall and serialize into an XML message HTTP response.
              */
-            return processExceptionResponse(ex, serviceDef);
+            return processExceptionResponse(ex, version, worker);
 
         }
 
@@ -263,7 +239,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker worker) {
         logException(ex);
 
         // SEND THE HTTP RESPONSE
@@ -283,12 +259,12 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * @return GetCapabilities or DescribeProcess or Execute object.
      * @throws CstlServiceException if request is unknow.
      */
-    public Object adaptQuery(final String request) throws CstlServiceException {
+    public RequestBase adaptQuery(final String request, final Worker w) throws CstlServiceException {
 
         if (GETCAPABILITIES.equalsIgnoreCase(request)) {
             return adaptKvpGetCapabilitiesRequest();
         } else if (DESCRIBEPROCESS.equalsIgnoreCase(request)) {
-            return adaptKvpDescribeProcessRequest();
+            return adaptKvpDescribeProcessRequest(w);
         } else if (EXECUTE.equalsIgnoreCase(request)) {
             return adaptKvpExecuteRequest();
         }
@@ -323,10 +299,10 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * @return DescribeProcess object.
      * @throws CstlServiceException if mandatory parameters are missing.
      */
-    private DescribeProcess adaptKvpDescribeProcessRequest() throws CstlServiceException {
+    private DescribeProcess adaptKvpDescribeProcessRequest(final Worker w) throws CstlServiceException {
 
         final String strVersion = getParameter(VERSION_PARAMETER, true);
-        isVersionSupported(strVersion);
+        w.checkVersionSupported(strVersion, false);
 
         final DescribeProcess describe = new DescribeProcess();
         describe.setService(getParameter(SERVICE_PARAMETER, true));

@@ -61,9 +61,8 @@ public class SensorMLWriter<T extends AbstractSensorML> implements MessageBodyWr
 
     @Override
     public void writeTo(final T t, Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
-        Marshaller m = null;
         try {
-            m = SensorMLMarshallerPool.getInstance().acquireMarshaller();
+            final Marshaller m = SensorMLMarshallerPool.getInstance().acquireMarshaller();
             if (t.getVersion() != null && t.getVersion().equals("1.0.1")) {
                 m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, SML_101_XSD);
             } else {
@@ -73,13 +72,9 @@ public class SensorMLWriter<T extends AbstractSensorML> implements MessageBodyWr
                 m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, SML_100_XSD);
             }
             m.marshal(t, out);
-
+            SensorMLMarshallerPool.getInstance().release(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the SensorML response", ex);
-        } finally {
-            if (m != null) {
-                 SensorMLMarshallerPool.getInstance().release(m);
-            }
         }
     }
 }

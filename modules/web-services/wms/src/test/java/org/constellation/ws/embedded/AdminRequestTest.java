@@ -34,9 +34,11 @@ import org.constellation.configuration.ServiceStatus;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.provider.featurestore.FeatureStoreProviderService;
+import org.geotoolkit.data.shapefile.ShapefileFolderDataStoreFactory;
+import org.geotoolkit.parameter.Parameters;
 
 // JUnit dependencies
 import org.junit.*;
@@ -90,14 +92,18 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
                         final File outputDir = initDataDirectory();
 
                         final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
-                        srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
-                                .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
-                        srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
-                                .setValue("http://www.opengis.net/gml");
-
+                        Parameters.getOrCreate(SOURCE_LOADALL_DESCRIPTOR, source).setValue(Boolean.TRUE);
+                        Parameters.getOrCreate(SOURCE_ID_DESCRIPTOR, source).setValue("shapeSrc");
+                        
+                        final String namespace = "http://www.opengis.net/gml";
+                        final URL url = new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
+                        
+                        final ParameterValueGroup choice = getOrCreate(FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
+                        final ParameterValueGroup shapefileConfig = ShapefileFolderDataStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
+                        Parameters.getOrCreate(ShapefileFolderDataStoreFactory.URLFOLDER, shapefileConfig).setValue(url);
+                        Parameters.getOrCreate(ShapefileFolderDataStoreFactory.NAMESPACE, shapefileConfig).setValue(namespace);
+                        choice.values().add(shapefileConfig);
+                        
                         ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
                         layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
                         layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
@@ -242,6 +248,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
         sources.add(new Source("shapeSrc", true, null, null));
         Layers layerObj = new Layers(sources);
         LayerContext layerContext = new LayerContext(layerObj);
+        layerContext.getCustomParameters().put("shiroAccessible", "false");
 
         postRequestObject(conec, layerContext);
         Object obj = unmarshallResponse(conec);

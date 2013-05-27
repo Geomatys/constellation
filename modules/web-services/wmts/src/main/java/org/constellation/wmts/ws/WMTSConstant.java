@@ -39,21 +39,21 @@ public final class WMTSConstant {
     
     public static final OperationsMetadata OPERATIONS_METADATA;
     static {
-        final List<DCP> dcps = new ArrayList<DCP>();
-        dcps.add(new DCP(new HTTP(new RequestMethodType("somURL"), new RequestMethodType("someURL"))));
+        final List<DCP> getAndPost = new ArrayList<DCP>();
+        getAndPost.add(new DCP(new HTTP(new RequestMethodType("somURL"), new RequestMethodType("someURL"))));
 
-        final List<DCP> dcps2 = new ArrayList<DCP>();
-        dcps2.add(new DCP(new HTTP(null, new RequestMethodType("someURL"))));
+        final List<DCP> onlyPost = new ArrayList<DCP>();
+        onlyPost.add(new DCP(new HTTP(null, new RequestMethodType("someURL"))));
 
         final List<Operation> operations = new ArrayList<Operation>();
 
-        Operation getCapabilities = new Operation(dcps, null, null, null, "GetCapabilities");
+        final Operation getCapabilities = new Operation(getAndPost, null, null, null, "GetCapabilities");
         operations.add(getCapabilities);
 
-        Operation getTile = new Operation(dcps, null, null, null, "GetTile");
+        final Operation getTile = new Operation(getAndPost, null, null, null, "GetTile");
         operations.add(getTile);
 
-        Operation getFeatureInfo = new Operation(dcps, null, null, null, "GetFeatureInfo");
+        final Operation getFeatureInfo = new Operation(getAndPost, null, null, null, "GetFeatureInfo");
         operations.add(getFeatureInfo);
 
         final List<DomainType> constraints = new ArrayList<DomainType>();

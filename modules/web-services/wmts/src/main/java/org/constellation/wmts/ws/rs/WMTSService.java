@@ -17,7 +17,6 @@
 package org.constellation.wmts.ws.rs;
 
 import com.sun.jersey.spi.resource.Singleton;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -31,6 +30,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
@@ -39,6 +39,8 @@ import org.constellation.wmts.ws.DefaultWMTSWorker;
 
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
+import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
 
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
@@ -71,7 +73,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      * provides the version 1.0.0 of OGC WMTS standard, for the moment.
      */
     public WMTSService() {
-        super(ServiceDef.WMTS_1_0_0);
+        super(Specification.WMTS);
         setXMLContext(WMTSMarshallerPool.getInstance());
         setFullRequestLog(true);
 
@@ -94,13 +96,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
     public Response treatIncomingRequest(final Object objectRequest, final WMTSWorker worker) {
         ServiceDef serviceDef = null;
         try {
-            if (worker == null) {
-                throw new CstlServiceException(NOT_WORKING,
-                                              NO_APPLICABLE_CODE);
-            }
-            logParameters();
-            worker.setServiceUrl(getServiceURL());
-
+            
             // if the request is not an xml request we fill the request parameter.
             final RequestBase request;
             if (objectRequest == null) {
@@ -111,7 +107,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
                 throw new CstlServiceException("The operation " + objectRequest.getClass().getName() + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
             }
-            serviceDef = getVersionFromNumber(request.getVersion());
+            serviceDef = worker.getVersionFromNumber(request.getVersion());
 
             if (request instanceof GetCapabilities) {
                 final GetCapabilities gc = (GetCapabilities) request;
@@ -129,7 +125,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
             throw new CstlServiceException("The operation " + request.getClass().getName() +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, serviceDef);
+            return processExceptionResponse(ex, serviceDef, worker);
         }
     }
 
@@ -324,7 +320,8 @@ public class WMTSService extends GridWebService<WMTSWorker> {
             final GetCapabilities gc = createNewGetCapabilitiesRequestRestful(version);
             return treatIncomingRequest(gc);
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, null);
+            final Worker w = WSEngine.getInstance("WMTS", getSafeParameter("serviceId"));
+            return processExceptionResponse(ex, null, w);
         }
     }
 
@@ -358,7 +355,8 @@ public class WMTSService extends GridWebService<WMTSWorker> {
             final GetTile gt = createNewGetTileRequestRestful(layer, tileMatrixSet, tileMatrix, tileRow, tileCol, mimeType, null);
             return treatIncomingRequest(gt);
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, null);
+            final Worker w = WSEngine.getInstance("WMTS", getSafeParameter("serviceId"));
+            return processExceptionResponse(ex, null, w);
         }
     }
 
@@ -377,11 +375,11 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      *
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef, final Worker worker) {
         logException(ex);
 
         if (serviceDef == null) {
-            serviceDef = getBestVersion(null);
+            serviceDef = worker.getBestVersion(null);
         }
         final String codeName = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
 

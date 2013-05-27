@@ -53,7 +53,7 @@ public class FilesystemSOSFactory implements SMLFactory {
      */
     @Override
     public SensorReader getSensorReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws MetadataIoException {
-        return new FileSensorReader(configuration);
+        return new FileSensorReader(configuration, properties);
     }
 
     /**

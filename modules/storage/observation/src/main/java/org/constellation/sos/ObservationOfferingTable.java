@@ -33,7 +33,7 @@ import org.constellation.gml.v311.EnvelopeTable;
 import org.geotoolkit.gml.xml.v311.BoundingShapeType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
-import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
+import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
@@ -44,7 +44,7 @@ import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
 import org.geotoolkit.sos.xml.v100.OfferingResponseModeType;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
 import org.geotoolkit.xml.Namespaces;
@@ -204,7 +204,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             sampling.add(c.getComponent());
          }
          TimePositionType beginPosition = null;
-         TimePositionType endPosition   = null;
+         final TimePositionType endPosition;
 
          if (results.getTimestamp(indexOf(query.eventTimeBegin)) != null) {
             final Timestamp begin =  results.getTimestamp(indexOf(query.eventTimeBegin));
@@ -368,20 +368,20 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
                 release(lc, statement);
 
                 // we insert the response mode
-                if (off.getResponseMode() != null && off.getResponseMode().size() != 0){
+                if (off.getResponseMode() != null && !off.getResponseMode().isEmpty()){
                     for (ResponseModeType mode:off.getResponseMode()) {
                         getResponseModes().getIdentifier(new OfferingResponseModeType(off.getId(), mode));
                     }
                 }
                 // on insere la liste de station qui a effectué cette observation
-                if (off.getFeatureOfInterest() != null && off.getFeatureOfInterest().size() != 0) {
+                if (off.getFeatureOfInterest() != null && !off.getFeatureOfInterest().isEmpty()) {
                     for (ReferenceType station:off.getFeatureOfInterest()) {
                         getStations().getIdentifier(new OfferingSamplingFeatureType(off.getId(), station));
                     }
                 }
 
                 // on insere les phenomene observé
-                if(off.getObservedProperty() != null && off.getObservedProperty().size() != 0){
+                if(off.getObservedProperty() != null && !off.getObservedProperty().isEmpty()){
                     for (PhenomenonType pheno: off.getObservedProperty()){
                         getPhenomenons().getIdentifier(new OfferingPhenomenonType(off.getId(), pheno));
                     }

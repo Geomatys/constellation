@@ -29,7 +29,9 @@ import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.observation.sql.ObservationDatabaseCreator;
+import org.constellation.om2.OM2DatabaseCreator;
 import org.mdweb.sql.DatabaseCreator;
 import org.mdweb.sql.DatabaseUpdater;
 import org.mdweb.sql.DefaultDatabaseUpdater;
@@ -53,6 +55,7 @@ public class SOSBean extends AbstractServiceBean{
     private String omUserPass;
     
     private String omPostgisDir;
+    private String om2PostgisDir;
     
     private String smlConfigType;
     
@@ -91,6 +94,7 @@ public class SOSBean extends AbstractServiceBean{
     
     public List<SelectItem> getOmConfigTypes() {
         final List<SelectItem> selectItems = new ArrayList<SelectItem>();
+        selectItems.add(new SelectItem("om2"));
         selectItems.add(new SelectItem("postgrid"));
         selectItems.add(new SelectItem("filesystem"));
         return selectItems;
@@ -135,6 +139,9 @@ public class SOSBean extends AbstractServiceBean{
             } else if (rType == DataSourceType.FILESYSTEM) {
                 config.setObservationFilterType(DataSourceType.LUCENE);
                 config.setObservationWriterType(DataSourceType.FILESYSTEM);
+            } else if (rType == DataSourceType.OM2) {
+                config.setObservationFilterType(DataSourceType.OM2);
+                config.setObservationWriterType(DataSourceType.OM2);
             }
         }
         this.omConfigType = omConfigType;
@@ -423,6 +430,20 @@ public class SOSBean extends AbstractServiceBean{
     }
     
     /**
+     * @return the omPostgisDir
+     */
+    public String getOm2PostgisDir() {
+        return om2PostgisDir;
+    }
+
+    /**
+     * @param omPostgisDir the omPostgisDir to set
+     */
+    public void setOm2PostgisDir(String omPostgisDir) {
+        this.om2PostgisDir = omPostgisDir;
+    }
+    
+    /**
      * @return the obsIdBase
      */
     public String getObsIdBase() {
@@ -586,13 +607,24 @@ public class SOSBean extends AbstractServiceBean{
         if (configurationObject instanceof SOSConfiguration) {
             final SOSConfiguration config = (SOSConfiguration) configurationObject;
             final Automatic omConfig = config.getOMConfiguration();
+            final DataSourceType omType = config.getObservationReaderType();
             try {
                 if (omConfig != null) {
-                    if (omConfig.getBdd() != null) {
-                        final DataSource ds = omConfig.getBdd().getDataSource();
+                    final BDD db = omConfig.getBdd();
+                    if (db != null) {
+                        final DataSource ds       = db.getDataSource();
+                        final boolean isPostgres  = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
                         if (ds != null) {
-                            final File postgisInstall = new File(omPostgisDir);
-                            ObservationDatabaseCreator.createObservationDatabase(ds, postgisInstall);
+                            if (DataSourceType.POSTGRID.equals(omType)) {
+                                final File postgisInstall = new File(omPostgisDir);
+                                ObservationDatabaseCreator.createObservationDatabase(ds, postgisInstall);
+
+                            } else if (DataSourceType.OM2.equals(omType)) {
+                                final File postgisInstall = new File(om2PostgisDir);
+                                OM2DatabaseCreator.createObservationDatabase(ds, isPostgres, postgisInstall);
+                            } else {
+                                LOGGER.warning("Unexpected datasource type for build OM database:" + omConfig.getType());
+                            }
                         }
                     }
                 } else {
@@ -610,12 +642,17 @@ public class SOSBean extends AbstractServiceBean{
         if (configurationObject instanceof SOSConfiguration) {
             final SOSConfiguration config = (SOSConfiguration) configurationObject;
             final Automatic omConfig = config.getOMConfiguration();
+            final DataSourceType omType = config.getObservationReaderType();
             if (omConfig != null) {
                 if (omConfig.getBdd() != null) {
                     try {
                         final DataSource ds = omConfig.getBdd().getDataSource();
                         if (ds != null) {
-                            return ObservationDatabaseCreator.validConnection(ds) && !ObservationDatabaseCreator.structurePresent(ds);
+                            if (DataSourceType.POSTGRID.equals(omType)) {
+                                return ObservationDatabaseCreator.validConnection(ds) && !ObservationDatabaseCreator.structurePresent(ds);
+                            } else if (DataSourceType.OM2.equals(omType)) {
+                                return OM2DatabaseCreator.validConnection(ds) && !OM2DatabaseCreator.structurePresent(ds);
+                            }
                         } else {
                             LOGGER.info("No datasource available for build");
                             return false;

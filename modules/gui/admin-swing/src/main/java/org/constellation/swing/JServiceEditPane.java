@@ -43,6 +43,9 @@ public class JServiceEditPane extends javax.swing.JPanel {
         if ("WMS".equals(serviceType) || "WMTS".equals(serviceType) || "WCS".equals(serviceType) || "WFS".equals(serviceType)) {
             serviceEditionPanel =  new JServiceMapEditPane(server, serviceType, serviceInstance, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
+        } else if ("CSW".equals(serviceType)){
+            serviceEditionPanel =  new JServiceCswEditPane(serviceInstance, configuration);
+            guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else {
             serviceEditionPanel = null;
         }

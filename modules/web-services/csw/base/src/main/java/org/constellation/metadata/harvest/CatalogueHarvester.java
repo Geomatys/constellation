@@ -105,41 +105,36 @@ public abstract class CatalogueHarvester {
         result[0] = 0;
         result[1] = 0;
         result[2] = 0;
-        Unmarshaller unmarshaller = null;
-        try {
-            unmarshaller = marshallerPool.acquireUnmarshaller();
+        
+        final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
-            if (Namespaces.GMD.equals(resourceType) ||
-                Namespaces.CSW_202.equals(resourceType) ||
-               "http://www.isotc211.org/2005/gfc".equals(resourceType)) {
+        if (Namespaces.GMD.equals(resourceType) ||
+            Namespaces.CSW_202.equals(resourceType) ||
+           "http://www.isotc211.org/2005/gfc".equals(resourceType)) {
 
-                final InputStream in      = getSingleMetadata(sourceURL);
-                final Object harvested    = unmarshaller.unmarshal(in);
+            final InputStream in      = getSingleMetadata(sourceURL);
+            final Object harvested    = unmarshaller.unmarshal(in);
+            marshallerPool.release(unmarshaller);
 
-                if (harvested == null) {
-                    throw new CstlServiceException("The resource can not be parsed.",
-                            INVALID_PARAMETER_VALUE, "Source");
-                }
-
-                LOGGER.log(Level.INFO, "Object Type of the harvested Resource: {0}", harvested.getClass().getName());
-
-                // ugly patch TODO handle update in mdweb
-                try {
-                    if (metadataWriter.storeMetadata(harvested)) {
-                        result[0] = 1;
-                    }
-                } catch (IllegalArgumentException e) {
-                    result[1] = 1;
-                }  catch (MetadataIoException ex) {
-                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-                }
-            } else {
-                throw new CstlServiceException("unexpected resourceType: " + resourceType, NO_APPLICABLE_CODE);
+            if (harvested == null) {
+                throw new CstlServiceException("The resource can not be parsed.",
+                        INVALID_PARAMETER_VALUE, "Source");
             }
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
+
+            LOGGER.log(Level.INFO, "Object Type of the harvested Resource: {0}", harvested.getClass().getName());
+
+            // ugly patch TODO handle update in mdweb
+            try {
+                if (metadataWriter.storeMetadata(harvested)) {
+                    result[0] = 1;
+                }
+            } catch (IllegalArgumentException e) {
+                result[1] = 1;
+            }  catch (MetadataIoException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
+        } else {
+            throw new CstlServiceException("unexpected resourceType: " + resourceType, NO_APPLICABLE_CODE);
         }
         return result;
     }

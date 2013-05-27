@@ -80,7 +80,8 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected SQLQuery getNullFilter() {
+    protected SQLQuery getNullFilter(final List<QName> typeNames) {
+        // TODO use typeNames
         return new SQLQuery("Select \"identifier\" from \"Storage\".\"Records\" where \"recordSet\" != 'MDATA");
     }
     
@@ -90,7 +91,7 @@ public class SQLFilterParser extends FilterParser {
      * @param filter a Filter object build directly from the XML or from a CQL request
      */
     @Override
-    protected SQLQuery getQuery(final FilterType filter, Map<String, QName> variables, Map<String, String> prefixs) throws FilterParserException {
+    protected SQLQuery getQuery(final FilterType filter, Map<String, QName> variables, Map<String, String> prefixs, final List<QName> typeNames) throws FilterParserException {
         this.variables    = variables;
         this.prefixs      = prefixs;
         executeSelect     = true;
@@ -109,6 +110,10 @@ public class SQLFilterParser extends FilterParser {
             } else if (filter.getSpatialOps() != null) {
                 response = new SQLQuery(treatSpatialOperator(filter.getSpatialOps()));
                 
+            // we treat time operator: TimeAfter, TimeBefore, TimeDuring, ...
+            } else if (filter.getTemporalOps()!= null) {
+                response = new SQLQuery(treatTemporalOperator(filter.getTemporalOps().getValue()));
+
             } else if (filter.getId() != null) {
                 response = new SQLQuery(treatIDOperator(filter.getId()));
             }  
@@ -118,6 +123,7 @@ public class SQLFilterParser extends FilterParser {
             if (executeSelect)
                 response.createSelect();
         }
+        // TODO use typeNames
         return response;
     }
     
@@ -271,13 +277,13 @@ public class SQLFilterParser extends FilterParser {
     protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, Object literalValue, String operator) throws FilterParserException {
         response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName.getPropertyName())).append("' AND ");
         response.append('v').append(nbField).append(".\"value\" ").append(operator);
+        if (isDateField(propertyName)) {
+            literalValue = extractDateValue(literalValue);
+        }
         if (literalValue != null) {
             literalValue = literalValue.toString();
         } else {
             literalValue = "null";
-        }
-        if (isDateField(propertyName)) {
-            literalValue = extractDateValue((String)literalValue);
         }
         if (!"IS NULL ".equals(operator)) {
             response.append("'").append(literalValue).append("' ");
@@ -290,10 +296,15 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected String extractDateValue(final String literal) throws FilterParserException {
+    protected String extractDateValue(final Object literal) throws FilterParserException {
         try {
             synchronized (DATE_FORMATTER) {
-                final Date d = TemporalUtilities.parseDate(literal);
+                final Date d;
+                if (literal instanceof Date) {
+                    d = (Date)literal;
+                } else {
+                    d = TemporalUtilities.parseDate(String.valueOf(literal));
+                }
                 return DATE_FORMATTER.format(d);
             }
         } catch (ParseException ex) {

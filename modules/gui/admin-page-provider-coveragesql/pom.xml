@@ -47,7 +47,7 @@
     included in the JARs' list for which Maven will move into "target/binaries".
   -->
     <dependencies>
-	<dependency>
+	    <dependency>
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-coverage-sql</artifactId>
         </dependency>
@@ -61,7 +61,6 @@
             <artifactId>el-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
 </project>

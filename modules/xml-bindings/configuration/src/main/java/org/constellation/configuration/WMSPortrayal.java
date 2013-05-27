@@ -32,7 +32,7 @@ import org.geotoolkit.display2d.GO2Hints;
 import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.PortrayalExtension;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.util.XArrays;
+import org.apache.sis.util.ArraysExt;
 import org.geotoolkit.util.logging.Logging;
 
 /**
@@ -42,9 +42,9 @@ import org.geotoolkit.util.logging.Logging;
 @XmlRootElement(name="WMSPortrayal")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WMSPortrayal {
-    
+
     private static final Logger LOGGER = Logging.getLogger(WMSPortrayal.class);
-    
+
     private static final String INTERPOLATION_NEAREST = "nearest";
     private static final String INTERPOLATION_BILINEAR = "bilinear";
     private static final String INTERPOLATION_BICUBIC = "bicubic";
@@ -55,103 +55,103 @@ public class WMSPortrayal {
 
     private static final String RENDERING_ORDER_FEATURE = "feature";
     private static final String RENDERING_ORDER_SYMBOLIZER = "symbolizer";
-    
+
     @XmlTransient
     private static boolean emptyExtension = false;
 
     @XmlTransient
     private final static Map<String,ImageWriterSpi> nativewriterspi = new HashMap<String, ImageWriterSpi>();
-    
+
     /**
      * AntiAliasing.
      */
     @XmlElement(name="Antialiasing")
     private boolean antialiasing = true;
-    
+
     /**
      * Interpolation is used when rendering images, values are : {@link #INTERPOLATION_NEAREST}, {@link #INTERPOLATION_BILINEAR} or {@link #INTERPOLATION_BICUBIC}.
      */
     @XmlElement(name="Interpolation")
     private String interpolation ;
-    
+
     /**
      * Global Java2D rendering quality, values are : {@link #RENDERING_QUALITY}, {@link #RENDERING_SPEED} or {@link #RENDERING_DEFAULT}.
      */
     @XmlElement(name="Rendering")
     private String rendering;
-    
+
     /**
      * Set the rendering order,order by symbolizer is longer but gives nicer results for vector
      * datas, values are : {@link #RENDERING_ORDER_FEATURE} or {@link #RENDERING_ORDER_SYMBOLIZER}.
      */
     @XmlElement(name="Rendering-order")
     private String renderingOrder;
-    
+
     /**
      * Generalization of geometries.
      */
     @XmlElement(name="Generalize")
     private boolean generalize;
-    
+
     /**
      * Generalization factor for geometries.
      */
     @XmlElement(name="Generalize-factor")
     private Float generalizeFactor;
-    
+
     /**
-     * MultiThreaded : experimental, may consume more memory but may provide much better 
+     * MultiThreaded : experimental, may consume more memory but may provide much better
      * performance for several layers at the same time.
      */
     @XmlElement(name="Multithread")
     private boolean multithread;
-    
+
     /**
      * Direct coverage writer : experimental, when possible allow the portrayal service
      * to directly write coverages in the response stream.
      */
     @XmlElement(name="Coverage-writer")
     private boolean coverageWriter;
-    
+
     /**
      * Parallal Buffer : experimental.
      */
     @XmlElement(name="Parallal-buffer")
     private boolean parallalBuffer;
-    
+
     /**
      * Set the Native Java Advanced Imaging readers that are allowed to be used. Default : none.
      */
     @XmlElement(name="JAI-native-reader")
     private List<String> nativeReader = new ArrayList<String>();
-    
+
     /**
      * Set the Native Java Advanced Imaging writers that are allowed to be used. Default : png and jpeg allowed.
      */
     @XmlElement(name="JAI-native-writer")
     private List<String> nativeWriter = new ArrayList<String>();
-    
+
     /**
      * Compressions level based on the mime type.
      */
     @XmlElement(name="Compressions")
     private Compressions compressions;
-    
+
     /**
      * Legend template used by default.
      */
     @XmlElement(name="LegendTemplate")
     private LegendTemplate legendTemplate;
-    
+
     /**
      * Portrayal decoration like Grid, Text, Images, Compas, ...
      */
     @XmlElement(name="Decorations")
     private Decorations decorations;
-    
-    
+
+
     public WMSPortrayal() {
-        
+
         //default rendering hints
         this.antialiasing = true;
         this.interpolation = INTERPOLATION_NEAREST;
@@ -162,22 +162,22 @@ public class WMSPortrayal {
         this.multithread = false;
         this.coverageWriter = false;
         this.parallalBuffer = false;
-        
+
         this.legendTemplate = new LegendTemplate();
         this.decorations = new Decorations();
         this.compressions = new Compressions();
     }
-    
+
      /**
      * @return the hints defined in the wms portrayal configuration file.
      */
     public Hints getHints() {
-        
+
         final Hints hints = new Hints();
-        
+
         //antialiasing
         hints.put(RenderingHints.KEY_ANTIALIASING, (antialiasing) ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
-        
+
         //interpolation
         if (interpolation != null && !interpolation.isEmpty()) {
             if (INTERPOLATION_BICUBIC.equalsIgnoreCase(interpolation)) {
@@ -190,7 +190,7 @@ public class WMSPortrayal {
                 LOGGER.log(Level.WARNING, "Interpolation value not valid : {0}. Can be \"nearest\", \"bilinear\" or \"bicubic\".", interpolation);
             }
         }
-        
+
         //rendering
         if (rendering != null && !rendering.isEmpty()) {
             if (RENDERING_DEFAULT.equalsIgnoreCase(rendering)) {
@@ -203,7 +203,7 @@ public class WMSPortrayal {
                 LOGGER.log(Level.WARNING, "Rendering value not valid : {0}. Can be \"default\", \"quality\" or \"speed\".", rendering);
             }
         }
-        
+
         //renderingOrder
         if (renderingOrder != null && !renderingOrder.isEmpty()) {
             if (RENDERING_ORDER_SYMBOLIZER.equalsIgnoreCase(renderingOrder)) {
@@ -214,29 +214,29 @@ public class WMSPortrayal {
                 LOGGER.log(Level.WARNING, "Rendering order value not valid : {0}. Can be \"feature\" or \"symbolizer\".", renderingOrder);
             }
         }
-        
+
         //generalize
         hints.put(GO2Hints.KEY_GENERALIZE, generalize);
         //generalize factor
         hints.put(GO2Hints.KEY_GENERALIZE_FACTOR, (generalizeFactor != null) ? generalizeFactor : GO2Hints.GENERALIZE_FACTOR_DEFAULT);
-        
+
         //multithread
         hints.put(GO2Hints.KEY_MULTI_THREAD, multithread);
-        
+
         //coverageWriter
         hints.put(GO2Hints.KEY_COVERAGE_WRITER, coverageWriter);
-        
+
         //parallalBuffer
         hints.put(GO2Hints.KEY_PARALLAL_BUFFER, parallalBuffer);
         return hints;
     }
-    
+
     public void setHints(final Hints hints) {
         //antialiasing
         if (hints.containsKey(RenderingHints.KEY_ANTIALIASING)) {
             antialiasing = hints.get(RenderingHints.KEY_ANTIALIASING).equals(RenderingHints.VALUE_ANTIALIAS_ON) ? true : false;
         }
-        
+
         //interpolation
         if (hints.containsKey(RenderingHints.KEY_INTERPOLATION)) {
             final Object inter = hints.get(RenderingHints.KEY_INTERPOLATION);
@@ -248,7 +248,7 @@ public class WMSPortrayal {
                 interpolation = INTERPOLATION_BILINEAR;
             }
         }
-        
+
         //rendering
         if (hints.containsKey(RenderingHints.KEY_RENDERING)) {
             final Object render = hints.get(RenderingHints.KEY_RENDERING);
@@ -260,7 +260,7 @@ public class WMSPortrayal {
                 rendering = RENDERING_SPEED;
             }
         }
-        
+
         //rendering order
         if (hints.containsKey(GO2Hints.KEY_SYMBOL_RENDERING_ORDER)) {
             final Object renderOrder = hints.get(GO2Hints.KEY_SYMBOL_RENDERING_ORDER);
@@ -270,27 +270,27 @@ public class WMSPortrayal {
                 renderingOrder = RENDERING_ORDER_FEATURE;
             }
         }
-        
+
         //generalize
         if (hints.containsKey(GO2Hints.KEY_GENERALIZE)) {
             generalize = (Boolean) hints.get(GO2Hints.KEY_GENERALIZE);
         }
-        
+
         //generalize factor
         if (hints.containsKey(GO2Hints.KEY_GENERALIZE_FACTOR)) {
             generalizeFactor = (Float) hints.get(GO2Hints.KEY_GENERALIZE_FACTOR);
         }
-        
+
         //multithread
         if (hints.containsKey(GO2Hints.KEY_MULTI_THREAD)) {
             multithread = (Boolean) hints.get(GO2Hints.KEY_MULTI_THREAD);
         }
-        
+
         //coverageWriter
         if (hints.containsKey(GO2Hints.KEY_COVERAGE_WRITER)) {
             coverageWriter = (Boolean) hints.get(GO2Hints.KEY_COVERAGE_WRITER);
         }
-        
+
         //parallalBuffer
         if (hints.containsKey(GO2Hints.KEY_PARALLAL_BUFFER)) {
             parallalBuffer = (Boolean) hints.get(GO2Hints.KEY_PARALLAL_BUFFER);
@@ -301,7 +301,7 @@ public class WMSPortrayal {
         this.legendTemplate = legendTemplate;
     }
 
-    
+
     /**
      * Returns the default legend template.
      */
@@ -319,10 +319,10 @@ public class WMSPortrayal {
      */
     public PortrayalExtension getExtension() {
         if (emptyExtension) return new DecorationExtension();
-        
+
         return decorations.getExtension();
     }
-    
+
     /**
      * Disable any read extension (test purpose).
      *
@@ -331,8 +331,8 @@ public class WMSPortrayal {
     public static synchronized void setEmptyExtension(final boolean emptyExt) {
         emptyExtension = emptyExt;
     }
-    
-    
+
+
     public Map<String,Float> getCompressions(){
         final Map<String, Float> compMap = new HashMap<String, Float>();
         if (compressions != null) {
@@ -342,7 +342,7 @@ public class WMSPortrayal {
         }
         return compMap;
     }
-    
+
     public Float getCompression(String mime){
         if (compressions != null) {
             for (Compression comp : compressions.getCompressions()) {
@@ -359,13 +359,13 @@ public class WMSPortrayal {
             this.compressions.setCompressions(compression);
         }
     }
-    
+
     public void addCompression(Compression compression) {
         if (compressions != null) {
             this.compressions.getCompressions().add(compression);
         }
     }
-    
+
     /**
      * Create an output definition for the given mime type
      * Compression rate, type and optimal writer spi.
@@ -390,7 +390,7 @@ public class WMSPortrayal {
                 ImageWriterSpi spi = it.next();
                 final String classname = spi.getClass().getName();
                 if (!classname.startsWith("com.sun.media.")) {
-                    if(XArrays.contains(spi.getMIMETypes(),mime)){
+                    if(ArraysExt.contains(spi.getMIMETypes(),mime)){
                         odef.setSpi(spi);
                         break;
                     }
@@ -399,7 +399,7 @@ public class WMSPortrayal {
         }
         return odef;
     }
-    
+
     private synchronized static ImageWriterSpi getNativeWriterSpi(final String mime){
         ImageWriterSpi spi = nativewriterspi.get(mime);
         if(spi != null) return spi;
@@ -409,7 +409,7 @@ public class WMSPortrayal {
             spi = it.next();
             final String classname = spi.getClass().getName();
             if (classname.startsWith("com.sun.media.")) {
-                if(XArrays.contains(spi.getMIMETypes(),mime)){
+                if(ArraysExt.contains(spi.getMIMETypes(),mime)){
                     nativewriterspi.put(mime, spi);
                     return spi;
                 }
@@ -417,7 +417,7 @@ public class WMSPortrayal {
         }
         return null;
     }
-    
+
 
     public boolean isAntialiasing() {
         return antialiasing;
@@ -514,6 +514,6 @@ public class WMSPortrayal {
     public void setDecorations(List<AbstractDecoration> decorations) {
         this.decorations.setDecorations(decorations);
     }
-    
-    
+
+
 }

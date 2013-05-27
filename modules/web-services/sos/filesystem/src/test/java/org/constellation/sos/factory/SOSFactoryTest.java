@@ -18,7 +18,6 @@
 package org.constellation.sos.factory;
 
 import java.io.File;
-import java.util.Properties;
 import java.util.Map;
 import java.util.HashMap;
 import javax.imageio.spi.ServiceRegistry;
@@ -29,7 +28,6 @@ import org.constellation.generic.database.BDD;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
-import org.constellation.sos.io.filesystem.FileSensorReader;
 import org.constellation.metadata.io.MetadataIoException;
 
 import org.geotoolkit.util.FileUtilities;
@@ -95,7 +93,6 @@ public class SOSFactoryTest {
         parameters.put(OMFactory.OBSERVATION_ID_BASE, "idbase");
         parameters.put(OMFactory.OBSERVATION_TEMPLATE_ID_BASE, "templateIdBase");
         parameters.put(OMFactory.SENSOR_ID_BASE, "sensorBase");
-        parameters.put(OMFactory.IDENTIFIER_MAPPING, new Properties());
 
         boolean exLaunched = false;
         try  {

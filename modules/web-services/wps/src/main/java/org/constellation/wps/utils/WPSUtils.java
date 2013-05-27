@@ -18,8 +18,6 @@ package org.constellation.wps.utils;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,10 +26,13 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.constellation.util.Util;
 import static org.constellation.wps.ws.WPSConstant.*;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
@@ -40,12 +41,15 @@ import org.geotoolkit.ows.xml.v110.DomainMetadataType;
 import org.geotoolkit.ows.xml.v110.LanguageStringType;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.util.ArgumentChecks;
+import org.apache.sis.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wps.io.WPSIO;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
+import org.opengis.feature.type.FeatureType;
 
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -130,6 +134,17 @@ public class WPSUtils {
     }
 
     /**
+     * Build layerName
+     *
+     * @param processDesc
+     * @return authority.code
+     */
+    public static String buildLayerName(final ProcessDescriptor processDesc) {
+        ArgumentChecks.ensureNonNull("processDesc", processDesc);
+        return  processDesc.getIdentifier().getAuthority().getTitle().toString() + "." + processDesc.getIdentifier().getCode();
+    }
+
+    /**
      * Extract the factory name from a process identifier. e.g : urn:ogc:geomatys:wps:math:add return math.
      *
      * @param identifier
@@ -185,7 +200,7 @@ public class WPSUtils {
      * @param ioType
      * @return processIdentifier:ioType:paramName
      */
-    public static String buildProcessIOIdentifiers(final ProcessDescriptor procDesc, final ParameterDescriptor input,
+    public static String buildProcessIOIdentifiers(final ProcessDescriptor procDesc, final GeneralParameterDescriptor input,
             final WPSIO.IOType ioType) {
         if (input != null) {
             if (ioType.equals(WPSIO.IOType.INPUT)) {
@@ -267,57 +282,96 @@ public class WPSUtils {
      * @return true if process is supported, false if is not.
      */
     public static boolean isSupportedProcess(final ProcessDescriptor descriptor) {
-
+        
         //Inputs
-        final List<GeneralParameterDescriptor> inputDesc = descriptor.getInputDescriptor().descriptors();
-        for (GeneralParameterDescriptor input : inputDesc) {
-            if (!(input instanceof ParameterDescriptor)) {
-                return false;
-            } else {
-                final ParameterDescriptor inputParam = (ParameterDescriptor) input;
-                final Class inputClass = inputParam.getValueClass();
-                if (!WPSIO.isSupportedInputClass(inputClass)) {
-                    return false;
-                }
-            }
+        final GeneralParameterDescriptor inputDesc = descriptor.getInputDescriptor();
+        if(!isSupportedParameter(inputDesc, WPSIO.IOType.INPUT)) {
+            return false;
         }
 
         //Outputs
-        final List<GeneralParameterDescriptor> outputDesc = descriptor.getOutputDescriptor().descriptors();
-        for (GeneralParameterDescriptor output : outputDesc) {
-            if (!(output instanceof ParameterDescriptor)) {
-                return false;
-            } else {
-                final ParameterDescriptor outputParam = (ParameterDescriptor) output;
-                final Class outputClass = outputParam.getValueClass();
-                if (!WPSIO.isSupportedOutputClass(outputClass)) {
-                    return false;
+        GeneralParameterDescriptor outputDesc = descriptor.getOutputDescriptor();        
+        if(!isSupportedParameter(outputDesc, WPSIO.IOType.OUTPUT)) {
+            return false;
+        }        
+        return true;
+    }
+    
+    /**
+     * A function which test if the given parameter can be proceed by the WPS.
+     * @param toTest The descriptor of the parameter to test.
+     * @param type The parameter type (input or output).
+     * @return true if the WPS can work with this parameter, false otherwise.
+     */
+    public static boolean isSupportedParameter(GeneralParameterDescriptor toTest, WPSIO.IOType type) {
+        boolean isClean = false;
+        if (toTest instanceof ParameterDescriptorGroup) {
+            for (GeneralParameterDescriptor desc : ((ParameterDescriptorGroup) toTest).descriptors()) {
+                isClean = isSupportedParameter(desc, type);
+                if (!isClean) {
+                    break;
                 }
             }
+        } else if (toTest instanceof ParameterDescriptor) {
+            final ParameterDescriptor param = (ParameterDescriptor) toTest;
+            final Class paramClass = param.getValueClass();
+
+            isClean = (type.equals(WPSIO.IOType.INPUT))
+                    ? WPSIO.isSupportedInputClass(paramClass)
+                    : WPSIO.isSupportedOutputClass(paramClass);
         }
-        return true;
+        return isClean;
     }
 
     /**
      * Return the SupportedComplexDataInputType for the given class.
      *
-     * @param attributeClass
-     * @return SupportedComplexDataInputType
+     * @param attributeClass The java class to get complex type from.
+     * @param ioType The type of parameter to describe (input or output).
+     * @param type The complex type (complex, reference, etc.).
+     * @return SupportedComplexDataInputType 
      */
     public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.FormChoice type) {
+        return describeComplex(attributeClass, ioType, type, null);
+    }
+
+    /**
+     * Return the SupportedComplexDataInputType for the given class.
+     *
+     * @param attributeClass The java class to get complex type from.
+     * @param ioType The type of parameter to describe (input or output).
+     * @param type The complex type (complex, reference, etc.).
+     * @param userData A map containing user's options for type support.
+     * @return SupportedComplexDataInputType
+     */
+    public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.FormChoice type, final Map<String, Object> userData) {
 
         final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
         final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
         final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
-        final List<WPSIO.FormatSupport> infos = WPSIO.getFormats(attributeClass, ioType);
+        List<WPSIO.FormatSupport> infos = null;
+        String schema = null;
+
+        if (userData != null) {
+            try {
+                infos = (List<WPSIO.FormatSupport>) userData.get(WPSIO.SUPPORTED_FORMATS_KEY);
+                schema = (String) userData.get(WPSIO.SCHEMA_KEY);
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "A parameter type definition can't be read.", e);
+            }
+        }
+
+        if (infos == null) {
+            infos = WPSIO.getFormats(attributeClass, ioType);
+        }
 
         if (infos != null) {
             for (WPSIO.FormatSupport inputClass : infos) {
 
                 final ComplexDataDescriptionType complexDesc = new ComplexDataDescriptionType();
-                complexDesc.setEncoding(inputClass.getEncoding() != null ? inputClass.getEncoding() : null); //Encoding
-                complexDesc.setMimeType(inputClass.getMimeType() != null ? inputClass.getMimeType() : null);                    //Mime
-                complexDesc.setSchema(inputClass.getSchema() != null ? inputClass.getSchema() : null);       //URL to xsd schema
+                complexDesc.setEncoding(inputClass.getEncoding()); //Encoding
+                complexDesc.setMimeType(inputClass.getMimeType()); //Mime
+                complexDesc.setSchema(schema != null ? schema : inputClass.getSchema()); //URL to xsd schema
 
                 if (inputClass.isDefaultFormat()) {
                     complexComb.setFormat(complexDesc);
@@ -335,8 +389,9 @@ public class WPSUtils {
         return complex;
     }
 
+
     /**
-     * Check if all requested inputs/outputs are presente in the process descriptor. Check also if all mandatory
+     * Check if all requested inputs/outputs are present in the process descriptor. Check also if all mandatory
      * inputs/outputs are specified. If an non allowed input/output is requested or if a mandatory input/output is
      * missing, an {@link CstlServiceException CstlServiceException} will be throw.
      *
@@ -350,13 +405,13 @@ public class WPSUtils {
         //check inputs
         final List<String> inputIdentifiers = extractRequestInputIdentifiers(request);
         final ParameterDescriptorGroup inputDescriptorGroup = processDesc.getInputDescriptor();
-        final Map<String, Boolean> inputDescMap = desciptorsAsMap(inputDescriptorGroup, processDesc, WPSIO.IOType.INPUT);
+        final Map<String, Boolean> inputDescMap = descriptorsAsMap(inputDescriptorGroup, processDesc, WPSIO.IOType.INPUT);
         checkIOIdentifiers(inputDescMap, inputIdentifiers, WPSIO.IOType.INPUT);
 
         //check outputs
         final List<String> outputIdentifiers = extractRequestOutputIdentifiers(request);
         final ParameterDescriptorGroup outputDescriptorGroup = processDesc.getOutputDescriptor();
-        final Map<String, Boolean> outputDescMap = desciptorsAsMap(outputDescriptorGroup, processDesc, WPSIO.IOType.OUTPUT);
+        final Map<String, Boolean> outputDescMap = descriptorsAsMap(outputDescriptorGroup, processDesc, WPSIO.IOType.OUTPUT);
         checkIOIdentifiers(outputDescMap, outputIdentifiers, WPSIO.IOType.OUTPUT);
 
     }
@@ -414,7 +469,7 @@ public class WPSUtils {
      * @param descGroup
      * @return all parameters code and there mandatory value as map.
      */
-    private static Map<String, Boolean> desciptorsAsMap(final ParameterDescriptorGroup descGroup, final ProcessDescriptor procDesc,
+    private static Map<String, Boolean> descriptorsAsMap(final ParameterDescriptorGroup descGroup, final ProcessDescriptor procDesc,
             final WPSIO.IOType iOType) {
 
         final Map<String, Boolean> map = new HashMap<String, Boolean>();
@@ -422,11 +477,8 @@ public class WPSUtils {
             final List<GeneralParameterDescriptor> descriptors = descGroup.descriptors();
 
             for (final GeneralParameterDescriptor geneDesc : descriptors) {
-                if (geneDesc instanceof ParameterDescriptor) {
-                    final ParameterDescriptor desc = (ParameterDescriptor) geneDesc;
-                    final String id = buildProcessIOIdentifiers(procDesc, desc, iOType);
-                    map.put(id, desc.getMinimumOccurs() > 0);
-                }
+                    final String id = buildProcessIOIdentifiers(procDesc, geneDesc, iOType);
+                    map.put(id, geneDesc.getMinimumOccurs() > 0);
             }
         }
         return map;
@@ -435,12 +487,12 @@ public class WPSUtils {
     /**
      * Confronts the process parameters {@code Map} to the list of requested identifiers for an type of IO
      * (Input,Output). If there is a missing mandatory parameter in the list of requested identifiers, an {@link CstlServiceException CstlServiceException}
-     * will be throw. If an unknow parameter is requested, it also throw an {@link CstlServiceException CstlServiceException}
+     * will be throw. If an unknown parameter is requested, it also throw an {@link CstlServiceException CstlServiceException}
      *
      * @param descMap - {@code Map} contain all parameters with their mandatory attributes for INPUT or OUTPUT.
      * @param requestIdentifiers - {@code List} of requested identifiers in INPUT or OUTPUT.
      * @param iotype - {@link WPSIO.IOType type}.
-     * @throws CstlServiceException for missing or unknow parmeter.
+     * @throws CstlServiceException for missing or unknown parameter.
      */
     private static void checkIOIdentifiers(final Map<String, Boolean> descMap, final List<String> requestIdentifiers, final WPSIO.IOType iotype)
             throws CstlServiceException {
@@ -448,9 +500,9 @@ public class WPSUtils {
         final String type = iotype == WPSIO.IOType.INPUT ? "INPUT" : "OUTPUT";
 
         if (descMap.isEmpty() && !requestIdentifiers.isEmpty()) {
-            throw new CstlServiceException("This process have no inputs.", INVALID_PARAMETER_VALUE, "input"); //process have no inputs
+            throw new CstlServiceException("This process have no inputs.", INVALID_PARAMETER_VALUE, "input"); //process have no input
         } else {
-            //check for Unknow parameter.
+            //check for Unknown parameter.
             for (final String identifier : requestIdentifiers) {
                 if (!descMap.containsKey(identifier)) {
                     throw new CstlServiceException("Unknow " + type + " parameter : " + identifier + ".", INVALID_PARAMETER_VALUE, identifier);
@@ -469,59 +521,7 @@ public class WPSUtils {
         }
     }
 
-    /**
-     * Create the temporary directory used for storage.
-     *
-     * @return {@code true} if success, {@code false} if failed.
-     */
-    public static boolean createTempDirectory() {
-        final String tmpDirPath = getTempDirectoryPath();
-        final File tmpDir       = new File(tmpDirPath);
-        if (tmpDir.isDirectory()) {
-            LOGGER.log(Level.INFO, "Temporary storage directory already created at : " + tmpDir);
-            return true;
-        }
-        
-        boolean success = tmpDir.mkdirs();
-        if (success) {
-            LOGGER.log(Level.INFO, "Temporary storage directory created at : " + tmpDir);
-        } else {
-            LOGGER.log(Level.WARNING, "Temporary storage directory can't be created at : " + tmpDir);
-        }
-        return success;
-    }
-
-    /**
-     * Delete a file. If the file is a directory, the method will recursivly delete all files before.
-     *
-     * @deprecated use the methods from geotk FileUtilities
-     * 
-     * @param file
-     * @return {@code true} if success, {@code false} if failed.
-     */
-    @Deprecated
-    public static boolean deleteTempFileOrDirectory(final File file) {
-        //directory case.
-        if (file.isDirectory()) {
-            String[] children = file.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteTempFileOrDirectory(new File(file, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-
-        boolean success = file.delete();
-        if (success) {
-            LOGGER.log(Level.INFO, "Temporary file " + file.getAbsolutePath() + " deleted.");
-        } else {
-            LOGGER.log(Level.WARNING, "Temporary file " + file.getAbsolutePath() + " can't be deleted.");
-        }
-        return success;
-    }
-
-    /**
+     /**
      * Store the given object into a temorary file specified by the given fileName into the temporary folder. The object
      * to store is marshalled by the {@link WPSMarshallerPool}. If the temporary file already exist he will be
      * overwrited.
@@ -536,62 +536,25 @@ public class WPSUtils {
         final MarshallerPool marshallerPool = WPSMarshallerPool.getInstance();
         boolean success = false;
 
-        Marshaller marshaller = null;
         try {
 
             final File outputFile = new File(folderPath, fileName);
-            marshaller = marshallerPool.acquireMarshaller();
+            final Marshaller marshaller = marshallerPool.acquireMarshaller();
             marshaller.marshal(obj, outputFile);
-
+            marshallerPool.release(marshaller);
             success = outputFile.exists();
 
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Error during unmarshalling", ex);
-        } finally {
-            marshallerPool.release(marshaller);
         }
         return success;
     }
 
     /**
-     * Retrurn the absolute path to the temporary directory.
-     *
-     * @return absolut path String.
+     * Return tuple toString mime/encoding/schema. "[mimeType, encoding, schema]".
+     * @param requestedOuptut DocumentOutputDefinitionType
+     * @return tuple string.
      */
-    public static String getTempDirectoryPath() {
-        return Util.getWebappDiretory().getAbsolutePath() + TEMP_FOLDER;
-    }
-
-    /**
-     * Return the temporary folder URL. e.g : http://server:port/domain/tempDoc/
-     *
-     * @param workerURL
-     * @return temporary folder path URL.
-     */
-    public static String getTempDirectoryURL(final String workerURL) {
-        String path = null;
-        try {
-            final URL url = new URL(workerURL);
-            path = url.getProtocol() + "://" + url.getAuthority() + "/" + url.getPath().split("/")[1] + TEMP_FOLDER;
-        } catch (MalformedURLException ex) {
-            LOGGER.log(Level.WARNING, "Error during temporary folder URL.", ex);
-        }
-        return path;
-    }
-
-    /**
-     * Clean temporary file used as process inputs.
-     *
-     * @param files
-     */
-    public static void cleanTempFiles(List<File> files) {
-        if (files != null) {
-            for (final File f : files) {
-                f.delete();
-            }
-        }
-    }
-
     public static String outputDefinitionToString(final DocumentOutputDefinitionType requestedOuptut) {
         final StringBuilder builder = new StringBuilder();
         final String begin = "[";
@@ -613,5 +576,39 @@ public class WPSUtils {
        
         builder.append(end);
         return builder.toString();
+    }
+    
+    /**
+     * A function to retrieve a Feature schema, and store it into the given file
+     * as an xsd.
+     *
+     * @param source The feature to get schema from.
+     * @param destination The file where we want to save our feature schema.
+     * @throws JAXBException If we can't parse / write the schema properly.
+     */
+    public static void storeFeatureSchema(FeatureType source, File destination) throws JAXBException {
+
+        JAXBFeatureTypeWriter writer = new JAXBFeatureTypeWriter();
+        Schema s = writer.getSchemaFromFeatureType(source);
+        MarshallerPool pool = XSDMarshallerPool.getInstance();
+        Marshaller marsh = pool.acquireMarshaller();
+
+        marsh.marshal(s, destination);
+    }
+
+
+    /**
+     * @return the current time in an XMLGregorianCalendar.
+     */
+    public static XMLGregorianCalendar getCurrentXMLGregorianCalendar(){
+        XMLGregorianCalendar xcal = null;
+        try {
+            final GregorianCalendar c = new GregorianCalendar();
+            c.setTime(new Date());
+            xcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+        } catch (DatatypeConfigurationException ex) {
+            LOGGER.log(Level.INFO, "Can't create the creation time of the status.");
+        }
+        return xcal;
     }
 }

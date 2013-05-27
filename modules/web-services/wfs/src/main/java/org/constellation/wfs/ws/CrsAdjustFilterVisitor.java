@@ -41,13 +41,13 @@ public class CrsAdjustFilterVisitor extends DuplicatingFilterVisitor{
     private final CoordinateReferenceSystem baseCrs;
     private final CoordinateReferenceSystem replacementCrs;
 
-    public CrsAdjustFilterVisitor(CoordinateReferenceSystem baseCrs, CoordinateReferenceSystem replacementCrs) {
+    public CrsAdjustFilterVisitor(final CoordinateReferenceSystem baseCrs, final CoordinateReferenceSystem replacementCrs) {
         this.baseCrs = baseCrs;
         this.replacementCrs = replacementCrs;
     }
     
     @Override
-    public Object visit(Literal expression, Object extraData) {
+    public Object visit(final Literal expression, final Object extraData) {
         Object obj = expression.getValue();
         try {
             if(obj instanceof BoundingBox){

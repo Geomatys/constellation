@@ -41,19 +41,17 @@ import static org.constellation.sos.ws.Utils.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
-import org.geotoolkit.gml.xml.v311.ReferenceType;
-import org.geotoolkit.gml.xml.v311.TimeInstantType;
-import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.geotoolkit.observation.xml.v100.ProcessType;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.gml.xml.Envelope;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.util.logging.Logging;
-import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
+
+import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
-import org.opengis.observation.Observation;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 
 /**
  *
@@ -69,11 +67,6 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     private final Connection connection;
 
-    /**
-     * The properties file allowing to store the id mapping between physical and database ID.
-     */
-    protected Properties map;
-
      /**
      * use for debugging purpose
      */
@@ -82,12 +75,14 @@ public class DefaultObservationFilter implements ObservationFilter {
     /**
      * The base for observation id.
      */
-    protected String observationIdBase;
+    protected final String observationIdBase;
 
     /**
      * The base for observation id.
      */
-    protected String observationTemplateIdBase;
+    protected final String observationTemplateIdBase;
+    
+    protected final String phenomenonIdBase;
 
     /**
      * Clone a new Observation Filter.
@@ -96,16 +91,16 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     public DefaultObservationFilter(final DefaultObservationFilter omFilter) {
         this.connection                = omFilter.connection;
-        this.map                       = omFilter.map;
         this.observationIdBase         = omFilter.observationIdBase;
         this.observationTemplateIdBase = omFilter.observationTemplateIdBase;
+        this.phenomenonIdBase          = omFilter.phenomenonIdBase;
     }
 
     
     public DefaultObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase         = (String)     properties.get(OMFactory.OBSERVATION_ID_BASE);
         this.observationTemplateIdBase = (String)     properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
-        this.map                       = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
+        this.phenomenonIdBase          = (String)     properties.get(OMFactory.PHENOMENON_ID_BASE);
         
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
@@ -138,10 +133,10 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest = new StringBuilder("SELECT \"name\" FROM \"observation\".\"observations\" WHERE \"name\" LIKE '%");
         }
         if (requestMode == INLINE) {
-            sqlRequest.append(observationIdBase).append("%' AND ");
+            sqlRequest.append(observationIdBase).append("%' ");
 
         } else if (requestMode == RESULT_TEMPLATE) {
-            sqlRequest.append(observationTemplateIdBase).append("%' AND ");
+            sqlRequest.append(observationTemplateIdBase).append("%' ");
         }
     }
 
@@ -149,60 +144,67 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterGetResult(final Observation template, final QName resultModel) {
-        final ProcessType process = (ProcessType) template.getProcedure();
-        
+    public void initFilterGetResult(final String procedure, final QName resultModel) {
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"measurements\" WHERE ");
         } else {
             sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"observations\" WHERE ");
         }
         //we add to the request the property of the template
-        sqlRequest.append("\"procedure\"='").append(process.getHref()).append("'");
+        sqlRequest.append("\"procedure\"='").append(procedure).append("'");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(final List<String> procedures, final ObservationOfferingType off) {
-        sqlRequest.append(" ( ");
+    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
+        // do nothing not implemented
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setProcedure(final List<String> procedures, final List<ObservationOffering> offerings) {
         if (!procedures.isEmpty()) {
-
+            sqlRequest.append("AND ( ");
             for (String s : procedures) {
                 if (s != null) {
-                    String dbId = map.getProperty(s);
-                    if (dbId == null) {
-                        dbId = s;
-                    }
-                    sqlRequest.append(" \"procedure\"='").append(dbId).append("' OR ");
+                    sqlRequest.append(" \"procedure\"='").append(s).append("' OR ");
                 }
             }
-        } else {
+            sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
+            sqlRequest.append(") ");
+        } else if (!offerings.isEmpty()) {
+            
+            sqlRequest.append("AND ( ");
             //if is not specified we use all the process of the offering
-            for (ReferenceType proc : off.getProcedure()) {
-                sqlRequest.append(" \"procedure\"='").append(proc.getHref()).append("' OR ");
+            for (ObservationOffering off : offerings) {
+                for (String proc : off.getProcedures()) {
+                    sqlRequest.append(" \"procedure\"='").append(proc).append("' OR ");
+                }
             }
+            sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
+            sqlRequest.append(") ");
         }
-        sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
-        sqlRequest.append(") ");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setObservedProperties(final List<String> phenomenon, final List<String> compositePhenomenon) {
-        sqlRequest.append(" AND( ");
-        for (String p : phenomenon) {
-            sqlRequest.append(" \"observed_property\"='").append(p).append("' OR ");
+    public void setObservedProperties(final List<String> phenomenon) {
+        if (!phenomenon.isEmpty()) {
+            sqlRequest.append(" AND( ");
+            for (String p : phenomenon) {
+                p = p.replace(phenomenonIdBase, "");
+                sqlRequest.append(" \"observed_property\"='").append(p).append("' OR \"observed_property_composite\"='").append(p).append("' OR ");
 
+            }
+            sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
+            sqlRequest.append(") ");
         }
-        for (String p : compositePhenomenon) {
-            sqlRequest.append(" \"observed_property_composite\"='").append(p).append("' OR ");
-        }
-        sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
-        sqlRequest.append(") ");
     }
 
     /**
@@ -210,12 +212,14 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void setFeatureOfInterest(final List<String> fois) {
-        sqlRequest.append(" AND (");
-        for (String foi : fois) {
-            sqlRequest.append("(\"feature_of_interest_point\"='").append(foi).append("' OR \"feature_of_interest\"='").append(foi).append("' OR \"feature_of_interest_curve\"='").append(foi).append("') OR");
+        if (!fois.isEmpty()) {
+            sqlRequest.append(" AND (");
+            for (String foi : fois) {
+                sqlRequest.append("(\"feature_of_interest_point\"='").append(foi).append("' OR \"feature_of_interest\"='").append(foi).append("' OR \"feature_of_interest_curve\"='").append(foi).append("') OR");
+            }
+            sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
+            sqlRequest.append(") ");
         }
-        sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
-        sqlRequest.append(") ");
     }
 
     /**
@@ -223,10 +227,10 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void setTimeEquals(final Object time) throws CstlServiceException {
-        if (time instanceof TimePeriodType) {
-            final TimePeriodType tp = (TimePeriodType) time;
-            final String begin      = getTimeValue(tp.getBeginPosition());
-            final String end        = getTimeValue(tp.getEndPosition());
+        if (time instanceof Period) {
+            final Period tp    = (Period) time;
+            final String begin = getTimeValue(tp.getBeginning().getPosition());
+            final String end   = getTimeValue(tp.getEnding().getPosition());
 
             // we request directly a multiple observation or a period observation (one measure during a period)
             sqlRequest.append("AND (");
@@ -234,9 +238,9 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest.append(" \"sampling_time_end\"='").append(end).append("') ");
 
         // if the temporal object is a timeInstant
-        } else if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position    = getTimeValue(ti.getTimePosition());
+        } else if (time instanceof Instant) {
+            final Instant ti      = (Instant) time;
+            final String position = getTimeValue(ti.getPosition());
             sqlRequest.append("AND (");
 
             // case 1 a single observation
@@ -258,9 +262,9 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public void setTimeBefore(final Object time) throws CstlServiceException  {
         // for the operation before the temporal object must be an timeInstant
-        if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position    = getTimeValue(ti.getTimePosition());
+        if (time instanceof Instant) {
+            final Instant ti      = (Instant) time;
+            final String position = getTimeValue(ti.getPosition());
             sqlRequest.append("AND (");
 
             // the single and multpile observations which begin after the bound
@@ -278,9 +282,9 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public void setTimeAfter(final Object time) throws CstlServiceException {
         // for the operation after the temporal object must be an timeInstant
-        if (time instanceof TimeInstantType) {
-            final TimeInstantType ti = (TimeInstantType) time;
-            final String position    = getTimeValue(ti.getTimePosition());
+        if (time instanceof Instant) {
+            final Instant ti      = (Instant) time;
+            final String position = getTimeValue(ti.getPosition());
             sqlRequest.append("AND (");
 
             // the single and multpile observations which begin after the bound
@@ -301,10 +305,10 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void setTimeDuring(final Object time) throws CstlServiceException {
-        if (time instanceof TimePeriodType) {
-            final TimePeriodType tp = (TimePeriodType) time;
-            final String begin      = getTimeValue(tp.getBeginPosition());
-            final String end        = getTimeValue(tp.getEndPosition());
+        if (time instanceof Period) {
+            final Period tp    = (Period) time;
+            final String begin = getTimeValue(tp.getBeginning().getPosition());
+            final String end   = getTimeValue(tp.getEnding().getPosition());
             sqlRequest.append("AND (");
 
             // the multiple observations included in the period
@@ -416,7 +420,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(final EnvelopeType e) throws CstlServiceException {
+    public void setBoundingBox(final Envelope e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
@@ -438,16 +442,26 @@ public class DefaultObservationFilter implements ObservationFilter {
 
     @Override
     public void setTimeLatest() throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new CstlServiceException("setTimeLatest is not supported by this ObservationFilter implementation.");
     }
 
     @Override
     public void setTimeFirst() throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new CstlServiceException("setTimeFirst is not supported by this ObservationFilter implementation.");
     }
 
     @Override
-    public void setOffering(final ObservationOfferingType offering) throws CstlServiceException {
+    public void setOfferings(final List<ObservationOffering> offerings) throws CstlServiceException {
         // not used in this implementations
+    }
+    
+    @Override
+    public boolean isDefaultTemplateTime() {
+        return true;
+    }
+
+    @Override
+    public Set<String> filterFeatureOfInterest() throws CstlServiceException {
+        throw new CstlServiceException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
     }
 }

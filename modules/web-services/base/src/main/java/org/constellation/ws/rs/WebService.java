@@ -20,19 +20,19 @@ package org.constellation.ws.rs;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.ByteArrayInputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import org.xml.sax.SAXException;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
+import java.lang.reflect.Proxy;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.logging.Level;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -45,14 +45,19 @@ import javax.ws.rs.POST;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
 import static org.constellation.ws.ExceptionCode.*;
+import org.constellation.ws.WebServiceUtilities;
+import org.constellation.xml.PrefixMappingInvocationHandler;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.Versioned;
@@ -166,23 +171,11 @@ public abstract class WebService {
     /**
      * If this flag is set the method logParameters() will write the entire request in the logs
      * instead of the parameters map.
+     *
+     * @deprecated move to worker
      */
+    @Deprecated
     private boolean fullRequestLog = false;
-
-    /**
-     * If this flag is set r false the method logParameters() will write nothing in the logs
-     */
-    private boolean printRequestParameter = true;
-
-    /**
-     * If this flag is set to true a validator is added to the XML request unmarshaller.
-     */
-    private boolean requestValidationActivated = false;
-
-    /**
-     * if the flag requestValidationActivated is set to true this attribute must contain the main xsd file.
-     */
-    private String mainXsdPath = null;
 
     /**
      * A pool of JAXB unmarshaller used to create Java objects from XML files.
@@ -335,31 +328,39 @@ public abstract class WebService {
     @Consumes("*/xml")
     public Response doPOSTXml(final InputStream is) {
         if (marshallerPool != null) {
-            Object request = null;
-            Unmarshaller unmarshaller = null;
+            final Object request;
             final MarshallerPool pool;
+
             // we look for a configuration query
+            final boolean requestValidationActivated;
+            final List<Schema> schemas;
             final List<String> serviceId = getParameter("serviceId");
-            if (serviceId != null && !serviceId.isEmpty() && "admin".equals(serviceId.get(0))) {
-                pool = getConfigurationPool();
+            if (serviceId != null && !serviceId.isEmpty()){
+                requestValidationActivated = isRequestValidationActivated(serviceId.get(0));
+                schemas                    = getRequestValidationSchema(serviceId.get(0));
+                if ("admin".equals(serviceId.get(0))) {
+                    pool = getConfigurationPool();
+                } else {
+                    pool = getMarshallerPool();
+                }
             } else {
-                pool = getMarshallerPool();
+                schemas                    = null;
+                pool                       = getMarshallerPool();
+                requestValidationActivated = false;
             }
 
+            final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
             try {
-                unmarshaller = pool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
                 if (requestValidationActivated) {
-                    try {
-                        final SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                        final Schema schema    = sf.newSchema(new URL(mainXsdPath));
+                    for (Schema schema : schemas) {
                         unmarshaller.setSchema(schema);
-                    } catch (SAXException ex) {
-                        LOGGER.warning("SAX exception while adding the Validator to the JAXB unmarshaller");
-                    } catch (MalformedURLException ex) {
-                        LOGGER.warning("MalformedURL exception while adding the Validator to the JAXB unmarshaller");
                     }
+                    request = unmarshallRequestWithMapping(unmarshaller, is, prefixMapping);
+                } else {
+                    request = unmarshallRequest(unmarshaller, is);
                 }
-                request = unmarshallRequest(unmarshaller, is);
+                pool.release(unmarshaller);
             } catch (JAXBException e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg == null) {
@@ -375,15 +376,12 @@ public abstract class WebService {
                 } else {
                     codeName = INVALID_REQUEST.name();
                 }
+                final String locator = WebServiceUtilities.getValidationLocator(errorMsg, prefixMapping);
 
-                return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, null);
+                return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, locator);
             } catch (CstlServiceException e) {
 
                 return launchException(e.getMessage(), e.getExceptionCode().identifier(), e.getLocator());
-            } finally {
-                if (unmarshaller != null)  {
-                    pool.release(unmarshaller);
-                }
             }
 
             if (request instanceof Versioned) {
@@ -392,18 +390,15 @@ public abstract class WebService {
                     getUriContext().getQueryParameters().add("VERSION", ar.getVersion().toString());
                 }
             }
-
-            if (request != null) {
-                if (request instanceof JAXBElement) {
-                    request = ((JAXBElement) request).getValue();
-                }
-                LOGGER.log(Level.FINER, "request type:{0}", request.getClass().getName());
-            }
             return treatIncomingRequest(request);
         } else {
             return Response.ok("This service is not running", MimeType.TEXT_PLAIN).build();
         }
     }
+
+    protected abstract boolean isRequestValidationActivated(final String workerID);
+
+    protected abstract List<Schema> getRequestValidationSchema(final String workerID);
 
     /**
      * A method simply unmarshalling the request with the specified unmarshaller from the specified inputStream.
@@ -416,6 +411,18 @@ public abstract class WebService {
      */
     protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException, CstlServiceException {
         return unmarshaller.unmarshal(is);
+    }
+
+    protected Object unmarshallRequestWithMapping(final Unmarshaller unmarshaller, final InputStream is, final Map<String, String> prefixMapping) throws JAXBException {
+        try {
+            final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(is);
+            final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
+                    new Class[]{XMLEventReader.class}, new PrefixMappingInvocationHandler(rootEventReader, prefixMapping));
+
+            return unmarshaller.unmarshal(eventReader);
+        } catch (XMLStreamException ex) {
+            throw new JAXBException(ex);
+        }
     }
 
     /**
@@ -498,8 +505,7 @@ public abstract class WebService {
      * @return the parameter, or {@code null} if not specified and not mandatory.
      * @throw CstlServiceException
      */
-    protected String getParameter(final String parameterName, final boolean mandatory)
-                                                           throws CstlServiceException {
+    protected String getParameter(final String parameterName, final boolean mandatory) throws CstlServiceException {
 
         final List<String> values = getParameter(parameterName);
         if (values == null) {
@@ -510,25 +516,21 @@ public abstract class WebService {
             return null;
         } else {
             final String value = values.get(0);
-            if ((value == null || value.isEmpty()) && mandatory) {
-                /* For the STYLE/STYLES parameters, they are mandatory in the GetMap request.
-                 * Nevertheless we do not know what to put in for raster, that's why for these
-                 * parameters we will just return the value, even if it is empty.
-                 *
-                 * According to the WMS standard, if STYLES="" is set, then the default style
-                 * should be applied.
-                 *
-                 * todo: fix the style parameter.
-                 */
-                if (parameterName.equalsIgnoreCase("STYLE") ||
-                    parameterName.equalsIgnoreCase("STYLES")) {
-                    return value;
-                }
+            if (value == null && mandatory) {
                 throw new CstlServiceException("The parameter " + parameterName + " should have a value",
                         MISSING_PARAMETER_VALUE, parameterName.toLowerCase());
             } else {
                 return value;
             }
+        }
+    }
+
+    protected String getSafeParameter(final String parameterName) {
+        final List<String> values = getParameter(parameterName);
+        if (values == null) {
+            return null;
+        } else {
+            return values.get(0);
         }
     }
 
@@ -544,20 +546,31 @@ public abstract class WebService {
      * Extract all The parameters from the query and write it in the console.
      * It is a debug method.
      */
-    protected void logParameters() throws CstlServiceException {
-        if (printRequestParameter) {
-            if (!fullRequestLog) {
-                final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
-                if (!parameters.isEmpty()) {
-                    // we don't write POST request with VERSION parameters automatically put
-                    if (parameters.size() != 1 || !parameters.containsKey("VERSION")) {
-                        LOGGER.info(parameters.toString());
-                    }
+    protected void logParameters() {
+        if (!fullRequestLog) {
+            final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
+            if (!parameters.isEmpty()) {
+                // we don't write POST request with VERSION parameters automatically put
+                if (parameters.size() != 1 || !parameters.containsKey("VERSION")) {
+                    LOGGER.info(parameters.toString());
                 }
-            } else {
-                if (getUriContext().getRequestUri() != null) {
-                    LOGGER.info(getUriContext().getRequestUri().toString());
-                }
+            }
+        } else {
+            if (getUriContext().getRequestUri() != null) {
+                LOGGER.info(getUriContext().getRequestUri().toString());
+            }
+        }
+    }
+
+    protected void logPostParameters(final Object request) {
+        if (request != null) {
+            final MarshallerPool pool = getMarshallerPool();
+            try {
+                final Marshaller m = pool.acquireMarshaller();
+                m.marshal(request, System.out);
+                pool.release(m);
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, "Error while marshalling the request", ex);
             }
         }
     }
@@ -573,12 +586,9 @@ public abstract class WebService {
      * @return the parameter or null if not specified
      * @throw CstlServiceException
      */
-    protected Object getComplexParameter(final String parameterName, final boolean mandatory)
-                                                                  throws CstlServiceException
-    {
-        Unmarshaller unmarshaller = null;
+    protected Object getComplexParameter(final String parameterName, final boolean mandatory) throws CstlServiceException {
         try {
-            unmarshaller = marshallerPool.acquireUnmarshaller();
+            final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
             List<String> list = parameters.get(parameterName);
             if (list == null) {
@@ -594,6 +604,7 @@ public abstract class WebService {
             }
             final StringReader sr = new StringReader(list.get(0));
             Object result = unmarshaller.unmarshal(sr);
+            marshallerPool.release(unmarshaller);
             if (result instanceof JAXBElement) {
                 result = ((JAXBElement)result).getValue();
             }
@@ -601,10 +612,6 @@ public abstract class WebService {
         } catch (JAXBException ex) {
              throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
                             ex, INVALID_PARAMETER_VALUE);
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
-            }
         }
     }
 
@@ -628,34 +635,8 @@ public abstract class WebService {
     /**
      * @param fullRequestLog the fullRequestLog to set
      */
-    public void setFullRequestLog(boolean fullRequestLog) {
+    public void setFullRequestLog(final boolean fullRequestLog) {
         this.fullRequestLog = fullRequestLog;
-    }
-
-    /**
-     * @return the printRequestParameter
-     */
-    public boolean isPrintRequestParameter() {
-        return printRequestParameter;
-    }
-
-    /**
-     * @param printRequestParameter the printRequestParameter to set
-     */
-    public void setPrintRequestParameter(boolean printRequestParameter) {
-        this.printRequestParameter = printRequestParameter;
-    }
-
-    /**
-     * Enable the request validation.
-     * When a request will arrive, the service will try to validate it against the specified
-     * XSD specified in mainXsdPath.
-     *
-     * @param mainXsdPath The URL to the xsd.
-     */
-    public void activateRequestValidation(String mainXsdPath) {
-        this.mainXsdPath                = mainXsdPath;
-        this.requestValidationActivated = true;
     }
 
     /**

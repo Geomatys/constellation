@@ -24,7 +24,6 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.io.IOUtilities;
 import java.io.IOException;
 import org.constellation.provider.LayerProviderProxy;
-import org.geotoolkit.data.sml.SMLDataStoreFactory;
 import org.constellation.util.Util;
 import java.sql.Connection;
 import javax.ws.rs.core.Response;
@@ -32,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.io.InputStream;
+import java.net.URL;
 import javax.xml.bind.Marshaller;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -43,14 +43,13 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.wfs.ws.rs.WFSService;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.provider.configuration.Configurator;
 import org.geotoolkit.data.FeatureCollection;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 
-import org.geotoolkit.data.om.OMDataStoreFactory;
+import static org.geotoolkit.parameter.ParametersExt.*;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.util.FileUtilities;
 
@@ -100,6 +99,7 @@ public class WFSServiceTest {
         Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
         LayerContext context = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
         context.getCustomParameters().put("transactionSecurized", "false");
+        context.getCustomParameters().put("shiroAccessible", "false");
 
         Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
         m.marshal(context, LayerContext);
@@ -234,87 +234,80 @@ public class WFSServiceTest {
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
                 final ParameterValueGroup config = desc.createValue();
 
-                if("shapefile".equals(serviceName)){
-
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
-                    srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
-                            .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
-                    srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
-                            .setValue("http://www.opengis.net/gml");
-
-
-                    ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("BasicPolygons");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_BasicPolygons");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Bridges");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Bridges");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("BuildingCenters");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_BuildingCenters");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Buildings");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Buildings");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("DividedRoutes");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_DividedRoutes");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Forests");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Forests");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Lakes");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Lakes");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("MapNeatline");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_MapNeatLine");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Ponds");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Ponds");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("RoadSegments");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_RoadSegments");
-
-                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Streams");
-                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Streams");
-
-                }else if("observation".equals(serviceName)){
-                    try{
+                if("feature-store".equals(serviceName)){
+                    try{ 
+                        
+                        {//OBSERVATION
                         final String url = "jdbc:derby:memory:TestWFSServiceOM";
-                        ds = new DefaultDataSource(url + ";create=true");
+                        final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
                         sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
                         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
                         con.close();
-
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        final ParameterValueGroup srcconfig = getOrCreate(OMDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
-                        srcconfig.parameter(OMDataStoreFactory.SGBDTYPE.getName().getCode()).setValue("derby");
-                        srcconfig.parameter(OMDataStoreFactory.DERBYURL.getName().getCode()).setValue(url);
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("omSrc");
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(), ex);
-                    }
-                }else if("sensorML".equals(serviceName)){
-                    try{
+                        ds.shutdown();
+                        
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("omSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);    
+                        
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
+                        getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
+                        getOrCreateValue(omconfig, "derbyurl").setValue(url);
+                        }
+                        
+                        {//SHAPEFILE
+                        final File outputDir = initDataDirectory();
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("shapeSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);    
+                        
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");        
+                        
+                        ParameterValueGroup layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("BasicPolygons");
+                        getOrCreateValue(layer, "style").setValue("cite_style_BasicPolygons");     
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Bridges");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Bridges");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("BuildingCenters");
+                        getOrCreateValue(layer, "style").setValue("cite_style_BuildingCenters");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Buildings");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Buildings");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("DividedRoutes");
+                        getOrCreateValue(layer, "style").setValue("cite_style_DividedRoutes");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Forests");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Forests");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Lakes");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Lakes");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("MapNeatline");
+                        getOrCreateValue(layer, "style").setValue("cite_style_MapNeatLine");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Ponds");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Ponds");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("RoadSegments");
+                        getOrCreateValue(layer, "style").setValue("cite_style_RoadSegments");
+                        layer = createGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("Streams");
+                        getOrCreateValue(layer, "style").setValue("cite_style_Streams");                        
+                        
+                        }
+                        
+                        {//SENSORML
                         final String url2 = "jdbc:derby:memory:TestWFSServiceSMl";
                         ds2 = new DefaultDataSource(url2 + ";create=true");
                         Connection con = ds2.getConnection();
@@ -328,15 +321,19 @@ public class WFSServiceTest {
                         sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML.sql"));
                         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
                         con.close();
-
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        final ParameterValueGroup srcconfig = getOrCreate(SMLDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("smlSrc");
-                        srcconfig.parameter(SMLDataStoreFactory.SGBDTYPE.getName().getCode()).setValue("derby");
-                        srcconfig.parameter(SMLDataStoreFactory.DERBYURL.getName().getCode()).setValue(url2);
+                            
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("smlSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);             
+                        
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup omconfig = createGroup(choice, "SMLParameters");
+                        getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
+                        getOrCreateValue(omconfig, "derbyurl").setValue(url2);                      
+                        }
+                        
                     }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(), ex);
+                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
                     }
                 }
 

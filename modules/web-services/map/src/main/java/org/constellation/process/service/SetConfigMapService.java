@@ -97,17 +97,13 @@ public class SetConfigMapService extends AbstractProcess {
 
             //get layerContext.xml file.
             File configurationFile = new File(instanceDirectory, "layerContext.xml");
-            Marshaller marshaller = null;
             try {
-                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(configuration, configurationFile);
+                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
 
             } catch (JAXBException ex) {
                 throw new ProcessException(ex.getMessage(), this, ex);
-            } finally {
-                if (marshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-                }
             }
 
         } else {

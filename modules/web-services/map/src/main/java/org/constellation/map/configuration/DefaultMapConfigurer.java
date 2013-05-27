@@ -59,7 +59,7 @@ import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.converter.Classes;
+import org.apache.sis.util.Classes;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 
 import org.opengis.feature.type.Name;
@@ -93,7 +93,13 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
     private final Map<String, ProviderService> services = new HashMap<String, ProviderService>();
 
+    private ProviderOperationListener providerListener;
+    
     public DefaultMapConfigurer() {
+        this(new DefaultProviderOperationListener());
+    }
+    
+    public DefaultMapConfigurer(final ProviderOperationListener providerListener) {
         final Collection<LayerProviderService> availableLayerServices = LayerProviderProxy.getInstance().getServices();
         for (LayerProviderService service: availableLayerServices) {
             this.services.put(service.getName(), service);
@@ -102,6 +108,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         for (StyleProviderService service: availableStyleServices) {
             this.services.put(service.getName(), service);
         }
+        this.providerListener = providerListener;
     }
 
     @Override
@@ -258,7 +265,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 try {
                     final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                     process.call();
-
+                    providerListener.fireProvidedAdded((String)sourceToAdd.parameter("id").getValue());
                 } catch (ProcessException ex) {
                     return new AcknowlegementType("Failure", ex.getLocalizedMessage());
                 }
@@ -314,7 +321,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 try {
                     final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
                     process.call();
-
+                    providerListener.fireProvidedModified(currentId);
                 } catch (ProcessException ex) {
                     return new AcknowlegementType("Failure", ex.getLocalizedMessage());
                 }
@@ -390,7 +397,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
                 process.call();
-
+                providerListener.fireProvidedDeleted(providerId);
             } catch (ProcessException ex) {
                 return new AcknowlegementType("Failure", ex.getLocalizedMessage());
             }

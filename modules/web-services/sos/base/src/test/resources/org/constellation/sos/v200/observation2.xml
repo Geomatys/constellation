@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<om:OM_Observation xmlns:sos="http://www.opengis.net/sos/2.0"
+                   xmlns:swe="http://www.opengis.net/swe/2.0" 
+                   xmlns:gml="http://www.opengis.net/gml/3.2" 
+                   xmlns:om="http://www.opengis.net/om/2.0" 
+                   xmlns:sams="http://www.opengis.net/samplingSpatial/2.0"
+                   xmlns:sf="http://www.opengis.net/sampling/2.0" 
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:xlink="http://www.w3.org/1999/xlink"
+                   gml:id="obs-305">
+    <gml:name>urn:ogc:object:observation:GEOM:305</gml:name>
+    <om:type xlink:href="http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_ComplexObservation"/>
+    <om:phenomenonTime>
+        <gml:TimePeriod gml:id="time-305">
+            <gml:beginPosition>2007-05-01T07:59:00.0</gml:beginPosition>
+            <gml:endPosition>2007-05-01T11:59:00.0</gml:endPosition>
+        </gml:TimePeriod>
+    </om:phenomenonTime>
+    <om:resultTime/>
+    <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:3"/>
+    <om:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:depth"/>
+    <om:featureOfInterest>
+        <sams:SF_SpatialSamplingFeature gml:id="station-001">
+            <gml:description>Point d'eau BSSS</gml:description>
+            <gml:name>10972X0137-PONT</gml:name>
+            <sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/>
+            <sf:sampledFeature xlink:href="urn:-sandre:object:bdrhf:123X"/>
+            <sams:shape>
+                <gml:Point gml:id="STATION-LOCALISATION">
+                    <gml:pos srsName="urn:ogc:def:crs:epsg:7.9:27582">65400.0 1731368.0</gml:pos>
+                </gml:Point>
+            </sams:shape>
+        </sams:SF_SpatialSamplingFeature>
+    </om:featureOfInterest>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
+        <swe:DataArray id="dataArray-2">
+            <swe:elementCount>
+                <swe:Count>
+                    <swe:value>5</swe:value>
+                </swe:Count>
+            </swe:elementCount>
+            <swe:elementType name="dataArray-2">
+                <swe:DataRecord id="datarecord-0">
+                    <swe:field name="Time">
+                        <swe:Time definition="urn:ogc:data:time:iso8601">
+                            <swe:uom/>
+                        </swe:Time>
+                    </swe:field>
+                    <swe:field name="depth">
+                        <swe:Quantity definition="urn:ogc:def:phenomenon:GEOM:depth">
+                            <swe:uom code="m"/>
+                        </swe:Quantity>
+                    </swe:field>
+                </swe:DataRecord>
+            </swe:elementType>
+            <swe:encoding>
+                <swe:TextEncoding blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
+            </swe:encoding>
+            <swe:values>2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@</swe:values>
+        </swe:DataArray>
+    </om:result>
+</om:OM_Observation>

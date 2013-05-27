@@ -36,6 +36,9 @@ import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.geotoolkit.test.xml.DomComparator;
 
 import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 
 // JUnit dependencies
 import org.junit.*;
@@ -81,28 +84,26 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
 
                 final ParameterValueGroup config = desc.createValue();
 
-                if("postgis".equals(serviceName)){
-                    // Defines a PostGis data provider
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(PostgisNGDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
+                if("feature-store".equals(serviceName)){
+                    final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                    getOrCreateValue(source, "id").setValue("postgisSrc");
+                    getOrCreateValue(source, "load_all").setValue(true);                        
 
-                    srcconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
-                    srcconfig.parameter(PORT.getName().getCode()).setValue(5432);
-                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
-                    srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
-                    srcconfig.parameter(USER.getName().getCode()).setValue("test");
-                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+                    final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                    final ParameterValueGroup pgconfig = createGroup(choice, " PostGISParameters");
+                    getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
+                    getOrCreateValue(pgconfig,"port").setValue(5432);
+                    getOrCreateValue(pgconfig,"database").setValue("cite-wfs");
+                    getOrCreateValue(pgconfig,"schema").setValue("public");
+                    getOrCreateValue(pgconfig,"user").setValue("test");
+                    getOrCreateValue(pgconfig,"password").setValue("test");
+                    getOrCreateValue(pgconfig,"namespace").setValue("no namespace");
 
                     //add a custom sql query layer
-                    ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("CustomSQLQuery");
-                    layer.parameter(LAYER_QUERY_LANGUAGE.getName().getCode()).setValue("CUSTOM-SQL");
-                    layer.parameter(LAYER_QUERY_STATEMENT.getName().getCode()).setValue(
-                            "SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
+                    final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                    getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
+                    getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
+                    getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");            
                 }
 
                 //empty configuration for others

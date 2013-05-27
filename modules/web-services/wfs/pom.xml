@@ -124,25 +124,7 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-shapefile</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-coveragesql</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-postgis</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-om</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -154,13 +136,7 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-sml</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-datastore</artifactId>
+      <artifactId>cstl-store-data-featurestore</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

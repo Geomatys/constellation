@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.File;
 import java.util.Arrays;
-import java.util.StringTokenizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +65,7 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.lucene.index.IndexDirectoryFilter;
+import org.geotoolkit.util.StringUtilities;
 
 /**
  * The base for The CSW configurer.
@@ -133,6 +133,13 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             final String id = getParameter("ID", true, parameters);
             final String identifierList = getParameter("IDENTIFIERS", true, parameters);
             return addToIndex(id, identifierList);
+        }
+        
+        if ("RemoveFromIndex".equalsIgnoreCase(request)) {
+
+            final String id = getParameter("ID", true, parameters);
+            final String identifierList = getParameter("IDENTIFIERS", true, parameters);
+            return removeFromIndex(id, identifierList);
         }
 
         if ("stopIndex".equalsIgnoreCase(request)) {
@@ -503,12 +510,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
      */
     public AcknowlegementType addToIndex(final String id, final String identifierList) throws CstlServiceException {
         LOGGER.info("Add to index requested");
-        final List<String> identifiers = new ArrayList<String>();
-        final StringTokenizer tokens = new StringTokenizer(identifierList, ",;");
-        while (tokens.hasMoreTokens()) {
-            final String token = tokens.nextToken().trim();
-            identifiers.add(token);
-        }
+        final List<String> identifiers = StringUtilities.toStringList(identifierList);
         AbstractIndexer indexer  = null;
         try {
             final CSWMetadataReader reader  = initReader(id);
@@ -516,7 +518,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             if (reader != null) {
                 try {
                     for (String identifier : identifiers) {
-                        objectToIndex.add(reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115));
+                        objectToIndex.add(reader.getMetadata(identifier, AbstractMetadataReader.NATIVE));
                     }
                 } catch (MetadataIoException ex) {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
@@ -543,6 +545,38 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         final String msg = "The specified record have been added to the CSW index";
         return new AcknowlegementType("Success", msg);
     }
+    
+    /**
+     * Remove some CSW record to the index.
+     *
+     * @param asynchrone
+     * @return
+     * @throws CstlServiceException
+     */
+    public AcknowlegementType removeFromIndex(final String id, final String identifierList) throws CstlServiceException {
+        LOGGER.info("Remove from index requested");
+        final List<String> identifiers = StringUtilities.toStringList(identifierList);
+        AbstractIndexer indexer  = null;
+        try {
+            final CSWMetadataReader reader  = initReader(id);
+            indexer = initIndexer(id, reader);
+            if (indexer != null) {
+                for (String metadataID : identifiers) {
+                    indexer.removeDocument(metadataID);
+                }
+            } else {
+                throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
+            }
+
+        } finally {
+            if (indexer != null) {
+                indexer.destroy();
+            }
+        }
+
+        final String msg = "The specified record have been remove from the CSW index";
+        return new AcknowlegementType("Success", msg);
+    }
 
     private AcknowlegementType importRecords(final String id, final File f, final String fileName) throws CstlServiceException {
         LOGGER.info("Importing record");
@@ -561,12 +595,12 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         } else {
             throw new CstlServiceException("Unexpected file extension, accepting zip or xml");
         }
-        Unmarshaller u = null;
         try {
-            u = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
+            final Unmarshaller u = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
             for (File importedFile: files) {
                 if (importedFile != null) {
                     Object unmarshalled = u.unmarshal(importedFile);
+                    EBRIMMarshallerPool.getInstance().release(u);
                     if (unmarshalled instanceof JAXBElement) {
                         unmarshalled = ((JAXBElement)unmarshalled).getValue();
                     }
@@ -581,10 +615,6 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             LOGGER.log(Level.WARNING, "Exception while unmarshalling imported file", ex);
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
-        } finally {
-            if (u != null) {
-                EBRIMMarshallerPool.getInstance().release(u);
-            }
         }
         return new AcknowlegementType("Error", "An error occurs during the process");
     }
@@ -649,7 +679,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             throw new ConfigurationException("No configuration directory have been found");
         } else {
             cswConfigDir = new File(configDir, "CSW");
-            if (cswConfigDir == null || !cswConfigDir.isDirectory()) {
+            if (!cswConfigDir.isDirectory()) {
                 throw new ConfigurationException("No CSW configuration directory have been found");
             }
             return cswConfigDir;

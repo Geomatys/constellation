@@ -37,7 +37,6 @@ import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 
 // Apache Lucene dependencies
@@ -52,11 +51,11 @@ import org.constellation.filter.FilterParserException;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -77,49 +76,36 @@ import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
-import org.geotoolkit.csw.xml.v202.AcknowledgementType;
-import org.geotoolkit.csw.xml.v202.Capabilities;
-import org.geotoolkit.csw.xml.v202.DeleteType;
-import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
-import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
-import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
-import org.geotoolkit.csw.xml.v202.HarvestResponseType;
-import org.geotoolkit.csw.xml.v202.InsertType;
-import org.geotoolkit.csw.xml.v202.QueryType;
-import org.geotoolkit.csw.xml.v202.SearchResultsType;
-import org.geotoolkit.csw.xml.v202.TransactionResponseType;
-import org.geotoolkit.csw.xml.v202.TransactionSummaryType;
-import org.geotoolkit.csw.xml.v202.UpdateType;
-import org.geotoolkit.csw.xml.v202.SchemaComponentType;
-import org.geotoolkit.csw.xml.v202.EchoedRequestType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.ogc.xml.v110.FilterCapabilities;
-import org.geotoolkit.ogc.xml.v110.SortByType;
-import org.geotoolkit.ogc.xml.v110.SortPropertyType;
+import org.geotoolkit.ogc.xml.SortBy;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.Sections;
-import org.geotoolkit.ows.xml.v100.DomainType;
-import org.geotoolkit.ows.xml.v100.Operation;
-import org.geotoolkit.ows.xml.v100.OperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractDomain;
+import org.geotoolkit.ows.xml.AbstractOperation;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.geotoolkit.ows.xml.v100.ServiceIdentification;
-import org.geotoolkit.ows.xml.v100.ServiceProvider;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // GeoAPI dependencies
 import org.opengis.filter.sort.SortOrder;
+import org.opengis.filter.capability.FilterCapabilities;
 import org.opengis.util.CodeList;
 
 
@@ -215,11 +201,10 @@ public class CSWworker extends AbstractWorker {
      */
     private int profile;
 
-    /**
-     * The current version of the service.
-     */
-    private ServiceDef actingVersion = ServiceDef.CSW_2_0_2;
-
+    private MetadataSecurityFilter securityFilter;
+    
+    private Automatic configuration;
+            
     /**
      * Build a new CSW worker with the specified configuration directory
      *
@@ -236,12 +221,13 @@ public class CSWworker extends AbstractWorker {
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
      *
      */
-    public CSWworker(final String serviceID, final File configDir, Automatic configuration) {
+    public CSWworker(final String serviceID, final File configDir, Automatic candidate) {
         super(serviceID, configDir, ServiceDef.Specification.CSW);
+        setSupportedVersion(ServiceDef.CSW_2_0_2);
         isStarted = true;
         try {
             //we look if the configuration have been specified
-            if (configuration == null) {
+            if (candidate == null) {
                 final MarshallerPool pool             = GenericDatabaseMarshallerPool.getInstance();
                 final Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
                 final File configFile                 = new File(configDir, "config.xml");
@@ -251,10 +237,11 @@ public class CSWworker extends AbstractWorker {
                     isStarted = false;
                     return;
                 } else {
-                    configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
+                    candidate = (Automatic) configUnmarshaller.unmarshal(configFile);
                 }
                 pool.release(configUnmarshaller);
             }
+            configuration = candidate;
 
             // we initialize the filterParsers
             init(configuration, "", configDir);
@@ -265,10 +252,10 @@ public class CSWworker extends AbstractWorker {
             // look for log level
             setLogLevel(configuration.getLogLevel());
 
-            // look for transaction security
-            final String ts = configuration.getParameter("transactionSecurized");
-            if (ts != null && !ts.isEmpty()) {
-                transactionSecurized = Boolean.parseBoolean(ts);
+            // look for shiro accessibility
+            final String sa = configuration.getParameter("shiroAccessible");
+            if (sa != null && !sa.isEmpty()) {
+                shiroAccessible = Boolean.parseBoolean(sa);
             }
             LOGGER.info("CSW" + suffix + " worker (" + configuration.getFormat() + ") \"" + serviceID + "\" running\n");
 
@@ -330,6 +317,7 @@ public class CSWworker extends AbstractWorker {
         indexSearcher                 = cswfactory.getIndexSearcher(configDir, serviceID);
         luceneFilterParser            = cswfactory.getLuceneFilterParser();
         sqlFilterParser               = cswfactory.getSQLFilterParser();
+        securityFilter                = cswfactory.getSecurityFilter();
         if (profile == TRANSACTIONAL) {
             mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);
             catalogueHarvester        = cswfactory.getCatalogueHarvester(configuration, mdWriter);
@@ -378,7 +366,9 @@ public class CSWworker extends AbstractWorker {
             supportedTypeNames.addAll(EBRIM30_TYPE_NAMES);
             supportedTypeNames.addAll(EBRIM25_TYPE_NAMES);
         }
-
+        if (supportedDataTypes.contains(ISO_19110)) {
+            supportedTypeNames.addAll(FC_TYPE_NAMES);
+        }
     }
 
     /**
@@ -416,21 +406,17 @@ public class CSWworker extends AbstractWorker {
      * @throws CstlServiceException if there is a JAXBException while using the unmarshaller.
      */
     private void initializeRecordSchema() throws CstlServiceException {
-        Unmarshaller unmarshaller = null;
         try {
-            unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
+            final Unmarshaller unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
 
-            schemas.put(RECORD_QNAME,            unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/record.xsd")));
-            schemas.put(METADATA_QNAME,          unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/metadata.xsd")));
+            schemas.put(RECORD_QNAME,              unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/record.xsd")));
+            schemas.put(METADATA_QNAME,            unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/metadata.xsd")));
             schemas.put(EXTRINSIC_OBJECT_QNAME,    unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd")));
             schemas.put(EXTRINSIC_OBJECT_25_QNAME, unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd")));
+             XSDMarshallerPool.getInstance().release(unmarshaller);
 
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB Exception when trying to parse xsd file", ex, NO_APPLICABLE_CODE);
-        } finally {
-            if (unmarshaller != null) {
-                XSDMarshallerPool.getInstance().release(unmarshaller);
-            }
         }
     }
 
@@ -510,7 +496,7 @@ public class CSWworker extends AbstractWorker {
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
-    public Capabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
+    public AbstractCapabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
         LOGGER.log(logLevel, "getCapabilities request processing\n");
         final long startTime = System.currentTimeMillis();
@@ -531,15 +517,29 @@ public class CSWworker extends AbstractWorker {
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
+        
+        Sections sections = requestCapabilities.getSections();
+        if (sections == null) {
+            sections = new SectionsType(ALL);
+        }
+        //according to CITE test a GetCapabilities must always return Filter_Capabilities
+        if (!sections.containsSection(FILTER_CAPABILITIES) || sections.containsSection(ALL)) {
+            sections.add(FILTER_CAPABILITIES);
+        }
+        
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
         if (returnUS) {
-            return new Capabilities("2.0.2", getCurrentUpdateSequence());
+            return CswXmlFactory.createCapabilities("2.0.2", getCurrentUpdateSequence());
+        }
+        
+        final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache("2.0.2", null);
+        if (cachedCapabilities != null) {
+            return (AbstractCapabilities) cachedCapabilities.applySections(sections);
         }
 
         /*
          final AcceptFormats formats = requestCapabilities.getAcceptFormats();
-
 
          if (formats != null && formats.getOutputFormat().size() > 0 && !formats.getOutputFormat().contains(MimeType.TEXT_XML)) {
 
@@ -547,170 +547,145 @@ public class CSWworker extends AbstractWorker {
              throw new OWSWebServiceException("accepted format : text/xml",
                                              INVALID_PARAMETER_VALUE, "acceptFormats",
                                              version);
-
         }
         */
 
         // we load the skeleton capabilities
-        final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
-        if (skeletonCapabilities == null) {
-            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-        }
+        final AbstractCapabilities skeletonCapabilities = (AbstractCapabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
 
         //we prepare the response document
-        ServiceIdentification si = null;
-        ServiceProvider       sp = null;
-        OperationsMetadata    om = null;
-        FilterCapabilities    fc = null;
-
-        Sections sections = requestCapabilities.getSections();
-        if (sections == null) {
-            sections = new SectionsType(ALL);
+        final AbstractServiceIdentification si = skeletonCapabilities.getServiceIdentification();
+        final AbstractServiceProvider       sp = skeletonCapabilities.getServiceProvider();
+        final FilterCapabilities            fc = CSW_FILTER_CAPABILITIES;
+        final AbstractOperationsMetadata   om  = CSWConstants.OPERATIONS_METADATA.clone();
+        
+        // we remove the operation not supported in this profile (transactional/discovery)
+        if (profile == DISCOVERY) {
+            om.removeOperation("Harvest");
+            om.removeOperation("Transaction");
         }
 
-        //according to CITE test a GetCapabilities must always return Filter_Capabilities
-        if (!sections.containsSection(FILTER_CAPABILITIES) || sections.containsSection(ALL)) {
-            sections.add(FILTER_CAPABILITIES);
-        }
+        // we update the URL
+        om.updateURL(getServiceUrl());
 
-        //we enter the information for service identification.
-        if (sections.containsSection("ServiceIdentification") || sections.containsSection(ALL)) {
-
-            si = skeletonCapabilities.getServiceIdentification();
-        }
-
-        //we enter the information for service provider.
-        if (sections.containsSection("ServiceProvider") || sections.containsSection(ALL)) {
-
-            sp = skeletonCapabilities.getServiceProvider();
-        }
-
-        //we enter the operation Metadata
-        if (sections.containsSection("OperationsMetadata") || sections.containsSection(ALL)) {
-
-            om = skeletonCapabilities.getOperationsMetadata();
-
-            if (om != null) {
-
-                // we remove the operation not supported in this profile (transactional/discovery)
-                if (profile == DISCOVERY) {
-                    om.removeOperation("Harvest");
-                    om.removeOperation("Transaction");
-                }
-
-                // we update the URL
-                om.updateURL(getServiceUrl());
-
-                // we add the cascaded services (if there is some)
-                final DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");
-                if (cascadedCSW == null) {
-                    if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
-                        final DomainType fedCata = new DomainType("FederatedCatalogues", cascadedCSWservers);
-                        om.getConstraint().add(fedCata);
-                    }
-                } else {
-                    if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
-                        cascadedCSW.setValue(cascadedCSWservers);
-                    } else {
-                        om.removeConstraint(cascadedCSW);
-                    }
-                }
-
-                // we update the operation parameters
-                final Operation gr = om.getOperation("GetRecords");
-                if (gr != null) {
-                    final DomainType os = gr.getParameter(OUTPUT_SCHEMA);
-                    if (os != null) {
-                        os.setValue(acceptedResourceType);
-                    }
-                    final DomainType tn = gr.getParameter(TYPENAMES);
-                    if (tn != null) {
-                        final List<String> values = new ArrayList<String>();
-                        for (QName qn : supportedTypeNames) {
-                            values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
-                        }
-                        tn.setValue(values);
-                    }
-
-                    //we update the ISO queryable elements :
-                    final DomainType isoQueryable = gr.getConstraint("SupportedISOQueryables");
-                    if (isoQueryable != null) {
-                        final List<String> values = new ArrayList<String>();
-                        for (String name : ISO_QUERYABLE.keySet() ) {
-                            values.add("apiso:" + name);
-                        }
-                        isoQueryable.setValue(values);
-                    }
-                    //we update the DC queryable elements :
-                    final DomainType dcQueryable = gr.getConstraint("SupportedDublinCoreQueryables");
-                    if (dcQueryable != null) {
-                        final List<String> values = new ArrayList<String>();
-                        for (String name : DUBLIN_CORE_QUERYABLE.keySet() ) {
-                            values.add("dc:" + name);
-                        }
-                        dcQueryable.setValue(values);
-                    }
-
-                    //we update the reader's additional queryable elements :
-                    final DomainType additionalQueryable = gr.getConstraint("AdditionalQueryables");
-                    if (additionalQueryable != null) {
-                        final List<String> values = new ArrayList<String>();
-                        for (QName name : mdReader.getAdditionalQueryableQName()) {
-                            // allow to redefine the mapping in reader implementation
-                            if (!ISO_QUERYABLE.containsKey(name.getLocalPart()) &&
-                                !DUBLIN_CORE_QUERYABLE.containsKey(name.getLocalPart())) {
-                                values.add(name.getPrefix() + ':' + name.getLocalPart());
-                            }
-                        }
-                        if (values.size() > 0) {
-                            additionalQueryable.setValue(values);
-                        }
-                    }
-                }
-
-                final Operation grbi = om.getOperation("GetRecordById");
-                if (grbi != null) {
-                    final DomainType os = grbi.getParameter(OUTPUT_SCHEMA);
-                    if (os != null) {
-                        os.setValue(acceptedResourceType);
-                    }
-                }
-
-                final Operation dr = om.getOperation("DescribeRecord");
-                if (dr != null) {
-                    final DomainType tn = dr.getParameter("TypeName");
-                    if (tn != null) {
-                        final List<String> values = new ArrayList<String>();
-                        for (QName qn : supportedTypeNames) {
-                            values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
-                        }
-                        tn.setValue(values);
-                    }
-                    final DomainType sl = dr.getParameter("SchemaLanguage");
-                    if (sl != null) {
-                        sl.setValue(supportedSchemaLanguage);
-                    }
-                }
-
-                //we add the INSPIRE extend capabilties
-                final InspireCapabilitiesType inspireCapa = new InspireCapabilitiesType(Arrays.asList("FRA", "ENG"));
-                final MultiLingualCapabilities m          = new MultiLingualCapabilities();
-                m.setMultiLingualCapabilities(inspireCapa);
-                om.setExtendedCapabilities(m);
+        // we add the cascaded services (if there is some)
+        final AbstractDomain cascadedCSW  = om.getConstraint("FederatedCatalogues");
+        if (cascadedCSW == null) {
+            if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
+                final AbstractDomain fedCata = CswXmlFactory.createDomain("2.0.2","FederatedCatalogues", cascadedCSWservers);
+                om.addConstraint(fedCata);
+            }
+        } else {
+            if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
+                cascadedCSW.setValue(cascadedCSWservers);
+            } else {
+                om.removeConstraint("FederatedCatalogues");
             }
         }
 
-        //we enter the information filter capablities.
-        if (sections.containsSection(FILTER_CAPABILITIES) || sections.containsSection(ALL)) {
+        // we update the operation parameters
+        final AbstractOperation gr = om.getOperation("GetRecords");
+        if (gr != null) {
+            final AbstractDomain os = gr.getParameter(OUTPUT_SCHEMA);
+            if (os != null) {
+                os.setValue(acceptedResourceType);
+            }
+            final AbstractDomain tn = gr.getParameter(TYPENAMES);
+            if (tn != null) {
+                final List<String> values = new ArrayList<String>();
+                for (QName qn : supportedTypeNames) {
+                    values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
+                }
+                tn.setValue(values);
+            }
 
-            fc = skeletonCapabilities.getFilterCapabilities();
+            //we update the ISO queryable elements :
+            final AbstractDomain isoQueryable = gr.getConstraint("SupportedISOQueryables");
+            if (isoQueryable != null) {
+                final List<String> values = new ArrayList<String>();
+                for (String name : ISO_QUERYABLE.keySet() ) {
+                    values.add("apiso:" + name);
+                }
+                isoQueryable.setValue(values);
+            }
+            //we update the DC queryable elements :
+            final AbstractDomain dcQueryable = gr.getConstraint("SupportedDublinCoreQueryables");
+            if (dcQueryable != null) {
+                final List<String> values = new ArrayList<String>();
+                for (String name : DUBLIN_CORE_QUERYABLE.keySet() ) {
+                    values.add("dc:" + name);
+                }
+                dcQueryable.setValue(values);
+            }
+
+            //we update the reader's additional queryable elements :
+            final AbstractDomain additionalQueryable = gr.getConstraint("AdditionalQueryables");
+            if (additionalQueryable != null) {
+                final List<String> values = new ArrayList<String>();
+                for (QName name : mdReader.getAdditionalQueryableQName()) {
+                    // allow to redefine the mapping in reader implementation
+                    if (!ISO_QUERYABLE.containsKey(name.getLocalPart()) &&
+                        !DUBLIN_CORE_QUERYABLE.containsKey(name.getLocalPart())) {
+                        values.add(name.getPrefix() + ':' + name.getLocalPart());
+                    }
+                }
+                if (values.size() > 0) {
+                    additionalQueryable.setValue(values);
+                }
+            }
         }
 
+        final AbstractOperation grbi = om.getOperation("GetRecordById");
+        if (grbi != null) {
+            final AbstractDomain os = grbi.getParameter(OUTPUT_SCHEMA);
+            if (os != null) {
+                os.setValue(acceptedResourceType);
+            }
+        }
 
-        final Capabilities c = new Capabilities(si, sp, om, CSW_202_VERSION, null, fc);
+        final AbstractOperation dr = om.getOperation("DescribeRecord");
+        if (dr != null) {
+            final AbstractDomain tn = dr.getParameter("TypeName");
+            if (tn != null) {
+                final List<String> values = new ArrayList<String>();
+                for (QName qn : supportedTypeNames) {
+                    values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
+                }
+                tn.setValue(values);
+            }
+            final AbstractDomain sl = dr.getParameter("SchemaLanguage");
+            if (sl != null) {
+                sl.setValue(supportedSchemaLanguage);
+            }
+        }
+        
+        final AbstractOperation hr = om.getOperation("Harvest");
+        if (hr != null) {
+            final AbstractDomain tn = hr.getParameter("ResourceType");
+            if (tn != null) {
+                tn.setValue(acceptedResourceType);
+            }
+        }
+        
+        final AbstractOperation tr = om.getOperation("Transaction");
+        if (tr != null) {
+            final AbstractDomain tn = tr.getParameter("ResourceType");
+            if (tn != null) {
+                tn.setValue(acceptedResourceType);
+            }
+        }
 
+        //we add the INSPIRE extend capabilties
+        final InspireCapabilitiesType inspireCapa = new InspireCapabilitiesType(Arrays.asList("FRA", "ENG"));
+        final MultiLingualCapabilities m          = new MultiLingualCapabilities();
+        m.setMultiLingualCapabilities(inspireCapa);
+        om.setExtendedCapabilities(m);
+
+        final AbstractCapabilities c = CswXmlFactory.createCapabilities("2.0.2", si, sp, om, null, fc);
+
+        putCapabilitiesInCache("2.0.2", null, c);
         LOGGER.log(logLevel, "GetCapabilities request processed in {0} ms", (System.currentTimeMillis() - startTime));
-        return c;
+        return (AbstractCapabilities) c.applySections(sections);
     }
 
     /**
@@ -726,10 +701,9 @@ public class CSWworker extends AbstractWorker {
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
 
-        //we prepare the response
-        GetRecordsResponseType response;
-
-        final String id = request.getRequestId();
+        final String version   = request.getVersion().toString();
+        final String id        = request.getRequestId();
+        final String userLogin = getUserLogin();
 
         // we initialize the output format of the response
         initializeOutputFormat(request);
@@ -756,12 +730,12 @@ public class CSWworker extends AbstractWorker {
         }
 
         //We initialize (and verify) the principal attribute of the query
-        QueryType query;
+        Query query;
         List<QName> typeNames;
         final Map<String, QName> variables = new HashMap<String, QName>();
         final Map<String, String> prefixs  = new HashMap<String, String>();
         if (request.getAbstractQuery() != null) {
-            query = (QueryType)request.getAbstractQuery();
+            query = (Query)request.getAbstractQuery();
             typeNames =  query.getTypeNames();
             if (typeNames == null || typeNames.isEmpty()) {
                 throw new CstlServiceException("The query must specify at least typeName.",
@@ -771,7 +745,7 @@ public class CSWworker extends AbstractWorker {
                     if (type != null) {
                         prefixs.put(type.getPrefix(), type.getNamespaceURI());
                         //for ebrim mode the user can put variable after the Qname
-                        if (type.getLocalPart().indexOf('_') != -1 && !type.getLocalPart().startsWith("MD")) {
+                        if (type.getLocalPart().indexOf('_') != -1 && !(type.getLocalPart().startsWith("MD") || type.getLocalPart().startsWith("FC"))) {
                             final StringTokenizer tokenizer = new StringTokenizer(type.getLocalPart(), "_;");
                             type = new QName(type.getNamespaceURI(), tokenizer.nextToken());
                             while (tokenizer.hasMoreTokens()) {
@@ -785,11 +759,7 @@ public class CSWworker extends AbstractWorker {
                     }
                     //we verify that the typeName is supported
                     if (!supportedTypeNames.contains(type)) {
-                        String typeName = "null";
-                        if (type != null) {
-                            typeName = type.getLocalPart();
-                        }
-                        throw new CstlServiceException("The typeName " + typeName + " is not supported by the service:" +'\n' +
+                        throw new CstlServiceException("The typeName " + type.getLocalPart() + " is not supported by the service:" +'\n' +
                                                       "supported one are:" + '\n' + supportedTypeNames(),
                                                       INVALID_PARAMETER_VALUE, TYPENAMES);
                     }
@@ -823,7 +793,7 @@ public class CSWworker extends AbstractWorker {
             set = null;
         }
 
-        SearchResultsType searchResults = null;
+        SearchResults searchResults = null;
 
         //we get the maxRecords wanted and start position
         final Integer maxRecord = request.getMaxRecords();
@@ -839,7 +809,7 @@ public class CSWworker extends AbstractWorker {
             // build the sql query from the specified filter
             final SQLQuery sqlQuery;
             try {
-                sqlQuery = (SQLQuery) sqlFilterParser.getQuery(query.getConstraint(), variables, prefixs);
+                sqlQuery = (SQLQuery) sqlFilterParser.getQuery(query.getConstraint(), variables, prefixs, getConvertibleTypeNames(typeNames));
             } catch (FilterParserException ex) {
                 throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
             }
@@ -848,7 +818,7 @@ public class CSWworker extends AbstractWorker {
            LOGGER.log(logLevel, "ebrim SQL query obtained:{0}", sqlQuery);
            try {
             // we try to execute the query
-            results = mdReader.executeEbrimSQLQuery(sqlQuery.getQuery());
+            results = securityFilter.filterResults(userLogin, mdReader.executeEbrimSQLQuery(sqlQuery.getQuery()));
            } catch (MetadataIoException ex) {
                CodeList execptionCode = ex.getExceptionCode();
                if (execptionCode == null) {
@@ -862,15 +832,15 @@ public class CSWworker extends AbstractWorker {
             // build the lucene query from the specified filter
             final SpatialQuery luceneQuery;
             try {
-                luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(query.getConstraint(), variables, prefixs);
+                luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(query.getConstraint(), variables, prefixs, getConvertibleTypeNames(typeNames));
             } catch (FilterParserException ex) {
                 throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
             }
 
             //we look for a sorting request (for now only one sort is used)
-            final SortByType sortBy = query.getSortBy();
+            final SortBy sortBy = query.getSortBy();
             if (sortBy != null && sortBy.getSortProperty().size() > 0) {
-                final SortPropertyType first = sortBy.getSortProperty().get(0);
+                final org.opengis.filter.sort.SortBy first = sortBy.getSortProperty().get(0);
                 if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().isEmpty()) {
                     throw new CstlServiceException("A SortBy filter must specify a propertyName.",
                                                   NO_APPLICABLE_CODE);
@@ -897,7 +867,7 @@ public class CSWworker extends AbstractWorker {
             }
 
             // we try to execute the query
-            results = executeLuceneQuery(luceneQuery);
+            results = securityFilter.filterResults(userLogin, executeLuceneQuery(luceneQuery));
         }
         final int nbResults = results.length;
 
@@ -949,13 +919,13 @@ public class CSWworker extends AbstractWorker {
 
         // we return only the number of result matching
         if (resultType.equals(ResultType.HITS)) {
-            searchResults = new SearchResultsType(id, (ElementSetType)set, nbResults, nextRecord);
+            searchResults = CswXmlFactory.createSearchResults("2.0.2", id, set, nbResults, nextRecord);
 
         // we return a list of Record
         } else if (resultType.equals(ResultType.RESULTS)) {
 
-            final List<AbstractRecordType> abstractRecords = new ArrayList<AbstractRecordType>();
-            final List<Object> records                     = new ArrayList<Object>();
+            final List<AbstractRecord> abstractRecords = new ArrayList<AbstractRecord>();
+            final List<Object> records                 = new ArrayList<Object>();
             try {
                 for (int i = startPos -1; i < max; i++) {
                     final Object obj = mdReader.getMetadata(results[i], mode, set, elementName);
@@ -964,7 +934,7 @@ public class CSWworker extends AbstractWorker {
 
                     } else if (obj != null) {
                         if (mode == DUBLINCORE) {
-                            abstractRecords.add((AbstractRecordType)obj);
+                            abstractRecords.add((AbstractRecord)obj);
                         } else {
                             records.add(obj);
                         }
@@ -982,40 +952,38 @@ public class CSWworker extends AbstractWorker {
 
                 final Object additionalResult = distributedResults.additionalResults.get(i);
                 if (mode == DUBLINCORE) {
-                    abstractRecords.add((AbstractRecordType) additionalResult);
+                    abstractRecords.add((AbstractRecord) additionalResult);
                 } else {
                     records.add(additionalResult);
                 }
             }
 
             if (mode == DUBLINCORE) {
-                searchResults = new SearchResultsType(id,
-                                                      (ElementSetType)set,
+                searchResults = CswXmlFactory.createSearchResults("2.0.2",
+                                                      id,
+                                                      set,
                                                       totalMatched,
                                                       abstractRecords,
+                                                      null,
                                                       abstractRecords.size(),
                                                       nextRecord);
             } else {
-                searchResults = new SearchResultsType(id,
-                                                      (ElementSetType) set,
+                searchResults = CswXmlFactory.createSearchResults("2.0.2",
+                                                      id,
+                                                      set,
                                                       totalMatched,
-                                                      records.size(),
+                                                      null,
                                                       records,
+                                                      records.size(),
                                                       nextRecord);
             }
 
             //we return an Acknowledgement if the request is valid.
         } else if (resultType.equals(ResultType.VALIDATE)) {
-            try {
-                return new AcknowledgementType(id, new EchoedRequestType(request), System.currentTimeMillis());
-
-            } catch(DatatypeConfigurationException ex) {
-                throw new CstlServiceException("DataTypeConfiguration exception while creating acknowledgment response",
-                                               NO_APPLICABLE_CODE);
-            }
+            return CswXmlFactory.createAcknowledgement(version, id, request, System.currentTimeMillis());
         }
 
-        response = new GetRecordsResponseType(id, System.currentTimeMillis(), request.getVersion().toString(), searchResults);
+        GetRecordsResponse response = CswXmlFactory.createGetRecordsResponse(request.getVersion().toString(), id, System.currentTimeMillis(), searchResults);
         LOGGER.log(logLevel, "GetRecords request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
@@ -1055,6 +1023,23 @@ public class CSWworker extends AbstractWorker {
                                           NO_APPLICABLE_CODE);
         }
     }
+    
+    /**
+     * Add the convertible typeName to the list.
+     * Example : MD_Metadata can be converted to a csw:Record
+     * @param typeNames
+     * @return 
+     */
+    private List<QName> getConvertibleTypeNames(final List<QName> typeNames) {
+        final List<QName> result = new ArrayList<QName>();
+        for (QName typeName : typeNames) {
+            if (typeName.equals(RECORD_QNAME) && !result.contains(METADATA_QNAME)) {
+                result.add(METADATA_QNAME);
+            }
+            result.add(typeName);
+        }
+        return result;
+    }
 
     /**
      * web service operation return one or more records specified by there identifier.
@@ -1068,9 +1053,11 @@ public class CSWworker extends AbstractWorker {
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
 
+        final String version   = request.getVersion().toString();
+        final String userLogin = getUserLogin();
+        
         // we initialize the output format of the response
         initializeOutputFormat(request);
-
 
         // we get the level of the record to return (Brief, summary, full)
         ElementSetType set = ElementSetType.SUMMARY;
@@ -1093,10 +1080,10 @@ public class CSWworker extends AbstractWorker {
         }
 
         //we begin to build the result
-        GetRecordByIdResponseType response;
-        final List<String> unexistingID        = new ArrayList<String>();
-        final List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
-        final List<Object> otherRecords        = new ArrayList<Object>();
+        GetRecordByIdResponse response;
+        final List<String> unexistingID    = new ArrayList<String>();
+        final List<AbstractRecord> records = new ArrayList<AbstractRecord>();
+        final List<Object> otherRecords    = new ArrayList<Object>();
 
         final Class expectedType;
         final int mode;
@@ -1123,7 +1110,7 @@ public class CSWworker extends AbstractWorker {
 
             final String saved = id;
             id = executeIdentifierQuery(id);
-            if (id == null) {
+            if (id == null || !securityFilter.allowed(userLogin, id)) {
                 unexistingID.add(saved);
                 LOGGER.log(Level.WARNING, "unexisting id:{0}", saved);
                 continue;
@@ -1158,7 +1145,7 @@ public class CSWworker extends AbstractWorker {
             throwUnexistingIdentifierException(unexistingID);
         }
 
-        response = new GetRecordByIdResponseType(records, otherRecords);
+        response = CswXmlFactory.createGetRecordByIdResponse(version, records, otherRecords);
         LOGGER.log(logLevel, "GetRecordById request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
@@ -1194,7 +1181,7 @@ public class CSWworker extends AbstractWorker {
      * @param request
      * @return
      */
-    public DescribeRecordResponseType describeRecord(final DescribeRecord request) throws CstlServiceException{
+    public DescribeRecordResponse describeRecord(final DescribeRecord request) throws CstlServiceException{
         LOGGER.log(logLevel, "DescribeRecords request processing\n");
         final long startTime = System.currentTimeMillis();
 
@@ -1203,6 +1190,8 @@ public class CSWworker extends AbstractWorker {
         // we initialize the output format of the response
         initializeOutputFormat(request);
 
+        final String version = request.getVersion().toString();
+        
         // we initialize the type names
         List<QName> typeNames = (List<QName>)request.getTypeName();
         if (typeNames == null || typeNames.isEmpty()) {
@@ -1224,34 +1213,34 @@ public class CSWworker extends AbstractWorker {
                                            "\nsupported ones are:\n" + supportedList,
                                           INVALID_PARAMETER_VALUE, "schemaLanguage");
         }
-        final List<SchemaComponentType> components   = new ArrayList<SchemaComponentType>();
+        final List<SchemaComponent> components   = new ArrayList<SchemaComponent>();
 
         if (typeNames.contains(RECORD_QNAME)) {
             final Object object = schemas.get(RECORD_QNAME);
-            final SchemaComponentType component = new SchemaComponentType(Namespaces.CSW_202, schemaLanguage, object);
+            final SchemaComponent component = CswXmlFactory.createSchemaComponent(version, Namespaces.CSW_202, schemaLanguage, object);
             components.add(component);
         }
 
         if (typeNames.contains(METADATA_QNAME)) {
             final Object object = schemas.get(METADATA_QNAME);
-            final SchemaComponentType component = new SchemaComponentType(Namespaces.GMD, schemaLanguage, object);
+            final SchemaComponent component = CswXmlFactory.createSchemaComponent(version, Namespaces.GMD, schemaLanguage, object);
             components.add(component);
         }
 
         if (containsOneOfEbrim30(typeNames)) {
             final Object object = schemas.get(EXTRINSIC_OBJECT_QNAME);
-            final SchemaComponentType component = new SchemaComponentType(EBRIM_30, schemaLanguage, object);
+            final SchemaComponent component = CswXmlFactory.createSchemaComponent(version, EBRIM_30, schemaLanguage, object);
             components.add(component);
         }
 
         if (containsOneOfEbrim25(typeNames)) {
             final Object object = schemas.get(EXTRINSIC_OBJECT_25_QNAME);
-            final SchemaComponentType component = new SchemaComponentType(EBRIM_25, schemaLanguage, object);
+            final SchemaComponent component = CswXmlFactory.createSchemaComponent(version, EBRIM_25, schemaLanguage, object);
             components.add(component);
         }
 
         LOGGER.log(logLevel, "DescribeRecords request processed in {0} ms", (System.currentTimeMillis() - startTime));
-        return new DescribeRecordResponseType(components);
+        return CswXmlFactory.createDescribeRecordResponse(version, components);
     }
 
     /**
@@ -1266,8 +1255,10 @@ public class CSWworker extends AbstractWorker {
         LOGGER.log(logLevel, "GetDomain request processing\n");
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
+        final String currentVersion = request.getVersion().toString();
+        
         // we prepare the response
-        List<DomainValues> responseList = new ArrayList<DomainValues>();
+       final  List<DomainValues> responseList;
 
         final String parameterName = request.getParameterName();
         final String propertyName  = request.getPropertyName();
@@ -1282,23 +1273,18 @@ public class CSWworker extends AbstractWorker {
          * "parameterName" return metadata about the service itself.
          */
         if (parameterName != null) {
+            responseList = new ArrayList<DomainValues>();
             final StringTokenizer tokens = new StringTokenizer(parameterName, ",");
             while (tokens.hasMoreTokens()) {
                 final String token      = tokens.nextToken().trim();
                 final int pointLocation = token.indexOf('.');
                 if (pointLocation != -1) {
 
-                    // we load the skeleton capabilities
-                    final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
-                    if (skeletonCapabilities == null) {
-                        throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-                    }
-                    
                     final String operationName = token.substring(0, pointLocation);
                     final String parameter     = token.substring(pointLocation + 1);
-                    final Operation o          = skeletonCapabilities.getOperationsMetadata().getOperation(operationName);
+                    final AbstractOperation o  = OPERATIONS_METADATA.getOperation(operationName);
                     if (o != null) {
-                        final DomainType param = o.getParameterIgnoreCase(parameter);
+                        final AbstractDomain param = o.getParameterIgnoreCase(parameter);
                         QName type;
                         if ("GetCapabilities".equals(operationName)) {
                             type = CAPABILITIES_QNAME;
@@ -1306,7 +1292,7 @@ public class CSWworker extends AbstractWorker {
                             type = RECORD_QNAME;
                         }
                         if (param != null) {
-                            final DomainValues value = CswXmlFactory.getDomainValues(actingVersion.version.toString(), token, null, param.getValue(), type);
+                            final DomainValues value = CswXmlFactory.getDomainValues(currentVersion, token, null, param.getValue(), type);
                             responseList.add(value);
                         } else {
                             throw new CstlServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
@@ -1343,7 +1329,7 @@ public class CSWworker extends AbstractWorker {
         }
         LOGGER.log(logLevel, "GetDomain request processed in {0} ms", (System.currentTimeMillis() - startTime));
 
-        return CswXmlFactory.getDomainResponse(actingVersion.version.toString(), responseList);
+        return CswXmlFactory.getDomainResponse(currentVersion, responseList);
     }
 
     /**
@@ -1352,29 +1338,21 @@ public class CSWworker extends AbstractWorker {
      * @param request
      * @return
      */
-    public TransactionResponseType transaction(final Transaction request) throws CstlServiceException {
-        return transaction(request, false);
-    }
-
-    /**
-     * A web service method allowing to Insert / update / delete record from the CSW.
-     *
-     * @param request
-     * @param javaCall use this flag to pass the shiro security whan using the worker in a non web context.
-     * @return
-     */
-    public TransactionResponseType transaction(final Transaction request, final boolean javaCall) throws CstlServiceException {
+    public TransactionResponse transaction(final Transaction request) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
 
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
         }
-        if (!javaCall && transactionSecurized && !SecurityManager.isAuthenticated()) {
+        if (shiroAccessible && isTransactionSecurized() && !SecurityManager.isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform a transaction request.");
         }
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
+        
+        final String version = request.getVersion().toString();
+        
         // we prepare the report
         int totalInserted       = 0;
         int totalUpdated        = 0;
@@ -1383,8 +1361,8 @@ public class CSWworker extends AbstractWorker {
 
         final List<Object> transactions = request.getInsertOrUpdateOrDelete();
         for (Object transaction: transactions) {
-            if (transaction instanceof InsertType) {
-                final InsertType insertRequest = (InsertType)transaction;
+            if (transaction instanceof Insert) {
+                final Insert insertRequest = (Insert)transaction;
 
                 for (Object record : insertRequest.getAny()) {
 
@@ -1404,19 +1382,26 @@ public class CSWworker extends AbstractWorker {
                     }
                 }
 
-            } else if (transaction instanceof DeleteType) {
+            } else if (transaction instanceof Delete) {
                 if (mdWriter.deleteSupported()) {
-                    final DeleteType deleteRequest = (DeleteType)transaction;
-                    //String dataType = deleteRequest.getTypeName();
+                    final Delete deleteRequest = (Delete)transaction;
                     if (deleteRequest.getConstraint() == null) {
                         throw new CstlServiceException("A constraint must be specified.",
                                                       MISSING_PARAMETER_VALUE, "constraint");
                     }
-
+                    final List<QName> typeNames = new ArrayList<QName>();
+                    final String dataType = deleteRequest.getTypeName();
+                    if (dataType != null && !dataType.isEmpty()) {
+                        try {
+                            typeNames.add(TypeNames.valueOf(dataType));
+                        } catch (IllegalArgumentException ex) {
+                            throw new CstlServiceException("Unexpected value for typeName:" + dataType, INVALID_PARAMETER_VALUE, "typeName");
+                        }
+                    }
                     // build the lucene query from the specified filter
                     final SpatialQuery luceneQuery;
                     try {
-                        luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(deleteRequest.getConstraint(), null, null);
+                        luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(deleteRequest.getConstraint(), null, null, getConvertibleTypeNames(typeNames));
                     } catch (FilterParserException ex) {
                         throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
                     }
@@ -1446,9 +1431,9 @@ public class CSWworker extends AbstractWorker {
                 }
 
 
-            } else if (transaction instanceof UpdateType) {
+            } else if (transaction instanceof Update) {
                 if (mdWriter.updateSupported()) {
-                    final UpdateType updateRequest = (UpdateType) transaction;
+                    final Update updateRequest = (Update) transaction;
                     if (updateRequest.getConstraint() == null) {
                         throw new CstlServiceException("A constraint must be specified.",
                                 MISSING_PARAMETER_VALUE, "constraint");
@@ -1460,11 +1445,12 @@ public class CSWworker extends AbstractWorker {
                         throw new CstlServiceException("You must choose between the any part or a list of RecordProperty, you can't specify both.",
                                 MISSING_PARAMETER_VALUE, "MD_Metadata");
                     }
-
+                    
+                    final List<QName> typeNames = new ArrayList<QName>();
                     // build the lucene query from the specified filter
                     final SpatialQuery luceneQuery;
                     try {
-                        luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(updateRequest.getConstraint(), null, null);
+                        luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(updateRequest.getConstraint(), null, null, getConvertibleTypeNames(typeNames));
                     } catch (FilterParserException ex) {
                         throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
                     }
@@ -1516,11 +1502,9 @@ public class CSWworker extends AbstractWorker {
                         NO_APPLICABLE_CODE);
             }
         }
-        final TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
-                                                                          totalUpdated,
-                                                                          totalDeleted,
-                                                                          requestID);
-        final TransactionResponseType response = new TransactionResponseType(summary, null, request.getVersion().toString());
+        final TransactionSummary summary = CswXmlFactory.createTransactionSummary(version, totalInserted, totalUpdated, totalDeleted, requestID);
+        
+        final TransactionResponse response = CswXmlFactory.createTransactionResponse(version, summary, null);
         LOGGER.log(logLevel, "Transaction request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
@@ -1531,17 +1515,19 @@ public class CSWworker extends AbstractWorker {
      * @param request
      * @return
      */
-    public HarvestResponseType harvest(final Harvest request) throws CstlServiceException {
+    public HarvestResponse harvest(final Harvest request) throws CstlServiceException {
         LOGGER.log(logLevel, "Harvest request processing\n");
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
         }
-        if (transactionSecurized && !SecurityManager.isAuthenticated()) {
+        if (isTransactionSecurized() && !SecurityManager.isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform a harvest request.");
         }
         verifyBaseRequest(request);
-        HarvestResponseType response;
+        final String version = request.getVersion().toString();
+        
+        HarvestResponse response;
         // we prepare the report
         final int totalInserted;
         final int totalUpdated;
@@ -1585,18 +1571,15 @@ public class CSWworker extends AbstractWorker {
                         totalUpdated  = results[1];
                         totalDeleted  = results[2];
                     }
-                    final TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
-                                                                                      totalUpdated,
-                                                                                      totalDeleted,
-                                                                                      null);
-                    final TransactionResponseType transactionResponse = new TransactionResponseType(summary, null, request.getVersion().toString());
-                    response = new HarvestResponseType(transactionResponse);
+                    final TransactionSummary summary = CswXmlFactory.createTransactionSummary(version, totalInserted, totalUpdated, totalDeleted, null);
+                    final TransactionResponse transactionResponse = CswXmlFactory.createTransactionResponse(version, summary, null);
+                    response = CswXmlFactory.createHarvestResponse(version, transactionResponse);
 
                 //mode asynchronous
                 } else {
 
-                    final AcknowledgementType acknowledgement = new AcknowledgementType(null, new EchoedRequestType(request), System.currentTimeMillis());
-                    response = new HarvestResponseType(acknowledgement);
+                    final Acknowledgement acknowledgement = CswXmlFactory.createAcknowledgement(version, null, request, System.currentTimeMillis());
+                    response = CswXmlFactory.createHarvestResponse(version, acknowledgement);
                     long period = 0;
                     if (request.getHarvestInterval() != null) {
                         period = request.getHarvestInterval().getTimeInMillis(new Date(System.currentTimeMillis()));
@@ -1618,9 +1601,6 @@ public class CSWworker extends AbstractWorker {
             } catch (IOException ex) {
                 throw new CstlServiceException("The service can't open the connection to the source",
                                               INVALID_PARAMETER_VALUE, SOURCE);
-            } catch (DatatypeConfigurationException ex) {
-                throw new CstlServiceException("The service has made an error of timestamp",
-                                              INVALID_PARAMETER_VALUE);
             }
 
         } else {
@@ -1680,9 +1660,9 @@ public class CSWworker extends AbstractWorker {
                  * TODO remove this
                  */
                 if (request.getVersion().toString().equals(CSW_202_VERSION)) {
-                    this.actingVersion = ServiceDef.CSW_2_0_2;
+                    request.setVersion(ServiceDef.CSW_2_0_2.version.toString());
                 } else if (request.getVersion().toString().equals("2.0.0") && (request instanceof GetDomain)) {
-                    this.actingVersion = ServiceDef.CSW_2_0_0;
+                    request.setVersion(ServiceDef.CSW_2_0_0.version.toString());
 
                 } else {
                     throw new CstlServiceException("version must be \"2.0.2\"!", VERSION_NEGOTIATION_FAILED, "version");
@@ -1758,6 +1738,7 @@ public class CSWworker extends AbstractWorker {
      */
     @Override
     public void destroy() {
+        super.destroy();
         if (mdReader != null) {
             mdReader.destroy();
         }
@@ -1800,5 +1781,21 @@ public class CSWworker extends AbstractWorker {
     protected MarshallerPool getMarshallerPool() {
         return CSWMarshallerPool.getInstance();
     }
+    
+    public void clearCache() throws CstlServiceException {
+        try {
+            indexSearcher.refresh();
+            mdReader.clearCache();
+        } catch (IndexingException ex) {
+            throw new CstlServiceException("Error while refreshing cache", ex, NO_APPLICABLE_CODE);
+        }
+    }
 
+   @Override
+    protected String getProperty(final String key) {
+        if (configuration != null) {
+            return configuration.getParameter(key);
+        }
+        return null;
+    }
 }

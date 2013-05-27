@@ -70,10 +70,13 @@ public final class QueryConstants {
     
     //CSW operations
     public static final String REQUEST_REFRESH_INDEX         = "refreshIndex"; 
+    public static final String REQUEST_ADD_TO_INDEX          = "AddToIndex";
+    public static final String REQUEST_REMOVE_FROM_INDEX     = "RemoveFromIndex";
     public static final String REQUEST_IMPORT_RECORDS        = "importRecords"; 
     public static final String REQUEST_DELETE_RECORDS        = "deleteRecords";
     public static final String REQUEST_METADATA_EXIST        = "metadataExist"; 
     public static final String REQUEST_AVAILABLE_SOURCE_TYPE = "getCSWDatasourceType"; 
+    public static final String REQUEST_CLEAR_CACHE           = "clearCache"; 
     
     //Service operations
     public static final String REQUEST_UPDATE_CAPABILITIES   = "updateCapabilities"; 
@@ -86,6 +89,7 @@ public final class QueryConstants {
     public static final String ACCEPT_VERSIONS_PARAMETER = "ACCEPTVERSIONS";
     public static final String ACCEPT_FORMATS_PARAMETER = "AcceptFormats";
     public static final String SECTIONS_PARAMETER = "Sections";
+    public static final String SERVICE_PARAMETER_LC = "service";
     
     private QueryConstants(){}
     

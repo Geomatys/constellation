@@ -49,7 +49,6 @@ import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 
 
 /**
@@ -70,15 +69,16 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testGetCapabilities() throws JAXBException, CstlServiceException {
-        final GetCapabilities request = new GetCapabilitiesType(null, null);
-        final GetCapabilitiesResponse response = WORKER.getCapabilities(request);
+        GetCapabilities request = new GetCapabilitiesType("1.0.0", "WCS", null, null);
+        GetCapabilitiesResponse response = WORKER.getCapabilities(request);
 
         assertNotNull(response);
         assertTrue(response instanceof WCSCapabilitiesType);
-        final WCSCapabilitiesType getCaps = (WCSCapabilitiesType) response;
+        WCSCapabilitiesType getCaps = (WCSCapabilitiesType) response;
 
         
         // Verifies that the test layer is present into the GetCapabilities response.
+        boolean find = false;
         final List<CoverageOfferingBriefType> offerings = getCaps.getContentMetadata().getCoverageOfferingBrief();
         assertFalse(offerings.isEmpty());
         for (CoverageOfferingBriefType offering : offerings) {
@@ -86,12 +86,35 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
                 if (string.getName().getLocalPart().equalsIgnoreCase("name") &&
                     string.getValue().equals(LAYER_TEST))
                 {
-                    return;
+                    find = true;
                 }
             }
         }
         // Not found in the list of coverage offerings, there is a mistake here.
-        fail("Unable to find the layer "+ LAYER_TEST +" in the GetCapabilities document.");
+        if (!find) {
+            fail("Unable to find the layer "+ LAYER_TEST +" in the GetCapabilities document.");
+        }
+        
+        request = new GetCapabilitiesType("1.0.0", "WCS", "/WCS_Capabilities/Capability", null);
+        getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
+        
+        assertNotNull(getCaps.getCapability());
+        assertNull(getCaps.getContentMetadata());
+        assertNull(getCaps.getService());
+        
+        request = new GetCapabilitiesType("1.0.0", "WCS", "/WCS_Capabilities/Service", null);
+        getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
+        
+        assertNull(getCaps.getCapability());
+        assertNull(getCaps.getContentMetadata());
+        assertNotNull(getCaps.getService());
+        
+        request = new GetCapabilitiesType("1.0.0", "WCS", "/WCS_Capabilities/ContentMetadata", null);
+        getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
+        
+        assertNull(getCaps.getCapability());
+        assertNotNull(getCaps.getContentMetadata());
+        assertNull(getCaps.getService());
     }
 
     /**
@@ -169,8 +192,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         pos.add(new DirectPositionType(180.0, 90.0));
         final EnvelopeType envelope = new EnvelopeType(pos, "CRS:84");
         final DomainSubsetType domain = new DomainSubsetType(null, new SpatialSubsetType(envelope, grid));
-        final GetCoverage request = new GetCoverageType(
-                LAYER_TEST, domain, null, null, new OutputType(MimeType.IMAGE_PNG, "CRS:84"));
+        GetCoverage request = new GetCoverageType(LAYER_TEST, domain, null, null, new OutputType(MimeType.IMAGE_PNG, "CRS:84"));
 
         // Finally execute the request on the worker.
         final RenderedImage image = (RenderedImage) WORKER.getCoverage(request);
@@ -181,5 +203,15 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         // TODO: the image should have indexed colors. Find the origin of the conversion from
         //       indexed color to RGB (int values).
 //        assertEquals(Commons.checksum(image), 3183786073L);
+        
+        
+        request = new GetCoverageType(LAYER_TEST, domain, null, "WCS_INTERPLATION_METHOD_INVALID", new OutputType(MimeType.IMAGE_PNG, "CRS:84"));
+        boolean exLaunched = false;
+        try {
+            WORKER.getCoverage(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+        }
+        assertTrue(exLaunched);
     }
 }

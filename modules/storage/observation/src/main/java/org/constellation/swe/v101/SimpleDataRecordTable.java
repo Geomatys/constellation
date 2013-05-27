@@ -182,7 +182,11 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordType> 
                 } else {
                     statement.statement.setNull(indexOf(query.definition),  java.sql.Types.VARCHAR);
                 }
-                statement.statement.setBoolean(indexOf(query.fixed),       datarecord.isFixed());
+                if (datarecord.isFixed() != null) {
+                    statement.statement.setBoolean(indexOf(query.fixed), datarecord.isFixed());
+                } else {
+                    statement.statement.setNull(indexOf(query.fixed), java.sql.Types.BOOLEAN);
+                }
                 updateSingleton(statement.statement);
                 release(lc, statement);
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sa:SamplingPoint xmlns:sa="http://www.opengis.net/sampling/1.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="station-001">
+    <gml:description>Point d'eau BSSS</gml:description>
+    <gml:name>10972X0137-PONT</gml:name>
+    <gml:boundedBy>
+        <gml:Null>not_bounded</gml:Null>
+    </gml:boundedBy>
+    <sa:sampledFeature xlink:href="urn:-sandre:object:bdrhf:123X"/>
+    <sa:position>
+        <gml:Point gml:id="STATION-LOCALISATION">
+            <gml:pos srsName="urn:ogc:def:crs:epsg:7.9:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+        </gml:Point>
+    </sa:position>
+</sa:SamplingPoint>

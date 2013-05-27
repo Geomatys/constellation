@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sos:ObservationOffering gml:id="offering-allSensor" xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0">
+    <gml:name>offering-allSensor</gml:name>
+    <gml:srsName>EPSG:4326</gml:srsName>
+    <gml:boundedBy>
+        <gml:Null>not_bounded</gml:Null>
+
+    </gml:boundedBy>
+    <sos:time>
+        <gml:TimePeriod>
+            <gml:beginPosition>2008-05-14T10:40:25.236</gml:beginPosition>
+            <gml:endPosition indeterminatePosition="now"></gml:endPosition>
+        </gml:TimePeriod>
+    </sos:time>
+    <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:2"/>
+    <sos:observedProperty>
+        <swe:CompositePhenomenon dimension="2" gml:id="depth-temperature">
+            <gml:name>urn:ogc:def:phenomenon:GEOM:resultComponents</gml:name>
+            <swe:component>
+                <swe:Phenomenon gml:id="temperature">
+                    <gml:name>urn:ogc:def:phenomenon:GEOM:temperature</gml:name>
+                </swe:Phenomenon>
+            </swe:component>
+            <swe:component>
+                <swe:Phenomenon gml:id="depth">
+                    <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
+                </swe:Phenomenon>
+            </swe:component>
+        </swe:CompositePhenomenon>
+    </sos:observedProperty>
+    <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:depth"/>
+    <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:temperature"/>
+    <sos:featureOfInterest xlink:href="station-001"/>
+    <sos:featureOfInterest xlink:href="station-002"/>
+    <sos:featureOfInterest xlink:href="station-006"/>
+    <sos:responseFormat>application/xml</sos:responseFormat>
+    <sos:resultModel>om:Observation</sos:resultModel>
+    <sos:resultModel>om:Measurement</sos:resultModel>
+    <sos:responseMode>inline</sos:responseMode>
+    <sos:responseMode>resultTemplate</sos:responseMode>
+</sos:ObservationOffering>

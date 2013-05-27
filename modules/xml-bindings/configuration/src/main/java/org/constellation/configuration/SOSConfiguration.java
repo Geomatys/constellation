@@ -212,8 +212,9 @@ public class SOSConfiguration {
      * @return the observationFilterType
      */
     public DataSourceType getObservationFilterType() {
-        if (observationFilterType == null)
+        if (observationFilterType == null) {
             observationFilterType = DataSourceType.POSTGRID;
+        }
         return observationFilterType;
     }
 
@@ -228,8 +229,9 @@ public class SOSConfiguration {
      * @return the observationReaderType
      */
     public DataSourceType getObservationReaderType() {
-        if (observationReaderType == null)
+        if (observationReaderType == null) {
             observationReaderType = DataSourceType.POSTGRID;
+        }
         return observationReaderType;
     }
 
@@ -244,8 +246,9 @@ public class SOSConfiguration {
      * @return the SMLType
      */
     public DataSourceType getSMLType() {
-        if (smlType == null)
+        if (smlType == null) {
             smlType = DataSourceType.MDWEB;
+        }
         return smlType;
     }
 
@@ -281,6 +284,7 @@ public class SOSConfiguration {
     /**
      * @return the observationIdBase
      */
+    @Deprecated
     public String getObservationIdBase() {
         return observationIdBase;
     }
@@ -288,6 +292,7 @@ public class SOSConfiguration {
     /**
      * @param observationIdBase the observationIdBase to set
      */
+    @Deprecated
     public void setObservationIdBase(final String observationIdBase) {
         this.observationIdBase = observationIdBase;
     }
@@ -296,6 +301,7 @@ public class SOSConfiguration {
      * return the phenomenon id prefix.
      * @return
      */
+    @Deprecated
     public String getPhenomenonIdBase() {
         return phenomenonIdBase;
     }
@@ -304,6 +310,7 @@ public class SOSConfiguration {
      * set the the phenomenon id prefix.
      * @param phenomenonIdBase
      */
+    @Deprecated
     public void setPhenomenonIdBase(final String phenomenonIdBase) {
         this.phenomenonIdBase = phenomenonIdBase;
     }
@@ -311,6 +318,7 @@ public class SOSConfiguration {
     /**
      * @return the observationTemplateIdBase
      */
+    @Deprecated
     public String getObservationTemplateIdBase() {
         return observationTemplateIdBase;
     }
@@ -318,6 +326,7 @@ public class SOSConfiguration {
     /**
      * @param observationTemplateIdBase the observationTemplateIdBase to set
      */
+    @Deprecated
     public void setObservationTemplateIdBase(final String observationTemplateIdBase) {
         this.observationTemplateIdBase = observationTemplateIdBase;
     }
@@ -325,6 +334,7 @@ public class SOSConfiguration {
     /**
      * @return the sensorIdBase
      */
+    @Deprecated
     public String getSensorIdBase() {
         return sensorIdBase;
     }
@@ -332,6 +342,7 @@ public class SOSConfiguration {
     /**
      * @param sensorIdBase the sensorIdBase to set
      */
+    @Deprecated
     public void setSensorIdBase(final String sensorIdBase) {
         this.sensorIdBase = sensorIdBase;
     }
@@ -339,6 +350,7 @@ public class SOSConfiguration {
     /**
      * @return the maxObservationByRequest
      */
+    @Deprecated
     public int getMaxObservationByRequest() {
         return maxObservationByRequest;
     }
@@ -346,6 +358,7 @@ public class SOSConfiguration {
     /**
      * @param maxObservationByRequest the maxObservationByRequest to set
      */
+    @Deprecated
     public void setMaxObservationByRequest(final int maxObservationByRequest) {
         this.maxObservationByRequest = maxObservationByRequest;
     }
@@ -353,6 +366,7 @@ public class SOSConfiguration {
     /**
      * @return the templateValidTime
      */
+    @Deprecated
     public String getTemplateValidTime() {
         return templateValidTime;
     }
@@ -360,6 +374,7 @@ public class SOSConfiguration {
     /**
      * @param templateValidTime the templateValidTime to set
      */
+    @Deprecated
     public void setTemplateValidTime(final String templateValidTime) {
         this.templateValidTime = templateValidTime;
     }
@@ -382,12 +397,15 @@ public class SOSConfiguration {
      * Return a flag for the SOS profile (discovery/transactional)
      * @return
      */
+    @Deprecated
     public int getProfile() {
-        if ("transactional".equalsIgnoreCase(profile))
+        if ("transactional".equalsIgnoreCase(profile)) {
             return 1;
+        }
         return 0;
     }
     
+    @Deprecated
     public String getProfileValue() {
         return profile;
     }
@@ -396,6 +414,7 @@ public class SOSConfiguration {
      * set the flag for the SOS profile (discovery/transactional)
      * @param profile
      */
+    @Deprecated
     public void setProfile(final String profile) {
         this.profile = profile;
     }
@@ -403,6 +422,7 @@ public class SOSConfiguration {
     /**
      * @return the logFolder
      */
+    @Deprecated
     public String getLogFolder() {
         return logFolder;
     }
@@ -410,6 +430,7 @@ public class SOSConfiguration {
     /**
      * @param logFolder the logFolder to set
      */
+    @Deprecated
     public void setLogFolder(final String logFolder) {
         this.logFolder = logFolder;
     }
@@ -417,6 +438,7 @@ public class SOSConfiguration {
     /**
      * @return the debugMode
      */
+    @Deprecated
     public boolean isDebugMode() {
         return debugMode;
     }
@@ -424,6 +446,7 @@ public class SOSConfiguration {
     /**
      * @param debugMode the debugMode to set
      */
+    @Deprecated
     public void setDebugMode(final boolean debugMode) {
         this.debugMode = debugMode;
     }
@@ -431,6 +454,7 @@ public class SOSConfiguration {
     /**
      * @return the verifySynchronization
      */
+    @Deprecated
     public boolean isVerifySynchronization() {
         return verifySynchronization;
     }
@@ -438,6 +462,7 @@ public class SOSConfiguration {
     /**
      * @param verifySynchronization the verifySynchronization to set
      */
+    @Deprecated
     public void setVerifySynchronization(final boolean verifySynchronization) {
         this.verifySynchronization = verifySynchronization;
     }
@@ -462,6 +487,7 @@ public class SOSConfiguration {
     /**
      * @return the keepCapabilities
      */
+    @Deprecated
     public boolean isKeepCapabilities() {
         return keepCapabilities;
     }
@@ -469,6 +495,7 @@ public class SOSConfiguration {
     /**
      * @param keepCapabilities the keepCapabilities to set
      */
+    @Deprecated
     public void setKeepCapabilities(final boolean keepCapabilities) {
         this.keepCapabilities = keepCapabilities;
     }

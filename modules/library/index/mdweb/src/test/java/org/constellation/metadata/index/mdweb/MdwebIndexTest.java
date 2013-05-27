@@ -200,6 +200,7 @@ public class MdwebIndexTest {
         expectedResult.add("666-999-666");
         expectedResult.add("999-666-999");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("meta_NaN_id");
 
         assertEquals(expectedResult, result);
 
@@ -746,6 +747,7 @@ public class MdwebIndexTest {
         expectedResult.add("CTDF02");
         expectedResult.add("cat-1");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         assertEquals(expectedResult, result);
 
@@ -767,6 +769,7 @@ public class MdwebIndexTest {
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         expectedResult.add("cat-1");
         expectedResult.add("CTDF02");
@@ -804,6 +807,7 @@ public class MdwebIndexTest {
         expectedResult.add("cat-1"); // TODO why cat-1 in first he is not indexable
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("CTDF02");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
@@ -848,6 +852,7 @@ public class MdwebIndexTest {
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("CTDF02");
         expectedResult.add("cat-1");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
@@ -965,6 +970,7 @@ public class MdwebIndexTest {
         LOGGER.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("meta_NaN_id");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("40510_145_19930221211500");

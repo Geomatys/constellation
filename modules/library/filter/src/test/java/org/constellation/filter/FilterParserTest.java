@@ -21,10 +21,12 @@ package org.constellation.filter;
 import org.geotoolkit.ogc.xml.v110.UpperBoundaryType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
 import java.io.StringReader;
+import java.util.Arrays;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
+import org.geotoolkit.csw.xml.TypeNames;
 
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
@@ -108,7 +110,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -135,7 +137,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -161,7 +163,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -187,7 +189,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -213,7 +215,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -239,7 +241,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -265,7 +267,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -292,7 +294,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -324,7 +326,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -334,7 +336,7 @@ public class FilterParserTest {
          * Test 10: a simple empty Filter
          */
         QueryConstraintType nullConstraint = null;
-        spaQuery = (SpatialQuery) filterParser.getQuery(nullConstraint, null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(nullConstraint, null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -350,7 +352,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -366,11 +368,27 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "CloudCover:{12 TO 2147483648}");
+        
+        /**
+         * Test 12: a simple Filter PropertyIsGreaterThan with numeric field + typeName
+         */
+        filter = FilterParser.cqlToFilter("CloudCover > 12");
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, Arrays.asList(TypeNames.METADATA_QNAME));
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "(CloudCover:{12 TO 2147483648} AND objectType:\"MD_Metadata\")");
 
         pool.release(filterUnmarshaller);
     }
@@ -400,7 +418,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -427,7 +445,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -454,12 +472,21 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "identifier:(*chain_acq_1*)");
 
+        /**
+         * Test 4: a simple Filter PropertyIsLike on a identifier field + typeName
+         */
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, Arrays.asList(TypeNames.METADATA_QNAME));
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "(identifier:(*chain_acq_1*) AND objectType:\"MD_Metadata\")");
+        
         pool.release(filterUnmarshaller);
     }
 
@@ -527,7 +554,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -558,7 +585,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -595,7 +622,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -623,7 +650,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -651,7 +678,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -679,13 +706,24 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "CreationDate:[\"20070602000000\" 30000101000000]");
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.NOT);
+        
+        /**
+         * Test 7: a simple Filter Not PropertyIsGreaterThanOrEqualTo + typeName
+         */
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, Arrays.asList(TypeNames.METADATA_QNAME));
 
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 1);
+        assertEquals(spaQuery.getQuery(), "(objectType:\"MD_Metadata\")");
+        assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.AND);
+        assertEquals(spaQuery.getSubQueries().get(0).getQuery(),"CreationDate:[\"20070602000000\" 30000101000000]"); 
+        assertEquals(spaQuery.getSubQueries().get(0).getLogicalOperator(), SerialChainFilter.NOT);
         pool.release(filterUnmarshaller);
     }
 
@@ -724,7 +762,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    != null);
 
-        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -760,7 +798,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    != null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -794,7 +832,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    != null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -842,7 +880,7 @@ public class FilterParserTest {
         SpatialQuery spaQuery;
         boolean error = false;
         try {
-            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
         } catch (FilterParserException ex) {
             assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
             assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
@@ -871,7 +909,7 @@ public class FilterParserTest {
 
         error = false;
         try {
-            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
         } catch (FilterParserException ex) {
             assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
             assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
@@ -899,7 +937,7 @@ public class FilterParserTest {
 
         error = false;
         try {
-            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
         } catch (FilterParserException ex) {
             assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
             assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
@@ -931,7 +969,7 @@ public class FilterParserTest {
 
         error = false;
         try {
-            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
         } catch (FilterParserException ex) {
             assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
             assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
@@ -963,7 +1001,7 @@ public class FilterParserTest {
 
         error = false;
         try {
-            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
         } catch (FilterParserException ex) {
             assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
             assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
@@ -992,7 +1030,7 @@ public class FilterParserTest {
 
         error = false;
         try {
-            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
         } catch (FilterParserException ex) {
             assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
             assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
@@ -1046,7 +1084,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -1099,7 +1137,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -1165,7 +1203,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(metafile:doc)");
@@ -1236,7 +1274,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(metafile:doc)");
@@ -1310,7 +1348,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(metafile:doc)");
@@ -1390,7 +1428,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(Title:(*VM*))");
@@ -1436,7 +1474,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(Title:(*VM*) AND Title:\"VM\")");
@@ -1485,7 +1523,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(Title:\"VM\")");
@@ -1539,7 +1577,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(Title:(*VM*) OR Title:\"VM\")");
@@ -1589,7 +1627,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(Title:\"VM\")");
@@ -1649,7 +1687,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -1709,7 +1747,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getQuery(), "(metafile:doc NOT Title:\"VMAI\")");
@@ -1791,7 +1829,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(Title:(*VM*))");
@@ -1902,7 +1940,7 @@ public class FilterParserTest {
         assertTrue(filter.getId().isEmpty()   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(metafile:doc)");

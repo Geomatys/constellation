@@ -43,9 +43,9 @@ public enum ServiceDef {
     WCS_1_1_1(Specification.WCS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.0", true),
     WCS_1_1_2(Specification.WCS, Organization.OGC, "1.1.2", Profile.NONE, "1.1.0", true),
     // WFS service definitions
-    WFS_1_0_0(Specification.WFS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true),
-    WFS_1_1_0(Specification.WFS, Organization.OGC, "1.1.0", Profile.NONE, "1.1.0", true),
-    WFS_2_0_0(Specification.WFS, Organization.OGC, "2.0.0", Profile.NONE, "1.1.0", true),
+    WFS_1_0_0(Specification.WFS, Organization.OGC, "1.0.0", Profile.NONE, "1.0.0", true),
+    WFS_1_1_0(Specification.WFS, Organization.OGC, "1.1.0", Profile.NONE, "1.0.0", true),
+    WFS_2_0_0(Specification.WFS, Organization.OGC, "2.0.0", Profile.NONE, "2.0.0", true),
     // CSW service definition
     CSW_2_0_0(Specification.CSW, Organization.OGC, "2.0.0", Profile.CSW_ISO, "1.2.0", true),
     CSW_2_0_2(Specification.CSW, Organization.OGC, "2.0.2", Profile.CSW_ISO, "1.2.0", true),
@@ -53,6 +53,7 @@ public enum ServiceDef {
     CONFIG(Specification.NONE, Organization.NONE, null, Profile.NONE, "1.0", false),
     // SOS service definition
     SOS_1_0_0(Specification.SOS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true),
+    SOS_2_0_0(Specification.SOS, Organization.OGC, "2.0.0", Profile.NONE, "1.1.0", true),
     // Security services definitions
     PEP(Specification.PEP, Organization.OASIS, null, Profile.NONE, null, false),
     PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE, null, false),
@@ -110,7 +111,7 @@ public enum ServiceDef {
         this.owsCompliant = ows;
     }
 
-    public static class Version extends org.geotoolkit.util.Version {
+    public static class Version extends org.apache.sis.util.Version {
 
         private static final long serialVersionUID = -1004484794380489333L;
 
@@ -124,7 +125,7 @@ public enum ServiceDef {
      *
      * @param str A string containing a version number.
      *
-     * @see org.geotoolkit.util.Version#compareTo(org.geotoolkit.util.Version)
+     * @see org.apache.sis.util.Version#compareTo(org.apache.sis.util.Version)
      *
      * @return A negative value if this version is lower than the supplied version, a positive
      *         value if it is higher, or 0 if they are equal.

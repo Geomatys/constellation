@@ -1,10 +1,6 @@
 org.constellation.menu.provider.ProvidersItem
 org.constellation.menu.provider.CoverageFileItem
 org.constellation.menu.provider.CoverageMosaicItem
-org.constellation.menu.provider.OMItem
-org.constellation.menu.provider.PostGISItem
-org.constellation.menu.provider.SensorMLItem
-org.constellation.menu.provider.ShapefileItem
 org.constellation.menu.provider.CoverageStoreItem
-org.constellation.menu.provider.DataStoreItem
+org.constellation.menu.provider.FeatureStoreItem
 org.constellation.menu.provider.ServerStoreItem

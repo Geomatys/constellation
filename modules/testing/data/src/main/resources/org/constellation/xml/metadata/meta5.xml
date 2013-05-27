@@ -245,7 +245,7 @@
                         <gco:CharacterString>92005711.ctd</gco:CharacterString>
                         <gmd:PT_FreeText>
                             <gmd:textGroup>
-                                <gmd:LocalisedCharacterString locale="#locale-eng">other translation</gmd:LocalisedCharacterString>
+                                <gmd:LocalisedCharacterString locale="#locale-eng">92005711.ctd</gmd:LocalisedCharacterString>
                             </gmd:textGroup>
                         </gmd:PT_FreeText>
                     </gmd:title>
@@ -331,7 +331,7 @@
                         <gco:CharacterString>IFREMER / IDM/SISMER</gco:CharacterString>
                         <gmd:PT_FreeText>
                             <gmd:textGroup>
-                                <gmd:LocalisedCharacterString locale="#locale-eng">Nautical britain agency</gmd:LocalisedCharacterString>
+                                <gmd:LocalisedCharacterString locale="#locale-eng">IFREMER / IDM/SISMER</gmd:LocalisedCharacterString>
                             </gmd:textGroup>
                         </gmd:PT_FreeText>
                     </gmd:organisationName>

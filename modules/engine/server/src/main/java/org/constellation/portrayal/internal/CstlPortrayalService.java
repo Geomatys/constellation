@@ -16,7 +16,7 @@
  */
 package org.constellation.portrayal.internal;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import org.constellation.portrayal.PortrayalServiceIF;
@@ -43,7 +43,7 @@ import org.geotoolkit.display2d.service.VisitDef;
  *
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
- * @see Cst.Portrayal
+ * @see Cstl.Portrayal
  * @see Portrayal
  */
 public final class CstlPortrayalService implements PortrayalServiceIF {
@@ -124,6 +124,19 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
     @Override
     public BufferedImage writeInImage(Exception e, Dimension dim){
         return DefaultPortrayalService.writeException(e, dim);
+    }
+
+    /**
+     *{@inheritDoc}
+     */
+    @Override
+    public BufferedImage writeBlankImage(Color color, Dimension dim) {
+        final BufferedImage img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g = img.createGraphics();
+        g.setColor(color);
+        g.fillRect(0, 0, dim.width, dim.height);
+        g.dispose();
+        return img;
     }
 
     /**

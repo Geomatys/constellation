@@ -47,13 +47,16 @@ import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.util.ComparisonMode;
+import org.apache.sis.util.ComparisonMode;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.xml.IdentifierSpace;
 
 import org.opengis.feature.catalog.FeatureCatalogue;
 
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 import org.mdweb.model.storage.FullRecord;
 import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.model.storage.Value;
@@ -62,6 +65,7 @@ import org.mdweb.model.storage.Value;
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class MDWebMetadataWriterTest {
 
 
@@ -145,6 +149,7 @@ public class MDWebMetadataWriterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order=1)
     public void writeMetadataComponentSMLTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -171,6 +176,7 @@ public class MDWebMetadataWriterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order=2)
     public void writeMetadataSystemSMLTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
@@ -213,6 +219,7 @@ public class MDWebMetadataWriterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order=3)
     public void writeMetadataISOXlinkTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_20));
@@ -254,6 +261,7 @@ public class MDWebMetadataWriterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order=4)
     public void writeMetadataGMLTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -363,6 +371,7 @@ public class MDWebMetadataWriterTest {
     }
 
     @Test
+    @Order(order=5)
     public void writeMetadataMultiContactTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
@@ -395,6 +404,7 @@ public class MDWebMetadataWriterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order=5)
     public void writeMetadata19110Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -417,6 +427,7 @@ public class MDWebMetadataWriterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order=6)
     public void writeMetadataDCTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         RecordType absExpResult = (RecordType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
@@ -438,6 +449,7 @@ public class MDWebMetadataWriterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order=7)
     public void writeMetadataISO19115Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -481,6 +493,7 @@ public class MDWebMetadataWriterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order=8)
     public void writeMetadata191152Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -507,6 +520,7 @@ public class MDWebMetadataWriterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order=9)
     public void writeMetadata191152Again() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/imageMetadata.xml"));
@@ -537,6 +551,7 @@ public class MDWebMetadataWriterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order=10)
     public void writeMetadata19119Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -554,6 +569,7 @@ public class MDWebMetadataWriterTest {
     }
 
     @Test
+    @Order(order=11)
     public void writeMetadataEbrimTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -583,6 +599,7 @@ public class MDWebMetadataWriterTest {
     }
 
     @Test
+    @Order(order=12)
     public void writeMetadataEbrim30Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -601,6 +618,7 @@ public class MDWebMetadataWriterTest {
     }
 
     @Test
+    @Order(order=13)
     public void deleteMetadataTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 

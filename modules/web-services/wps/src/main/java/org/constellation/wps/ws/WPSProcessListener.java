@@ -16,14 +16,10 @@
  */
 package org.constellation.wps.ws;
 
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.constellation.ServiceDef;
 import org.constellation.wps.utils.WPSUtils;
@@ -32,37 +28,49 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
+import org.geotoolkit.util.Exceptions;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.wps.converters.WPSConvertersUtils;
 import org.geotoolkit.wps.xml.v100.*;
 
 import org.opengis.parameter.GeneralParameterDescriptor;
 /**
+ * ProcessListener implementation for WPS asynchronous process execution.
  *
  * @author Quentin Boileau (Geomatys).
  */
 public class WPSProcessListener implements ProcessListener{
 
     private static final Logger LOGGER = Logging.getLogger(WPSProcessListener.class);
-    
-    private Execute request;
-    private ExecuteResponse responseDoc;
+    private static final int TIMEOUT = 20000; //processing time step
+
+    private final Execute request;
+    private final ExecuteResponse responseDoc;
+    private final String fileName;
+    private final ServiceDef def;
+    final Map<String, Object> parameters;
     private final String folderPath;
-    private String fileName;
-    private ServiceDef def;
-    private String serviceURL;
     private long nextTimestamp;
-    private static final int TIMEOUT = 20000;
-    
+    private final boolean useStatus;
+
+    /**
+     *
+     * @param request execute request
+     * @param responseDoc ExecuteResponse base
+     * @param fileName name of the file to update
+     * @param def service def (use when exception occurs)
+     */
     public WPSProcessListener(final Execute request, final ExecuteResponse responseDoc, final String fileName, final ServiceDef def,
-            final String serviceURL, final String folderPath) {
+            final Map<String, Object> parameters) {
         this.request = request;
         this.responseDoc = responseDoc;
         this.fileName = fileName;
         this.def = def;
-        this.serviceURL = serviceURL;
+        this.parameters = parameters;
+        this.folderPath = (String) parameters.get(WPSConvertersUtils.OUT_STORAGE_DIR);
         this.nextTimestamp = System.currentTimeMillis() + TIMEOUT;
-        this.folderPath = folderPath;
+        this.useStatus = this.request.getResponseForm().getResponseDocument().isStatus();
     }
     
     @Override
@@ -70,28 +78,32 @@ public class WPSProcessListener implements ProcessListener{
         LOGGER.log(Level.INFO, "Process {0} is started.", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
         final StatusType status = new StatusType();
         final ProcessStartedType started = new ProcessStartedType();
-        status.setCreationTime(getCurrentXMLGregorianCalendar());
+        status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
         started.setValue("Process " + request.getIdentifier().getValue() + " is started");
         started.setPercentCompleted(0);
         status.setProcessStarted(started);
-        responseDoc.setStatus(status);
+        if (useStatus) {
+            responseDoc.setStatus(status);
+        }
         WPSUtils.storeResponse(responseDoc, folderPath, fileName);
     }
 
     @Override
     public void progressing(final ProcessEvent event) {
-        final long currentTimestamp = System.currentTimeMillis();
-        if (currentTimestamp >= (nextTimestamp)){
-            //LOGGER.log(Level.INFO, "Process {0} is progressing : {1}.", new Object[]{WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()), event.getProgress()});
-            nextTimestamp += TIMEOUT;
-            final StatusType status = new StatusType();
-            status.setCreationTime(getCurrentXMLGregorianCalendar());
-            final ProcessStartedType started = new ProcessStartedType();
-            started.setValue("Process " + request.getIdentifier().getValue() + " is pending");
-            started.setPercentCompleted((int) event.getProgress());
-            status.setProcessStarted(started);
-            responseDoc.setStatus(status);
-            WPSUtils.storeResponse(responseDoc, folderPath, fileName);
+        if (useStatus) {
+            final long currentTimestamp = System.currentTimeMillis();
+            if (currentTimestamp >= (nextTimestamp)){
+                //LOGGER.log(Level.INFO, "Process {0} is progressing : {1}.", new Object[]{WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()), event.getProgress()});
+                nextTimestamp += TIMEOUT;
+                final StatusType status = new StatusType();
+                status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
+                final ProcessStartedType started = new ProcessStartedType();
+                started.setValue("Process " + request.getIdentifier().getValue() + " is pending");
+                started.setPercentCompleted((int) event.getProgress());
+                status.setProcessStarted(started);
+                responseDoc.setStatus(status);
+                WPSUtils.storeResponse(responseDoc, folderPath, fileName);
+            }
         }
     }
 
@@ -101,11 +113,10 @@ public class WPSProcessListener implements ProcessListener{
         try {
             final List<GeneralParameterDescriptor> processOutputDesc = event.getSource().getDescriptor().getOutputDescriptor().descriptors();
             final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-            WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput(), serviceURL, folderPath);
+            WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput(), parameters);
             final StatusType status = new StatusType();
-            status.setCreationTime(getCurrentXMLGregorianCalendar());
-            status.setProcessSucceeded("Process complet.");
-            
+            status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
+            status.setProcessSucceeded("Process completed.");
             responseDoc.setStatus(status);
             responseDoc.setProcessOutputs(outputs);
             WPSUtils.storeResponse(responseDoc, folderPath, fileName);
@@ -119,9 +130,9 @@ public class WPSProcessListener implements ProcessListener{
     public void failed(final ProcessEvent event) {
         LOGGER.log(Level.WARNING, "Process "+WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor())+" has failed.", event.getException());
         final StatusType status = new StatusType();
-        status.setCreationTime(getCurrentXMLGregorianCalendar());
+        status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
         final ProcessFailedType processFT = new ProcessFailedType();
-        processFT.setExceptionReport(new ExceptionReport(event.getException().getMessage(), null, null, null));
+        processFT.setExceptionReport(new ExceptionReport(Exceptions.formatStackTrace(event.getException()), null, null, this.def.exceptionVersion.toString()));
         status.setProcessFailed(processFT);
         responseDoc.setStatus(status);
         WPSUtils.storeResponse(responseDoc, folderPath, fileName);
@@ -129,18 +140,38 @@ public class WPSProcessListener implements ProcessListener{
 
     @Override
     public void paused(final ProcessEvent event) {
-	// TODO
+        if (useStatus) {
+            LOGGER.log(Level.INFO, "Process {0} is paused.", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
+            final StatusType status = new StatusType();
+            final ProcessStartedType paused = new ProcessStartedType();
+            status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
+            paused.setValue("Process " + request.getIdentifier().getValue() + " is paused");
+            paused.setPercentCompleted((int) event.getProgress());
+            status.setProcessPaused(paused);
+            responseDoc.setStatus(status);
+            WPSUtils.storeResponse(responseDoc, folderPath, fileName);
+        }
     }
 
     @Override
     public void resumed(final ProcessEvent event) {
-	// TODO
+        if (useStatus) {
+            LOGGER.log(Level.INFO, "Process {0} is resumed.", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
+            final StatusType status = new StatusType();
+            final ProcessStartedType resumed = new ProcessStartedType();
+            status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
+            resumed.setValue("Process " + request.getIdentifier().getValue() + " is resumed");
+            resumed.setPercentCompleted((int) event.getProgress());
+            status.setProcessPaused(resumed);
+            responseDoc.setStatus(status);
+            WPSUtils.storeResponse(responseDoc, folderPath, fileName);
+        }
     }
     
     /**
-     * Write the occured exception in the response file.
+     * Write the occurred exception in the response file.
      * 
-     * @param ex 
+     * @param ex exception
      */
     private void writeException(final CstlServiceException ex){
 
@@ -157,18 +188,4 @@ public class WPSProcessListener implements ProcessListener{
         WPSUtils.storeResponse(report, folderPath, fileName);
     }
     
-    /**
-     * @return the current time in an XMLGregorianCalendar.
-     */
-    private static XMLGregorianCalendar getCurrentXMLGregorianCalendar(){
-        XMLGregorianCalendar xcal = null;
-        try {
-            final GregorianCalendar c = new GregorianCalendar();
-            c.setTime(new Date());
-            xcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-        } catch (DatatypeConfigurationException ex) {
-            LOGGER.log(Level.INFO, "Can't create the creation time of the status.");
-        }
-        return xcal;
-    }
 }

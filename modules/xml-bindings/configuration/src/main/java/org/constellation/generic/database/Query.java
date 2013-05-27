@@ -617,7 +617,8 @@ public class Query {
         }
 
         if (union != null) {
-            mainQuery.append(" UNION ").append(union.getQuery().buildSQLQuery());
+            mainQuery.insert(0, "(");
+            mainQuery.append(") UNION (").append(union.getQuery().buildSQLQuery()).append(" )");
         }
         return mainQuery.toString();
     }
@@ -625,12 +626,15 @@ public class Query {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[Query]");
-        if (name != null)
+        if (name != null) {
             s.append("name: ").append(name).append('\n');
-        if (select != null)
+        }
+        if (select != null) {
             s.append("select:").append(select).append('\n');
-        if (option != null)
+        }
+        if (option != null) {
             s.append("option: ").append(option).append('\n');
+        }
         if (from != null && !from.isEmpty()) {
             int i = 0;
             for (From f: from) {

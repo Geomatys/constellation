@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<om:Observation xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sampling/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <gml:name>urn:ogc:object:observation:GEOM:801</gml:name>
+    <om:samplingTime>
+        <gml:TimePeriod>
+            <gml:beginPosition>2007-05-01T12:59:00.0</gml:beginPosition>
+            <gml:endPosition>2007-05-01T16:59:00.0</gml:endPosition>
+        </gml:TimePeriod>
+    </om:samplingTime>
+    <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:8"/>
+    <om:observedProperty>
+        <swe:CompositePhenomenon dimension="2" gml:id="aggregatePhenomenon">
+            <gml:name>urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon</gml:name>
+            <swe:component>
+                <swe:Phenomenon gml:id="depth">
+                    <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
+                </swe:Phenomenon>
+            </swe:component>
+            <swe:component>
+                <swe:Phenomenon gml:id="temperature">
+                    <gml:name>urn:ogc:def:phenomenon:GEOM:temperature</gml:name>
+                </swe:Phenomenon>
+            </swe:component>
+        </swe:CompositePhenomenon>
+    </om:observedProperty>
+    <om:featureOfInterest>
+        <sa:SamplingCurve gml:id="station-006">
+            <gml:description>Geology traverse</gml:description>
+            <gml:name>cycle1</gml:name>
+            <gml:boundedBy>
+                <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582" gml:id="bound-1">
+                    <gml:lowerCorner>-30.711 134.196</gml:lowerCorner>
+                    <gml:upperCorner>-30.702 134.205</gml:upperCorner>
+                </gml:Envelope>
+            </gml:boundedBy>
+            <sa:shape>
+                <gml:LineString gml:id="pr1_ls1" srsName="urn:ogc:def:crs:epsg:7.9:27582">
+                    <gml:pos>-30.711 134.205</gml:pos>
+                    <gml:pos>-30.710 134.204</gml:pos>
+                    <gml:pos>-30.709 134.203</gml:pos>
+                    <gml:pos>-30.708 134.201</gml:pos>
+                    <gml:pos>-30.706 134.196</gml:pos>
+                    <gml:pos>-30.703 134.197</gml:pos>
+                    <gml:pos>-30.702 134.199</gml:pos>
+                </gml:LineString>
+            </sa:shape>
+            <sa:length/>
+        </sa:SamplingCurve>
+    </om:featureOfInterest>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
+        <swe:DataArray gml:id="dataArray-4">
+            <swe:elementCount>
+                <swe:Count>
+                    <swe:value>5</swe:value>
+                </swe:Count>
+            </swe:elementCount>
+             <swe:elementType name="dataArray-4">
+                <swe:SimpleDataRecord gml:id="datarecord-1" fixed="false">
+                    <swe:field name="Time">
+                        <swe:Time definition="urn:ogc:data:time:iso8601"/>
+                    </swe:field>
+                    <swe:field name="depth">
+                        <swe:Quantity definition="urn:ogc:def:phenomenon:GEOM:depth">
+                            <swe:uom code="m"/>
+                        </swe:Quantity>
+                    </swe:field>
+                    <swe:field name="temperature">
+                        <swe:Quantity definition="urn:ogc:def:phenomenon:GEOM:temperature">
+                            <swe:uom code="°C"/>
+                        </swe:Quantity>
+                    </swe:field>
+                </swe:SimpleDataRecord>
+            </swe:elementType>
+            <swe:encoding>
+                <swe:TextBlock blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
+            </swe:encoding>
+            <swe:values>2007-05-01T12:59:00,6.56,12.0@@2007-05-01T13:59:00,6.56,13.0@@2007-05-01T14:59:00,6.56,14.0@@2007-05-01T15:59:00,6.56,15.0@@2007-05-01T16:59:00,6.56,16.0@@</swe:values>
+        </swe:DataArray>
+    </om:result>
+</om:Observation>
+
+

@@ -253,10 +253,18 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
      * {@inheritDoc}
      */
     @Override
+    protected boolean isFeatureCatalogue(FullRecord record) {
+        return record.getRoot().getType().getName().equals("FC_FeatureCatalogue");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected String getType(FullRecord f) {
         return f.getRoot().getType().getName();
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -372,7 +380,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
      * @throws MD_IOException
      */
     public static List<Value> getValuesFromPathID(String fullPathID, final FullRecord record) throws MD_IOException {
-        String pathID            = null;
+        String pathID;
         String conditionalPathID = null;
         String conditionalValue  = null;
         int ordinal              = -1;

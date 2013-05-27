@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.geotoolkit.gui.swing.tree.Trees;
 import java.util.Objects;
@@ -36,6 +37,9 @@ import java.util.Objects;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LayerContext {
 
+    @XmlAttribute
+    private DataSourceType implementation;
+            
     private Layers layers;
 
     private String security;
@@ -125,6 +129,20 @@ public class LayerContext {
     public Map<String, String> getCustomParameters() {
         return customParameters;
     }
+    
+    /**
+     * @return the implementation
+     */
+    public DataSourceType getImplementation() {
+        return implementation;
+    }
+
+    /**
+     * @param implementation the implementation to set
+     */
+    public void setImplementation(DataSourceType implementation) {
+        this.implementation = implementation;
+    }
 
     @Override
     public String toString() {
@@ -135,6 +153,9 @@ public class LayerContext {
         }
         if (supportedLanguages != null) {
             sb.append("Supported languages:\n").append(supportedLanguages);
+        }
+        if (implementation != null) {
+            sb.append("Implementation:\n").append(implementation);
         }
         if (customParameters != null && !customParameters.isEmpty()) {
             sb.append("Custom parameters:\n");

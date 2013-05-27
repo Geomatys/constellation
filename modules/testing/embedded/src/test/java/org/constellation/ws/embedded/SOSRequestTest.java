@@ -20,7 +20,7 @@ package org.constellation.ws.embedded;
 // JUnit dependencies
 import org.geotoolkit.ows.xml.v110.Operation;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import java.util.Arrays;
 import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.Capabilities;
@@ -32,18 +32,24 @@ import java.util.HashMap;
 import java.util.Map;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.constellation.sos.ws.soap.SOService;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
+import org.geotoolkit.sos.xml.v200.CapabilitiesType;
+import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class SOSRequestTest extends AbstractGrizzlyServer {
 
     private static String getDefaultURL() {
@@ -77,6 +83,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=1)
     public void testSOSInvalidRequest() throws Exception {
 
         waitForStart();
@@ -100,6 +107,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=2)
     public void testSOSGetCapabilities() throws Exception {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL(getDefaultURL());
@@ -132,7 +140,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
         // Try to marshall something from the response returned by the server.
         // The response should be a Capabilities.
         obj = unmarshallResponse(getCapsUrl);
-        assertTrue(obj instanceof Capabilities);
+        assertTrue("was:" + obj, obj instanceof Capabilities);
 
         c = (Capabilities) obj;
 
@@ -153,11 +161,67 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
         op = c.getOperationsMetadata().getOperation("GetObservation");
 
         assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), getDefaultURL());
+    }
+    
+    @Test
+    @Order(order=3)
+    public void testSOSGetCapabilitiesv2() throws Exception {
+        // Creates a valid GetCapabilities url.
+        URL getCapsUrl = new URL(getDefaultURL());
 
 
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        final GetCapabilitiesType request = new GetCapabilitiesType("2.0.0", "text/xml");
+
+        postRequestObject(conec, request);
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof CapabilitiesType);
+
+        CapabilitiesType c = (CapabilitiesType) obj;
+
+        assertTrue(c.getOperationsMetadata() != null);
+
+        Operation op = c.getOperationsMetadata().getOperation("GetObservation");
+
+        assertTrue(op != null);
+        assertTrue(op.getDCP().size() > 0);
+
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), getDefaultURL());
+
+        // Creates a valid GetCapabilties url.
+        getCapsUrl = new URL(getTestURL() + "request=GetCapabilities&service=SOS&version=2.0.0");
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a Capabilities.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue("was:" + obj, obj instanceof CapabilitiesType);
+
+        c = (CapabilitiesType) obj;
+
+        op = c.getOperationsMetadata().getOperation("GetObservation");
+
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), getTestURL());
+
+        // Creates a valid GetCapabilties url.
+        getCapsUrl = new URL(getDefaultURL()+ "request=GetCapabilities&service=SOS&version=2.0.0");
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a Capabilities.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof CapabilitiesType);
+
+        c = (CapabilitiesType) obj;
+
+        op = c.getOperationsMetadata().getOperation("GetObservation");
+
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), getDefaultURL());
     }
 
     @Test
+    @Order(order=4)
     public void testSOSDescribeSensor() throws Exception {
         // Creates a valid DescribeSensor url.
         final URL getCapsUrl = new URL(getDefaultURL());
@@ -179,6 +243,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=5)
     public void testSOSGetObservation() throws Exception {
         // Creates a valid GetObservation url.
         final URL getCapsUrl = new URL(getDefaultURL());
@@ -209,6 +274,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=6)
     public void testSOSGetFeatureOfInterest() throws Exception {
         // Creates a valid GetObservation url.
         final URL getCapsUrl = new URL(getDefaultURL());

@@ -17,15 +17,19 @@
 
 package org.constellation.configuration;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.geotoolkit.gui.swing.tree.Trees;
 
 /**
- *
+ * Configuration for a WPS service.
+ * 
  * @author Guilhem Legal (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  * @since 0.9
  */
 @XmlRootElement(name="ProcessContext")
@@ -37,8 +41,24 @@ public class ProcessContext {
     private String security;
 
     private Languages supportedLanguages;
+
+    /**
+     * Path where output wps data will be saved.
+     */
+    private String webdavDirectory;
+
+    /**
+     * Identifier of FileCoverageStore provider used by WPS to publish
+     * coverages in WMS.
+     */
+    private String fileCoverageProviderId;
+
+    /**
+     * Instance name of the WMS service linked to current WPS.
+     */
+    private String wmsInstanceName;
     
-    private String tmpDirectory;
+    private final Map<String, String> customParameters = new HashMap<String, String>();
 
     public ProcessContext() {
 
@@ -71,7 +91,7 @@ public class ProcessContext {
 
 
     /**
-     * @param layers the layers to set
+     * @param processes the layers to set
      */
     public void setProcesses(List<ProcessFactory> processes) {
         this.processes = new Processes(processes);
@@ -108,19 +128,55 @@ public class ProcessContext {
     }
     
     /**
-     * @return the tmpDirectory
+     * @return the webdavDirectory
      */
-    public String getTmpDirectory() {
-        return tmpDirectory;
+    public String getWebdavDirectory() {
+        return webdavDirectory;
     }
 
     /**
-     * @param tmpDirectory the tmpDirectory to set
+     * @param webdavDirectory the webdavDirectory to set
      */
-    public void setTmpDirectory(String tmpDirectory) {
-        this.tmpDirectory = tmpDirectory;
+    public void setWebdavDirectory(String webdavDirectory) {
+        this.webdavDirectory = webdavDirectory;
+    }
+
+    /**
+     * @return the wmsInstanceName
+     */
+    public String getWmsInstanceName() {
+        return wmsInstanceName;
+    }
+
+    /**
+     * @param wmsInstanceName the wmsInstanceName to set
+     */
+    public void setWmsInstanceName(String wmsInstanceName) {
+        this.wmsInstanceName = wmsInstanceName;
+    }
+
+    /**
+     * @return the fileCoverageProviderId
+     */
+    public String getFileCoverageProviderId() {
+        return fileCoverageProviderId;
+    }
+
+
+    /**
+     * @param fileCoverageProviderId the fileCoverageProviderId to set
+     */
+    public void setFileCoverageProviderId(String fileCoverageProviderId) {
+        this.fileCoverageProviderId = fileCoverageProviderId;
     }
     
+    /**
+     * @return the customParameters
+     */
+    public Map<String, String> getCustomParameters() {
+        return customParameters;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
@@ -130,6 +186,21 @@ public class ProcessContext {
         }
         if (supportedLanguages != null) {
             sb.append("Supported languages:\n").append(supportedLanguages);
+        }
+        if (webdavDirectory != null) {
+            sb.append("WebDav directory :\n").append(webdavDirectory);
+        }
+        if (wmsInstanceName != null) {
+            sb.append("WMS instance name :\n").append(wmsInstanceName);
+        }
+        if (fileCoverageProviderId != null) {
+            sb.append("FileCoverageStore id :\n").append(fileCoverageProviderId);
+        }
+        if (customParameters != null && !customParameters.isEmpty()) {
+            sb.append("Custom parameters:\n");
+            for (Map.Entry<String, String> entry : customParameters.entrySet()) {
+                sb.append("key:").append(entry.getKey()).append(" value:").append(entry.getValue()).append('\n');
+            }
         }
         return sb.toString();
     }

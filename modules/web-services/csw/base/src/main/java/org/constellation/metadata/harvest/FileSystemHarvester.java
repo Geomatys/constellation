@@ -90,9 +90,8 @@ public class FileSystemHarvester extends CatalogueHarvester {
      */
     private int harvestDirectory(File dataDirectory) throws CstlServiceException {
         int nbRecordInserted      = 0;
-        Unmarshaller unmarshaller =  null;
         try {
-            unmarshaller = marshallerPool.acquireUnmarshaller();
+            final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             for (File dataFile : dataDirectory.listFiles()) {
                 LOGGER.log(Level.INFO, "current file:{0}", dataFile.getPath());
 
@@ -131,13 +130,10 @@ public class FileSystemHarvester extends CatalogueHarvester {
                     nbRecordInserted = nbRecordInserted + harvestDirectory(dataFile);
                 }
             }
+            marshallerPool.release(unmarshaller);
             return nbRecordInserted;
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex);
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
-            }
         }
     }
 

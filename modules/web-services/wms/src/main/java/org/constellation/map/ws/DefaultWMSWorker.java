@@ -22,8 +22,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
@@ -32,16 +30,20 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
@@ -62,22 +64,23 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.StyleProviderProxy;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
 import static org.constellation.api.CommonConstants.*;
+import org.constellation.configuration.DimensionDefinition;
 import org.constellation.configuration.WMSPortrayal;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.query.wms.WMSQuery.*;
+import static org.constellation.map.ws.WMSConstant.*;
 
 //Geotoolkit dependencies
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.OutputDef;
@@ -93,6 +96,7 @@ import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
@@ -111,14 +115,9 @@ import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.PeriodUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.wms.xml.v111.Request;
-import org.geotoolkit.wms.xml.v130.Keyword;
-import org.geotoolkit.wms.xml.v130.DataURL;
+import org.geotoolkit.wms.xml.AbstractLegendURL;
+import org.geotoolkit.wms.xml.AbstractOnlineResource;
 import org.geotoolkit.wms.xml.v130.Capability;
-import org.geotoolkit.wms.xml.v130.MetadataURL;
-import org.geotoolkit.wms.xml.v130.Identifier;
-import org.geotoolkit.wms.xml.v130.KeywordList;
-import org.geotoolkit.wms.xml.v130.LogoURL;
 import org.geotoolkit.wms.xml.AbstractDimension;
 import org.geotoolkit.wms.xml.AbstractLayer;
 import org.geotoolkit.wms.xml.AbstractRequest;
@@ -129,17 +128,28 @@ import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
 import org.geotoolkit.wms.xml.DescribeLayer;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
-import org.geotoolkit.wms.xml.v130.Attribution;
-import org.geotoolkit.wms.xml.v130.AuthorityURL;
-import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
 import org.geotoolkit.xml.MarshallerPool;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.referencing.ReferencingUtilities;
+import org.geotoolkit.referencing.crs.AbstractSingleCRS;
+import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
+import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
+import org.geotoolkit.referencing.cs.AbstractCS;
+import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
-import org.geotoolkit.util.collection.UnmodifiableArrayList;
+import org.geotoolkit.referencing.datum.AbstractDatum;
+import org.apache.sis.measure.Range;
+import org.apache.sis.internal.util.UnmodifiableArrayList;
+
+import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.wms.xml.AbstractBoundingBox;
+import org.geotoolkit.wms.xml.AbstractGeographicBoundingBox;
+import org.geotoolkit.wms.xml.AbstractLogoURL;
 
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Expression;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -189,54 +199,34 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     /**
      * AxisDirection name for Lat/Long, Elevation, temporal dimensions.
      */
-    private static final List<String> COMMONS_DIM = UnmodifiableArrayList.wrap(
+    private static final List<String> COMMONS_DIM = UnmodifiableArrayList.wrap(new String[] {
             "NORTH", "EAST", "SOUTH", "WEST",
             "UP", "DOWN",
-            "FUTURE", "PAST");
-
-
-    /**
-     * Output responses of a GetCapabilities request.
-     */
-    private final Map<String,AbstractWMSCapabilities> CAPS_RESPONSE =
-            Collections.synchronizedMap(new HashMap<String,AbstractWMSCapabilities>());
+            "FUTURE", "PAST"});
 
     private WMSPortrayal mapPortrayal;
 
     public DefaultWMSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WMS);
-        
+        setSupportedVersion(ServiceDef.WMS_1_3_0_SLD, ServiceDef.WMS_1_1_1_SLD);
+
         mapPortrayal = new WMSPortrayal();
-        
+
         final File portrayalFile = new File(configurationDirectory, "WMSPortrayal.xml");
         if (portrayalFile.exists()) {
             final MarshallerPool marshallerPool = GenericDatabaseMarshallerPool.getInstance();
-            Unmarshaller unmarchaller = null;
             try {
-                unmarchaller = marshallerPool.acquireUnmarshaller();
-                mapPortrayal = (WMSPortrayal) unmarchaller.unmarshal(portrayalFile);
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+                mapPortrayal = (WMSPortrayal) unmarshaller.unmarshal(portrayalFile);
+                marshallerPool.release(unmarshaller);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
-            } finally {
-                if (unmarchaller != null) {
-                    marshallerPool.release(unmarchaller);
-                }
             }
         }
-        
+
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMS worker {0} running", id);
         }
-
-        //listen to changes on the providers to clear the getcapabilities cache
-        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                refreshUpdateSequence();
-                CAPS_RESPONSE.clear();
-            }
-        });
-
     }
 
     @Override
@@ -279,10 +269,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException {
         isWorking();
-        final String queryVersion = getCapab.getVersion().toString();
-
+        final String queryVersion      = getCapab.getVersion().toString();
         final String requestedLanguage = getCapab.getLanguage();
-
+        final String userLogin         = getUserLogin();
         // we get the request language, if its not set we get the default "eng"
         final String currentLanguage;
         if (requestedLanguage != null && supportedLanguages.contains(requestedLanguage) && !requestedLanguage.equals(defaultLanguage)) {
@@ -291,9 +280,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             currentLanguage = null;
         }
 
-        final String keyCache = getId() + queryVersion + '-' + currentLanguage;
-        if (CAPS_RESPONSE.containsKey(keyCache)) {
-            return CAPS_RESPONSE.get(keyCache);
+        final Object cachedCapabilities = getCapabilitiesFromCache(queryVersion, currentLanguage);
+        if (cachedCapabilities != null) {
+            return (AbstractWMSCapabilities) cachedCapabilities;
         }
 
         final AbstractWMSCapabilities inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS", currentLanguage);
@@ -301,10 +290,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final AbstractRequest request;
         final List<String> exceptionFormats;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
-            request          = new Request(WMSConstant.createRequest111(GFI_MIME_TYPES));
+            request          = WMSConstant.createRequest111(GFI_MIME_TYPES).clone();
             exceptionFormats = WMSConstant.EXCEPTION_111;
         } else {
-            request          = new org.geotoolkit.wms.xml.v130.Request(WMSConstant.createRequest130(GFI_MIME_TYPES));
+            request          = WMSConstant.createRequest130(GFI_MIME_TYPES).clone();
             exceptionFormats = WMSConstant.EXCEPTION_130;
         }
         request.updateURL(getServiceUrl());
@@ -319,11 +308,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         //Build the list of layers
         final List<AbstractLayer> outputLayers = new ArrayList<AbstractLayer>();
-        final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
-        final Map<Name,Layer> layers = getLayers();
+        final Map<Name,Layer> layers = getLayers(userLogin);
 
         for (Name name : layers.keySet()) {
-            final LayerDetails layer = namedProxy.get(name);
+            final LayerDetails layer = getLayerReference(userLogin, name);
             final Layer configLayer  = layers.get(name);
 
             if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
@@ -516,6 +504,59 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             }
 
+            // Verify extra dimensions
+            if(!configLayer.getDimensions().isEmpty()){
+                try {
+                    final MapItem mi = layer.getMapLayer(null, null);
+                    applyLayerFiltersAndDims(mi, userLogin);
+
+                    if(mi instanceof FeatureMapLayer){
+                        final FeatureMapLayer fml = (FeatureMapLayer) mi;
+                        for(FeatureMapLayer.DimensionDef ddef : fml.getExtraDimensions()){
+                            final Collection<Range> collRefs = fml.getDimensionRange(ddef);
+                            // Transform it to a set in order to filter same values
+                            final Set<Range> refs = new HashSet<Range>();
+                            for (Range ref : collRefs) {
+                                refs.add(ref);
+                            }
+
+                            final StringBuilder values = new StringBuilder();
+                            int index = 0;
+                            for (final Range val : refs) {
+                                values.append(val.getMinValue());
+                                if(val.getMinValue().compareTo(val.getMaxValue()) != 0){
+                                    values.append('-');
+                                    values.append(val.getMaxValue());
+                                }
+                                if (index++ < refs.size()-1) {
+                                    values.append(",");
+                                }
+                            }
+
+                            final boolean multipleValues = (refs.size() > 1);
+                            final String unitSymbol = ddef.getCrs().getCoordinateSystem().getAxis(0).getUnit().toString();
+                            final String unit = unitSymbol;
+                            final String axisName = ddef.getCrs().getCoordinateSystem().getAxis(0).getName().getCode();
+                            final String defaut = "";
+
+                            dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+                                new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName, unit,
+                                    unitSymbol, defaut, multipleValues, null, null) :
+                                new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName, unit,
+                                    unitSymbol, defaut, multipleValues, null, null);
+
+                            dimensions.add(dim);
+                        }
+                    }
+
+                } catch (PortrayalException ex) {
+                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
+                    break;
+                } catch (DataStoreException ex) {
+                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
+                    break;
+                }
+            }
 
             /*
              * LegendUrl generation
@@ -535,14 +576,22 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     layerName = fullLayerName.getLocalPart();
                 }
             }
-            final String beginLegendUrl = getServiceUrl() + "REQUEST=GetLegendGraphic&" +
-                                                    "VERSION=1.1.1&" +
-                                                    "FORMAT=";
-            final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
-            final String legendUrlPng = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
-            final String queryable    = (layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) ? "1" : "0";
+            final String beginLegendUrl = getServiceUrl() + "REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=";
+            final String legendUrlGif   = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
+            final String legendUrlPng   = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
+            final String queryable      = (layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) ? "1" : "0";
+            final String _abstract;
+            final String keyword;
+            if (layer instanceof CoverageLayerDetails) {
+                final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
+                _abstract = StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks());
+                keyword   = StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic());
+            } else {
+                _abstract = "Vector data";
+                keyword   = "Vector data";
+            }
 
-            final AbstractLayer outputLayer;
+            final AbstractBoundingBox outputBBox;
             if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
                 /*
                  * TODO
@@ -551,97 +600,47 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                  *
                  * do we have to use the same order as WMS 1.3.0 (SOUTH WEST NORTH EAST) ???
                  */
-                final org.geotoolkit.wms.xml.v111.BoundingBox outputBBox =
-                    new org.geotoolkit.wms.xml.v111.BoundingBox("EPSG:4326",
+                outputBBox = createBoundingBox(queryVersion,
+                            "EPSG:4326",
                             inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getSouthBoundLatitude(),
                             inputGeoBox.getEastBoundLongitude(),
-                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion);
-
-                // we build The Style part
-                org.geotoolkit.wms.xml.v111.OnlineResource or =
-                        new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
-
-                final List<String> stylesName = layer.getFavoriteStyles();
-                final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
-                if (stylesName != null && !stylesName.isEmpty()) {
-                    // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
-                    for (String styleName : stylesName) {
-                        final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
-                        final org.geotoolkit.wms.xml.v111.Style style = convertMutableStyleToWmsStyle111(ms, layer, legendUrlPng, legendUrlGif);
-                        styles.add(style);
-                    }
-                }
-
-                final LatLonBoundingBox bbox = new LatLonBoundingBox(inputGeoBox);
-                final org.geotoolkit.wms.xml.v111.Layer outputLayer111;
-                if (layer instanceof CoverageLayerDetails) {
-                    final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
-                    outputLayer111 = new org.geotoolkit.wms.xml.v111.Layer(layerName,
-                            StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks()),
-                            StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()), DEFAULT_CRS,
-                            bbox, outputBBox, queryable, dimensions, styles);
-                } else {
-                    outputLayer111 = new org.geotoolkit.wms.xml.v111.Layer(layerName,
-                            "Vector data", "Vector data", DEFAULT_CRS, bbox,
-                            outputBBox, queryable, dimensions, styles);
-                }
-
-                outputLayer = customizeLayer111(outputLayer111, configLayer, layer, legendUrlPng, legendUrlGif);
+                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0);
             } else {
                 /*
                  * TODO
                  * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
                  */
-                final org.geotoolkit.wms.xml.v130.BoundingBox outputBBox =
-                    new org.geotoolkit.wms.xml.v130.BoundingBox("EPSG:4326",
+                outputBBox = createBoundingBox(queryVersion,
+                            "EPSG:4326",
                             inputGeoBox.getSouthBoundLatitude(),
                             inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getNorthBoundLatitude(),
-                            inputGeoBox.getEastBoundLongitude(), 0.0, 0.0,
-                            queryVersion);
-
-                // we build a Style Object
-                org.geotoolkit.wms.xml.v130.OnlineResource or =
-                        new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
-
-                final List<String> stylesName = layer.getFavoriteStyles();
-                final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
-                if (stylesName != null && !stylesName.isEmpty()) {
-                    // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
-                    for (String styleName : stylesName) {
-                        final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
-                        final org.geotoolkit.wms.xml.v130.Style style = convertMutableStyleToWmsStyle130(ms, layer, legendUrlPng, legendUrlGif);
-                        styles.add(style);
-                    }
-                }
-
-                final EXGeographicBoundingBox bbox = new EXGeographicBoundingBox(inputGeoBox);
-                final org.geotoolkit.wms.xml.v130.Layer outputLayer130;
-                if (layer instanceof CoverageLayerDetails) {
-                    final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
-                    outputLayer130 = new org.geotoolkit.wms.xml.v130.Layer(layerName,
-                            StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks()),
-                            StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()), DEFAULT_CRS,
-                            bbox, outputBBox, queryable, dimensions, styles);
-                } else {
-                    outputLayer130 = new org.geotoolkit.wms.xml.v130.Layer(layerName,
-                            "Vector data", "Vector data", DEFAULT_CRS, bbox,
-                            outputBBox, queryable, dimensions, styles);
-                }
-                outputLayer = customizeLayer130(outputLayer130, configLayer, layer, legendUrlPng, legendUrlGif);
+                            inputGeoBox.getEastBoundLongitude(), 0.0, 0.0);
             }
+            // we build a Style Object
+            final List<String> stylesName = layer.getFavoriteStyles();
+            final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<org.geotoolkit.wms.xml.Style>();
+            if (stylesName != null && !stylesName.isEmpty()) {
+                // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
+                for (String styleName : stylesName) {
+                    final MutableStyle ms = getStyle(styleName);
+                    final org.geotoolkit.wms.xml.Style style = convertMutableStyleToWmsStyle("1.3.0", ms, layer, legendUrlPng, legendUrlGif);
+                    styles.add(style);
+                }
+            }
+            final AbstractGeographicBoundingBox bbox = createGeographicBoundingBox(queryVersion, inputGeoBox);
+            final AbstractLayer outputLayerO = createLayer(queryVersion, layerName,_abstract,keyword, DEFAULT_CRS,
+                            bbox, outputBBox, queryable, dimensions, styles);
+
+            final AbstractLayer outputLayer = customizeLayer(queryVersion, outputLayerO, configLayer, layer, legendUrlPng, legendUrlGif);
             outputLayers.add(outputLayer);
         }
 
         //we build the general layer and add it to the document
-        final AbstractLayer mainLayer = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-            customizeLayer111(new org.geotoolkit.wms.xml.v111.Layer("Constellation Web Map Layer",
+        final AbstractLayer mainLayer = customizeLayer(queryVersion, createLayer(queryVersion, "Constellation Web Map Layer",
                     "description of the service(need to be fill)", DEFAULT_CRS,
-                    new LatLonBoundingBox(-180.0, -90.0, 180.0, 90.0), outputLayers), getMainLayer(), null, null, null):
-            customizeLayer130(new org.geotoolkit.wms.xml.v130.Layer("Constellation Web Map Layer",
-                    "description of the service(need to be fill)", DEFAULT_CRS,
-                    new EXGeographicBoundingBox(-180.0, -90.0, 180.0, 90.0), outputLayers), getMainLayer(), null, null, null);
+                    createGeographicBoundingBox(queryVersion, -180.0, -90.0, 180.0, 90.0), outputLayers), getMainLayer(), null, null, null);
 
         inCapabilities.getCapability().setLayer(mainLayer);
 
@@ -672,27 +671,32 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
 
         }
-        CAPS_RESPONSE.put(keyCache, inCapabilities);
+        putCapabilitiesInCache(queryVersion, currentLanguage, inCapabilities);
         return inCapabilities;
     }
 
     /**
      * Apply the layer customization extracted from the configuration.
      *
-     * @param outputLayer111
+     * @param version
+     * @param outputLayer
      * @param configLayer
+     * @param layerDetails
+     * @param legendUrlPng
+     * @param legendUrlGif
      * @return
+     * @throws CstlServiceException
      */
-    private org.geotoolkit.wms.xml.v111.Layer customizeLayer111(final org.geotoolkit.wms.xml.v111.Layer outputLayer111, final Layer configLayer,
-            final LayerDetails layerDetails, final String legendUrlPng, final String legendUrlGif)
+    private AbstractLayer customizeLayer(final String version, final AbstractLayer outputLayer, final Layer configLayer,
+            final LayerDetails layerDetails, final String legendUrlPng, final String legendUrlGif) throws CstlServiceException
     {
         if (configLayer == null) {
-            return outputLayer111;
+            return outputLayer;
         }
         if (configLayer.getStyles() != null && !configLayer.getStyles().isEmpty()) {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
-            final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
+            final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<org.geotoolkit.wms.xml.Style>();
             for (String styl : configLayer.getStyles()) {
                 final MutableStyle ms;
                 if (styl.startsWith("${")) {
@@ -706,216 +710,88 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     }
                     ms = StyleUtilities.copy(style);
                 } else {
-                    ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
-                }
-
-                final org.geotoolkit.wms.xml.v111.Style wmsStyle = convertMutableStyleToWmsStyle111(ms, layerDetails, legendUrlPng, legendUrlGif);
-                styles.add(wmsStyle);
-            }
-            if (!styles.isEmpty()) {
-                outputLayer111.setStyle(styles);
-            }
-        }
-        if (configLayer.getTitle() != null) {
-            outputLayer111.setTitle(configLayer.getTitle());
-        }
-        if (configLayer.getAbstrac() != null) {
-            outputLayer111.setAbstract(configLayer.getAbstrac());
-        }
-        if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-            final List<org.geotoolkit.wms.xml.v111.Keyword> keywords = new ArrayList<org.geotoolkit.wms.xml.v111.Keyword>();
-            for (String kw : configLayer.getKeywords()) {
-                keywords.add(new org.geotoolkit.wms.xml.v111.Keyword(kw));
-            }
-            outputLayer111.setKeywordList(new org.geotoolkit.wms.xml.v111.KeywordList(keywords));
-        }
-        if (configLayer.getMetadataURL() != null) {
-            final FormatURL metadataURL = configLayer.getMetadataURL();
-            outputLayer111.setMetadataURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.MetadataURL(metadataURL.getFormat(),
-                    metadataURL.getOnlineResource().getHref(),
-                    metadataURL.getType())));
-        }
-        if (configLayer.getDataURL() != null) {
-            final FormatURL dataURL = configLayer.getDataURL();
-            outputLayer111.setDataURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.DataURL(dataURL.getFormat(),
-                    dataURL.getOnlineResource().getHref())));
-        }
-        if (configLayer.getAuthorityURL() != null) {
-            final FormatURL authorityURL = configLayer.getAuthorityURL();
-            outputLayer111.setAuthorityURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.AuthorityURL(authorityURL.getName(),
-                    authorityURL.getOnlineResource().getHref())));
-        }
-        if (configLayer.getIdentifier() != null) {
-            final Reference identifier = configLayer.getIdentifier();
-            outputLayer111.setIdentifier(Arrays.asList(new org.geotoolkit.wms.xml.v111.Identifier(identifier.getValue(), identifier.getAuthority())));
-        }
-        if (configLayer.getAttribution() != null) {
-            final AttributionType attribution = configLayer.getAttribution();
-            final FormatURL fUrl = attribution.getLogoURL();
-            final org.geotoolkit.wms.xml.v111.LogoURL logoUrl;
-            if (fUrl != null) {
-                logoUrl = new org.geotoolkit.wms.xml.v111.LogoURL(fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
-            } else {
-                logoUrl = null;
-            }
-            outputLayer111.setAttribution(new org.geotoolkit.wms.xml.v111.Attribution(attribution.getTitle(),
-                    attribution.getOnlineResource().getHref(),
-                    logoUrl));
-        }
-        if (configLayer.getOpaque() != null) {
-            int opaque = 0;
-            if (configLayer.getOpaque()) {
-                opaque = 1;
-            }
-            outputLayer111.setOpaque(opaque);
-        }
-        if (!configLayer.getCrs().isEmpty()) {
-            outputLayer111.setSrs(configLayer.getCrs());
-        }
-        return outputLayer111;
-    }
-
-    private org.geotoolkit.wms.xml.v111.Style convertMutableStyleToWmsStyle111(final MutableStyle ms, final LayerDetails layerDetails,
-            final String legendUrlPng, final String legendUrlGif)
-    {
-        if (layerDetails == null) {
-            return null;
-        }
-        org.geotoolkit.wms.xml.v111.OnlineResource or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
-        final LegendTemplate lt = mapPortrayal.getDefaultLegendTemplate();
-        final Dimension dimension;
-        try {
-            dimension = layerDetails.getPreferredLegendSize(lt, ms);
-        } catch (PortrayalException ex) {
-            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-            return null;
-        }
-
-        final org.geotoolkit.wms.xml.v111.LegendURL legendURL1 =
-                new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_PNG, or,
-                dimension.width, dimension.height);
-
-        or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlGif);
-        final org.geotoolkit.wms.xml.v111.LegendURL legendURL2 =
-                new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_GIF, or,
-                dimension.width, dimension.height);
-
-        String styleName = ms.getName();
-        if (styleName != null && !styleName.isEmpty() && styleName.startsWith("${")) {
-            final DataReference dataRef = new DataReference(styleName);
-            styleName = dataRef.getLayerId().getLocalPart();
-        }
-        return new org.geotoolkit.wms.xml.v111.Style(
-                styleName, styleName, null, null, null, legendURL1, legendURL2);
-    }
-
-    /**
-     * Apply the layer customization extracted from the configuration.
-     *
-     * @param outputLayer130
-     * @param configLayer
-     * @return
-     */
-    private org.geotoolkit.wms.xml.v130.Layer customizeLayer130(final org.geotoolkit.wms.xml.v130.Layer outputLayer130, final Layer configLayer,
-            final LayerDetails layerDetails, final String legendUrlPng, final String legendUrlGif)
-    {
-        if (configLayer == null) {
-            return outputLayer130;
-        }
-        if (configLayer.getStyles() != null && !configLayer.getStyles().isEmpty()) {
-            // @TODO: convert the data reference string to a mutable style
-            // ${providerStyleType|providerStyleId|styleName}
-            final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
-            for (String styl : configLayer.getStyles()) {
-                MutableStyle ms = null;
-                if (styl.startsWith("${")) {
-                    final DataReference dr = new DataReference(styl);
-                    Style style = null;
-                    try {
-                        style = DataReferenceConverter.convertDataReferenceToStyle(dr);
-                        ms = StyleUtilities.copy(style);
-                    } catch (NonconvertibleObjectException e) {
-                        // The given style reference was invalid, we can't get a style from that
-                        LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-                    }
-                } else {
-                    ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
+                    ms = getStyleByIdentifier(styl);
                 }
                 if (ms != null) {
-                    final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
-                    styles.add(wmsStyle);
+                    styles.add(convertMutableStyleToWmsStyle(version, ms, layerDetails, legendUrlPng, legendUrlGif));
                 }
             }
             if (!styles.isEmpty()) {
-                outputLayer130.setStyle(styles);
+                outputLayer.updateStyle(styles);
             }
         }
         if (configLayer.getTitle() != null) {
-            outputLayer130.setTitle(configLayer.getTitle());
+            outputLayer.setTitle(configLayer.getTitle());
         }
         if (configLayer.getAbstrac() != null) {
-            outputLayer130.setAbstract(configLayer.getAbstrac());
+            outputLayer.setAbstract(configLayer.getAbstrac());
         }
         if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-            final List<Keyword> keywords = new ArrayList<Keyword>();
-            for (String kw : configLayer.getKeywords()) {
-                keywords.add(new Keyword(kw));
-            }
-            outputLayer130.setKeywordList(new KeywordList(keywords));
+            outputLayer.setKeywordList(configLayer.getKeywords());
         }
         if (configLayer.getMetadataURL() != null) {
             final FormatURL metadataURL = configLayer.getMetadataURL();
-            outputLayer130.setMetadataURL(Arrays.asList(new MetadataURL(metadataURL.getFormat(),
-                    metadataURL.getOnlineResource().getHref(),
-                    metadataURL.getType())));
+            outputLayer.setMetadataURL(metadataURL.getFormat(),
+                                          metadataURL.getOnlineResource().getHref(),
+                                          metadataURL.getType());
         }
         if (configLayer.getDataURL() != null) {
             final FormatURL dataURL = configLayer.getDataURL();
-            outputLayer130.setDataURL(Arrays.asList(new DataURL(dataURL.getFormat(),
-                    dataURL.getOnlineResource().getHref())));
+            outputLayer.setDataURL(dataURL.getFormat(),
+                                      dataURL.getOnlineResource().getHref());
         }
         if (configLayer.getAuthorityURL() != null) {
             final FormatURL authorityURL = configLayer.getAuthorityURL();
-            outputLayer130.setAuthorityURL(Arrays.asList(new AuthorityURL(authorityURL.getName(),
-                    authorityURL.getOnlineResource().getHref())));
+            outputLayer.setAuthorityURL(authorityURL.getName(),
+                                           authorityURL.getOnlineResource().getHref());
         }
         if (configLayer.getIdentifier() != null) {
             final Reference identifier = configLayer.getIdentifier();
-            outputLayer130.setIdentifier(Arrays.asList(new Identifier(identifier.getValue(), identifier.getAuthority())));
+            outputLayer.setIdentifier(identifier.getAuthority(), identifier.getValue());
         }
         if (configLayer.getAttribution() != null) {
             final AttributionType attribution = configLayer.getAttribution();
             final FormatURL fUrl = attribution.getLogoURL();
-            final LogoURL logoUrl;
+            final AbstractLogoURL logoUrl;
             if (fUrl != null) {
-                logoUrl = new LogoURL(fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
+                logoUrl = createLogoURL(version, fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
             } else {
                 logoUrl = null;
             }
-            outputLayer130.setAttribution(new Attribution(attribution.getTitle(),
-                    attribution.getOnlineResource().getHref(),
-                    logoUrl));
+            outputLayer.setAttribution(attribution.getTitle(),
+                                          attribution.getOnlineResource().getHref(),
+                                          logoUrl);
         }
         if (configLayer.getOpaque() != null) {
             int opaque = 0;
             if (configLayer.getOpaque()) {
                 opaque = 1;
             }
-            outputLayer130.setOpaque(opaque);
+            outputLayer.setOpaque(opaque);
         }
         if (!configLayer.getCrs().isEmpty()) {
-            outputLayer130.setCrs(configLayer.getCrs());
+            outputLayer.setCrs(configLayer.getCrs());
         }
-        return outputLayer130;
+        return outputLayer;
     }
 
-    private org.geotoolkit.wms.xml.v130.Style convertMutableStyleToWmsStyle130(final MutableStyle ms, final LayerDetails layerDetails,
+
+    /**
+     *
+     * @param currentVersion
+     * @param ms
+     * @param layerDetails
+     * @param legendUrlPng
+     * @param legendUrlGif
+     * @return
+     */
+    private org.geotoolkit.wms.xml.Style convertMutableStyleToWmsStyle(final String currentVersion, final MutableStyle ms, final LayerDetails layerDetails,
             final String legendUrlPng, final String legendUrlGif)
     {
         if (layerDetails == null) {
             return null;
         }
-        org.geotoolkit.wms.xml.v130.OnlineResource or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
+        AbstractOnlineResource or = createOnlineResource(currentVersion, legendUrlPng);
         final LegendTemplate lt = mapPortrayal.getDefaultLegendTemplate();
         final Dimension dimension;
         try {
@@ -925,22 +801,17 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return null;
         }
 
-        final org.geotoolkit.wms.xml.v130.LegendURL legendURL1 =
-                new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_PNG, or,
-                dimension.width, dimension.height);
+        final AbstractLegendURL legendURL1 = createLegendURL(currentVersion, MimeType.IMAGE_PNG, or, dimension.width, dimension.height);
 
-        or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlGif);
-        final org.geotoolkit.wms.xml.v130.LegendURL legendURL2 =
-                new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_GIF, or,
-                dimension.width, dimension.height);
+        or = createOnlineResource(currentVersion, legendUrlGif);
+        final AbstractLegendURL legendURL2 = createLegendURL(currentVersion, MimeType.IMAGE_GIF, or, dimension.width, dimension.height);
 
         String styleName = ms.getName();
         if (styleName != null && !styleName.isEmpty() && styleName.startsWith("${")) {
             final DataReference dataRef = new DataReference(styleName);
             styleName = dataRef.getLayerId().getLocalPart();
         }
-        return new org.geotoolkit.wms.xml.v130.Style(
-                styleName, styleName, null, null, null, legendURL1, legendURL2);
+        return createStyle(currentVersion, styleName, styleName, null, legendURL1, legendURL2);
     }
 
     /**
@@ -959,8 +830,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     	//
         // 1. SCENE
         //       -- get the List of layer references
-        final List<Name> layerNames = getFI.getQueryLayers();
-        final List<LayerDetails> layerRefs = getLayerReferences(layerNames);
+        final String userLogin             = getUserLogin();
+        final List<Name> layerNames        = getFI.getQueryLayers();
+        final List<LayerDetails> layerRefs = getLayerReferences(userLogin, layerNames);
 
         for (LayerDetails layer : layerRefs) {
             if (!layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) {
@@ -973,7 +845,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final List<String> styleNames          = getFI.getStyles();
         final StyledLayerDescriptor sld = getFI.getSld();
 
-        final List<MutableStyle> styles        = getStyles(layerRefs, sld, styleNames);
+        final List<MutableStyle> styles        = getStyles(layerRefs, sld, styleNames, userLogin);
         //       -- create the rendering parameter Map
         final Double elevation                 = getFI.getElevation();
         final Date time                        = getFI.getTime();
@@ -987,7 +859,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
             sdef.setContext(context);
             //apply layercontext filters
-            applyLayerFilters(context);
+            applyLayerFiltersAndDims(context, userLogin);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
@@ -995,7 +867,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // 2. VIEW
         Envelope refEnv;
         try {
-            refEnv = GO2Utilities.combine(getFI.getEnvelope2D(), new Date[]{getFI.getTime(), getFI.getTime()}, new Double[]{getFI.getElevation(), getFI.getElevation()});
+            refEnv = ReferencingUtilities.combine(getFI.getEnvelope2D(), new Date[]{getFI.getTime(), getFI.getTime()}, new Double[]{getFI.getElevation(), getFI.getElevation()});
         } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }
@@ -1040,7 +912,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         GetFeatureInfoVisitor visitor = null;
         for(final WMSVisitorFactory vf : VISITOR_FACTORIES){
             visitor = vf.createVisitor(getFI, layerRefs, infoFormat);
-            if(visitor != null) break;
+            if(visitor != null) {break;}
         }
 
         if(visitor == null) {
@@ -1087,8 +959,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     @Override
     public PortrayalResponse getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
         isWorking();
-        final LayerDetails layer = getLayerReference(getLegend.getLayer());
-        final String layerName = layer.getName().toString();
+        final String userLogin   = getUserLogin();
+        final LayerDetails layer = getLayerReference(userLogin, getLegend.getLayer());
+        final String layerName   = layer.getName().toString();
         if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
             throw new CstlServiceException("You are not allowed to request the layer \""+
                     layerName +"\".", LAYER_NOT_QUERYABLE, KEY_LAYER.toLowerCase());
@@ -1148,18 +1021,17 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             } else {
                 // No sld given, we use the style.
-                final Map<Name,Layer> layers = getLayers();
-                final Layer layerRef = layers.get(layer.getName());
+                final Map<Name,Layer> layers = getLayers(userLogin);
+                final Layer layerRef         = layers.get(layer.getName());
 
                 final List<String> defaultStyleRefs = layerRef.getStyles();
                 if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
                     final String styleId = defaultStyleRefs.get(0);
                     if (styleId.startsWith("${")) {
                         final DataReference styleRef = new DataReference(styleId);
-                        ms = (styleRef == null || styleRef.getLayerId() == null) ? null :
-                                StyleProviderProxy.getInstance().get(styleRef.getLayerId().getLocalPart());
+                        ms = (styleRef == null || styleRef.getLayerId() == null) ? null : getStyle(styleRef.getLayerId().getLocalPart());
                     } else {
-                        ms = StyleProviderProxy.getInstance().getByIdentifier(styleId);
+                        ms = getStyleByIdentifier(styleId);
                     }
                 } else {
                     ms = null;
@@ -1187,11 +1059,22 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     @Override
     public PortrayalResponse getMap(final GetMap getMap) throws CstlServiceException {
         isWorking();
+        final String queryVersion = getMap.getVersion().toString();
+        final String userLogin    = getUserLogin();
     	//
     	// Note this is almost the same logic as in getFeatureInfo
     	//
+        // TODO support BLANK exception format for WMS1.1.1 and WMS1.3.0
         final String errorType = getMap.getExceptionFormat();
-        final boolean errorInImage = EXCEPTIONS_INIMAGE.equalsIgnoreCase(errorType);
+        boolean errorInImage = false;
+        boolean errorBlank = false;
+        if (queryVersion.equals(ServiceDef.WMS_1_3_0.version.toString())) {
+            errorInImage = EXCEPTION_130_INIMAGE.equalsIgnoreCase(errorType);
+            errorBlank = EXCEPTION_130_BLANK.equalsIgnoreCase(errorType);
+        } else {
+            errorInImage = EXCEPTION_111_INIMAGE.equalsIgnoreCase(errorType);
+            errorBlank = EXCEPTION_111_BLANK.equalsIgnoreCase(errorType);
+        }
 
 
         // 1. SCENE
@@ -1199,14 +1082,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final List<Name> layerNames = getMap.getLayers();
         final List<LayerDetails> layerRefs;
         try{
-            layerRefs = getLayerReferences(layerNames);
+            layerRefs = getLayerReferences(userLogin, layerNames);
         } catch (CstlServiceException ex) {
-        	//TODO: distinguish
-            if (errorInImage) {
-                return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
-            } else {
-                throw new CstlServiceException(ex, LAYER_NOT_DEFINED, KEY_LAYERS.toLowerCase());
-            }
+            return handleExceptions(getMap, errorInImage, errorBlank, ex, LAYER_NOT_DEFINED,  KEY_LAYERS.toLowerCase());
         }
         for (LayerDetails layer : layerRefs) {
             if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
@@ -1219,7 +1097,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final List<String> styleNames = getMap.getStyles();
         final StyledLayerDescriptor sld = getMap.getSld();
 
-        final List<MutableStyle> styles = getStyles(layerRefs, sld, styleNames);
+        List<MutableStyle> styles;
+        try {
+            styles = getStyles(layerRefs, sld, styleNames, userLogin);
+        } catch (CstlServiceException ex) {
+            return handleExceptions(getMap, errorInImage, errorBlank, ex, STYLE_NOT_DEFINED, null);
+        }
         //       -- create the rendering parameter Map
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
@@ -1257,15 +1140,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 context.items().add(mapLayer);
             }
             //apply layercontext filters
-            applyLayerFilters(context);
+            applyLayerFiltersAndDims(context, userLogin);
 
             sdef.setContext(context);
         } catch (PortrayalException ex) {
-            if (errorInImage) {
-                return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
-            } else {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            }
+            return handleExceptions(getMap, errorInImage, errorBlank, ex, NO_APPLICABLE_CODE, null);
         }
 
 
@@ -1276,7 +1155,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 getMap.getEnvelope2D().getLowerCorner().getOrdinate(1) > getMap.getEnvelope2D().getUpperCorner().getOrdinate(1)) {
                 throw new CstlServiceException("BBOX parameter minimum is greater than the maximum", INVALID_PARAMETER_VALUE, KEY_BBOX.toLowerCase());
             }
-            refEnv = GO2Utilities.combine(getMap.getEnvelope2D(), new Date[]{getMap.getTime(), getMap.getTime()}, new Double[]{getMap.getElevation(), getMap.getElevation()});
+            refEnv = ReferencingUtilities.combine(getMap.getEnvelope2D(), new Date[]{getMap.getTime(), getMap.getTime()}, new Double[]{getMap.getElevation(), getMap.getElevation()});
         } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }
@@ -1316,18 +1195,35 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             try {
                 response.prepareNow();
             } catch (PortrayalException ex) {
-                if (errorInImage) {
-                    return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
-                } else {
-                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-                }
+                return handleExceptions(getMap, errorInImage, errorBlank, ex, NO_APPLICABLE_CODE, null);
             }
         }
 
         return response;
     }
 
-    private static MutableStyle extractStyle(final Name layerName, final StyledLayerDescriptor sld){
+    private PortrayalResponse handleExceptions(GetMap getMap, boolean errorInImage, boolean errorBlank,
+                                               Exception ex, OWSExceptionCode expCode, String locator) throws CstlServiceException {
+        if (errorInImage) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
+        } else if (errorBlank) {
+            Color exColor = getMap.getBackground() != null ? getMap.getBackground() : Color.WHITE;
+            if (getMap.getTransparent()) {
+                exColor = new Color(0x00FFFFFF & exColor.getRGB(), true); //mark alpha bit as 0 to make color transparent
+            }
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return new PortrayalResponse(Cstl.getPortrayalService().writeBlankImage(exColor, getMap.getSize()));
+        } else {
+            if (locator != null) {
+                throw new CstlServiceException(ex, expCode, locator);
+            } else {
+                throw new CstlServiceException(ex, expCode);
+            }
+        }
+    }
+
+    private static MutableStyle extractStyle(final Name layerName, final StyledLayerDescriptor sld) throws CstlServiceException{
         if(sld == null){
             throw new IllegalArgumentException("SLD should not be null");
         }
@@ -1352,7 +1248,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     if (mls instanceof MutableNamedStyle) {
                         final MutableNamedStyle mns = (MutableNamedStyle) mls;
                         final String namedStyle = mns.getName();
-                        return StyleProviderProxy.getInstance().get(namedStyle);
+                        return getStyle(namedStyle);
                     } else if (mls instanceof MutableStyle) {
                         return (MutableStyle) mls;
                     }
@@ -1371,7 +1267,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     }
 
     private List<MutableStyle> getStyles(final List<LayerDetails> layerRefs, final StyledLayerDescriptor sld,
-                                         final List<String> styleNames) throws CstlServiceException {
+                                         final List<String> styleNames, final String userLogin) throws CstlServiceException {
         final List<MutableStyle> styles = new ArrayList<MutableStyle>();
         for (int i=0; i<layerRefs.size(); i++) {
 
@@ -1384,13 +1280,13 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
                 final String namedStyle = styleNames.get(i);
-                style = StyleProviderProxy.getInstance().get(namedStyle);
+                style = getStyle(namedStyle);
                 if (style == null) {
                     throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
                 }
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
-                final Map<Name,Layer> layers = getLayers();
+                final Map<Name,Layer> layers = getLayers(userLogin);
                 final Layer layer = layers.get(layerRefs.get(i).getName());
 
                 final List<String> defaultStyleRefs = layer.getStyles();
@@ -1398,10 +1294,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final String styleId = defaultStyleRefs.get(0);
                     if (styleId.startsWith("${")) {
                         final DataReference styleRef = new DataReference(styleId);
-                        style = (styleRef == null || styleRef.getLayerId() == null) ? null :
-                                StyleProviderProxy.getInstance().get(styleRef.getLayerId().getLocalPart());
+                        style = (styleRef == null || styleRef.getLayerId() == null) ? null : getStyle(styleRef.getLayerId().getLocalPart());
                     } else {
-                        style = StyleProviderProxy.getInstance().getByIdentifier(styleId);
+                        style = getStyleByIdentifier(styleId);
                     }
                 } else {
                     style = null;
@@ -1412,24 +1307,54 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         return styles;
     }
 
-    private void applyLayerFilters(final MapContext context){
-        final Map<Name,Layer> layersContext = getLayers();
+    private void applyLayerFiltersAndDims(final MapItem item, final String userLogin){
+        final Map<Name,Layer> layersContext = getLayers(userLogin);
 
-        for(MapLayer layer : context.layers()){
-            if (layer instanceof FeatureMapLayer) {
-                final FeatureMapLayer fml = (FeatureMapLayer)layer;
-                final Layer layerContext = layersContext.get(fml.getCollection().getFeatureType().getName());
-                if (layerContext.getFilter() != null) {
-                    final StyleXmlIO xmlUtil = new StyleXmlIO();
-                    Filter filterGt = Filter.INCLUDE;
-                    try {
-                        filterGt = xmlUtil.getTransformer110().visitFilter(layerContext.getFilter());
-                    } catch (FactoryException e) {
-                        LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+        if(item instanceof FeatureMapLayer){
+            final FeatureMapLayer fml = (FeatureMapLayer)item;
+            final Layer layerContext = layersContext.get(fml.getCollection().getFeatureType().getName());
+            if (layerContext.getFilter() != null) {
+                final StyleXmlIO xmlUtil = new StyleXmlIO();
+                Filter filterGt = Filter.INCLUDE;
+                try {
+                    filterGt = xmlUtil.getTransformer110().visitFilter(layerContext.getFilter());
+                } catch (FactoryException e) {
+                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                }
+                fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filterGt));
+            }
+
+            for(DimensionDefinition ddef : layerContext.getDimensions()){
+
+                try {
+                    final String crsname = ddef.getCrs();
+                    final Expression lower = CQL.parseExpression(ddef.getLower());
+                    final Expression upper = CQL.parseExpression(ddef.getUpper());
+                    final CoordinateReferenceSystem crs;
+
+                    if("elevation".equalsIgnoreCase(crsname)){
+                        crs = DefaultVerticalCRS.ELLIPSOIDAL_HEIGHT;
+                    }else if("temporal".equalsIgnoreCase(crsname)){
+                        crs = DefaultTemporalCRS.JAVA;
+                    }else{
+                        final AbstractDatum customDatum = new AbstractDatum(Collections.singletonMap("name", crsname));
+                        final CoordinateSystemAxis csAxis = new DefaultCoordinateSystemAxis(crsname, "u", AxisDirection.valueOf(crsname), Unit.ONE);
+                        final AbstractCS customCs = new AbstractCS(Collections.singletonMap("name", crsname), csAxis);
+                        crs = new AbstractSingleCRS(Collections.singletonMap("name", crsname), customDatum, customCs);
                     }
-                    fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filterGt));
+
+                    final FeatureMapLayer.DimensionDef fdef = new FeatureMapLayer.DimensionDef(crs, lower, upper);
+                    fml.getExtraDimensions().add(fdef);
+
+                } catch (CQLException ex) {
+                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+
+        }
+
+        for(MapItem layer : item.items()){
+            applyLayerFiltersAndDims(layer, userLogin);
         }
 
     }
@@ -1460,15 +1385,5 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             throw new CstlServiceException("The update sequence must be an integer", ex, INVALID_PARAMETER_VALUE, "updateSequence");
         }
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void destroy() {
-        if (!CAPS_RESPONSE.isEmpty()) {
-            CAPS_RESPONSE.clear();
-        }
     }
 }

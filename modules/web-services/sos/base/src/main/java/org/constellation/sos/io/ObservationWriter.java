@@ -18,15 +18,15 @@
 package org.constellation.sos.io;
 
 // constellation dependencies
+import java.util.List;
 import org.constellation.ws.CstlServiceException;
 
+// geotoolkit dependencies
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.gml.xml.DirectPosition;
+import org.geotoolkit.swes.xml.ObservationTemplate;
+
 // GeoAPI dependencies
-import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
-import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
-import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
-import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
-import org.opengis.observation.Measurement;
 import org.opengis.observation.Observation;
 
 /**
@@ -35,6 +35,17 @@ import org.opengis.observation.Observation;
  */
 public interface ObservationWriter {
 
+    /**
+     * Write a new Observation template into the database
+     *
+     * @param template An O&M observation
+     *
+     * @return The new identifiers of the observation
+     *
+     * @throws CstlServiceException
+     */
+    String writeObservationTemplate(final ObservationTemplate template) throws CstlServiceException;
+    
     /**
      * Write a new Observation into the database
      *
@@ -47,24 +58,13 @@ public interface ObservationWriter {
     String writeObservation(final Observation observation) throws CstlServiceException;
 
     /**
-     * Write a new Measurement into the database
-     *
-     * @param measurement An O&M measurement
-     *
-     * @return The new identifiers of the observation
-     *
-     * @throws CstlServiceException
-     */
-    String writeMeasurement(final Measurement measurement) throws CstlServiceException;
-
-    /**
      * Write a new Observation offering into the database
      *
      * @param offering
      * @return
      * @throws CstlServiceException
      */
-    String writeOffering(final ObservationOfferingType offering) throws CstlServiceException;
+    String writeOffering(final ObservationOffering offering) throws CstlServiceException;
 
     /**
      * Update an offering after the add of a new Observation.
@@ -76,8 +76,7 @@ public interface ObservationWriter {
      *
      * @throws CstlServiceException
      */
-    void updateOffering(final OfferingProcedureType offProc, final OfferingPhenomenonType offPheno,
-            final OfferingSamplingFeatureType offSF) throws CstlServiceException;
+    void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException;
 
     /**
      * Refresh the cached offerings.
@@ -91,7 +90,7 @@ public interface ObservationWriter {
      * @param position The GML position of the sensor.
      * @throws CstlServiceException
      */
-    void recordProcedureLocation(final String physicalID, final DirectPositionType position) throws CstlServiceException;
+    void recordProcedureLocation(final String physicalID, final DirectPosition position) throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.

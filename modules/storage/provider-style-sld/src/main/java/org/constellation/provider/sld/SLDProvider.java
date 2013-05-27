@@ -40,7 +40,7 @@ import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.collection.Cache;
+import org.apache.sis.util.collection.Cache;
 import org.geotoolkit.style.MutableStyleFactory;
 import org.geotoolkit.util.logging.Logging;
 

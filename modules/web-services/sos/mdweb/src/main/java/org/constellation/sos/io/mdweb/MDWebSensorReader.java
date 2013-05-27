@@ -17,9 +17,12 @@
 
 package org.constellation.sos.io.mdweb;
 
-import java.util.*;
-
-// JAXB dependencies
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 // constellation dependencies
@@ -28,14 +31,20 @@ import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
-import org.mdweb.io.MD_IOException;
 
-import org.geotoolkit.sml.xml.AbstractSensorML;
+import static org.constellation.sos.ws.SOSConstants.*;
+
+// MDWeb dependencies
+import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.AbstractReader;
 import org.mdweb.model.storage.RecordSet;
+
+// GEOTK dependencies
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.util.StringUtilities;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -44,10 +53,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 public class MDWebSensorReader extends MDWebMetadataReader implements SensorReader {
 
-    /**
-     * The properties file allowing to store the id mapping between physical and database ID.
-     */
-    private final Properties map;
+    private final Map<String, List<String>> acceptedSensorMLFormats = new HashMap<String, List<String>>();
     
     /**
      * Build a new Sensor reader for a MDweb database.
@@ -74,9 +80,28 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
             throw new MetadataIoException("the service has throw a MD_IO Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
         }
-        this.map = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
+        final String smlFormats100 = configuration.getParameter("smlFormats100");
+        if (smlFormats100 != null) {
+            acceptedSensorMLFormats.put("1.0.0", StringUtilities.toStringList(smlFormats100));
+        } else {
+            acceptedSensorMLFormats.put("1.0.0", Arrays.asList(SENSORML_100_FORMAT_V100,
+                                                               SENSORML_101_FORMAT_V100));
+        }
+        
+        final String smlFormats200 = configuration.getParameter("smlFormats200");
+        if (smlFormats200 != null) {
+            acceptedSensorMLFormats.put("2.0.0", StringUtilities.toStringList(smlFormats200));
+        } else {
+            acceptedSensorMLFormats.put("2.0.0", Arrays.asList(SENSORML_100_FORMAT_V200,
+                                                               SENSORML_101_FORMAT_V200));
+        }
     }
 
+    @Override
+    public Map<String, List<String>> getAcceptedSensorMLFormats() {
+        return acceptedSensorMLFormats;
+    }
+    
     /**
      * Return the specified sensor description from the specified ID.
      *
@@ -91,11 +116,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
     @Override
     public AbstractSensorML getSensor(final String sensorId) throws CstlServiceException {
         try {
-            String dbId = map.getProperty(sensorId);
-            if (dbId == null) {
-                dbId = sensorId;
-            }
-            final Object metadata   = getMetadata(dbId, AbstractMetadataReader.SENSORML);
+            final Object metadata   = getMetadata(sensorId, AbstractMetadataReader.SENSORML);
             
             if (metadata instanceof AbstractSensorML) {
                return (AbstractSensorML) metadata;
@@ -104,7 +125,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
                 throw new CstlServiceException("this sensor is not registered in the database (id:" + sensorId + ")!",
                         INVALID_PARAMETER_VALUE, "procedure");
             } else {
-                throw new CstlServiceException("The form metadata is not a sensor", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("The metadata record is not a sensor", NO_APPLICABLE_CODE);
             }
 
         } catch (MetadataIoException ex) {

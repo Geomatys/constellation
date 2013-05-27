@@ -50,8 +50,12 @@ public final class MimeType {
     public static final String APP_INIMAGE     = "application/vnd.ogc.se_inimage";
 
     public static final String APP_XML         = "application/vnd.ogc.xml";
-     
+
+    public static final String APP_GML_XML     = "application/gml+xml";
+
     public static final String APP_GML         = "application/vnd.ogc.gml";
+
+    public static final String APP_GML3        = "application/vnd.ogc.gml3";
 
     public static final String APP_SE_XML      = "application/vnd.ogc.se_xml";
 

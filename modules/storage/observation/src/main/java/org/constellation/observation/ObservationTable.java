@@ -42,7 +42,7 @@ import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import java.util.Objects;
+import org.geotoolkit.util.Utilities;
 import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
@@ -51,6 +51,7 @@ import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.observation.xml.v100.ObservationType;
+import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
@@ -59,6 +60,8 @@ import org.geotoolkit.swe.xml.v101.AnyResultType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 
 
 /**
@@ -84,7 +87,7 @@ import org.geotoolkit.swe.xml.v101.PhenomenonType;
  * @author Guilhem Legal
  */
 public class ObservationTable extends SingletonTable<ObservationType> implements Cloneable {
-
+    
     /**
      * Connexion vers la table des stations.
      * <p>
@@ -94,7 +97,7 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
      * ensuite.
      */
     protected SamplingFeatureTable stations;
-
+    
     /**
      * Connexion vers la table des stations.
      * <p>
@@ -114,38 +117,38 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
      * ensuite.
      */
     protected SamplingCurveTable stationCurves;
-
+    
     /**
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected PhenomenonTable phenomenons;
-
+    
     /**
      * Connexion vers la table des {@linkplain CompositePhenomenon phénomènes composés}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected CompositePhenomenonTable compositePhenomenons;
-
+    
     /**
      * Connexion vers la table des {@linkplain Procedure procedures}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected ProcessTable procedures;
-
+    
     /**
      * Connexion vers la table des {@linkplain AnyResult result}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected AnyResultTable results;
-
+    
     /**
      * La station pour laquelle on veut des observations, ou {@code null} pour récupérer les
      * observations de toutes les stations.
      */
     protected SamplingFeature featureOfInterest;
-
-
+    
+    
     /**
      * Construit une nouvelle connexion vers la table des observations. Voyez la javadoc de
      * cette classe pour les conditions que doivent remplir la requête donnée en argument.
@@ -155,7 +158,7 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
     public ObservationTable(final Database database) {
         this(new ObservationQuery(database));
     }
-
+    
     /**
      * Super constructeur qui est appelé par les classe specialisant ObservationTable.
      *
@@ -180,25 +183,25 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
     protected ObservationTable clone() {
         return new ObservationTable(this);
     }
-
+    
     /**
      * Retourne la station pour laquelle on recherche des observations.
      */
     public final SamplingFeature getFeatureOfInterest() {
         return featureOfInterest;
     }
-
+    
     /**
      * Définit la station pour laquelle on recherche des observations.
      * La valeur {@code null} recherche toutes les stations.
      */
     public synchronized void setStation(final SamplingFeature station) {
-        if (!Objects.equals(station, this.featureOfInterest)) {
+        if (!Utilities.equals(station, this.featureOfInterest)) {
             this.featureOfInterest = station;
             fireStateChanged("Station");
         }
     }
-
+    
     /**
      * Configure la requête SQL spécifiée en fonction de la station et de l'observable recherchés
      * par cette table. Cette méthode est appelée automatiquement lorsque cette table a
@@ -219,31 +222,31 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
      * }
      * }
      */
-
-
-
+    
+    
+    
     /**
      * Construit une observation pour l'enregistrement courant.
      */
     @Override
     public ObservationType createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final ObservationQuery query = (ObservationQuery) super.query;
-
+        
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
         PhenomenonType pheno = (PhenomenonType)phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
-
+        
         if (compositePhenomenons == null) {
             compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
         }
         final CompositePhenomenonType compoPheno = compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
-
+        
         if (stations == null) {
             stations = getDatabase().getTable(SamplingFeatureTable.class);
         }
         SamplingFeatureType station = stations.getEntry(result.getString(indexOf(query.featureOfInterest)));
-
+        
         if (stationPoints == null) {
             stationPoints = getDatabase().getTable(SamplingPointTable.class);
         }
@@ -253,12 +256,12 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
             stationCurves = getDatabase().getTable(SamplingCurveTable.class);
         }
         final SamplingCurveType stationCurve = stationCurves.getEntry(result.getString(indexOf(query.featureOfInterestCurve)));
-
+        
         if (procedures == null) {
             procedures = getDatabase().getTable(ProcessTable.class);
         }
-        final ProcessType procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
-
+        final Process procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
+        
         if (results == null) {
             results = getDatabase().getTable(AnyResultTable.class);
         }
@@ -271,10 +274,10 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                 resultat = any.getReference();
             }
         }
-
-        if(pheno == null) pheno     = compoPheno;
-        if(station == null && stationCurve == null) station =  stationPoint;
-        if(station == null && stationPoint == null) station =  stationCurve;
+        
+        if(pheno == null) {pheno     = compoPheno;}
+        if(station == null && stationCurve == null) {station =  stationPoint;}
+        if(station == null && stationPoint == null) {station =  stationCurve;}
 
         final String name                               = result.getString(indexOf(query.name));
         final Timestamp begin                           = result.getTimestamp(indexOf(query.samplingTimeBegin));
@@ -290,13 +293,13 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
             final String normalizedTime = end.toString().replace(' ', 'T');
             endPosition = new TimePositionType(normalizedTime);
         }
-
+        
         if (beginPosition != null && endPosition != null) {
             samplingTime = new TimePeriodType(beginPosition, endPosition);
-
+        
         } else if (begin != null && end == null) {
             samplingTime =  new TimeInstantType(beginPosition);
-
+        
         //this case will normally never append
         } else if (begin == null && end != null) {
             samplingTime =  new TimeInstantType(endPosition);
@@ -308,20 +311,20 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
             }
             samplingTime.setId("samplingTime-" + id);
         }
-
+        
         return new ObservationType(name,
                                     result.getString(indexOf(query.description)),
                                     station,
                                     pheno,
-                                    procedure,
+                                    procedure.getHref(),
                                     //manque quality
                                     resultat,
                                     samplingTime);
-
-
+        
+        
     }
-
-
+    
+    
     /**
      * Retourne un nouvel identifier (ou l'identifier de l'observation passée en parametre si non-null)
      * et enregistre la nouvelle observation dans la base de donnée.
@@ -417,7 +420,7 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
 
                 //on insere le capteur
                 if (obs.getProcedure() != null) {
-                    final ProcessType process = (ProcessType)obs.getProcedure();
+                    final Process process = (Process)obs.getProcedure();
                     if (procedures == null) {
                         procedures = getDatabase().getTable(ProcessTable.class);
                     }
@@ -437,13 +440,14 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                     try {
                         prid = Integer.parseInt(rid);
                     } catch (NumberFormatException ex) {
-                        Logger.getAnonymousLogger().severe("unable to parse an integer identifier for result:" + rid);
+                        Logger.getAnonymousLogger().log(Level.SEVERE, "unable to parse an integer identifier for result:{0}", rid);
                         parsed = false;
                     }
-                    if (parsed)
+                    if (parsed) {
                         statement.statement.setInt(indexOf(query.result), prid);
-                    else
+                    } else {
                         statement.statement.setNull(indexOf(query.result), java.sql.Types.INTEGER);
+                    }
 
                 } else {
                     statement.statement.setNull(indexOf(query.result), java.sql.Types.INTEGER);
@@ -451,11 +455,11 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
 
                 // on insere le "samplingTime""
                 if (obs.getSamplingTime() != null){
-                    if (obs.getSamplingTime() instanceof TimePeriodType) {
+                    if (obs.getSamplingTime() instanceof Period) {
 
-                        final TimePeriodType sampTime = (TimePeriodType)obs.getSamplingTime();
-                        if (sampTime.getBeginPosition()!= null) {
-                            String s       = sampTime.getBeginPosition().getValue();
+                        final Period sampTime = (Period)obs.getSamplingTime();
+                        if (sampTime.getBeginning()!= null) {
+                            String s       = sampTime.getBeginning().getPosition().getDateTime().toString();
                             s = s.replace("T", " ");
                             final Timestamp date = Timestamp.valueOf(s);
                             statement.statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
@@ -463,9 +467,9 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                             statement.statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.TIMESTAMP);
                         }
 
-                        if (sampTime.getEndPosition() != null) {
+                        if (sampTime.getEnding() != null) {
 
-                            String s = sampTime.getEndPosition().getValue();
+                            String s = sampTime.getEnding().getPosition().getDateTime().toString();
                             s = s.replace("T", " ");
                             final Timestamp date = Timestamp.valueOf(s);
                             statement.statement.setTimestamp(indexOf(query.samplingTimeEnd),  date);
@@ -474,10 +478,10 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                             statement.statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
                         }
 
-                    } else if (obs.getSamplingTime() instanceof TimeInstantType) {
-                        final TimeInstantType sampTime = (TimeInstantType)obs.getSamplingTime();
-                        if (sampTime.getTimePosition() !=null) {
-                            final String s       = sampTime.getTimePosition().getValue();
+                    } else if (obs.getSamplingTime() instanceof Instant) {
+                        final Instant sampTime = (Instant)obs.getSamplingTime();
+                        if (sampTime.getPosition() !=null) {
+                            final String s       = sampTime.getPosition().getDateTime().toString();
                             final Timestamp date = Timestamp.valueOf(s);
                             statement.statement.setTimestamp(indexOf(query.samplingTimeBegin),  date);
                             statement.statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
@@ -494,7 +498,7 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                     statement.statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
                 }
                 statement.statement.setNull(indexOf(query.resultDefinition),   java.sql.Types.VARCHAR);
-
+                
                 updateSingleton(statement.statement);
                 release(lc, statement);
                 success = true;
@@ -508,5 +512,5 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
         }
         return id;
     }
-
+    
 }

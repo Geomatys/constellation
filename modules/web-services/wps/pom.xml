@@ -87,6 +87,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-provider</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-data-coveragestore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-xml-wps</artifactId>
         </dependency>
@@ -97,6 +107,10 @@
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-shapefile</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-coverageio-geotiff</artifactId>
         </dependency>
 
         <!-- test dependencies -->

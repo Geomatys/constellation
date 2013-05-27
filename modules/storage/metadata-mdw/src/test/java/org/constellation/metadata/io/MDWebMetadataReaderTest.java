@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.io.File;
 import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
 import javax.xml.bind.JAXBElement;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.sql.Connection;
 import javax.xml.bind.Unmarshaller;
@@ -42,7 +43,7 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.v100.SensorML;
-import org.geotoolkit.util.ComparisonMode;
+import org.apache.sis.util.ComparisonMode;
 import org.geotoolkit.util.Utilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
@@ -78,6 +79,7 @@ public class MDWebMetadataReaderTest {
         Connection con = ds.getConnection();
 
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+        sr.setEncoding("UTF-8");
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
@@ -97,6 +99,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.5.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-8.sql"));
 
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
@@ -232,8 +235,8 @@ public class MDWebMetadataReaderTest {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object result = reader.getMetadata("IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.xml", AbstractMetadataReader.ISO_19115);
-
-        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta10.xml"));
+        java.io.Reader ioReader = new InputStreamReader(Util.getResourceAsStream("org/constellation/xml/metadata/meta10.xml"), "UTF-8");
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(ioReader);
 
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
@@ -372,7 +375,8 @@ public class MDWebMetadataReaderTest {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object result = reader.getMetadata("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4", AbstractMetadataReader.ISO_19115);
 
-        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta-19119.xml"));
+        java.io.Reader reader = new InputStreamReader(Util.getResourceAsStream("org/constellation/xml/metadata/meta-19119.xml"), "UTF-8");
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(reader);
 
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
@@ -509,5 +513,27 @@ public class MDWebMetadataReaderTest {
         pool.release(unmarshaller);
 
         ebrimEquals(expResult, result);
+    }
+    
+    /**
+     * Tests the getMetadata method for ISO 19115 data with id on responsible party
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getMetadataResponsibleIDTest() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("meta-id", AbstractMetadataReader.ISO_19115);
+
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta12.xml"));
+
+        assertTrue(result instanceof DefaultMetadata);
+        //pool.acquireMarshaller().marshal(expResult, System.out);
+        //assertEquals(expResult.getId(), ((DefaultMetadata)result).getId());
+        metadataEquals(expResult, (DefaultMetadata)result);
+        
+
+        pool.release(unmarshaller);
     }
 }

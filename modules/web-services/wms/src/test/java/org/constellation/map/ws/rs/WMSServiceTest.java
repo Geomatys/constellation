@@ -31,10 +31,13 @@ import org.constellation.map.ws.QueryContext;
 import org.constellation.ws.rs.WebService;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
+import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
 
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.internal.referencing.CRSUtilities;
+import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
 import org.junit.AfterClass;
@@ -84,21 +87,24 @@ public class WMSServiceTest {
 
     private GetMap callGetMap() throws IllegalAccessException, IllegalArgumentException,
                                        InvocationTargetException, NoSuchMethodException{
+        
         //do not use this in real code, just for testing
+        final Worker worker = WSEngine.getInstance("WMS", "default");
         final Method adaptGetMapMethod = WMSService.class.getDeclaredMethod(
-                "adaptGetMap", String.class, boolean.class, QueryContext.class);
+                "adaptGetMap", boolean.class, QueryContext.class, Worker.class);
         adaptGetMapMethod.setAccessible(true);
-        final GetMap getMap = (GetMap)adaptGetMapMethod.invoke(service, "1.3.0",true,new QueryContext());
+        final GetMap getMap = (GetMap)adaptGetMapMethod.invoke(service, true, new QueryContext(), worker);
         return getMap;
     }
 
     private GetFeatureInfo callGetFeatureInfo() throws IllegalAccessException, IllegalArgumentException,
                                        InvocationTargetException, NoSuchMethodException{
         //do not use this in real code, just for testing
+        final Worker worker = WSEngine.getInstance("WMS", "default");
         final Method adaptGetMapMethod = WMSService.class.getDeclaredMethod(
-                "adaptGetFeatureInfo", String.class, QueryContext.class);
+                "adaptGetFeatureInfo", QueryContext.class, Worker.class);
         adaptGetMapMethod.setAccessible(true);
-        final GetFeatureInfo getFI = (GetFeatureInfo)adaptGetMapMethod.invoke(service, "1.3.0",new QueryContext());
+        final GetFeatureInfo getFI = (GetFeatureInfo)adaptGetMapMethod.invoke(service, new QueryContext(), worker);
         return getFI;
     }
 
@@ -124,6 +130,7 @@ public class WMSServiceTest {
         queryParameters.putSingle("STYLES", "");
         queryParameters.putSingle("TIME", "2007-06-23T14:31:56");
         queryParameters.putSingle("WIDTH", "800");
+        queryParameters.putSingle("VERSION", "1.3.0");
 
         final GetMap parsedQuery = callGetMap();
 
@@ -154,7 +161,7 @@ public class WMSServiceTest {
         assertEquals(560d, env2D.getMaximum(1),DELTA);
 
         //enevelope 4D
-        Envelope env4D = GO2Utilities.combine(parsedQuery.getEnvelope2D(), new Date[]{parsedQuery.getTime(), parsedQuery.getTime()}, new Double[]{parsedQuery.getElevation(), parsedQuery.getElevation()});
+        Envelope env4D = ReferencingUtilities.combine(parsedQuery.getEnvelope2D(), new Date[]{parsedQuery.getTime(), parsedQuery.getTime()}, new Double[]{parsedQuery.getElevation(), parsedQuery.getElevation()});
         CoordinateReferenceSystem crs = env4D.getCoordinateReferenceSystem();
         assertEquals(4, crs.getCoordinateSystem().getDimension());
         CoordinateReferenceSystem crs2D = CRSUtilities.getCRS2D(crs);
@@ -203,6 +210,7 @@ public class WMSServiceTest {
         queryParameters.putSingle("STYLES", "");
         queryParameters.putSingle("TIME", "2007-06-23T14:31:56");
         queryParameters.putSingle("WIDTH", "800");
+        queryParameters.putSingle("VERSION", "1.3.0");
 
         final GetFeatureInfo parsedQuery = callGetFeatureInfo();
 
@@ -233,7 +241,7 @@ public class WMSServiceTest {
         assertEquals(560d, env2D.getMaximum(1),DELTA);
 
         //enevelope 4D
-        Envelope env4D = GO2Utilities.combine(parsedQuery.getEnvelope2D(), new Date[]{parsedQuery.getTime(), parsedQuery.getTime()}, new Double[]{parsedQuery.getElevation(), parsedQuery.getElevation()});
+        Envelope env4D = ReferencingUtilities.combine(parsedQuery.getEnvelope2D(), new Date[]{parsedQuery.getTime(), parsedQuery.getTime()}, new Double[]{parsedQuery.getElevation(), parsedQuery.getElevation()});
         CoordinateReferenceSystem crs = env4D.getCoordinateReferenceSystem();
         assertEquals(4, crs.getCoordinateSystem().getDimension());
         CoordinateReferenceSystem crs2D = CRSUtilities.getCRS2D(crs);

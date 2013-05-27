@@ -27,10 +27,11 @@ import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.DirectPosition;
+import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -44,6 +45,7 @@ import org.junit.BeforeClass;
 import static org.junit.Assert.*;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.opengis.observation.Observation;
 
 /**
  *
@@ -137,7 +139,7 @@ public class UtilsTest {
     public void getSensorPositionTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
-        DirectPositionType result = Utils.getSensorPosition(sensor);
+        DirectPosition result = Utils.getSensorPosition(sensor);
         DirectPositionType expResult = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, Arrays.asList(65400.0,1731368.0));
 
         assertEquals(expResult, result);
@@ -264,17 +266,17 @@ public class UtilsTest {
 
         PhenomenonType pheno = new PhenomenonType("test", "test");
 
-        ObservationCollectionType collection = new ObservationCollectionType();
+        List<Observation> observations = new ArrayList<Observation>();
 
         ObservationType obs1 = new ObservationType();
         ObservationType obs2 = new ObservationType();
         ObservationType obs3 = new ObservationType();
 
-        collection.add(obs1);
-        collection.add(obs2);
-        collection.add(obs3);
+        observations.add(obs1);
+        observations.add(obs2);
+        observations.add(obs3);
 
-        EnvelopeType result = Utils.getCollectionBound(collection, "urn:ogc:def:crs:EPSG::4326");
+        Envelope result = Utils.getCollectionBound("1.0.0", observations, "urn:ogc:def:crs:EPSG::4326");
 
         EnvelopeType expResult = new EnvelopeType(null, new DirectPositionType(-180.0, -90.0), new DirectPositionType(180.0, 90.0), "urn:ogc:def:crs:EPSG::4326");
         expResult.setSrsDimension(2);
@@ -294,12 +296,12 @@ public class UtilsTest {
         sp3.setBoundedBy(new EnvelopeType(null, new DirectPositionType(0.0, -8.0), new DirectPositionType(20.0, 10.0), "urn:ogc:def:crs:EPSG::4326"));
         obs3 = new ObservationType(null, null, sp3, pheno, null, this, null);
 
-        collection = new ObservationCollectionType();
-        collection.add(obs1);
-        collection.add(obs2);
-        collection.add(obs3);
+        observations = new ArrayList<Observation>();
+        observations.add(obs1);
+        observations.add(obs2);
+        observations.add(obs3);
 
-        result = Utils.getCollectionBound(collection, "urn:ogc:def:crs:EPSG::4326");
+        result = Utils.getCollectionBound("1.0.0", observations, "urn:ogc:def:crs:EPSG::4326");
 
         expResult = new EnvelopeType(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(20.0, 15.0), "urn:ogc:def:crs:EPSG::4326");
         expResult.setSrsDimension(2);

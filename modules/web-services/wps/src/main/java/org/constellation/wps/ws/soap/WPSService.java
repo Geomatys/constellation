@@ -29,6 +29,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
+import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingType;
 
 // Constellation dependencies
@@ -144,5 +145,14 @@ public class WPSService extends OGCWebService<WPSWorker> {
         }
     }
 
+    @Override
+    protected Object treatIncomingRequest(Object objectRequest, WPSWorker worker) throws CstlServiceException {
+        throw new UnsupportedOperationException("TODO.");
+    }
+
+    @Override
+    protected SOAPMessage processExceptionResponse(String message, String code, String locator) {
+        throw new UnsupportedOperationException("TODO"); 
+    }
 }
 

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2010, Geomatys
+ *    (C) 2010 - 2013, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.configuration;
 
 import java.util.ArrayList;
@@ -78,6 +77,9 @@ public class Layer {
     @XmlElement(name="CRS")
     private List<String> crs;
 
+    @XmlElement(name="Dimension")
+    private List<DimensionDefinition> dimensions;
+
     public Layer() {
 
     }
@@ -100,7 +102,14 @@ public class Layer {
 
     public Layer(final QName name, final List<String> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
-            final List<String> crs) {
+            final List<String> crs)
+    {
+        this(name, styles, filter, alias, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs, null);
+    }
+
+    public Layer(final QName name, final List<String> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+            final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
+            final List<String> crs, final List<DimensionDefinition> dimensions) {
         this.name         = name;
         this.styles       = styles;
         this.filter       = filter;
@@ -114,6 +123,7 @@ public class Layer {
         this.attribution  = attribution;
         this.opaque       = opaque;
         this.crs          = crs;
+        this.dimensions   = dimensions;
         setAlias(alias);
     }
 
@@ -154,8 +164,10 @@ public class Layer {
         return alias;
     }
 
-    public void setAlias(String alias) {
-        if (alias != null) alias =  alias.trim().replaceAll(" ", "_");
+    public final void setAlias(String alias) {
+        if (alias != null) {
+            alias =  alias.trim().replaceAll(" ", "_");
+        }
         this.alias = alias;
     }
 
@@ -256,6 +268,17 @@ public class Layer {
         this.crs = crs;
     }
 
+    public List<DimensionDefinition> getDimensions() {
+        if (dimensions == null) {
+            dimensions = new ArrayList<DimensionDefinition>();
+        }
+        return dimensions;
+    }
+
+    public void setDimensions(final List<DimensionDefinition> dimensions) {
+        this.dimensions = dimensions;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[Layer]");
@@ -263,7 +286,6 @@ public class Layer {
             sb.append("name:\n").append(name).append('\n');
         }
         if (styles != null && !styles.isEmpty()) {
-            sb.append("styles:\n").append(styles).append('\n');
             for (String style : styles) {
                 sb.append("style:\n").append(style).append('\n');
             }
@@ -303,6 +325,12 @@ public class Layer {
         }
         if (title != null) {
             sb.append("title:\n").append(title).append('\n');
+        }
+        if (dimensions != null && !dimensions.isEmpty()) {
+            sb.append("dimensions:\n").append(dimensions).append('\n');
+            for (final DimensionDefinition dimension : dimensions) {
+                sb.append("dimension:\n").append(dimension).append('\n');
+            }
         }
         return sb.toString();
     }

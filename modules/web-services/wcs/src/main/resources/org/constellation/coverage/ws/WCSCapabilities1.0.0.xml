@@ -14,10 +14,4 @@
     <fees>NONE</fees>
     <accessConstraints>NONE</accessConstraints>
   </Service>
-  <Capability>
-    <Exception>
-      <Format>application/vnd.ogc.se_xml</Format>
-      <Format>text/xml</Format>
-    </Exception>
-  </Capability>
 </WCS_Capabilities>

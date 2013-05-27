@@ -64,9 +64,6 @@ public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
 
         final FeatureMapLayer layer = MapBuilder.createFeatureLayer((FeatureCollection)getOrigin(), style);
 
-        layer.setElevationRange(elevationStartField, elevationEndField);
-        layer.setTemporalRange(dateStartField, dateEndField);
-
         final String title = getName().getLocalPart();
         layer.setName(title);
         layer.setDescription(STYLE_FACTORY.description(title,title));

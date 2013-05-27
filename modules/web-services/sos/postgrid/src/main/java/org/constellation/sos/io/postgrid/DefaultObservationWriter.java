@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Connection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,19 +32,22 @@ import org.constellation.observation.ObservationTable;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.DirectPosition;
 
 // Geotoolkit dependencies
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.NoSuchTableException;
+import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.observation.xml.v100.MeasurementType;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.swes.xml.ObservationTemplate;
 
 // GeoAPI dependencies
 import org.opengis.observation.Measurement;
@@ -126,12 +130,23 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
+    public String writeObservationTemplate(final ObservationTemplate template) throws CstlServiceException {
+        if (template.getObservation() != null) {
+            return writeObservation(template.getObservation());
+        }
+        return null;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String writeObservation(final Observation observation) throws CstlServiceException {
         try {
-            if (observation instanceof MeasurementType && measTable != null) {
-                return measTable.getIdentifier((Measurement) observation);
+            if (observation instanceof Measurement && measTable != null) {
+                return measTable.getIdentifier((Measurement) OMXmlFactory.convert("1.0.0", observation));
             } else if (obsTable != null) {
-                return obsTable.getIdentifier(observation);
+                return obsTable.getIdentifier(OMXmlFactory.convert("1.0.0", observation));
             }
             return null;
         } catch (CatalogException ex) {
@@ -147,24 +162,9 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeMeasurement(final Measurement measurement) throws CstlServiceException {
+    public String writeOffering(final ObservationOffering offering) throws CstlServiceException {
         try {
-            return measTable.getIdentifier(measurement);
-        } catch (CatalogException ex) {
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(), NO_APPLICABLE_CODE);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String writeOffering(final ObservationOfferingType offering) throws CstlServiceException {
-        try {
-            return offTable.getIdentifier(offering);
+            return offTable.getIdentifier((ObservationOfferingType)offering);
 
         } catch (CatalogException ex) {
             throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -178,16 +178,22 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(final OfferingProcedureType offProc, final OfferingPhenomenonType offPheno, final OfferingSamplingFeatureType offSF) throws CstlServiceException {
+    public void updateOffering(final String offeringId, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException {
         try {
             if (offProc != null) {
-                offTable.getProcedures().getIdentifier(offProc);
+                final OfferingProcedureType offProcedure = new OfferingProcedureType(offeringId, offProc);
+                offTable.getProcedures().getIdentifier(offProcedure);
             }
             if (offPheno != null) {
-                offTable.getPhenomenons().getIdentifier(offPheno);
+                for (String phenId : offPheno) {
+                    final PhenomenonType pheno = new PhenomenonType(phenId, null);
+                    final OfferingPhenomenonType offPhenomenon = new OfferingPhenomenonType(offeringId, pheno);
+                    offTable.getPhenomenons().getIdentifier(offPhenomenon);
+                }
             }
             if (offSF != null) {
-                offTable.getStations().getIdentifier(offSF);
+                final OfferingSamplingFeatureType offSamp = new OfferingSamplingFeatureType(offeringId, offSF);
+                offTable.getStations().getIdentifier(offSamp);
             }
         } catch (CatalogException ex) {
             throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -209,7 +215,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void recordProcedureLocation(final String physicalID, final DirectPositionType position) throws CstlServiceException {
+    public void recordProcedureLocation(final String physicalID, final DirectPosition position) throws CstlServiceException {
         if (position == null || position.getValue().size() < 2 || !isPostgres) {return;}
         try {
             final Connection c       = omDatabase.getDataSource(true).getConnection();

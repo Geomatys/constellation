@@ -18,14 +18,11 @@ package org.constellation.wmts.ws;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.ParseException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.Cstl;
@@ -33,8 +30,6 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.Layer;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.StyleProviderProxy;
 import org.constellation.wmts.visitor.CSVGraphicVisitor;
 import org.constellation.wmts.visitor.GMLGraphicVisitor;
 import org.constellation.wmts.visitor.HTMLGraphicVisitor;
@@ -53,6 +48,7 @@ import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.v110.*;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
@@ -101,16 +97,10 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      */
     public DefaultWMTSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WMTS);
+        setSupportedVersion(ServiceDef.WMTS_1_0_0);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMTS worker {0} running", id);
         }
-        //listen to changes on the providers to clear the getcapabilities cache
-        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                refreshUpdateSequence();
-            }
-        });
     }
 
     @Override
@@ -124,7 +114,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
         LOGGER.log(logLevel, "getCapabilities request processing\n");
         final long start = System.currentTimeMillis();
-
+        final String userLogin  = getUserLogin();
+        
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("WMTS")) {
@@ -142,13 +133,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
-
-        //set the current updateSequence parameter
-        final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
-        if (returnUS) {
-            return new Capabilities("1.0.0", getCurrentUpdateSequence());
-        }
-
+        
         final AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
         if (formats != null && formats.getOutputFormat().size() > 0 ) {
             boolean found = false;
@@ -162,157 +147,131 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                                                  INVALID_PARAMETER_VALUE, "acceptFormats");
             }
         }
-
-        //we prepare the response document
-        Capabilities c           = null;
-        ServiceIdentification si = null;
-        ServiceProvider       sp = null;
-        OperationsMetadata    om = null;
-        ContentsType        cont = null;
-        List<Themes>      themes = null;
-
+        
         SectionsType sections = requestCapabilities.getSections();
         if (sections == null) {
             sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
         }
 
-        // we load the skeleton capabilities
+        //set the current updateSequence parameter
+        final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
+        if (returnUS) {
+            return new Capabilities("1.0.0", getCurrentUpdateSequence());
+        }
+
+        // If the getCapabilities response is in cache, we just return it.
+        final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache("1.0.0", null);
+        if (cachedCapabilities != null) {
+            return (Capabilities) cachedCapabilities.applySections(sections);
+        }
+        
+        // we load the skeleton capabilities 
         final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "WMTS");
-        if (skeletonCapabilities == null) {
-            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
-        }
+        
+         //we prepare the response document
+        final ServiceIdentification si = skeletonCapabilities.getServiceIdentification();
+        final ServiceProvider       sp = skeletonCapabilities.getServiceProvider();
+        final OperationsMetadata    om = WMTSConstant.OPERATIONS_METADATA.clone();
+        // TODO
+        final List<Themes>      themes = new ArrayList<Themes>();
+        
+        //we update the URL
+        om.updateURL(getServiceUrl());
 
-        //we enter the information for service identification.
-        if (sections.containsSection("ServiceIdentification") || sections.containsSection("All")) {
-            si = skeletonCapabilities.getServiceIdentification();
-        }
+        // Build the list of layers
+        final List<LayerType> outputLayers = new ArrayList<LayerType>();
+        // and the list of matrix set
+        final List<TileMatrixSet> tileSets = new ArrayList<TileMatrixSet>();
 
-        //we enter the information for service provider.
-        if (sections.containsSection("ServiceProvider") || sections.containsSection("All")) {
-            sp = skeletonCapabilities.getServiceProvider();
-        }
+        final Map<Name,Layer> declaredLayers = getLayers(userLogin);
 
-        //we enter the operation Metadata
-        if (sections.containsSection("OperationsMetadata") || sections.containsSection("All")) {
-           om = WMTSConstant.OPERATIONS_METADATA;
-           //we update the URL
-           om.updateURL(getServiceUrl());
-
-        }
-
-        if (sections.containsSection("Contents") || sections.containsSection("All")) {
-
-            // Build the list of layers
-            final List<LayerType> outputLayers = new ArrayList<LayerType>();
-            // and the list of matrix set
-            final List<TileMatrixSet> tileSets = new ArrayList<TileMatrixSet>();
-
-            final Map<Name,Layer> declaredLayers = getLayers();
-
-            for(final Name n : declaredLayers.keySet()){
-                final LayerDetails details = LayerProviderProxy.getInstance().get(n);
-                final Layer configlayer = declaredLayers.get(n);
-                final Object origin = details.getOrigin();
-                if(!(origin instanceof CoverageReference)){
-                    //WMTS only handle CoverageReference object
-                    LOGGER.log(Level.INFO, "Layer {0} has not a coverageReference origin. It will not be included in capabilities", n.getLocalPart());
-                    continue;
-                }
-                final CoverageReference ref = (CoverageReference) origin;
-                if(!(ref instanceof PyramidalModel)){
-                    //WMTS only handle PyramidalModel
-                    LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", n.getLocalPart());
-                    continue;
-                }
-
-                try{
-                    final PyramidalModel model = (PyramidalModel) ref;
-                    final PyramidSet set = model.getPyramidSet();
-                    String name;
-                    if (configlayer.getAlias() != null && !configlayer.getAlias().isEmpty()) {
-                        name = configlayer.getAlias().trim().replaceAll(" ", "_");
-                    } else {
-                        name = n.getLocalPart();
-                    }
-
-                    Envelope env = set.getEnvelope();
-
-                    env = CRS.transform(env, DefaultGeographicCRS.WGS84);
-
-                    final BoundingBoxType bbox = new WGS84BoundingBoxType(
-                            env.getMinimum(0),
-                            env.getMinimum(1),
-                            env.getMaximum(0),
-                            env.getMaximum(1));
-
-                    final List<Dimension> dims = new ArrayList<Dimension>();
-
-                    final LayerType outputLayer = new LayerType(
-                            name,
-                            "remarks",
-                            bbox,
-                            Collections.EMPTY_LIST,
-                            dims);
-
-                    outputLayer.setTitle(name);
-                    outputLayer.setAbstract(name);
-
-                    for(Pyramid pr : set.getPyramids()){
-                        final TileMatrixSet tms = new TileMatrixSet();
-                        tms.setIdentifier(new CodeType(pr.getId()));
-                        tms.setSupportedCRS(IdentifiedObjects.getIdentifier(pr.getCoordinateReferenceSystem()));
-
-                        final List<TileMatrix> tm = new ArrayList<TileMatrix>();
-                        final double[] scales = pr.getScales();
-                        for(int i=0; i<scales.length; i++){
-                            final GridMosaic mosaic = pr.getMosaic(i);
-                            double scale = mosaic.getScale();
-                            //convert scale in the strange WMTS scale denominator
-                            scale = WMTSUtilities.toScaleDenominator(pr.getCoordinateReferenceSystem(), scale);
-                            final TileMatrix matrix = new TileMatrix();
-                            matrix.setIdentifier(new CodeType(mosaic.getId()));
-                            matrix.setScaleDenominator(scale);
-                            matrix.setMatrixWidth(mosaic.getGridSize().width);
-                            matrix.setMatrixHeight(mosaic.getGridSize().height);
-                            matrix.setTileWidth(mosaic.getTileSize().width);
-                            matrix.setTileHeight(mosaic.getTileSize().height);
-                            matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getOrdinate(0));
-                            matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getOrdinate(1));
-                            tm.add(matrix);
-                        }
-                        tms.setTileMatrix(tm);
-
-                        final TileMatrixSetLink tmsl = new TileMatrixSetLink();
-                        tmsl.setTileMatrixSet(pr.getId());
-                        outputLayer.getTileMatrixSetLink().add(tmsl);
-                        tileSets.add(tms);
-                    }
-
-                    outputLayers.add(outputLayer);
-                } catch(DataStoreException ex) {
-                    LOGGER.log(Level.WARNING, ex.getMessage(),ex);
-                } catch(TransformException ex) {
-                    LOGGER.log(Level.WARNING, ex.getMessage(),ex);
-                }
+        for(final Name n : declaredLayers.keySet()){
+            final LayerDetails details = getLayerReference(userLogin, n);
+            final Layer configlayer    = declaredLayers.get(n);
+            final Object origin        = details.getOrigin();
+            if(!(origin instanceof CoverageReference)){
+                //WMTS only handle CoverageReference object
+                LOGGER.log(Level.INFO, "Layer {0} has not a coverageReference origin. It will not be included in capabilities", n.getLocalPart());
+                continue;
+            }
+            final CoverageReference ref = (CoverageReference) origin;
+            if(!(ref instanceof PyramidalModel)){
+                //WMTS only handle PyramidalModel
+                LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", n.getLocalPart());
+                continue;
             }
 
-            cont = new ContentsType();
-            cont.setLayers(outputLayers);
-            cont.setTileMatrixSet(tileSets);
+            try{
+                final PyramidalModel pmodel = (PyramidalModel) ref;
+                final PyramidSet set = pmodel.getPyramidSet();
+                final String name;
+                if (configlayer.getAlias() != null && !configlayer.getAlias().isEmpty()) {
+                    name = configlayer.getAlias().trim().replaceAll(" ", "_");
+                } else {
+                    name = n.getLocalPart();
+                }
+
+                Envelope env = set.getEnvelope();
+
+                env = CRS.transform(env, DefaultGeographicCRS.WGS84);
+
+                final BoundingBoxType bbox = new WGS84BoundingBoxType(
+                        env.getMinimum(0),
+                        env.getMinimum(1),
+                        env.getMaximum(0),
+                        env.getMaximum(1));
+
+                final List<Dimension> dims  = new ArrayList<Dimension>();
+                final LayerType outputLayer = new LayerType(
+                        name,
+                        name,
+                        name,
+                        bbox,
+                        Collections.EMPTY_LIST,
+                        dims);
+
+                for(Pyramid pr : set.getPyramids()){
+                    final TileMatrixSet tms = new TileMatrixSet();
+                    tms.setIdentifier(new CodeType(pr.getId()));
+                    tms.setSupportedCRS(IdentifiedObjects.getIdentifier(pr.getCoordinateReferenceSystem()));
+
+                    final List<TileMatrix> tm = new ArrayList<TileMatrix>();
+                    final double[] scales = pr.getScales();
+                    for(int i=0; i<scales.length; i++){
+                        final GridMosaic mosaic = pr.getMosaics(i).iterator().next();
+                        double scale = mosaic.getScale();
+                        //convert scale in the strange WMTS scale denominator
+                        scale = WMTSUtilities.toScaleDenominator(pr.getCoordinateReferenceSystem(), scale);
+                        final TileMatrix matrix = new TileMatrix();
+                        matrix.setIdentifier(new CodeType(mosaic.getId()));
+                        matrix.setScaleDenominator(scale);
+                        matrix.setMatrixDimension(mosaic.getGridSize());
+                        matrix.setTileDimension(mosaic.getTileSize());
+                        matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getOrdinate(0));
+                        matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getOrdinate(1));
+                        tm.add(matrix);
+                    }
+                    tms.setTileMatrix(tm);
+
+                    final TileMatrixSetLink tmsl = new TileMatrixSetLink(pr.getId());
+                    outputLayer.addTileMatrixSetLink(tmsl);
+                    tileSets.add(tms);
+                }
+
+                outputLayers.add(outputLayer);
+            } catch(DataStoreException ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+            } catch(TransformException ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+            }
         }
-
-        if (sections.containsSection("Themes") || sections.containsSection("All")) {
-            // TODO
-
-            themes = new ArrayList<Themes>();
-        }
-
-        c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
-
+        final ContentsType cont = new ContentsType(outputLayers, tileSets);
+       
+        // put full capabilities in cache
+        final Capabilities c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
+        putCapabilitiesInCache("1.0.0", null, c);
         LOGGER.log(logLevel, "getCapabilities processed in {0}ms.\n", (System.currentTimeMillis() - start));
-        return c;
-
-
+        return (Capabilities) c.applySections(sections);
     }
 
     /**
@@ -322,21 +281,20 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     public String getFeatureInfo(GetFeatureInfo request) throws CstlServiceException {
 
         //       -- get the List of layer references
-        final GetTile getTile = request.getGetTile();
-
+        final GetTile getTile       = request.getGetTile();
+        final String userLogin      = getUserLogin();
         final Name layerName        = Util.parseLayerName(getTile.getLayer());
-        final LayerDetails layerRef = getLayerReference(layerName);
+        final LayerDetails layerRef = getLayerReference(userLogin, layerName);
 
         Coverage c = null;
 
         // build an equivalent style List
-        final String styleName = getTile.getStyle();
-
-        final MutableStyle style        = getStyle(styleName);
+        final String styleName   = getTile.getStyle();
+        final MutableStyle style = getStyle(styleName);
         //       -- create the rendering parameter Map
         Double elevation =  null;
         Date time        = null;
-        List<DimensionNameValue> dimensions = getTile.getDimensionNameValue();
+        final List<DimensionNameValue> dimensions = getTile.getDimensionNameValue();
         for (DimensionNameValue dimension : dimensions) {
             if (dimension.getName().equalsIgnoreCase("elevation")) {
                 try {
@@ -437,13 +395,14 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      * {@inheritDoc}
      */
     @Override
-    public TileReference getTile(GetTile request) throws CstlServiceException {
+    public TileReference getTile(final GetTile request) throws CstlServiceException {
 
         //1 LAYER NOT USED FOR NOW
         Name layerName = Util.parseLayerName(request.getLayer());
-
+        final String userLogin  = getUserLogin();
+        
         //switch alias -> name
-        final Map<Name,Layer> declaredLayers = getLayers();
+        final Map<Name,Layer> declaredLayers = getLayers(userLogin);
         if(declaredLayers != null){
             for(Entry<Name,Layer> entry : declaredLayers.entrySet()){
                 if(layerName.getLocalPart().equalsIgnoreCase(entry.getValue().getAlias())){
@@ -492,8 +451,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
 
         try{
-            final LayerDetails details = LayerProviderProxy.getInstance().get(layerName);
-
+            final LayerDetails details = getLayerReference(userLogin, layerName);
             if(details == null){
                 throw new CstlServiceException("No layer for name : " + layerName , INVALID_PARAMETER_VALUE, "layerName");
             }
@@ -523,8 +481,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 throw new CstlServiceException("Undefined matrixSet:" + matrixSetName + " for layer:" + layerName, INVALID_PARAMETER_VALUE, "tilematrixset");
             }
             GridMosaic mosaic = null;
-            for(int i=0;i<pyramid.getScales().length;i++){
-                final GridMosaic gm = pyramid.getMosaic(i);
+            for(GridMosaic gm : pyramid.getMosaics()){
                 if(gm.getId().equals(level)){
                     mosaic = gm;
                     break;
@@ -549,28 +506,5 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             throw new CstlServiceException("Unexpected error : " + ex.getMessage(), ex , NO_APPLICABLE_CODE);
         }
 
-    }
-
-    private static MutableStyle getStyle(final String styleName) throws CstlServiceException {
-        final MutableStyle style;
-        if (styleName != null && !styleName.isEmpty()) {
-            //try to grab the style if provided
-            //a style has been given for this layer, try to use it
-            style = StyleProviderProxy.getInstance().get(styleName);
-            if (style == null) {
-                throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
-            }
-        } else {
-            //no defined styles, use the favorite one, let the layer get it himself.
-            style = null;
-        }
-        return style;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void destroy() {
     }
 }

@@ -35,20 +35,17 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 
-import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.gml.xml.v311.ReferenceType;
-import org.geotoolkit.observation.xml.v100.ObservationType;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
-import org.geotoolkit.sos.xml.v100.ResponseModeType;
-import org.geotoolkit.swe.xml.AnyResult;
-import org.geotoolkit.swe.xml.v101.AnyResultType;
-import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
-import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+import org.opengis.observation.Observation;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.temporal.TemporalPrimitive;
 
 /**
  *
@@ -66,6 +63,8 @@ public class FileObservationReader implements ObservationReader {
      */
     protected final String observationIdBase;
 
+    protected final String phenomenonIdBase;
+    
     private File offeringDirectory;
 
     private File phenomenonDirectory;
@@ -87,6 +86,7 @@ public class FileObservationReader implements ObservationReader {
 
     public FileObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
+        this.phenomenonIdBase  = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             offeringDirectory            = new File(dataDirectory, "offerings");
@@ -108,13 +108,16 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Collection<String> getOfferingNames() throws CstlServiceException {
+    public Collection<String> getOfferingNames(final String version) throws CstlServiceException {
         final List<String> offeringNames = new ArrayList<String>();
-        if (offeringDirectory.exists()) {
-            for (File offeringFile: offeringDirectory.listFiles()) {
-                String offeringName = offeringFile.getName();
-                offeringName = offeringName.substring(0, offeringName.indexOf(FILE_EXTENSION));
-                offeringNames.add(offeringName);
+        if (offeringDirectory.isDirectory()) {
+            final File offeringVersionDir = new File(observationDirectory, version);
+            if (offeringVersionDir.isDirectory()) {
+                for (File offeringFile: offeringVersionDir.listFiles()) {
+                    String offeringName = offeringFile.getName();
+                    offeringName = offeringName.substring(0, offeringName.indexOf(FILE_EXTENSION));
+                    offeringNames.add(offeringName);
+                }
             }
         }
         return offeringNames;
@@ -124,24 +127,40 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException {
-        final File offeringFile = new File(offeringDirectory, offeringName + FILE_EXTENSION);
-        if (offeringFile.exists()) {
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(offeringFile);
-                if (obj instanceof ObservationOfferingType) {
-                    return (ObservationOfferingType) obj;
-                }
-                throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
-            } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + offeringFile, ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (unmarshaller != null) {
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
+        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
+        for (String offeringName : offeringNames) {
+            offerings.add(getObservationOffering(offeringName, version));
+        }
+        return offerings;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
+        final File offeringVersionDir = new File(offeringDirectory, version); 
+        if (offeringVersionDir.isDirectory()) {
+            final File offeringFile = new File(offeringVersionDir, offeringName + FILE_EXTENSION);
+            if (offeringFile.exists()) {
+                try {
+                    final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
+                    Object obj = unmarshaller.unmarshal(offeringFile);
                     MARSHALLER_POOL.release(unmarshaller);
+                    if (obj instanceof JAXBElement) {
+                        obj = ((JAXBElement)obj).getValue();
+                    }
+                    if (obj instanceof ObservationOffering) {
+                        return (ObservationOffering) obj;
+                    }
+                    throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
+                } catch (JAXBException ex) {
+                    throw new CstlServiceException("Unable to unmarshall The file " + offeringFile, ex, NO_APPLICABLE_CODE);
                 }
             }
+        } else {
+            throw new CstlServiceException("Unsuported version:" + version);
         }
         return null;
     }
@@ -150,30 +169,34 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOfferingType> getObservationOfferings() throws CstlServiceException {
-        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
+    public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
+        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
         if (offeringDirectory.exists()) {
-            for (File offeringFile: offeringDirectory.listFiles()) {
-                Unmarshaller unmarshaller = null;
-                try {
-                    unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
-                    final Object obj = unmarshaller.unmarshal(offeringFile);
-                    if (obj instanceof ObservationOfferingType) {
-                        offerings.add((ObservationOfferingType) obj);
-                    } else {
-                        throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
-                    }
-                } catch (JAXBException ex) {
-                    String msg = ex.getMessage();
-                    if (msg == null && ex.getCause() != null) {
-                        msg = ex.getCause().getMessage();
-                    }
-                    LOGGER.warning("Unable to unmarshall The file " + offeringFile + " cause:" + msg);
-                } finally {
-                    if (unmarshaller != null) {
+            final File offeringVersionDir = new File(offeringDirectory, version); 
+            if (offeringVersionDir.isDirectory()) {
+                for (File offeringFile: offeringVersionDir.listFiles()) {
+                    try {
+                        final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
+                        Object obj = unmarshaller.unmarshal(offeringFile);
                         MARSHALLER_POOL.release(unmarshaller);
+                        if (obj instanceof JAXBElement) {
+                            obj = ((JAXBElement)obj).getValue();
+                        }
+                        if (obj instanceof ObservationOffering) {
+                            offerings.add((ObservationOffering) obj);
+                        } else {
+                            throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
+                        }
+                    } catch (JAXBException ex) {
+                        String msg = ex.getMessage();
+                        if (msg == null && ex.getCause() != null) {
+                            msg = ex.getCause().getMessage();
+                        }
+                        LOGGER.warning("Unable to unmarshall The file " + offeringFile + " cause:" + msg);
                     }
                 }
+            } else {
+                throw new CstlServiceException("Unsuported version:" + version);
             }
         }
         return offerings;
@@ -215,29 +238,13 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public PhenomenonType getPhenomenon(final String phenomenonName) throws CstlServiceException {
-        final File phenomenonFile = new File(phenomenonDirectory, phenomenonName + FILE_EXTENSION);
-        if (phenomenonFile.exists()) {
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(phenomenonFile);
-                if (obj instanceof JAXBElement) {
-                    obj = ((JAXBElement)obj).getValue();
-                }
-                if (obj instanceof PhenomenonType) {
-                    return (PhenomenonType) obj;
-                }
-                throw new CstlServiceException("The file " + phenomenonFile + " does not contains an phenomenon Object.", NO_APPLICABLE_CODE);
-            } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + phenomenonFile, ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (unmarshaller != null) {
-                    MARSHALLER_POOL.release(unmarshaller);
-                }
-            }
+    public boolean existPhenomenon(String phenomenonName) throws CstlServiceException {
+        // we remove the phenomenon id base
+        if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+            phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
         }
-        return null;
+        final File phenomenonFile = new File(phenomenonDirectory, phenomenonName + FILE_EXTENSION);
+        return phenomenonFile.exists();
     }
 
     /**
@@ -260,27 +267,23 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeatureType getFeatureOfInterest(final String samplingFeatureName) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws CstlServiceException {
         final File samplingFeatureFile = new File(foiDirectory, samplingFeatureName + FILE_EXTENSION);
         if (samplingFeatureFile.exists()) {
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(samplingFeatureFile);
+                MARSHALLER_POOL.release(unmarshaller);
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof SamplingFeatureType) {
-                    return (SamplingFeatureType) obj;
+                if (obj instanceof SamplingFeature) {
+                    return (SamplingFeature) obj;
                 }
                 throw new CstlServiceException("The file " + samplingFeatureFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
                 throw new CstlServiceException("Unable to unmarshall The file " + samplingFeatureFile, ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (unmarshaller != null) {
-                    MARSHALLER_POOL.release(unmarshaller);
-                }
-            }
+            } 
         }
         return null;
     }
@@ -289,29 +292,25 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationType getObservation(final String identifier, final QName resultModel) throws CstlServiceException {
+    public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
         File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (!observationFile.exists()) {
             observationFile = new File(observationTemplateDirectory, identifier + FILE_EXTENSION);
         }
         if (observationFile.exists()) {
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(observationFile);
+                MARSHALLER_POOL.release(unmarshaller);
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof ObservationType) {
-                    return (ObservationType) obj;
+                if (obj instanceof Observation) {
+                    return (Observation) obj;
                 }
                 throw new CstlServiceException("The file " + observationFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
                 throw new CstlServiceException("Unable to unmarshall The file " + observationFile, ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (unmarshaller != null) {
-                    MARSHALLER_POOL.release(unmarshaller);
-                }
             }
         }
         throw new CstlServiceException("The file " + observationFile + " does not exist", NO_APPLICABLE_CODE);
@@ -321,28 +320,25 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public AnyResult getResult(final String identifier, final QName resutModel) throws CstlServiceException {
+    public Object getResult(final String identifier, final QName resutModel, final String version) throws CstlServiceException {
         final File anyResultFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (anyResultFile.exists()) {
-            Unmarshaller unmarshaller = null;
+            
             try {
-                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(anyResultFile);
+                MARSHALLER_POOL.release(unmarshaller);
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof ObservationType) {
-                    final ObservationType obs = (ObservationType) obj;
-                    final DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
-                    return new AnyResultType(null, arrayP.getDataArray());
+                if (obj instanceof Observation) {
+                    final Observation obs = (Observation) obj;
+                    final DataArrayProperty arrayP = (DataArrayProperty) obs.getResult();
+                    return arrayP.getDataArray();
                 }
                 throw new CstlServiceException("The file " + anyResultFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
                 throw new CstlServiceException("Unable to unmarshall The file " + anyResultFile, ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (unmarshaller != null) {
-                    MARSHALLER_POOL.release(unmarshaller);
-                }
             }
         }
         throw new CstlServiceException("The file " + anyResultFile + " does not exist", NO_APPLICABLE_CODE);
@@ -352,8 +348,17 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ReferenceType getReference(final String href) throws CstlServiceException {
-        return new ReferenceType(null, href);
+    public boolean existProcedure(final String href) throws CstlServiceException {
+        if (sensorDirectory.exists()) {
+            for (File sensorFile: sensorDirectory.listFiles()) {
+                String sensorName = sensorFile.getName();
+                sensorName = sensorName.substring(0, sensorName.indexOf(FILE_EXTENSION));
+                if (sensorName.equals(href)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -361,7 +366,16 @@ public class FileObservationReader implements ObservationReader {
      */
     @Override
     public String getNewObservationId() throws CstlServiceException {
-        return observationIdBase + observationDirectory.list().length;
+        String obsID = null;
+        boolean exist = true;
+        int i = observationDirectory.list().length;
+        while (exist) {
+            obsID = observationIdBase + i;
+            final File newFile = new File(observationDirectory, obsID);
+            exist = newFile.exists();
+            i++;
+        }
+        return obsID;
     }
 
     /**
@@ -376,7 +390,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException {
+    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws CstlServiceException {
         throw new CstlServiceException("The Filesystem implementation of SOS does not support GetFeatureofInterestTime");
     }
     

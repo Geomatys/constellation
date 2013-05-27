@@ -55,7 +55,7 @@ import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.client.ServerFactory;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
-import org.geotoolkit.util.ArgumentChecks;
+import org.apache.sis.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.xml.MarshallerPool;
@@ -361,6 +361,41 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     }
 
     /**
+     * Fire event that a service has been created.
+     *
+     * @param instanceName Instance name for this service.
+     * @param serviceType Type of the service (WMS, CSW, SOS, ...).
+     */
+    private void fireServiceCreated(final String instanceName, final String serviceType) {
+        for (ConstellationListener listener : listeners.getListeners(ConstellationListener.class)) {
+            listener.serviceCreated(instanceName, serviceType);
+        }
+    }
+
+    /**
+     * Fire event that a service has been deleted.
+     *
+     * @param id Identifier of the service to delete.
+     */
+    private void fireServiceDeleted(final String instanceName, final String serviceType) {
+        for (ConstellationListener listener : listeners.getListeners(ConstellationListener.class)) {
+            listener.serviceDeleted(instanceName, serviceType);
+        }
+    }
+
+    /**
+     * Fire event that a provider has been updated.
+     * @param instanceName Service name for this provider.
+     * @param id Identifier of the provider to delete.
+     * @param config Configuration of the provider.
+     */
+    private void fireServiceUpdated(final String instanceName, final String id, final Object config) {
+        for (ConstellationListener listener : listeners.getListeners(ConstellationListener.class)) {
+            listener.serviceUpdated(instanceName, id, config);
+        }
+    }
+
+    /**
      * Configuration methods for services
      */
     public final class Services{
@@ -454,15 +489,19 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         /**
          * Create a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
          *
-         * @param service The service name to restart (wms, wfs, csw,...).
+         * @param service The service type to create (wms, wfs, csw,...).
          * @param instanceId The instance identifier to create.
          *
          * @return true if the operation succeed
          */
-        public boolean newInstance(String service, String instanceId) {
+        public boolean newInstance(final String service, final String instanceId) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
-                return sendRequestAck(url, null);
+                final boolean succeed = sendRequestAck(url, null);
+                if (succeed) {
+                    fireServiceCreated(instanceId, service);
+                }
+                return succeed;
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -516,7 +555,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean deleteInstance(final String service, final String instanceId) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
-                return sendRequestAck(url, null);
+                final boolean succeed = sendRequestAck(url, null);
+                if (succeed) {
+                    fireServiceDeleted(instanceId, service);
+                }
+                return succeed;
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -561,7 +604,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean configureInstance(final String service, final String instanceId, final Object configuration) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
-                return sendRequestAck(url, configuration);
+                final boolean succeed = sendRequestAck(url, configuration);
+                if (succeed) {
+                    fireServiceUpdated(instanceId, service, configuration);
+                }
+                return succeed;
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -1171,6 +1218,38 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean refreshIndex(final String id, final boolean asynchrone) {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
+                return sendRequestAck(url, null);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
+        public boolean addToIndex(final String id, final List<String> identifiers) {
+            try {
+                final String idList = StringUtilities.toCommaSeparatedValues(identifiers);
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_ADD_TO_INDEX + "&id=" + id + "&identifiers=" + idList;
+                return sendRequestAck(url, null);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
+        public boolean removeFromIndex(final String id, final List<String> identifiers) {
+            try {
+                final String idList = StringUtilities.toCommaSeparatedValues(identifiers);
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REMOVE_FROM_INDEX + "&id=" + id + "&identifiers=" + idList;
+                return sendRequestAck(url, null);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
+        public boolean clearCache(final String id) {
+            try {
+                final String url = getURLWithEndSlash() + "csw/admin?request=" + REQUEST_CLEAR_CACHE + "&id=" + id;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);

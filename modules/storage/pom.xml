@@ -100,18 +100,15 @@
         <module>metadata</module>
         <module>metadata-mdw</module>
     	<module>generic</module>
-	    <module>observation</module>
-	    <module>provider</module>
+	<module>observation</module>
+	<module>om2</module>
+	<module>provider</module>
         <module>provider-data-coveragesgroup</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
-        <module>provider-data-datastore</module>
+        <module>provider-data-featurestore</module>
         <module>provider-data-coveragestore</module>
         <module>provider-data-serverstore</module>
-        <module>provider-data-om</module>
-        <module>provider-data-postgis</module>
-        <module>provider-data-shapefile</module>
-        <module>provider-data-sml</module>
         <module>provider-style-sld</module>
         <module>provider-style-unnormalize</module>
       </modules>
@@ -124,10 +121,7 @@
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
         <module>provider-data-coveragestore</module>
-        <module>provider-data-om</module>
-        <module>provider-data-postgis</module>
-        <module>provider-data-shapefile</module>
-        <module>provider-data-sml</module>
+        <module>provider-data-featurestore</module>
         <module>provider-style-sld</module>
         <module>provider-style-unnormalize</module>
       </modules>
@@ -140,10 +134,7 @@
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
         <module>provider-data-coveragestore</module>
-        <module>provider-data-om</module>
-        <module>provider-data-postgis</module>
-        <module>provider-data-shapefile</module>
-        <module>provider-data-sml</module>
+        <module>provider-data-featurestore</module>
         <module>provider-style-sld</module>
         <module>provider-style-unnormalize</module>
       </modules>
@@ -156,10 +147,7 @@
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
         <module>provider-data-coveragestore</module>
-        <module>provider-data-om</module>
-        <module>provider-data-postgis</module>
-        <module>provider-data-shapefile</module>
-        <module>provider-data-sml</module>
+        <module>provider-data-featurestore</module>
         <module>provider-style-sld</module>
         <module>provider-style-unnormalize</module>
       </modules>
@@ -179,6 +167,7 @@
         <module>metadata-mdw</module>
     	<module>generic</module>
         <module>observation</module>
+	<module>om2</module>
       </modules>
     </profile>
     <profile>

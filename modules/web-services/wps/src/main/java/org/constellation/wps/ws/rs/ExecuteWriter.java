@@ -58,18 +58,12 @@ public class ExecuteWriter<T extends WPSResponse> implements MessageBodyWriter<T
     @Override
     public void writeTo(final T t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt,
             final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
-        Marshaller m = null;
         try {
-            m = WPSMarshallerPool.getInstance().acquireMarshaller();
+            final Marshaller m = WPSMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
+            WPSMarshallerPool.getInstance().release(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the feature collection", ex);
-        } finally {
-            if(m!=null){
-                WPSMarshallerPool.getInstance().release(m);
-            }
         }
-        
     }
-
 }

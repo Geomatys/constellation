@@ -58,17 +58,12 @@ public class WMTSResponseWriter<T extends WMTSResponse> implements MessageBodyWr
     @Override
     public void writeTo(final T t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt,
             final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
-        Marshaller m = null;
         try {
-            m = WMTSMarshallerPool.getInstance().acquireMarshaller();
+            final Marshaller m = WMTSMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
-
+            WMTSMarshallerPool.getInstance().release(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the wmts response", ex);
-        } finally {
-            if (m != null) {
-                 WMTSMarshallerPool.getInstance().release(m);
-            }
         }
     }
 }

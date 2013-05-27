@@ -275,10 +275,10 @@ public class ByIDHarvester extends CatalogueHarvester {
             // we get the response document
             final InputStream in   = conec.getInputStream();
 
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 harvested = unmarshaller.unmarshal(in);
+                marshallerPool.release(unmarshaller);
                 if (harvested instanceof JAXBElement) {
                     harvested = ((JAXBElement) harvested).getValue();
                 }
@@ -287,10 +287,6 @@ public class ByIDHarvester extends CatalogueHarvester {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             }  catch (IllegalAccessError ex) {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
-            } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
-                }
             }
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, "The Distant service have made an error", ex);

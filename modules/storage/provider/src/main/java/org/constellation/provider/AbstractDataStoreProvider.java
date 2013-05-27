@@ -28,18 +28,16 @@ import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.storage.DataStoreException;
 
 import org.opengis.feature.type.Name;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.geotoolkit.data.AbstractFeatureStore;
 import org.geotoolkit.data.AbstractFeatureStoreFactory;
 import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.data.memory.MemoryFeatureStore;
 import static org.geotoolkit.parameter.Parameters.*;
+import org.opengis.parameter.ParameterValue;
 
 /**
  * Abstract provider which handle a Datastore.
@@ -51,7 +49,6 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
 
     private final Set<Name> index = new LinkedHashSet<Name>();
     private ExtendedFeatureStore store;
-    private ParameterValueGroup storeConfig;
 
     public AbstractDataStoreProvider(final ProviderService service,
             final ParameterValueGroup config) throws DataStoreException {
@@ -59,11 +56,8 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         visit();
     }
 
-    /**
-     * @return the descriptor used for this datastore source configuration.
-     */
-    protected abstract ParameterDescriptorGroup getDatastoreDescriptor();
-
+    protected abstract FeatureStore createBaseFeatureStore();
+    
     /**
      * @return the datastore this provider encapsulate.
      */
@@ -114,54 +108,39 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public void reload() {
-        synchronized(this){
-            index.clear();
-            visit();
-        }
+    public synchronized void reload() {
+        dispose();
+        visit();
     }
 
     /**
      * {@inheritDoc }
      */
     @Override
-    public void dispose() {
-        synchronized(this){
-            index.clear();
+    public synchronized void dispose() {
+        if(store != null){
+            store.dispose();
         }
+        index.clear();
     }
 
     @Override
-    protected void visit() {
+    protected synchronized void visit() {
         final ParameterValueGroup source = getSource();
-        storeConfig = getSourceConfiguration(source, getDatastoreDescriptor());
 
-        final String namespace = value(AbstractFeatureStoreFactory.NAMESPACE, storeConfig);
-        FeatureStore candidate = null;
-        try {
-            candidate = FeatureStoreFinder.open(storeConfig);
-        } catch (DataStoreException ex) {
-            getLogger().log(Level.WARNING, ex.getLocalizedMessage(),ex);
+        FeatureStore candidate = createBaseFeatureStore();
+        String namespace = null;
+        ParameterValue paramns = candidate.getConfiguration().parameter(AbstractFeatureStoreFactory.NAMESPACE.getName().getCode());
+        if(paramns == null || paramns.getValue() == null){
+            namespace = null;
+        }else if("no namespace".equalsIgnoreCase(String.valueOf(paramns.getValue()))){
+            namespace = null;
+        }else{
+            namespace = paramns.stringValue();
         }
 
         if (candidate == null) {
-            final StringBuilder sb = new StringBuilder("Could not create datastore for parameters : \n");
-
-            for(final GeneralParameterValue val : storeConfig.values()){
-                final String key = val.getDescriptor().getName().getCode();
-                final Object value;
-                if(val instanceof ParameterValue){
-                    value = ((ParameterValue)val).getValue();
-                }else{
-                    value = "~complex value~";
-                }
-
-                if (key.equals("passwd")){
-                    sb.append(key).append(" : *******").append('\n');
-                } else {
-                    sb.append(key).append(" : ").append(value).append('\n');
-                }
-            }
+            //final StringBuilder sb = new StringBuilder("Could not create featurestore : "+this.getClass().getSimpleName()+" id="+getId());
 
             //use an empty datastore
             candidate = new MemoryFeatureStore();

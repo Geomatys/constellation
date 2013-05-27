@@ -1,46 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LayerContext xmlns="http://www.constellation.org/config">
-    <layers>
-        <Source id="shapeSrc" load_all="true">
-            <include>
-                <Layer name="BasicPolygons">
-                    <Style>cite_style_BasicPolygons</Style>
-                </Layer>
-                <Layer name="Bridges">
-                    <Style>cite_style_Bridges</Style>
-                </Layer>
-                <Layer name="BuildingCenters">
-                    <Style>cite_style_BuildingCenters</Style>
-                </Layer>
-                <Layer name="Buildings">
-                    <Style>cite_style_Buildings</Style>
-                </Layer>
-                <Layer name="DividedRoutes">
-                    <Style>cite_style_DividedRoutes</Style>
-                </Layer>
-                <Layer name="Forests">
-                    <Style>cite_style_Forests</Style>
-                </Layer>
-                <Layer name="Lakes">
-                    <Style>cite_style_Lakes</Style>
-                </Layer>
-                <Layer name="MapNeatline">
-                    <Style>cite_style_MapNeatLine</Style>
-                </Layer>
-                <Layer name="NamedPlaces">
-                    <Style>cite_style_NamedPlaces</Style>
-                </Layer>
-                <Layer name="Ponds">
-                    <Style>cite_style_Ponds</Style>
-                </Layer>
-                <Layer name="RoadSegments">
-                    <Style>cite_style_RoadSegments</Style>
-                </Layer>
-                <Layer name="Streams">
-                    <Style>cite_style_Streams</Style>
-                </Layer>
-            </include>
-        </Source>
-    </layers>
-</LayerContext>
+<cstl:LayerContext xmlns:cstl="http://www.constellation.org/config" xmlns:geotk="cite">
+    <cstl:layers>
+        <cstl:Source id="shapeSrc" load_all="true">
+            <cstl:include>
+                <cstl:Layer name="geotk:BasicPolygons">
+                    <cstl:Style>cite_style_BasicPolygons</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:Bridges">
+                    <cstl:Style>cite_style_Bridges</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:BuildingCenters">
+                    <cstl:Style>cite_style_BuildingCenters</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:Buildings">
+                    <cstl:Style>cite_style_Buildings</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:DividedRoutes">
+                    <cstl:Style>cite_style_DividedRoutes</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:Forests">
+                    <cstl:Style>cite_style_Forests</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:Lakes">
+                    <cstl:Style>cite_style_Lakes</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:MapNeatline">
+                    <cstl:Style>cite_style_MapNeatLine</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:NamedPlaces">
+                    <cstl:Style>cite_style_NamedPlaces</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:Ponds">
+                    <cstl:Style>cite_style_Ponds</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:RoadSegments">
+                    <cstl:Style>cite_style_RoadSegments</cstl:Style>
+                </cstl:Layer>
+                <cstl:Layer name="geotk:Streams">
+                    <cstl:Style>cite_style_Streams</cstl:Style>
+                </cstl:Layer>
+            </cstl:include>
+        </cstl:Source>
+    </cstl:layers>
+    <cstl:customParameters>
+        <entry>
+            <key>shiroAccessible</key>
+            <value>false</value>
+        </entry>
+    </cstl:customParameters>
+</cstl:LayerContext>
 

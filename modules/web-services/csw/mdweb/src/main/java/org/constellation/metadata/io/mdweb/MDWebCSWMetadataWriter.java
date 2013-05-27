@@ -26,9 +26,9 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
+import org.geotoolkit.csw.xml.RecordProperty;
 
 // Geotoolkit dependencies
-import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import java.util.Objects;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -92,7 +92,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      * {@inheritDoc}
      */
     @Override
-    public boolean updateMetadata(final String metadataID, final List<RecordPropertyType> properties) throws MetadataIoException {
+    public boolean updateMetadata(final String metadataID, final List<? extends RecordProperty> properties) throws MetadataIoException {
         LOGGER.log(logLevel, "metadataID: {0}", metadataID);
 
         FullRecord f = null;
@@ -103,7 +103,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                         NO_APPLICABLE_CODE);
         }
 
-        for (RecordPropertyType property : properties) {
+        for (RecordProperty property : properties) {
             try {
                 final String xpath = property.getName();
                 final Object value = property.getValue();

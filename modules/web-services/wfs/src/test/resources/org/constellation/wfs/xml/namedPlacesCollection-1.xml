@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs">
+<wfs:FeatureCollection timeStamp="" gml:id="id" numberOfFeatures="2" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs">
     <gml:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:4326">
             <gml:lowerCorner>0.0014 -0.0011</gml:lowerCorner>

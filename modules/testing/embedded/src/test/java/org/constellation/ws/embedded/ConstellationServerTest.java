@@ -22,15 +22,19 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.sos.ws.soap.SOService;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class ConstellationServerTest extends AbstractGrizzlyServer {
 
     @BeforeClass
@@ -57,17 +61,19 @@ public class ConstellationServerTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=1)
     public void testgetDescriptor() throws Exception {
 
         waitForStart();
 
         final ConstellationServer administrator = ConstellationServer.login("http://localhost:" + grizzly.getCurrentPort(), "", "");
         assertNotNull(administrator);
-        GeneralParameterDescriptor desc = administrator.providers.getServiceDescriptor("shapefile");
+        GeneralParameterDescriptor desc = administrator.providers.getServiceDescriptor("feature-store");
         assertNotNull(desc);
     }
 
     @Test
+    @Order(order=2)
     public void testImportFile() throws Exception {
 
         final ConstellationServer administrator = ConstellationServer.login("http://localhost:" + grizzly.getCurrentPort(), "", "");

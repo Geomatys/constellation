@@ -22,7 +22,7 @@ import java.util.Collection;
 import javax.xml.bind.JAXBElement;
 
 import org.geotoolkit.util.Utilities;
-import org.geotoolkit.util.ComparisonMode;
+import org.apache.sis.util.ComparisonMode;
 import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.csw.xml.v202.GetRecordsType;
 import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
@@ -417,9 +417,9 @@ public final class MetadataUtilities {
                         assertEquals(expConst, resConst);
                     }
                     assertEquals(expId.getResourceConstraints(), resId.getResourceConstraints());
-                    assertEquals(expId.getResourceFormats(), expId.getResourceFormats());
-                    assertEquals(expId.getResourceMaintenances(), expId.getResourceMaintenances());
-                    assertEquals(expId.getResourceSpecificUsages(), expId.getResourceSpecificUsages());
+                    assertEquals(expId.getResourceFormats(), resId.getResourceFormats());
+                    assertEquals(expId.getResourceMaintenances(), resId.getResourceMaintenances());
+                    assertEquals(expId.getResourceSpecificUsages(), resId.getResourceSpecificUsages());
                     assertEquals(expId.getStatus(), resId.getStatus());
 
                 if (expId instanceof DefaultDataIdentification) {
@@ -434,6 +434,7 @@ public final class MetadataUtilities {
                     assertEquals(idExpResult.getStandard(), idResult.getStandard());
                     assertEquals(idExpResult.getSupplementalInformation(), idResult.getSupplementalInformation());
                     assertEquals(idExpResult.getTopicCategories(), idResult.getTopicCategories());
+                    
                     assertEquals(idExpResult, idResult);
                 } else if (expId instanceof ServiceIdentificationImpl) {
                     ServiceIdentificationImpl expService = (ServiceIdentificationImpl) expId;
@@ -473,7 +474,7 @@ public final class MetadataUtilities {
         assertEquals(expResult.getReferenceSystemInfo().size(), result.getReferenceSystemInfo().size());
         if (expResult.getReferenceSystemInfo().iterator().hasNext()) {
             if (expResult.getReferenceSystemInfo().iterator().next() != null) {
-                if (expResult.getReferenceSystemInfo().iterator().next().getName() != null) {
+                if (expResult.getReferenceSystemInfo().iterator().next().getName() != null && result.getReferenceSystemInfo().iterator().next().getName() != null) {
                     assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getAuthority(), result.getReferenceSystemInfo().iterator().next().getName().getAuthority());
                     assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getCodeSpace(), result.getReferenceSystemInfo().iterator().next().getName().getCodeSpace());
                 }

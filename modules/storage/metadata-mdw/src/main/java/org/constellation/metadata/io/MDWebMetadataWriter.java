@@ -19,8 +19,6 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -41,7 +39,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.util.Util;
+import org.geotoolkit.metadata.iso.MetadataEntity;
 
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription;
@@ -49,8 +47,8 @@ import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.IdentifierSpace;
 import org.geotoolkit.xml.IdentifiedObject;
-import org.geotoolkit.xml.XLink;
-import org.geotoolkit.xml.XLink.Type;
+import org.apache.sis.xml.XLink;
+import org.apache.sis.xml.XLink.Type;
 
 // MDWeb dependencies
 import org.mdweb.model.profiles.Profile;
@@ -125,7 +123,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * A flag indicating that we don't want to add the metadata to the index.
      */
-    private final boolean noIndexation;
+    protected final boolean noIndexation;
 
     private final Map<Standard, List<Standard>> standardMapping = new HashMap<Standard, List<Standard>>();
 
@@ -254,6 +252,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         availableStandards.add(Standard.ISO_19103);
         availableStandards.add(Standard.ISO_19119);
         availableStandards.add(Standard.ISO_19110);
+        availableStandards.add(Standard.MDWEB);
 
         standardMapping.put(Standard.ISO_19115, availableStandards);
 
@@ -289,42 +288,39 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
         // we add the extra binding extracted from a properties file
         try {
-            final InputStream extraIn = Util.getResourceAsStream("org/constellation/metadata/io/extra-standard.properties");
-            if (extraIn != null) {
-                final Properties extraProperties = new Properties();
-                extraProperties.load(extraIn);
-                extraIn.close();
-                for (Entry<Object, Object> entry : extraProperties.entrySet()) {
-                    String mainStandardName = (String) entry.getKey();
-                    mainStandardName = mainStandardName.replace('_', ' ');
-                    final Standard newMainStandard = mdWriter.getStandard(mainStandardName);
-                    if (newMainStandard == null) {
-                        LOGGER.log(Level.WARNING, "Unable to find the extra main standard:{0}", mainStandardName);
-                        continue;
-                    }
-                    final List<String> standardList  = StringUtilities.toStringList((String) entry.getValue());
-                    final List<Standard> standards   = new ArrayList<Standard>();
-                    for (String standardName : standardList) {
-                        Standard standard = mdWriter.getStandard(standardName);
-                        if (standard == null) {
-                            LOGGER.log(Level.FINER, "Unable to find the extra standard:{0}", standardName);
-                        } else {
-                            standards.add(standard);
-                        }
-                    }
-                    if (standardMapping.containsKey(newMainStandard)) {
-                        final List<Standard> previousStandards = standardMapping.get(newMainStandard);
-                        previousStandards.addAll(standards);
-                        standardMapping.put(newMainStandard, previousStandards);
+            final Map<String, List<String>> extraStandard = new HashMap<String, List<String>>();
+            final Iterator<ExtraMappingFactory> ite = ServiceRegistry.lookupProviders(ExtraMappingFactory.class);
+            while (ite.hasNext()) {
+                final ExtraMappingFactory currentFactory = ite.next();
+                extraStandard.putAll(currentFactory.getExtraStandard());
+            }
+                
+            for (Entry<String, List<String>> entry : extraStandard.entrySet()) {
+                final String mainStandardName = entry.getKey();
+                final Standard newMainStandard = mdWriter.getStandard(mainStandardName);
+                if (newMainStandard == null) {
+                    LOGGER.log(Level.WARNING, "Unable to find the extra main standard:{0}", mainStandardName);
+                    continue;
+                }
+                final List<String> standardList  = entry.getValue();
+                final List<Standard> standards   = new ArrayList<Standard>();
+                for (String standardName : standardList) {
+                    Standard standard = mdWriter.getStandard(standardName);
+                    if (standard == null) {
+                        LOGGER.log(Level.FINER, "Unable to find the extra standard:{0}", standardName);
                     } else {
-                        standardMapping.put(newMainStandard, standards);
+                        standards.add(standard);
                     }
                 }
-            } else {
-                LOGGER.warning("Unable to find the extra-standard properties file");
+                if (standardMapping.containsKey(newMainStandard)) {
+                    final List<Standard> previousStandards = standardMapping.get(newMainStandard);
+                    previousStandards.addAll(standards);
+                    standardMapping.put(newMainStandard, previousStandards);
+                } else {
+                    standardMapping.put(newMainStandard, standards);
+                }
             }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "IO exception while reading extra standard properties for MDW meta writer", ex);
+
         } catch (MD_IOException ex) {
             LOGGER.log(Level.WARNING, "MD_IO exception while reading extra standard properties for MDW meta writer", ex);
         }
@@ -492,7 +488,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final Collection c = (Collection) object;
             for (Object obj: c) {
                 if (path.getName().equals("geographicElement2") && obj instanceof DefaultGeographicDescription) {
-                    path = mdWriter.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3");
+                    final String parentID = path.getParent().getId();
+                    path = mdWriter.getPath(parentID + ":geographicElement3");
                 }
                 result.addAll(addValueFromObject(record, obj, path, parentValue));
 
@@ -712,7 +709,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             return result;
                         }
 
-                    // special case for xlink
+                    // special case for id
+                    } else if ("id".equals(propName) && object instanceof IdentifiedObject) {
+                        final Object propertyValue = ((IdentifiedObject)object).getIdentifierMap().getSpecialized(IdentifierSpace.ID);
+                        if (propertyValue != null) {
+                            final Path childPath = new Path(path, prop);
+
+                            //if the path is not already in the database we write it
+                            if (mdWriter.getPath(childPath.getId()) == null) {
+                                mdWriter.writePath(childPath);
+                            }
+                            result.addAll(addValueFromObject(record, propertyValue, childPath, value));
+                        }
                     } else if ("xLink".equals(propName) && object instanceof IdentifiedObject) {
                         final Object propertyValue = ((IdentifiedObject)object).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK);
                         if (propertyValue != null) {
@@ -914,7 +922,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             String name = className;
             int nameType = 0;
-            while (nameType < 2) {
+            while (nameType < 3) {
 
                 LOGGER.finer("searching: " + standard.getName() + ':' + name);
                 result = mdWriter.getClasse(name, standard);
@@ -931,8 +939,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         nameType = 1;
                         break;
                     }
-                    default:
+                    case 1: {
+                        name = "TM_" + className;
                         nameType = 2;
+                        break;
+                    }
+                    default:
+                        nameType = 3;
                         break;
                 }
             }
@@ -1318,6 +1331,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     public RecordSet getMdRecordSet() {
         return mdRecordSet;
+    }
+
+    /**
+     * @return the defaultUser
+     */
+    public User getDefaultUser() {
+        return defaultUser;
     }
 
     protected static final class MixedPath {
