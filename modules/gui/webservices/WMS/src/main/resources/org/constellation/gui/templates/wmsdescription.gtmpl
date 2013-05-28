@@ -17,36 +17,36 @@
                 <div class="control-group">
                     <label class="control-label" for="name">&{wms.create.description.service.name.label}</label>
                     <div class="controls">
-                        <input type="text" id="name">
+                        <input type="text" id="name" name="createdService.name">
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" for="identifier">&{wms.create.description.service.identifier.label}</label>
                     <div class="controls">
-                        <input type="text" id="identifier">
+                        <input type="text" id="identifier" name="createdService.identifier">
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" for="keywords">&{wms.create.description.service.keywords.label}</label>
 
                     <div class="controls">
-                        <input type="text" id="keywords"/>
+                        <input type="text" id="keywords" name="createdService.keywords"/>
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" for="inputDescription">&{wms.create.description.service.description.label}</label>
                     <div class="controls">
-                        <textarea cols="50" id="inputDescription" class="input-xxlarge"></textarea>
+                        <textarea cols="50" id="inputDescription" name="createdService.description" class="input-xxlarge"></textarea>
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label">&{wms.create.description.version.title}</label>
                     <div class="controls">
                         <label class="checkbox inline" for="v111">
-                            <input type="checkbox" value="111" id="v111"> 1.1.1
+                            <input type="checkbox" value="111" id="v111" name="v111"> 1.1.1
                         </label>
                         <label class="checkbox inline" for="v130">
-                            <input type="checkbox" value="130" id="v130"> 1.3.0
+                            <input type="checkbox" value="130" id="v130" name="v130"> 1.3.0
                         </label>
                     </div>
                 </div>

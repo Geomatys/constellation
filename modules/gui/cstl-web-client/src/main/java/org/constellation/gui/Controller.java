@@ -16,12 +16,16 @@
 
 package org.constellation.gui;
 
+import juzu.Action;
 import juzu.Path;
-import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
 import juzu.template.Template;
+import org.constellation.gui.model.AccessConstraint;
+import org.constellation.gui.model.Contact;
+import org.constellation.gui.model.Service;
+import org.constellation.gui.service.ServicesManager;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -30,25 +34,37 @@ import java.util.ResourceBundle;
 public class Controller {
 
     @Inject
+    protected ServicesManager servicesManager;
+
+    @Inject
     @Path("index.gtmpl")
-    Template index;
+    protected Template index;
 
     @Inject
     @Path("webservices.gtmpl")
-    Template webServices;
+    protected Template webServices;
 
     @Inject
-    ResourceBundle bundle;
+    protected ResourceBundle bundle;
 
     @View
     @Route("/")
-    public void index(){
+    public void index() {
         index.render();
     }
 
     @View
     @Route("/webservices")
-    public void webservices(){
+    public void webservices() {
         webServices.render();
+    }
+
+    @Action
+    @Route("/wms/list")
+    public Response createService(Service createdService, Contact serviceContact, AccessConstraint serviceConstraint) throws IOException {
+        createdService.setServiceConstraints(serviceConstraint);
+        createdService.setServiceContact(serviceContact);
+        servicesManager.createServices(createdService);
+        return Controller_.index();
     }
 }

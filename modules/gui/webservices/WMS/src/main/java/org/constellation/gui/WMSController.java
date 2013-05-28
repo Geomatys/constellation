@@ -16,10 +16,11 @@
 
 package org.constellation.gui;
 
+import juzu.Action;
 import juzu.Path;
+import juzu.Response;
 import juzu.Route;
 import juzu.View;
-import juzu.Response;
 import juzu.template.Template;
 
 import javax.inject.Inject;
@@ -27,13 +28,15 @@ import java.io.IOException;
 
 public class WMSController {
 
-  @Inject
-  @Path("wmscreate.gtmpl")
-  Template index;
 
-  @View
-  @Route("/wms")
-  public Response index() throws IOException {
-    return index.ok();
-  }
+    @Inject
+    @Path("wmscreate.gtmpl")
+    Template index;
+
+    @View
+    @Route("/wms")
+    public Response index() throws IOException {
+        return index.ok();
+    }
+
 }

@@ -9,7 +9,7 @@
     </context-param>
     <context-param>
         <param-name>juzu.inject</param-name>
-        <param-value>guice</param-value>
+        <param-value>spring</param-value>
     </context-param>
     <servlet>
         <servlet-name>AssetServlet</servlet-name>
