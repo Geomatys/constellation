@@ -42,7 +42,7 @@
     </developers>
 
     <properties>
-        <juzu.version>0.7.0-beta6-SNAPSHOT</juzu.version>
+        <juzu.version>0.7.0-beta7-SNAPSHOT</juzu.version>
     </properties>
 
     <dependencies>
