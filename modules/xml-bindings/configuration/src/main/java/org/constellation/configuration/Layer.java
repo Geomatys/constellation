@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.namespace.QName;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.util.Utilities;
@@ -80,6 +81,9 @@ public class Layer {
     @XmlElement(name="Dimension")
     private List<DimensionDefinition> dimensions;
 
+    @XmlTransient
+    private String providerID;
+    
     public Layer() {
 
     }
@@ -249,6 +253,14 @@ public class Layer {
 
     public void setOpaque(final Boolean opaque) {
         this.opaque = opaque;
+    }
+    
+    public String getProviderID() {
+        return providerID;
+    }
+
+    public void setProviderID(final String providerID) {
+        this.providerID = providerID;
     }
 
     /**

@@ -149,8 +149,10 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
 
     /**
      * {@inheritDoc }
+     * @deprecated use get(key, providerID) instead because two provider can have the same named layer
      */
     @Override
+    @Deprecated
     public V get(K key) {
         final List<V> candidates = new ArrayList<V>();
         
@@ -181,6 +183,14 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         }
         
         return null;
+    }
+    
+    public V get(K key, final String providerID) {
+        final Provider<K,V> provider = getProvider(providerID);
+        if (provider == null) {
+            return null;
+        }
+        return provider.get(key);
     }
 
     public abstract Collection<? extends S> getServices();
@@ -232,6 +242,15 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         return Collections.unmodifiableCollection(PROVIDERS);
     }
 
+    public synchronized P getProvider(final String id){
+        for (P provider : getProviders()) {
+            if (provider.getId().equals(id)) {
+                return provider;
+            }
+        }
+        return null;
+    }
+    
     /**
      * {@inheritDoc }
      */

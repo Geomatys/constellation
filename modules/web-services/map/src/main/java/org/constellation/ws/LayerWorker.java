@@ -176,7 +176,8 @@ public abstract class LayerWorker extends AbstractWorker {
          * For each source declared in the layer context we search for layers informations.
          */
         for (final Source source : layerContext.getLayers()) {
-            final Set<Name> layerNames = namedProxy.getKeys(source.getId());
+            final String sourceID = source.getId();
+            final Set<Name> layerNames = namedProxy.getKeys(sourceID);
             for(final Name layerName : layerNames) {
                 final QName qn = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
                 /*
@@ -189,12 +190,12 @@ public abstract class LayerWorker extends AbstractWorker {
                     // we look for detailled informations in the include sections
                     } else {
                         if (securityFilter.allowed(login, layerName)) {
-                            final Layer layer = source.isIncludedLayer(qn);
+                            Layer layer = source.isIncludedLayer(qn);
                             if (layer == null) {
-                                layers.put(layerName, new Layer(qn));
-                            } else {
-                                layers.put(layerName, layer);
-                            }
+                                layer = new Layer(qn);
+                            } 
+                            layer.setProviderID(sourceID);
+                            layers.put(layerName, layer);
                         }
                     }
                 /*
@@ -203,6 +204,7 @@ public abstract class LayerWorker extends AbstractWorker {
                 } else {
                     Layer layer = source.isIncludedLayer(qn);
                     if (layer != null && securityFilter.allowed(login, layerName)) {
+                        layer.setProviderID(sourceID);
                         layers.put(layerName, layer);
                     }
                 }
@@ -234,9 +236,9 @@ public abstract class LayerWorker extends AbstractWorker {
     protected LayerDetails getLayerReference(final String login, final Name layerName) throws CstlServiceException {
         final LayerDetails layerRef;
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
-        final Name fullName = layersContainsKey(login, layerName);
+        final NameInProvider fullName = layersContainsKey(login, layerName);
         if (fullName != null) {
-            layerRef = namedProxy.get(fullName);
+            layerRef = namedProxy.get(fullName.name, fullName.providerID);
             if (layerRef == null) {throw new CstlServiceException("Unable to find  the Layer named:" + layerName + " in the provider proxy", NO_APPLICABLE_CODE);}
         } else {
             throw new CstlServiceException("Unknow Layer name:" + layerName, LAYER_NOT_DEFINED);
@@ -248,7 +250,7 @@ public abstract class LayerWorker extends AbstractWorker {
      * We can't use directly layers.containsKey because it may miss the namespace or the alias.
      * @param name
      */
-    protected Name layersContainsKey(final String login, final Name name) {
+    protected NameInProvider layersContainsKey(final String login, final Name name) {
         if (name == null) {
             return null;
         }
@@ -258,11 +260,12 @@ public abstract class LayerWorker extends AbstractWorker {
             return null;
         }
 
-        if (!layers.containsKey(name)) {
+        final Layer directLayer = layers.get(name);
+        if (directLayer == null) {
             //search with only localpart
             for (Name layerName: layers.keySet()) {
                 if (layerName.getLocalPart().equals(name.getLocalPart())) {
-                    return layerName;
+                    return new NameInProvider(layerName, layers.get(layerName).getProviderID());
                 }
             }
 
@@ -272,14 +275,14 @@ public abstract class LayerWorker extends AbstractWorker {
                 if (layer.getAlias() != null && !layer.getAlias().isEmpty()) {
                     final String alias = layer.getAlias().trim().replaceAll(" ", "_");
                     if (alias.equals(name.getLocalPart())) {
-                        return l.getKey();
+                        return new NameInProvider(l.getKey(), layer.getProviderID());
                     }
                 }
             }
 
             return null;
         }
-        return name;
+        return new NameInProvider(name, directLayer.getProviderID());
     }
     
     protected static MutableStyle getStyle(final String styleName) throws CstlServiceException {
@@ -361,5 +364,15 @@ public abstract class LayerWorker extends AbstractWorker {
             namedLayerName = new DefaultName(layerName);
         }
         return namedLayerName;
+    }
+    
+    public static class NameInProvider {
+        public Name name;
+        public String providerID;
+     
+        public NameInProvider(final Name name, final String providerID) {
+            this.name = name;
+            this.providerID = providerID;
+        }
     }
 }
