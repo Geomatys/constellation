@@ -5,7 +5,7 @@
         <img src="images/constellation.png"/>
     </div>
 </div>
-<form class="form-horizontal" action="@{createService()}" method="post">
+<form class="form-horizontal" action="@{createWMSService()}" method="post">
     #{include path=wmsdescription.gtmpl/}
     #{include path=wmsmetadata.gtmpl/}
 </form>

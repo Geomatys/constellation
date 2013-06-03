@@ -30,7 +30,7 @@
                     <label class="control-label" for="keywords">&{wms.create.description.service.keywords.label}</label>
 
                     <div class="controls">
-                        <input type="text" id="keywords" name="createdService.keywords"/>
+                        <input type="text" id="keywords" name="keywords"/>
                     </div>
                 </div>
                 <div class="control-group">

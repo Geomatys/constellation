@@ -1,4 +1,4 @@
-package org.constellation.gui.model;
+package org.constellation.dto;
 
 import juzu.Mapped;
 

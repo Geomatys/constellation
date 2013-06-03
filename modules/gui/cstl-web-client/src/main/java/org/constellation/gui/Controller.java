@@ -22,13 +22,16 @@ import juzu.Response;
 import juzu.Route;
 import juzu.View;
 import juzu.template.Template;
-import org.constellation.gui.model.AccessConstraint;
-import org.constellation.gui.model.Contact;
-import org.constellation.gui.model.Service;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
+import org.constellation.dto.Service;
 import org.constellation.gui.service.ServicesManager;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller {
@@ -60,11 +63,26 @@ public class Controller {
     }
 
     @Action
-    @Route("/wms/list")
-    public Response createService(Service createdService, Contact serviceContact, AccessConstraint serviceConstraint) throws IOException {
+    @Route("/wms/success")
+    public Response createWMSService(Service createdService, Contact serviceContact, AccessConstraint serviceConstraint,
+                                     String v111, String v130, String keywords) throws IOException {
+
+        List<String> versionList = new ArrayList<String>(0);
+        if (v111 != null) {
+            versionList.add(v111);
+        }
+        if (v130 != null) {
+            versionList.add(v130);
+        }
+        createdService.setVersions(versionList);
+
+        String[] keywordsArray = keywords.split(" ");
+        List<String> keywordsList = Arrays.asList(keywordsArray);
+        createdService.setKeywords(keywordsList);
+
         createdService.setServiceConstraints(serviceConstraint);
         createdService.setServiceContact(serviceContact);
-        servicesManager.createServices(createdService);
-        return Controller_.index();
+        servicesManager.createServices(createdService, "WMS");
+        return WMSController_.success();
     }
 }

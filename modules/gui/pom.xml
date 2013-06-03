@@ -42,7 +42,7 @@
     </developers>
 
     <properties>
-        <juzu.version>0.7.0-beta7-SNAPSHOT</juzu.version>
+        <juzu.version>0.7.0-beta9-SNAPSHOT</juzu.version>
     </properties>
 
     <dependencies>
@@ -102,6 +102,7 @@
     <!-- =========================================================== -->
     <modules>
         <module>admin-swing</module>
+        <module>cstl-services</module>
         <module>administration</module>
         <module>common</module>
         <module>data</module>

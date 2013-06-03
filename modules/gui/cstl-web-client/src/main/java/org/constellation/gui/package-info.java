@@ -20,6 +20,7 @@
         @Alias(of = "/org/constellation/gui/templates/menu.gtmpl", as = "menu.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/wmsdescription.gtmpl", as = "wmsdescription.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/wmsmetadata.gtmpl", as = "wmsmetadata.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wmssuccess.gtmpl", as = "wmssuccess.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/wmscreate.gtmpl", as = "wmscreate.gtmpl")})
 
 @juzu.plugin.servlet.Servlet(value = "/", resourceBundle = "locale.cstl")

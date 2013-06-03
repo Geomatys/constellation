@@ -27,5 +27,10 @@
             <artifactId>common</artifactId>
             <version>0.9-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation</groupId>
+            <artifactId>cstl-client</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

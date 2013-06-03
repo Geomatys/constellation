@@ -66,7 +66,7 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
      * {@inheritDoc}
      */
     @Override
-    protected void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException {
+    protected void configureInstance(final File instanceDirectory, final Object configuration, final Object capabilitiesConfiguration) throws CstlServiceException {
 
 
         if (configuration instanceof LayerContext) {
@@ -80,6 +80,7 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
                         inputs.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
                         inputs.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
                         inputs.parameter(CreateMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+                        inputs.parameter(CreateMapServiceDescriptor.CAPABILITIES_CONFIG).setValue(capabilitiesConfiguration);
 
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();
@@ -120,8 +121,8 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
      * {@inheritDoc}
      */
     @Override
-    protected void basicConfigure(final File instanceDirectory) throws CstlServiceException {
-        configureInstance(instanceDirectory, new LayerContext());
+    protected void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException {
+        configureInstance(instanceDirectory, new LayerContext(), capabilitiesConfiguration);
     }
 
     /**

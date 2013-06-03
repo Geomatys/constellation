@@ -1,7 +1,11 @@
 package org.constellation.gui.service;
 
-import org.constellation.gui.model.Service;
+import org.constellation.admin.service.ConstellationServer;
+import org.constellation.dto.Service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -15,8 +19,17 @@ public class ServicesManager {
     public ServicesManager() {
     }
 
-    public void createServices(Service createdService){
-        System.out.println("test currentService : "+createdService.getName());
-
+    public void createServices(Service createdService, String service) {
+        if (createdService != null) {
+            LOGGER.log(Level.INFO, "service will be created : " + createdService.getName());
+            URL serverUrl = null;
+            try {
+                serverUrl = new URL("http://localhost:8090/constellation/WS/");
+                ConstellationServer cs = new ConstellationServer(serverUrl, "admin", "admin");
+                cs.services.newInstance(service, createdService);
+            } catch (MalformedURLException e) {
+                LOGGER.log(Level.WARNING, "error on url", e);
+            }
+        }
     }
 }

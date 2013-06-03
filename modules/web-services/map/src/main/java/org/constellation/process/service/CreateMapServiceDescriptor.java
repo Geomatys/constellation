@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.configuration.LayerContext;
+import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
 import static org.constellation.process.service.MapProcessUtils.*;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
@@ -84,6 +85,10 @@ public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters",
             new GeneralParameterDescriptor[]{OUT_CONFIGURATION});
 
+    public static final String CAPABILITIES_CONFIG= "capabilities_service_description";
+    private static final String CAPABILITIES_CONFIG_REMARKS = "The LayerContext configuration for the new instance.";
+    public static final ParameterDescriptor<LayerContext> CAPABILITIES_CONFIGURATION =
+            new DefaultParameterDescriptor(CAPABILITIES_CONFIG, CAPABILITIES_CONFIG_REMARKS, Object.class, null, false);
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

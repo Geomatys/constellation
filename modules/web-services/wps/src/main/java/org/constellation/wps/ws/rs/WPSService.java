@@ -105,7 +105,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
     }
 
     @Override
-    protected void configureInstance(File instanceDirectory, Object configuration) throws CstlServiceException {
+    protected void configureInstance(File instanceDirectory, Object configuration, Object capabilitiesConfiguration) throws CstlServiceException {
         if (configuration instanceof ProcessContext) {
             final File configurationFile = new File(instanceDirectory, "processContext.xml");
             try {
@@ -142,8 +142,8 @@ public class WPSService extends OGCWebService<WPSWorker> {
     }
 
     @Override
-    protected void basicConfigure(File instanceDirectory) throws CstlServiceException {
-        configureInstance(instanceDirectory, new ProcessContext(new Processes(true)));
+    protected void basicConfigure(File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException {
+        configureInstance(instanceDirectory, new ProcessContext(new Processes(true)), capabilitiesConfiguration);
     }
 
     @Override

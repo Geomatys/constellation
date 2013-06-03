@@ -1,6 +1,8 @@
-package org.constellation.gui.model;
+package org.constellation.dto;
 
 import juzu.Mapped;
+
+import java.util.List;
 
 /**
  * @author bgarcia
@@ -13,11 +15,11 @@ public class Service {
 
     private String identifier;
 
-    private String keywords;
+    private List<String> keywords;
 
     private String description;
 
-    private String versions;
+    private List<String> versions;
 
     private Contact serviceContact;
 
@@ -43,28 +45,12 @@ public class Service {
         this.identifier = identifier;
     }
 
-    public String getKeywords() {
-        return keywords;
-    }
-
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getVersions() {
-        return versions;
-    }
-
-    public void setVersions(String versions) {
-        this.versions = versions;
     }
 
     public Contact getServiceContact() {
@@ -81,5 +67,21 @@ public class Service {
 
     public void setServiceConstraints(AccessConstraint serviceConstraints) {
         this.serviceConstraints = serviceConstraints;
+    }
+
+    public List<String> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
+    }
+
+    public List<String> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(List<String> versions) {
+        this.versions = versions;
     }
 }

@@ -23,6 +23,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.WMSPortrayal;
+import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.process.service.CreateMapServiceDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.*;
@@ -58,6 +59,7 @@ public class CreateMapService extends AbstractProcess {
         final String identifier = value(IDENTIFIER, inputParameters);
         LayerContext configuration = value(CONFIGURATION, inputParameters);
         File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
+        Object theFuttureService = value(CAPABILITIES_CONFIGURATION, inputParameters);
 
         if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName)
                 || "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName))) {
@@ -102,7 +104,7 @@ public class CreateMapService extends AbstractProcess {
         if (instanceDirectory.exists()) {
             configurationFile = new File(instanceDirectory, "layerContext.xml");
             final File portrayalFile = new File(instanceDirectory, "WMSPortrayal.xml");
-            
+
             //get configuration if aleady exist.
             if (configurationFile.exists()) {
                 createConfig = false;
@@ -119,7 +121,7 @@ public class CreateMapService extends AbstractProcess {
                     throw new ProcessException(ex.getMessage(), this, ex);
                 }
             }
-            
+
             if (serviceName.equalsIgnoreCase("WMS")) {
                 //create default portrayal file if not exist ONLY for WMS services
                 if (!portrayalFile.exists()) {
@@ -131,6 +133,9 @@ public class CreateMapService extends AbstractProcess {
                         throw new ProcessException(ex.getMessage(), this, ex);
                     }
                 }
+
+//                TODO create capabilities
+
             }
 
         } else if (instanceDirectory.mkdir()) {
@@ -150,8 +155,8 @@ public class CreateMapService extends AbstractProcess {
                 throw new ProcessException(ex.getMessage(), this, ex);
             }
         }
-            
+
         getOrCreate(OUT_CONFIGURATION, outputParameters).setValue(configuration);
-        
+
     }
 }

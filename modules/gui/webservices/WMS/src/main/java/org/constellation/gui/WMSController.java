@@ -16,7 +16,6 @@
 
 package org.constellation.gui;
 
-import juzu.Action;
 import juzu.Path;
 import juzu.Response;
 import juzu.Route;
@@ -33,10 +32,21 @@ public class WMSController {
     @Path("wmscreate.gtmpl")
     Template index;
 
+    @Inject
+    @Path("wmssuccess.gtmpl")
+    Template success;
+
     @View
     @Route("/wms")
     public Response index() throws IOException {
         return index.ok();
     }
+
+    @View
+    @Route("/wms/success")
+    public Response success() throws IOException {
+        return success.ok();
+    }
+
 
 }
