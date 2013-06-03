@@ -24,7 +24,7 @@ public class ServicesManager {
             LOGGER.log(Level.INFO, "service will be created : " + createdService.getName());
             URL serverUrl = null;
             try {
-                serverUrl = new URL("http://localhost:8090/constellation/WS/");
+                serverUrl = new URL("http://localhost:8080/constellation/WS/");
                 ConstellationServer cs = new ConstellationServer(serverUrl, "admin", "admin");
                 cs.services.newInstance(service, createdService);
             } catch (MalformedURLException e) {

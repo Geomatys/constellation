@@ -73,7 +73,7 @@
     </properties>
 
     <build>
-        <finalName>constellation</finalName>
+        <finalName>cstl-web-client</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
