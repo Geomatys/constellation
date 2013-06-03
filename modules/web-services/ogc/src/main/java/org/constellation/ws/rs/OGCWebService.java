@@ -41,6 +41,7 @@ import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceStatus;
+import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.DeleteServiceDescriptor;
@@ -102,9 +103,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     /**
      * Initialize the basic attributes of a web serviceType.
      *
-     * @param supportedVersions A list of the supported version of this serviceType.
-     *                          The first version specified <strong>MUST</strong> be the highest
-     *                          one, the best one.
      */
     public OGCWebService(final ServiceDef.Specification specification) {
         super();
@@ -430,22 +428,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 return Response.ok(response, "text/xml").build();
 
             } else if ("newInstance".equalsIgnoreCase(request)) {
-                LOGGER.info("creating an instance");
-                final String identifier = getParameter("id", true);
-                final AcknowlegementType response;
-                final File serviceDirectory = getServiceDirectory();
-                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                    final File instanceDirectory = new File (serviceDirectory, identifier);
-                    if (instanceDirectory.mkdir()) {
-                        basicConfigure(instanceDirectory);
-                        response = new AcknowlegementType("Success", "instance succefully created");
-                    } else {
-                        response = new AcknowlegementType("Error", "unable to create an instance");
-                    }
-                } else {
-                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
-                }
-                return Response.ok(response, "text/xml").build();
+                return newInstance(objectRequest);
 
 
             } else if ("renameInstance".equalsIgnoreCase(request)) {
@@ -499,7 +482,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 final AcknowlegementType response;
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     File instanceDirectory     = new File (serviceDirectory, identifier);
-                    configureInstance(instanceDirectory, objectRequest);
+                    configureInstance(instanceDirectory, objectRequest, null);
                     response = new AcknowlegementType("Success", "Instance correctly configured");
                 } else {
                     throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
@@ -598,6 +581,40 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     }
 
     /**
+     * create new service intance
+     * @return
+     * @throws CstlServiceException
+     * @param objectRequest
+     */
+    private Response newInstance(Object objectRequest) throws CstlServiceException {
+        LOGGER.info("creating an instance");
+        final String identifier = getParameter("id", true);
+        final AcknowlegementType response;
+        final File serviceDirectory = getServiceDirectory();
+        if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+            final File instanceDirectory = new File (serviceDirectory, identifier);
+            if (instanceDirectory.mkdir()) {
+
+
+//                reset
+                if(objectRequest!= null && objectRequest instanceof Service){
+                    Service tocreated = (Service) objectRequest;
+                    basicConfigure(instanceDirectory, tocreated);
+                }else{
+                    //create basic conf
+                    basicConfigure(instanceDirectory, null);
+                }
+                response = new AcknowlegementType("Success", "instance succefully created");
+            } else {
+                response = new AcknowlegementType("Error", "unable to create an instance");
+            }
+        } else {
+            throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
+        }
+        return Response.ok(response, "text/xml").build();
+    }
+
+    /**
      * need to be overriden by subClasses to add specific admin operation
      */
     protected Response treatSpecificAdminRequest(final String request) throws CstlServiceException {
@@ -652,7 +669,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param instanceDirectory The directory containing the instance configuration files.
      * @param configuration A service specific configuration Object.
      */
-    protected abstract void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException;
+    protected abstract void configureInstance(final File instanceDirectory, final Object configuration, final Object capabilitiesConfiguration) throws CstlServiceException;
 
     /**
      * Return the configuration object of the instance.
@@ -665,8 +682,10 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * create an empty configuration for the service.
      *
      * @param instanceDirectory The directory containing the instance configuration files.
+     * @param capabilitiesConfiguration
      */
-    protected abstract void basicConfigure(final File instanceDirectory) throws CstlServiceException;
+    protected abstract void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException;
+
 
     /**
      * Treat the incoming request and call the right function.

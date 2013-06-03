@@ -1,0 +1,19 @@
+#{decorate path=menu.gtmpl/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="images/constellation.png"/>
+    </div>
+    <div class="span4 offset3">
+        <div class="dropdown">
+            <a data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle">
+                <span class="icon-plus icon-white" style="margin-top: 0px;"></span>
+                   &{webservicepage.button.create.label}
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="wms">&{webservicepage.button.dropdown.wms.label}</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

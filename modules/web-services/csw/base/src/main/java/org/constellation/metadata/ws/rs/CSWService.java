@@ -261,7 +261,7 @@ public class CSWService extends OGCWebService<CSWworker> {
      * {@inheritDoc}
      */
     @Override
-    protected void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException {
+    protected void configureInstance(final File instanceDirectory, final Object configuration, final Object capabilitiesConfiguration) throws CstlServiceException {
         if (configuration instanceof Automatic) {
             final File configurationFile = new File(instanceDirectory, "config.xml");
             try {
@@ -280,8 +280,8 @@ public class CSWService extends OGCWebService<CSWworker> {
      * {@inheritDoc}
      */
     @Override
-    protected void basicConfigure(final File instanceDirectory) throws CstlServiceException {
-        configureInstance(instanceDirectory, new Automatic("filesystem", new BDD()));
+    protected void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException {
+        configureInstance(instanceDirectory, new Automatic("filesystem", new BDD()), null);
     }
 
 

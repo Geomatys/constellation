@@ -1,0 +1,45 @@
+#{decorate path=menu.gtmpl/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="images/constellation.png"/>
+    </div>
+</div>
+<form class="form-horizontal" action="@{createWMSService()}" method="post">
+    #{include path=wmsdescription.gtmpl/}
+    #{include path=wmsmetadata.gtmpl/}
+</form>
+<script type="text/javascript">
+    jQuery('#metadata').fadeToggle();
+    jQuery('#layerlimitGroup').tooltip({
+        html:true,
+        placement: "bottom",
+        trigger: "hover"});
+    jQuery('#maxWidthGroup').tooltip({
+        html:true,
+        placement: "bottom",
+        trigger: "hover"});
+    jQuery('#maxHeightGroup').tooltip({
+        html:true,
+        placement: "bottom",
+        trigger: "hover"});
+
+
+    function goToDescription(){
+        jQuery('#metadata').fadeToggle(toggleDescription);
+    }
+
+    function toggleDescription(){
+        jQuery('#description').fadeToggle();
+    }
+
+    function goToMetadata(){
+        //add service name on top left div
+        $('#NewServiceName').append($('#name').val())
+        jQuery('#description').fadeToggle(toggleMetadata);
+    }
+
+    function toggleMetadata(){
+        jQuery('#metadata').fadeToggle();
+    }
+</script>

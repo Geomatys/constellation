@@ -1,6 +1,0 @@
-org.constellation.menu.provider.ProvidersItem
-org.constellation.menu.provider.CoverageFileItem
-org.constellation.menu.provider.CoverageMosaicItem
-org.constellation.menu.provider.CoverageStoreItem
-org.constellation.menu.provider.FeatureStoreItem
-org.constellation.menu.provider.ServerStoreItem

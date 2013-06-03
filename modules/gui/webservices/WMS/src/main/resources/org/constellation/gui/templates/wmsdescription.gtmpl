@@ -1,0 +1,63 @@
+<div id="description">
+    <div class="row" style="height:30px;">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <a class="brand" href="#">&{wms.create.title.label}</a>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+        <div class="span2 well">
+            <p><h4>&{wms.create.description.title.label}</h4></p>
+            <p>&{wms.create.description.text}</p>
+        </div>
+        <div class="span9">
+            <fieldset>
+                <legend>&{wms.create.description.service.legend}</legend>
+                <div class="control-group">
+                    <label class="control-label" for="name">&{wms.create.description.service.name.label}</label>
+                    <div class="controls">
+                        <input type="text" id="name" name="createdService.name">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="identifier">&{wms.create.description.service.identifier.label}</label>
+                    <div class="controls">
+                        <input type="text" id="identifier" name="createdService.identifier">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="keywords">&{wms.create.description.service.keywords.label}</label>
+
+                    <div class="controls">
+                        <input type="text" id="keywords" name="keywords"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="inputDescription">&{wms.create.description.service.description.label}</label>
+                    <div class="controls">
+                        <textarea cols="50" id="inputDescription" name="createdService.description" class="input-xxlarge"></textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">&{wms.create.description.version.title}</label>
+                    <div class="controls">
+                        <label class="checkbox inline" for="v111">
+                            <input type="checkbox" value="111" id="v111" name="v111"> 1.1.1
+                        </label>
+                        <label class="checkbox inline" for="v130">
+                            <input type="checkbox" value="130" id="v130" name="v130"> 1.3.0
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="row">
+            <div class="span2 offset10">
+            </br>
+                <a href="@{webservices()}">&{wms.create.cancel.label}</a>
+                <a class="btn btn-primary" onclick="goToMetadata();" type="button">&{wms.create.next.label}</a>
+            </div>
+        </div>
+    </div>
+</div>

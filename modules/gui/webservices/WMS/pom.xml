@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>webservices</artifactId>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
+
+    <groupId>org.constellation.gui</groupId>
+    <artifactId>wms</artifactId>
+    <version>0.9-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>WMS gui part</name>
+
+    <properties>
+        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.6</maven.compiler.source>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>common</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation</groupId>
+            <artifactId>cstl-client</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>

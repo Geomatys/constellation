@@ -8,6 +8,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.constellation</groupId>
         <artifactId>modules</artifactId>
@@ -15,40 +16,22 @@
     </parent>
 
 
-
-    <!--
-    Description du module.
-  -->
+    <!--Description du module.-->
     <groupId>org.constellation</groupId>
     <artifactId>gui</artifactId>
     <packaging>pom</packaging>
-    <name>Modules for the web sites</name>
+    <name>server administration web site</name>
     <description>
         Modules for the JSF based web interfaces.
     </description>
 
 
-
-    <!--
-    Developers and contributors list.
-  -->
+    <!--Developers and contributors list.-->
     <developers>
         <developer>
-            <id>desruisseaux</id>
-            <name>Martin Desruisseaux</name>
-            <email>desruisseaux@users.sourceforge.net</email>
-            <organization>Geomatys</organization>
-            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-            <roles>
-                <role>Administrateur du projet</role>
-                <role>Développeur Java</role>
-            </roles>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
-            <id>glegal</id>
-            <name>Guilhem Legal</name>
-            <email>guilhem.legal@geomatys.fr</email>
+            <id>bgarcia</id>
+            <name>Benjamin Garcia</name>
+            <email>benjamin.garcia@geomatys.com</email>
             <organization>Geomatys</organization>
             <organizationUrl>http://www.geomatys.fr/</organizationUrl>
             <roles>
@@ -57,67 +40,75 @@
             <timezone>+1</timezone>
         </developer>
     </developers>
-    <contributors>
-        <contributor>
-            <name>Antoine Hnawia</name>
-            <email>antoine.hnawia@noumea.ird.nc</email>
-            <organization>IRD Unité S140</organization>
-            <organizationUrl>http://www.espace.ird.nc</organizationUrl>
-            <roles>
-                <role>Développeur Java</role>
-            </roles>
-            <timezone>+11</timezone>
-        </contributor>
-        <contributor>
-            <name>Touraivane</name>
-            <email>touraivane@univ-nc.nc</email>
-            <organization>Université de la Nouvelle-Calédonie</organization>
-            <organizationUrl>http://www.univ-nc.nc</organizationUrl>
-            <roles>
-                <role>Développeur Java</role>
-            </roles>
-            <timezone>+11</timezone>
-        </contributor>
-        <contributor>
-            <name>Briançon Cédric</name>
-            <email>cedric.briancon@geomatys.fr</email>
-            <organization>Geomatys</organization>
-            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-            <roles>
-                <role>Développeur Java</role>
-            </roles>
-            <timezone>+1</timezone>
-        </contributor>
-    </contributors>
 
+    <properties>
+        <juzu.version>0.7.0-beta9-SNAPSHOT</juzu.version>
+    </properties>
+
+    <dependencies>
+        <!-- Application dependencies-->
+        <dependency>
+            <groupId>org.juzu</groupId>
+            <artifactId>juzu-bom-core</artifactId>
+            <version>${juzu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.juzu</groupId>
+            <artifactId>juzu-plugins-servlet</artifactId>
+            <version>${juzu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.juzu</groupId>
+            <artifactId>juzu-plugins-less</artifactId>
+            <version>${juzu.version}</version>
+        </dependency>
+
+        <!-- Junit for testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.juzu</groupId>
+            <artifactId>juzu-bom-arquillian</artifactId>
+            <version>0.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.juzu</groupId>
+            <artifactId>juzu-bom-arquillian-tomcat7</artifactId>
+            <version>0.6.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Force artifact version to pass test correctly -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>1.7.6</version>
+        </dependency>
+    </dependencies>
 
     <!-- =========================================================== -->
-  <!--     Modules included in the build                           -->
-  <!-- =========================================================== -->
-
+    <!--     Modules included in the build                           -->
+    <!-- =========================================================== -->
     <modules>
-        <module>cstl-client</module>
         <module>admin-swing</module>
-        <module>admin-base</module>
-        <module>admin-page-cstl</module>
-        <module>admin-page-jvm</module>
-        <module>admin-page-jai</module>
-        <module>admin-page-geotk</module>
-        <module>admin-page-tool</module>
-        <module>admin-page-providers</module>
-        <module>admin-page-provider-coveragesql</module>
-        <module>admin-page-sld</module>
-        <module>admin-page-services</module>
-        <module>admin-page-wmts</module>
-        <module>admin-page-wms</module>
-        <module>admin-page-wcs</module>
-        <module>admin-page-wfs</module>
-        <module>admin-page-csw</module>
-        <module>admin-page-sos</module>
-        <module>admin-page-wps</module>
         <module>cstl-services</module>
-        <module>cstl-admin</module>
-        <module>cstl-wrapper</module>
+        <module>administration</module>
+        <module>common</module>
+        <module>data</module>
+        <module>style</module>
+        <module>webservices</module>
+        <module>cstl-web-client</module>
     </modules>
 
 </project>

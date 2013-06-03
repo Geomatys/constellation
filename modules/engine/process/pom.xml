@@ -64,7 +64,7 @@
        <version>${project.version}</version>
     </dependency>
     <dependency>
-       <groupId>org.constellation.gui</groupId>
+       <groupId>org.constellation</groupId>
        <artifactId>cstl-client</artifactId>
        <version>${project.version}</version>
     </dependency>

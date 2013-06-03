@@ -17,6 +17,7 @@
  */
 package org.constellation.ws.rs;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.ByteArrayInputStream;
@@ -28,6 +29,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 // jersey dependencies
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.core.HttpContext;
 import java.lang.reflect.Proxy;
 import java.util.LinkedHashMap;
@@ -52,6 +56,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Schema;
 
 // Constellation dependencies
+import org.constellation.dto.Service;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
@@ -394,6 +399,19 @@ public abstract class WebService {
         } else {
             return Response.ok("This service is not running", MimeType.TEXT_PLAIN).build();
         }
+    }
+
+    @POST
+    @Consumes("application/json")
+    public Response doPostjSon(InputStream is){
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Service toCreateService = mapper.readValue(is, Service.class);
+            treatIncomingRequest(toCreateService);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "", e);
+        }
+        return Response.ok().build();
     }
 
     protected abstract boolean isRequestValidationActivated(final String workerID);

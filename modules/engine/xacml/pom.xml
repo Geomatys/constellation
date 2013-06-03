@@ -57,17 +57,6 @@
     </developer>
   </developers>
 
-  <repositories>
-    <repository>
-      <id>jboss</id>
-      <name>jboss xacml</name>
-      <url>http://repository.jboss.com/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <!--
     Required dependencies for building. These dependencies wil be included into
     the JARs list that Maven will put into the directory "target/binaries".

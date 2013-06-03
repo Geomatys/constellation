@@ -887,98 +887,40 @@
   -->
     <repositories>
         <repository>
-            <id>java.net.1</id>
-            <name>java.net community</name>
-            <url>http://download.java.net/maven/1</url>
-            <!--layout>legacy</layout-->
+            <id>snapshots</id>
+            <name>geomatys repo snapshots</name>
+            <url>http://maven2.geomatys.com/repository/snapshots/</url>
             <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+        <enabled>true</enabled>
+      </snapshots>
         </repository>
         <repository>
-            <id>java.net.2</id>
-            <name>java.net community</name>
-            <url>http://download.java.net/maven/2</url>
+            <id>internal</id>
+            <name>geomatys repo internal</name>
+            <url>http://maven2.geomatys.com/repository/internal/</url>
             <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>java.net.glassfish</id>
-            <name>java.net community</name>
-            <url>http://download.java.net/maven/glassfish</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>geomatys</id>
-            <name>Builds from Geomatys</name>
-            <url>http://maven.geomatys.com</url>
-        </repository>
-        <repository>
-            <id>geotoolkit</id>
-            <name>GeoToolkit repository</name>
-            <url>http://maven.geotoolkit.org</url>
-        </repository>
-        <!-- TODO remove this repo when oracle jdbc driver will be deployed in geomatys repo -->
-        <repository>
-            <id>ifremer</id>
-            <name>IFREMER</name>
-            <url>http://www.ifremer.fr/maven/repository/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <!--repository>
-            <id>jboss.com</id>
-            <name>Jboss</name>
-            <url>http://repository.jboss.com/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository-->
-         <repository>
-            <id>jboss nexus</id>
-            <name>Jboss nexus</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>repo1.maven.org</id>
-            <name>repo1.maven.org</name>
-            <url>http://repo1.maven.org/maven2/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>ettrema-repo</id>
-            <url>http://www.ettrema.com/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+        <enabled>false</enabled>
+      </snapshots>
         </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
-            <id>geomatys</id>
-            <name>Builds from Geomatys</name>
-            <url>http://maven.geomatys.com</url>
+            <id>internal</id>
+            <name>geomatys repo internal</name>
+            <url>http://maven2.geomatys.com/repository/internal/</url>
+            <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>geotoolkit</id>
-            <name>Builds from Geotoolkit</name>
-            <url>http://maven.geotoolkit.org</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>maven2-repository.dev.java.net</id>
-            <url>http://download.java.net/maven/2</url>
+            <id>snapshots</id>
+            <name>geomatys repo snapshots</name>
+            <url>http://maven2.geomatys.com/repository/snapshots/</url>
+            <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
 
 
     <!--
