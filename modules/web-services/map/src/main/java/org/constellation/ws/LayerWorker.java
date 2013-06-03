@@ -25,9 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
@@ -162,16 +160,46 @@ public abstract class LayerWorker extends AbstractWorker {
         throw new FactoryNotFoundException("No Map factory has been found for type:" + type);
     }
     
+    protected Layer getConfigurationLayer(final Name layerName, final String login) {
+        if (layerName != null && layerName.getLocalPart() != null) {
+            final QName qname = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
+            return getConfigurationLayer(qname, login);
+        }
+        return null;
+    }
+
+    protected Layer getConfigurationLayer(final QName layerName, final String login) {
+        if (layerName != null) {
+            final List<Layer> layers = getConfigurationLayers(login);
+            for (Layer layer : layers) {
+                if (layer.getName().equals(layerName) || (layer.getAlias() != null && layer.getAlias().equals(layerName.getLocalPart()))) {
+                    return layer;
+                }
+            }
+        }
+        return null;
+    }
+
+    protected List<QName> getConfigurationLayerNames(final String login) {
+        final List<QName> result = new ArrayList<QName>();
+        final List<Layer> layers = getConfigurationLayers(login);
+        for (Layer layer : layers) {
+            result.add(layer.getName());
+        }
+        return result;
+    }
+
     /**
      *
-     * @return map of additional informations for each layer declared in the layer context.
+     * @return map of additional informations for each layer declared in the
+     * layer context.
      */
-    protected Map<Name, Layer> getLayers(final String login){
+    protected List<Layer> getConfigurationLayers(final String login) {
         if (layerContext == null) {
-            return new HashMap<Name, Layer>();
+            return new ArrayList<Layer>();
         }
         final LayerProviderProxy namedProxy  = LayerProviderProxy.getInstance();
-        final Map<Name, Layer> layers = new HashMap<Name, Layer>();
+        final List<Layer> layers = new ArrayList<Layer>();
         /*
          * For each source declared in the layer context we search for layers informations.
          */
@@ -195,7 +223,7 @@ public abstract class LayerWorker extends AbstractWorker {
                                 layer = new Layer(qn);
                             } 
                             layer.setProviderID(sourceID);
-                            layers.put(layerName, layer);
+                            layers.add(layer);
                         }
                     }
                 /*
@@ -205,7 +233,7 @@ public abstract class LayerWorker extends AbstractWorker {
                     Layer layer = source.isIncludedLayer(qn);
                     if (layer != null && securityFilter.allowed(login, layerName)) {
                         layer.setProviderID(sourceID);
-                        layers.put(layerName, layer);
+                        layers.add(layer);
                     }
                 }
             }
@@ -213,6 +241,7 @@ public abstract class LayerWorker extends AbstractWorker {
         return layers;
     }
 
+    
     /**
      * Return all layers details in LayerProviders from there names.
      * @param layerNames
@@ -227,6 +256,10 @@ public abstract class LayerWorker extends AbstractWorker {
         return layerRefs;
     }
 
+    protected LayerDetails getLayerReference(final String login, final QName layerName) throws CstlServiceException {
+        return getLayerReference(login, new DefaultName(layerName));
+    }
+    
     /**
      * Search layer real name and return the LayerDetails from LayerProvider.
      * @param layerName
@@ -255,34 +288,34 @@ public abstract class LayerWorker extends AbstractWorker {
             return null;
         }
 
-        final Map<Name,Layer> layers = getLayers(login);
-        if (layers == null) {
+        final List<QName> layerNames = getConfigurationLayerNames(login);
+        if (layerNames == null) {
             return null;
         }
 
-        final Layer directLayer = layers.get(name);
+        final Layer directLayer =  getConfigurationLayer(name, login);
         if (directLayer == null) {
             //search with only localpart
-            for (Name layerName: layers.keySet()) {
+            for (QName layerName: layerNames) {
                 if (layerName.getLocalPart().equals(name.getLocalPart())) {
-                    return new NameInProvider(layerName, layers.get(layerName).getProviderID());
+                    return new NameInProvider(layerName, getConfigurationLayer(layerName, login).getProviderID());
                 }
             }
 
             //search in alias if any
-            for (Map.Entry<Name, Layer> l: layers.entrySet()) {
-                final Layer layer = l.getValue();
+             for (QName l: layerNames) {
+                final Layer layer = getConfigurationLayer(l, login);
                 if (layer.getAlias() != null && !layer.getAlias().isEmpty()) {
                     final String alias = layer.getAlias().trim().replaceAll(" ", "_");
                     if (alias.equals(name.getLocalPart())) {
-                        return new NameInProvider(l.getKey(), layer.getProviderID());
+                        return new NameInProvider(l, layer.getProviderID());
                     }
                 }
             }
 
             return null;
         }
-        return new NameInProvider(name, directLayer.getProviderID());
+        return new NameInProvider(directLayer.getName(), directLayer.getProviderID());
     }
     
     protected static MutableStyle getStyle(final String styleName) throws CstlServiceException {
@@ -372,6 +405,11 @@ public abstract class LayerWorker extends AbstractWorker {
      
         public NameInProvider(final Name name, final String providerID) {
             this.name = name;
+            this.providerID = providerID;
+        }
+        
+        public NameInProvider(final QName name, final String providerID) {
+            this.name = new DefaultName(name);
             this.providerID = providerID;
         }
     }

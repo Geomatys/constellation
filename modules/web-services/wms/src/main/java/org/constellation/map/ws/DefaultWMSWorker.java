@@ -308,11 +308,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         //Build the list of layers
         final List<AbstractLayer> outputLayers = new ArrayList<AbstractLayer>();
-        final Map<Name,Layer> layers = getLayers(userLogin);
+        final List<Layer> layers = getConfigurationLayers(userLogin);
 
-        for (Name name : layers.keySet()) {
-            final LayerDetails layer = getLayerReference(userLogin, name);
-            final Layer configLayer  = layers.get(name);
+       for (Layer configLayer : layers) {
+            final LayerDetails layer = getLayerReference(userLogin, configLayer.getName());
 
             if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
                 continue;
@@ -1021,15 +1020,14 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             } else {
                 // No sld given, we use the style.
-                final Map<Name,Layer> layers = getLayers(userLogin);
-                final Layer layerRef         = layers.get(layer.getName());
+                final Layer layerRef = getConfigurationLayer(layer.getName(), userLogin);
 
                 final List<String> defaultStyleRefs = layerRef.getStyles();
                 if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
                     final String styleId = defaultStyleRefs.get(0);
                     if (styleId.startsWith("${")) {
                         final DataReference styleRef = new DataReference(styleId);
-                        ms = (styleRef == null || styleRef.getLayerId() == null) ? null : getStyle(styleRef.getLayerId().getLocalPart());
+                        ms = (styleRef.getLayerId() == null) ? null : getStyle(styleRef.getLayerId().getLocalPart());
                     } else {
                         ms = getStyleByIdentifier(styleId);
                     }
@@ -1066,8 +1064,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     	//
         // TODO support BLANK exception format for WMS1.1.1 and WMS1.3.0
         final String errorType = getMap.getExceptionFormat();
-        boolean errorInImage = false;
-        boolean errorBlank = false;
+        final boolean errorInImage;
+        final boolean errorBlank;
         if (queryVersion.equals(ServiceDef.WMS_1_3_0.version.toString())) {
             errorInImage = EXCEPTION_130_INIMAGE.equalsIgnoreCase(errorType);
             errorBlank = EXCEPTION_130_BLANK.equalsIgnoreCase(errorType);
@@ -1286,15 +1284,14 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
-                final Map<Name,Layer> layers = getLayers(userLogin);
-                final Layer layer = layers.get(layerRefs.get(i).getName());
+                final Layer layer = getConfigurationLayer(layerRefs.get(i).getName(), userLogin);
 
                 final List<String> defaultStyleRefs = layer.getStyles();
                 if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
                     final String styleId = defaultStyleRefs.get(0);
                     if (styleId.startsWith("${")) {
                         final DataReference styleRef = new DataReference(styleId);
-                        style = (styleRef == null || styleRef.getLayerId() == null) ? null : getStyle(styleRef.getLayerId().getLocalPart());
+                        style = (styleRef.getLayerId() == null) ? null : getStyle(styleRef.getLayerId().getLocalPart());
                     } else {
                         style = getStyleByIdentifier(styleId);
                     }
@@ -1308,11 +1305,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     }
 
     private void applyLayerFiltersAndDims(final MapItem item, final String userLogin){
-        final Map<Name,Layer> layersContext = getLayers(userLogin);
 
         if(item instanceof FeatureMapLayer){
             final FeatureMapLayer fml = (FeatureMapLayer)item;
-            final Layer layerContext = layersContext.get(fml.getCollection().getFeatureType().getName());
+            final Layer layerContext = getConfigurationLayer(fml.getCollection().getFeatureType().getName(), userLogin);
             if (layerContext.getFilter() != null) {
                 final StyleXmlIO xmlUtil = new StyleXmlIO();
                 Filter filterGt = Filter.INCLUDE;
