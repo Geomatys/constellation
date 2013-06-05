@@ -115,11 +115,11 @@
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-xml-ogc</artifactId>
         </dependency>
-        <dependency>
+        <!-- dependency>
             <groupId>ojdbc</groupId>
             <artifactId>ojdbc</artifactId>
             <scope>provided</scope>
-        </dependency>
+        </dependency -->
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
