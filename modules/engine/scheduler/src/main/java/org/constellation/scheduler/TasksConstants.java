@@ -33,6 +33,8 @@ final class TasksConstants {
     
     public static final String TAG_TRIGGER = "trigger";
     public static final String ATT_STEP = "step";
+    public static final String ATT_START_DATE = "startDate";
+    public static final String ATT_START_STEP = "startStep";
     
     public static final String TAG_PARAMETERS = "parameters";
     

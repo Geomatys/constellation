@@ -16,6 +16,10 @@
  */
 package org.constellation.scheduler;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opengis.util.NoSuchIdentifierException;
@@ -41,9 +45,16 @@ import static javax.xml.stream.XMLStreamReader.*;
 import static org.constellation.scheduler.TasksConstants.*;
 
 /**
- * Reader tasks from an xml file.
+ * Reader tasks from an xml file. A task can get a repeat step (in seconds), a start date ( formatted as YYYY/MM/dd HH:mm:ss)
+ * and a start step (still in seconds), which is the step available only for the first execution.
+ *
+ * Ex : If you specify a start Step but no start date, the process will start at current time + start step seconds.
+ * If you specify a start date + a start step, you'll start at specified date + start date.
+ *
+ * If a step is given, the task will be repeated every step seconds. Otherwise, task is executed only once.
  * 
  * @author Johann Sorel (Geomatys)
+ * @author Alexis Manin (Geomatys)
  * @module pending
  */
 public class TasksReader extends StaxStreamReader{
@@ -52,7 +63,7 @@ public class TasksReader extends StaxStreamReader{
         
     }
     
-    public List<Task> read() throws XMLStreamException, IOException{
+    public List<Task> read() throws XMLStreamException, IOException {
         
         while (reader.hasNext()) {
             final int type = reader.next();
@@ -128,20 +139,53 @@ public class TasksReader extends StaxStreamReader{
         return task;
     }
     
-    private ParameterValueGroup readParameters(final ParameterDescriptorGroup desc) throws XMLStreamException, IOException{
+    private ParameterValueGroup readParameters(final ParameterDescriptorGroup desc) throws XMLStreamException, IOException {
         final ParameterValueReader prmreader = new ParameterValueReader(desc);
         prmreader.setInput(reader);
         return (ParameterValueGroup) prmreader.read();
     }
     
-    private SimpleTrigger readTrigger() throws XMLStreamException{
-        
-        final double step = parseDouble(reader.getAttributeValue(null, ATT_STEP));
+    private SimpleTrigger readTrigger() throws XMLStreamException {
+
+        int step = 0, startStep = 0;
+        Date startDate;
+
+        final String strStep      = reader.getAttributeValue(null, ATT_STEP);
+        final String strStartDate = reader.getAttributeValue(null, ATT_START_DATE);
+        final String strStartStep = reader.getAttributeValue(null, ATT_START_STEP);
+
+        if(strStep != null) {
+            step = Integer.decode(strStep);
+        }
+
+        if(strStartStep != null) {
+            startStep = Integer.decode(strStartStep);
+        }
+
+        if(strStartDate != null) {
+            DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            try {
+                startDate = format.parse(strStartDate);
+            } catch (ParseException e) {
+                throw new XMLStreamException("Unable to parse the date given in "+ ATT_START_DATE + "attribute. It must be " +
+                        "formatted as yyyy/MM/dd HH:mm:ss", e);
+            }
+        } else {
+            startDate = new Date();
+        }
+
+        // Increment start step to ensure that the first iteration date won't be in the past at trigger start.
+        if (++startStep > 0) {
+            startDate.setTime(startDate.getTime()+1000*startStep);
+        }
+
         toTagEnd(TAG_TRIGGER);
         
         final TriggerBuilder tb = TriggerBuilder.newTrigger();
-        tb.startNow();
-        tb.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever((int)step));
+        tb.startAt(startDate);
+        if (step > 0) {
+            tb.withSchedule(SimpleScheduleBuilder.repeatSecondlyForever((int)step));
+        }
         return (SimpleTrigger) tb.build();
     }
     
