@@ -70,7 +70,7 @@ public final class CstlScheduler {
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.SEVERE, "=== Failed to read tasks ===\n"+ex.getLocalizedMessage(), ex); 
         }
-        
+
         final SchedulerFactory schedFact = new StdSchedulerFactory();
         try {
             quartzScheduler = schedFact.getScheduler();

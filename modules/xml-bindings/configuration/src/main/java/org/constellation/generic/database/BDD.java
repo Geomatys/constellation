@@ -25,13 +25,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.lang.reflect.UndeclaredThrowableException;
 import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import oracle.jdbc.pool.OracleConnectionPoolDataSource;
-import oracle.jdbc.pool.OracleDataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import org.geotoolkit.internal.sql.DefaultDataSource;
@@ -40,6 +39,7 @@ import org.geotoolkit.jdbc.WrappedDataSource;
 import org.geotoolkit.util.Utilities;
 import org.geotoolkit.util.logging.Logging;
 
+import javax.sql.ConnectionPoolDataSource;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.postgresql.ds.common.BaseDataSource;
 
@@ -59,32 +59,32 @@ public class BDD {
 
     @Deprecated
     private static final Map<BDD, Connection> CONNECTION_MAP = new HashMap<BDD, Connection>();
-    
+
     /**
      * The className of the driver
      */
     private String className;
-    
+
     /**
      * The url to connect the database
      */
     private String connectURL;
-    
+
     /**
      * The username connecting the database
      */
     private String user;
-    
+
     /**
      * The password of the user
      */
     private String password;
-    
+
     /**
      * The database schema.
      */
     private String schema;
-    
+
     private boolean sharedConnection = false;
 
     /**
@@ -93,7 +93,7 @@ public class BDD {
     public BDD() {
 
     }
-    
+
     public BDD(final BDD that) {
         this.className        = that.className;
         this.connectURL       = that.connectURL;
@@ -227,7 +227,7 @@ public class BDD {
     public void setPassword(final String password) {
         this.password = password;
     }
-    
+
     /**
      * @return the schema
      */
@@ -241,7 +241,7 @@ public class BDD {
     public void setSchema(String schema) {
         this.schema = schema;
     }
-    
+
     /**
      * @return the sharedConnection
      */
@@ -255,10 +255,10 @@ public class BDD {
     public void setSharedConnection(boolean sharedConnection) {
         this.sharedConnection = sharedConnection;
     }
-    
+
     /**
      * Return a new connection to the database.
-     * 
+     *
      * @return
      * @throws java.sql.SQLException
      *
@@ -292,14 +292,38 @@ public class BDD {
     public static void clearConnectionPool() {
         CONNECTION_MAP.clear();
     }
-    
+
+    /**
+     * Creates a data source for the given classname using the reflection API.
+     * This avoid direct dependency to a driver that we can not redistribute.
+     */
+    private Object createDataSourceByReflection(final String classname) throws SQLException {
+        try {
+            final Class<?> c = Class.forName(classname);
+            final Object source = c.newInstance();
+            c.getMethod("setURL",      String.class).invoke(source, connectURL);
+            c.getMethod("setUser",     String.class).invoke(source, user);
+            c.getMethod("setPassword", String.class).invoke(source, password);
+            return source;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof SQLException) {
+                throw (SQLException) cause;
+            }
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new UndeclaredThrowableException(e);
+        }
+    }
+
     /**
      * Return a new connection to the database.
      *
      * @return
      * @throws java.sql.SQLException
-     *
-     * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
      */
     public DataSource getDataSource() throws SQLException {
         final DataSource source;
@@ -316,11 +340,7 @@ public class BDD {
                 return null;
             }
         } else if (className.equals(ORACLE_DRIVER_CLASS)) {
-            final OracleDataSource oraSource = new OracleDataSource();
-            oraSource.setURL(connectURL);
-            oraSource.setUser(user);
-            oraSource.setPassword(password);
-            source = oraSource;
+            source = (DataSource) createDataSourceByReflection("oracle.jdbc.pool.OracleDataSource");
         } else {
             source = new DefaultDataSource(connectURL);
         }
@@ -332,8 +352,6 @@ public class BDD {
      *
      * @return
      * @throws java.sql.SQLException
-     *
-     * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
      */
     public DataSource getPooledDataSource() {
         final DataSource source;
@@ -395,11 +413,8 @@ public class BDD {
             }
         } else if (className.equals(ORACLE_DRIVER_CLASS)) {
             try {
-                final OracleConnectionPoolDataSource oraSource = new OracleConnectionPoolDataSource();
-                oraSource.setURL(connectURL);
-                oraSource.setUser(user);
-                oraSource.setPassword(password);
-                source = new WrappedDataSource(oraSource);
+                source = new WrappedDataSource((ConnectionPoolDataSource)
+                        createDataSourceByReflection("oracle.jdbc.pool.OracleConnectionPoolDataSource"));
             } catch (SQLException ex) {
                 LOGGER.log(Level.SEVERE, "SQLException while creating oracle datasource", ex);
                 return null;
@@ -461,14 +476,14 @@ public class BDD {
         }
         return DriverManager.getConnection(connectURL, user, password);
     }
-    
+
     public boolean isPostgres() {
         if (className == null) {
             className = POSTGRES_DRIVER_CLASS;
         }
         return className.equals(POSTGRES_DRIVER_CLASS);
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[BDD]");
@@ -478,7 +493,7 @@ public class BDD {
         s.append("password: ").append(password).append('\n');
         return s.toString();
     }
-    
+
     /**
      * Verify if this entry is identical to the specified object.
      */
