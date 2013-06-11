@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -59,7 +59,7 @@ public class FormatURL {
             this.onlineResource = new Reference(href);
         }
     }
-    
+
     public FormatURL(final String format, final Reference href) {
         this.format = format;
         this.onlineResource = href;
@@ -88,7 +88,7 @@ public class FormatURL {
             this.onlineResource = new Reference(href);
         }
     }
-    
+
     public FormatURL(final Integer width,final Integer height, final String format, final Reference ref) {
         this.width  = width;
         this.height = height;
@@ -179,7 +179,7 @@ public class FormatURL {
     public void setHeight(Integer height) {
         this.height = height;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[FormatURL]");
@@ -203,17 +203,17 @@ public class FormatURL {
         }
         return sb.toString();
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof FormatURL) {
             final FormatURL that = (FormatURL) obj;
-            return Utilities.equals(this.width,   that.width) &&
-                   Utilities.equals(this.type,     that.type) &&
-                   Utilities.equals(this.onlineResource,  that.onlineResource) &&
-                   Utilities.equals(this.name,         that.name) &&
-                   Utilities.equals(this.format,       that.format) &&
-                   Utilities.equals(this.height,       that.height);
+            return Objects.equals(this.width,   that.width) &&
+                   Objects.equals(this.type,     that.type) &&
+                   Objects.equals(this.onlineResource,  that.onlineResource) &&
+                   Objects.equals(this.name,         that.name) &&
+                   Objects.equals(this.format,       that.format) &&
+                   Objects.equals(this.height,       that.height);
         }
         return false;
     }

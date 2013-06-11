@@ -27,11 +27,11 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 
 /**
- * 
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -50,9 +50,9 @@ public class Orderby {
     private String value;
 
     public Orderby() {
-        
+
     }
-    
+
     public Orderby(final Orderby orderBy) {
         if (orderBy != null) {
             this.group  = orderBy.group;
@@ -60,7 +60,7 @@ public class Orderby {
             this.value  = orderBy.value;
         }
     }
-    
+
     /**
      * Gets the value of the sens property.
      */
@@ -102,7 +102,7 @@ public class Orderby {
     public void setvalue(String value) {
         this.value = value;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[Orderby]");
@@ -114,7 +114,7 @@ public class Orderby {
             s.append("value : ").append(value).append('\n');
         return s.toString();
     }
-    
+
     /**
      * Verify if this entry is identical to the specified object.
      */
@@ -126,9 +126,9 @@ public class Orderby {
         if (object instanceof Orderby) {
             final Orderby that = (Orderby) object;
 
-            return Utilities.equals(this.sens,  that.sens)  &&
-                   Utilities.equals(this.group, that.group) &&
-                   Utilities.equals(this.value, that.value);
+            return Objects.equals(this.sens,  that.sens)  &&
+                   Objects.equals(this.group, that.group) &&
+                   Objects.equals(this.value, that.value);
         }
         return false;
     }

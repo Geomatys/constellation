@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco" 
-                 xmlns:gmd="http://www.isotc211.org/2005/gmd" 
-                 xmlns:fra="http://www.cnig.gouv.fr/2005/fra" 
+<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco"
+                 xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                 xmlns:fra="http://www.cnig.gouv.fr/2005/fra"
                  xmlns:gmx="http://www.isotc211.org/2005/gmx"
-                 xmlns:xlink="http://www.w3.org/1999/xlink" 
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
                  xmlns:gml="http://www.opengis.net/gml"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://eden.ign.fr/xsd/isotc211/isofull/20090316/gmd/gmd.xsd

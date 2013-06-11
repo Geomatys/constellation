@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -38,7 +38,7 @@ import org.geotoolkit.util.Utilities;
     "value"
 })
 public class LeftJoin {
- 
+
     @XmlAttribute
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     private String operator;
@@ -148,7 +148,7 @@ public class LeftJoin {
     /**
      * same mecanism as replaceVariable(String varName, String varValue, boolean withQuote)
      * but all the varName/varValue are contained in a map.
-     * 
+     *
      * @param parameters a map of varName/varValue.
      */
     public void replaceVariable(HashMap<String, String> parameters) {
@@ -183,9 +183,9 @@ public class LeftJoin {
         if (object instanceof LeftJoin) {
             final LeftJoin that = (LeftJoin) object;
 
-            return Utilities.equals(this.operator, that.operator) &&
-                   Utilities.equals(this.group, that.group) &&
-                   Utilities.equals(this.value, that.value);
+            return Objects.equals(this.operator, that.operator) &&
+                   Objects.equals(this.group, that.group) &&
+                   Objects.equals(this.value, that.value);
         }
         return false;
     }

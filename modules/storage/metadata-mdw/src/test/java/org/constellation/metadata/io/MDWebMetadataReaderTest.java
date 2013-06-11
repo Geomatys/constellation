@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import java.util.Objects;
 import java.io.File;
 import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
 import javax.xml.bind.JAXBElement;
@@ -219,7 +220,7 @@ public class MDWebMetadataReaderTest {
 
         assertTrue(result instanceof DefaultMetadata);
         assertTrue(Utilities.deepEquals(expResult, (DefaultMetadata)result, ComparisonMode.BY_CONTRACT));
-        assertFalse(Utilities.equals(expResult, (DefaultMetadata)result));
+        assertFalse(Objects.equals(expResult, (DefaultMetadata)result));
 
         pool.release(unmarshaller);
     }

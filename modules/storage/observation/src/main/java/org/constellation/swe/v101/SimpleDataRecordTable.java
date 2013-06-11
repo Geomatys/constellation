@@ -30,7 +30,7 @@ import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *  Connexion vers la table des {@linkplain SimpleDataRecord simpleDataRecord}.
@@ -39,20 +39,20 @@ import org.geotoolkit.util.Utilities;
  * @author Guilhem Legal
  */
 public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordType> implements Cloneable {
-    
+
     /**
      * identifiant secondaire de la table
      * (identifiant du DataBlock contenant le dataRecord qui possede ce champ).
      */
     private String idDataBlock;
-    
-    
+
+
     /**
      * Connexion vers la table des {@linkplain DataRecordField dataRecord field}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     private AnyScalarTable fields;
-    
+
     /**
      * Construit une table des data record.
      *
@@ -61,14 +61,14 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordType> 
     public SimpleDataRecordTable(final Database database) {
         this(new SimpleDataRecordQuery(database));
     }
-    
+
     /**
      * Initialise l'identifiant de la table.
      */
     private SimpleDataRecordTable(final SimpleDataRecordQuery query) {
         super(query,query.byIdDataRecord);
     }
-    
+
     /**
      * Un constructeur qui prend en parametre un table partagée afin d'en creer
      * une qui ne l'ai pas.
@@ -92,19 +92,19 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordType> 
     public synchronized String getIdDataBlock() {
         return idDataBlock;
     }
-    
+
     /**
      * Modifie l'identifiant du dataBlock si il est different de l'actuel.
      *
      * @param idDataBlock le nouvel identifiant du dataBlock.
      */
     public synchronized void setIdDataBlock(final String idDataBlock) {
-        if (!Utilities.equals(this.idDataBlock, idDataBlock)) {
+        if (!Objects.equals(this.idDataBlock, idDataBlock)) {
             this.idDataBlock = idDataBlock;
             fireStateChanged("idDataBlock");
         }
     }
-    
+
     /**
      * Construit un data record pour l'enregistrement courant.
      */
@@ -113,22 +113,22 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordType> 
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
         final String idDataBlock = results.getString(indexOf(query.idBlock));
         final String idDataRecord = results.getString(indexOf(query.idDataRecord));
-        
+
         if (fields == null) {
             fields = getDatabase().getTable(AnyScalarTable.class);
         }
-       
+
         fields.setIdDataBlock(idDataBlock);
         fields.setIdDataRecord(idDataRecord);
         final Collection<AnyScalarPropertyType> scalars = fields.getEntries();
-        
+
         return new SimpleDataRecordType(idDataBlock, idDataRecord,
                 results.getString(indexOf(query.definition)),
-                results.getBoolean(indexOf(query.fixed)), 
+                results.getBoolean(indexOf(query.fixed)),
                 scalars);
-        
+
     }
-    
+
     /**
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
@@ -138,9 +138,9 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordType> 
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
         if (!type.equals(QueryType.INSERT))
             statement.setString(indexOf(query.byIdBlock), idDataBlock);
-        
+
     }
-    
+
     /**
      * Retourne un nouvel identifier (ou l'identifier du data record passée en parametre si non-null)
      * et enregistre le nouveau data record dans la base de donnée si il n'y est pas deja.

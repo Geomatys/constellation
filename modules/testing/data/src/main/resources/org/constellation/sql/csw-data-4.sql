@@ -97,4 +97,3 @@ INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStan
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (11, 'Ebrim v2.5:ExtrinsicObject:home', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:home.1', 'http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi');
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (11, 'Ebrim v2.5:ExtrinsicObject:objectType', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:objectType.1', 'Theme');
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (11, 'Ebrim v2.5:ExtrinsicObject:status', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:status.1', 'Approved');
-

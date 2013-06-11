@@ -207,7 +207,7 @@ public class GenericConfigurationXMLBindingTest {
         "        </bdd>"                                                           + '\n' +
         "        <customparameters/>"                                              + '\n' +
         "    </ns2:OMConfiguration>"                                               + '\n' +
-        "    <ns2:extensions name=\"coriolis\" format=\"MDWEB\">"                  + '\n' +
+        "    <ns2:extensions format=\"MDWEB\" name=\"coriolis\">"                  + '\n' +
         "        <bdd>"                                                            + '\n' +
         "            <className>org.driver.test</className>"                       + '\n' +
         "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
@@ -458,7 +458,7 @@ public class GenericConfigurationXMLBindingTest {
         "    </select>"                          + '\n' +
         "    <from group=\"observations\">location loc, physical_parameter pp</from>"                               + '\n' +
         "    <where group=\"observations\">loc.location_id = lm.location_id</where>"                                + '\n' +
-        "    <orderBy group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderBy>"         + '\n' +
+        "    <orderBy sens=\"ASC\" group=\"observations\">loc.platform_code, loc.instrument_code</orderBy>"         + '\n' +
         "</query>" + '\n';
 
         Select select = new Select();

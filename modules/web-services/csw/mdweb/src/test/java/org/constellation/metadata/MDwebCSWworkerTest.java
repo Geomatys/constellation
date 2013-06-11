@@ -211,22 +211,9 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
-    @Order(order=9)
-    public void transactionDeleteTest() throws Exception {
-        super.transactionDeleteTest();
-    }
-
-    /**
-     * Tests the transaction method
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Override
-    @Order(order=10)
-    public void transactionInsertTest() throws Exception {
-        super.transactionInsertTest();
-
+    @Order(order = 9)
+    public void transactionDeleteInsertTest() throws Exception {
+        super.transactionDeleteInsertTest();
     }
 
     /**

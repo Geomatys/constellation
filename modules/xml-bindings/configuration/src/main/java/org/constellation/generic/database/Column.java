@@ -20,7 +20,7 @@ package org.constellation.generic.database;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -46,7 +46,7 @@ public class Column {
     public Column() {
 
     }
-    
+
     public Column(final Column column) {
         if (column != null) {
             this.sql = column.sql;
@@ -56,7 +56,7 @@ public class Column {
 
     /**
      * Build a new Column.
-     * 
+     *
      * @param var the alias of the column.
      * @param sql the column name (or a function)
      */
@@ -106,7 +106,7 @@ public class Column {
             s.append("sql:").append(getSql()).append('\n');
         return s.toString();
     }
-    
+
     /**
      * Verify if this entry is identical to the specified object.
      */
@@ -118,8 +118,8 @@ public class Column {
         if (object instanceof Column) {
             final Column that = (Column) object;
 
-            return Utilities.equals(this.getSql(), that.getSql()) &&
-                   Utilities.equals(this.getVar(), that.getVar());
+            return Objects.equals(this.getSql(), that.getSql()) &&
+                   Objects.equals(this.getVar(), that.getVar());
         }
         return false;
     }

@@ -28,7 +28,7 @@ import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -40,7 +40,7 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
      * identifier secondary of the table.
      */
     private String idOffering;
-    
+
     /*
      * un lien vers la table des sampling feature.
      *
@@ -50,12 +50,12 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
      *
      * private SamplingPointTable samplingPoints;
      */
-    
+
     /**
-     * A lnk to the reference table. 
+     * A lnk to the reference table.
      */
      private ReferenceTable samplingFeatures;
-     
+
     /**
      * Build a new offering sampling feature table.
      *
@@ -92,12 +92,12 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
     protected OfferingSamplingFeatureType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingSamplingFeatureQuery query = (OfferingSamplingFeatureQuery) super.query;
         ReferenceType samplingFeature;
-        
+
         if (samplingFeatures == null) {
                 samplingFeatures = getDatabase().getTable(ReferenceTable.class);
             }
         samplingFeature = samplingFeatures.getEntry(results.getString(indexOf(query.samplingFeature)));
-        
+
 
         return new OfferingSamplingFeatureType(results.getString(indexOf(query.idOffering)), samplingFeature);
     }
@@ -119,12 +119,12 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
     }
 
     public synchronized void setIdOffering(String idOffering) {
-        if (!Utilities.equals(this.idOffering, idOffering)) {
+        if (!Objects.equals(this.idOffering, idOffering)) {
             this.idOffering = idOffering;
             fireStateChanged("idOffering");
         }
     }
-    
+
      /**
      * Insere un nouveau capteur a un offering dans la base de donnée.
      *
@@ -154,7 +154,7 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
                 }
                 result.close();
                 release(lc, statement);
-                
+
                 final Stmt insert    = getStatement(lc, QueryType.INSERT);
                 insert.statement.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
                 if ( samplingFeatures == null) {
@@ -165,7 +165,7 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
 
                 updateSingleton(insert.statement);
                 release(lc, insert);
-                
+
                 success = true;
             } finally {
                 transactionEnd(lc, success);

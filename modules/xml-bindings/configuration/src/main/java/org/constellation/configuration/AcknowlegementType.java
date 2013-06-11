@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  * A single response object indicating the success or failure of an operation.
@@ -88,7 +88,7 @@ public class AcknowlegementType {
     public void setStatus(String status) {
         this.status = status;
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -97,8 +97,8 @@ public class AcknowlegementType {
 
         if (obj instanceof AcknowlegementType) {
             final AcknowlegementType that = (AcknowlegementType) obj;
-            return Utilities.equals(this.message, that.message) &&
-                   Utilities.equals(this.status, that.status);
+            return Objects.equals(this.message, that.message) &&
+                   Objects.equals(this.status, that.status);
         }
         return false;
     }

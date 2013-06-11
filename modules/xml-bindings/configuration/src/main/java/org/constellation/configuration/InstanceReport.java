@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  * Create a report about a service with the instances informations.
@@ -85,7 +85,7 @@ public class InstanceReport {
         }
         if (obj instanceof InstanceReport) {
             final InstanceReport that = (InstanceReport) obj;
-            return Utilities.equals(this.instances, that.instances);
+            return Objects.equals(this.instances, that.instances);
         }
         return false;
     }

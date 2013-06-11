@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.constellation.configuration.DataSourceType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 import org.geotoolkit.util.logging.Logging;
 
 /**
@@ -690,22 +690,22 @@ public class Automatic {
         if (object instanceof Automatic) {
             final Automatic that = (Automatic) object;
 
-            return Utilities.equals(this.bdd,              that.bdd)              &&
-                   Utilities.equals(this.name  ,           that.name)             &&
-                   Utilities.equals(this.format  ,         that.format)           &&
-                   Utilities.equals(this.dataDirectory,    that.dataDirectory)    &&
-                   Utilities.equals(this.defaultRecordSet, that.defaultRecordSet) &&
-                   Utilities.equals(this.enableCache,      that.enableCache)      &&
-                   Utilities.equals(this.enableThread,     that.enableThread)     &&
-                   Utilities.equals(this.profile,          that.profile)          &&
-                   Utilities.equals(this.storeMapping,     that.storeMapping)     &&
-                   Utilities.equals(this.thesaurus,        that.thesaurus)        &&
-                   Utilities.equals(this.noIndexation,     that.noIndexation)     &&
-                   Utilities.equals(this.harvester,        that.harvester)        &&
-                   Utilities.equals(this.noIndexation,     that.noIndexation)     &&
-                   Utilities.equals(this.logLevel,         that.logLevel)         &&
-                   Utilities.equals(this.customparameters, that.customparameters) &&
-                   Utilities.equals(this.queries,          that.queries);
+            return Objects.equals(this.bdd,              that.bdd)              &&
+                   Objects.equals(this.name  ,           that.name)             &&
+                   Objects.equals(this.format  ,         that.format)           &&
+                   Objects.equals(this.dataDirectory,    that.dataDirectory)    &&
+                   Objects.equals(this.defaultRecordSet, that.defaultRecordSet) &&
+                   Objects.equals(this.enableCache,      that.enableCache)      &&
+                   Objects.equals(this.enableThread,     that.enableThread)     &&
+                   Objects.equals(this.profile,          that.profile)          &&
+                   Objects.equals(this.storeMapping,     that.storeMapping)     &&
+                   Objects.equals(this.thesaurus,        that.thesaurus)        &&
+                   Objects.equals(this.noIndexation,     that.noIndexation)     &&
+                   Objects.equals(this.harvester,        that.harvester)        &&
+                   Objects.equals(this.noIndexation,     that.noIndexation)     &&
+                   Objects.equals(this.logLevel,         that.logLevel)         &&
+                   Objects.equals(this.customparameters, that.customparameters) &&
+                   Objects.equals(this.queries,          that.queries);
         }
         return false;
     }

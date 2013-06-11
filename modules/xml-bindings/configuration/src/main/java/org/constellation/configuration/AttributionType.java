@@ -20,7 +20,7 @@ package org.constellation.configuration;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -90,7 +90,7 @@ public class AttributionType {
     public void setLogoURL(FormatURL logoURL) {
         this.logoURL = logoURL;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[AttributionType]");
@@ -105,14 +105,14 @@ public class AttributionType {
         }
         return sb.toString();
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof AttributionType) {
             final AttributionType that = (AttributionType) obj;
-            return Utilities.equals(this.logoURL,        that.logoURL) &&
-                   Utilities.equals(this.onlineResource, that.onlineResource) &&
-                   Utilities.equals(this.title,          that.title);
+            return Objects.equals(this.logoURL,        that.logoURL) &&
+                   Objects.equals(this.onlineResource, that.onlineResource) &&
+                   Objects.equals(this.title,          that.title);
         }
         return false;
     }

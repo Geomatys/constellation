@@ -143,8 +143,8 @@ public class WFS2WorkerTest {
         alltypes.add(new QName("http://www.opengis.net/gml/3.2","Streams"));
         alltypes.add(new QName("http://www.opengis.net/sml/1.0","Component"));
         alltypes.add(new QName("http://www.opengis.net/sml/1.0","DataSourceType"));
-        alltypes.add(new QName("http://www.opengis.net/gml/3.2","Lakes"));
         alltypes.add(new QName("http://www.opengis.net/sampling/1.0","SamplingPoint"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","Lakes"));
         alltypes.add(new QName("http://www.opengis.net/gml/3.2","NamedPlaces"));
         alltypes.add(new QName("http://www.opengis.net/gml/3.2","Buildings"));
         alltypes.add(new QName("http://www.opengis.net/gml/3.2","RoadSegments"));

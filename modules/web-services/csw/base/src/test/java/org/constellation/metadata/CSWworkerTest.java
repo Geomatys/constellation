@@ -1287,6 +1287,7 @@ public class CSWworkerTest {
         list.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         list.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         list.add("urn:motiive:csw-ebrim");
+//        list.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         list.add("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
         values = new ListOfValuesType(list);
         value  = new DomainValuesType(null, "identifier", values, METADATA_QNAME);
@@ -1504,7 +1505,7 @@ public class CSWworkerTest {
      *
      * @throws java.lang.Exception
      */
-    public void transactionDeleteTest() throws Exception {
+    public void transactionDeleteInsertTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
         LOGGER.finer("\n\n--- TRANSACTION DELETE TEST --- \n\n");
@@ -1550,43 +1551,35 @@ public class CSWworkerTest {
         assertTrue(exe != null);
         assertEquals(exe.getExceptionCode() , INVALID_PARAMETER_VALUE);
         assertEquals(exe.getLocator() , "id");
-        pool.release(unmarshaller);
-    }
 
-    /**
-     * Tests the transaction method
-     *
-     * @throws java.lang.Exception
-     */
-    public void transactionInsertTest() throws Exception {
 
         LOGGER.finer("\n\n--- TRANSACTION INSERT TEST --- \n\n");
 
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : we add the metadata 42292_5p_19900609195600
          */
-        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+        ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
 
         InsertType insert       = new InsertType(ExpResult1);
-        TransactionType request = new TransactionType("CSW", "2.0.2", insert);
-        TransactionResponse result  = worker.transaction(request);
+        request = new TransactionType("CSW", "2.0.2", insert);
+        result  = worker.transaction(request);
 
         assertEquals(result.getTransactionSummary().getTotalInserted(), 1);
 
 
         // then we must be sure that the metadata is present
-        GetRecordByIdType requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+        requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
-        GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+        GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
         assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
-        Object obj = GRresult.getAny().get(0);
+        obj = GRresult.getAny().get(0);
         assertTrue(obj instanceof DefaultMetadata);
 
-        DefaultMetadata isoResult = (DefaultMetadata) obj;
+        isoResult = (DefaultMetadata) obj;
         metadataEquals(ExpResult1, isoResult);
 
         /*
@@ -2438,6 +2431,52 @@ public class CSWworkerTest {
 
         assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true), meta.getDateStamp());
         assertEquals(newMeta, meta);
+
+
+
+        /*
+         * restore context by replacing CTD02 by 42292_5p_19900609195600
+         */
+
+
+        replacement        = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+        constraint         = new QueryConstraintType("identifier='CTDF02'", "1.1.0");
+        update             = new UpdateType(replacement, constraint);
+        request            = new TransactionType("CSW", "2.0.2", update);
+        result             = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
+
+
+        // we try to request the updated metadata
+        exe = null;
+        try {
+            requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("CTDF02"));
+             worker.getRecordById(requestGRBI);
+        } catch (CstlServiceException ex) {
+            exe = ex;
+        }
+
+        // we must receive an exception saying that the metadata is not present.
+        assertTrue(exe != null);
+        assertEquals(exe.getExceptionCode() , INVALID_PARAMETER_VALUE);
+        assertEquals(exe.getLocator() , "id");
+
+
+        // then we must be sure that the replacement metadata is present
+        requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
+        GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+
+        assertTrue(GRresult != null);
+        assertTrue(GRresult.getAbstractRecord().isEmpty());
+        assertTrue(GRresult.getAny().size() == 1);
+        obj = GRresult.getAny().get(0);
+        assertTrue(obj instanceof DefaultMetadata);
+
+        isoResult = (DefaultMetadata) obj;
+        metadataEquals(replacement, isoResult);
 
         pool.release(unmarshaller);
     }

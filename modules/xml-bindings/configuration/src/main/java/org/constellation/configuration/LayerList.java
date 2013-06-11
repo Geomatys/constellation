@@ -21,7 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -58,12 +58,12 @@ public class LayerList {
     public void setLayer(List<Layer> layer) {
         this.layer = layer;
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof LayerList) {
             final LayerList that = (LayerList) obj;
-            return Utilities.equals(this.layer, that.layer);
+            return Objects.equals(this.layer, that.layer);
         }
         return false;
     }

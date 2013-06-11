@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.configuration.LayerContext;
+import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
 import static org.constellation.process.service.MapProcessUtils.*;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
@@ -70,10 +71,16 @@ public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<File> INSTANCE_DIRECTORY =
             new DefaultParameterDescriptor(INSTANCE_DIRECTORY_NAME, INSTANCE_DIRECTORY_REMARKS, File.class, null, false);
 
+
+    public static final String CAPABILITIES_CONFIG= "capabilities_service_description";
+    private static final String CAPABILITIES_CONFIG_REMARKS = "The capabilities configuration for the new instance.";
+    public static final ParameterDescriptor<LayerContext> CAPABILITIES_CONFIGURATION =
+            new DefaultParameterDescriptor(CAPABILITIES_CONFIG, CAPABILITIES_CONFIG_REMARKS, Object.class, null, false);
+
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY, CAPABILITIES_CONFIGURATION});
 
 
     public static final String OUT_CONFIG_NAME = "out_configuration";
@@ -83,7 +90,6 @@ public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters",
             new GeneralParameterDescriptor[]{OUT_CONFIGURATION});
-
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

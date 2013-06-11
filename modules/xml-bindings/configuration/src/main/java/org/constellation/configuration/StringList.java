@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -37,11 +37,11 @@ public class StringList {
 
     @XmlElement(name="Entry")
     private Collection<String> list;
-    
+
     public StringList() {
-        
+
     }
-    
+
     public StringList(final Collection<String> list) {
         this.list = list;
     }
@@ -56,7 +56,7 @@ public class StringList {
     public void setList(final Collection<String> list) {
         this.list = list;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[StringList]:\n");
@@ -67,12 +67,12 @@ public class StringList {
         }
         return sb.toString();
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof StringList) {
             final StringList that = (StringList) obj;
-            return Utilities.equals(this.list, that.list);
+            return Objects.equals(this.list, that.list);
         }
         return false;
     }

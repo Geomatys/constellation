@@ -30,7 +30,7 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -42,17 +42,17 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonTy
      * identifier secondary of the table.
      */
     private String idOffering;
-    
+
     /**
      * a link to the reference table.
      */
     private PhenomenonTable phenomenons;
-    
+
      /**
      * un lien vers la table des phenomenes compose.
      */
     private CompositePhenomenonTable compositePhenomenons;
-    
+
     /**
      * Build a new offering phenomenon table.
      *
@@ -61,7 +61,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonTy
     public OfferingPhenomenonTable(final Database database) {
         this(new OfferingPhenomenonQuery(database));
     }
-    
+
     /**
      * Build a new offering phenomenon table not shared.
      */
@@ -83,13 +83,13 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonTy
     private OfferingPhenomenonTable(final OfferingPhenomenonQuery query) {
         super(query,query.byPhenomenon);
     }
-    
-    
+
+
     @Override
     protected OfferingPhenomenonType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingPhenomenonQuery query = (OfferingPhenomenonQuery) super.query;
         PhenomenonType phenomenon;
-        
+
         if (!results.getString(indexOf(query.phenomenon)).isEmpty()) {
             if (phenomenons == null) {
                 phenomenons = getDatabase().getTable(PhenomenonTable.class);
@@ -98,12 +98,12 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonTy
         } else {
             if (compositePhenomenons == null) {
                 compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
-        } 
+        }
             phenomenon = compositePhenomenons.getEntry(results.getString(indexOf(query.compositePhenomenon)));
         }
         return new OfferingPhenomenonType(results.getString(indexOf(query.idOffering)), phenomenon);
     }
-    
+
     /**
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
@@ -113,22 +113,22 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonTy
         final OfferingPhenomenonQuery query = (OfferingPhenomenonQuery) super.query;
         if (! type.equals(QueryType.INSERT))
             statement.setString(indexOf(query.byOffering), idOffering);
-        
+
     }
-    
-    
+
+
     public synchronized String getIdOffering() {
         return idOffering;
     }
-    
+
     public synchronized void setIdOffering(String idOffering) {
-        if (!Utilities.equals(this.idOffering, idOffering)) {
+        if (!Objects.equals(this.idOffering, idOffering)) {
             this.idOffering = idOffering;
             fireStateChanged("idOffering");
         }
-        
+
     }
-    
+
     /**
      * Insere un nouveau capteur a un offering dans la base de donnée.
      *

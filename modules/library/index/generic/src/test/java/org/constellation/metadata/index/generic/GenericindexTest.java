@@ -18,6 +18,8 @@
 package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.util.logging.Logging;
 import java.io.File;
@@ -56,6 +58,7 @@ import org.geotoolkit.metadata.iso.extent.DefaultTemporalExtent;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
+import org.junit.runner.RunWith;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //Junit dependencies
@@ -69,6 +72,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class GenericindexTest {
 
     protected static final FilterFactory2 FF = (FilterFactory2)
@@ -117,6 +121,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 1)
     public void simpleSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -244,6 +249,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 2)
     public void wildCharSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -387,6 +393,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 3)
     public void numericComparisonSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -489,6 +496,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 4)
     public void dateSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -638,6 +646,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 5)
     public void sortedSearchTest() throws Exception {
 
         Filter nullFilter   = null;
@@ -818,6 +827,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 6)
     public void spatialSearchTest() throws Exception {
 
         String resultReport = "";
@@ -887,6 +897,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 7)
     public void TermQueryTest() throws Exception {
 
         /**
@@ -923,6 +934,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 8)
     public void DeleteDocumentTest() throws Exception {
         indexer.removeDocument("CTDF02");
 
@@ -957,6 +969,7 @@ public class GenericindexTest {
 
 
     @Test
+    @Order(order = 9)
     public void extractValuesTest() throws Exception {
         DefaultMetadata meta = new DefaultMetadata();
         DefaultDataIdentification ident = new DefaultDataIdentification();
@@ -1006,6 +1019,7 @@ public class GenericindexTest {
     }
 
     @Test
+    @Order(order = 10)
     public void extractValuesTest2() throws Exception {
 
         DefaultMetadata meta4 = new DefaultMetadata();

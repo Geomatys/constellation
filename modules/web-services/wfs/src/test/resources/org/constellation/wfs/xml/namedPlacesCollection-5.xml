@@ -33,7 +33,7 @@
                         <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
                             <gml:exterior>
                                 <gml:LinearRing>
-                                    <gml:posList>0.0020 0.0024 0.0042 0.0024 0.0042 6.0E-4 0.0014 6.0E-4 0.0014 0.0010 0.0020 0.0024</gml:posList>
+                                    <gml:posList>0.002 0.0024 0.0042 0.0024 0.0042 6.0E-4 0.0014 6.0E-4 0.0014 0.001 0.002 0.0024</gml:posList>
                                 </gml:LinearRing>
                             </gml:exterior>
                         </gml:Polygon>

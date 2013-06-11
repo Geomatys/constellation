@@ -277,7 +277,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * {@inheritDoc}
      */
     @Override
-    protected void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException {
+    protected void configureInstance(final File instanceDirectory, final Object configuration, final Object capabilitiesConfiguration) throws CstlServiceException {
         if (configuration instanceof SOSConfiguration) {
             final File configurationFile = new File(instanceDirectory, "config.xml");
             try {
@@ -296,13 +296,13 @@ public class SOService extends OGCWebService<SOSworker> {
      * {@inheritDoc}
      */
     @Override
-    protected void basicConfigure(final File instanceDirectory) throws CstlServiceException {
+    protected void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException {
         final SOSConfiguration baseConfig = new SOSConfiguration(new Automatic(null, new BDD()), new Automatic(null, new BDD()));
         baseConfig.setObservationReaderType(DataSourceType.FILESYSTEM);
         baseConfig.setObservationFilterType(DataSourceType.LUCENE);
         baseConfig.setObservationWriterType(DataSourceType.FILESYSTEM);
         baseConfig.setSMLType(DataSourceType.FILESYSTEM);
-        configureInstance(instanceDirectory, baseConfig);
+        configureInstance(instanceDirectory, baseConfig, capabilitiesConfiguration);
     }
 
     /**
