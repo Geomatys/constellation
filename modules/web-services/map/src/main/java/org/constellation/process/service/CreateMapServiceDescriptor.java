@@ -71,10 +71,16 @@ public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<File> INSTANCE_DIRECTORY =
             new DefaultParameterDescriptor(INSTANCE_DIRECTORY_NAME, INSTANCE_DIRECTORY_REMARKS, File.class, null, false);
 
+
+    public static final String CAPABILITIES_CONFIG= "capabilities_service_description";
+    private static final String CAPABILITIES_CONFIG_REMARKS = "The capabilities configuration for the new instance.";
+    public static final ParameterDescriptor<LayerContext> CAPABILITIES_CONFIGURATION =
+            new DefaultParameterDescriptor(CAPABILITIES_CONFIG, CAPABILITIES_CONFIG_REMARKS, Object.class, null, false);
+
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY, CAPABILITIES_CONFIGURATION});
 
 
     public static final String OUT_CONFIG_NAME = "out_configuration";
@@ -84,11 +90,6 @@ public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters",
             new GeneralParameterDescriptor[]{OUT_CONFIGURATION});
-
-    public static final String CAPABILITIES_CONFIG= "capabilities_service_description";
-    private static final String CAPABILITIES_CONFIG_REMARKS = "The LayerContext configuration for the new instance.";
-    public static final ParameterDescriptor<LayerContext> CAPABILITIES_CONFIGURATION =
-            new DefaultParameterDescriptor(CAPABILITIES_CONFIG, CAPABILITIES_CONFIG_REMARKS, Object.class, null, false);
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

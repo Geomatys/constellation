@@ -168,6 +168,7 @@
         <mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>
         <mapfaces.version>0.9-SNAPSHOT</mapfaces.version>
         <jersey.version>1.11</jersey.version>
+        <juzu.version>0.7.0-beta9-SNAPSHOT</juzu.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
         <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>

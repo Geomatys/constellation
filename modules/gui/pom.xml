@@ -41,10 +41,6 @@
         </developer>
     </developers>
 
-    <properties>
-        <juzu.version>0.7.0-beta9-SNAPSHOT</juzu.version>
-    </properties>
-
     <dependencies>
         <!-- Application dependencies-->
         <dependency>

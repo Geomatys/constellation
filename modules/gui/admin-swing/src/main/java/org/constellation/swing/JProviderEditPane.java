@@ -39,9 +39,12 @@ import org.geotoolkit.gui.swing.propertyedit.JFeatureOutLine;
 import org.geotoolkit.gui.swing.propertyedit.LayerStylePropertyPanel;
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JAdvancedStylePanel;
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JClassificationIntervalStylePanel;
+import org.geotoolkit.gui.swing.propertyedit.styleproperty.JClassificationJenksPanel;
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JClassificationSingleStylePanel;
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JRasterColorMapStylePanel;
+import org.geotoolkit.gui.swing.propertyedit.styleproperty.JSLDImportExportPanel;
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JSimpleStylePanel;
+import org.geotoolkit.gui.swing.resource.MessageBundle;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.parameter.Parameters;
@@ -217,13 +220,16 @@ public class JProviderEditPane extends javax.swing.JPanel {
         layer.setStyle(style);
 
         LayerStylePropertyPanel editors = new LayerStylePropertyPanel();
-        editors.addPropertyPanel(new JSimpleStylePanel());
-        editors.addPropertyPanel(new JClassificationSingleStylePanel());
-        editors.addPropertyPanel(new JClassificationIntervalStylePanel());
-        editors.addPropertyPanel(new JRasterColorMapStylePanel());
-        editors.addPropertyPanel(new JAdvancedStylePanel());
+        editors.addPropertyPanel(MessageBundle.getString("analyze"),new JSimpleStylePanel());
+        editors.addPropertyPanel(MessageBundle.getString("analyze_vector"),new JClassificationSingleStylePanel());
+        editors.addPropertyPanel(MessageBundle.getString("analyze_vector"),new JClassificationIntervalStylePanel());
+        editors.addPropertyPanel(MessageBundle.getString("analyze_raster"),new JClassificationJenksPanel());
+        editors.addPropertyPanel(MessageBundle.getString("analyze_raster"),new JRasterColorMapStylePanel());
+        editors.addPropertyPanel(MessageBundle.getString("sld"),new JAdvancedStylePanel());
+        editors.addPropertyPanel(MessageBundle.getString("sld"),new JSLDImportExportPanel());
+
         editors.setTarget(layer);
-        
+
         final JPanel north = new JPanel(new BorderLayout());
         north.add(BorderLayout.WEST,lbl);
         north.add(BorderLayout.CENTER,textField);
