@@ -24,7 +24,7 @@
         <dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-core</artifactId>
-            <version>${juzu.version}</version>
+            <version>0.7.0-beta11-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

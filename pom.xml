@@ -168,7 +168,6 @@
         <mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>
         <mapfaces.version>0.9-SNAPSHOT</mapfaces.version>
         <jersey.version>1.11</jersey.version>
-        <juzu.version>0.7.0-beta9-SNAPSHOT</juzu.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
         <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
@@ -813,7 +812,7 @@
             <dependency>
                 <groupId>postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>9.1-901.jdbc4</version>
+                <version>9.1-901-1.jdbc4</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
@@ -888,40 +887,89 @@
   -->
     <repositories>
         <repository>
-            <id>snapshots</id>
-            <name>geomatys repo snapshots</name>
-            <url>http://maven2.geomatys.com/repository/snapshots/</url>
+            <id>java.net.1</id>
+            <name>java.net community</name>
+            <url>http://download.java.net/maven/1</url>
+            <!--layout>legacy</layout-->
             <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
-            <id>internal</id>
-            <name>geomatys repo internal</name>
-            <url>http://maven2.geomatys.com/repository/internal/</url>
+            <id>java.net.2</id>
+            <name>java.net community</name>
+            <url>http://download.java.net/maven/2</url>
             <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>java.net.glassfish</id>
+            <name>java.net community</name>
+            <url>http://download.java.net/maven/glassfish</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>geomatys</id>
+            <name>Builds from Geomatys</name>
+            <url>http://maven.geomatys.com</url>
+        </repository>
+        <repository>
+            <id>geotoolkit</id>
+            <name>GeoToolkit repository</name>
+            <url>http://maven.geotoolkit.org</url>
+        </repository>
+        <!--repository>
+            <id>jboss.com</id>
+            <name>Jboss</name>
+            <url>http://repository.jboss.com/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository-->
+         <repository>
+            <id>jboss nexus</id>
+            <name>Jboss nexus</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>repo1.maven.org</id>
+            <name>repo1.maven.org</name>
+            <url>http://repo1.maven.org/maven2/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>ettrema-repo</id>
+            <url>http://www.ettrema.com/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
-            <id>internal</id>
-            <name>geomatys repo internal</name>
-            <url>http://maven2.geomatys.com/repository/internal/</url>
-            <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
+            <id>geomatys</id>
+            <name>Builds from Geomatys</name>
+            <url>http://maven.geomatys.com</url>
         </pluginRepository>
         <pluginRepository>
-            <id>snapshots</id>
-            <name>geomatys repo snapshots</name>
-            <url>http://maven2.geomatys.com/repository/snapshots/</url>
-            <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
+            <id>geotoolkit</id>
+            <name>Builds from Geotoolkit</name>
+            <url>http://maven.geotoolkit.org</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven2-repository.dev.java.net</id>
+            <url>http://download.java.net/maven/2</url>
         </pluginRepository>
     </pluginRepositories>
+
 
 
     <!--

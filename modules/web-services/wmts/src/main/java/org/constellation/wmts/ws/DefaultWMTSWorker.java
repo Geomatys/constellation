@@ -183,21 +183,20 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         // and the list of matrix set
         final List<TileMatrixSet> tileSets = new ArrayList<TileMatrixSet>();
 
-        final Map<Name,Layer> declaredLayers = getLayers(userLogin);
+        final List<Layer> declaredLayers = getConfigurationLayers(userLogin);
 
-        for(final Name n : declaredLayers.keySet()){
-            final LayerDetails details = getLayerReference(userLogin, n);
-            final Layer configlayer    = declaredLayers.get(n);
+       for (final Layer configLayer : declaredLayers){
+            final LayerDetails details = getLayerReference(userLogin, configLayer.getName());
             final Object origin        = details.getOrigin();
             if(!(origin instanceof CoverageReference)){
                 //WMTS only handle CoverageReference object
-                LOGGER.log(Level.INFO, "Layer {0} has not a coverageReference origin. It will not be included in capabilities", n.getLocalPart());
+                LOGGER.log(Level.INFO, "Layer {0} has not a coverageReference origin. It will not be included in capabilities", configLayer.getName());
                 continue;
             }
             final CoverageReference ref = (CoverageReference) origin;
             if(!(ref instanceof PyramidalModel)){
                 //WMTS only handle PyramidalModel
-                LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", n.getLocalPart());
+                LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", configLayer.getName());
                 continue;
             }
 
@@ -205,10 +204,10 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 final PyramidalModel pmodel = (PyramidalModel) ref;
                 final PyramidSet set = pmodel.getPyramidSet();
                 final String name;
-                if (configlayer.getAlias() != null && !configlayer.getAlias().isEmpty()) {
-                    name = configlayer.getAlias().trim().replaceAll(" ", "_");
+                if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
+                    name = configLayer.getAlias().trim().replaceAll(" ", "_");
                 } else {
-                    name = n.getLocalPart();
+                    name = configLayer.getName().getLocalPart();
                 }
 
                 Envelope env = set.getEnvelope();
@@ -398,19 +397,9 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     public TileReference getTile(final GetTile request) throws CstlServiceException {
 
         //1 LAYER NOT USED FOR NOW
-        Name layerName = Util.parseLayerName(request.getLayer());
+        final Name layerName = Util.parseLayerName(request.getLayer());
         final String userLogin  = getUserLogin();
         
-        //switch alias -> name
-        final Map<Name,Layer> declaredLayers = getLayers(userLogin);
-        if(declaredLayers != null){
-            for(Entry<Name,Layer> entry : declaredLayers.entrySet()){
-                if(layerName.getLocalPart().equalsIgnoreCase(entry.getValue().getAlias())){
-                    layerName = entry.getKey();
-                }
-            }
-        }
-
         // 2. PARAMETERS NOT USED FOR NOW
         Double elevation =  null;
         Date time        = null;

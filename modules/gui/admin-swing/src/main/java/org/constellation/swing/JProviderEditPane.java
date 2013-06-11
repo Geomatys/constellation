@@ -227,9 +227,8 @@ public class JProviderEditPane extends javax.swing.JPanel {
         editors.addPropertyPanel(MessageBundle.getString("analyze_raster"),new JRasterColorMapStylePanel());
         editors.addPropertyPanel(MessageBundle.getString("sld"),new JAdvancedStylePanel());
         editors.addPropertyPanel(MessageBundle.getString("sld"),new JSLDImportExportPanel());
-
         editors.setTarget(layer);
-
+        
         final JPanel north = new JPanel(new BorderLayout());
         north.add(BorderLayout.WEST,lbl);
         north.add(BorderLayout.CENTER,textField);

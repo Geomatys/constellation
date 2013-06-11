@@ -201,7 +201,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                         coverage + "\".", LAYER_NOT_QUERYABLE, KEY_COVERAGE.toLowerCase());
             }
             
-            final Layer configLayer = getLayers(userLogin).get(layerRef.getName());
+            final Layer configLayer = getConfigurationLayer(layerRef.getName(), userLogin);
             final Name fullCoverageName = coverageRef.getName();
             final String coverageName;
             if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
@@ -449,11 +449,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         
         
         final List<CoverageInfo> offBrief = new ArrayList<CoverageInfo>();
-        final Map<Name,Layer> layers = getLayers(userLogin);
+        final List<Layer> layers = getConfigurationLayers(userLogin);
         try {
-            for (Name name : layers.keySet()) {
-                final LayerDetails layer = getLayerReference(userLogin, name);
-                final Layer configLayer  = layers.get(name);
+            for (Layer configLayer : layers) {
+                final LayerDetails layer = getLayerReference(userLogin, configLayer.getName());
 
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
                     continue;
