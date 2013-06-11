@@ -39,13 +39,13 @@ public class WMSController {
     @View
     @Route("/wms")
     public Response index() throws IOException {
-        return index.ok();
+        return index.ok().withMimeType("text/html");
     }
 
     @View
     @Route("/wms/success")
     public Response success() throws IOException {
-        return success.ok();
+        return success.ok().withMimeType("text/html");
     }
 
 

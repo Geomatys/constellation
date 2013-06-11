@@ -52,14 +52,14 @@ public class Controller {
 
     @View
     @Route("/")
-    public void index() {
-        index.render();
+    public Response index() {
+        return index.ok().withMimeType("text/html");
     }
 
     @View
     @Route("/webservices")
-    public void webservices() {
-        webServices.render();
+    public Response  webservices() {
+        return webServices.ok().withMimeType("text/html");
     }
 
     @Action
