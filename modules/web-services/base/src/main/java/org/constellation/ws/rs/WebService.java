@@ -407,11 +407,11 @@ public abstract class WebService {
         try {
             ObjectMapper mapper = new ObjectMapper();
             Service toCreateService = mapper.readValue(is, Service.class);
-            treatIncomingRequest(toCreateService);
+            return treatIncomingRequest(toCreateService);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "", e);
         }
-        return Response.ok().build();
+        return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     protected abstract boolean isRequestValidationActivated(final String workerID);

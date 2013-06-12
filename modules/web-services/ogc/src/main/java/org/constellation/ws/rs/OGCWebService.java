@@ -594,8 +594,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         if (serviceDirectory != null && serviceDirectory.isDirectory()) {
             final File instanceDirectory = new File (serviceDirectory, identifier);
             if (instanceDirectory.mkdir()) {
-
-
 //                reset
                 if(objectRequest!= null && objectRequest instanceof Service){
                     Service tocreated = (Service) objectRequest;

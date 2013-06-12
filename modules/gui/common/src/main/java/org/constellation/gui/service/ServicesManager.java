@@ -19,17 +19,18 @@ public class ServicesManager {
     public ServicesManager() {
     }
 
-    public void createServices(Service createdService, String service) {
+    public boolean createServices(Service createdService, String service) {
         if (createdService != null) {
             LOGGER.log(Level.INFO, "service will be created : " + createdService.getName());
             URL serverUrl = null;
             try {
-                serverUrl = new URL("http://localhost:8080/constellation/WS/");
+                serverUrl = new URL("http://localhost:8090/constellation/WS/");
                 ConstellationServer cs = new ConstellationServer(serverUrl, "admin", "admin");
-                cs.services.newInstance(service, createdService);
+                return cs.services.newInstance(service, createdService);
             } catch (MalformedURLException e) {
                 LOGGER.log(Level.WARNING, "error on url", e);
             }
         }
+        return false;
     }
 }

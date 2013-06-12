@@ -21,6 +21,7 @@ import juzu.Response;
 import juzu.Route;
 import juzu.View;
 import juzu.template.Template;
+import org.constellation.dto.Service;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -32,21 +33,10 @@ public class WMSController {
     @Path("wmscreate.gtmpl")
     Template index;
 
-    @Inject
-    @Path("wmssuccess.gtmpl")
-    Template success;
-
     @View
     @Route("/wms")
     public Response index() throws IOException {
         return index.ok().withMimeType("text/html");
     }
-
-    @View
-    @Route("/wms/success")
-    public Response success() throws IOException {
-        return success.ok().withMimeType("text/html");
-    }
-
 
 }

@@ -60,12 +60,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
-import java.io.BufferedReader;
+import javax.xml.ws.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -1406,12 +1405,14 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
                 if (request instanceof String) {
                     String sRequest = (String) request;
-                    return doJsonPost(sRequest, conec);
+                    doJsonPost(sRequest, conec, unmarshallerPool, descriptor);
 
                 } else {
-                    return doXMLPost(request, conec, unmarshallerPool, descriptor);
+                    doXMLPost(request, conec, unmarshallerPool, descriptor);
 
                 }
+
+                return readResponse(descriptor, unmarshallerPool, conec);
             }
 
         } catch (IOException ex) {
@@ -1421,13 +1422,53 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         return null;
     }
 
+    private Object readResponse(ParameterDescriptorGroup descriptor, MarshallerPool unmarshallerPool, HttpURLConnection conec) throws IOException {
+        if (unmarshallerPool == null) {
+            //use default pool
+            unmarshallerPool = POOL;
+        }
+
+        Object response = null;
+        readSessionId(conec);
+        Unmarshaller unmarshaller = null;
+        try {
+            unmarshaller = unmarshallerPool.acquireUnmarshaller();
+            final InputStream responseStream = AbstractRequest.openRichException(conec, getClientSecurity());
+            response = unmarshaller.unmarshal(responseStream);
+            if (response instanceof JAXBElement) {
+                JAXBElement element = (JAXBElement) response;
+                if (element.getName().equals(ObjectFactory.SOURCE_QNAME)
+                        || element.getName().equals(ObjectFactory.LAYER_QNAME)
+                        || element.getName().equals(ObjectFactory.INPUT_QNAME)) {
+                    final ParameterValueReader reader = new ParameterValueReader(descriptor);
+                    reader.setInput(element.getValue());
+                    response = reader.read();
+                } else {
+                    response = ((JAXBElement) response).getValue();
+                }
+            }
+
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
+        } catch (XMLStreamException ex) {
+            LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read xml response document.\ncause: {0}", ex.getMessage());
+        } catch (IllegalAccessError ex) {
+            LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
+        } finally {
+            if (unmarshaller != null) {
+                unmarshallerPool.release(unmarshaller);
+            }
+        }
+        return response;
+    }
+
     /**
      * @param request
      * @param conec
+     * @param unmarshallerPool
+     * @param descriptor
      */
-    private Object doJsonPost(String request, HttpURLConnection conec) {
-        Object response = null;
-
+    private void doJsonPost(String request, HttpURLConnection conec, MarshallerPool unmarshallerPool, ParameterDescriptorGroup descriptor) {
         try {
             conec.setRequestMethod("POST");
             conec.setRequestProperty("Content-Type", "application/json");
@@ -1438,21 +1479,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 throw new RuntimeException("Failed : HTTP error code : "
                         + conec.getResponseCode());
             }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (conec.getInputStream())));
-
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
-            }
-
-            conec.disconnect();
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "", e);
         }
-        return response;
     }
 
 
@@ -1465,7 +1494,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      * @param descriptor
      * @throws IOException
      */
-    private Object doXMLPost(Object request, HttpURLConnection conec, MarshallerPool unmarshallerPool, ParameterDescriptorGroup descriptor) throws IOException {
+    private void doXMLPost(Object request, HttpURLConnection conec, MarshallerPool unmarshallerPool, ParameterDescriptorGroup descriptor) throws IOException {
         Object response = null;
 
         conec.setRequestProperty("Content-Type", "text/xml");
@@ -1520,42 +1549,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 }
             }
         }
-
-        if (unmarshallerPool == null) {
-            //use default pool
-            unmarshallerPool = POOL;
-        }
-
-        readSessionId(conec);
-        Unmarshaller unmarshaller = null;
-        try {
-            unmarshaller = unmarshallerPool.acquireUnmarshaller();
-            final InputStream responseStream = AbstractRequest.openRichException(conec, getClientSecurity());
-            response = unmarshaller.unmarshal(responseStream);
-            if (response instanceof JAXBElement) {
-                JAXBElement element = (JAXBElement) response;
-                if (element.getName().equals(ObjectFactory.SOURCE_QNAME)
-                        || element.getName().equals(ObjectFactory.LAYER_QNAME)
-                        || element.getName().equals(ObjectFactory.INPUT_QNAME)) {
-                    final ParameterValueReader reader = new ParameterValueReader(descriptor);
-                    reader.setInput(element.getValue());
-                    response = reader.read();
-                } else {
-                    response = ((JAXBElement) response).getValue();
-                }
-            }
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
-        } catch (XMLStreamException ex) {
-            LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read xml response document.\ncause: {0}", ex.getMessage());
-        } catch (IllegalAccessError ex) {
-            LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
-        } finally {
-            if (unmarshaller != null) {
-                unmarshallerPool.release(unmarshaller);
-            }
-        }
-        return response;
     }
 
     /**

@@ -1,0 +1,95 @@
+#{decorate path=menu.gtmpl/}
+#{param name=service/}
+#{param name=type/}
+#{param name=versions/}
+#{param name=created/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="images/constellation.png"/>
+    </div>
+    <div class="span4 offset6">
+        <div class="dropdown">
+            <a data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle">
+                <span class="icon-plus icon-white" style="margin-top: 0px;"></span>
+                &{webservicepage.button.create.label}
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="wms">&{webservicepage.button.dropdown.wms.label}</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="row" style="height:30px;">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <%if(created) {%>
+                    <a class="brand" href="#">Service créé avec succès</a>
+                <%} else {%>
+                    <a class="brand" href="#">Erreur lors de la création</a>
+                <%}%>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+        <%if(created){%>
+            <div class="span11 alert alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                Félicitation ! Votre service <strong>${service.name}</strong> a été créé avec succès !
+            </div>
+            <div class="span11">
+                <p class="lead"><span class="badge badge-success">&nbsp;</span> ${service.name}</p>
+            </div>
+            <div class="span6">
+                <div class="well">
+                    <div class="row">
+                        <div class="offset4 span2">
+                            <div class="btn-group">
+                                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <i class="icon-wrench"></i>
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Editer</a></li>
+                                    <li><a href="#">GetCapabilities</a></li>
+                                    <li><a href="#">Log de démarrage</a></li>
+                                    <li><a href="#">Supprimer le service</a></li>
+                                </ul>
+                            </div>
+                            <a class="btn btn-info" href="#"><i class="icon-refresh"></i></a>
+                            <a class="btn btn-danger" href="#"><i class="icon-stop"></i></a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="span3">
+                            <p><strong>Type de service</strong> &nbsp; ${type}</p>
+                            <p><strong>Version</strong> &nbsp;
+                                <% for (def version : versions) {%>
+                                    ${version}
+                                <%}%>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="span6">
+                            <dl>
+                                <dt>Description du service</dt>
+                                <dd>${service.description}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="offset1 span4">
+                <a class="btn btn-large" href="#"><i class="icon-plus-sign"></i> Ajouter des couches au service</a>
+            </div>
+        <%}else{%>
+            <div class="span11 alert alert-error">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                Erreur ! Votre service <strong>${service.name}</strong> n'a pas été créé!
+            </div>
+        <%}%>
+    </div>
+</div>

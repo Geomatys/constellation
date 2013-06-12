@@ -18,6 +18,7 @@ package org.constellation.gui;
 
 import juzu.Action;
 import juzu.Path;
+import juzu.PropertyType;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
@@ -46,6 +47,10 @@ public class Controller {
     @Inject
     @Path("webservices.gtmpl")
     protected Template webServices;
+
+    @Inject
+    @Path("wmssuccess.gtmpl")
+    org.constellation.gui.templates.wmssuccess success;
 
     @Inject
     protected ResourceBundle bundle;
@@ -82,7 +87,15 @@ public class Controller {
 
         createdService.setServiceConstraints(serviceConstraint);
         createdService.setServiceContact(serviceContact);
-        servicesManager.createServices(createdService, "WMS");
-        return WMSController_.success();
+        boolean created = servicesManager.createServices(createdService, "WMS");
+        System.out.println(created);
+        return Controller_.succeded(createdService, "WMS", versionList, created + "");
+    }
+
+    @View
+    @Route("/succeded")
+    public Response succeded(Service createdService, String type, List<String> versionList, String created){
+        Boolean create = Boolean.parseBoolean(created);
+        return success.with().service(createdService).type(type).versions(versionList).created(create).ok().withMimeType("text/html");
     }
 }
