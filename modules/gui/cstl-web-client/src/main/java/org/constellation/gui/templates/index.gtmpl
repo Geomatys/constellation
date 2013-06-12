@@ -1,6 +1,6 @@
 #{decorate path=menu.gtmpl/}
 
-
+<!-- Head -->
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span4">
         <img src="images/constellation.png"/>
@@ -9,7 +9,9 @@
         <h2>&{homepage.title}</h2>
     </div>
 </div>
+
 <div class="row-fluid">
+    <!-- Service block -->
     <div class="span6 well">
         <div class="row-fluid">
             <div class="span4">
@@ -34,6 +36,8 @@
             </div>
         </div>
     </div>
+
+    <!-- data block -->
     <div class="span6 well">
         <div class="row-fluid">
             <div class="span4">
@@ -48,6 +52,7 @@
     </div>
 </div>
 <div class="row-fluid">
+    <!-- mapcontext block -->
     <div class="span6 well">
         <div class="row-fluid">
             <div class="span4">
@@ -60,6 +65,8 @@
             </div>
         </div>
     </div>
+
+    <!-- geoviewer block -->
     <div class="span6 well">
         <div class="row-fluid">
             <div class="span4">
@@ -73,7 +80,9 @@
         </div>
     </div>
 </div>
+
 <div class="row-fluid">
+    <!-- statistic block -->
     <div class="span12 well">
         <div class="row-fluid">
             <div style="display: table;width: 100%;">

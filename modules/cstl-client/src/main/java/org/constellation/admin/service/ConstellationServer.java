@@ -60,7 +60,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.ws.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -123,6 +122,8 @@ import static org.constellation.api.QueryConstants.REQUEST_UPDATE_TASK;
  *
  * @author Guilhem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
+ * @author Benjamin Garcia (Geomatys)
+ * @version 0.9
  */
 public class ConstellationServer<S extends Services, P extends Providers, C extends Csws, T extends Tasks> extends AbstractServer {
 

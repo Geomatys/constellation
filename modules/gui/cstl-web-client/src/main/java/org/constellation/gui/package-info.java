@@ -1,38 +1,58 @@
 /*
- * Copyright 2013 eXo Platform SAS
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *    (C) 2007 - 2012, Geomatys
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 
-
+/*
+ * Juzu application declaration. List all alias need to run cstl-web-client
+ */
 @juzu.Application(defaultController = Controller.class, resourceAliases = {
-        @Alias(of = "/org/constellation/gui/templates/commonIndex.gtmpl", as = "commonIndex.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/menu.gtmpl", as = "menu.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/wmsdescription.gtmpl", as = "wmsdescription.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/wmsmetadata.gtmpl", as = "wmsmetadata.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wmssuccess.gtmpl", as = "wmssuccess.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/wmscreate.gtmpl", as = "wmscreate.gtmpl")})
 
+/*
+ * Declare servlet Base URL and which bundle used
+ */
 @juzu.plugin.servlet.Servlet(value = "/", resourceBundle = "locale.cstl")
 
+/*
+ * Less file loaded
+ */
 @Less(value = "bootstrap/bootstrap.less", minify = true)
 
+/*
+ * javascript and css loaded
+ */
 @Assets(stylesheets = @Stylesheet(src = "bootstrap/bootstrap.css"),
         scripts = {@Script(id = "jQuery", src = "js/jquery-2.0.0.js"),
                 @Script(id = "collapse", src = "js/bootstrap-collapse.js", depends = "jQuery"),
                 @Script(id = "tooltip", src = "js/bootstrap-tooltip.js", depends = "jQuery"),
                 @Script(id = "alert", src = "js/bootstrap-alert.js", depends = "jQuery"),
-                @Script(id = "dropdown", src = "js/bootstrap-dropdown.js", depends = "jQuery")}) package org.constellation.gui;
+                @Script(id = "dropdown", src = "js/bootstrap-dropdown.js", depends = "jQuery")})
+
+/**
+ * Constellation web client main part.
+ * It's the start point and declaration of all other part used
+ *
+ * @author Benjamin Garcia (Geomatys)
+ * @version 0.9
+ * @since 0.9
+ */
+package org.constellation.gui;
 
 import juzu.Alias;
 import juzu.plugin.asset.Assets;
