@@ -101,7 +101,6 @@
     <!-- =========================================================== -->
     <modules>
         <module>admin-swing</module>
-        <module>cstl-services</module>
         <module>administration</module>
         <module>common</module>
         <module>data</module>
