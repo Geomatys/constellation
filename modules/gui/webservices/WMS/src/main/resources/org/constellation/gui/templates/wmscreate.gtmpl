@@ -1,16 +1,24 @@
 #{decorate path=menu.gtmpl/}
 
+<!-- Header -->
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
         <img src="images/constellation.png"/>
     </div>
 </div>
+
+<!-- Form to create WMS service -->
 <form class="form-horizontal" action="@{createWMSService()}" method="post">
     #{include path=wmsdescription.gtmpl/}
     #{include path=wmsmetadata.gtmpl/}
 </form>
+
+<!-- Javascript part to manage pagination and tooltip on wms creation page -->
 <script type="text/javascript">
+    // on load hide metadata part
     jQuery('#metadata').fadeToggle();
+
+    //tooltip managment
     jQuery('#layerlimitGroup').tooltip({
         html:true,
         placement: "bottom",
@@ -25,20 +33,32 @@
         trigger: "hover"});
 
 
+    /**
+     * hide metadata part when back on description part
+     */
     function goToDescription(){
         jQuery('#metadata').fadeToggle(toggleDescription);
     }
 
+    /**
+     * toggle description part
+     */
     function toggleDescription(){
         jQuery('#description').fadeToggle();
     }
 
+    /**
+     * switch from description to metadata.
+     */
     function goToMetadata(){
         //add service name on top left div
         $('#NewServiceName').append($('#name').val())
         jQuery('#description').fadeToggle(toggleMetadata);
     }
 
+    /**
+     * toggle metadata part
+     */
     function toggleMetadata(){
         jQuery('#metadata').fadeToggle();
     }

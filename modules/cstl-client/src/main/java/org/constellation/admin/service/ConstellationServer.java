@@ -516,14 +516,18 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * Create a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
          *
          * @param serviceType : The service type (wms, wfs, csw,...).
-         * @param service     : {@link Service} dto object to post JSON
+         * @param service     : {@link Service} DTO object to post JSON
          * @return true if the operation succeed
          */
         public boolean newInstance(String serviceType, Service service) {
             try {
                 final String url = getURLWithEndSlash() + serviceType.toLowerCase() + "/admin?request=newInstance&id=" + service.getIdentifier();
+
+                // transform object to JSON
                 ObjectMapper mapper = new ObjectMapper();
                 String json = mapper.writeValueAsString(service);
+
+                //send request
                 return sendRequestAck(url, json);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, "error", ex);
@@ -1404,12 +1408,13 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     conec.setRequestMethod("PUT");
                 }
 
+                //if request is String, it's a json part
                 if (request instanceof String) {
                     String sRequest = (String) request;
-                    doJsonPost(sRequest, conec, unmarshallerPool, descriptor);
+                    doJsonPost(sRequest, conec);
 
                 } else {
-                    doXMLPost(request, conec, unmarshallerPool, descriptor);
+                    doXMLPost(request, conec);
 
                 }
 
@@ -1423,6 +1428,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         return null;
     }
 
+    /**
+     * Unmarshall server response.
+     *
+     * @param descriptor used to transform XML
+     * @param unmarshallerPool Pool to load unmarshaller
+     * @param conec {@link HttpURLConnection} to access to constellation server side
+     * @return an object which contains service state (create or not for example)
+     * @throws IOException
+     */
     private Object readResponse(ParameterDescriptorGroup descriptor, MarshallerPool unmarshallerPool, HttpURLConnection conec) throws IOException {
         if (unmarshallerPool == null) {
             //use default pool
@@ -1464,15 +1478,17 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     }
 
     /**
-     * @param request
-     * @param conec
-     * @param unmarshallerPool
-     * @param descriptor
+     * Send request with inner JSON
+     * @param request JSON object which define object to send
+     * @param conec {@link HttpURLConnection} to access to constellation server side
      */
-    private void doJsonPost(String request, HttpURLConnection conec, MarshallerPool unmarshallerPool, ParameterDescriptorGroup descriptor) {
+    private void doJsonPost(String request, HttpURLConnection conec) {
         try {
+            //Define request
             conec.setRequestMethod("POST");
             conec.setRequestProperty("Content-Type", "application/json");
+
+            //Send request
             OutputStream os = conec.getOutputStream();
             os.write(request.getBytes());
             os.flush();
@@ -1487,17 +1503,13 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
 
     /**
+     * Send request with inner XML
      *
-     *
-     * @param request
-     * @param conec
-     * @param unmarshallerPool
-     * @param descriptor
+     * @param request object which will be send as XML
+     * @param conec {@link HttpURLConnection} to access to constellation server side
      * @throws IOException
      */
-    private void doXMLPost(Object request, HttpURLConnection conec, MarshallerPool unmarshallerPool, ParameterDescriptorGroup descriptor) throws IOException {
-        Object response = null;
-
+    private void doXMLPost(Object request, HttpURLConnection conec) throws IOException {
         conec.setRequestProperty("Content-Type", "text/xml");
 
         if (request instanceof GeneralParameterValue) {

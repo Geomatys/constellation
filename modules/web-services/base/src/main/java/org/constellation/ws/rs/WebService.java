@@ -401,12 +401,22 @@ public abstract class WebService {
         }
     }
 
+    /**
+     * Map {@link InputStream} send on object required. Call if request content JSON
+     *
+     * @param is {@link InputStream} send by client side
+     *
+     * @return {@link Response} with status
+     */
     @POST
     @Consumes("application/json")
     public Response doPostjSon(InputStream is){
         try {
+            //transform JSON to Service object.
             ObjectMapper mapper = new ObjectMapper();
             Service toCreateService = mapper.readValue(is, Service.class);
+
+            // Call treat
             return treatIncomingRequest(toCreateService);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "", e);

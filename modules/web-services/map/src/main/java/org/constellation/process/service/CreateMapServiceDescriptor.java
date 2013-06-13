@@ -39,6 +39,8 @@ import org.opengis.util.InternationalString;
 /**
  * ProcessDescriptor for create a new Map service like WMS, WMTS, WCS or WFS.
  * @author Quentin Boileau (Geomatys).
+ * @author Benjamin Garcia (Geomatys).
+ *
  */
 public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
 
@@ -72,6 +74,9 @@ public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
             new DefaultParameterDescriptor(INSTANCE_DIRECTORY_NAME, INSTANCE_DIRECTORY_REMARKS, File.class, null, false);
 
 
+    /*
+     * GetCapabilities service part define on sent object
+     */
     public static final String CAPABILITIES_CONFIG= "capabilities_service_description";
     private static final String CAPABILITIES_CONFIG_REMARKS = "The capabilities configuration for the new instance.";
     public static final ParameterDescriptor<LayerContext> CAPABILITIES_CONFIGURATION =

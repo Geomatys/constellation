@@ -1,17 +1,18 @@
 /*
- * Copyright 2013 eXo Platform SAS
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *    (C) 2007 - 2012, Geomatys
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 
 package org.constellation.gui;
@@ -26,13 +27,29 @@ import org.constellation.dto.Service;
 import javax.inject.Inject;
 import java.io.IOException;
 
+/**
+ * WMS service controller. To manage all specific service operations
+ *
+ * @author Benjamin Garcia (Geomatys)
+ * @version 0.9
+ * @since 0.9
+ *
+ */
 public class WMSController {
 
 
+    /**
+     * root wms service page
+     */
     @Inject
     @Path("wmscreate.gtmpl")
     Template index;
 
+    /**
+     * Generate wms service main page
+     * @return a {@link Response} with right mime type
+     * @throws IOException
+     */
     @View
     @Route("/wms")
     public Response index() throws IOException {

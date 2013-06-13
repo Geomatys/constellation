@@ -1,3 +1,4 @@
+<!-- wms creation description part. Its the first form part. -->
 <div id="description">
     <div class="row" style="height:30px;">
         <div class="navbar">
@@ -6,6 +7,7 @@
             </div>
         </div>
     </div>
+    <!-- main part -->
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <div class="span2 well">
             <p><h4>&{wms.create.description.title.label}</h4></p>
@@ -52,6 +54,8 @@
                 </div>
             </fieldset>
         </div>
+
+        <!-- button part to manage pagination -->
         <div class="row">
             <div class="span2 offset10">
             </br>

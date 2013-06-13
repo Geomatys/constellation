@@ -680,7 +680,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * create an empty configuration for the service.
      *
      * @param instanceDirectory The directory containing the instance configuration files.
-     * @param capabilitiesConfiguration
+     * @param capabilitiesConfiguration Define GetCapabilities service part.
      */
     protected abstract void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException;
 
