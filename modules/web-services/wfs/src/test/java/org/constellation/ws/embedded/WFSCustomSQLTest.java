@@ -27,15 +27,12 @@ import javax.xml.bind.JAXBException;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
 
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.geotoolkit.test.xml.DomComparator;
 
-import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;

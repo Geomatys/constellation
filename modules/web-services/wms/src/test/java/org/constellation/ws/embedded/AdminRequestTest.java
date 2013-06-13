@@ -37,7 +37,7 @@ import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.provider.featurestore.FeatureStoreProviderService;
-import org.geotoolkit.data.shapefile.ShapefileFolderDataStoreFactory;
+import org.geotoolkit.data.shapefile.ShapefileFolderFeatureStoreFactory;
 import org.geotoolkit.parameter.Parameters;
 
 // JUnit dependencies
@@ -99,9 +99,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
                         final URL url = new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
                         
                         final ParameterValueGroup choice = getOrCreate(FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
-                        final ParameterValueGroup shapefileConfig = ShapefileFolderDataStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
-                        Parameters.getOrCreate(ShapefileFolderDataStoreFactory.URLFOLDER, shapefileConfig).setValue(url);
-                        Parameters.getOrCreate(ShapefileFolderDataStoreFactory.NAMESPACE, shapefileConfig).setValue(namespace);
+                        final ParameterValueGroup shapefileConfig = ShapefileFolderFeatureStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
+                        Parameters.getOrCreate(ShapefileFolderFeatureStoreFactory.URLFOLDER, shapefileConfig).setValue(url);
+                        Parameters.getOrCreate(ShapefileFolderFeatureStoreFactory.NAMESPACE, shapefileConfig).setValue(namespace);
                         choice.values().add(shapefileConfig);
                         
                         ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());

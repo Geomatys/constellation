@@ -36,9 +36,7 @@ import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
-import org.constellation.provider.featurestore.FeatureStoreProviderService;
 import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
-import org.geotoolkit.data.shapefile.ShapefileFolderDataStoreFactory;
 
 // Geotoolkit dependencies
 import org.geotoolkit.wms.xml.WMSMarshallerPool;

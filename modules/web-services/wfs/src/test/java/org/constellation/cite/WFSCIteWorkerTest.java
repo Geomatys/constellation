@@ -56,7 +56,7 @@ import static org.junit.Assert.*;
 import static org.constellation.provider.featurestore.FeatureStoreProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
-import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
+import static org.geotoolkit.data.postgis.PostgisNGFeatureStoreFactory.*;
 
 
 /**

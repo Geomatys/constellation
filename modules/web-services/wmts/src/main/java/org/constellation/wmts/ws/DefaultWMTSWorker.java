@@ -194,14 +194,14 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 continue;
             }
             final CoverageReference ref = (CoverageReference) origin;
-            if(!(ref instanceof PyramidalModel)){
+            if(!(ref instanceof PyramidalCoverageReference)){
                 //WMTS only handle PyramidalModel
                 LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", configLayer.getName());
                 continue;
             }
 
             try{
-                final PyramidalModel pmodel = (PyramidalModel) ref;
+                final PyramidalCoverageReference pmodel = (PyramidalCoverageReference) ref;
                 final PyramidSet set = pmodel.getPyramidSet();
                 final String name;
                 if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
@@ -451,13 +451,13 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 throw new CstlServiceException("Unvalid layer :" + layerName + " , layer is not a pyramid model" + layerName, INVALID_PARAMETER_VALUE, "layerName");
             }
             final CoverageReference ref = (CoverageReference) origin;
-            if(!(ref instanceof PyramidalModel)){
-                //WMTS only handle PyramidalModel
+            if(!(ref instanceof PyramidalCoverageReference)){
+                //WMTS only handle PyramidalCoverageReference
                 throw new CstlServiceException("Unvalid layer :" + layerName + " , layer is not a pyramid model" + layerName, INVALID_PARAMETER_VALUE, "layerName");
             }
 
 
-            final PyramidalModel model = (PyramidalModel) ref;
+            final PyramidalCoverageReference model = (PyramidalCoverageReference) ref;
             final PyramidSet set = model.getPyramidSet();
             Pyramid pyramid = null;
             for(Pyramid pr : set.getPyramids()){
