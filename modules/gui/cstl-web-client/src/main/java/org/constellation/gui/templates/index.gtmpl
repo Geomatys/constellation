@@ -17,7 +17,7 @@
             <div class="span4">
                 <img src="images/services.png" style="display: block; margin: 0 auto;"/>
                 <p><h3 class="text-center">&{homepage.webservices.title.label}</h3></p>
-                <a href="@{webservices()}" class="btn" style="display: block; margin: 0 auto;">&{homepage.webservices.button.label}</a>
+                <a href="@{webservices()}" class="btn" style="display: block; margin: 0 auto;" id="servicebtn">&{homepage.webservices.button.label}</a>
             </div>
             <div class="span7 offset1" style="font-size:14px">
                 &{homepage.webservices.summary}

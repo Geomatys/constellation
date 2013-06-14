@@ -7,13 +7,13 @@
     <!-- Menu to create services -->
     <div class="span4 offset3">
         <div class="dropdown">
-            <a data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle">
+            <a id="createservice" data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle">
                 <span class="icon-plus icon-white" style="margin-top: 0px;"></span>
                    &{webservicepage.button.create.label}
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a href="wms">&{webservicepage.button.dropdown.wms.label}</a></li>
+                <li><a href="wms" id="wmschoice">&{webservicepage.button.dropdown.wms.label}</a></li>
             </ul>
         </div>
     </div>

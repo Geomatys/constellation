@@ -6,5 +6,5 @@
 
 
     <!-- service bean used to call constellation server-->
-    <bean class="org.constellation.gui.service.ServicesManager" id="serviceManager" scope="session"></bean>
+    <bean class="org.constellation.gui.mock.ServicesManagerMock" id="serviceManager" scope="session"></bean>
 </beans>

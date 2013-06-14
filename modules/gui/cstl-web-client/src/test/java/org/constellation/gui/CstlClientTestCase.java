@@ -36,6 +36,8 @@ import java.net.URL;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -90,11 +92,6 @@ public class CstlClientTestCase {
     }
 
 
-    @Test
-    public void test(){
-        assertTrue(true);
-    }
-
     /**
      * Main menu bar test case. Use to verify all links in menu
      */
@@ -107,10 +104,51 @@ public class CstlClientTestCase {
         List<WebElement> navLinks = nav.findElements(By.tagName("a"));
         for (WebElement navLink : navLinks) {
             String href = navLink.getAttribute("href");
+
             if (navLink.getText().equals("HomePage")) {
                 assertEquals(href, deploymentURL.toString());
             }
+            if (navLink.getText().equals("Web services")) {
+                assertEquals(href, deploymentURL.toString() + "webservices");
+            }
 //            TODO : to continue with all pages
         }
+    }
+
+    /**
+     * Test Homepage links with found a {@link WebElement} an next navigation page.
+     */
+    @Test
+    @RunAsClient
+    public void testHomePageLinks(){
+        driver.get(deploymentURL.toString());
+        WebElement serviceBtn = driver.findElement(By.id("servicebtn"));
+        serviceBtn.click();
+        WebElement createService = driver.findElement(By.id("createservice"));
+
+        //if not null => button exist we are go on an other page...
+        assertNotNull(createService);
+    }
+
+    /**
+     * test wms creation page navigation
+     */
+    @Test
+    @RunAsClient
+    public void testCreateWMS(){
+        driver.get(deploymentURL.toString()+"webservices");
+        WebElement createService = driver.findElement(By.id("createservice"));
+        assertNotNull(createService);
+
+        //wms button test visibility
+        WebElement wmschoice = driver.findElement(By.id("wmschoice"));
+        assertFalse(wmschoice.isDisplayed());
+        createService.click();
+        assertTrue(wmschoice.isDisplayed());
+
+        //go to form first page
+        wmschoice.click();
+
+//        TODO continue test
     }
 }
