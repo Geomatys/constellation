@@ -1417,15 +1417,14 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     doXMLPost(request, conec);
 
                 }
-
-                return readResponse(descriptor, unmarshallerPool, conec);
             }
+            
+            return readResponse(descriptor, unmarshallerPool, conec);
 
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, "The Distant service have made an error", ex);
             return null;
         }
-        return null;
     }
 
     /**
