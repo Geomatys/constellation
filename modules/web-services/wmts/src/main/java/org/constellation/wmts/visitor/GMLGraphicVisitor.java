@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import org.apache.sis.storage.DataStoreException;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
@@ -37,7 +38,6 @@ import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.metadata.iso.citation.Citations;
 import org.geotoolkit.referencing.IdentifiedObjects;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 

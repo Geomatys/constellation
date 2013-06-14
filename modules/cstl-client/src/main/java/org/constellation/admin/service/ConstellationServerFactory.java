@@ -22,7 +22,6 @@ import org.geotoolkit.metadata.iso.citation.DefaultCitation;
 import org.geotoolkit.metadata.iso.identification.DefaultServiceIdentification;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.storage.DataStoreException;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.parameter.ParameterDescriptor;
@@ -30,6 +29,7 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.util.Collections;
+import org.apache.sis.storage.DataStoreException;
 
 /**
  *

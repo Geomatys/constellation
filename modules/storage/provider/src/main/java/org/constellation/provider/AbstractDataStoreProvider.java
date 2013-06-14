@@ -21,11 +21,11 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
+import org.apache.sis.storage.DataStoreException;
 
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.storage.DataStoreException;
 
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;

@@ -29,11 +29,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
+import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.logging.Logging;
 
 /**

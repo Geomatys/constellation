@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import javax.xml.stream.XMLStreamException;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Version;
 import org.constellation.configuration.FormatURL;
@@ -50,7 +51,6 @@ import org.constellation.ws.LayerWorker;
 import org.constellation.ws.UnauthorizedException;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.data.FeatureStoreUtilities;
 import org.geotoolkit.feature.SchemaException;
 import org.geotoolkit.ows.xml.RequestBase;

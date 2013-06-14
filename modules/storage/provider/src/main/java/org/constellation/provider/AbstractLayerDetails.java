@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef.Query;
 
 import org.geotoolkit.display.exception.PortrayalException;
@@ -33,7 +34,6 @@ import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;

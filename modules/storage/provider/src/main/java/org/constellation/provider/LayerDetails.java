@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -32,7 +33,6 @@ import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.style.MutableStyleFactory;

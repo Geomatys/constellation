@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import org.apache.sis.storage.DataStoreException;
 
 // Constellation dependencies
 import org.constellation.Cstl;
@@ -53,7 +54,6 @@ import org.geotoolkit.ows.xml.v110.*;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.wmts.WMTSUtilities;

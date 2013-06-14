@@ -19,10 +19,10 @@ package org.constellation.provider;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.sis.storage.DataStoreException;
 
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;

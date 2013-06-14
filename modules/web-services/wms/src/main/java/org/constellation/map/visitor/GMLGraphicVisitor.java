@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.measure.unit.Unit;
+import org.apache.sis.storage.DataStoreException;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
@@ -49,7 +50,6 @@ import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.internal.jaxb.ObjectFactory;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.referencing.IdentifiedObjects;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.logging.Logging;

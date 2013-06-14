@@ -108,7 +108,6 @@ import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.sld.xml.GetLegendGraphic;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleUtilities;
 import org.geotoolkit.util.MeasurementRange;
@@ -139,6 +138,7 @@ import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.referencing.datum.AbstractDatum;
 import org.apache.sis.measure.Range;
 import org.apache.sis.internal.util.UnmodifiableArrayList;
+import org.apache.sis.storage.DataStoreException;
 
 import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;

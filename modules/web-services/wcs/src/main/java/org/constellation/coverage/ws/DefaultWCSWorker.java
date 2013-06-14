@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import org.apache.sis.storage.DataStoreException;
 
 // Constellation dependencies
 import org.constellation.Cstl;
@@ -64,7 +65,6 @@ import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.resources.Errors;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.TimeParser;
