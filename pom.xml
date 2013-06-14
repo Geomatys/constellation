@@ -476,6 +476,16 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-db-postgres</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+	     <dependency>
+	        <groupId>org.geotoolkit.pending</groupId>
+        	<artifactId>geotk-s57</artifactId>
+                 <version>${geotoolkit-pending.version}</version>
+	    </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-jaxp-core</artifactId>
                 <version>${geotoolkit-pending.version}</version>
             </dependency>
@@ -892,6 +902,13 @@
             <url>http://maven2.geomatys.com/repository/snapshots/</url>
             <snapshots>
                 <enabled>true</enabled>
+            </snapshots>
+        </repository>
+	<repository>
+            <id>etrema</id>
+            <url>http://www.ettrema.com/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
         <repository>
