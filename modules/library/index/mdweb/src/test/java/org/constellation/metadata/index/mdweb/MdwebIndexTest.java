@@ -42,6 +42,8 @@ import org.constellation.generic.database.BDD;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 
 // geotoolkit dependencies
 import org.geotoolkit.factory.FactoryFinder;
@@ -64,12 +66,14 @@ import org.opengis.filter.FilterFactory2;
 //Junit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 
 /**
  * Test class for constellation lucene index
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class MdwebIndexTest {
 
     protected static final FilterFactory2 FF = (FilterFactory2)
@@ -150,6 +154,7 @@ public class MdwebIndexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 1)
     public void simpleSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -283,6 +288,7 @@ public class MdwebIndexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 2)
     public void numericComparisonSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -422,6 +428,7 @@ public class MdwebIndexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 3)
     public void wildCharSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -568,6 +575,7 @@ public class MdwebIndexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 4)
     public void dateSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
@@ -712,6 +720,7 @@ public class MdwebIndexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 5)
     public void sortedSearchTest() throws Exception {
 
         Filter nullFilter   = null;
@@ -918,6 +927,7 @@ public class MdwebIndexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 5)
     public void spatialSearchTest() throws Exception {
 
         String resultReport = "";
@@ -994,6 +1004,7 @@ public class MdwebIndexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 6)
     public void TermQueryTest() throws Exception {
 
         /**
@@ -1043,6 +1054,7 @@ public class MdwebIndexTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Order(order = 7)
     public void DeleteDocumentTest() throws Exception {
         indexer.removeDocument("CTDF02");
 
@@ -1076,6 +1088,7 @@ public class MdwebIndexTest {
     }
 
     @Test
+    @Order(order = 8)
     public void extractValuesTest() throws Exception {
 
         MD_IOFactory factory = null;

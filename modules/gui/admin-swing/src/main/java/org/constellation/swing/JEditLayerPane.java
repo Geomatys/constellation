@@ -19,7 +19,6 @@ package org.constellation.swing;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +61,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
      * Creates new form JEditLayerPane
      */
     public JEditLayerPane(final ConstellationServer server, final Object configuration, final String serviceType, final LayerModel layerModel) {
-        this.context = context;
+        this.context = (LayerContext)configuration;
         this.layerModel = layerModel;
         initComponents();
         
@@ -70,8 +69,8 @@ public class JEditLayerPane extends javax.swing.JPanel {
         
         //create combobox items (dataReference string)
         final List<String> providerList = new ArrayList<String>();
-        final List<String> styleList = new ArrayList<String>();
-        styleList.add(EMPTY_ITEM);
+        final List<DataReference> styleList = new ArrayList<DataReference>();
+        styleList.add(null);
         
         final ProvidersReport providersReport = server.providers.listProviders();
         final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
@@ -86,7 +85,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
                 for (final String item : layers) {
                     
                     if ("sld".equals(serviceProviderType)) {
-                        styleList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, providerID, item).getReference());
+                        styleList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, providerID, item));
                     } else {
                         boolean addProviderToList = false;
                         //WFS -> data-store
@@ -156,7 +155,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
             //style only the first !!! TODO handle a list of styles in GUI.
             if (!layer.getStyles().isEmpty()) {
                 
-                final String styleRef = layer.getStyles().get(0);
+                final DataReference styleRef = layer.getStyles().get(0);
                 guiLayerStyleCBox.setSelectedItem(styleRef);
             }
             
@@ -278,11 +277,9 @@ public class JEditLayerPane extends javax.swing.JPanel {
         
         //data
         final DataReference data = new DataReference((String) guiLayerDataCBox.getSelectedItem());
-        if (data != null) {
-            final QName qname = new QName(data.getLayerId().getNamespaceURI(), data.getLayerId().getLocalPart());
-            layerModel.getLayer().setName(qname);
-            layerModel.setProviderId(data.getServiceId());
-        }
+        final QName qname = new QName(data.getLayerId().getNamespaceURI(), data.getLayerId().getLocalPart());
+        layerModel.getLayer().setName(qname);
+        layerModel.setProviderId(data.getServiceId());
         
         //alias
         final String alias = guiLayerAliasText.getText();
@@ -293,10 +290,10 @@ public class JEditLayerPane extends javax.swing.JPanel {
         }
         
         //style
-        final String style = (String) guiLayerStyleCBox.getSelectedItem();
+        final DataReference style = (DataReference) guiLayerStyleCBox.getSelectedItem();
         if (!EMPTY_ITEM.equals(style)) {
             if (layerModel.getLayer().getStyles() == null) {
-                layerModel.getLayer().setStyles(new ArrayList<String>());
+                layerModel.getLayer().setStyles(new ArrayList<DataReference>());
             }
             if (!layerModel.getLayer().getStyles().contains(style)) {
                 //TODO handle multi style with the default one.

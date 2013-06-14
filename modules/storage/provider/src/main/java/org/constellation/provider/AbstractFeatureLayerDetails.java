@@ -285,15 +285,14 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
 
     /**
      * {@inheritDoc}
-     */
-    @Override
-    protected MutableStyle getDefaultStyle(){
+     
+    private MutableStyle getDefaultStyle(){
         try {
             return StyleProviderProxy.STYLE_RANDOM_FACTORY.createDefaultVectorStyle(store.getFeatureType(name));
         } catch (DataStoreException ex) {
             return StyleProviderProxy.STYLE_RANDOM_FACTORY.createPolygonStyle();
         }
-    }
+    }*/
 
     /**
      * Returns {@code null}. This method should not be used in this context.

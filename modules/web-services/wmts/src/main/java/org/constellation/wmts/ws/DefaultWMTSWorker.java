@@ -31,6 +31,7 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.Layer;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.LayerDetails;
+import org.constellation.util.DataReference;
 import org.constellation.wmts.visitor.CSVGraphicVisitor;
 import org.constellation.wmts.visitor.GMLGraphicVisitor;
 import org.constellation.wmts.visitor.HTMLGraphicVisitor;
@@ -284,12 +285,15 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         final String userLogin      = getUserLogin();
         final Name layerName        = Util.parseLayerName(getTile.getLayer());
         final LayerDetails layerRef = getLayerReference(userLogin, layerName);
-
-        Coverage c = null;
-
+        final Layer configLayer     = getConfigurationLayer(layerName, userLogin);
+        
         // build an equivalent style List
-        final String styleName   = getTile.getStyle();
-        final MutableStyle style = getStyle(styleName);
+        final String styleName       = getTile.getStyle();
+        final DataReference styleRef = configLayer.getStyle(styleName);
+        final MutableStyle style     = getStyle(styleRef);
+
+        
+        Coverage c = null;
         //       -- create the rendering parameter Map
         Double elevation =  null;
         Date time        = null;
@@ -399,6 +403,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         //1 LAYER NOT USED FOR NOW
         final Name layerName = Util.parseLayerName(request.getLayer());
         final String userLogin  = getUserLogin();
+        final Layer configLayer = getConfigurationLayer(layerName, userLogin);
+        
         
         // 2. PARAMETERS NOT USED FOR NOW
         Double elevation =  null;
@@ -423,7 +429,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
         // 3 STYLE NOT USED FOR NOW
         final String styleName    = request.getStyle();
-        final MutableStyle style  = getStyle(styleName);
+        final DataReference styleRef = configLayer.getStyle(styleName);
+        final MutableStyle style  = getStyle(styleRef);
 
 
         // 4. We get the parameters

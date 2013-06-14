@@ -221,8 +221,9 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetCoverage request returns indeed a {@link BufferedImage}.
      */
     @Test
-    public void testWCSGetCoverage() throws IOException {
-
+    public void testWCSGetCoverage() throws Exception {
+        waitForStart();
+        
         // Creates a valid GetCoverage url.
         final URL getCoverageUrl;
         try {

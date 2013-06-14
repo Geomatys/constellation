@@ -81,11 +81,6 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
     }
 
     @Override
-    protected MutableStyle getDefaultStyle() {
-        return null;
-    }
-
-    @Override
     public SortedSet<Date> getAvailableTimes() throws DataStoreException {
         return new TreeSet<Date>();
     }

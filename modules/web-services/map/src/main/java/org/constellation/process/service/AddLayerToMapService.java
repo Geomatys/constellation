@@ -125,8 +125,8 @@ public class AddLayerToMapService extends AbstractProcess {
 
         //add style if exist
         if (layerStyleRef != null) {
-            final List<String> styles = new ArrayList<String>();
-            styles.add(layerStyleRef.getReference());
+            final List<DataReference> styles = new ArrayList<DataReference>();
+            styles.add(layerStyleRef);
             newLayer.setStyles(styles);
         }
 

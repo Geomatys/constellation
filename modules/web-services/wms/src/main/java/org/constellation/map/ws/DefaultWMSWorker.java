@@ -303,7 +303,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(getCapab.getUpdateSequence());
         if (returnUS) {
-            throw new CstlServiceException("the update sequence paramter is equal to the current", CURRENT_UPDATE_SEQUENCE, "updateSequence");
+            throw new CstlServiceException("the update sequence parameter is equal to the current", CURRENT_UPDATE_SEQUENCE, "updateSequence");
         }
 
         //Build the list of layers
@@ -618,13 +618,13 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                             inputGeoBox.getEastBoundLongitude(), 0.0, 0.0);
             }
             // we build a Style Object
-            final List<String> stylesName = layer.getFavoriteStyles();
+            final List<DataReference> stylesName = configLayer.getStyles();
             final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<org.geotoolkit.wms.xml.Style>();
             if (stylesName != null && !stylesName.isEmpty()) {
                 // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
-                for (String styleName : stylesName) {
+                for (DataReference styleName : stylesName) {
                     final MutableStyle ms = getStyle(styleName);
-                    final org.geotoolkit.wms.xml.Style style = convertMutableStyleToWmsStyle("1.3.0", ms, layer, legendUrlPng, legendUrlGif);
+                    final org.geotoolkit.wms.xml.Style style = convertMutableStyleToWmsStyle(queryVersion, ms, layer, legendUrlPng, legendUrlGif);
                     styles.add(style);
                 }
             }
@@ -696,21 +696,16 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
             final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<org.geotoolkit.wms.xml.Style>();
-            for (String styl : configLayer.getStyles()) {
+            for (DataReference styl : configLayer.getStyles()) {
                 final MutableStyle ms;
-                if (styl.startsWith("${")) {
-                    final DataReference dr = new DataReference(styl);
-                    Style style = null;
-                    try {
-                        style = DataReferenceConverter.convertDataReferenceToStyle(dr);
-                    } catch (NonconvertibleObjectException e) {
-                        // The given style reference was invalid, we can't get a style from that
-                        LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-                    }
-                    ms = StyleUtilities.copy(style);
-                } else {
-                    ms = getStyleByIdentifier(styl);
+                Style style = null;
+                try {
+                    style = DataReferenceConverter.convertDataReferenceToStyle(styl);
+                } catch (NonconvertibleObjectException e) {
+                    // The given style reference was invalid, we can't get a style from that
+                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
                 }
+                ms = StyleUtilities.copy(style);
                 if (ms != null) {
                     styles.add(convertMutableStyleToWmsStyle(version, ms, layerDetails, legendUrlPng, legendUrlGif));
                 }
@@ -841,7 +836,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
         //       -- build an equivalent style List
         //TODO: clean up the SLD vs. style logic
-        final List<String> styleNames          = getFI.getStyles();
+        final List<String> styleNames   = getFI.getStyles();
         final StyledLayerDescriptor sld = getFI.getSld();
 
         final List<MutableStyle> styles        = getStyles(layerRefs, sld, styleNames, userLogin);
@@ -1022,15 +1017,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 // No sld given, we use the style.
                 final Layer layerRef = getConfigurationLayer(layer.getName(), userLogin);
 
-                final List<String> defaultStyleRefs = layerRef.getStyles();
+                final List<DataReference> defaultStyleRefs = layerRef.getStyles();
                 if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
-                    final String styleId = defaultStyleRefs.get(0);
-                    if (styleId.startsWith("${")) {
-                        final DataReference styleRef = new DataReference(styleId);
-                        ms = (styleRef.getLayerId() == null) ? null : getStyle(styleRef.getLayerId().getLocalPart());
-                    } else {
-                        ms = getStyleByIdentifier(styleId);
-                    }
+                    final DataReference styleRef = defaultStyleRefs.get(0);
+                    ms = (styleRef.getLayerId() == null) ? null : getStyle(styleRef);
                 } else {
                     ms = null;
                 }
@@ -1221,11 +1211,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
     }
 
-    private static MutableStyle extractStyle(final Name layerName, final StyledLayerDescriptor sld) throws CstlServiceException{
+    private static MutableStyle extractStyle(final Name layerName, final Layer configLayer, final StyledLayerDescriptor sld) throws CstlServiceException{
         if(sld == null){
             throw new IllegalArgumentException("SLD should not be null");
         }
-
+        
         final List<MutableNamedLayer> emptyNameSLDLayers = new ArrayList<MutableNamedLayer>();
         for(final org.opengis.sld.Layer sldLayer : sld.layers()){
             // We can't do anything if it is not a MutableNamedLayer.
@@ -1246,7 +1236,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     if (mls instanceof MutableNamedStyle) {
                         final MutableNamedStyle mns = (MutableNamedStyle) mls;
                         final String namedStyle = mns.getName();
-                        return getStyle(namedStyle);
+                        final DataReference styleRef = configLayer.getStyle(namedStyle);
+                        return getStyle(styleRef);
                     } else if (mls instanceof MutableStyle) {
                         return (MutableStyle) mls;
                     }
@@ -1268,33 +1259,29 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                                          final List<String> styleNames, final String userLogin) throws CstlServiceException {
         final List<MutableStyle> styles = new ArrayList<MutableStyle>();
         for (int i=0; i<layerRefs.size(); i++) {
-
+            final Name layerName = layerRefs.get(i).getName();
+            final Layer layer = getConfigurationLayer(layerName, userLogin);
+            
             final MutableStyle style;
             if (sld != null) {
                 //try to use the provided SLD
-                style = extractStyle(layerRefs.get(i).getName(), sld);
-            } else if (styleNames != null && styleNames.size() > i &&
-                       styleNames.get(i) != null && !styleNames.get(i).isEmpty()) {
+                style = extractStyle(layerName, layer, sld);
+            } else if (styleNames != null && styleNames.size() > i && styleNames.get(i) != null && !styleNames.get(i).isEmpty()) {
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
                 final String namedStyle = styleNames.get(i);
-                style = getStyle(namedStyle);
+                final DataReference ref = layer.getStyle(namedStyle);
+                style = getStyle(ref);
                 if (style == null) {
                     throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
                 }
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
-                final Layer layer = getConfigurationLayer(layerRefs.get(i).getName(), userLogin);
 
-                final List<String> defaultStyleRefs = layer.getStyles();
+                final List<DataReference> defaultStyleRefs = layer.getStyles();
                 if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
-                    final String styleId = defaultStyleRefs.get(0);
-                    if (styleId.startsWith("${")) {
-                        final DataReference styleRef = new DataReference(styleId);
-                        style = (styleRef.getLayerId() == null) ? null : getStyle(styleRef.getLayerId().getLocalPart());
-                    } else {
-                        style = getStyleByIdentifier(styleId);
-                    }
+                    final DataReference styleRef = defaultStyleRefs.get(0);
+                    style = (styleRef.getLayerId() == null) ? null : getStyle(styleRef);
                 } else {
                     style = null;
                 }

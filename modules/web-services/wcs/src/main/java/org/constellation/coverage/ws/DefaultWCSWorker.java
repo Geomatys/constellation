@@ -48,6 +48,7 @@ import org.constellation.configuration.Layer;
 import org.constellation.ws.LayerWorker;
 import static org.constellation.query.Query.*;
 import static org.constellation.coverage.ws.WCSConstant.*;
+import org.constellation.util.DataReference;
 
 // Geotoolkit dependencies
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -623,7 +624,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
         }
-        CoverageLayerDetails layerRef = (CoverageLayerDetails) tmplayerRef;
+        final CoverageLayerDetails layerRef = (CoverageLayerDetails) tmplayerRef;
+        final Layer configLayer = getConfigurationLayer(tmpName, userLogin);
 
         // we verify the interpolation method even if we don't use it
         try {
@@ -798,10 +800,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             renderParameters.put("ELEVATION", elevation);
             final SceneDef sdef = new SceneDef();
 
-            final List<String> styleNames = layerRef.getFavoriteStyles();
+            final List<DataReference> styles = configLayer.getStyles();
             final MutableStyle style;
-            if (!styleNames.isEmpty()) {
-                final String styleName = styleNames.get(0);
+            if (!styles.isEmpty()) {
+                final DataReference styleName = styles.get(0);
                 final MutableStyle incomingStyle = getStyle(styleName);
                 style = WCSUtils.filterStyle(incomingStyle, request.getRangeSubset());
             } else {

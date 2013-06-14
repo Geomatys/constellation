@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.namespace.QName;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import java.util.Objects;
+import org.constellation.util.DataReference;
 
 /**
  *
@@ -43,7 +44,7 @@ public class Layer {
     private String alias;
 
     @XmlElement(name="Style")
-    private List<String> styles;
+    private List<DataReference> styles;
 
     @XmlElement(name="Filter")
     private FilterType filter;
@@ -92,7 +93,7 @@ public class Layer {
         this.name = name;
     }
 
-    public Layer(final QName name, final List<String> styles) {
+    public Layer(final QName name, final List<DataReference> styles) {
         this.name = name;
         this.styles = styles;
     }
@@ -104,14 +105,14 @@ public class Layer {
         this(name, null, null, null, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs);
     }
 
-    public Layer(final QName name, final List<String> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+    public Layer(final QName name, final List<DataReference> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs)
     {
         this(name, styles, filter, alias, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs, null);
     }
 
-    public Layer(final QName name, final List<String> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+    public Layer(final QName name, final List<DataReference> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs, final List<DimensionDefinition> dimensions) {
         this.name         = name;
@@ -145,14 +146,25 @@ public class Layer {
         this.name = name;
     }
 
-    public List<String> getStyles() {
+    public List<DataReference> getStyles() {
         if (styles == null) {
-            styles = new ArrayList<String>();
+            styles = new ArrayList<DataReference>();
         }
         return styles;
     }
+    
+    public DataReference getStyle(final String styleID) {
+        if (styles != null) {
+            for (DataReference styleRef : styles) {
+                if (styleRef.getLayerId().getLocalPart().equals(styleID)) {
+                    return styleRef;
+                }
+            }
+        }
+        return null;
+    }
 
-    public void setStyles(final List<String> styles) {
+    public void setStyles(final List<DataReference> styles) {
         this.styles = styles;
     }
 
@@ -298,7 +310,7 @@ public class Layer {
             sb.append("name:\n").append(name).append('\n');
         }
         if (styles != null && !styles.isEmpty()) {
-            for (String style : styles) {
+            for (DataReference style : styles) {
                 sb.append("style:\n").append(style).append('\n');
             }
         }

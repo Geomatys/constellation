@@ -43,6 +43,7 @@ import org.constellation.map.security.LayerSecurityFilter;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
+import org.constellation.util.DataReference;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.feature.DefaultName;
 import org.opengis.feature.type.Name;
@@ -318,12 +319,12 @@ public abstract class LayerWorker extends AbstractWorker {
         return new NameInProvider(directLayer.getName(), directLayer.getProviderID());
     }
     
-    protected static MutableStyle getStyle(final String styleName) throws CstlServiceException {
+    protected static MutableStyle getStyle(final DataReference styleName) throws CstlServiceException {
         final MutableStyle style;
-        if (styleName != null && !styleName.isEmpty()) {
+        if (styleName != null) {
             //try to grab the style if provided
             //a style has been given for this layer, try to use it
-            style = StyleProviderProxy.getInstance().get(styleName);
+            style = StyleProviderProxy.getInstance().get(styleName.getLayerId().getLocalPart(), styleName.getServiceId());
             if (style == null) {
                 throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
             }
@@ -333,23 +334,6 @@ public abstract class LayerWorker extends AbstractWorker {
         }
         return style;
     }
-    
-    protected static MutableStyle getStyleByIdentifier(final String styleName) throws CstlServiceException {
-        final MutableStyle style;
-        if (styleName != null && !styleName.isEmpty()) {
-            //try to grab the style if provided
-            //a style has been given for this layer, try to use it
-            style = StyleProviderProxy.getInstance().getByIdentifier(styleName);
-            if (style == null) {
-                throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
-            }
-        } else {
-            //no defined styles, use the favorite one, let the layer get it himself.
-            style = null;
-        }
-        return style;
-    }
-
     
     protected Layer getMainLayer() {
         if (layerContext == null) {

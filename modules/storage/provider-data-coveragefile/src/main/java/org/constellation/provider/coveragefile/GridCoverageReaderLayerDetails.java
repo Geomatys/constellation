@@ -195,10 +195,10 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
         return new TreeSet<Number>();
     }
 
-    @Override
-    protected MutableStyle getDefaultStyle() {
+    /*
+    private MutableStyle getDefaultStyle() {
         return StyleProviderProxy.STYLE_FACTORY.style(StyleProviderProxy.STYLE_FACTORY.rasterSymbolizer());
-    }
+    }*/
 
     /**
      * {@inheritDoc}

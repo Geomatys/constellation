@@ -113,11 +113,6 @@ public interface LayerDetails {
             final Double elevation, final Date time) throws DataStoreException, IOException;
 
     /**
-     * Returns a list of favorites styles associated to this layer.
-     */
-    List<String> getFavoriteStyles();
-
-    /**
      * @see Layer#getGeographicBoundingBox
      */
     GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException;

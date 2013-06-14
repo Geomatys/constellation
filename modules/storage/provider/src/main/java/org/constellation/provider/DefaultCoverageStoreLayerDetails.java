@@ -138,8 +138,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
-    protected MutableStyle getDefaultStyle() {
+    private MutableStyle getDefaultStyle() {
         return DEFAULT;
     }
 

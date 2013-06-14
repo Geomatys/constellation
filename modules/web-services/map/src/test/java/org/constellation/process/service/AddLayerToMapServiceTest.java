@@ -143,7 +143,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
-        assertEquals(STYLE_DATA_REF.getReference() ,outLayer.getStyles().get(0));
+        assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
         
         assertTrue(checkInstanceExist("addLayer1"));
         deleteInstance("addLayer1");
@@ -189,7 +189,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
-        assertEquals(STYLE_DATA_REF.getReference() ,outLayer.getStyles().get(0));
+        assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
         
         assertTrue(checkInstanceExist("addLayer2"));
         deleteInstance("addLayer2");
@@ -238,7 +238,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
-        assertEquals(STYLE_DATA_REF.getReference() ,outLayer.getStyles().get(0));
+        assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
         
         assertTrue(checkInstanceExist("addLayer3"));
         deleteInstance("addLayer3");
@@ -292,7 +292,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
-        assertEquals(STYLE_DATA_REF.getReference() ,outLayer.getStyles().get(0));
+        assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
 
         assertTrue(outSource.isExcludedLayer(new QName("http://custom-namespace/", "city")));
         

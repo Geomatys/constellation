@@ -4,40 +4,40 @@
         <cstl:Source id="shapeSrc" load_all="true">
             <cstl:include>
                 <cstl:Layer name="geotk:BasicPolygons">
-                    <cstl:Style>cite_style_BasicPolygons</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_BasicPolygons}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:Bridges">
-                    <cstl:Style>cite_style_Bridges</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_Bridges}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:BuildingCenters">
-                    <cstl:Style>cite_style_BuildingCenters</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_BuildingCenters}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:Buildings">
-                    <cstl:Style>cite_style_Buildings</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_Buildings}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:DividedRoutes">
-                    <cstl:Style>cite_style_DividedRoutes</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_DividedRoutes}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:Forests">
-                    <cstl:Style>cite_style_Forests</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_Forests}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:Lakes">
-                    <cstl:Style>cite_style_Lakes</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_Lakes}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:MapNeatline">
-                    <cstl:Style>cite_style_MapNeatLine</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_MapNeatLine}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:NamedPlaces">
-                    <cstl:Style>cite_style_NamedPlaces</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_NamedPlaces}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:Ponds">
-                    <cstl:Style>cite_style_Ponds</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_Ponds}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:RoadSegments">
-                    <cstl:Style>cite_style_RoadSegments</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_RoadSegments}</cstl:Style>
                 </cstl:Layer>
                 <cstl:Layer name="geotk:Streams">
-                    <cstl:Style>cite_style_Streams</cstl:Style>
+                    <cstl:Style>${providerStyleType|sldSrc|cite_style_Streams}</cstl:Style>
                 </cstl:Layer>
             </cstl:include>
         </cstl:Source>

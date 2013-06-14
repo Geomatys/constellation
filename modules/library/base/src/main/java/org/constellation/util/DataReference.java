@@ -16,6 +16,7 @@
  */
 package org.constellation.util;
 
+import javax.xml.bind.annotation.XmlValue;
 import org.geotoolkit.feature.DefaultName;
 import org.opengis.feature.type.Name;
 
@@ -53,6 +54,8 @@ public class DataReference implements CharSequence{
     private String serviceId;
     private String layerId;
 
+    private DataReference() {}
+    
     public DataReference(final String str) {
         this.reference = str;
         computeReferenceParts();
@@ -96,6 +99,7 @@ public class DataReference implements CharSequence{
         return new DataReference(SERVICE_TYPE, null,serviceURL, serviceSpec, serviceId, layerId);
     }
 
+    @XmlValue
     public String getReference() {
         return reference;
     }

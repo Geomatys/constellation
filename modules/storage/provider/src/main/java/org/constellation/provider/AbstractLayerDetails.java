@@ -60,6 +60,7 @@ public abstract class AbstractLayerDetails implements LayerDetails{
     /**
      * Favorites styles associated with this layer.
      */
+    @Deprecated
     protected final List<String> favorites;
 
     /**
@@ -105,19 +106,6 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> getFavoriteStyles() {
-        return favorites;
-    }
-
-    /**
-     * Returns the default style to apply for the renderer.
-     */
-    protected abstract MutableStyle getDefaultStyle();
-
 
     /**
      * {@inheritDoc}
@@ -132,14 +120,7 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         MutableStyle mutableStyle = null;
         if (style != null) {
             mutableStyle = (MutableStyle) style;
-        } else {
-            if (!getFavoriteStyles().isEmpty()) {
-                mutableStyle = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
-            }
-            if (mutableStyle == null) {
-                mutableStyle = getDefaultStyle();
-            }
-        }
+        } 
 
         final MapItem mapItem = getMapLayer(mutableStyle, null);
 

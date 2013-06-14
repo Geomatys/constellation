@@ -14,6 +14,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.util.DataReference;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
@@ -311,7 +312,7 @@ public class ConfigurationXmlBindingTest {
 
         sources = new ArrayList<Source>();
         include = new ArrayList<Layer>();
-        l1 = new Layer(new QName("layer1"), Collections.singletonList("${providerStyleType|sldProviderId|styleName}"));
+        l1 = new Layer(new QName("layer1"), Collections.singletonList(new DataReference("${providerStyleType|sldProviderId|styleName}")));
         include.add(l1);
         s1 = new Source("source1", false, include, null);
         sources.add(s1);
@@ -342,7 +343,7 @@ public class ConfigurationXmlBindingTest {
 
         final BBOXType bbox = new BBOXType("property", -180, -90, 180, 90, "CRS:84");
         filter.setSpatialOps(bbox);
-        l1 = new Layer(new QName("layer1"), Collections.singletonList("${providerStyleType|sldProviderId|styleName}"),
+        l1 = new Layer(new QName("layer1"), Collections.singletonList(new DataReference("${providerStyleType|sldProviderId|styleName}")),
                        filter, null, null, null, null, null, null, null, null, null, null, null);
         include.add(l1);
         s1 = new Source("source1", false, include, null);
@@ -717,7 +718,7 @@ public class ConfigurationXmlBindingTest {
 
         sources = new ArrayList<Source>();
         include = new ArrayList<Layer>();
-        l1 = new Layer(new QName("layer1"), Collections.singletonList("${providerStyleType|sldProviderId|styleName}"));
+        l1 = new Layer(new QName("layer1"), Collections.singletonList(new DataReference("${providerStyleType|sldProviderId|styleName}")));
         include.add(l1);
         s1 = new Source("source1", false, include, null);
         sources.add(s1);
@@ -756,7 +757,7 @@ public class ConfigurationXmlBindingTest {
 
         final BBOXType bbox = new BBOXType("property", -180, -90, 180, 90, "CRS:84");
         filter.setSpatialOps(bbox);
-        l1 = new Layer(new QName("layer1"), Collections.singletonList("${providerStyleType|sldProviderId|styleName}"),
+        l1 = new Layer(new QName("layer1"), Collections.singletonList(new DataReference("${providerStyleType|sldProviderId|styleName}")),
                        filter, null, null, null, null, null, null, null, null, null, null, null);
         include.add(l1);
         s1 = new Source("source1", false, include, null);
