@@ -36,6 +36,7 @@ import java.net.URL;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Main junit test case with arquillian and selenium
@@ -45,16 +46,16 @@ import static junit.framework.Assert.assertEquals;
  * @since 0.9
  *
  */
-//@RunWith(Arquillian.class)
+@RunWith(Arquillian.class)
 public class CstlClientTestCase {
 
     /**
      * Initialise war deployment for test case
      * @return a war file object
      */
-//    @Deployment
+    @Deployment
     public static WebArchive createDeployment() {
-        WebArchive war = Helper.createBaseServletDeployment();
+        WebArchive war = Helper.createBaseServletDeployment("spring");
         war.addAsWebInfResource(new File("src/test/resources/spring.xml"));
         war.addPackages(true, "org.constellation.gui");
         return war;
@@ -63,13 +64,13 @@ public class CstlClientTestCase {
     /**
      * driver to find object on web page
      */
-//    @Drone
+    @Drone
     WebDriver driver;
 
     /**
      * root url deployment
      */
-//    @ArquillianResource
+    @ArquillianResource
     URL deploymentURL;
 
 
@@ -89,11 +90,16 @@ public class CstlClientTestCase {
     }
 
 
+    @Test
+    public void test(){
+        assertTrue(true);
+    }
+
     /**
      * Main menu bar test case. Use to verify all links in menu
      */
-//    @Test
-//    @RunAsClient
+    @Test
+    @RunAsClient
     public void testNavBar() {
         driver.get(deploymentURL.toString());
         WebElement nav = driver.findElement(By.className("nav"));
