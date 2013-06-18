@@ -60,7 +60,7 @@
             <div class="span2 offset10">
             </br>
                 <a href="@{webservices()}">&{wms.create.cancel.label}</a>
-                <a class="btn btn-primary" onclick="goToMetadata();" type="button">&{wms.create.next.label}</a>
+                <a class="btn btn-primary" onclick="goToMetadata();" type="button" id="nextButton">&{wms.create.next.label}</a>
             </div>
         </div>
     </div>

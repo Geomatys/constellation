@@ -4,7 +4,11 @@ import org.constellation.dto.Service;
 import org.constellation.gui.service.ServicesManager;
 
 import javax.enterprise.inject.Specializes;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotSame;
 
 /**
  * ServiceManager mock
@@ -28,6 +32,10 @@ public class ServicesManagerMock extends ServicesManager{
      */
     @Override
     public boolean createServices(Service createdService, String service) {
+        LOGGER.log(Level.INFO, createdService.getName());
+        LOGGER.log(Level.INFO, createdService.getIdentifier());
+        LOGGER.log(Level.INFO, createdService.getDescription());
+        LOGGER.log(Level.INFO, createdService.getKeywords().toString());
         return true;
     }
 }
