@@ -51,6 +51,9 @@ public class WMSResponseWriter<T extends WMSResponse> implements MessageBodyWrit
 
     @Override
     public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
+        if (MediaType.APPLICATION_JSON_TYPE.equals(mt)) {
+            return false;
+        }
         return WMSResponse.class.isAssignableFrom(type);
     }
 

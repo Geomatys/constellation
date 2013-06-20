@@ -168,7 +168,7 @@ public final class ConfigurationService extends WebService  {
         Marshaller marshaller = null;
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
-            final String request = (String) getParameter("REQUEST", true);
+            final String request = getParameter("REQUEST", true);
 
             for (AbstractConfigurer configurer: configurers) {
                 configurer.setContainerNotifier(cn);
@@ -176,7 +176,7 @@ public final class ConfigurationService extends WebService  {
 
             if (REQUEST_FULL_RESTART.equalsIgnoreCase(request)) {
                 final boolean force = getBooleanParameter("FORCED", false);
-                return Response.ok(restartService(force), MimeType.TEXT_XML).build();
+                return Response.ok(restartService(force)).build();
             }
 
             else if (REQUEST_DOWNLOAD.equalsIgnoreCase(request)) {
@@ -186,18 +186,18 @@ public final class ConfigurationService extends WebService  {
 
             else if (REQUEST_LIST_SERVICE.equalsIgnoreCase(request)) {
                 final ServiceReport response = new ServiceReport(WSEngine.getRegisteredServices());
-                return Response.ok(response, MediaType.TEXT_XML).build();
+                return Response.ok(response).build();
             }
 
             else if (REQUEST_GET_CONFIG_PATH.equalsIgnoreCase(request)) {
                 final AcknowlegementType response = getConfigPath();
-                return Response.ok(response, MediaType.TEXT_XML).build();
+                return Response.ok(response).build();
             }
 
             else if (REQUEST_SET_CONFIG_PATH.equalsIgnoreCase(request)) {
                 final String path = getParameter("path", false);
                 final AcknowlegementType response = setConfigPath(path);
-                return Response.ok(response, MediaType.TEXT_XML).build();
+                return Response.ok(response).build();
             }
 
             else if (REQUEST_UPDATE_USER.equalsIgnoreCase(request)) {
@@ -205,23 +205,23 @@ public final class ConfigurationService extends WebService  {
                 final String password = getParameter("password", true);
                 final String oldLogin = getParameter("oldLogin", true);
                 final AcknowlegementType response = updateUser(userName, password, oldLogin);
-                return Response.ok(response, MediaType.TEXT_XML).build();
+                return Response.ok(response).build();
             }
 
             else if (REQUEST_DELETE_USER.equalsIgnoreCase(request)) {
                 final String userName = getParameter("userName", true);
                 final AcknowlegementType response = deleteUser(userName);
-                return Response.ok(response, MediaType.TEXT_XML).build();
+                return Response.ok(response).build();
             }
 
             else if (REQUEST_GET_USER_NAME.equalsIgnoreCase(request)) {
                 final AcknowlegementType response = getUserName();
-                return Response.ok(response, MediaType.TEXT_XML).build();
+                return Response.ok(response).build();
             }
 
             else if (REQUEST_ACCESS.equalsIgnoreCase(request)) {
                 final AcknowlegementType response = new AcknowlegementType("Success", "You have access to the configuration service");
-                return Response.ok(response, MediaType.TEXT_XML).build();
+                return Response.ok(response).build();
             }
 
             /* specific operations */
@@ -236,7 +236,7 @@ public final class ConfigurationService extends WebService  {
                     }
                     final Object response = configurer.treatRequest(request, getUriContext().getQueryParameters(), objectRequest);
                     if (response != null) {
-                        return Response.ok(response, MimeType.TEXT_XML).build();
+                        return Response.ok(response).build();
                     }
                 }
             }
@@ -247,7 +247,8 @@ public final class ConfigurationService extends WebService  {
 
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Error while marshalling the configuration service response", ex);
-            return Response.ok("<error>JAXB Exception</error>", MimeType.TEXT_XML).build();
+            final AcknowlegementType response = new AcknowlegementType("Error", "JAXB Exception");
+            return Response.ok(response).build();
 
         } catch (CstlServiceException ex) {
             final String code = StringUtilities.transformCodeName(ex.getExceptionCode().name());
@@ -259,7 +260,7 @@ public final class ConfigurationService extends WebService  {
             } else {
                 LOGGER.info(ex.getMessage());
             }
-            return Response.ok(report, MimeType.TEXT_XML).build();
+            return Response.ok(report).build();
 
         } finally {
             if (marshaller != null) {
@@ -280,7 +281,7 @@ public final class ConfigurationService extends WebService  {
     protected Response launchException(final String message, final String codeName, final String locator) {
         final ExceptionCode code = ExceptionCode.valueOf(codeName);
         final ExceptionReport report = new ExceptionReport(message, code.name());
-        return Response.ok(report, MimeType.TEXT_XML).build();
+        return Response.ok(report).build();
     }
 
     /**

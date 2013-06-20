@@ -359,7 +359,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 } catch (ProcessException ex) {
                     response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
                 }
-                return Response.ok(response, "text/xml").build();
+                return Response.ok(response).build();
 
             } else if ("start".equalsIgnoreCase(request)) {
                 LOGGER.info("starting an instance");
@@ -381,7 +381,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 } catch (ProcessException ex) {
                     response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
                 }
-                return Response.ok(response, "text/xml").build();
+                return Response.ok(response).build();
 
             } else if ("stop".equalsIgnoreCase(request)) {
                 LOGGER.info("stopping an instance");
@@ -402,7 +402,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     response = new AcknowlegementType("Error", "unable to stop the instance : " + ex.getMessage());
                 }
 
-                return Response.ok(response, "text/xml").build();
+                return Response.ok(response).build();
 
             } else if ("delete".equalsIgnoreCase(request)) {
                 LOGGER.info("deleting an instance");
@@ -425,7 +425,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     response = new AcknowlegementType("Error", "unable to delete the instance : " + ex.getMessage());
                 }
 
-                return Response.ok(response, "text/xml").build();
+                return Response.ok(response).build();
 
             } else if ("newInstance".equalsIgnoreCase(request)) {
                 return newInstance(objectRequest);
@@ -469,7 +469,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 } else {
                     throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
                 }
-                return Response.ok(response, "text/xml").build();
+                return Response.ok(response).build();
 
 
             /*
@@ -487,7 +487,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 } else {
                     throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
                 }
-                return Response.ok(response, "text/xml").build();
+                return Response.ok(response).build();
 
             /*
              * Send the configuration file of an instance.
@@ -507,7 +507,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 } else {
                     throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
                 }
-                return Response.ok(response, "text/xml").build();
+                return Response.ok(response).build();
 
             /*
              * Return a report about the instances in the service.
@@ -536,7 +536,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     }
                 }
                 final InstanceReport report = new InstanceReport(instances);
-                return Response.ok(report, "text/xml").build();
+                return Response.ok(report).build();
 
             } else if ("updateCapabilities".equalsIgnoreCase(request)) {
                 LOGGER.info("updating instance capabilities");
@@ -568,7 +568,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 } else {
                     throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
                 }
-                return Response.ok(response, "text/xml").build();
+                return Response.ok(response).build();
 
             } else {
                 return treatSpecificAdminRequest(request);
@@ -576,7 +576,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         } catch (CstlServiceException ex) {
             LOGGER.log(Level.WARNING, "Sending admin exception:{0}", ex.getMessage());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getMessage());
-            return Response.ok(report, "text/xml").build();
+            return Response.ok(report).build();
         }
     }
 
@@ -609,7 +609,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         } else {
             throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
         }
-        return Response.ok(response, "text/xml").build();
+        return Response.ok(response).build();
     }
 
     /**

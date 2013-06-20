@@ -84,6 +84,10 @@
             <artifactId>servlet-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.constellation.library</groupId>
             <artifactId>cstl-lib-base</artifactId>
             <version>${project.version}</version>

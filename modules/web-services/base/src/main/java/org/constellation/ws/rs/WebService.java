@@ -17,58 +17,57 @@
  */
 package org.constellation.ws.rs;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.ByteArrayInputStream;
-import java.util.StringTokenizer;
-import java.util.logging.Logger;
-import java.util.List;
-import java.util.Map.Entry;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
-// jersey dependencies
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.core.HttpContext;
-import java.lang.reflect.Proxy;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.logging.Level;
+import org.constellation.dto.Service;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
+import org.constellation.ws.WebServiceUtilities;
+import org.constellation.xml.PrefixMappingInvocationHandler;
+import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.util.Versioned;
+import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.xml.MarshallerPool;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-
-// JAXB xml binding dependencies
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Schema;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.lang.reflect.Proxy;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.constellation.ws.ExceptionCode.INVALID_REQUEST;
+import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED;
+
+// jersey dependencies
+// JAXB xml binding dependencies
 // Constellation dependencies
-import org.constellation.dto.Service;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
-
-import static org.constellation.ws.ExceptionCode.*;
-import org.constellation.ws.WebServiceUtilities;
-import org.constellation.xml.PrefixMappingInvocationHandler;
-
 // Geotoolkit dependencies
-import org.geotoolkit.util.Versioned;
-import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.util.StringUtilities;
 
 
 /**
