@@ -1411,6 +1411,7 @@ public class CSWworker extends AbstractWorker {
                     try {
                         for (String metadataID : results) {
                             final boolean deleted = mdWriter.deleteMetadata(metadataID);
+                            mdReader.removeFromCache(metadataID);
                             if (!deleted) {
                                 throw new CstlServiceException("The service does not succeed to delete the metadata:" + metadataID,
                                                   NO_APPLICABLE_CODE);
