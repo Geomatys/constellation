@@ -89,7 +89,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
                     } else {
                         boolean addProviderToList = false;
                         //WFS -> data-store
-                        if ( ("WFS".equals(serviceType) && "data-store".equals(serviceProviderType)) ) {
+                        if ( ("WFS".equals(serviceType) && "feature-store".equals(serviceProviderType)) ) {
                             addProviderToList = true;
                         }
                         
