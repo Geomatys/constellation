@@ -44,17 +44,34 @@
         <servlet-name>ServletAdaptor</servlet-name>
         <url-pattern>/WS/*</url-pattern>
     </servlet-mapping>
-    
-     <!--  SOAP enabling
-         
-         In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in the web-app tag (at the top of this document)
-         In Tomcat   : 1) Uncomment the WSServletContextListener listener.
-                       2) Rename the file sun-jaxws.xml.backup  in sun-jaxws.xml and uncomment the endpoint you want to enable.
-           
-     >
-    <listener>
-        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-    </listener-->
+    <servlet>
+        <servlet-name>newREST</servlet-name>
+        <servlet-class>org.constellation.ws.rs.CstlServletContainer</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
+            <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>org.constellation.ws.rest</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>newREST</servlet-name>
+        <url-pattern>/services/*</url-pattern>
+    </servlet-mapping>
+
+    <!--  SOAP enabling
+
+        In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in the web-app tag (at the top of this document)
+        In Tomcat   : 1) Uncomment the WSServletContextListener listener.
+                      2) Rename the file sun-jaxws.xml.backup  in sun-jaxws.xml and uncomment the endpoint you want to enable.
+
+    >
+   <listener>
+       <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+   </listener-->
 
     <!-- webdav server servlet -->
     <servlet>

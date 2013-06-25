@@ -145,21 +145,6 @@ public final class ConfigurationService extends WebService  {
 
     }
 
-    private AuthenticationReader getAuthReader() {
-        final File authProperties = ConfigDirectory.getAuthConfigFile();
-        final Properties prop = new Properties();
-        try {
-            final FileInputStream fis = new FileInputStream(authProperties);
-            prop.load(fis);
-            final String url = prop.getProperty("cstl_authdb_host");
-            final DefaultDataSource ds = new DefaultDataSource(url.replace('\\', '/') + ";");
-            return new DataSourceAuthenticationReader(ds);
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "IOException while loading cstl auth properties file", ex);
-        }
-        return null;
-    }
-
     /**
      * Handle the various types of requests made to the service.
      */
@@ -176,7 +161,7 @@ public final class ConfigurationService extends WebService  {
 
             if (REQUEST_FULL_RESTART.equalsIgnoreCase(request)) {
                 final boolean force = getBooleanParameter("FORCED", false);
-                return Response.ok(restartService(force)).build();
+                return Response.ok(ConfigurationUtilities.restartService(force, configurers, cn)).build();
             }
 
             else if (REQUEST_DOWNLOAD.equalsIgnoreCase(request)) {
@@ -190,13 +175,13 @@ public final class ConfigurationService extends WebService  {
             }
 
             else if (REQUEST_GET_CONFIG_PATH.equalsIgnoreCase(request)) {
-                final AcknowlegementType response = getConfigPath();
+                final AcknowlegementType response = ConfigurationUtilities.getConfigPath();
                 return Response.ok(response).build();
             }
 
             else if (REQUEST_SET_CONFIG_PATH.equalsIgnoreCase(request)) {
                 final String path = getParameter("path", false);
-                final AcknowlegementType response = setConfigPath(path);
+                final AcknowlegementType response = ConfigurationUtilities.setConfigPath(path);
                 return Response.ok(response).build();
             }
 
@@ -204,18 +189,18 @@ public final class ConfigurationService extends WebService  {
                 final String userName = getParameter("userName", true);
                 final String password = getParameter("password", true);
                 final String oldLogin = getParameter("oldLogin", true);
-                final AcknowlegementType response = updateUser(userName, password, oldLogin);
+                final AcknowlegementType response = ConfigurationUtilities.updateUser(userName, password, oldLogin);
                 return Response.ok(response).build();
             }
 
             else if (REQUEST_DELETE_USER.equalsIgnoreCase(request)) {
                 final String userName = getParameter("userName", true);
-                final AcknowlegementType response = deleteUser(userName);
+                final AcknowlegementType response = ConfigurationUtilities.deleteUser(userName);
                 return Response.ok(response).build();
             }
 
             else if (REQUEST_GET_USER_NAME.equalsIgnoreCase(request)) {
-                final AcknowlegementType response = getUserName();
+                final AcknowlegementType response = ConfigurationUtilities.getUserName();
                 return Response.ok(response).build();
             }
 
@@ -284,49 +269,6 @@ public final class ConfigurationService extends WebService  {
         return Response.ok(report).build();
     }
 
-    /**
-     * Restart all the web-services, reload the providers.
-     * If some services are currently indexing, the service will not restart
-     * unless you specified the flag "forced".
-     *
-     * @return an Acknowledgment if the restart succeed.
-     */
-    private AcknowlegementType restartService(final boolean forced) {
-        LOGGER.info("\n restart requested \n");
-        // clear cache
-        for (AbstractConfigurer configurer : configurers) {
-            configurer.beforeRestart();
-        }
-
-        if (cn != null) {
-            if (!configurerLock()) {
-                BDD.clearConnectionPool();
-                WSEngine.prepareRestart();
-                cn.reload();
-                return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
-            } else if (!forced) {
-                return new AcknowlegementType("failed", "There is an indexation running use the parameter FORCED=true to bypass it.");
-            } else {
-                for (AbstractConfigurer configurer : configurers) {
-                    configurer.closeForced();
-                }
-                BDD.clearConnectionPool();
-                WSEngine.prepareRestart();
-                cn.reload();
-                return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted (previous indexation was stopped)");
-            }
-        } else {
-            return new AcknowlegementType("failed", "The services can not be restarted (ContainerNotifier is null)");
-        }
-
-    }
-
-    private boolean configurerLock() {
-        for (AbstractConfigurer configurer : configurers) {
-            if (configurer.isLock()) return true;
-        }
-        return false;
-    }
 
     /**
      * Receive a file and write it into the static file path.
@@ -365,63 +307,7 @@ public final class ConfigurationService extends WebService  {
         throw new CstlServiceException("Download operation not implemented", OPERATION_NOT_SUPPORTED);
     }
 
-    private AcknowlegementType getConfigPath() throws CstlServiceException{
-        final String path = ConfigDirectory.getConfigDirectory().getPath();
-        return new AcknowlegementType("Success", path);
-    }
 
-    private AcknowlegementType setConfigPath(final String path) throws CstlServiceException{
-        // Set the new user directory
-        if (path != null && !path.isEmpty()) {
-            final File userDirectory = new File(path);
-            if (!userDirectory.isDirectory()) {
-                userDirectory.mkdir();
-            }
-            ConfigDirectory.setConfigDirectory(userDirectory);
-        }
-
-        return new AcknowlegementType("Success", path);
-    }
-
-    private AcknowlegementType updateUser(final String userName, final String password, final String oldLogin) {
-        try {
-            final AuthenticationReader authReader = getAuthReader();
-            authReader.writeUser(userName, password, "Default Constellation Administrator", Arrays.asList("cstl-admin"), oldLogin);
-            authReader.destroy();
-            return new AcknowlegementType("Success", "The user has been changed");
-        } catch (AuthenticationException ex) {
-            LOGGER.log(Level.WARNING, "Error while updating user", ex);
-        }
-        return new AcknowlegementType("Failure", "An error occurs");
-    }
-
-    private AcknowlegementType deleteUser(final String userName) {
-        try {
-            final AuthenticationReader authReader = getAuthReader();
-            authReader.deleteUser(userName);
-            authReader.destroy();
-            return new AcknowlegementType("Success", "The user has been deleted");
-        } catch (AuthenticationException ex) {
-            LOGGER.log(Level.WARNING, "Error while deleting user", ex);
-        }
-        return new AcknowlegementType("Failure", "An error occurs");
-    }
-
-    private AcknowlegementType getUserName() {
-        try {
-            final AuthenticationReader authReader = getAuthReader();
-            final List<UserAuthnInfo> users =  authReader.listAllUsers();
-            String userName = null;
-            if (users != null && !users.isEmpty()) {
-                userName = users.get(0).getLogin();
-            }
-            authReader.destroy();
-            return new AcknowlegementType("Success", userName);
-        } catch (AuthenticationException ex) {
-            LOGGER.log(Level.WARNING, "Error while updating user", ex);
-        }
-        return new AcknowlegementType("Failure", "An error occurs");
-    }
 
     /**
      * {@inheritDoc}

@@ -47,6 +47,9 @@ public final class LayerContextWriter implements MessageBodyWriter {
 
     @Override
     public boolean isWriteable(Class type, Type type1, Annotation[] antns, MediaType mt) {
+        if (MediaType.APPLICATION_JSON_TYPE.equals(mt)) {
+            return false;
+        }
         return LayerContext.class.isAssignableFrom(type);
     }
 
