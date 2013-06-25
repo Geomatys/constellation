@@ -149,7 +149,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.web-services-rest</groupId>
-                    <artifactId>cstl-web-rest</artifactId>
+                    <artifactId>cstl-web-restfull</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
