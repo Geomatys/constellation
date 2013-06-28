@@ -1,0 +1,13 @@
+package org.constellation.ws.rs;
+
+/**
+ * Service type listing. Used to know which implementation use on utilities
+ *
+ * @author Benjamin Garcia (Geomatys)
+ * @version 0.9
+ * @since 0.9
+ *
+ */
+public enum ServiceType {
+    WMS, WMTS, WFS, CSW, WPS, SOS
+}

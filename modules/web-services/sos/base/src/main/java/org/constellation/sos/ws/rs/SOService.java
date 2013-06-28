@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import java.io.File;
 
 // Jersey dependencies
 import javax.ws.rs.Path;
@@ -30,19 +29,11 @@ import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
 
 //JAXB dependencies
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.SOSConfiguration;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
@@ -54,6 +45,7 @@ import static org.constellation.api.QueryConstants.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
+import org.constellation.ws.rs.ServiceType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
@@ -91,6 +83,9 @@ import org.opengis.temporal.Period;
 /**
  *
  * @author Guilhem Legal
+ * @author Benjamin Garcia (Geomatys)
+ *
+ * @version 0.9
  */
 @Path("sos/{serviceId}")
 @Singleton
@@ -102,6 +97,7 @@ public class SOService extends OGCWebService<SOSworker> {
     public SOService() throws CstlServiceException {
         super(Specification.SOS);
         setXMLContext(SOSMarshallerPool.getInstance());
+        utils.getServiceUtilities().put(ServiceType.SOS, new SOSServiceConfiguration());
         LOGGER.log(Level.INFO, "SOS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
@@ -271,62 +267,6 @@ public class SOService extends OGCWebService<SOSworker> {
         final String exceptionCode   = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(), exceptionVersion);
         return Response.ok(report, MimeType.TEXT_XML).build();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void configureInstance(final File instanceDirectory, final Object configuration, final Object capabilitiesConfiguration) throws CstlServiceException {
-        if (configuration instanceof SOSConfiguration) {
-            final File configurationFile = new File(instanceDirectory, "config.xml");
-            try {
-                Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-            } catch(JAXBException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            }
-        } else {
-            throw new CstlServiceException("The configuration Object is not a SOSConfiguration", INVALID_PARAMETER_VALUE);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException {
-        final SOSConfiguration baseConfig = new SOSConfiguration(new Automatic(null, new BDD()), new Automatic(null, new BDD()));
-        baseConfig.setObservationReaderType(DataSourceType.FILESYSTEM);
-        baseConfig.setObservationFilterType(DataSourceType.LUCENE);
-        baseConfig.setObservationWriterType(DataSourceType.FILESYSTEM);
-        baseConfig.setSMLType(DataSourceType.FILESYSTEM);
-        configureInstance(instanceDirectory, baseConfig, capabilitiesConfiguration);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
-        final File configurationFile = new File(instanceDirectory, "config.xml");
-        if (configurationFile.exists()) {
-            try {
-                final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                if (obj instanceof SOSConfiguration) {
-                    return obj;
-                } else {
-                    throw new CstlServiceException("The config.xml file does not contain a SOSConfiguration object");
-                }
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex);
-            }
-        } else {
-            throw new CstlServiceException("Unable to find a file config.xml");
-        }
     }
 
     /**

@@ -18,13 +18,11 @@ package org.constellation.wps.ws.rs;
 
 import com.sun.jersey.spi.resource.Singleton;
 import org.constellation.ServiceDef;
-import org.constellation.configuration.ProcessContext;
-import org.constellation.configuration.Processes;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ws.rs.ServiceType;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
@@ -35,12 +33,8 @@ import org.geotoolkit.wps.xml.v100.*;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,6 +52,9 @@ import org.geotoolkit.ows.xml.RequestBase;
  * WPS web service class.
  *
  * @author Quentin Boileau (Geomatys).
+ * @author Benjamin Garcia (Geomatys).
+ *
+ * @version 0.9
  */
 @Path("wps/{serviceId}")
 @Singleton
@@ -77,7 +74,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WPSMarshallerPool.getInstance());
-
+        utils.getServiceUtilities().put(ServiceType.WPS, new WPSServiceConfiguration());
         LOGGER.log(Level.INFO, "WPS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
@@ -102,48 +99,6 @@ public class WPSService extends OGCWebService<WPSWorker> {
             EXECUTOR = Executors.newCachedThreadPool();
         }
         return EXECUTOR;
-    }
-
-    @Override
-    protected void configureInstance(File instanceDirectory, Object configuration, Object capabilitiesConfiguration) throws CstlServiceException {
-        if (configuration instanceof ProcessContext) {
-            final File configurationFile = new File(instanceDirectory, "processContext.xml");
-            try {
-                Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            }
-        } else {
-            throw new CstlServiceException("The configuration Object is not a process context", INVALID_PARAMETER_VALUE);
-        }
-    }
-
-    @Override
-    protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
-        final File configurationFile = new File(instanceDirectory, "processContext.xml");
-        if (configurationFile.exists()) {
-            try {
-                final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                if (obj instanceof ProcessContext) {
-                    return obj;
-                } else {
-                    throw new CstlServiceException("The processContext.xml file does not contain a ProcessContext object");
-                }
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex);
-            }
-        } else {
-            throw new CstlServiceException("Unable to find a file processContext.xml");
-        }
-    }
-
-    @Override
-    protected void basicConfigure(File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException {
-        configureInstance(instanceDirectory, new ProcessContext(new Processes(true)), capabilitiesConfiguration);
     }
 
     @Override

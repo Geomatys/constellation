@@ -17,25 +17,10 @@
  */
 package org.constellation.ws.rs;
 
-import java.io.File;
-
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.LayerContext;
-import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.SetConfigMapServiceDescriptor;
-import org.constellation.process.service.CreateMapServiceDescriptor;
-import org.constellation.process.service.GetConfigMapServiceDescriptor;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
-import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.process.ProcessFinder;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * A Super class for WMS, WMTS, WFS and WCS web-service.
@@ -43,6 +28,9 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Guilhem Legal (Geomatys)
  * @author Cédric Briançon (Geomatys)
+ * @author Benjamin Garcia (Geomatys)
+ *
+ * @version 0.9
  * @since 0.5
  */
 public abstract class GridWebService<W extends Worker> extends OGCWebService<W> {
@@ -62,92 +50,5 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
         LayerProviderProxy.getInstance().dispose();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void configureInstance(final File instanceDirectory, final Object configuration, final Object capabilitiesConfiguration) throws CstlServiceException {
 
-
-        if (configuration instanceof LayerContext) {
-            if (instanceDirectory.isDirectory()) {
-                if (instanceDirectory.listFiles().length == 0) {
-                    //Create
-                    try {
-                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
-                        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                        inputs.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
-                        inputs.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
-                        inputs.parameter(CreateMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
-                        inputs.parameter(CreateMapServiceDescriptor.CAPABILITIES_CONFIG).setValue(capabilitiesConfiguration);
-
-                        final org.geotoolkit.process.Process process = desc.createProcess(inputs);
-                        process.call();
-
-                    } catch (NoSuchIdentifierException ex) {
-                        throw new CstlServiceException(ex);
-                    } catch (ProcessException ex) {
-                        throw new CstlServiceException(ex);
-                    }
-
-                } else {
-
-                    //Update
-                    try {
-                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigMapServiceDescriptor.NAME);
-                        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(SetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                        inputs.parameter(SetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
-                        inputs.parameter(SetConfigMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
-                        inputs.parameter(SetConfigMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
-
-                        final org.geotoolkit.process.Process process = desc.createProcess(inputs);
-                        process.call();
-
-                    } catch (NoSuchIdentifierException ex) {
-                        throw new CstlServiceException(ex);
-                    } catch (ProcessException ex) {
-                        throw new CstlServiceException(ex);
-                    }
-                }
-            }
-        } else {
-            throw new CstlServiceException("The configuration Object is not a layer context", INVALID_PARAMETER_VALUE);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException {
-        configureInstance(instanceDirectory, new LayerContext(), capabilitiesConfiguration);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
-
-        try {
-            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigMapServiceDescriptor.NAME);
-
-            ParameterValueGroup in = desc.getInputDescriptor().createValue();
-            in.parameter(GetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-            in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
-            in.parameter(GetConfigMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
-
-            final org.geotoolkit.process.Process proc = desc.createProcess(in);
-            final ParameterValueGroup ouptuts = proc.call();
-
-            return ouptuts.parameter(GetConfigMapServiceDescriptor.CONFIG_NAME).getValue();
-
-        } catch (NoSuchIdentifierException ex) {
-            throw new CstlServiceException(ex);
-        } catch (ProcessException ex) {
-            throw new CstlServiceException(ex);
-        }
-    }
 }

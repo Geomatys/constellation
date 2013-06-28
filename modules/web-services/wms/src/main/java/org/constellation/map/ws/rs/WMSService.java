@@ -35,7 +35,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
@@ -52,6 +51,7 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
+import org.constellation.ws.rs.ServiceType;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 
 //GeotoolKit dependencies
@@ -91,10 +91,11 @@ import org.geotoolkit.ows.xml.RequestBase;
  * The REST facade to an OGC Web Map Service, implementing versions 1.1.1 and
  * 1.3.0.
  *
- * @version $Id$
+ * @version 0.9
  *
  * @author Guilhem Legal (Geomatys)
  * @author Cédric Briançon (Geomatys)
+ * @author Benjain Garcia (Geomatys)
  * @since 0.1
  */
 @Path("wms/{serviceId}")
@@ -108,7 +109,7 @@ public class WMSService extends GridWebService<WMSWorker> {
      */
     public WMSService() {
         super(Specification.WMS);
-
+        utils.getServiceUtilities().put(ServiceType.WMS, new WMSServiceConfiguration());
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WMSMarshallerPool.getInstance());
 
@@ -258,7 +259,6 @@ public class WMSService extends GridWebService<WMSWorker> {
      * Converts a DescribeLayer request composed of string values, to a container
      * of real java objects.
      *
-     * @param version The version of the web service detected.
      * @return The DescribeLayer request.
      * @throws CstlServiceException
      */
@@ -285,7 +285,6 @@ public class WMSService extends GridWebService<WMSWorker> {
      * Converts a GetCapabilities request composed of string values, to a container
      * of real java objects.
      *
-     * @param version The version of the web service detected.
      * @return A GetCapabilities request.
      * @throws CstlServiceException
      */
@@ -341,7 +340,6 @@ public class WMSService extends GridWebService<WMSWorker> {
      * Converts a GetFeatureInfo request composed of string values, to a container
      * of real java objects.
      *
-     * @param version The version of the web service detected.
      * @return A GetFeatureInfo request.
      * @throws CstlServiceException
      */
@@ -472,7 +470,6 @@ public class WMSService extends GridWebService<WMSWorker> {
      * Converts a GetMap request composed of string values, to a container of real
      * java objects.
      *
-     * @param version    The version of the web service detected.
      * @param fromGetMap {@code true} if the request is done for a GetMap, {@code false}
      *                   otherwise (in the case of a GetFeatureInfo for example).
      * @return The GetMap request.

@@ -27,6 +27,22 @@
         rest web services as possible.
     </description>
 
+    <!--
+  Developers and contributors.
+-->
+    <developers>
+        <developer>
+            <id>bgarcia</id>
+            <name>Benjamin Garcia</name>
+            <email>benjamin.garcia@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
@@ -44,6 +60,18 @@
             <artifactId>cstl-web-configuration</artifactId>
             <version>0.9-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation.web-services</groupId>
+            <artifactId>cstl-web-ogc</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-process-core</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+
+
 
         <!-- Geomatys external project -->
         <dependency>

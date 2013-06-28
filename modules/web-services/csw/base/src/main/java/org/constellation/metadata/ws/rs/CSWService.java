@@ -18,86 +18,89 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
-import java.util.logging.Level;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 
-// jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
-import java.util.Arrays;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
-//JAXB dependencies
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-import javax.xml.namespace.QName;
-
-// Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.generic.database.Automatic;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.jaxb.CstlXMLSerializer;
-import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.utils.SerializerResponse;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ws.WebServiceUtilities;
-import org.constellation.generic.database.BDD;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-
-import static org.constellation.api.QueryConstants.*;
-import org.constellation.configuration.AcknowlegementType;
-import static org.constellation.metadata.CSWConstants.*;
 import org.constellation.ws.UnauthorizedException;
 import org.constellation.ws.WSEngine;
+import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ws.Worker;
-
-// Geotoolkit dependencies
+import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ws.rs.ServiceType;
 import org.geotoolkit.csw.xml.CSWResponse;
 import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.DescribeRecord;
 import org.geotoolkit.csw.xml.DistributedSearch;
 import org.geotoolkit.csw.xml.ElementSetName;
+import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.GetCapabilities;
 import org.geotoolkit.csw.xml.GetDomain;
 import org.geotoolkit.csw.xml.GetRecordById;
 import org.geotoolkit.csw.xml.GetRecordsRequest;
-import org.geotoolkit.csw.xml.Transaction;
-import org.geotoolkit.csw.xml.ResultType;
-import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.Harvest;
 import org.geotoolkit.csw.xml.Query;
 import org.geotoolkit.csw.xml.QueryConstraint;
+import org.geotoolkit.csw.xml.ResultType;
+import org.geotoolkit.csw.xml.Transaction;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AcceptVersions;
-import org.geotoolkit.ows.xml.v100.SectionsType;
+import org.geotoolkit.ows.xml.RequestBase;
+import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
+import org.geotoolkit.ows.xml.v100.SectionsType;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.Namespaces;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.ows.xml.Sections;
-import org.geotoolkit.util.StringUtilities;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
+import static org.constellation.api.QueryConstants.ACCEPT_FORMATS_PARAMETER;
+import static org.constellation.api.QueryConstants.ACCEPT_VERSIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.SECTIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
+import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
+import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
+import static org.constellation.metadata.CSWConstants.MALFORMED;
+import static org.constellation.metadata.CSWConstants.NAMESPACE;
+import static org.constellation.metadata.CSWConstants.NOT_EXIST;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+
+// jersey dependencies
+//JAXB dependencies
+// Constellation dependencies
+// Geotoolkit dependencies
 
 /**
  * RestFul CSW service.
  *
  * @author Guilhem Legal
+ * @author Benjamin Garcia (Geomatys)
+ *
+ * @version 0.9
  */
 @Path("csw/{serviceId}")
 @Singleton
@@ -109,6 +112,7 @@ public class CSWService extends OGCWebService<CSWworker> {
     public CSWService() {
         super(Specification.CSW);
         setXMLContext(EBRIMMarshallerPool.getInstance());
+        utils.getServiceUtilities().put(ServiceType.CSW, new CSWServiceConfiguration());
         LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
@@ -256,58 +260,6 @@ public class CSWService extends OGCWebService<CSWworker> {
         return Response.ok(report, MimeType.TEXT_XML).build();
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void configureInstance(final File instanceDirectory, final Object configuration, final Object capabilitiesConfiguration) throws CstlServiceException {
-        if (configuration instanceof Automatic) {
-            final File configurationFile = new File(instanceDirectory, "config.xml");
-            try {
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-            } catch(JAXBException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            }
-        } else {
-            throw new CstlServiceException("The configuration Object is not an Automatic object", INVALID_PARAMETER_VALUE);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException {
-        configureInstance(instanceDirectory, new Automatic("filesystem", new BDD()), null);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
-        final File configurationFile = new File(instanceDirectory, "config.xml");
-        if (configurationFile.exists()) {
-            try {
-                Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                if (obj instanceof Automatic) {
-                    return obj;
-                } else {
-                    throw new CstlServiceException("The config.xml file does not contain a Automatic object");
-                }
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex);
-            }
-        } else {
-            throw new CstlServiceException("Unable to find a file config.xml");
-        }
-    }
 
     /**
      * Build request object from KVP parameters.

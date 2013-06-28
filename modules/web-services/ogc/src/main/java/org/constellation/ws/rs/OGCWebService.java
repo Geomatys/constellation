@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.PUT;
@@ -36,19 +35,12 @@ import org.apache.shiro.authc.UnknownAccountException;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ExceptionReport;
-import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.ServiceStatus;
-import org.constellation.dto.Service;
+import org.constellation.configuration.LayerContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.DeleteServiceDescriptor;
-import org.constellation.process.service.RestartServiceDescriptor;
 import org.constellation.process.service.StartServiceDescriptor;
-import org.constellation.process.service.StopServiceDescriptor;
-import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.security.SecurityManager;
@@ -94,11 +86,15 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Guilhem Legal (Geomatys)
  * @author Cédric Briançon (Geomatys)
+ * @author Garcia Benjamin (Geomatys)
+ *
+ * @version 0.9
  * @since 0.3
  */
 public abstract class OGCWebService<W extends Worker> extends WebService {
 
     final String serviceName;
+    protected static OGCServiceConfiguration utils;
 
     /**
      * Initialize the basic attributes of a web serviceType.
@@ -109,6 +105,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         if (specification == null){
             throw new IllegalArgumentException("It is compulsory for a web service to have a specification.");
         }
+        utils = new OGCServiceConfiguration();
         serviceName = specification.name();
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
         WSEngine.registerService(serviceName, "REST", getWorkerClass());
@@ -124,37 +121,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
     }
 
-    /**
-     * Return the dedicated Web-service configuration directory.
-     *
-     * @return
-     */
-    protected File getServiceDirectory() {
-        final File configDirectory   = ConfigDirectory.getConfigDirectory();
-        if (configDirectory != null && configDirectory.isDirectory()) {
-            final File serviceDirectory = new File(configDirectory, serviceName);
-            if (serviceDirectory.isDirectory()) {
-                return serviceDirectory;
-            } else {
-                LOGGER.log(Level.INFO, "The service configuration directory: {0} does not exist or is not a directory, creating new one.", serviceDirectory.getPath());
-                if (!serviceDirectory.mkdir()) {
-                    LOGGER.log(Level.WARNING, "The service was unable to create the directory.{0}", serviceDirectory.getPath());
-                } else {
-                    return serviceDirectory;
-                }
-            }
-        } else {
-            if (configDirectory == null) {
-                LOGGER.warning("The service was unable to find a config directory.");
-            } else {
-                LOGGER.log(Level.WARNING, "The configuration directory: {0} does not exist or is not a directory.", configDirectory.getPath());
-            }
-        }
-        return null;
-    }
-
     private void startAllInstance() {
-        final File serviceDirectory = getServiceDirectory();
+        final File serviceDirectory = utils.getServiceDirectory(serviceName);
         if (serviceDirectory != null && serviceDirectory.isDirectory()) {
             for (File instanceDirectory : serviceDirectory.listFiles()) {
                 if (instanceDirectory.isDirectory()) {
@@ -180,32 +148,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
     }
 
-    private Worker buildWorker(final String identifier) {
-        final File serviceDirectory = getServiceDirectory();
-        if (serviceDirectory != null) {
-            final File instanceDirectory = new File(serviceDirectory, identifier);
-            if (instanceDirectory.isDirectory()) {
-                final Worker newWorker = createWorker(instanceDirectory);
-                if (newWorker != null) {
-                    WSEngine.addServiceInstance(serviceName, instanceDirectory.getName(), newWorker);
-                }
-                return newWorker;
-            } else {
-                LOGGER.log(Level.WARNING, "The instance directory: {0} does not exist or is not a directory.", instanceDirectory.getPath());
-            }
-        }
-        return null;
-    }
 
-    /**
-     * Build a new instance of Web service worker with the specified configuration directory
-     *
-     * @param instanceDirectory The configuration directory of the instance.
-     * @return
-     */
-    private Worker createWorker(final File instanceDirectory) {
-        return (Worker) ReflectionUtilities.newInstance(getWorkerClass(), instanceDirectory.getName(), instanceDirectory);
-    }
+
+
 
     /**
      * @return the worker class of the service.
@@ -342,89 +287,24 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 } else {
                     closeFirst = true;
                 }
-                AcknowlegementType response;
-                try {
-                    ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
-                    ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                    inputs.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                    inputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-                    inputs.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(closeFirst);
-                    inputs.parameter(RestartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
-
-                    org.geotoolkit.process.Process proc = desc.createProcess(inputs);
-                    proc.call();
-                    response = new AcknowlegementType("Success", "instances succefully restarted");
-                } catch (NoSuchIdentifierException ex) {
-                    response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
-                } catch (ProcessException ex) {
-                    response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
-                }
+                AcknowlegementType response = utils.restart(serviceName, identifier, closeFirst);
                 return Response.ok(response).build();
 
             } else if ("start".equalsIgnoreCase(request)) {
                 LOGGER.info("starting an instance");
                 final String identifier = getParameter("id", true);
-                final Class clazz       = getWorkerClass();
-                AcknowlegementType response;
-                try {
-                    ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
-                    ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                    inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                    inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-                    inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
-
-                    org.geotoolkit.process.Process proc = desc.createProcess(inputs);
-                    proc.call();
-                    response = new AcknowlegementType("Success", "new instance succefully started");
-                } catch (NoSuchIdentifierException ex) {
-                    response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
-                } catch (ProcessException ex) {
-                    response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
-                }
+                AcknowlegementType response = utils.start(serviceName, identifier);
                 return Response.ok(response).build();
 
             } else if ("stop".equalsIgnoreCase(request)) {
-                LOGGER.info("stopping an instance");
                 final String identifier = getParameter("id", true);
-                AcknowlegementType response;
-                try {
-                    ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopServiceDescriptor.NAME);
-                    ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                    inputs.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-                    inputs.parameter(StopServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-
-                    org.geotoolkit.process.Process proc = desc.createProcess(inputs);
-                    proc.call();
-                    response = new AcknowlegementType("Success", "instance succesfully stopped");
-                } catch (NoSuchIdentifierException ex) {
-                    response = new AcknowlegementType("Error", "unable to stop the instance : " + ex.getMessage());
-                } catch (ProcessException ex) {
-                    response = new AcknowlegementType("Error", "unable to stop the instance : " + ex.getMessage());
-                }
-
+                AcknowlegementType response = utils.stop(serviceName, identifier);
                 return Response.ok(response).build();
 
             } else if ("delete".equalsIgnoreCase(request)) {
                 LOGGER.info("deleting an instance");
                 final String identifier = getParameter("id", true);
-                AcknowlegementType response;
-
-                try {
-                    ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteServiceDescriptor.NAME);
-                    ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                    inputs.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                    inputs.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-                    inputs.parameter(DeleteServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
-
-                    org.geotoolkit.process.Process proc = desc.createProcess(inputs);
-                    proc.call();
-                    response = new AcknowlegementType("Success", "instance succesfully deleted");
-                } catch (NoSuchIdentifierException ex) {
-                    response = new AcknowlegementType("Error", "unable to delete the instance : " + ex.getMessage());
-                } catch (ProcessException ex) {
-                    response = new AcknowlegementType("Error", "unable to delete the instance : " + ex.getMessage());
-                }
-
+                AcknowlegementType response = utils.delete(serviceName, identifier);
                 return Response.ok(response).build();
 
             } else if ("newInstance".equalsIgnoreCase(request)) {
@@ -435,40 +315,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 LOGGER.info("renaming an instance");
                 final String identifier = getParameter("id", true);
                 final String newName    = getParameter("newName", true);
-                // we stop the current worker
-                WSEngine.shutdownInstance(serviceName, identifier);
-
-                final AcknowlegementType response;
-                final File serviceDirectory = getServiceDirectory();
-                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                    final File instanceDirectory = new File (serviceDirectory, identifier);
-                    final File newDirectory      = new File (serviceDirectory, newName);
-
-                    if (instanceDirectory.isDirectory()) {
-                        if (!newDirectory.exists()) {
-                            if (instanceDirectory.renameTo(newDirectory)) {
-                                final Worker newWorker = buildWorker(newName);
-                                if (newWorker == null) {
-                                    throw new CstlServiceException("The instance " + newName + " can be started, maybe there is no configuration directory with this name.", INVALID_PARAMETER_VALUE);
-                                } else {
-                                    if (newWorker.isStarted()) {
-                                        response = new AcknowlegementType("Success", "instance succefully renamed");
-                                    } else {
-                                        response = new AcknowlegementType("Error", "unable to start the renamed instance");
-                                    }
-                                }
-                            } else {
-                                response = new AcknowlegementType("Error", "Unable to rename the directory");
-                            }
-                        } else {
-                            response = new AcknowlegementType("Error", "already existing instance:" + newName);
-                        }
-                    } else {
-                        response = new AcknowlegementType("Error", "no existing instance:" + identifier);
-                    }
-                } else {
-                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
-                }
+                AcknowlegementType response = utils.rename(serviceName, identifier, newName);
                 return Response.ok(response).build();
 
 
@@ -478,15 +325,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             } else if ("configure".equalsIgnoreCase(request)) {
                 LOGGER.info("configure an instance");
                 final String identifier = getParameter("id", true);
-                final File serviceDirectory = getServiceDirectory();
-                final AcknowlegementType response;
-                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                    File instanceDirectory     = new File (serviceDirectory, identifier);
-                    configureInstance(instanceDirectory, objectRequest, null);
-                    response = new AcknowlegementType("Success", "Instance correctly configured");
-                } else {
-                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
-                }
+                final AcknowlegementType response = utils.configure(serviceName, identifier, (LayerContext) objectRequest);
                 return Response.ok(response).build();
 
             /*
@@ -495,54 +334,21 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             } else if ("getConfiguration".equalsIgnoreCase(request)) {
                 LOGGER.info("sending instance configuration");
                 final String identifier = getParameter("id", true);
-                final File serviceDirectory = getServiceDirectory();
-                final Object response;
-                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                    File instanceDirectory     = new File (serviceDirectory, identifier);
-                    if (instanceDirectory.isDirectory()) {
-                        response = getInstanceConfiguration(instanceDirectory);
-                    } else {
-                        throw new CstlServiceException("Unable to find an instance:" + identifier, NO_APPLICABLE_CODE);
-                    }
-                } else {
-                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
-                }
+                final Object response = utils.getConfiguration(serviceName, identifier);
                 return Response.ok(response).build();
 
             /*
              * Return a report about the instances in the service.
              */
             } else if ("listInstance".equalsIgnoreCase(request)) {
-                LOGGER.finer("listing instances");
-                final List<Instance> instances = new ArrayList<Instance>();
-                // 1- First we list the instance in the map
-                for (Entry<String, Boolean> entry : WSEngine.getEntriesStatus(serviceName)) {
-                    final ServiceStatus status;
-                    if (entry.getValue()) {
-                        status = ServiceStatus.WORKING;
-                    } else {
-                        status = ServiceStatus.ERROR;
-                    }
-                    instances.add(new Instance(entry.getKey(), serviceName, status));
-                }
-                // 2- Then we list the instance not yet started
-                final File serviceDirectory = getServiceDirectory();
-                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                    for (File instanceDirectory : serviceDirectory.listFiles()) {
-                        final String name = instanceDirectory.getName();
-                        if (instanceDirectory.isDirectory() && !name.startsWith(".") && !WSEngine.serviceInstanceExist(serviceName, name)) {
-                            instances.add(new Instance(name, serviceName, ServiceStatus.NOT_STARTED));
-                        }
-                    }
-                }
-                final InstanceReport report = new InstanceReport(instances);
+                InstanceReport report = utils.listInstance(serviceName);
                 return Response.ok(report).build();
 
             } else if ("updateCapabilities".equalsIgnoreCase(request)) {
                 LOGGER.info("updating instance capabilities");
                 final String identifier = getParameter("id", true);
                 final String fileName   = getParameter("fileName", true);
-                final File serviceDirectory = getServiceDirectory();
+                final File serviceDirectory = utils.getServiceDirectory(serviceName);
                 final AcknowlegementType response;
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     File instanceDirectory     = new File (serviceDirectory, identifier);
@@ -587,28 +393,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param objectRequest
      */
     private Response newInstance(Object objectRequest) throws CstlServiceException {
-        LOGGER.info("creating an instance");
         final String identifier = getParameter("id", true);
-        final AcknowlegementType response;
-        final File serviceDirectory = getServiceDirectory();
-        if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-            final File instanceDirectory = new File (serviceDirectory, identifier);
-            if (instanceDirectory.mkdir()) {
-//                reset
-                if(objectRequest!= null && objectRequest instanceof Service){
-                    Service tocreated = (Service) objectRequest;
-                    basicConfigure(instanceDirectory, tocreated);
-                }else{
-                    //create basic conf
-                    basicConfigure(instanceDirectory, null);
-                }
-                response = new AcknowlegementType("Success", "instance succefully created");
-            } else {
-                response = new AcknowlegementType("Error", "unable to create an instance");
-            }
-        } else {
-            throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
-        }
+        final AcknowlegementType response = utils.newInstance(serviceName, identifier, objectRequest);
         return Response.ok(response).build();
     }
 
@@ -660,29 +446,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     protected void specificRestart(final String identifier) {
         // do nothing in this implementation
     }
-
-    /**
-     * create a new File containing the specific object sent.
-     *
-     * @param instanceDirectory The directory containing the instance configuration files.
-     * @param configuration A service specific configuration Object.
-     */
-    protected abstract void configureInstance(final File instanceDirectory, final Object configuration, final Object capabilitiesConfiguration) throws CstlServiceException;
-
-    /**
-     * Return the configuration object of the instance.
-     *
-     * @param instanceDirectory The directory containing the instance configuration files.
-     */
-    protected abstract Object getInstanceConfiguration(final File instanceDirectory) throws CstlServiceException;
-
-    /**
-     * create an empty configuration for the service.
-     *
-     * @param instanceDirectory The directory containing the instance configuration files.
-     * @param capabilitiesConfiguration Define GetCapabilities service part.
-     */
-    protected abstract void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration) throws CstlServiceException;
 
 
     /**

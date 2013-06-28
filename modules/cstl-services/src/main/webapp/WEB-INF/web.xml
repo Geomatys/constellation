@@ -53,7 +53,8 @@
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.constellation.ws.rest</param-value>
+            <param-value>org.constellation.ws.rest;
+                         org.constellation.ws.rs.provider</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
