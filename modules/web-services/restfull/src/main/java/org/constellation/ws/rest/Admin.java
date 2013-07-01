@@ -1,11 +1,14 @@
 package org.constellation.ws.rest;
 
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.ws.rs.ConfigurationUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.rest.post.Configuration;
+import org.constellation.ws.rs.OGCServiceConfiguration;
+import org.constellation.ws.rs.ServiceConfiguration;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -62,4 +65,11 @@ public class Admin {
         return Response.ok(ConfigurationUtilities.setConfigPath(configuration.getPath())).build();
     }
 
+    @GET
+    @Path("listinstances")
+    public Response listintances(){
+        OGCServiceConfiguration sc = new OGCServiceConfiguration();
+        InstanceReport report = sc.listInstance();
+    return Response.ok(report).build();
+    }
 }

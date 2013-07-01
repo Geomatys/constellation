@@ -1,5 +1,7 @@
 #{decorate path=menu.gtmpl/}
 
+#{param name=services/}
+
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
         <img src="images/constellation.png"/>
@@ -13,8 +15,32 @@
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a href="wms" id="wmschoice">&{webservicepage.button.dropdown.wms.label}</a></li>
+                <li><a href="create/wms" id="wmschoice">&{webservicepage.button.dropdown.wms.label}</a></li>
             </ul>
         </div>
+    </div>
+</div>
+<div class="row">
+    <div class="row" style="height:30px;">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <a class="brand" href="#">Services disponibles</a>
+                <ul class="nav pull-right">
+                    <li class="active"><a href="#">Tous</a></li>
+                    <li><a href="#">CSW</a></li>
+                    <li><a href="#">WMS</a></li>
+                    <li><a href="#">WMTS</a></li>
+                    <li><a href="#">WFS</a></li>
+                    <li><a href="#">WCS</a></li>
+                    <li><a href="#">SOS</a></li>
+                    <li><a href="#">WPS</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+        <% for (def service : services) {%>
+          ${service.name}
+        <%}%>
     </div>
 </div>

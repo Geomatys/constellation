@@ -51,7 +51,7 @@ public class WMSController {
      * @throws IOException
      */
     @View
-    @Route("/wms")
+    @Route("/create/wms")
     public Response index() throws IOException {
         return index.ok().withMimeType("text/html");
     }

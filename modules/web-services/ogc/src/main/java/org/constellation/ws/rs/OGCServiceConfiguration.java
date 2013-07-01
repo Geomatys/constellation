@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,6 +87,22 @@ public class OGCServiceConfiguration {
             }
         }
         final InstanceReport report = new InstanceReport(instances);
+        return report;
+    }
+
+    /**
+     * List all services instance
+     *
+     * @return a {@link InstanceReport} which contains service list
+     */
+    public InstanceReport listInstance(){
+        LOGGER.finer("listing all instance");
+        Set<String> serviceTypes =  WSEngine.getRegisteredServices().keySet();
+        List<Instance> instanceReports = new ArrayList<Instance>(0);
+        for (String serviceType : serviceTypes) {
+            instanceReports.addAll(listInstance(serviceType).getInstances());
+        }
+        final InstanceReport report = new InstanceReport(instanceReports);
         return report;
     }
 
@@ -309,7 +326,7 @@ public class OGCServiceConfiguration {
      *
      * @param serviceType  service choosen type
      * @param identifier   service identifier
-     * @param layerContext service configuration
+     * @param configuration service configuration
      * @return {@link AcknowlegementType} : to know on client side server state after operation call
      */
     public AcknowlegementType configure(final String serviceType, final String identifier, final Object configuration) throws CstlServiceException {

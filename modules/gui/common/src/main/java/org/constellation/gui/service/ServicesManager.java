@@ -21,6 +21,8 @@ import org.constellation.dto.Service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,7 +51,7 @@ public class ServicesManager {
         if (createdService != null) {
             LOGGER.log(Level.INFO, "service will be created : " + createdService.getName());
             try {
-                URL serverUrl = new URL("http://localhost:8090/constellation/");
+                URL serverUrl = new URL("http://localhost:8090/constellation/services");
                 ConstellationServer cs = new ConstellationServer(serverUrl, "admin", "admin");
                 return cs.services.newInstance(service, createdService);
             } catch (MalformedURLException e) {
@@ -57,5 +59,27 @@ public class ServicesManager {
             }
         }
         return false;
+    }
+
+    public List<ServiceSummary> getServiceList() {
+        List<ServiceSummary> serviceSummary = new ArrayList<ServiceSummary>(0);
+        ServiceSummary summary = new ServiceSummary();
+        summary.setName("name");
+        summary.setSummary("This is a summary");
+        summary.setLayerNumber(35);
+        summary.setType("WMS");
+        summary.setState("STARTED");
+        serviceSummary.add(summary);
+
+        try {
+            URL serverUrl = new URL("http://localhost:8090/constellation/services");
+            ConstellationServer cs = new ConstellationServer(serverUrl, "admin", "admin");
+        } catch (MalformedURLException e) {
+            LOGGER.log(Level.WARNING, "", e);
+        }
+
+        //todo get availables services.
+        //todo for each service, get main information.
+        return serviceSummary;
     }
 }

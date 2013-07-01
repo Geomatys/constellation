@@ -27,7 +27,10 @@ import juzu.template.Template;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
+import org.constellation.gui.service.ServiceSummary;
 import org.constellation.gui.service.ServicesManager;
+import org.constellation.gui.templates.success;
+import org.constellation.gui.templates.webservices;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -64,7 +67,7 @@ public class Controller {
      */
     @Inject
     @Path("webservices.gtmpl")
-    protected Template webServices;
+    org.constellation.gui.templates.webservices webServices;
 
     /**
      * End service creation page juzu tempate
@@ -72,6 +75,13 @@ public class Controller {
     @Inject
     @Path("success.gtmpl")
     org.constellation.gui.templates.success success;
+
+    /**
+     * End service creation page juzu tempate
+     */
+    @Inject
+    @Path("servicedescription.gtmpl")
+    org.constellation.gui.templates.servicedescription servicedescription;
 
     /**
      * {@link ResourceBundle} used on this application
@@ -96,7 +106,8 @@ public class Controller {
     @View
     @Route("/webservices")
     public Response webservices() {
-        return webServices.ok().withMimeType("text/html");
+        List<ServiceSummary> services = servicesManager.getServiceList();
+        return webServices.with().services(services).ok().withMimeType("text/html");
     }
 
     /**
@@ -158,5 +169,11 @@ public class Controller {
     public Response succeded(Service createdService, String type, List<String> versionList, String created) {
         Boolean create = Boolean.parseBoolean(created);
         return success.with().service(createdService).type(type).versions(versionList).created(create).ok().withMimeType("text/html");
+    }
+
+    @View
+    @Route("/servicedescription")
+    public Response servicedescription(String servicename){
+        return servicedescription.ok().withMimeType("text/html");
     }
 }

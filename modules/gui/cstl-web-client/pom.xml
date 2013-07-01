@@ -44,42 +44,6 @@
         </dependency>
     </dependencies>
 
-
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.7</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <phase>install</phase>
-                                <configuration>
-                                    <target name="copy.on.webapp">
-                                        <delete file="${tomcat.webapp.dir}${project.build.finalName}.war" />
-                                        <delete dir="${tomcat.webapp.dir}${project.build.finalName}"/>
-                                        <copy file="${project.build.directory}/${project.build.finalName}.war"
-                                              todir="${tomcat.webapp.dir}"/>
-                                    </target>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
-    <properties>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.compiler.source>1.6</maven.compiler.source>
-    </properties>
-
     <build>
         <finalName>cstl-web-client</finalName>
         <plugins>
