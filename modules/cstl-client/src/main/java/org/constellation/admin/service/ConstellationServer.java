@@ -521,7 +521,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean newInstance(String serviceType, Service service) {
             try {
-                final String url = getURLWithEndSlash() + serviceType.toLowerCase() + "/admin?request=newInstance&id=" + service.getIdentifier();
+                final String url = getURLWithEndSlash() + serviceType.toUpperCase() + "/instance";
 
                 // transform object to JSON
                 ObjectMapper mapper = new ObjectMapper();

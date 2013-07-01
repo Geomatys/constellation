@@ -38,6 +38,7 @@ import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
+import org.constellation.ws.rs.ServiceType;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 import org.constellation.coverage.ws.DefaultWCSWorker;
 import org.constellation.ws.ExceptionCode;
@@ -115,6 +116,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         super(Specification.WCS);
 
         setFullRequestLog(true);
+        utils.getServiceUtilities().put(ServiceType.WMS, new WCSServiceConfiguration());
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WCSMarshallerPool.getInstance());
 

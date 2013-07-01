@@ -42,6 +42,7 @@ import static org.constellation.api.QueryConstants.*;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 
+import org.constellation.ws.rs.ServiceType;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
@@ -76,7 +77,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
         super(Specification.WMTS);
         setXMLContext(WMTSMarshallerPool.getInstance());
         setFullRequestLog(true);
-
+        utils.getServiceUtilities().put(ServiceType.WMS, new WMTSServiceConfiguration());
         LOGGER.log(Level.INFO, "WMTS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 

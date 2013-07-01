@@ -59,6 +59,7 @@ import org.constellation.ws.UnauthorizedException;
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wfs.ws.WFSConstants.*;
 import org.constellation.ws.Worker;
+import org.constellation.ws.rs.ServiceType;
 import org.constellation.xml.PrefixMappingInvocationHandler;
 
 // Geotoolkit dependencies
@@ -102,6 +103,7 @@ public class WFSService extends GridWebService<WFSWorker> {
      */
     public WFSService() {
         super(Specification.WFS);
+        utils.getServiceUtilities().put(ServiceType.WMS, new WFSServiceConfiguration());
         try {
             final MarshallerPool pool = new MarshallerPool(
                            "org.geotoolkit.wfs.xml.v110"   +

@@ -14,8 +14,6 @@ import java.util.logging.Logger;
  */
 public class WMSServiceConfiguration extends GridServiceConfiguration {
 
-    private static final Logger LOGGER = Logger.getLogger(WMSServiceConfiguration.class.getName());
-
 
     @Override
     public Class getWorkerClass() {
