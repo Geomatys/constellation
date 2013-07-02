@@ -17,6 +17,8 @@
 package org.constellation.gui.service;
 
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.InstanceReport;
 import org.constellation.dto.Service;
 
 import java.net.MalformedURLException;
@@ -62,23 +64,26 @@ public class ServicesManager {
     }
 
     public List<ServiceSummary> getServiceList() {
-        List<ServiceSummary> serviceSummary = new ArrayList<ServiceSummary>(0);
-        ServiceSummary summary = new ServiceSummary();
-        summary.setName("name");
-        summary.setSummary("This is a summary");
-        summary.setLayerNumber(35);
-        summary.setType("WMS");
-        summary.setState("STARTED");
-        serviceSummary.add(summary);
+        final List<ServiceSummary> serviceSummary = new ArrayList<ServiceSummary>(0);
 
         try {
+            //TODO get availables services.
             URL serverUrl = new URL("http://localhost:8090/constellation/services");
             ConstellationServer cs = new ConstellationServer(serverUrl, "admin", "admin");
+            InstanceReport report =  cs.services.listInstance();
+            for (Instance instance : report.getInstances()) {
+                ServiceSummary currentSummary = new ServiceSummary();
+                currentSummary.setName(instance.getName());
+                currentSummary.setType(instance.getType());
+                currentSummary.setState(instance.getStatus().toString());
+                serviceSummary.add(currentSummary);
+
+            }
+
         } catch (MalformedURLException e) {
             LOGGER.log(Level.WARNING, "", e);
         }
 
-        //todo get availables services.
         //todo for each service, get main information.
         return serviceSummary;
     }

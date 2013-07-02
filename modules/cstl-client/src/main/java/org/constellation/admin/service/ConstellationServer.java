@@ -612,6 +612,30 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
 
         /**
+         * Ask for a report about the instances for all service.
+         *
+         * @return A {@link InstanceReport} about all service.
+         */
+        public InstanceReport listInstance() {
+            try {
+                final String url = getURLWithEndSlash() + "admin/listinstances";
+                final Object response = sendRequest(url, null);
+                if (response instanceof InstanceReport) {
+                    return (InstanceReport) response;
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return null;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return null;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+
+        /**
          * Send a configuration object to the specified service and instance.
          *
          * @param service       The service name to restart (wms, wfs, csw,...).
