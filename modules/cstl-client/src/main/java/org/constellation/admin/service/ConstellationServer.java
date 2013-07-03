@@ -277,7 +277,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 return null;
             }
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
         return null;
     }
@@ -301,7 +301,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 return false;
             }
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
         return false;
     }
@@ -311,7 +311,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             final String url = getURLWithEndSlash() + "configuration?request=deleteUser&username=" + userName;
             return sendRequestAck(url, null);
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
         return false;
     }
@@ -325,7 +325,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             final String url = getURLWithEndSlash() + "configuration?request=updateUser&username=" + userName + "&password=" + password + "&oldLogin=" + oldLogin;
             return sendRequestAck(url, null);
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
         return false;
     }
@@ -347,7 +347,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 return null;
             }
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
         return null;
     }
@@ -425,7 +425,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return new HashMap<String, List<String>>();
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return new HashMap<String, List<String>>();
         }
@@ -440,7 +440,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_FULL_RESTART;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -456,7 +456,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=restart";
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -472,7 +472,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=renameInstance&id=" + instanceId + "&newName=" + newName;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -489,7 +489,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -506,7 +506,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
 
@@ -547,7 +547,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -564,7 +564,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -581,7 +581,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -606,7 +606,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return null;
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -630,7 +630,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return null;
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -648,7 +648,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
                 return sendRequestAck(url, configuration);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -674,7 +674,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return null;
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -694,7 +694,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -726,7 +726,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_RESTART_ALL_LAYER_PROVIDERS;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -739,7 +739,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_RESTART_ALL_STYLE_PROVIDERS;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -769,7 +769,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return new AcknowlegementType("Failure", ((ExceptionReport) response).getMessage());
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
                 return new AcknowlegementType("Failure", ex.getMessage());
             }
             return null;
@@ -791,7 +791,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -803,9 +803,25 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * @return
          */
         public boolean deleteProvider(final String id) {
+            return deleteProvider(id, false);
+        }
+
+        /**
+         * Remove a source provider in the service and eventually delete data.
+         *
+         * @param id The identifier of the source
+         * @param deleteData {@code True} to delete the data.
+         * @return
+         */
+        public boolean deleteProvider(final String id, final boolean deleteData) {
             try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_PROVIDER + "&id=" + id;
-                Object response = sendRequest(url, null);
+                final StringBuilder url = new StringBuilder();
+                url.append(getURLWithEndSlash()).append("configuration?request=").append(REQUEST_DELETE_PROVIDER)
+                   .append("&id=").append(id);
+                if (deleteData) {
+                    url.append("&deleteData=").append(deleteData);
+                }
+                Object response = sendRequest(url.toString(), null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
                     if ("Success".equals(ack.getStatus())) {
@@ -818,7 +834,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -847,7 +863,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -863,7 +879,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_RESTART_PROVIDER + "&id=" + id;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -884,7 +900,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CREATE_LAYER + "&id=" + id;
                 return sendRequestAck(url, config);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -900,7 +916,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_LAYER + "&id=" + id + "&layerName=" + layerName;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -916,7 +932,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_LAYER + "&id=" + id + "&layerName=" + layerName;
                 return sendRequestAck(url, layer);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -938,11 +954,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return utils.readStyle(response, SymbologyEncoding.V_1_1_0);
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             } catch (FactoryException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -960,7 +976,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CREATE_STYLE + "&id=" + id + "&styleName=" + styleName;
                 return sendRequestAck(url, style);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -978,7 +994,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_STYLE + "&id=" + id + "&styleName=" + styleName;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -999,7 +1015,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_STYLE + "&id=" + id + "&styleName=" + styleName;
                 return sendRequestAck(url, style);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1021,7 +1037,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -1043,7 +1059,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -1062,7 +1078,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return null;
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -1091,7 +1107,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return null;
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -1113,7 +1129,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return null;
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -1133,7 +1149,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -1156,7 +1172,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
@@ -1188,7 +1204,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                         + "&step=" + step;
                 return sendRequestAck(url, parameters);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1221,7 +1237,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                         + "&step=" + step;
                 return sendRequestAck(url, parameters);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1236,7 +1252,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash().toString() + "configuration?request=" + REQUEST_DELETE_TASK + "&id=" + id;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1253,7 +1269,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1264,7 +1280,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_ADD_TO_INDEX + "&id=" + id + "&identifiers=" + idList;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1275,7 +1291,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REMOVE_FROM_INDEX + "&id=" + id + "&identifiers=" + idList;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1285,7 +1301,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "csw/admin?request=" + REQUEST_CLEAR_CACHE + "&id=" + id;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1295,7 +1311,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id + "&filename=" + fileName;
                 return sendRequestAck(url, importFile, null, null, true);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1317,7 +1333,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1327,7 +1343,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_RECORDS + "&id=" + id + "&metadata=" + metadataName;
                 return sendRequestAck(url, null);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
         }
@@ -1343,7 +1359,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 }
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return new ArrayList<String>();
         }

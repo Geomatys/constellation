@@ -387,12 +387,16 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      */
     private AcknowlegementType deleteProvider(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String providerId = getParameter("id", true, parameters);
+        final boolean deleteData = getBooleanParameter("deleteData", false, parameters);
 
         try {
 
             final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderDescriptor.NAME);
             final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
             inputs.parameter(DeleteProviderDescriptor.PROVIDER_ID_NAME).setValue(providerId);
+            if (deleteData) {
+                inputs.parameter(DeleteProviderDescriptor.DELETE_DATA_NAME).setValue(deleteData);
+            }
 
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);

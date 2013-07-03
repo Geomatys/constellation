@@ -41,12 +41,16 @@ public final class DeleteProvider extends AbstractCstlProcess{
     @Override
     protected void execute() throws ProcessException {
         final String providerID = value(PROVIDER_ID, inputParameters);
+        final boolean deleteData = value(DELETE_DATA, inputParameters);
 
         boolean found = false;
 
         Collection<? extends Provider> providers = LayerProviderProxy.getInstance().getProviders();
         for (final Provider p : providers) {
             if (p.getId().equals(providerID)) {
+                if (deleteData) {
+                    p.removeAll();
+                }
                 LayerProviderProxy.getInstance().removeProvider((LayerProvider) p);
                 found = true;
                 break;

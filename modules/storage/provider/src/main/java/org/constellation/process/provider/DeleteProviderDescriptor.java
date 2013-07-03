@@ -42,11 +42,16 @@ public class DeleteProviderDescriptor extends AbstractProcessDescriptor {
     private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to remove.";
     public static final ParameterDescriptor<String> PROVIDER_ID =
             new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
+    
+    public static final String DELETE_DATA_NAME = "delete_data";
+    private static final String DELETE_DATA_REMARKS = "Delete data.";
+    public static final ParameterDescriptor<Boolean> DELETE_DATA =
+            new DefaultParameterDescriptor(DELETE_DATA_NAME, DELETE_DATA_REMARKS, Boolean.class, false, false);
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{PROVIDER_ID});
+            new GeneralParameterDescriptor[]{PROVIDER_ID, DELETE_DATA});
 
 
     /**Output parameters */

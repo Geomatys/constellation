@@ -102,6 +102,11 @@ public interface Provider<K,V> {
     ParameterValueGroup getSource();
 
     /**
+     * Remove all data from this provider.
+     */
+    void removeAll();
+
+    /**
      * Update the provider configuration.
      * 
      * @param config : new configuration
