@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
  * @since 0.9
  *
  */
-@Path("/user")
+@Path("/1/user")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class User {

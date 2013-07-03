@@ -2,6 +2,7 @@ package org.constellation.ws.rest;
 
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.LayerContext;
 import org.constellation.dto.Service;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rest.post.Rename;
@@ -27,7 +28,7 @@ import java.util.logging.Logger;
  * @version 0.9
  * @since 0.9
  */
-@Path("/{serviceType}")
+@Path("/1/{serviceType}")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class ServiceAdmin {
@@ -50,7 +51,7 @@ public class ServiceAdmin {
      * @return a {@link Response} with service listing
      */
     @GET
-    @Path("listinstances")
+    @Path("status")
     public Response listInstance(final @PathParam("serviceType") String serviceType) {
         InstanceReport report = serviceConfiguration.listInstance(serviceType);
         return Response.ok(report).build();
@@ -134,8 +135,8 @@ public class ServiceAdmin {
      * @return a {@link Response} which contains service configuration
      */
     @GET
-    @Path("{id}")
-    public Response getConfiguration(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id) {
+    @Path("{id}/configuration")
+    public Response configuration(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id) {
         LOGGER.info("sending instance configuration");
         Object response;
         try {
@@ -157,8 +158,8 @@ public class ServiceAdmin {
      * @throws CstlServiceException
      */
     @POST
-    @Path("{id}")
-    public Response postConfiguration(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id, final Object configuration) throws CstlServiceException {
+    @Path("{id}/configuration")
+    public Response configuration(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id, final LayerContext configuration) throws CstlServiceException {
         final AcknowlegementType response = serviceConfiguration.configure(serviceType, id, configuration);
         return Response.ok(response).build();
     }
@@ -173,8 +174,8 @@ public class ServiceAdmin {
      * @throws CstlServiceException
      */
     @POST
-    @Path("instance")
-    public Response instance(final @PathParam("serviceType") String serviceType, Service service) throws CstlServiceException {
+    @Path("metadata")
+    public Response metadata(final @PathParam("serviceType") String serviceType, Service service) throws CstlServiceException {
         LOGGER.info("creating an instance");
         final AcknowlegementType response = serviceConfiguration.newInstance(serviceType, service.getIdentifier(), service);
         return Response.ok(response).build();

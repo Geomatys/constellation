@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
  * @version 0.9
  * @since 0.9
  */
-@Path("/admin/")
+@Path("/1/admin/")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class Admin {
@@ -36,8 +36,8 @@ public class Admin {
      * @return
      */
     @GET
-    @Path("availablesServices/")
-    public Response AvailablesServices() {
+    @Path("serviceType/")
+    public Response serviceType() {
         final ServiceReport response = new ServiceReport(WSEngine.getRegisteredServices());
         return Response.ok(response).build();
     }
@@ -48,7 +48,7 @@ public class Admin {
      * @throws CstlServiceException
      */
     @GET
-    @Path("configurationPath")
+    @Path("configurationLocation")
     public Response configurationPath() throws CstlServiceException {
         return Response.ok(ConfigurationUtilities.getConfigPath()).build();
     }
@@ -60,13 +60,13 @@ public class Admin {
      * @throws CstlServiceException
      */
     @POST
-    @Path("configurationPath")
+    @Path("configurationLocation")
     public Response configurationPath(final Configuration configuration) throws CstlServiceException {
         return Response.ok(ConfigurationUtilities.setConfigPath(configuration.getPath())).build();
     }
 
     @GET
-    @Path("listinstances")
+    @Path("status")
     public Response listintances(){
         OGCServiceConfiguration sc = new OGCServiceConfiguration();
         InstanceReport report = sc.listInstance();
