@@ -225,7 +225,7 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
                 try {
                     write(name, mapContext);
                 } catch (JAXBException e) {
-                    getLogger().log(Level.INFO, "Unable to do the marshalling of the map context object");
+                    getLogger().log(Level.WARNING, "Unable to do the marshalling of the map context object", e);
                 }
             }
         }
