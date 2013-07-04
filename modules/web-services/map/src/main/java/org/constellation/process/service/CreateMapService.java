@@ -20,12 +20,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.WMSPortrayal;
+import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -153,15 +155,17 @@ public class CreateMapService extends AbstractProcess {
                         Service capabilitiesInformation = (Service) capabilitiesService;
                         for (String version : capabilitiesInformation.getVersions()) {
                             // create service versions files
-                            if (version.equals("130")) {
-                                createV130Capabilities(instanceDirectory, capabilitiesInformation);
-
-                            } else if (version.equals("111")) {
+                            if (version.equals("111")) {
                                 createV110Capabilities(instanceDirectory, capabilitiesInformation);
 
                             } else {
                                 createV130Capabilities(instanceDirectory, capabilitiesInformation);
                             }
+
+                            JAXBContext context = JAXBContext.newInstance(Service.class, Contact.class, AccessConstraint.class);
+                            final Marshaller marshaller = context.createMarshaller();
+                            final File WMSServiceMetadata = new File(instanceDirectory, "WMSServiceMetadata.xml");
+                            marshaller.marshal(capabilitiesInformation, WMSServiceMetadata);
                         }
                     }
                 }catch (JAXBException ex) {
