@@ -1,8 +1,11 @@
 package org.constellation.ws.rs;
 
+import org.constellation.configuration.Instance;
 import org.constellation.ws.CstlServiceException;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.util.List;
 
 /**
  * Describe methods which need to be specify by an implementation to manage service (create, set configuration, etc...)
@@ -55,4 +58,17 @@ public interface ServiceConfiguration {
     public void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException;
 
 
+    /**
+     * give instance abstract
+     * @param instanceDirectory instance folder which contain metadata file
+     * @return service abstract information
+     */
+    String getAbstract(File instanceDirectory);
+
+    /**
+     * Give instance layer number
+     * @param instanceDirectory instance folder which contain metadata file
+     * @return an <code>int</code> which is layer number configurated on instance
+     */
+    int getlayersNumber(File instanceDirectory);
 }

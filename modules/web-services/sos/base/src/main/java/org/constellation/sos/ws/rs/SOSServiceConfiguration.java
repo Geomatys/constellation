@@ -74,4 +74,14 @@ public class SOSServiceConfiguration implements ServiceConfiguration {
         baseConfig.setSMLType(DataSourceType.FILESYSTEM);
         configureInstance(instanceDirectory, baseConfig, capabilitiesConfiguration, serviceType);
     }
+
+    public String getAbstract(File instanceDirectory) {
+        //TODO
+        return "";
+    }
+
+    public int getlayersNumber(File instanceDirectory) {
+        //TODO
+        return 0;
+    }
 }

@@ -70,4 +70,14 @@ public class WPSServiceConfiguration implements ServiceConfiguration {
     public void basicConfigure(File instanceDirectory, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
         configureInstance(instanceDirectory, new ProcessContext(new Processes(true)), capabilitiesConfiguration, serviceType);
     }
+
+    public String getAbstract(File instanceDirectory) {
+        //TODO
+        return "";
+    }
+
+    public int getlayersNumber(File instanceDirectory) {
+        //TODO
+        return 0;
+    }
 }

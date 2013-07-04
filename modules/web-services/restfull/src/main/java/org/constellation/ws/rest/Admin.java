@@ -1,5 +1,6 @@
 package org.constellation.ws.rest;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceReport;
@@ -17,6 +18,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Restfull main configuration service
@@ -29,6 +33,8 @@ import javax.ws.rs.core.Response;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class Admin {
+
+    private static final Logger LOGGER = Logging.getLogger(Admin.class);
 
     /**
      * service to return available service list
@@ -70,6 +76,6 @@ public class Admin {
     public Response listintances(){
         OGCServiceConfiguration sc = new OGCServiceConfiguration();
         InstanceReport report = sc.listInstance();
-    return Response.ok(report).build();
+        return Response.ok(report).build();
     }
 }

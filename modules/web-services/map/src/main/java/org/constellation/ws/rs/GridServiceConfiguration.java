@@ -1,6 +1,10 @@
 package org.constellation.ws.rs;
 
 import org.constellation.configuration.LayerContext;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
+import org.constellation.dto.Service;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.CreateMapServiceDescriptor;
 import org.constellation.process.service.GetConfigMapServiceDescriptor;
@@ -9,10 +13,17 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 
@@ -24,6 +35,8 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
  * @since 0.9
  */
 public abstract class GridServiceConfiguration implements ServiceConfiguration {
+
+    protected static final Logger LOGGER = Logging.getLogger(GridServiceConfiguration.class);
 
     public void configureInstance(File instanceDirectory, Object configuration, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
         if (configuration instanceof LayerContext) {
@@ -97,5 +110,33 @@ public abstract class GridServiceConfiguration implements ServiceConfiguration {
 
     public void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
         configureInstance(instanceDirectory, new LayerContext(), capabilitiesConfiguration, serviceType);
+    }
+
+    public String getAbstract(File instanceDirectory){
+        try{
+            //unmarshall serviceMetadata.xml File to create Service object
+            JAXBContext context = JAXBContext.newInstance(Service.class, Contact.class, AccessConstraint.class);
+            final Unmarshaller unmarshaller = context.createUnmarshaller();
+            final File wMSServiceMetadata = new File(instanceDirectory, "serviceMetadata.xml");
+            final Service service = (Service) unmarshaller.unmarshal(wMSServiceMetadata);
+            return service.getDescription();
+        }catch (JAXBException ex){
+            LOGGER.log(Level.INFO, "no serviceMetadata.xml");
+        }
+        return "";
+    }
+
+    public int getlayersNumber(File instanceDirectory) {
+        try{
+            //unmarshall layerContext.xml to create LayerContext object
+            MarshallerPool pool = GenericDatabaseMarshallerPool.getInstance();
+            final File wMSLayerContext = new File(instanceDirectory, "layerContext.xml");
+            Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+            LayerContext layerContext = (LayerContext) unmarshaller.unmarshal(wMSLayerContext);
+            return layerContext.getLayers().size();
+        }catch (JAXBException ex){
+            LOGGER.log(Level.INFO, "no layerContext.xml");
+        }
+        return 0;
     }
 }

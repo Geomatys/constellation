@@ -24,8 +24,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Objects;
 
 /**
- *
  * @author Guilhem Legal (Geomatys)
+ * @author Benjamin Garcia (Geomatys)
  */
 @XmlRootElement(name ="Instance")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -39,6 +39,12 @@ public class Instance {
 
     @XmlAttribute
     private ServiceStatus status;
+
+    @XmlAttribute
+    private String _abstract;
+
+    @XmlAttribute
+    private Integer layersNumber;
 
     public Instance() {
 
@@ -80,6 +86,22 @@ public class Instance {
      */
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String get_abstract() {
+        return _abstract;
+    }
+
+    public void set_abstract(String _abstract) {
+        this._abstract = _abstract;
+    }
+
+    public Integer getLayersNumber() {
+        return layersNumber;
+    }
+
+    public void setLayersNumber(Integer layersNumber) {
+        this.layersNumber = layersNumber;
     }
 
     @Override

@@ -164,7 +164,7 @@ public class CreateMapService extends AbstractProcess {
 
                             JAXBContext context = JAXBContext.newInstance(Service.class, Contact.class, AccessConstraint.class);
                             final Marshaller marshaller = context.createMarshaller();
-                            final File WMSServiceMetadata = new File(instanceDirectory, "WMSServiceMetadata.xml");
+                            final File WMSServiceMetadata = new File(instanceDirectory, "serviceMetadata.xml");
                             marshaller.marshal(capabilitiesInformation, WMSServiceMetadata);
                         }
                     }

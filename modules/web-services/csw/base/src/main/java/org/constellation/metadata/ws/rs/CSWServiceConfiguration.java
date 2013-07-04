@@ -66,4 +66,14 @@ public class CSWServiceConfiguration implements ServiceConfiguration {
     public void basicConfigure(File instanceDirectory, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
         configureInstance(instanceDirectory, new Automatic("filesystem", new BDD()), null, serviceType);
     }
+
+    public String getAbstract(File instanceDirectory) {
+        //TODO
+        return "";
+    }
+
+    public int getlayersNumber(File instanceDirectory) {
+        //TODO
+        return 0;
+    }
 }

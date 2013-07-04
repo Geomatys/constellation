@@ -21,6 +21,7 @@ import org.geotoolkit.process.ProcessFinder;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,16 +92,59 @@ public class OGCServiceConfiguration {
     }
 
     /**
-     * List all services instance
+     * List all service instance
      *
      * @return a {@link InstanceReport} which contains service list
      */
-    public InstanceReport listInstance(){
+    public InstanceReport listInstance() {
         LOGGER.finer("listing all instance");
         Set<String> serviceTypes =  WSEngine.getRegisteredServices().keySet();
         List<Instance> instanceReports = new ArrayList<Instance>(0);
+
+        //  loop on all service type which exist on server
         for (String serviceType : serviceTypes) {
-            instanceReports.addAll(listInstance(serviceType).getInstances());
+            final File serviceDirectory = getServiceDirectory(serviceType);
+            if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+
+                //  loop on all service on service type
+                for (File instanceDirectory : serviceDirectory.listFiles()) {
+                    //get instance name
+                    final String name = instanceDirectory.getName();
+
+                    ServiceType st = ServiceType.valueOf(serviceType);
+                    ServiceConfiguration configuration = serviceUtilities.get(st);
+
+                    //get layer number
+                    Integer layersNumber = configuration.getlayersNumber(instanceDirectory);
+
+                    //get service abstract
+                    String _abstract = configuration.getAbstract(instanceDirectory);
+
+                    final boolean serviceExist = WSEngine.serviceInstanceExist(serviceType, name);
+                    ServiceStatus status;
+                    Instance currentInstance = null;
+
+                    // get service state
+                    if (instanceDirectory.isDirectory() && !name.startsWith(".")) {
+                        if (serviceExist) {
+                            status = ServiceStatus.WORKING;
+                        } else {
+                            status = ServiceStatus.ERROR;
+                        }
+                        if (instanceDirectory.isDirectory() && !name.startsWith(".") && !serviceExist) {
+                            status = ServiceStatus.NOT_STARTED;
+                        }
+                        currentInstance = new Instance(name, serviceType, status);
+                    }
+
+                    //add abstract & layer number on instance
+                    currentInstance.set_abstract(_abstract);
+                    currentInstance.setLayersNumber(layersNumber);
+
+                    //add instance on list
+                    instanceReports.add(currentInstance);
+                }
+            }
         }
         final InstanceReport report = new InstanceReport(instanceReports);
         return report;
