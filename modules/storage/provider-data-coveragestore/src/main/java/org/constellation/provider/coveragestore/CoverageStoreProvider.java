@@ -26,6 +26,7 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
+import org.geotoolkit.coverage.postgresql.PGCoverageStore;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -124,5 +125,24 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
     }
+    
+    @Override
+    public void removeAll() {
+        try {
+            for (Name name : names) {
+                store.delete(name);
+            }
+            reload();
 
+            if (store instanceof PGCoverageStore) {
+                final PGCoverageStore pgStore = (PGCoverageStore)store;
+                final String dbSchema = pgStore.getDatabaseSchema();
+                if (dbSchema != null && !dbSchema.isEmpty()) {
+                    pgStore.dropPostgresSchema(dbSchema);
+                }
+            }
+        } catch (DataStoreException e) {
+            getLogger().log(Level.WARNING, e.getMessage(), e);
+        }
+    }
 }
