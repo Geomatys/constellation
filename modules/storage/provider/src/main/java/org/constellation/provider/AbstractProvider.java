@@ -46,6 +46,9 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
         this.service = service;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getId(){
         if(source == null){
@@ -54,6 +57,9 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
         return ProviderParameters.getSourceId(source);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ProviderService<K, V, Provider<K, V>> getService() {
         return service;
@@ -65,11 +71,17 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
         return LOGGER;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized ParameterValueGroup getSource() {
         return source;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void updateSource(ParameterValueGroup config){
         if(!source.getDescriptor().equals(config.getDescriptor())){
@@ -80,6 +92,9 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
         fireUpdateEvent();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<K> getKeys(String sourceId) {
         if(sourceId != null && source != null){
@@ -92,19 +107,31 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
         return getKeys();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean contains(K key) {
         return getKeys().contains(key);
     }
 
+    /**
+     * Empty implementation.
+     */
     @Override
     public void reload() {
     }
 
+    /**
+     * Empty implementation.
+     */
     @Override
     public void dispose() {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeAll() {
         for (K key : getKeys()) {
@@ -112,6 +139,9 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
         }
     }
 
+    /**
+     * Empty implementation.
+     */
     @Override
     public void remove(K key) {
     }
@@ -122,11 +152,17 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
         listeners.firePropertyChange(RELOAD_TIME_PROPERTY, oldTime, lastUpdateTime);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addPropertyListener(PropertyChangeListener listener) {
         listeners.addPropertyChangeListener(listener);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removePropertyListener(PropertyChangeListener listener) {
         listeners.removePropertyChangeListener(listener);

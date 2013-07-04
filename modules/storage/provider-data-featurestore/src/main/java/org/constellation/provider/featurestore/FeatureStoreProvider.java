@@ -23,6 +23,7 @@ import static org.constellation.provider.AbstractProvider.getLogger;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
+import org.geotoolkit.db.postgres.PostgresFeatureStore;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -67,5 +68,25 @@ public class FeatureStoreProvider extends AbstractDataStoreProvider{
         
         return store;
     }
-    
+
+    /**
+     * Remove all data, even postgres schema.
+     */
+    @Override
+    public void removeAll() {
+        super.removeAll();
+
+        final FeatureStore store = createBaseFeatureStore();
+        if (store instanceof PostgresFeatureStore) {
+            final PostgresFeatureStore pgStore = (PostgresFeatureStore)store;
+            final String dbSchema = pgStore.getDatabaseSchema();
+            try {
+                if (dbSchema != null && !dbSchema.isEmpty()) {
+                    pgStore.dropPostgresSchema(dbSchema);
+                }
+            } catch (DataStoreException e) {
+                getLogger().log(Level.WARNING, e.getMessage(), e);
+            }
+        }
+    }
 }
