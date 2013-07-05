@@ -53,7 +53,7 @@ public class ServicesManager {
         if (createdService != null) {
             LOGGER.log(Level.INFO, "service will be created : " + createdService.getName());
             try {
-                URL serverUrl = new URL("http://localhost:8090/constellation/services");
+                URL serverUrl = new URL("http://localhost:8090/constellation/api/1/");
                 ConstellationServer cs = new ConstellationServer(serverUrl, "admin", "admin");
                 return cs.services.newInstance(service, createdService);
             } catch (MalformedURLException e) {
@@ -63,28 +63,66 @@ public class ServicesManager {
         return false;
     }
 
-    public List<ServiceSummary> getServiceList() {
-        final List<ServiceSummary> serviceSummary = new ArrayList<ServiceSummary>(0);
+    /**
+     * Get all service List
+     *
+     * @return A {@link Instance} {@link List} to display this.
+     */
+    public List<InstanceSummary> getServiceList() {
+        List<InstanceSummary> instancesSummary = new ArrayList<InstanceSummary>(0);
 
         try {
-            //TODO get availables services.
-            URL serverUrl = new URL("http://localhost:8090/constellation/services");
+            URL serverUrl = new URL("http://localhost:8090/constellation/api/1/");
             ConstellationServer cs = new ConstellationServer(serverUrl, "admin", "admin");
-            InstanceReport report =  cs.services.listInstance();
+            InstanceReport report = cs.services.listInstance();
+            //map server side object on client side object
             for (Instance instance : report.getInstances()) {
-                ServiceSummary currentSummary = new ServiceSummary();
-                currentSummary.setName(instance.getName());
-                currentSummary.setType(instance.getType());
-                currentSummary.setState(instance.getStatus().toString());
-                serviceSummary.add(currentSummary);
-
+                InstanceSummary instanceSum = new InstanceSummary();
+                if(instance.get_abstract().isEmpty()){
+                    instanceSum.set_abstract("-");
+                }else{
+                    instanceSum.set_abstract(instance.get_abstract());
+                }
+                instanceSum.setLayersNumber(instance.getLayersNumber());
+                instanceSum.setName(instance.getName());
+                instanceSum.setStatus(instance.getStatus().toString());
+                instanceSum.setType(instance.getType());
+                instancesSummary.add(instanceSum);
             }
-
         } catch (MalformedURLException e) {
             LOGGER.log(Level.WARNING, "", e);
         }
 
-        //todo for each service, get main information.
-        return serviceSummary;
+        return instancesSummary;
     }
+
+
+//    public static Object getService(final String identifier, final String type, final List<String> versions) {
+//        // TODO get full service data
+//        String s = type.toLowerCase();
+//        if (s.equals("wms")) {
+//            if(LOGGER.isLoggable(Level.INFO)){
+//                LOGGER.log(Level.INFO, "on WMS service");
+//            }
+//            return askWMSCapabilities(identifier, versions);
+//
+//        } else {
+//            System.out.println("do nothing");
+//        }
+//        return null;
+//    }
+//
+//    /**
+//     * return an object to know main service informations
+//     *
+//     * @param identifier service identifier
+//     * @param versions service version
+//     * @return an {@link AbstractWMSCapabilities}
+//     */
+//    private static AbstractWMSCapabilities askWMSCapabilities(final String identifier, final List<String> versions) {
+//        //TODO : 1) get metadatas
+//        //TODO : 2) get layers
+//
+//        return null;
+//    }
 }

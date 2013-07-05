@@ -121,7 +121,7 @@ public abstract class GridServiceConfiguration implements ServiceConfiguration {
             final Service service = (Service) unmarshaller.unmarshal(wMSServiceMetadata);
             return service.getDescription();
         }catch (JAXBException ex){
-            LOGGER.log(Level.INFO, "no serviceMetadata.xml");
+            LOGGER.log(Level.FINEST, "no serviceMetadata.xml");
         }
         return "";
     }
@@ -135,7 +135,7 @@ public abstract class GridServiceConfiguration implements ServiceConfiguration {
             LayerContext layerContext = (LayerContext) unmarshaller.unmarshal(wMSLayerContext);
             return layerContext.getLayers().size();
         }catch (JAXBException ex){
-            LOGGER.log(Level.INFO, "no layerContext.xml");
+            LOGGER.log(Level.FINEST, "no layerContext.xml");
         }
         return 0;
     }

@@ -7,7 +7,7 @@
         <img src="images/constellation.png"/>
     </div>
     <!-- Menu to create services -->
-    <div class="span4 offset3">
+    <div class="span3 offset6 pull-right">
         <div class="dropdown">
             <a id="createservice" data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle">
                 <span class="icon-plus icon-white" style="margin-top: 0px;"></span>
@@ -40,7 +40,43 @@
     </div>
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <% for (def service : services) {%>
-          ${service.name}
+          <div class="span6">
+            <a href="@{servicedescription(identifier = service.name, type = service.type)}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
+            <div class="well">
+                <div class="row">
+                    <div class="offset4 span2">
+                        <div class="btn-group">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="icon-wrench"></i>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">&{service.menu.edit.label}</a></li>
+                                <li><a href="#">&{service.menu.getcapabilities.label}</a></li>
+                                <li><a href="#">&{service.menu.log.label}</a></li>
+                                <li><a href="#">&{service.menu.show.label}</a></li>
+                                <li><a href="#">&{service.menu.url.label}</a></li>
+                                <li><a href="#">&{service.menu.delete.label}</a></li>
+                            </ul>
+                        </div>
+                        <a class="btn btn-info" href="#"><i class="icon-refresh"></i></a>
+                        <% if(service.status=="WORKING"){%>
+                            <a class="btn btn-danger" href="#"><i class="icon-stop"></i></a>
+                        <%}else{%>
+                            <a class="btn btn-success" href="#"><i class="icon-play"></i></a>
+                        <%}%>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="span4">
+                        <p><strong>&{service.abstract.label}</strong></p>
+                        <p>${service._abstract}</p>
+                        <p><strong>&{service.data.label}</strong></p>
+                        <p>${service.layersNumber}</p>
+                    </div>
+                </div>
+            </div>
+          </div>
         <%}%>
     </div>
 </div>

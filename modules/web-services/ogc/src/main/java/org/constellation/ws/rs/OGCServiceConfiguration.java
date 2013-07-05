@@ -135,14 +135,16 @@ public class OGCServiceConfiguration {
                             status = ServiceStatus.NOT_STARTED;
                         }
                         currentInstance = new Instance(name, serviceType, status);
+
+                        //add abstract & layer number on instance
+                        currentInstance.set_abstract(_abstract);
+                        currentInstance.setLayersNumber(layersNumber);
+
+                        //add instance on list
+                        instanceReports.add(currentInstance);
                     }
 
-                    //add abstract & layer number on instance
-                    currentInstance.set_abstract(_abstract);
-                    currentInstance.setLayersNumber(layersNumber);
 
-                    //add instance on list
-                    instanceReports.add(currentInstance);
                 }
             }
         }

@@ -27,10 +27,8 @@ import juzu.template.Template;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
-import org.constellation.gui.service.ServiceSummary;
+import org.constellation.gui.service.InstanceSummary;
 import org.constellation.gui.service.ServicesManager;
-import org.constellation.gui.templates.success;
-import org.constellation.gui.templates.webservices;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -106,7 +104,7 @@ public class Controller {
     @View
     @Route("/webservices")
     public Response webservices() {
-        List<ServiceSummary> services = servicesManager.getServiceList();
+        List<InstanceSummary> services = servicesManager.getServiceList();
         return webServices.with().services(services).ok().withMimeType("text/html");
     }
 
@@ -173,7 +171,8 @@ public class Controller {
 
     @View
     @Route("/servicedescription")
-    public Response servicedescription(String servicename){
+    public Response servicedescription(String identifier, String type){
+//        ServicesManager.getService(identifier, type);
         return servicedescription.ok().withMimeType("text/html");
     }
 }

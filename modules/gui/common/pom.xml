@@ -28,6 +28,10 @@
             <artifactId>cstl-web-dto</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-client-wms</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>

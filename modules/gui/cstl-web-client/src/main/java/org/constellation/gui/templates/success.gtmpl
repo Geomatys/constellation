@@ -60,10 +60,10 @@
                                     <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="#">&{service.create.end.menu.edit.label}</a></li>
-                                    <li><a href="#">&{service.create.end.menu.getcapabilities.label}</a></li>
-                                    <li><a href="#">&{service.create.end.menu.log.label}</a></li>
-                                    <li><a href="#">&{service.create.end.menu.delete.label}</a></li>
+                                    <li><a href="#">&{service.menu.edit.label}</a></li>
+                                    <li><a href="#">&{service.menu.getcapabilities.label}</a></li>
+                                    <li><a href="#">&{service.menu.log.label}</a></li>
+                                    <li><a href="#">&{service.menu.delete.label}</a></li>
                                 </ul>
                             </div>
                             <a class="btn btn-info" href="#"><i class="icon-refresh"></i></a>
@@ -93,7 +93,7 @@
 
             <!-- Button to add data on service -->
             <div class="offset1 span4">
-                <a class="btn btn-large" href="@{servicedescription(servicename = service.name)}"><i class="icon-plus-sign"></i> &{service.create.end.addlayers.label}</a>
+                <a class="btn btn-large" href="@{servicedescription(identifier = service.identifier, type = type, versions = versions)}"><i class="icon-plus-sign"></i> &{service.create.end.addlayers.label}</a>
             </div>
         <%}else{%>
             <!-- alert part -->
