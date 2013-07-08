@@ -25,6 +25,7 @@ import org.constellation.admin.service.ConstellationServer.Tasks;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.LayerList;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.ServiceReport;
@@ -709,6 +710,44 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public String getInstanceURL(final String service, final String instanceId) {
             return getURLWithEndSlash() + service.toLowerCase() + '/' + instanceId;
+        }
+
+        /**
+         *
+         * @param serviceType
+         * @param identifier
+         * @return
+         */
+        public Service getMetadata(final String serviceType, final String identifier){
+            final String url = getURLWithEndSlash()+serviceType.toUpperCase()+"/"+identifier+"/metadata";
+            try {
+                Object response = sendRequest(url, null);
+                if(response instanceof Service){
+                    return (Service)response;
+                }
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Error when send request to server", e);
+            }
+            return null;
+        }
+
+        /**
+         *
+         * @param serviceType
+         * @param identifier
+         * @return
+         */
+        public LayerList getLayers(final String serviceType, final String identifier){
+            final String url = getURLWithEndSlash()+serviceType.toUpperCase()+"/"+identifier+"/layers";
+            try {
+                Object response = sendRequest(url, null);
+                if(response instanceof LayerList){
+                    return (LayerList)response;
+                }
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Error when send request to server", e);
+            }
+            return null;
         }
 
     }

@@ -21,8 +21,8 @@
     </div>
 </div>
 <div class="row">
-    <div class="row" style="height:30px;">
-        <div class="navbar">
+    <div class="row" >
+        <div class="navbar" style="margin-bottom: 0px;">
             <div class="navbar-inner">
                 <a class="brand" href="#">Services disponibles</a>
                 <ul class="nav pull-right">

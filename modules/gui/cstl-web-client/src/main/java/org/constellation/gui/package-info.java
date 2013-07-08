@@ -42,6 +42,7 @@
                 @Script(id = "collapse", src = "js/bootstrap-collapse.js", depends = "jQuery"),
                 @Script(id = "tooltip", src = "js/bootstrap-tooltip.js", depends = "jQuery"),
                 @Script(id = "alert", src = "js/bootstrap-alert.js", depends = "jQuery"),
+                @Script(id = "tab", src = "js/bootstrap-tab.js", depends = "jQuery"),
                 @Script(id = "dropdown", src = "js/bootstrap-dropdown.js", depends = "jQuery")})
 
 /**

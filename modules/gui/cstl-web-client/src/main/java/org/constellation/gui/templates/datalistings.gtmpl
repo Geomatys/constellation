@@ -1,0 +1,59 @@
+<div class="row">
+    <div class="span9">
+        <div style="border-bottom: 1px solid #ddd;">
+            <h4>Liste des Couches</h4>
+        </div>
+        <div>
+            <h5><%= layers.getLayer().size() %> couches</h5>
+        </div>
+        <div class="navbar">
+            <div class="navbar-inner">
+                <ul class="nav">
+                    <li><a href="#">Titre</a></li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="#">Date</a></li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="#">Propriétaire</a></li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="#">Type de donnée</a></li>
+                    <li class="divider-vertical"></li>
+                </ul>
+                <form class="navbar-form pull-left">
+                    <button type="button" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                </form>
+                <form class="navbar-form pull-right">
+                    <input type="text" class="search-query" placeholder="Filtrer">
+                </form>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="span3">
+                    <button type="button" class="btn btn-info btn-small">selectionner toutes les couches</button></div>
+                <div class="span3">
+                    <div class="pagination" style="margin: 0px;">
+                        <ul>
+                            <li><a href="#">&laquo;</a></li>
+                            <li><a href="#">1</a> </li>
+                            <li><a href="#">2</a> </li>
+                            <li><a href="#">3</a> </li>
+                            <li><a href="#">4</a> </li>
+                            <li><a href="#">&raquo;</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="span3">
+                    <select>
+                        <option>option 1</option>
+                        <option>option 2</option>
+                        <option>option 3</option>
+                        <option>option 4</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="span3">
+        detail part
+    </div>
+</div>

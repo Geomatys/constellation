@@ -2,6 +2,7 @@ package org.constellation.ws.rs;
 
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.Layer;
+import org.constellation.dto.Service;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
@@ -74,4 +75,5 @@ public interface ServiceConfiguration {
      * @return an <code>int</code> which is layer number configurated on instance
      */
     List<Layer> getlayersNumber(Worker worker);
+
 }

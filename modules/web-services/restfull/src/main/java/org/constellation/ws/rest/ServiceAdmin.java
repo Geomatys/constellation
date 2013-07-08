@@ -187,6 +187,19 @@ public class ServiceAdmin {
     }
 
     @GET
+    @Path("{id}/metadata")
+    public Response metadata(final @PathParam("serviceType") String serviceType, final @PathParam("id") String identifier) throws CstlServiceException {
+        Service service = serviceConfiguration.getMetadata(serviceType, identifier);
+        return Response.ok(service).build();
+    }
+
+    /**
+     * Give service layer list
+     * @param serviceType a service type (WMS, WPS,...)
+     * @param id     service identifier
+     * @return a {@link LayerList}
+     */
+    @GET
     @Path("{id}/layers")
     public Response layers(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id){
         List<Layer> list = serviceConfiguration.getdatas(serviceType, id);

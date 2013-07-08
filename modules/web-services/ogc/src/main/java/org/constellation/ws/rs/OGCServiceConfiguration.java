@@ -6,6 +6,8 @@ import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.ServiceStatus;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.DeleteServiceDescriptor;
@@ -22,7 +24,9 @@ import org.geotoolkit.process.ProcessFinder;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -470,5 +474,23 @@ public class OGCServiceConfiguration {
         Worker worker = buildWorker(serviceType, id);
         ServiceType type = ServiceType.valueOf(serviceType);
         return serviceUtilities.get(type).getlayersNumber(worker);
+    }
+
+    public Service getMetadata(String serviceType, String identifier) {
+        File serviceTypeDirectory = getServiceDirectory(serviceType);
+        File currentServiceDirectory = new File(serviceTypeDirectory, identifier);
+        if(currentServiceDirectory.exists() && currentServiceDirectory.isDirectory()){
+            try{
+                //unmarshall serviceMetadata.xml File to create Service object
+                JAXBContext context = JAXBContext.newInstance(Service.class, Contact.class, AccessConstraint.class);
+                final Unmarshaller unmarshaller = context.createUnmarshaller();
+                final File wMSServiceMetadata = new File(currentServiceDirectory, "serviceMetadata.xml");
+                final Service service = (Service) unmarshaller.unmarshal(wMSServiceMetadata);
+                return service;
+            }catch (JAXBException e){
+                LOGGER.log(Level.WARNING, "error on serviceMetadataParsing", e);
+            }
+        }
+        return null;
     }
 }

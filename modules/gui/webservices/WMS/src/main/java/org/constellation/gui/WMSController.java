@@ -22,6 +22,7 @@ import juzu.Response;
 import juzu.Route;
 import juzu.View;
 import juzu.template.Template;
+import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.WMSManager;
 
@@ -75,10 +76,12 @@ public class WMSController {
     @Route("edit/wms/{serviceName}")
     public Response editWMS(String serviceName) throws IOException{
         Service service = wmsManager.getServiceMetadata(serviceName, "WMS");
+        LayerList layers = wmsManager.getLayers(serviceName, "WMS");
 
         //use parameter map (not type safe technique) because we aren't on juzu projet => gtmpl aren't build.
         Map<String, Object> parameters = new HashMap<String, Object>(0);
         parameters.put("service", service);
+        parameters.put("layers", layers);
         return serviceDescription.ok(parameters).withMimeType("text/html");
     }
 

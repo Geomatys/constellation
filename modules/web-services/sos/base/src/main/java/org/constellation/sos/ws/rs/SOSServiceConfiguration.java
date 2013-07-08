@@ -3,6 +3,7 @@ package org.constellation.sos.ws.rs;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.SOSConfiguration;
+import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;

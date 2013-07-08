@@ -1,6 +1,7 @@
 package org.constellation.metadata.ws.rs;
 
 import org.constellation.configuration.Layer;
+import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;

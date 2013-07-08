@@ -3,6 +3,7 @@ package org.constellation.gui.service;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 
 import java.net.MalformedURLException;
@@ -47,21 +48,38 @@ public class WMSManager {
     /**
      *
      * @param serviceName
-     * @param ServiceType
+     * @param serviceType
      * @return
      */
-    public Service getServiceMetadata(final String serviceName, final String ServiceType){
-        final Service service = new Service();
+    public Service getServiceMetadata(final String serviceName, final String serviceType){
+        Service service = new Service();
         service.setName(serviceName);
         try{
             URL serverUrl = new URL(constellationUrl);
             ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
-
-
+            service = cs.services.getMetadata(serviceType, serviceName);
         }catch (MalformedURLException e){
             LOGGER.log(Level.WARNING, "error on url", e);
         }
         return service;
+    }
+
+    /**
+     *
+     * @param serviceName
+     * @param serviceType
+     * @return
+     */
+    public LayerList getLayers(final String serviceName, final String serviceType){
+        LayerList layers = new LayerList();
+        try {
+            URL serverUrl = new URL(constellationUrl);
+            ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
+            layers = cs.services.getLayers(serviceType, serviceName);
+        } catch (MalformedURLException e) {
+            LOGGER.log(Level.WARNING, "", e);
+        }
+        return layers;
     }
 
 }

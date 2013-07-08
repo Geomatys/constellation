@@ -19,4 +19,5 @@ public class WMTSServiceConfiguration extends GridServiceConfiguration {
     public Class getWorkerClass() {
         return WMTSWorker.class;
     }
+
 }

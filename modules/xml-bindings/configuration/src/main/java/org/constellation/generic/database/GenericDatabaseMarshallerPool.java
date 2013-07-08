@@ -32,6 +32,7 @@ public final class GenericDatabaseMarshallerPool {
     static {
         try {
             instance = new MarshallerPool("org.constellation.configuration:"       +
+                                          "org.constellation.dto:"                 +
                                           "org.constellation.generic.database:"    +
                                           "org.geotoolkit.ogc.xml.v110:"           +
                                           "org.geotoolkit.internal.jaxb.geometry:" +

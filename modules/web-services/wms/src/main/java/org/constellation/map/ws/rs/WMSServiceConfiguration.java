@@ -1,5 +1,6 @@
 package org.constellation.map.ws.rs;
 
+import org.constellation.dto.Service;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.ws.rs.GridServiceConfiguration;
 
@@ -19,6 +20,5 @@ public class WMSServiceConfiguration extends GridServiceConfiguration {
     public Class getWorkerClass() {
         return DefaultWMSWorker.class;
     }
-
 
 }

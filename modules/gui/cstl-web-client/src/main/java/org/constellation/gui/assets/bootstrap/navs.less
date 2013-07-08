@@ -119,6 +119,8 @@
 }
 // Actual tabs (as links)
 .nav-tabs > li > a {
+  background-color: #E4E4E4;
+  color: @gray;
   padding-top: 8px;
   padding-bottom: 8px;
   line-height: @baseLineHeight;
@@ -133,10 +135,10 @@
 .nav-tabs > .active > a,
 .nav-tabs > .active > a:hover,
 .nav-tabs > .active > a:focus {
-  color: @gray;
+  color: @navbarLinkColorActive;
   background-color: @bodyBackground;
-  border: 1px solid #ddd;
-  border-bottom-color: transparent;
+  border-bottom: 1px solid #ddd;
+  border-top: @navbarLinkColorActive 2px solid;
   cursor: default;
 }
 
