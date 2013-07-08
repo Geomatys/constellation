@@ -4,6 +4,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.Layer;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
@@ -111,18 +112,19 @@ public class OGCServiceConfiguration {
                     //get instance name
                     final String name = instanceDirectory.getName();
 
-                    ServiceType st = ServiceType.valueOf(serviceType);
-                    ServiceConfiguration configuration = serviceUtilities.get(st);
+                    final ServiceType st = ServiceType.valueOf(serviceType);
+                    final ServiceConfiguration configuration = serviceUtilities.get(st);
 
                     //get layer number
-                    Integer layersNumber = configuration.getlayersNumber(instanceDirectory);
+                    final Worker worker = buildWorker(serviceType, name);
+                    final Integer layersNumber = configuration.getlayersNumber(worker).size();
 
                     //get service abstract
-                    String _abstract = configuration.getAbstract(instanceDirectory);
+                    final String _abstract = configuration.getAbstract(instanceDirectory);
 
                     final boolean serviceExist = WSEngine.serviceInstanceExist(serviceType, name);
                     ServiceStatus status;
-                    Instance currentInstance = null;
+                    Instance currentInstance;
 
                     // get service state
                     if (instanceDirectory.isDirectory() && !name.startsWith(".")) {
@@ -457,5 +459,16 @@ public class OGCServiceConfiguration {
             throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
         }
         return response;
+    }
+
+    /**
+     * return data list?
+     * @param serviceType
+     * @param id
+     */
+    public List<Layer> getdatas(String serviceType, String id) {
+        Worker worker = buildWorker(serviceType, id);
+        ServiceType type = ServiceType.valueOf(serviceType);
+        return serviceUtilities.get(type).getlayersNumber(worker);
     }
 }

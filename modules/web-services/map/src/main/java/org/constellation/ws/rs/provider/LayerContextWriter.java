@@ -39,9 +39,10 @@ import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.json.impl.JSONMarshallerImpl;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.LayerList;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 
 /**
@@ -63,7 +64,7 @@ public final class LayerContextWriter implements MessageBodyWriter {
 
     @Override
     public boolean isWriteable(Class type, Type type1, Annotation[] antns, MediaType mt) {
-        return LayerContext.class.isAssignableFrom(type);
+        return LayerContext.class.isAssignableFrom(type) || LayerList.class.isAssignableFrom(type);
     }
 
     @Override

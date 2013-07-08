@@ -1,7 +1,9 @@
 package org.constellation.ws.rs;
 
 import org.constellation.configuration.Instance;
+import org.constellation.configuration.Layer;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.Worker;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -67,8 +69,9 @@ public interface ServiceConfiguration {
 
     /**
      * Give instance layer number
-     * @param instanceDirectory instance folder which contain metadata file
+     *
+     * @param worker current instance worker to count data number
      * @return an <code>int</code> which is layer number configurated on instance
      */
-    int getlayersNumber(File instanceDirectory);
+    List<Layer> getlayersNumber(Worker worker);
 }

@@ -195,7 +195,7 @@ public abstract class LayerWorker extends AbstractWorker {
      * @return map of additional informations for each layer declared in the
      * layer context.
      */
-    protected List<Layer> getConfigurationLayers(final String login) {
+    public List<Layer> getConfigurationLayers(final String login) {
         if (layerContext == null) {
             return new ArrayList<Layer>();
         }

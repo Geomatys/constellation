@@ -1,16 +1,20 @@
 package org.constellation.metadata.ws.rs;
 
+import org.constellation.configuration.Layer;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.CSWworker;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.Worker;
 import org.constellation.ws.rs.ServiceConfiguration;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
@@ -72,8 +76,8 @@ public class CSWServiceConfiguration implements ServiceConfiguration {
         return "";
     }
 
-    public int getlayersNumber(File instanceDirectory) {
+    public List<Layer> getlayersNumber(Worker worker) {
         //TODO
-        return 0;
+        return new ArrayList<Layer>(0);
     }
 }

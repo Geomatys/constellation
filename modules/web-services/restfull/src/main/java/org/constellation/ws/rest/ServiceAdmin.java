@@ -2,7 +2,9 @@ package org.constellation.ws.rest;
 
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rest.post.Rename;
@@ -16,8 +18,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -181,5 +186,12 @@ public class ServiceAdmin {
         return Response.ok(response).build();
     }
 
+    @GET
+    @Path("{id}/layers")
+    public Response layers(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id){
+        List<Layer> list = serviceConfiguration.getdatas(serviceType, id);
+        LayerList layers = new LayerList(list);
+        return Response.ok(layers).build();
+    }
 
 }

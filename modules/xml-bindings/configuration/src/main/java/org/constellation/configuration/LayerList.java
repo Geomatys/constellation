@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Objects;
 
 /**
@@ -29,6 +30,7 @@ import java.util.Objects;
  * @since 0.6
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class LayerList {
 
     @XmlElement(name="Layer")
