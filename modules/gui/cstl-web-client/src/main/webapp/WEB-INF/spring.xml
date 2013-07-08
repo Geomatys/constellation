@@ -1,10 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 
+    <context:property-placeholder location="classpath:/constellation.properties"/>
+
+    <bean class="java.lang.String" id="constellationURL">
+        <constructor-arg type="java.lang.String" value="http://localhost:8090/constellation/api/1/" />
+    </bean>
+    <bean class="java.lang.String" id="constellationlogin">
+        <constructor-arg type="java.lang.String" value="admin" />
+    </bean>
+    <bean class="java.lang.String" id="constellationPassword">
+        <constructor-arg type="java.lang.String" value="admin" />
+    </bean>
+    
     <!-- service bean used to call constellation server-->
-    <bean class="org.constellation.gui.service.ServicesManager" id="serviceManager" scope="session"></bean>
+    <bean class="org.constellation.gui.service.ServicesManager" id="serviceManager" scope="session">
+        <property name="constellationUrl" ref="constellationURL"/>
+        <property name="login" ref="constellationlogin"/>
+        <property name="password" ref="constellationPassword"/>
+    </bean>
+
+    <bean class="org.constellation.gui.service.WMSManager" id="wmsManager" scope="session">
+        <property name="constellationUrl" ref="constellationURL"/>
+        <property name="login" ref="constellationlogin"/>
+        <property name="password" ref="constellationPassword"/>
+    </bean>
 </beans>

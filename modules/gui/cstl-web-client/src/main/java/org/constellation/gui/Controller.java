@@ -23,6 +23,7 @@ import juzu.Path;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
+import juzu.impl.inject.spi.spring.SpringContext;
 import juzu.template.Template;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
@@ -73,13 +74,6 @@ public class Controller {
     @Inject
     @Path("success.gtmpl")
     org.constellation.gui.templates.success success;
-
-    /**
-     * End service creation page juzu tempate
-     */
-    @Inject
-    @Path("servicedescription.gtmpl")
-    org.constellation.gui.templates.servicedescription servicedescription;
 
     /**
      * {@link ResourceBundle} used on this application
@@ -167,12 +161,5 @@ public class Controller {
     public Response succeded(Service createdService, String type, List<String> versionList, String created) {
         Boolean create = Boolean.parseBoolean(created);
         return success.with().service(createdService).type(type).versions(versionList).created(create).ok().withMimeType("text/html");
-    }
-
-    @View
-    @Route("/servicedescription")
-    public Response servicedescription(String identifier, String type){
-//        ServicesManager.getService(identifier, type);
-        return servicedescription.ok().withMimeType("text/html");
     }
 }

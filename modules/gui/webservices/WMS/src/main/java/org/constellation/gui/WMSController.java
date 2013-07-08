@@ -23,9 +23,12 @@ import juzu.Route;
 import juzu.View;
 import juzu.template.Template;
 import org.constellation.dto.Service;
+import org.constellation.gui.service.WMSManager;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * WMS service controller. To manage all specific service operations
@@ -37,6 +40,8 @@ import java.io.IOException;
  */
 public class WMSController {
 
+    @Inject
+    private WMSManager wmsManager;
 
     /**
      * root wms service page
@@ -44,6 +49,10 @@ public class WMSController {
     @Inject
     @Path("wmscreate.gtmpl")
     Template index;
+
+    @Inject
+    @Path("servicedescription.gtmpl")
+    Template serviceDescription;
 
     /**
      * Generate wms service main page
@@ -54,6 +63,23 @@ public class WMSController {
     @Route("/create/wms")
     public Response index() throws IOException {
         return index.ok().withMimeType("text/html");
+    }
+
+    /**
+     * generate wms service editon page
+     * @param serviceName service name
+     * @return a {@link Response} with right mime type
+     * @throws IOException
+     */
+    @View
+    @Route("edit/wms/{serviceName}")
+    public Response editWMS(String serviceName) throws IOException{
+        Service service = wmsManager.getServiceMetadata(serviceName, "WMS");
+
+        //use parameter map (not type safe technique) because we aren't on juzu projet => gtmpl aren't build.
+        Map<String, Object> parameters = new HashMap<String, Object>(0);
+        parameters.put("service", service);
+        return serviceDescription.ok(parameters).withMimeType("text/html");
     }
 
 }

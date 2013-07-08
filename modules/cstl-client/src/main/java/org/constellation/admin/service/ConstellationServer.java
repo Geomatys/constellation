@@ -1435,6 +1435,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         final URL source = new URL(sourceURL);
         final HttpURLConnection conec = (HttpURLConnection) source.openConnection();
+        conec.setRequestProperty("Accept", "application/xml");
         getClientSecurity().secure(conec);
         applySessionId(conec);
 
@@ -1450,6 +1451,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
                 //if request is String, it's a json part
                 if (request instanceof String) {
+                    conec.setRequestProperty("Accept", "application/json");
                     String sRequest = (String) request;
                     doJsonPost(sRequest, conec);
 

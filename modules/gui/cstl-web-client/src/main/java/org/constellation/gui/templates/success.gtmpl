@@ -93,7 +93,7 @@
 
             <!-- Button to add data on service -->
             <div class="offset1 span4">
-                <a class="btn btn-large" href="@{servicedescription(identifier = service.identifier, type = type, versions = versions)}"><i class="icon-plus-sign"></i> &{service.create.end.addlayers.label}</a>
+                <a class="btn btn-large" href="edit/${type}/${service.name}"><i class="icon-plus-sign"></i> &{service.create.end.addlayers.label}</a>
             </div>
         <%}else{%>
             <!-- alert part -->

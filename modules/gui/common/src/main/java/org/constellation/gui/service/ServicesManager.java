@@ -20,6 +20,9 @@ import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.dto.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,7 +42,35 @@ public class ServicesManager {
 
     private static final Logger LOGGER = Logger.getLogger(ServicesManager.class.getName());
 
+    /**
+     * constellation server URL
+     */
+    private String constellationUrl;
+
+    /**
+     * constellation server user login
+     */
+    private String login;
+
+    /**
+     * constellation server user password
+     */
+    private String password;
+
+
     public ServicesManager() {
+    }
+
+    public void setConstellationUrl(String constellationUrl) {
+        this.constellationUrl = constellationUrl;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     /**
@@ -53,8 +84,8 @@ public class ServicesManager {
         if (createdService != null) {
             LOGGER.log(Level.INFO, "service will be created : " + createdService.getName());
             try {
-                URL serverUrl = new URL("http://localhost:8090/constellation/api/1/");
-                ConstellationServer cs = new ConstellationServer(serverUrl, "admin", "admin");
+                URL serverUrl = new URL(constellationUrl);
+                ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
                 return cs.services.newInstance(service, createdService);
             } catch (MalformedURLException e) {
                 LOGGER.log(Level.WARNING, "error on url", e);
@@ -72,8 +103,8 @@ public class ServicesManager {
         List<InstanceSummary> instancesSummary = new ArrayList<InstanceSummary>(0);
 
         try {
-            URL serverUrl = new URL("http://localhost:8090/constellation/api/1/");
-            ConstellationServer cs = new ConstellationServer(serverUrl, "admin", "admin");
+            URL serverUrl = new URL(constellationUrl);
+            ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
             InstanceReport report = cs.services.listInstance();
             //map server side object on client side object
             for (Instance instance : report.getInstances()) {
@@ -86,7 +117,7 @@ public class ServicesManager {
                 instanceSum.setLayersNumber(instance.getLayersNumber());
                 instanceSum.setName(instance.getName());
                 instanceSum.setStatus(instance.getStatus().toString());
-                instanceSum.setType(instance.getType());
+                instanceSum.setType(instance.getType().toLowerCase());
                 instancesSummary.add(instanceSum);
             }
         } catch (MalformedURLException e) {
@@ -96,33 +127,4 @@ public class ServicesManager {
         return instancesSummary;
     }
 
-
-//    public static Object getService(final String identifier, final String type, final List<String> versions) {
-//        // TODO get full service data
-//        String s = type.toLowerCase();
-//        if (s.equals("wms")) {
-//            if(LOGGER.isLoggable(Level.INFO)){
-//                LOGGER.log(Level.INFO, "on WMS service");
-//            }
-//            return askWMSCapabilities(identifier, versions);
-//
-//        } else {
-//            System.out.println("do nothing");
-//        }
-//        return null;
-//    }
-//
-//    /**
-//     * return an object to know main service informations
-//     *
-//     * @param identifier service identifier
-//     * @param versions service version
-//     * @return an {@link AbstractWMSCapabilities}
-//     */
-//    private static AbstractWMSCapabilities askWMSCapabilities(final String identifier, final List<String> versions) {
-//        //TODO : 1) get metadatas
-//        //TODO : 2) get layers
-//
-//        return null;
-//    }
 }

@@ -41,7 +41,7 @@
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <% for (def service : services) {%>
           <div class="span6">
-            <a href="@{servicedescription(identifier = service.name, type = service.type)}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
+            <a href="edit/${service.type}/${service.name}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
             <div class="well">
                 <div class="row">
                     <div class="offset4 span2">
