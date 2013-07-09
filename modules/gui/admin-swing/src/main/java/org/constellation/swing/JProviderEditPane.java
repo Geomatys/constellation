@@ -202,6 +202,10 @@ public class JProviderEditPane extends javax.swing.JPanel {
     public ProviderReport getProviderReport() {
         return providerReport;
     }
+    
+    public void setIdentifierTextFieldEnable(boolean enable) {
+        guiIdentifier.setEnabled(enable);
+    }
 
     private void correctName(){
         int pos = guiIdentifier.getCaretPosition();
