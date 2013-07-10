@@ -32,12 +32,12 @@
 /*
  * Less file loaded
  */
-@Less(value = "bootstrap/bootstrap.less", minify = true)
+@Less(value = "cstl-web-client.less", minify = true)
 
 /*
  * javascript and css loaded
  */
-@Assets(stylesheets = @Stylesheet(src = "bootstrap/bootstrap.css"),
+@Assets(stylesheets = @Stylesheet(src = "cstl-web-client.css"),
         scripts = {@Script(id = "jQuery", src = "js/jquery-2.0.0.js"),
                 @Script(id = "collapse", src = "js/bootstrap-collapse.js", depends = "jQuery"),
                 @Script(id = "tooltip", src = "js/bootstrap-tooltip.js", depends = "jQuery"),

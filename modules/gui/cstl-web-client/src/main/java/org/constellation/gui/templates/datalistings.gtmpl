@@ -31,7 +31,7 @@
                 <div class="span3">
                     <button type="button" class="btn btn-info btn-small">selectionner toutes les couches</button></div>
                 <div class="span3">
-                    <div class="pagination" style="margin: 0px;">
+                    <div class="pagination text-info" style="margin: 0px;">
                         <ul>
                             <li><a href="#">&laquo;</a></li>
                             <li><a href="#">1</a> </li>
@@ -43,7 +43,7 @@
                     </div>
                 </div>
                 <div class="span3">
-                    <select>
+                    <select class="pull-right">
                         <option>option 1</option>
                         <option>option 2</option>
                         <option>option 3</option>
@@ -51,6 +51,25 @@
                     </select>
                 </div>
             </div>
+            <div class="row">
+                <div class="span9">
+                    <button type="button" class="btn btn-info btn-block">réduire ou agrandir</button>
+                </div>
+            </div>
+            <% for (def layer : layers.getLayer()){%>
+                <br/>
+                <div class="row">
+                    <% if(layer.type.equals("RASTER")){%>
+                        <div class="span9" style="background: url(../../images/raster.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;">
+                    <% }else{%>
+                        <div class="span9" style="background: url(../../images/vecteur.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;">
+                    <%}%>
+                        ${layer.name}<br/>
+                        <br/>
+                        ${layer.date}<br/>
+                    </div>
+                </div>
+            <%}%>
         </div>
     </div>
     <div class="span3">

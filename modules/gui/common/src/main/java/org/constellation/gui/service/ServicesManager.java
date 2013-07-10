@@ -20,9 +20,6 @@ import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.dto.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 
 import java.net.MalformedURLException;
 import java.net.URL;

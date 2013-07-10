@@ -82,6 +82,12 @@ public class Layer {
     @XmlElement(name="Dimension")
     private List<DimensionDefinition> dimensions;
 
+    @XmlElement(name="Modified-Date")
+    private String date;
+
+    @XmlElement(name="Type")
+    private String type;
+
     @XmlTransient
     private String providerID;
     
@@ -301,6 +307,22 @@ public class Layer {
 
     public void setDimensions(final List<DimensionDefinition> dimensions) {
         this.dimensions = dimensions;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override
