@@ -909,11 +909,18 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-	<repository>
+	    <repository>
             <id>etrema</id>
             <url>http://www.ettrema.com/maven2</url>
             <snapshots>
                 <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>geotoolkit</id>
+            <url>http://maven.geotoolkit.org/</url>
+            <snapshots>
+                <enabled>true</enabled>
             </snapshots>
         </repository>
         <repository>
