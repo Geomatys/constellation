@@ -53,15 +53,4 @@
     </developer>
   </developers>
 
-  <!--
-    Required dependencies for building. These dependencies wil be included into
-    the JARs list that Maven will put into the directory "target/binaries".
-  -->
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-  </dependencies>
-
 </project>

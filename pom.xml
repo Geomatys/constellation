@@ -127,7 +127,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -163,10 +162,8 @@
     <properties>
         <!-- Define parent projects versions -->
         <geoapi.version>3.1-M04</geoapi.version>
-        <geotoolkit.version>4.x-SNAPSHOT</geotoolkit.version>
-        <geotoolkit-pending.version>4.x-SNAPSHOT</geotoolkit-pending.version>
-        <mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>
-        <mapfaces.version>0.9-SNAPSHOT</mapfaces.version>
+        <geotoolkit.version>4.0-M0</geotoolkit.version>
+        <mdweb-meta.version>2.4.3</mdweb-meta.version>
         <jersey.version>1.11</jersey.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
@@ -266,15 +263,20 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Import all dependency management used by the MapFaces project. -->
+            <!-- Import all dependency management used by the Geotk project. -->
             <dependency>
-                <groupId>org.mapfaces</groupId>
-                <artifactId>mapfaces</artifactId>
-                <version>${mapfaces.version}</version>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotoolkit</artifactId>
+                <version>${geotoolkit.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>2.0.9</version>
+            </dependency>
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-core</artifactId>
@@ -321,14 +323,25 @@
                 <version>4.1.2</version> <!-- TODO: version mismatch with Geotk? -->
             </dependency>
             <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>2.0.1</version>
             </dependency>
             <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <scope>provided</scope>
+                <version>2.5</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.servlet.jsp</groupId>
                 <artifactId>jsp-api</artifactId>
-                <version>2.2</version> <!-- TODO: MapFaces uses 2.1. -->
+                <version>2.2</version>
             </dependency>
             <dependency>
                 <groupId>javax.el</groupId>
@@ -404,32 +417,6 @@
                     </exclusion>
                </exclusions>
             </dependency>
-            <!-- MapFaces -->
-            <dependency>
-                <groupId>org.mapfaces</groupId>
-                <artifactId>mapfaces-core</artifactId>
-                <version>${mapfaces.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mapfaces</groupId>
-                <artifactId>mapfaces-base</artifactId>
-                <version>${mapfaces.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mapfaces</groupId>
-                <artifactId>mapfaces-map</artifactId>
-                <version>${mapfaces.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mapfaces</groupId>
-                <artifactId>mapfaces-facelet-editor</artifactId>
-                <version>${mapfaces.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mapfaces</groupId>
-                <artifactId>mapfaces-io</artifactId>
-                <version>${mapfaces.version}</version>
-            </dependency>
             <!-- mdweb-metamodel -->
             <dependency>
                 <groupId>org.mdweb.metamodel</groupId>
@@ -458,362 +445,404 @@
                 <version>${geoapi.version}</version>
             </dependency>
 
-            <!-- Geotoolkit-pending version -->
+            <!-- Geotoolkit version -->
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-feature</artifactId>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-feature</artifactId>
+                <type>test-jar</type>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-jasperreport</artifactId>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-jaxp-core</artifactId>
+                <type>test-jar</type>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.project</groupId>
+                <artifactId>geotk-test</artifactId>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-kml</artifactId>
+                <version>${geotoolkit.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-widgets-swing-pending</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
 	    <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-filter-cql</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-utility-pending</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-utility-jdbc</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-db-postgres</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
 	     <dependency>
 	        <groupId>org.geotoolkit.pending</groupId>
         	<artifactId>geotk-s57</artifactId>
-                 <version>${geotoolkit-pending.version}</version>
+                 <version>${geotoolkit.version}</version>
 	    </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-jaxp-core</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-coverageio-geotiff</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-coverageio-bil</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-om</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-sensorML</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-spatial-lucene</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-filter</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-jdbc-postgis</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-go2</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-go2-style-extension</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-render</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-shapefile</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-coverageio-store</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-osm</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-osm-tms</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-csw</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-ignrm</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-wms</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-ncwms</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-sos</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-wcs</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-wps</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-wfs</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-googlemaps</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-wmsc</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-wmts</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-svg</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-temporal</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-clients-core</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-xml-owc</artifactId>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-xml-wmc</artifactId>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-sld</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-csw</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-ebrim</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-wfs</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-ows</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-ogc</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-sensorML</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-skos</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-sos</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-om</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-gml</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-xacml</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-xsd</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-wcs</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-wms</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-wmts</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-service</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-feature-catalogue</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-providers</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-jaxp-gml</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-core</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-quartz</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-math</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-vector</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-raster</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-coverage</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-jts-geometry</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-groovy</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-wps</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
-                <artifactId>geotk-datastore-core</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <artifactId>geotk-featurestore-core</artifactId>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-jaxp-core</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
                 <classifier>tests</classifier>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-jdbc-mysql</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-gpx</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-csv</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-dbf</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-osm-xml</artifactId>
-                <version>${geotoolkit-pending.version}</version>
+                <version>${geotoolkit.version}</version>
             </dependency>
 
             <!--
@@ -861,25 +890,10 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.geotoolkit</groupId>
-                <artifactId>geotk-metadata-sql</artifactId>
-                <version>${geotoolkit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotoolkit</groupId>
-                <artifactId>geotk-coverage-sql</artifactId>
-                <version>${geotoolkit.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.10</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.geotoolkit</groupId>
-                <artifactId>geotk-coverageio-netcdf</artifactId>
-                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit</groupId>

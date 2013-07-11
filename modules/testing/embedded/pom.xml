@@ -76,6 +76,11 @@
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.constellation</groupId>
+      <artifactId>cstl-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!--dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-wms</artifactId>
@@ -101,7 +106,7 @@
       <artifactId>cstl-web-wmts</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-csw-mdw</artifactId>

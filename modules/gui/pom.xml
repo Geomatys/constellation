@@ -62,13 +62,6 @@
             <version>${juzu.version}</version>
         </dependency>
 
-        <!-- Junit for testing -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-bom-arquillian</artifactId>
@@ -86,7 +79,6 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>

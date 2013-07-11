@@ -23,14 +23,6 @@
             <groupId>org.constellation.gui</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <!-- Exclusion because we can found this artifact required on runtime on dependency tree -->
-                <!-- and generate testcase execution error. -->
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.constellation.gui</groupId>
