@@ -77,8 +77,26 @@ public class LayerContext {
     /**
      * @param layers the layers to set
      */
-    public void setLayers(List<Source> layers) {
+    public void setLayers(final List<Source> layers) {
         this.layers = new Layers(layers);
+    }
+
+    public boolean hasSource(final String sourceID) {
+        for (Source src : getLayers()) {
+            if (Objects.equals(src.getId(), sourceID)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void removeSource(final String sourceID) {
+        for (Source src : getLayers()) {
+            if (Objects.equals(src.getId(), sourceID)) {
+                layers.getSource().remove(src);
+                return;
+            }
+        }
     }
 
     /**

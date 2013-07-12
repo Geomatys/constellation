@@ -17,6 +17,7 @@
 
 package org.constellation.map.configuration;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +25,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.stream.XMLStreamException;
 
 import org.quartz.TriggerBuilder;
@@ -81,6 +84,12 @@ import org.constellation.process.provider.RestartProviderDescriptor;
 import org.constellation.process.provider.UpdateProviderDescriptor;
 import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
 import org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor;
+import org.constellation.ws.WSEngine;
+import org.constellation.api.CommonConstants;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.InvalidParameterValueException;
 
@@ -401,6 +410,34 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
                 process.call();
+
+                //update the layer context using this provider
+                for (String specification : CommonConstants.WXS) {
+                    final Map<String, Worker> instances = WSEngine.getWorkersMap(specification);
+                    if (instances != null) {
+                        for (Worker w : instances.values()) {
+                            if (w.getConfiguration() instanceof LayerContext) {
+                                final LayerContext configuration = (LayerContext) w.getConfiguration();
+                                if (configuration.hasSource(providerId)) {
+                                    configuration.removeSource(providerId);
+                                    // save new Configuration
+                                    LOGGER.log(Level.INFO, "Updating service {0}-{1} for deleted provider", new Object[]{specification, w.getId()});
+                                    try {
+                                        final File configDirectory   = ConfigDirectory.getConfigDirectory();
+                                        final File serviceDir        = new File(configDirectory, specification);
+                                        final File instanceDirectory = new File(serviceDir, w.getId());
+                                        final File configurationFile =  new File(instanceDirectory, "layerContext.xml");
+                                        final Marshaller marshaller  = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                                        marshaller.marshal(configuration, configurationFile);
+                                        GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                                    } catch (JAXBException ex) {
+                                        throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 providerListener.fireProvidedDeleted(providerId);
             } catch (ProcessException ex) {
                 return new AcknowlegementType("Failure", ex.getLocalizedMessage());

@@ -117,4 +117,6 @@ public interface Worker {
     List<Schema> getRequestValidationSchema();
     
     void checkVersionSupported(final String version, final boolean getCapabilities) throws CstlServiceException;
+
+    Object getConfiguration();
 }
