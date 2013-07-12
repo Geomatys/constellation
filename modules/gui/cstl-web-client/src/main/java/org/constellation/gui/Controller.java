@@ -20,11 +20,15 @@ package org.constellation.gui;
 
 import juzu.Action;
 import juzu.Path;
+import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
 import juzu.impl.inject.spi.spring.SpringContext;
+import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
+import org.constellation.configuration.Layer;
+import org.constellation.configuration.LayerList;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
@@ -35,7 +39,9 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -74,6 +80,11 @@ public class Controller {
     @Inject
     @Path("success.gtmpl")
     org.constellation.gui.templates.success success;
+
+
+    @Inject
+    @Path("dataElement.gtmpl")
+    Template dataElement;
 
     /**
      * {@link ResourceBundle} used on this application
@@ -161,5 +172,24 @@ public class Controller {
     public Response succeded(Service createdService, String type, List<String> versionList, String created) {
         Boolean create = Boolean.parseBoolean(created);
         return success.with().service(createdService).type(type).versions(versionList).created(create).ok().withMimeType("text/html");
+    }
+
+    @Ajax
+    @Resource
+    @Route("/datalist")
+    public void generateDataList(String serviceName, String startElement, String counter, String orderBy, String filter){
+        LayerList layers = servicesManager.getLayers(serviceName, "WMS");
+        Map<String, Object> parameters = new HashMap<String, Object>(0);
+
+        if(layers.getLayer().size()<Integer.parseInt(counter)){
+            parameters.put("layers", layers);
+        }else{
+            List<Layer> layerList = new ArrayList<Layer>(Integer.parseInt(counter));
+            for (int i = Integer.parseInt(startElement); i < Integer.parseInt(counter); i++) {
+                layerList.add(layers.getLayer().get(i));
+            }
+            parameters.put("layers", layerList);
+        }
+        dataElement.with(parameters).render();
     }
 }

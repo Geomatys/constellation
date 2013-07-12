@@ -19,6 +19,7 @@ package org.constellation.gui.service;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 
 import java.net.MalformedURLException;
@@ -123,5 +124,24 @@ public class ServicesManager {
 
         return instancesSummary;
     }
+
+    /**
+     *
+     * @param serviceName
+     * @param serviceType
+     * @return
+     */
+    public LayerList getLayers(final String serviceName, final String serviceType){
+        LayerList layers = new LayerList();
+        try {
+            URL serverUrl = new URL(constellationUrl);
+            ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
+            layers = cs.services.getLayers(serviceType, serviceName);
+        } catch (MalformedURLException e) {
+            LOGGER.log(Level.WARNING, "", e);
+        }
+        return layers;
+    }
+
 
 }
