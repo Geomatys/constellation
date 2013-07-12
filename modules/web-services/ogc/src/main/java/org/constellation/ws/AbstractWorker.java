@@ -554,4 +554,9 @@ public abstract class AbstractWorker implements Worker {
     public void destroy() {
         clearCapabilitiesCache();
     }
+
+    @Override
+    public Object getConfiguration() {
+        return null;
+    }
 }

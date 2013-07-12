@@ -365,7 +365,12 @@ public abstract class LayerWorker extends AbstractWorker {
         }
         return null;
     }
-    
+
+    @Override
+    public LayerContext getConfiguration() {
+        return layerContext;
+    }
+
     /**
      * Parse a Name from a string.
      * @param layerName
