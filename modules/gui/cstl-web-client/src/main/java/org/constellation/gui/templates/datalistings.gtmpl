@@ -68,9 +68,11 @@
     $(function() {
         $("#nbLayersselect").on('change', function(){
             var counter = $(this).val();
-            alert($(this).val()+" couches");
-            alert($('#datalist'));
-            $('#datalist').jzLoad("Controller.generateDataList()",{"serviceName":"${service.name}", "startElement":0, "counter":counter, "orderBy":"", filter:""})
-        })
+            var test= "test";
+//            $('#datalist').jzAjax("Controller.generateDataList()",{data:{"servicename":"test"}});
+            $('#datalist').jzLoad(
+                    "Controller.generateDataList()",
+                    {"serviceName":"${service.name}", "startElement":"0", "counter":counter, "orderBy":"", "filter":""});
+        });
     });
 </script>
