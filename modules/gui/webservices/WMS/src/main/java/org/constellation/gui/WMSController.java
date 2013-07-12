@@ -18,17 +18,22 @@
 package org.constellation.gui;
 
 import juzu.Path;
+import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
+import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
+import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.WMSManager;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,6 +59,7 @@ public class WMSController {
     @Inject
     @Path("servicedescription.gtmpl")
     Template serviceDescription;
+
 
     /**
      * Generate wms service main page
@@ -84,5 +90,4 @@ public class WMSController {
         parameters.put("layers", layers);
         return serviceDescription.ok(parameters).withMimeType("text/html");
     }
-
 }

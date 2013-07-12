@@ -38,12 +38,13 @@
  * javascript and css loaded
  */
 @Assets(stylesheets = @Stylesheet(src = "cstl-web-client.css"),
-        scripts = {@Script(id = "jQuery", src = "js/jquery-2.0.0.js"),
-                @Script(id = "collapse", src = "js/bootstrap-collapse.js", depends = "jQuery"),
-                @Script(id = "tooltip", src = "js/bootstrap-tooltip.js", depends = "jQuery"),
-                @Script(id = "alert", src = "js/bootstrap-alert.js", depends = "jQuery"),
-                @Script(id = "tab", src = "js/bootstrap-tab.js", depends = "jQuery"),
-                @Script(id = "dropdown", src = "js/bootstrap-dropdown.js", depends = "jQuery")})
+        scripts = {@Script(id = "jquery", src = "js/jquery-2.0.0.js"),
+                @Script(id = "collapse", src = "js/bootstrap-collapse.js", depends = "jquery"),
+                @Script(id = "tooltip", src = "js/bootstrap-tooltip.js", depends = "jquery"),
+                @Script(id = "alert", src = "js/bootstrap-alert.js", depends = "jquery"),
+                @Script(id = "tab", src = "js/bootstrap-tab.js", depends = "jquery"),
+                @Script(id = "dropdown", src = "js/bootstrap-dropdown.js", depends = "jquery"),
+                @Script(id = "service", src = "js/services.js", depends = "jquery")})
 
 /**
  * Constellation web client main part.

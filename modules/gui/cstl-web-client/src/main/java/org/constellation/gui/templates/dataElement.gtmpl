@@ -1,0 +1,25 @@
+#{param name=layers/}
+<% for (def layer : layers.getLayer()){%>
+<br/>
+<div class="row">
+<% if(layer.type.equals("RASTER")){%>
+<div class="span9" style="background: url(../../images/raster.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;">
+    <% }else{%>
+    <div class="span9" style="background: url(../../images/vecteur.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;">
+        <%}%>
+        <div class="row">
+            <div class="span4" style="padding-left: 15px;">
+                <p>${layer.name}</p>
+            </div>
+            <div class="span1 pull-right">
+                <p class="text-right text-info">${layer.type}</p>
+            </div>
+        </div>
+        <div class="row" style="border-top: 1px solid #5bc0de">
+            <div class="span2" style="border: 1px solid #5bc0de; border-top: none;">
+                <p class="text-center">${layer.date}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<%}%>

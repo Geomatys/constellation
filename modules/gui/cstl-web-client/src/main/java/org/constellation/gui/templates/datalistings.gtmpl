@@ -31,23 +31,23 @@
                 <div class="span3">
                     <button type="button" class="btn btn-info btn-small">selectionner toutes les couches</button></div>
                 <div class="span3">
-                    <div class="pagination text-info" style="margin: 0px;">
+                    <div class="pagination" style="margin: 0px;">
                         <ul>
-                            <li><a href="#">&laquo;</a></li>
-                            <li><a href="#">1</a> </li>
-                            <li><a href="#">2</a> </li>
-                            <li><a href="#">3</a> </li>
-                            <li><a href="#">4</a> </li>
-                            <li><a href="#">&raquo;</a></li>
+                            <li><a href="#" class="text-info">&laquo;</a></li>
+                            <li><a href="#" class="text-info">1</a> </li>
+                            <li><a href="#" class="text-info">2</a> </li>
+                            <li><a href="#" class="text-info">3</a> </li>
+                            <li><a href="#" class="text-info">4</a> </li>
+                            <li><a href="#" class="text-info">&raquo;</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="span3">
-                    <select class="pull-right">
-                        <option>option 1</option>
-                        <option>option 2</option>
-                        <option>option 3</option>
-                        <option>option 4</option>
+                    <select class="pull-right" id="nbLayersselect">
+                        <option value="10" selected="selected">10 couches</option>
+                        <option value="20">20 couches</option>
+                        <option value="100">100 couches</option>
+                        <option value="all">Toutes les couches</option>
                     </select>
                 </div>
             </div>
@@ -56,33 +56,21 @@
                     <button type="button" class="btn btn-info btn-block">réduire ou agrandir</button>
                 </div>
             </div>
-            <% for (def layer : layers.getLayer()){%>
-                <br/>
-                <div class="row">
-                    <% if(layer.type.equals("RASTER")){%>
-                        <div class="span9" style="background: url(../../images/raster.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;">
-                    <% }else{%>
-                        <div class="span9" style="background: url(../../images/vecteur.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;">
-                    <%}%>
-                        <div class="row">
-                            <div class="span4" style="padding-left: 15px;">
-                                <p>${layer.name}</p>
-                            </div>
-                            <div class="span1 pull-right">
-                                <p class="text-right text-info">${layer.type}</p>
-                            </div>
-                        </div>
-                        <div class="row" style="border-top: 1px solid #5bc0de">
-                            <div class="span2" style="border: 1px solid #5bc0de; border-top: none;">
-                                <p class="text-center">${layer.date}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <%}%>
+            <div id="datalist">
+            </div>
         </div>
     </div>
     <div class="span3">
         detail part
     </div>
 </div>
+<script type="text/javascript" >
+    $(function() {
+        $("#nbLayersselect").on('change', function(){
+            var counter = $(this).val();
+            alert($(this).val()+" couches");
+            alert($('#datalist'));
+            $('#datalist').jzLoad("Controller.generateDataList()",{"serviceName":"${service.name}", "startElement":0, "counter":counter, "orderBy":"", filter:""})
+        })
+    });
+</script>
