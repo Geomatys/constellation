@@ -50,7 +50,7 @@ public class StyleReferenceTest {
             styleReference = new StyleReference("${providerLayerType|myProvider|mylayer}");
             fail();
 
-            styleReference = new StyleReference("${providerStyleType|myStyleProvider|myStyle|time}");
+            styleReference = new StyleReference("${providerStyleType|myStyleProvider|myStyle|"+time+"}");
             fail();
         } catch (IllegalArgumentException ex) {
 
