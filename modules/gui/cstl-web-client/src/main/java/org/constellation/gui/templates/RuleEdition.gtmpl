@@ -1,0 +1,22 @@
+#{decorate path=menu.gtmpl/}
+
+#{param name=providerId/}
+#{param name=styleName/}
+#{param name=ruleIndex/}
+#{param name=rule/}
+#{param name=method/}
+
+<!-- Header -->
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="../images/constellation.png"/>
+    </div>
+</div>
+
+<form action="@{StyleEditionController.updateRule(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex)}" method="post">
+    <input type="text" id="name" name="name" value="${rule.name}" />
+    <input type="text" id="title" name="title" value="${rule.title}" />
+    <input type="text" id="description" name="description" value="${rule.description}" />
+    <a href="@{StyleEditionController.styleEdition(providerId = providerId, styleName = styleName)}">Cancel</a>
+    <input type="submit" class="btn" value="Submit" />
+</form>

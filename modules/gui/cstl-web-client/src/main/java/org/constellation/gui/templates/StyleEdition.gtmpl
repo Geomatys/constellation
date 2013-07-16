@@ -1,0 +1,88 @@
+#{decorate path=menu.gtmpl/}
+
+#{param name=providerId/}
+#{param name=styleName/}
+#{param name=rules/}
+
+<!-- Header -->
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="../images/constellation.png"/>
+    </div>
+</div>
+
+<div>
+    <div style="background-color:#f5f5f5;height: 30px;padding: 8px 20px 8px;border:1px solid #ddd">
+        <span style="font-size:20px;line-height:30px;">Style</span>
+        <form class="form-inline pull-right" style="margin: 0;">
+            <label for="name">Nom du style:</label>
+            <input id="name" name="name" type="text" value="${styleName}" />
+            <input type="submit" class="btn" value="Mettre à jour" />
+        </form>
+    </div>
+
+    <div style="background-color:#fff;">
+        <div class="row">
+            <div class="span6">
+                <div style="padding: 15px 20px 0 20px;">
+                    <div style="margin-bottom:12px;">
+                        <span style="font-size:15px;line-height:30px;">Règles:</span>
+                        <div class="btn pull-right" style="margin-left: 5px;" onclick="$.ajax('@{StyleEditionController.removeAllRules(providerId = providerId, styleName = styleName)}');">
+                            <span class="icon-trash"></span>
+                            Tout supprimer
+                        </div>
+                        <div class="btn-group pull-right">
+                            <div class="btn dropdown-toggle" data-toggle="dropdown">
+                                <span class="icon-plus"></span>
+                                Nouvelle(s) règle(s)
+                            </div>
+                            <ul class="dropdown-menu">
+                                <li><a href="@{StyleEditionController.ruleEdition(providerId = providerId, styleName = styleName, method = 'm')}">Manuelle <i>(unique)</i></a></li>
+                                <li><a href="@{StyleEditionController.ruleEdition(providerId = providerId, styleName = styleName, method = 'ai')}">Par intervals <i>(multiple)</i></a></li>
+                                <li><a href="@{StyleEditionController.ruleEdition(providerId = providerId, styleName = styleName, method = 'auv')}">Par valeurs uniques <i>(multiple)</i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="rules" style="border:1px solid #ddd;height:512px;max-height:512px;overflow-y:auto;">
+                        <% for (def i = 0; i < rules.size; i++) {
+                            def rule = rules.get(i)
+                            def ruleIndex = i.toString()
+                        %>
+                            <div class="rule" style="height:30px;">
+                                <span style="line-height:30px;padding:0 10px;">${rule}</span>
+                                <a href="#" onclick="$.ajax('@{StyleEditionController.removeRule(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex)}');$(this).parent().remove();return false;" class="pull-right" style="line-height:20px;padding:5px 10px;">Supprimer</a>
+                                <span class="pull-right" style="display:block;border-left:1px solid #ccc;height:20px;margin:5px 0;"></span>
+                                <a href="@{StyleEditionController.ruleEdition(providerId = providerId, styleName = styleName, method = 'm', ruleIndex = ruleIndex)}" class="pull-right" style="line-height:20px;padding:5px 10px;">Editer</a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <div class="span6">
+                <div style="padding: 15px 20px 0 20px;">
+                    <div style="margin-bottom:12px;">
+                        <span style="font-size:15px;line-height:30px;">Apperçu: <b>BlueMarble</b></span>
+                        <div class="btn-group pull-right">
+                            <div class="btn dropdown-toggle" data-toggle="dropdown">
+                                <span class="icon-eye-open"></span>
+                                Voir la couche
+                                <span class="caret"></span>
+                            </div>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">BlueMarble</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div style="border:1px solid #ddd;height:512px;">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="padding: 15px 20px;text-align: right">
+            <a href="#" class="btn">Annuler</a>
+            <a href="#" class="btn btn-primary">Valider</a>
+        </div>
+    </div>
+</div>
+

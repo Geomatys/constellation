@@ -23,9 +23,7 @@ import juzu.Path;
 import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
-import juzu.SessionScoped;
 import juzu.View;
-import juzu.impl.request.Request;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.constellation.configuration.Layer;
@@ -35,7 +33,6 @@ import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.InstanceSummary;
 import org.constellation.gui.service.ServicesManager;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -53,7 +50,6 @@ import java.util.ResourceBundle;
  * @version 0.9
  * @since 0.9
  */
-@SessionScoped
 public class Controller {
 
 
@@ -113,8 +109,6 @@ public class Controller {
     @Route("/webservices")
     public Response webservices() {
         List<InstanceSummary> services = servicesManager.getServiceList();
-
-
         return webServices.with().services(services).ok().withMimeType("text/html");
     }
 
@@ -185,6 +179,7 @@ public class Controller {
     public void generateDataList(String serviceName, String startElement, String counter, String orderBy, String filter){
         LayerList layers = servicesManager.getLayers(serviceName, "WMS");
         Map<String, Object> parameters = new HashMap<String, Object>(0);
+
         if(layers.getLayer().size()<Integer.parseInt(counter)){
             parameters.put("layers", layers);
         }else{

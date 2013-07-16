@@ -31,4 +31,10 @@
         <property name="login" ref="constellationlogin"/>
         <property name="password" ref="constellationPassword"/>
     </bean>
+
+    <bean class="org.constellation.gui.service.StyleManager" id="sldManager" scope="request">
+        <property name="constellationUrl" ref="constellationURL"/>
+        <property name="login" ref="constellationlogin"/>
+        <property name="password" ref="constellationPassword"/>
+    </bean>
 </beans>

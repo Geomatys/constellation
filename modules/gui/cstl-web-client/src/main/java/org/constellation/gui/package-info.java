@@ -22,7 +22,10 @@
         @Alias(of = "/org/constellation/gui/templates/menu.gtmpl", as = "menu.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/wmsdescription.gtmpl", as = "wmsdescription.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/wmsmetadata.gtmpl", as = "wmsmetadata.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wmscreate.gtmpl", as = "wmscreate.gtmpl")})
+        @Alias(of = "/org/constellation/gui/templates/wmscreate.gtmpl", as = "wmscreate.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/StyleEdition.gtmpl", as = "StyleEdition.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/RuleEdition.gtmpl", as = "RuleEdition.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/SymbolizerEdition.gtmpl", as = "SymbolizerEdition.gtmpl")})
 
 /*
  * Declare servlet Base URL and which bundle used
