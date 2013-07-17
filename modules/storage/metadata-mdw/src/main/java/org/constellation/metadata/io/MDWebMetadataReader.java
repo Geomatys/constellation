@@ -774,13 +774,14 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         // special case for xlink
                         if (attribName.equals("xLink") && IdentifiedObject.class.isAssignableFrom(classe)) {
                             ((IdentifiedObject)result).getIdentifierMap().putSpecialized(IdentifierSpace.XLINK, (XLink)param);
-                        }
-                        final Field field = ReflectionUtilities.getFieldFromName(attribName, classe);
-
-                        if (field != null) {
-                            setFieldToValue(field, attribName, result, param);
                         } else {
-                            LOGGER.warning("no field " + attribName + " in class:" + classe.getName() + "\ncurrentPath:" + path.getId());
+                            final Field field = ReflectionUtilities.getFieldFromName(attribName, classe);
+
+                            if (field != null) {
+                                setFieldToValue(field, attribName, result, param);
+                            } else {
+                                LOGGER.warning("no field " + attribName + " in class:" + classe.getName() + "\ncurrentPath:" + path.getId());
+                            }
                         }
                     }
                 }
