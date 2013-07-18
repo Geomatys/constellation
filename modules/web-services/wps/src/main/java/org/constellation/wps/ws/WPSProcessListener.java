@@ -132,7 +132,11 @@ public class WPSProcessListener implements ProcessListener{
         final StatusType status = new StatusType();
         status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
         final ProcessFailedType processFT = new ProcessFailedType();
-        processFT.setExceptionReport(new ExceptionReport(Exceptions.formatStackTrace(event.getException()), null, null, this.def.exceptionVersion.toString()));
+        if (event.getException() != null) {
+            processFT.setExceptionReport(new ExceptionReport(Exceptions.formatStackTrace(event.getException()), null, null, this.def.exceptionVersion.toString()));
+        } else {
+            processFT.setExceptionReport(new ExceptionReport("Process failed for some unknown reason.", null, null, this.def.exceptionVersion.toString()));
+        }
         status.setProcessFailed(processFT);
         responseDoc.setStatus(status);
         WPSUtils.storeResponse(responseDoc, folderPath, fileName);
