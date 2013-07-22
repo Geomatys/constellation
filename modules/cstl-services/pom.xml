@@ -522,6 +522,13 @@
 	    <groupId>com.ettrema</groupId>
             <artifactId>milton-servlet</artifactId>
         </dependency>
+        <!-- /!\ Needed For WebDav Service. Version 1.2.1 is important, because 1.3.0 and higher are incompatible
+            with milton servlet. -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.1</version>
+        </dependency>
     </dependencies>
 
     <build>
