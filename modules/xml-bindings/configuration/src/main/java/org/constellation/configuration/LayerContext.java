@@ -17,6 +17,7 @@
 
 package org.constellation.configuration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,17 @@ public class LayerContext {
         }
     }
 
+    public List<String> getSourceIDs() {
+        final List<String> providerIds = new ArrayList<String>();
+        for (Source s : getLayers()) {
+            final String providerId = s.getId();
+            if (providerId != null && !providerIds.contains(providerId)) {
+                providerIds.add(providerId);
+            }
+        }
+        return providerIds;
+    }
+    
     /**
      * @return the layers
      */
