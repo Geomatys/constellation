@@ -44,7 +44,7 @@ public class JServiceEditPane extends javax.swing.JPanel {
             serviceEditionPanel =  new JServiceMapEditPane(server, serviceType, serviceInstance, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else if ("CSW".equals(serviceType)){
-            serviceEditionPanel =  new JServiceCswEditPane(serviceInstance, configuration);
+            serviceEditionPanel =  new JServiceCswEditPane(server, serviceInstance, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else {
             serviceEditionPanel = null;

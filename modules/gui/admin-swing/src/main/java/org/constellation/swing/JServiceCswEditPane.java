@@ -19,19 +19,24 @@ package org.constellation.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 import org.constellation.generic.database.Automatic;
 import static org.constellation.swing.JServiceEditionPane.LOGGER;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -39,6 +44,7 @@ import static org.constellation.swing.JServiceEditionPane.LOGGER;
  */
 public class JServiceCswEditPane extends JServiceEditionPane {
 
+    private ConstellationServer server;
     private Instance serviceInstance;
     private Automatic configuration; 
     private JServiceEditionPane specificPane;
@@ -53,7 +59,8 @@ public class JServiceCswEditPane extends JServiceEditionPane {
     /**
      * Creates new form JServiceMapEditPane
      */
-    public JServiceCswEditPane(final Instance serviceInstance, final Object configuration) {
+    public JServiceCswEditPane(final ConstellationServer server, final Instance serviceInstance, final Object configuration) {
+        this.server = server;
         this.serviceInstance = serviceInstance;
         this.configuration = (configuration instanceof Automatic) ? (Automatic) configuration : null;
         initComponents();
@@ -84,6 +91,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         jLabel1 = new JLabel();
         guiDataSourceCombo = new JComboBox();
         centerPane = new JPanel();
+        refreshIndexButton = new JButton();
 
         ResourceBundle bundle = ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("sourceType")); // NOI18N
@@ -108,6 +116,13 @@ public class JServiceCswEditPane extends JServiceEditionPane {
             .addGap(0, 236, Short.MAX_VALUE)
         );
 
+        refreshIndexButton.setText(bundle.getString("refreshIndex")); // NOI18N
+        refreshIndexButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                refreshIndexButtonActionPerformed(evt);
+            }
+        });
+
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -115,7 +130,10 @@ public class JServiceCswEditPane extends JServiceEditionPane {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(refreshIndexButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -130,7 +148,11 @@ public class JServiceCswEditPane extends JServiceEditionPane {
                     .addComponent(jLabel1)
                     .addComponent(guiDataSourceCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(refreshIndexButton)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -151,10 +173,15 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         repaint();
     }//GEN-LAST:event_guiDataSourceComboItemStateChanged
 
+    private void refreshIndexButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_refreshIndexButtonActionPerformed
+        server.csws.refreshIndex(serviceInstance.getName(), false);
+    }//GEN-LAST:event_refreshIndexButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel centerPane;
     private JComboBox guiDataSourceCombo;
     private JLabel jLabel1;
+    private JButton refreshIndexButton;
     // End of variables declaration//GEN-END:variables
 
     private void updateConfiguration() {
