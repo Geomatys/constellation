@@ -76,6 +76,23 @@
                                     <label for="maxScale" class="pull-left">MaxScale:</label>
                                     <input type="text" id="maxScale" name="maxScale" />
                                 </div>
+                                <div id="filter">
+                                    <ul style="">
+                                        <li>
+                                            <div style="line-height:30px">OR</div>
+                                            <ul>
+                                                <li>
+                                                    <input type="text" class="input-small" />
+                                                    <select class="input-small"></select>
+                                                    <input type="text" class="input-small" />
+                                                    <div class="btn">Remove</div>
+                                                </li>
+                                                <li><div class="btn">AND</div><div class="btn">OR</div><div class="btn">Condition</div></li>
+                                            </ul>
+                                        </li>
+                                        <li><div class="btn">AND</div><div class="btn">OR</div><div class="btn">Condition</div></li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>

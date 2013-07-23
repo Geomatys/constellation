@@ -55,7 +55,7 @@
                         <input type="text" id="graphic.mark.stroke.opacity" name="graphic.mark.stroke.opacity" />
                     </div>
                     <div class="form-row">
-                        <label class="pull-left">Line style:</label>
+                        <label class="pull-left">Marker stroke style:</label>
                         <div class="btn-group" data-toggle="buttons-radio">
                             <button name="graphic.mark.stroke.continuous" type="button" class="btn">Continuous</button>
                             <button name="graphic.mark.stroke.dashed" type="button" class="btn" data-value="dashed">Dashed</button>

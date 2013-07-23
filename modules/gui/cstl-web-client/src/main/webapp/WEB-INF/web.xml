@@ -6,7 +6,11 @@
 
     <context-param>
         <param-name>juzu.run_mode</param-name>
-        <param-value>prod</param-value>
+        <param-value>live</param-value>
+    </context-param>
+    <context-param>
+        <param-name>juzu.src_path</param-name>
+        <param-value>/home/geomatys/projects/geomatys/oss-clone-for-projects/constellation/modules/gui/cstl-web-client/src/main/java/</param-value>
     </context-param>
     <context-param>
         <param-name>juzu.inject</param-name>
