@@ -23,9 +23,7 @@
         @Alias(of = "/org/constellation/gui/templates/wmsdescription.gtmpl", as = "wmsdescription.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/wmsmetadata.gtmpl", as = "wmsmetadata.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/wmscreate.gtmpl", as = "wmscreate.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/StyleEdition.gtmpl", as = "StyleEdition.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/RuleEdition.gtmpl", as = "RuleEdition.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/SymbolizerEdition.gtmpl", as = "SymbolizerEdition.gtmpl")})
+        @Alias(of = "/org/constellation/gui/templates/style/overview.gtmpl", as = "overview.gtmpl")})
 
 /*
  * Declare servlet Base URL and which bundle used
@@ -42,12 +40,18 @@
  */
 @Assets(stylesheets = @Stylesheet(src = "cstl-web-client.css"),
         scripts = {@Script(id = "jquery", src = "js/jquery-2.0.0.js"),
+                @Script(id = "json", src = "js/jquery.json-2.4.js", depends = "jquery"),
                 @Script(id = "collapse", src = "js/bootstrap-collapse.js", depends = "jquery"),
                 @Script(id = "tooltip", src = "js/bootstrap-tooltip.js", depends = "jquery"),
+                @Script(id = "popover", src = "js/bootstrap-popover.js", depends = "tooltip"),
                 @Script(id = "alert", src = "js/bootstrap-alert.js", depends = "jquery"),
                 @Script(id = "tab", src = "js/bootstrap-tab.js", depends = "jquery"),
+                @Script(id = "buttons", src = "js/bootstrap-buttons.js", depends = "jquery"),
                 @Script(id = "dropdown", src = "js/bootstrap-dropdown.js", depends = "jquery"),
-                @Script(id = "service", src = "js/services.js", depends = "jquery")})
+                @Script(id = "colorpicker", src = "js/bootstrap-colorpicker.js", depends = "jquery"),
+                @Script(id = "slider", src = "js/bootstrap-slider.js", depends = "jquery"),
+                @Script(id = "service", src = "js/services.js", depends = "jquery"),
+                @Script(id = "styleedition", src = "js/styleedition.js", depends = "jquery")})
 
 /**
  * Constellation web client main part.

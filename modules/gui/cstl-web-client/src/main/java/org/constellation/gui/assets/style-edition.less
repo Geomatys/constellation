@@ -1,0 +1,256 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2007 - 2012, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+/*!
+ * Style definition for all the style edition pages.
+ *
+ * @author Fabien Bernard (Geomatys).
+ */
+
+
+/**************************************************************************
+ *                                Common                                  *
+ **************************************************************************/
+
+@style-edition-border: 1px solid #CCCCCC;
+@style-edition-header-background: #F5F5F5;
+@style-edition-body-background: #FFFFFF;
+@style-edition-rule-hover-background: #EEEEEE;
+
+.style-edition,
+.rule-edition,
+.symbolizer-edition {
+
+  form {
+    margin: 0;
+  }
+  .big-title {
+    font-size: 20px;
+    line-height: 30px;
+  }
+  .medium-title {
+    font-size: 15px;
+    line-height: 30px;
+  }
+
+  .header-bar {
+    background: @style-edition-header-background;
+    height: 30px;
+    padding: 8px 20px 8px;
+    border: @style-edition-border;
+  }
+
+  .body-container {
+    background: @style-edition-body-background;
+
+    .title-row {
+      margin-bottom: 12px;
+
+      .btn {
+        margin-left: 5px;
+      }
+    }
+    .form-row {
+      margin-bottom:25px;
+      height: 30px;
+
+      label,
+      input,
+      select,
+      textarea {
+        margin-bottom:0;
+        float: left;
+      }
+      label {
+        width: 165px;
+        line-height: 30px;
+      }
+      input,
+      select,
+      textarea {
+        width: 275px;
+      }
+      input.small,
+      select.small,
+      textarea.small {
+        width: 70px;
+      }
+      textarea {
+        height:150px;
+        max-width: 275px;
+        min-width: 275px;
+      }
+      .slider {
+        margin-top: 5px;
+        .slider-track {
+          .box-shadow(~"inset 0 1px 3px rgba(0, 0, 0, 0.25)");
+
+          .slider-selection {
+            background: #8283FF;
+            .opacity(80);
+          }
+          .slider-handle.round {
+            .opacity(100);
+          }
+        }
+      }
+    }
+    .list {
+      border: @style-edition-border;
+      overflow-y: auto;
+
+      .item {
+        height: 40px;
+        line-height: 40px;
+
+        a,
+        .vertical-separator {
+          .opacity(50);
+          float: right;
+        }
+        a {
+          padding: 0 10px;
+        }
+        .vertical-separator {
+          border-left: @style-edition-border;
+          height: 30px;
+          margin: 5px 0;
+        }
+
+        &:hover {
+          background: @style-edition-rule-hover-background;
+          .box-shadow(~"0 0 5px rgba(0,0,0,0.25)");
+
+          a,
+          .vertical-separator {
+            .opacity(100);
+          }
+        }
+      }
+    }
+
+    #left,
+    #right {
+      padding: 15px 20px 0 20px;
+    }
+    #map {
+      border: @style-edition-border;
+      height: 512px;
+    }
+  }
+
+  .footer-actions {
+    padding: 15px 20px;
+    text-align: right;
+  }
+}
+
+
+/**************************************************************************
+ *                                 Style                                  *
+ **************************************************************************/
+
+.style-edition {
+  #rules {
+    height: 512px;
+    max-height: 512px;
+
+    .rule {
+      .title {
+        display: block;
+        float: left;
+        padding: 0 10px 0 15px;
+      }
+    }
+    .loader {
+      position: absolute;
+      width: 100%;
+      height: 512px;
+    }
+  }
+}
+
+
+/**************************************************************************
+ *                                  Rule                                  *
+ **************************************************************************/
+
+.rule-edition {
+  .tab-pane {
+    overflow-y: auto;
+
+    .tab-pane-inner {
+      padding: 15px;
+      min-height: 150px;
+    }
+    li a.symbol-point,
+    li a.symbol-line,
+    li a.symbol-polygon {
+      line-height: 30px;
+      padding: 3px 20px 3px 50px;
+      background-repeat: no-repeat;
+      background-position: 10px center;
+    }
+    .symbol-point {
+      background-image: url('img/point-symbol.png');
+    }
+    .symbol-line {
+      background-image: url('img/line-symbol.png');
+    }
+    .symbol-polygon {
+      background-image: url('img/polygon-symbol.png');
+    }
+  }
+
+  #symbolizers {
+    height: 350px;
+    max-height: 350px;
+    .symbolizer {
+      .symbol-point,
+      .symbol-line,
+      .symbol-polygon {
+        float: left;
+        margin: 5px 5px 5px 20px;
+        height: 30px;
+        width: 30px;
+      }
+    }
+  }
+}
+
+
+/**************************************************************************
+ *                                Symbol                                  *
+ **************************************************************************/
+
+.symbolizer-edition {
+  .body-container {
+    #left {
+      padding: 45px 20px 0 35px;
+    }
+    .form-row {
+      .color-overview {
+        float: left;
+        height: 28px;
+        width: 28px;
+        margin: 1px 1px 1px 10px;
+        background-color: #FF0000;
+        .box-shadow(~"0 0 3px rgba(0,0,0,0.5)");
+      }
+    }
+  }
+}

@@ -3,5 +3,4 @@
 #{param name=providerId/}
 #{param name=styleName/}
 #{param name=ruleIndex/}
-#{param name=symbolizer/}
-
+#{param name=symbolIndex/}

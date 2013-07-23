@@ -1,0 +1,87 @@
+#{decorate path=menu.gtmpl/}
+
+#{param name=providerId/}
+#{param name=styleName/}
+#{param name=ruleIndex/}
+#{param name=symbolIndex/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="../images/constellation.png"/>
+    </div>
+</div>
+
+<div class="symbolizer-edition">
+    <div class="header-bar">
+        <span class="big-title">Symbole</span>
+    </div>
+
+    <div class="body-container">
+        <div class="row">
+            <div class="span6">
+                <div id="left">
+                    <div class="form-row">
+                        <label for="graphic.mark.geometry" class="pull-left">Marker geometry:</label>
+                        <select id="graphic.mark.geometry" name="graphic.mark.geometry">
+                            <option value="circle">Circle</option>
+                            <option value="square">Square</option>
+                            <option value="cross">Cross</option>
+                            <option value="star">Star</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="graphic.size" class="pull-left">Marker size:</label>
+                        <input type="text" id="graphic.size" name="graphic.size" />
+                    </div>
+                    <div class="form-row">
+                        <label for="graphic.opacity" class="pull-left">Marker opacity:</label>
+                        <input type="text" id="graphic.opacity" name="graphic.opacity" />
+                    </div>
+                    <div class="form-row">
+                        <label for="graphic.rotation" class="pull-left">Marker rotation:</label>
+                        <input type="text" id="graphic.rotation" name="graphic.rotation" />
+                    </div>
+                    <div class="form-row">
+                        <label for="graphic.mark.stroke.color" class="pull-left">Marker stroke color:</label>
+                        <input type="text" id="graphic.mark.stroke.color" name="graphic.mark.stroke.color" class="small" />
+                        <div class="color-overview"></div>
+                    </div>
+                    <div class="form-row">
+                        <label for="graphic.mark.stroke.width" class="pull-left">Marker stroke width:</label>
+                        <input type="text" id="graphic.mark.stroke.width" name="graphic.mark.stroke.width" />
+                    </div>
+                    <div class="form-row">
+                        <label for="graphic.mark.stroke.opacity" class="pull-left">Marker stroke opacity:</label>
+                        <input type="text" id="graphic.mark.stroke.opacity" name="graphic.mark.stroke.opacity" />
+                    </div>
+                    <div class="form-row">
+                        <label class="pull-left">Line style:</label>
+                        <div class="btn-group" data-toggle="buttons-radio">
+                            <button name="graphic.mark.stroke.continuous" type="button" class="btn">Continuous</button>
+                            <button name="graphic.mark.stroke.dashed" type="button" class="btn" data-value="dashed">Dashed</button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="graphic.mark.fill.color" class="pull-left">Marker fill color:</label>
+                        <input type="text" id="graphic.mark.fill.color" name="graphic.mark.fill.color" class="small" />
+                        <div class="color-overview"></div>
+                    </div>
+                    <div class="form-row">
+                        <label for="graphic.mark.fill.opacity" class="pull-left">Marker fill opacity:</label>
+                        <input type="text" id="graphic.mark.fill.opacity" name="graphic.mark.fill.opacity" />
+                    </div>
+                </div>
+            </div>
+            #{include path=overview.gtmpl/}
+        </div>
+
+        <div class="footer-actions">
+            <a onclick="CSTL.PointSymbol.cancel();" href="@{StyleEdition.rule(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex, method = 'm')}" class="btn">&{edition.style.cancel.label}</a>
+            <a onclick="CSTL.PointSymbol.validate();" href="@{StyleEdition.rule(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex, method = 'm')}" class="btn btn-primary">&{edition.style.validate.label}</a>
+        </div>
+
+        <script type="text/javascript">
+            CSTL.PointSymbol.init(${symbolIndex});
+        </script>
+    </div>
+</div>

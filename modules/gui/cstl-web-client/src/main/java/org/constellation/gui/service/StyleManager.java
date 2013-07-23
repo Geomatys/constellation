@@ -17,18 +17,13 @@
 
 package org.constellation.gui.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.constellation.admin.service.ConstellationServer;
-import org.constellation.gui.util.StyleEditionUtilities;
-import org.constellation.gui.util.StyleEditionWorkspace;
-import org.geotoolkit.style.MutableRule;
+import org.constellation.gui.binding.Style;
 import org.geotoolkit.style.MutableStyle;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * Manager for style provider operations.
@@ -82,7 +77,7 @@ public final class StyleManager {
     }
 
     /**
-     * Gets a {@link MutableStyle} instance form constellation.
+     * Gets a {@link MutableStyle} instance form constellation server.
      *
      * @param providerId the provider id
      * @param styleName  the style name
@@ -95,8 +90,22 @@ public final class StyleManager {
             final ConstellationServer server = new ConstellationServer(url, login, password);
             return server.providers.downloadStyle(providerId, styleName);
         } catch (Exception ex) {
-            throw new IOException("The style named \"" + styleName + "\" for provider with id \"" + providerId +
-                    "\" doesn't exists.");
+            throw new IOException("The style named \"" + styleName + "\" for provider with id \"" + providerId + "\" doesn't exists.");
         }
+    }
+
+    /**
+     * Gets a style JSON representation form constellation server.
+     *
+     * @param providerId the provider id
+     * @param styleName  the style name
+     * @return the style JSON representation
+     * @throws IOException if failed to acquire or parse style for any reason
+     */
+    public String getStyleJSON(final String providerId, final String styleName) throws IOException {
+        final MutableStyle mutableStyle = this.getStyle(providerId, styleName);
+        final Style style = new Style(mutableStyle);
+        final ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(style);
     }
 }

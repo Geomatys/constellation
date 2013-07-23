@@ -1,0 +1,20 @@
+<div class="span6">
+    <div id="right">
+        <div class="title-row">
+            <span class="medium-title">&{edition.style.overview.title}: <b>BlueMarble</b></span>
+            <div class="btn-group pull-right">
+                <div class="btn dropdown-toggle" data-toggle="dropdown">
+                    <span class="icon-eye-open"></span>
+                    &{edition.style.see.layer.label}
+                    <span class="caret"></span>
+                </div>
+                <ul class="dropdown-menu">
+                    <li><a href="#">BlueMarble</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="map">
+
+        </div>
+    </div>
+</div>

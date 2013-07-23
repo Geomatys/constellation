@@ -1,0 +1,4 @@
+#{decorate path=menu.gtmpl/}
+
+#{param name=providerId/}
+#{param name=styleName/}

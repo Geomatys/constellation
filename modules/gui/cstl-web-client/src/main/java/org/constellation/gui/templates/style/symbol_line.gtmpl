@@ -1,0 +1,57 @@
+#{decorate path=menu.gtmpl/}
+
+#{param name=providerId/}
+#{param name=styleName/}
+#{param name=ruleIndex/}
+#{param name=symbolIndex/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="../images/constellation.png"/>
+    </div>
+</div>
+
+<div class="symbolizer-edition">
+    <div class="header-bar">
+        <span class="big-title">Symbole</span>
+    </div>
+
+    <div class="body-container">
+        <div class="row">
+            <div class="span6">
+                <div id="left">
+                    <div class="form-row">
+                        <label for="stroke.color" class="pull-left">Stroke color:</label>
+                        <input type="text" id="stroke.color" name="stroke.color" class="small" />
+                        <div class="color-overview"></div>
+                    </div>
+                    <div class="form-row">
+                        <label for="stroke.width" class="pull-left">Stroke width:</label>
+                        <input type="text" id="stroke.width" name="stroke.width" />
+                    </div>
+                    <div class="form-row">
+                        <label for="stroke.opacity" class="pull-left">Stroke opacity:</label>
+                        <input type="text" id="stroke.opacity" name="stroke.opacity" />
+                    </div>
+                    <div class="form-row">
+                        <label class="pull-left">Line style:</label>
+                        <div class="btn-group" data-toggle="buttons-radio">
+                            <button name="stroke.continuous" type="button" class="btn">Continuous</button>
+                            <button name="stroke.dashed" type="button" class="btn" data-value="dashed">Dashed</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            #{include path=overview.gtmpl/}
+        </div>
+
+        <div class="footer-actions">
+            <a onclick="CSTL.LineSymbol.cancel();" href="@{StyleEdition.rule(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex, method = 'm')}" class="btn">&{edition.style.cancel.label}</a>
+            <a onclick="CSTL.LineSymbol.validate();" href="@{StyleEdition.rule(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex, method = 'm')}" class="btn btn-primary">&{edition.style.validate.label}</a>
+        </div>
+
+        <script type="text/javascript">
+            CSTL.LineSymbol.init(${symbolIndex});
+        </script>
+    </div>
+</div>
