@@ -121,14 +121,19 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
             return null;
         }
         try {
-            VersionControl control = store.getVersioning(key);
-            CoverageReference coverageReference = null;
-            if (control.isVersioned() && version != null) {
-                coverageReference = store.getCoverageReference(key, new Version(control, "version", version));
-            } else {
-                coverageReference = store.getCoverageReference(key);
+            if (store != null) {
+                CoverageReference coverageReference = null;
+                if ( store.handleVersioning()) {
+                    VersionControl control = store.getVersioning(key);
+                    if (control.isVersioned() && version != null) {
+                        coverageReference = store.getCoverageReference(key, control.getVersion(version));
+                    }
+                }
+                if(coverageReference == null) {
+                    coverageReference = store.getCoverageReference(key);
+                }
+                return new DefaultCoverageStoreLayerDetails(key, coverageReference);
             }
-            return new DefaultCoverageStoreLayerDetails(key, coverageReference);
         } catch (DataStoreException ex) {
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
         } catch (VersioningException ex) {

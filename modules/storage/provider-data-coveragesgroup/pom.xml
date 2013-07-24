@@ -6,59 +6,73 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.constellation</groupId>
-    <artifactId>storage</artifactId>
-    <version>0.9-SNAPSHOT</version>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>storage</artifactId>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
 
 
-
-  <!--
-    Module description.
-  -->
-  <groupId>org.constellation.storage</groupId>
-  <artifactId>cstl-store-data-coveragesgroup</artifactId>
-  <packaging>jar</packaging>
-  <name>Provider for data : Coverages Group</name>
-  <description>
-    These packages provide access to Coverages Group datas.
-  </description>
-
+    <!--
+      Module description.
+    -->
+    <groupId>org.constellation.storage</groupId>
+    <artifactId>cstl-store-data-coveragesgroup</artifactId>
+    <packaging>jar</packaging>
+    <name>Provider for data : Coverages Group</name>
+    <description>
+        These packages provide access to Coverages Group datas.
+    </description>
 
 
-  <!--
-    Developers and contributors.
-  -->
-  <developers>
-    <developer>
-      <id>cedricbr</id>
-      <name>Cédric Briançon</name>
-      <email>cedric.briancon@geomatys.com</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.com/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
+    <!--
+      Developers and contributors.
+    -->
+    <developers>
+        <developer>
+            <id>cedricbr</id>
+            <name>Cédric Briançon</name>
+            <email>cedric.briancon@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.com/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
 
-  <!--
-    Required dependencies for building. These dependencies wil be included into
-    the JARs list that Maven will put into the directory "target/binaries".
-  -->
-  <dependencies>
-    <dependency>
-        <groupId>org.constellation.storage</groupId>
-        <artifactId>cstl-store-provider</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-xml-providers</artifactId>
-    </dependency>
-  </dependencies>
+    <!--
+      Required dependencies for building. These dependencies wil be included into
+      the JARs list that Maven will put into the directory "target/binaries".
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-provider</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-xml-providers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-client-wmts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-client-wms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-client-wfs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-featurestore-core</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

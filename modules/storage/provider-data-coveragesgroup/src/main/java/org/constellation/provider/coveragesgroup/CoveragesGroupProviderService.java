@@ -38,8 +38,9 @@ import static org.constellation.provider.coveragesgroup.CoveragesGroupProvider.*
 
 /**
  *
- * @author Johann Sorel
- * @author Cédric Briançon
+ * @author Johann Sorel (Geomatys)
+ * @author Cédric Briançon (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
 public class CoveragesGroupProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {

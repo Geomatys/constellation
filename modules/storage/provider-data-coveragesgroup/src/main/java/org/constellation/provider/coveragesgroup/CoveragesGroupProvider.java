@@ -40,7 +40,8 @@ import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
- * @author Cédric Briançon
+ * @author Cédric Briançon (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
 public class CoveragesGroupProvider extends AbstractLayerProvider {
 
@@ -77,9 +78,16 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      */
     @Override
     public LayerDetails get(final Name key, Date version) {
+        return get(key, null, null);
+    }
+
+    /**
+     * hacked method to pass the login/pass to WebMapServer
+     */
+    public LayerDetails get(final Name key, final String login, final String password) {
         final File mapContextFile = index.get(key);
         if (mapContextFile != null) {
-            return new CoveragesGroupLayerDetails(key, mapContextFile);
+            return new CoveragesGroupLayerDetails(key, mapContextFile, login, password);
         }
         return null;
     }
@@ -119,8 +127,11 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
                 } else if (mapItem instanceof CoverageMapLayer) {
                     final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
                     final String id = cml.getCoverageReference().getName().getLocalPart();
+                    final MutableStyle ms = cml.getSelectionStyle();
+                    final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
+                            new org.geotoolkit.providers.xml.StyleReference(ms.getName());
                     final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                            new org.geotoolkit.providers.xml.DataReference(id), (org.geotoolkit.providers.xml.StyleReference)null);
+                            new org.geotoolkit.providers.xml.DataReference(id), styleRef);
                     ml.setOpacity(cml.getOpacity());
                     finalMapItem.getMapItems().add(ml);
                 } else {
@@ -152,8 +163,11 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
             } else if (mapItem instanceof CoverageMapLayer) {
                 final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
                 final String id = cml.getCoverageReference().getName().getLocalPart();
+                final MutableStyle ms = cml.getSelectionStyle();
+                final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
+                        new org.geotoolkit.providers.xml.StyleReference(ms.getName());
                 final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                            new org.geotoolkit.providers.xml.DataReference(id), (org.geotoolkit.providers.xml.StyleReference)null);
+                            new org.geotoolkit.providers.xml.DataReference(id), styleRef);
                     finalMapItem.getMapItems().add(ml);
             } else {
                 final org.geotoolkit.providers.xml.MapItem finalMapItemChild = new org.geotoolkit.providers.xml.MapItem(null);

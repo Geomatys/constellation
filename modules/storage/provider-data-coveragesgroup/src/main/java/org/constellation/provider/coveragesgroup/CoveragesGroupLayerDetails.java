@@ -35,7 +35,6 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
@@ -43,12 +42,11 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.operation.TransformException;
 
 /**
  *
- * @author Cédric Briançon
+ * @author Cédric Briançon (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
 public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
     private static final Logger LOGGER = Logging.getLogger(CoveragesGroupLayerDetails.class);
@@ -59,17 +57,24 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
     private Unmarshaller unmarshaller;
 
     public CoveragesGroupLayerDetails(final Name name, final File file) {
+        this(name, file, null, null);
+    }
+
+    /**
+     * hacked method to pass the login/pass to WebMapServer
+     */
+    public CoveragesGroupLayerDetails(final Name name, final File file, final String login, final String password) {
         super(name, Collections.EMPTY_LIST);
 
         // Parsing ctxt : MapBuilder.createContext
         try {
-            ctxt = createMapContextForFile(file);
+            ctxt = createMapContextForFile(file, login, password);
         } catch (JAXBException e) {
             LOGGER.log(Level.INFO, "Unable to convert map context file into a valid object", e);
         }
     }
 
-    private MapContext createMapContextForFile(final File file) throws JAXBException {
+    private MapContext createMapContextForFile(final File file, final String login, final String password) throws JAXBException {
         pool = new MarshallerPool(org.geotoolkit.providers.xml.MapContext.class, org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class);
         unmarshaller = pool.acquireUnmarshaller();
         final Object result = unmarshaller.unmarshal(file);
@@ -77,7 +82,7 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
             throw new JAXBException("Wrong response for the unmarshalling");
         }
         final org.geotoolkit.providers.xml.MapContext mapContext = (org.geotoolkit.providers.xml.MapContext)result;
-        return ConvertersJaxbToGeotk.convertsMapContext(mapContext);
+        return ConvertersJaxbToGeotk.convertsMapContext(mapContext,login, password);
     }
 
     @Override
