@@ -17,6 +17,7 @@
 package org.constellation.configuration;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -32,6 +33,7 @@ import org.constellation.util.DataReference;
  *
  * @author Guilhem Legal (Geomatys)
  * @author Cédric Briançon (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  * @since 0.6
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -42,6 +44,9 @@ public class Layer {
 
     @XmlAttribute
     private String alias;
+
+    @XmlAttribute
+    private Long version;
 
     @XmlElement(name="Style")
     private List<DataReference> styles;
@@ -121,6 +126,12 @@ public class Layer {
     public Layer(final QName name, final List<DataReference> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs, final List<DimensionDefinition> dimensions) {
+        this(name, styles, filter, alias, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs, dimensions, null);
+    }
+
+    public Layer(final QName name, final List<String> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+                 final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
+                 final List<String> crs, final List<DimensionDefinition> dimensions, final Date version) {
         this.name         = name;
         this.styles       = styles;
         this.filter       = filter;
@@ -135,6 +146,7 @@ public class Layer {
         this.opaque       = opaque;
         this.crs          = crs;
         this.dimensions   = dimensions;
+        this.version      = version != null ? Long.valueOf(version.getTime()): null;
         setAlias(alias);
     }
 
@@ -191,6 +203,22 @@ public class Layer {
             alias =  alias.trim().replaceAll(" ", "_");
         }
         this.alias = alias;
+    }
+
+    /**
+     * Get layer data version Date in timestamp
+     * @return timestamp or null if not defined
+     */
+    public Long getVersion() {
+        return version;
+    }
+
+    /**
+     * Set layer data version timestamp date.
+     * @param version timestamp
+     */
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public String getTitle() {
@@ -342,6 +370,9 @@ public class Layer {
         if (alias != null) {
             sb.append("alias:\n").append(alias).append('\n');
         }
+        if (version != null) {
+            sb.append("version:\n").append(version).append('\n');
+        }
         if (abstrac != null) {
             sb.append("abstract=").append(abstrac).append('\n');
         }
@@ -392,6 +423,7 @@ public class Layer {
                    Objects.equals(this.dataURL,      that.dataURL) &&
                    Objects.equals(this.filter,       that.filter) &&
                    Objects.equals(this.alias,        that.alias) &&
+                   Objects.equals(this.version,      that.version) &&
                    Objects.equals(this.identifier,   that.identifier) &&
                    Objects.equals(this.keywords,     that.keywords) &&
                    Objects.equals(this.metadataURL,  that.metadataURL) &&
@@ -410,6 +442,7 @@ public class Layer {
         hash = 79 * hash + (this.styles != null ? this.styles.hashCode() : 0);
         hash = 79 * hash + (this.filter != null ? this.filter.hashCode() : 0);
         hash = 79 * hash + (this.alias != null ? this.alias.hashCode() : 0);
+        hash = 79 * hash + (this.version != null ? this.version.hashCode() : 0);
         hash = 79 * hash + (this.title != null ? this.title.hashCode() : 0);
         hash = 79 * hash + (this.abstrac != null ? this.abstrac.hashCode() : 0);
         hash = 79 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);
