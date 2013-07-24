@@ -21,12 +21,9 @@ import java.beans.PropertyChangeListener;
 import org.constellation.configuration.Language;
 import org.constellation.ws.security.SimplePDP;
 import org.constellation.ServiceDef.Specification;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 import java.io.File;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
@@ -272,7 +269,11 @@ public abstract class LayerWorker extends AbstractWorker {
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
         final NameInProvider fullName = layersContainsKey(login, layerName);
         if (fullName != null) {
-            layerRef = namedProxy.get(fullName.name, fullName.providerID);
+            if (fullName.dataVersion != null) {
+                layerRef = namedProxy.get(fullName.name, fullName.providerID, fullName.dataVersion);
+            } else {
+                layerRef = namedProxy.get(fullName.name, fullName.providerID);
+            }
             if (layerRef == null) {throw new CstlServiceException("Unable to find  the Layer named:" + layerName + " in the provider proxy", NO_APPLICABLE_CODE);}
         } else {
             throw new CstlServiceException("Unknow Layer name:" + layerName, LAYER_NOT_DEFINED);
@@ -294,29 +295,44 @@ public abstract class LayerWorker extends AbstractWorker {
             return null;
         }
 
-        final Layer directLayer =  getConfigurationLayer(name, login);
+        final Layer directLayer = getConfigurationLayer(name, login);
         if (directLayer == null) {
             //search with only localpart
-            for (QName layerName: layerNames) {
+            for (QName layerName : layerNames) {
                 if (layerName.getLocalPart().equals(name.getLocalPart())) {
-                    return new NameInProvider(layerName, getConfigurationLayer(layerName, login).getProviderID());
+                    final Layer layerConfig = getConfigurationLayer(layerName, login);
+                    Date version = null;
+                    if (layerConfig.getVersion() != null) {
+                        version = new Date(layerConfig.getVersion());
+                    }
+                    return new NameInProvider(layerName, layerConfig.getProviderID(), version);
                 }
             }
 
             //search in alias if any
-             for (QName l: layerNames) {
+            for (QName l : layerNames) {
                 final Layer layer = getConfigurationLayer(l, login);
                 if (layer.getAlias() != null && !layer.getAlias().isEmpty()) {
                     final String alias = layer.getAlias().trim().replaceAll(" ", "_");
                     if (alias.equals(name.getLocalPart())) {
-                        return new NameInProvider(l, layer.getProviderID());
+                        Date version = null;
+                        if (layer.getVersion() != null) {
+                            version = new Date(layer.getVersion());
+                        }
+                        return new NameInProvider(l, layer.getProviderID(), version);
                     }
                 }
             }
 
             return null;
         }
-        return new NameInProvider(directLayer.getName(), directLayer.getProviderID());
+
+        Date version = null;
+        if (directLayer.getVersion() != null) {
+            version = new Date(directLayer.getVersion());
+        }
+
+        return new NameInProvider(directLayer.getName(), directLayer.getProviderID(), version);
     }
     
     protected static MutableStyle getStyle(final DataReference styleName) throws CstlServiceException {
@@ -391,15 +407,24 @@ public abstract class LayerWorker extends AbstractWorker {
     public static class NameInProvider {
         public Name name;
         public String providerID;
+        public Date dataVersion;
      
         public NameInProvider(final Name name, final String providerID) {
-            this.name = name;
-            this.providerID = providerID;
+            this(name, providerID, null);
         }
         
         public NameInProvider(final QName name, final String providerID) {
-            this.name = new DefaultName(name);
+            this(new DefaultName(name), providerID, null);
+        }
+
+        public NameInProvider(final QName name, final String providerID, final Date dataVersion) {
+            this(new DefaultName(name), providerID, dataVersion);
+        }
+
+        public NameInProvider(final Name name, final String providerID, final Date dataVersion) {
+            this.name = name;
             this.providerID = providerID;
+            this.dataVersion= dataVersion;
         }
     }
 }
