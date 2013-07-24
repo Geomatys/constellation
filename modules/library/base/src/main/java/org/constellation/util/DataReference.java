@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2012, Geomatys
+ *    (C) 2013, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,18 +20,25 @@ import javax.xml.bind.annotation.XmlValue;
 import org.geotoolkit.feature.DefaultName;
 import org.opengis.feature.type.Name;
 
+import java.util.Date;
+
 /**
- * Reference to a provider or service layer relative to dcns server.
+ * Reference to a provider or service layer.
  * The reference pattern depend of the type of input data.
  *
  * If DataReference is from a provider layer, the pattern will be like :
  * <code>${providerLayerType|providerId|layerId}</code> for example <code>${providerLayerType|shapeFileProvider|CountiesLayer}</code>
+ * use {@link #createProviderDataReference(String, String, String, java.util.Date)} with {@link #PROVIDER_LAYER_TYPE}
  *
  * If DataReference is from a provider Style, the pattern will be like :
  * <code>${providerStyleType|providerId|layerId}</code> for example <code>${providerStyleType|sldProvider|flashyStyle}</code>
+ * use {@link #createProviderDataReference(String, String, String, java.util.Date)} with {@link #PROVIDER_STYLE_TYPE}
  *
  * If DataReference is from a Service, the pattern will be like :
  * <code>${serviceType|serviceURL|serviceSpec|serviceId|layerId}</code> for example <code>${serviceType|http://localhost:8080/cstl/WS/wms/defaultInstance|WMS|defaultInstance|CountiesLayer}</code>
+ * use {@link #createServiceDataReference(String, String, String, String, java.util.Date)}
+ *
+ * Parameter <code>dataVersion</code> add the version used to extract data only if reference data support versionning.
  *
  * @author Johann Sorel (Geomatys)
  * @author Quentin Boileau (Geomatys).
@@ -47,6 +54,10 @@ public class DataReference implements CharSequence{
     public static String SERVICE_TYPE        = "serviceType";
 
     private String reference;
+
+    /**
+     * Reference type can be  {@link #PROVIDER_LAYER_TYPE} or {@link #PROVIDER_STYLE_TYPE} or {@link #SERVICE_TYPE}.
+     */
     private String type;
     private String providerId;
     private String serviceURL;
@@ -54,16 +65,45 @@ public class DataReference implements CharSequence{
     private String serviceId;
     private String layerId;
 
-    private DataReference() {}
-    
+    /**
+     * Date version of targed data. In timestamp.
+     */
+    protected String dataVersion;
+
     public DataReference(final String str) {
         this.reference = str;
         computeReferenceParts();
     }
 
+    /**
+     * DataReference constructor without layer version date.
+     * @param dataType {@link #PROVIDER_LAYER_TYPE} {@link #PROVIDER_STYLE_TYPE} {@link #SERVICE_TYPE}
+     * @param providerId
+     * @param serviceURL
+     * @param serviceSpec
+     * @param serviceId
+     * @param layerId
+     */
     public DataReference (final String dataType, final String providerId, final String serviceURL, final String serviceSpec, final String serviceId, final String layerId) {
+        this(dataType, providerId, serviceURL, serviceSpec, serviceId, layerId, null);
+    }
+
+    /**
+     * DataReference constructor WITH layer version date.
+     * @param dataType {@link #PROVIDER_LAYER_TYPE} {@link #PROVIDER_STYLE_TYPE} {@link #SERVICE_TYPE}
+     * @param providerId
+     * @param serviceURL
+     * @param serviceSpec
+     * @param serviceId
+     * @param layerId
+     * @param dataVersion date of date version. (can be used only if targeted data is versioned).
+     */
+    public DataReference (final String dataType, final String providerId, final String serviceURL, final String serviceSpec, final String serviceId, final String layerId,
+                          final Date dataVersion) {
         if (dataType != null && (dataType.equals(PROVIDER_LAYER_TYPE) || dataType.equals(PROVIDER_STYLE_TYPE) || dataType.equals(SERVICE_TYPE))) {
             this.type       = dataType;
+        } else {
+            throw new IllegalArgumentException("Reference should match pattern ${providerLayerType|providerId|layerId} or ${providerStyleType|providerId|layerId} or ${serviceType|serviceURL|serviceSpec|serviceId|layerId}.");
         }
         this.serviceURL     = serviceURL;
         this.providerId     = providerId;
@@ -71,21 +111,33 @@ public class DataReference implements CharSequence{
         this.serviceId      = serviceId;
         this.layerId        = layerId;
         this.reference      = buildRefrenceString();
+        this.dataVersion = dataVersion != null ? Long.valueOf(dataVersion.getTime()).toString() : null;
     }
-
 
     /**
      * Create a DataReference from a provider layer or style.
-     * @param providerType like providerLayerType or providerStyleType
+     * @param providerType should be  {@link #PROVIDER_LAYER_TYPE} or {@link #PROVIDER_STYLE_TYPE}
      * @param providerId provider identifier
      * @param layerId layer identifier
      * @return DataReference
      */
     public static DataReference createProviderDataReference(final String providerType, final String providerId, final String layerId) {
+        return createProviderDataReference(providerType, providerId, layerId, null);
+    }
+
+    /**
+     * Create a DataReference from a provider layer or style.
+     * @param providerType should be  {@link #PROVIDER_LAYER_TYPE} or {@link #PROVIDER_STYLE_TYPE}
+     * @param providerId provider identifier
+     * @param layerId layer identifier
+     * @param dataVersion Date of data version.
+     * @return DataReference
+     */
+    public static DataReference createProviderDataReference(final String providerType, final String providerId, final String layerId, final Date dataVersion) {
         if (providerType != null && (providerType.equals(PROVIDER_LAYER_TYPE) || providerType.equals(PROVIDER_STYLE_TYPE))) {
-            return new DataReference(providerType, providerId, null, null, null, layerId);
+            return new DataReference(providerType, providerId, null, null, null, layerId, dataVersion);
         }
-        throw new IllegalArgumentException("Reference should match pattern ${providerLayerType|providerId|layerId} or ${providerStyleType|providerId|layerId} or ${serviceType|serviceURL|serviceSpec|serviceId|layerId}.");
+        throw new IllegalArgumentException("Reference should match pattern ${providerLayerType|providerId|layerId} or ${providerStyleType|providerId|layerId}.");
     }
 
     /**
@@ -96,12 +148,24 @@ public class DataReference implements CharSequence{
      * @return DataReference
      */
     public static DataReference createServiceDataReference(final String serviceURL, final String serviceSpec, final String serviceId, final String layerId) {
-        return new DataReference(SERVICE_TYPE, null,serviceURL, serviceSpec, serviceId, layerId);
+        return createServiceDataReference(serviceURL, serviceSpec, serviceId, layerId, null);
+    }
+
+    /**
+     * Create a DataReference from a service.
+     * @param serviceSpec like WMS, WFS, ...
+     * @param serviceId instance identifier of the service
+     * @param layerId layer identifier
+     * @param dataVersion Date of data version.
+     * @return DataReference
+     */
+    public static DataReference createServiceDataReference(final String serviceURL, final String serviceSpec, final String serviceId, final String layerId, final Date dataVersion) {
+        return new DataReference(SERVICE_TYPE, null,serviceURL, serviceSpec, serviceId, layerId, dataVersion);
     }
 
     @XmlValue
     public String getReference() {
-        return reference;
+        return buildRefrenceString();
     }
 
     public void setReference(final String reference) {
@@ -121,20 +185,24 @@ public class DataReference implements CharSequence{
 
             final String datatype = dataSplit[0];
             //get data type
-            if (!datatype.isEmpty() && (datatype.equals(PROVIDER_LAYER_TYPE) || datatype.equals(PROVIDER_STYLE_TYPE) ) && groupCount == 3 ) {
+            if (!datatype.isEmpty() && (datatype.equals(PROVIDER_LAYER_TYPE) || datatype.equals(PROVIDER_STYLE_TYPE) ) && (groupCount == 3 || groupCount == 4)) {
                 type = datatype;
-            } else if (!datatype.isEmpty() && datatype.equals(SERVICE_TYPE) && groupCount == 5) {
+            } else if (!datatype.isEmpty() && datatype.equals(SERVICE_TYPE) && (groupCount == 5 || groupCount == 6)) {
                 type = datatype;
             } else {
                 throw new IllegalArgumentException("Reference data should be type of providerLayerType or providerStyleType or serviceType.");
             }
 
+            this.dataVersion = null;
             if (type.equals(PROVIDER_LAYER_TYPE) || type.equals(PROVIDER_STYLE_TYPE)) {
 
                 this.serviceSpec = null;
                 this.serviceId = null;
                 this.providerId = dataSplit[1];     //providerID
                 this.layerId = dataSplit[2];        //layerID
+                if (groupCount == 4) {
+                    this.dataVersion = dataSplit[3]; //dataVersion
+                }
 
             } else if (type.equals(SERVICE_TYPE)) {
 
@@ -143,6 +211,9 @@ public class DataReference implements CharSequence{
                 this.serviceSpec = dataSplit[2];    //WMS
                 this.serviceId = dataSplit[3];      //serviceID
                 this.layerId = dataSplit[4];        //layerID
+                if (groupCount == 6) {
+                    this.dataVersion = dataSplit[5]; //dataVersion
+                }
 
             }
         } else {
@@ -160,14 +231,17 @@ public class DataReference implements CharSequence{
         if (type.equals(PROVIDER_LAYER_TYPE) || type.equals(PROVIDER_STYLE_TYPE)) {
 
             buffer.append(providerId).append(SEPARATOR);
-            buffer.append(layerId);
 
         } else if (type.equals(SERVICE_TYPE)) {
 
             buffer.append(serviceURL).append(SEPARATOR);
             buffer.append(serviceSpec).append(SEPARATOR);
             buffer.append(serviceId).append(SEPARATOR);
-            buffer.append(layerId);
+        }
+
+        buffer.append(layerId);
+        if (dataVersion != null) {
+            buffer.append(SEPARATOR).append(dataVersion);
         }
 
         buffer.append("}");
@@ -219,6 +293,20 @@ public class DataReference implements CharSequence{
         return DefaultName.valueOf(layerId);
     }
 
+    /**
+     * The dataVersion if not null.
+     * @return Date or null if dataVersion not specified.
+     */
+    public Date getDataVersion() {
+
+        if (dataVersion != null) {
+            Long time = Long.valueOf(dataVersion);
+            return new Date(time);
+        }
+        return null;
+    }
+
+
     @Override
     public int length() {
         return reference.length();
@@ -266,6 +354,7 @@ public class DataReference implements CharSequence{
         sb.append("serviceSpec:\n").append(serviceSpec).append('\n');
         sb.append("serviceId:\n").append(serviceId).append('\n');
         sb.append("layerId:\n").append(layerId).append('\n');
+        sb.append("dataVersion:\n").append(dataVersion).append('\n');
         return sb.toString();
     }
 

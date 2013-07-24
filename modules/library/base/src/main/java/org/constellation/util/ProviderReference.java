@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2012, Geomatys
+ *    (C) 2013, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,22 @@
  */
 package org.constellation.util;
 
+import java.util.Date;
+
 /**
+ * Reference to a constellation provider an all his layers.
+ *
+ * If DataReference is from a provider layer, the pattern will be like :
+ * <code>${providerLayerType|providerId}</code> for example <code>${providerLayerType|shapeFileProvider}</code>
+ * Use {@link #PROVIDER_LAYER_TYPE}
+ *
+ * If DataReference is from a provider Style, the pattern will be like :
+ * <code>${providerStyleType|providerId}</code> for example <code>${providerStyleType|sldProvider}</code>
+ * use {@link #PROVIDER_STYLE_TYPE}
+ *
+ * If a dataVersion is used, the pattern will looks like :
+ * <code>${providerLayerType|providerId|dataVersion}</code> for example <code>${providerLayerType|versionedShapeFileProvider|1373876676}</code>
+ * where dataVersion will be a Date in timestamp format.
  *
  * @author Quentin Boileau (Geomatys)
  */
@@ -33,22 +48,38 @@ public class ProviderReference implements CharSequence {
     private String providerType;
     private String providerId;
 
+    /**
+     * Provider data version formated in timestamp. Use only if targeted FeatureStore/CoverageStore support versionning.
+     */
+    private String dataVersion;
+
     public ProviderReference(final String reference) {
         this.reference = reference;
         computeReferenceParts();
     }
 
 
-
     public ProviderReference(final String providerType, final String providerId) {
-        this.providerType = providerType;
-        this.providerId = providerId;
+        this(providerType, providerId, null);
+    }
+
+    public ProviderReference(final String providerType, final String providerId, final Date dataVersion) {
+        if (providerType != null && (providerType.equals(PROVIDER_LAYER_TYPE) || providerType.equals(PROVIDER_STYLE_TYPE))) {
+            this.providerType = providerType;
+            this.providerId = providerId;
+            this.dataVersion = dataVersion != null ? Long.valueOf(dataVersion.getTime()).toString() : null;
+        } else {
+            throw new IllegalArgumentException("Reference should match pattern ${providerLayerType|providerId} or ${providerStyleType|providerId}.");
+        }
     }
 
     private String buildRefrenceString() {
         final StringBuffer buffer = new StringBuffer("${");
         buffer.append(providerType).append(SEPARATOR);
         buffer.append(providerId);
+        if (dataVersion != null) {
+            buffer.append(SEPARATOR).append(dataVersion);
+        }
         buffer.append("}");
         return buffer.toString();
     }
@@ -62,13 +93,16 @@ public class ProviderReference implements CharSequence {
 
             final String datatype = dataSplit[0];
             //get data type
-            if (!datatype.isEmpty() && (datatype.equals(PROVIDER_LAYER_TYPE) || datatype.equals(PROVIDER_STYLE_TYPE) ) && groupCount == 2 ) {
+            if (!datatype.isEmpty() && (datatype.equals(PROVIDER_LAYER_TYPE) || datatype.equals(PROVIDER_STYLE_TYPE) ) && (groupCount == 2 || groupCount == 3)) {
                 this.providerType = datatype;   //providerType
             } else {
                 throw new IllegalArgumentException("Reference data should be type of providerLayerType or providerStyleType.");
             }
 
             this.providerId = dataSplit[1];     //providerID
+            if (groupCount == 3) {
+                this.dataVersion = dataSplit[2]; //dataVersion
+            }
         } else {
             throw new IllegalArgumentException("Reference should match pattern ${providerLayerType|providerId} or ${providerStyleType|providerId}.");
         }
@@ -78,25 +112,25 @@ public class ProviderReference implements CharSequence {
         return buildRefrenceString();
     }
 
-    public void setReference(String reference) {
-        this.reference = reference;
-        computeReferenceParts();
-    }
-
     public String getProviderType() {
         return providerType;
-    }
-
-    public void setProviderType(String providerType) {
-        this.providerType = providerType;
     }
 
     public String getProviderId() {
         return providerId;
     }
 
-    public void setProviderId(String providerId) {
-        this.providerId = providerId;
+    /**
+     * The dataVersion if not null.
+     * @return Date or null if dataVersion not specified.
+     */
+    public Date getDataVersion() {
+
+        if (dataVersion != null) {
+            Long time = Long.valueOf(dataVersion);
+            return new Date(time);
+        }
+        return null;
     }
 
 
@@ -143,6 +177,7 @@ public class ProviderReference implements CharSequence {
         sb.append("reference:\n").append(reference).append('\n');
         sb.append("providerType:\n").append(providerType).append('\n');
         sb.append("providerId:\n").append(providerId).append('\n');
+        sb.append("dataVersion:\n").append(dataVersion).append('\n');
         return sb.toString();
     }
 

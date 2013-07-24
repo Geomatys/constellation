@@ -18,7 +18,11 @@ package org.constellation.util;
 
 import org.geotoolkit.feature.DefaultName;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
+
+import java.util.Date;
 
 /**
  *
@@ -29,10 +33,22 @@ public class DataReferenceTest {
     @Test
     public void testDataReference () {
 
+        Date currentDate = new Date();
+        long time = currentDate.getTime();
+
         DataReference dataRef = new DataReference("${providerLayerType|myProvider|myLayer}");
         assertEquals("providerLayerType", dataRef.getDataType());
         assertEquals("myProvider", dataRef.getServiceId());
         assertEquals(DefaultName.valueOf("myLayer"), dataRef.getLayerId());
+        assertNull(dataRef.getDataVersion());
+        assertNull(dataRef.getServiceSpec());
+
+        //with date
+        dataRef = new DataReference("${providerLayerType|myProvider|myLayer|"+time+"}");
+        assertEquals("providerLayerType", dataRef.getDataType());
+        assertEquals("myProvider", dataRef.getServiceId());
+        assertEquals(DefaultName.valueOf("myLayer"), dataRef.getLayerId());
+        assertEquals(currentDate, dataRef.getDataVersion());
         assertNull(dataRef.getServiceSpec());
 
         dataRef = new DataReference("${serviceType|http://serviceURL/|WMS|defaultInstance|myLayer}");
@@ -41,13 +57,33 @@ public class DataReferenceTest {
         assertEquals("WMS", dataRef.getServiceSpec());
         assertEquals("defaultInstance", dataRef.getServiceId());
         assertEquals(DefaultName.valueOf("myLayer"), dataRef.getLayerId());
+        assertNull(dataRef.getDataVersion());
+
+        //with date
+        dataRef = new DataReference("${serviceType|http://serviceURL/|WMS|defaultInstance|myLayer|"+time+"}");
+        assertEquals("serviceType", dataRef.getDataType());
+        assertEquals("http://serviceURL/", dataRef.getServiceURL());
+        assertEquals("WMS", dataRef.getServiceSpec());
+        assertEquals("defaultInstance", dataRef.getServiceId());
+        assertEquals(DefaultName.valueOf("myLayer"), dataRef.getLayerId());
+        assertEquals(currentDate, dataRef.getDataVersion());
+
 
         dataRef = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "myStyleProvider", "myStyle");
         assertEquals("providerStyleType", dataRef.getDataType());
         assertEquals("myStyleProvider", dataRef.getServiceId());
         assertEquals(DefaultName.valueOf("myStyle"), dataRef.getLayerId());
+        assertNull(dataRef.getDataVersion());
         assertNull(dataRef.getServiceSpec());
         assertEquals("${providerStyleType|myStyleProvider|myStyle}", dataRef.getReference());
+
+        dataRef = DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, "myProvider", "myLayer", currentDate);
+        assertEquals("providerLayerType", dataRef.getDataType());
+        assertEquals("myProvider", dataRef.getServiceId());
+        assertEquals(DefaultName.valueOf("myLayer"), dataRef.getLayerId());
+        assertEquals(currentDate, dataRef.getDataVersion());
+        assertNull(dataRef.getServiceSpec());
+        assertEquals("${providerLayerType|myProvider|myLayer|"+time+"}", dataRef.getReference());
 
         dataRef = DataReference.createServiceDataReference("http://localhost:8080/cstl/WS/WMS/defaultInstance2","WMS", "defaultInstance2", "myLayer10");
         assertEquals("serviceType", dataRef.getDataType());
@@ -63,8 +99,6 @@ public class DataReferenceTest {
         assertEquals("dcns-coastline", dataRef.getServiceId());
         assertEquals(DefaultName.valueOf("{http://geotoolkit.org}isoline"), dataRef.getLayerId());
         assertNull(dataRef.getServiceSpec());
-
-
 
         dataRef = new DataReference("${serviceType|http://localhost:8080/cstl/WS/wfs/default3|WFS|default3|{shp}Countries}");
         assertEquals("serviceType", dataRef.getDataType());
