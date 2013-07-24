@@ -17,10 +17,7 @@
 
 package org.constellation.provider;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.constellation.provider.configuration.ProviderParameters;
 
@@ -107,8 +104,19 @@ public class MockLayerProviderService extends AbstractProviderService
             return names;
         }
 
+        /**
+         * {@inheritDoc }
+         */
         @Override
-        public LayerDetails get(Name key) {
+        public LayerDetails get(final Name key) {
+            return get(key, null);
+        }
+
+        /**
+         * {@inheritDoc }
+         */
+        @Override
+        public LayerDetails get(final Name key, Date version) {
             throw new UnsupportedOperationException("Not supported.");
         }
 

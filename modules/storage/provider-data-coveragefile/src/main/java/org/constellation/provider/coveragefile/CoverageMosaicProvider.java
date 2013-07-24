@@ -17,14 +17,13 @@
 package org.constellation.provider.coveragefile;
 
 import org.opengis.parameter.ParameterValue;
-import java.util.List;
+
+import java.util.*;
+
 import org.opengis.parameter.ParameterValueGroup;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 import org.constellation.provider.AbstractLayerProvider;
@@ -104,6 +103,14 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
      */
     @Override
     public LayerDetails get(final Name key) {
+        return get(key, null);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public LayerDetails get(final Name key, Date version) {
         final GridCoverageReader reader = index.get(key);
 
         if (reader != null) {

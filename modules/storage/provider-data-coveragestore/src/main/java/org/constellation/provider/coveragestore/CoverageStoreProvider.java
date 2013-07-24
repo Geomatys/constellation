@@ -17,6 +17,7 @@
 package org.constellation.provider.coveragestore;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
 import org.apache.sis.storage.DataStoreException;
@@ -24,9 +25,13 @@ import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.DefaultCoverageStoreLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
+import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
 import org.geotoolkit.coverage.postgresql.PGCoverageStore;
+import org.geotoolkit.version.Version;
+import org.geotoolkit.version.VersionControl;
+import org.geotoolkit.version.VersioningException;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -49,7 +54,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         super.reload();
         dispose();
 
-        //pameter is a choice of different types
+        //parameter is a choice of different types
         //extract the first one
         ParameterValueGroup param = getSource();
         param = param.groups("choice").get(0);
@@ -98,15 +103,35 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         return names;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public LayerDetails get(Name key) {
+    public LayerDetails get(final Name key) {
+        return get(key, null);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public LayerDetails get(Name key, Date version) {
         key = fullyQualified(key);
         if(!contains(key)){
             return null;
         }
         try {
-            return new DefaultCoverageStoreLayerDetails(key, store.getCoverageReference(key));
+            VersionControl control = store.getVersioning(key);
+            CoverageReference coverageReference = null;
+            if (control.isVersioned() && version != null) {
+                coverageReference = store.getCoverageReference(key, new Version(control, "version", version));
+            } else {
+                coverageReference = store.getCoverageReference(key);
+            }
+            return new DefaultCoverageStoreLayerDetails(key, coverageReference);
         } catch (DataStoreException ex) {
+            getLogger().log(Level.WARNING, ex.getMessage(), ex);
+        } catch (VersioningException ex) {
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
         return null;

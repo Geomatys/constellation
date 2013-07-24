@@ -17,6 +17,7 @@
 package org.constellation.provider;
 
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.sis.storage.DataStoreException;
@@ -38,13 +39,61 @@ import org.opengis.feature.type.Name;
  */
 public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
 
+    /**
+     * Build a FeatureLayerDetails with layer name, store and favorite style names.
+     *
+     * @param name layer name
+     * @param store FeatureStore
+     * @param favorites style names
+     */
     public DefaultDataStoreLayerDetails(Name name, FeatureStore store, List<String> favorites){
-        this(name,store,favorites,null,null,null,null);
+        this(name,store,favorites,null,null,null,null,null);
     }
 
+    /**
+     * Build a FeatureLayerDetails with layer name, store, favorite style names and data version date.
+     *
+     * @param name layer name
+     * @param store FeatureStore
+     * @param favorites style names
+     * @param versionDate data version date of the layer (can be null)
+     */
+    public DefaultDataStoreLayerDetails(Name name, FeatureStore store, List<String> favorites, Date versionDate){
+        this(name,store,favorites,null,null,null,null, versionDate);
+    }
+
+    /**
+     * Build a FeatureLayerDetails with layer name, store, favorite style names and temporal/elevation filters.
+     *
+     * @param name layer name
+     * @param store FeatureStore
+     * @param favorites style names
+     * @param dateStart temporal filter start
+     * @param dateEnd temporal filter end
+     * @param elevationStart elevation filter start
+     * @param elevationEnd elevation filter end
+     */
     public DefaultDataStoreLayerDetails(Name name, FeatureStore store, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
-        super(name,store,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
+        this(name,store,favorites,dateStart,dateEnd,elevationStart,elevationEnd , null);
+    }
+
+    /**
+     * Build a FeatureLayerDetails with layer name, store, favorite style names, temporal/elevation filters and
+     * data version date.
+     *
+     * @param name layer name
+     * @param store FeatureStore
+     * @param favorites style names
+     * @param dateStart temporal filter start
+     * @param dateEnd temporal filter end
+     * @param elevationStart elevation filter start
+     * @param elevationEnd elevation filter end
+     * @param versionDate data version date of the layer (can be null)
+     */
+    public DefaultDataStoreLayerDetails(Name name, FeatureStore store, List<String> favorites,
+                                        String dateStart, String dateEnd, String elevationStart, String elevationEnd, Date versionDate){
+        super(name,store,favorites,dateStart,dateEnd,elevationStart,elevationEnd, versionDate);
     }
 
     @Override

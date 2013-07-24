@@ -79,13 +79,27 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
     protected final PropertyName elevationStartField;
     protected final PropertyName elevationEndField;
 
+    /**
+     * Data version date. Use to query Features is input FeatureStore is versioned.
+     */
+    protected final Date versionDate;
+
     protected AbstractFeatureLayerDetails(Name name, FeatureStore store, List<String> favorites){
-        this(name,store,favorites,null,null,null,null);
+        this(name,store,favorites,null,null,null,null, null);
 
     }
 
+    protected AbstractFeatureLayerDetails(Name name, FeatureStore store, List<String> favorites, Date versionDate){
+        this(name,store,favorites,null,null,null,null, versionDate);
+
+    }
     protected AbstractFeatureLayerDetails(Name name, FeatureStore store, List<String> favorites,
-            String dateStart, String dateEnd, String elevationStart, String elevationEnd){
+                                          String dateStart, String dateEnd, String elevationStart, String elevationEnd){
+        this(name, store, favorites, dateStart, dateEnd, elevationStart, elevationEnd, null);
+    }
+
+    protected AbstractFeatureLayerDetails(Name name, FeatureStore store, List<String> favorites,
+            String dateStart, String dateEnd, String elevationStart, String elevationEnd, Date versionDate){
         super(name,favorites);
 
         if(store == null){
@@ -100,6 +114,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
         }*/
 
         this.store = store;
+        this.versionDate = versionDate;
 
         final FilterFactory ff = FactoryFinder.getFilterFactory(null);
 
@@ -311,7 +326,18 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
      */
     @Override
     public Object getOrigin() {
-        return store.createSession(false).getFeatureCollection(QueryBuilder.all(name));
+        final QueryBuilder builder = new QueryBuilder();
+        builder.setTypeName(name);
+
+        //build query using versionDate if not null and sotre support versioning.
+        if (store.getQueryCapabilities().handleVersioning()) {
+            if (versionDate != null) {
+                builder.setVersionDate(versionDate);
+            }
+        }
+
+        final Query query =  builder.buildQuery();
+        return store.createSession(false).getFeatureCollection(query);
     }
 
 

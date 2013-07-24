@@ -16,15 +16,13 @@
  */
 package org.constellation.provider;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
+
 import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.map.ElevationModel;
 
+import org.geotoolkit.util.Utilities;
 import org.opengis.feature.type.Name;
 
 /**
@@ -74,6 +72,52 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
             if(model != null) return model;
         }
         return null;
+    }
+
+    @Override
+    public LayerDetails get(Name key, Date version) {
+        final List<LayerDetails> candidates = new ArrayList<LayerDetails>();
+
+        for(final LayerProvider provider : getProviders()){
+            final LayerDetails layer = provider.get(key, version);
+            if(layer != null) {
+                candidates.add(layer);
+            }
+        }
+
+        if(candidates.size() == 1){
+            return candidates.get(0);
+        }else if(candidates.size()>1){
+            if(LayerDetails.class.isAssignableFrom(getValueClass())){
+                //make a more accurate search testing both namespace and local part are the same.
+                final Name nk = (Name) key;
+                for(int i=0;i<candidates.size();i++){
+                    final LayerDetails ld = candidates.get(i);
+                    if(   Utilities.equals(ld.getName().getNamespaceURI(), nk.getNamespaceURI())
+                            && Utilities.equals(ld.getName().getLocalPart(),nk.getLocalPart())){
+                        return ld;
+                    }
+                }
+
+                //we could not find one more accurate then another
+                return candidates.get(0);
+            }else{
+                return candidates.get(0);
+            }
+        }
+
+        return null;
+    }
+
+    public LayerDetails get(Name key, final String providerID, Date version) {
+        final LayerProvider provider = getProvider(providerID);
+        if (provider == null) {
+            return null;
+        }
+        if (version != null) {
+            return provider.get(key, version);
+        }
+        return provider.get(key);
     }
 
     @Override

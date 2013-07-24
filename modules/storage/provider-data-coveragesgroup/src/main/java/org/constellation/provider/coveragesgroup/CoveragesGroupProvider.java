@@ -19,10 +19,7 @@ package org.constellation.provider.coveragesgroup;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -72,6 +69,14 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      */
     @Override
     public LayerDetails get(final Name key) {
+       return get(key, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LayerDetails get(final Name key, Date version) {
         final File mapContextFile = index.get(key);
         if (mapContextFile != null) {
             return new CoveragesGroupLayerDetails(key, mapContextFile);

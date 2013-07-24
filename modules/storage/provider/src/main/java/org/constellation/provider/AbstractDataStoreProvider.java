@@ -18,6 +18,7 @@
 package org.constellation.provider;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -78,6 +79,14 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
      */
     @Override
     public LayerDetails get(final Name key) {
+        return get(key, null);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public LayerDetails get(final Name key, Date version) {
         Name goodKey;
         if (!index.contains(key)) {
             goodKey = containsOnlyLocalPart(index, key);
@@ -92,7 +101,7 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         }
         final ParameterValueGroup layer = getLayer(getSource(), goodKey.getLocalPart());
         if (layer == null) {
-            return new DefaultDataStoreLayerDetails(goodKey, store, null, null, null, null, null);
+            return new DefaultDataStoreLayerDetails(goodKey, store, null, null, null, null, null, version);
 
         } else {
             return new DefaultDataStoreLayerDetails(
@@ -100,7 +109,8 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
                     value(LAYER_DATE_START_FIELD_DESCRIPTOR, layer),
                     value(LAYER_DATE_END_FIELD_DESCRIPTOR, layer),
                     value(LAYER_ELEVATION_START_FIELD_DESCRIPTOR, layer),
-                    value(LAYER_ELEVATION_END_FIELD_DESCRIPTOR, layer));
+                    value(LAYER_ELEVATION_END_FIELD_DESCRIPTOR, layer),
+                    version);
         }
     }
 

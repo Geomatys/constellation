@@ -19,6 +19,8 @@ package org.constellation.provider;
 import org.geotoolkit.map.ElevationModel;
 import org.opengis.feature.type.Name;
 
+import java.util.Date;
+
 /**
  *
  * @version $Id$
@@ -29,4 +31,9 @@ public interface LayerProvider extends Provider<Name,LayerDetails>{
 
     ElevationModel getElevationModel(Name name);
 
+    /**
+     * Get the data related to the given key in given version.
+     * @return LayerDetails if it is in the data provider, or null if not.
+     */
+    LayerDetails get(Name key, Date version);
 }

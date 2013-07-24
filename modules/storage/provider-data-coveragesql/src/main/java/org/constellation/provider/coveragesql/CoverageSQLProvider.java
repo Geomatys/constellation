@@ -18,6 +18,7 @@ package org.constellation.provider.coveragesql;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
@@ -89,6 +90,14 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     @Override
     public LayerDetails get(final Name key) {
+        return get(key, null);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public LayerDetails get(final Name key, Date version) {
         // If the key is not present for this provider, it is not necessary to go further.
         // Without this test, an exception will be logged whose message is a warning about
         // the non presence of the requested key into the "Layers" table.
