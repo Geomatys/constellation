@@ -161,7 +161,7 @@ public final class ConvertersJaxbToGeotk {
 
         try {
             DataReference dataReference = new DataReference(styleRefStr);
-            providerID = dataReference.getServiceId();
+            providerID = dataReference.getProviderOrServiceId();
             styleName = dataReference.getLayerId().getLocalPart();
         } catch (IllegalArgumentException ex) {
             //style reference is a simple StyleReference which contain only the name of the style.
@@ -200,7 +200,7 @@ public final class ConvertersJaxbToGeotk {
          * Search in Provider layers
          */
         if (dataType.equals(DataReference.PROVIDER_LAYER_TYPE)) {
-            final String providerID = source.getServiceId();
+            final String providerID = source.getProviderOrServiceId();
 
             boolean providerFound = false;
             boolean providerLayerFound = false;
@@ -340,7 +340,7 @@ public final class ConvertersJaxbToGeotk {
          * Search in Provider layers
          */
         if (dataType.equals(DataReference.PROVIDER_LAYER_TYPE)) {
-            final String providerID = source.getServiceId();
+            final String providerID = source.getProviderOrServiceId();
 
             boolean providerFound = false;
             boolean providerLayerFound = false;
@@ -380,7 +380,7 @@ public final class ConvertersJaxbToGeotk {
         } else if (dataType.equals(DataReference.SERVICE_TYPE)) {
             final String serviceURL = source.getServiceURL();
             final String serviceSpec = source.getServiceSpec();
-            final String serviceId = source.getServiceId();
+            final String serviceId = source.getProviderOrServiceId();
 
             if (serviceSpec.equalsIgnoreCase("WFS")) {
                 if (serviceURL != null) {

@@ -279,7 +279,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
         final DataReference data = new DataReference((String) guiLayerDataCBox.getSelectedItem());
         final QName qname = new QName(data.getLayerId().getNamespaceURI(), data.getLayerId().getLocalPart());
         layerModel.getLayer().setName(qname);
-        layerModel.setProviderId(data.getServiceId());
+        layerModel.setProviderId(data.getProviderOrServiceId());
         
         //alias
         final String alias = guiLayerAliasText.getText();
@@ -371,7 +371,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
                 final String val = (String) value;
                 if (!val.trim().isEmpty() && !val.equals(EMPTY_ITEM)) {
                     final DataReference data = new DataReference((String) val);
-                    label.setText(data.getServiceId() + " - " +data.getLayerId().getLocalPart());
+                    label.setText(data.getProviderOrServiceId() + " - " +data.getLayerId().getLocalPart());
                 } else {
                     label.setText(" ----- ");
                 }

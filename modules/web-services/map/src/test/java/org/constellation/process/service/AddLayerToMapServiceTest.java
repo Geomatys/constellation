@@ -135,7 +135,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertTrue(outputContext.getLayers().size() == 1);
 
         final Source outSource = outputContext.getLayers().get(0);
-        assertEquals(COUNTRIES_DATA_REF.getServiceId() ,outSource.getId());
+        assertEquals(COUNTRIES_DATA_REF.getProviderOrServiceId() ,outSource.getId());
         assertFalse(outSource.getLoadAll());
         assertTrue(outSource.getInclude().size() == 1);
 
@@ -158,7 +158,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         final ProcessDescriptor descriptor = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, PROCESS_NAME);
 
         final LayerContext inputContext = new LayerContext();
-        inputContext.getLayers().add(new Source(COUNTRIES_DATA_REF.getServiceId(), false, null, null));
+        inputContext.getLayers().add(new Source(COUNTRIES_DATA_REF.getProviderOrServiceId(), false, null, null));
         createCustomInstance("addLayer2", inputContext);
         startInstance("addLayer2");
         
@@ -181,7 +181,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertTrue(outputContext.getLayers().size() == 1);
 
         final Source outSource = outputContext.getLayers().get(0);
-        assertEquals(COUNTRIES_DATA_REF.getServiceId() ,outSource.getId());
+        assertEquals(COUNTRIES_DATA_REF.getProviderOrServiceId() ,outSource.getId());
         assertFalse(outSource.getLoadAll());
         assertTrue(outSource.getInclude().size() == 1);
 
@@ -206,7 +206,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         final LayerContext inputContext = new LayerContext();
         final List<Layer> layers = new ArrayList<Layer>();
         layers.add(new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), COUNTRIES_DATA_REF.getLayerId().getLocalPart())));
-        inputContext.getLayers().add(new Source(COUNTRIES_DATA_REF.getServiceId(), false, layers, null));
+        inputContext.getLayers().add(new Source(COUNTRIES_DATA_REF.getProviderOrServiceId(), false, layers, null));
         final Filter bbox = FF.bbox("geom", 10, 0, 30, 50, null);
 
         createCustomInstance("addLayer3", inputContext);
@@ -230,7 +230,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertTrue(outputContext.getLayers().size() == 1);
 
         final Source outSource = outputContext.getLayers().get(0);
-        assertEquals(COUNTRIES_DATA_REF.getServiceId() ,outSource.getId());
+        assertEquals(COUNTRIES_DATA_REF.getProviderOrServiceId() ,outSource.getId());
         assertFalse(outSource.getLoadAll());
         assertTrue(outSource.getInclude().size() == 1);
 
@@ -257,7 +257,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         final List<Layer> layers = new ArrayList<Layer>();
         layers.add(new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), COUNTRIES_DATA_REF.getLayerId().getLocalPart())));
         layers.add(new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), "city")));
-        inputContext.getLayers().add(new Source(COUNTRIES_DATA_REF.getServiceId(), true, null, layers));
+        inputContext.getLayers().add(new Source(COUNTRIES_DATA_REF.getProviderOrServiceId(), true, null, layers));
         createCustomInstance("addLayer5", inputContext);
         startInstance("addLayer5");
         
@@ -282,7 +282,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertTrue(outputContext.getLayers().size() == 1);
 
         final Source outSource = outputContext.getLayers().get(0);
-        assertEquals(COUNTRIES_DATA_REF.getServiceId() ,outSource.getId());
+        assertEquals(COUNTRIES_DATA_REF.getProviderOrServiceId() ,outSource.getId());
         assertFalse(outSource.getLoadAll());
         assertTrue(outSource.getInclude().size() == 1);
         assertTrue(outSource.getExclude().size() == 1);
@@ -323,7 +323,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertTrue(outputContext.getLayers().size() == 1);
 
         final Source outSource = outputContext.getLayers().get(0);
-        assertEquals(COUNTRIES_DATA_REF.getServiceId() ,outSource.getId());
+        assertEquals(COUNTRIES_DATA_REF.getProviderOrServiceId() ,outSource.getId());
         assertFalse(outSource.getLoadAll());
         assertTrue(outSource.getInclude().size() == 1);
 

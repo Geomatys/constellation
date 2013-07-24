@@ -100,7 +100,7 @@ public class AddLayerToMapService extends AbstractProcess {
         final LayerContext layerContext = getServiceConfig(serviceType, serviceInstance, getServiceConfProcess);
 
         //extract provider identifier and layer name
-        final String providerID = layerRef.getServiceId();
+        final String providerID = layerRef.getProviderOrServiceId();
         final Date dataVersion = layerRef.getDataVersion();
         final Name layerName = layerRef.getLayerId();
         final QName layerQName = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());

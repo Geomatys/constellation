@@ -56,7 +56,7 @@ public final class DataReferenceConverter {
          * Search in Provider layers
          */
         if (dataType.equals(DataReference.PROVIDER_STYLE_TYPE)) {
-            final String providerID = source.getServiceId();
+            final String providerID = source.getProviderOrServiceId();
 
             boolean providerFound = false;
 

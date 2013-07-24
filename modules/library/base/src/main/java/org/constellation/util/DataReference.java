@@ -53,17 +53,17 @@ public class DataReference implements CharSequence{
     public static String PROVIDER_STYLE_TYPE = "providerStyleType";
     public static String SERVICE_TYPE        = "serviceType";
 
-    private String reference;
+    protected String reference;
 
     /**
      * Reference type can be  {@link #PROVIDER_LAYER_TYPE} or {@link #PROVIDER_STYLE_TYPE} or {@link #SERVICE_TYPE}.
      */
-    private String type;
-    private String providerId;
-    private String serviceURL;
-    private String serviceSpec;
-    private String serviceId;
-    private String layerId;
+    protected String type;
+    protected String providerId;
+    protected String serviceURL;
+    protected String serviceSpec;
+    protected String serviceId;
+    protected String layerId;
 
     /**
      * Date version of targed data. In timestamp.
@@ -280,11 +280,33 @@ public class DataReference implements CharSequence{
      * Read the service/provider id part of the data.
      * @return String
      */
-    public String getServiceId(){
+    public String getProviderOrServiceId(){
         if (type.equals(PROVIDER_LAYER_TYPE) || type.equals(PROVIDER_STYLE_TYPE)) {
             return providerId;
         } else if (type.equals(SERVICE_TYPE)) {
             return serviceId;
+        }
+        return null;
+    }
+
+    /**
+     * Read the service id part of the data.
+     * @return String if DataReference is a Service type or null
+     */
+    public String getServiceId(){
+        if (type.equals(SERVICE_TYPE)) {
+            return serviceId;
+        }
+        return null;
+    }
+
+    /**
+     * Read the provider id part of the data.
+     * @return String provider id if DataReference is a Style or layer provider type or null
+     */
+    public String getProviderId(){
+        if (type.equals(PROVIDER_LAYER_TYPE) || type.equals(PROVIDER_STYLE_TYPE)) {
+            return providerId;
         }
         return null;
     }
