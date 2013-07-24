@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Date;
 import java.util.Set;
 import javax.xml.namespace.QName;
 import org.constellation.configuration.DimensionDefinition;
@@ -100,6 +101,7 @@ public class AddLayerToMapService extends AbstractProcess {
 
         //extract provider identifier and layer name
         final String providerID = layerRef.getServiceId();
+        final Date dataVersion = layerRef.getDataVersion();
         final Name layerName = layerRef.getLayerId();
         final QName layerQName = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
 
@@ -133,6 +135,11 @@ public class AddLayerToMapService extends AbstractProcess {
         //add alias if exist
         if (layerAlias != null) {
             newLayer.setAlias(layerAlias);
+        }
+
+        //forward data version if defined.
+        if (dataVersion != null) {
+            newLayer.setVersion(dataVersion.getTime());
         }
 
 
@@ -233,7 +240,7 @@ public class AddLayerToMapService extends AbstractProcess {
      * Find provider from his identifier in registered layer providers.
      *
      * @param providerID
-     * @return LaerProvider found or null.
+     * @return LayerProvider found or null.
      */
     private LayerProvider findProvider(final String providerID) {
 
