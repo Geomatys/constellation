@@ -70,6 +70,10 @@ public class DataReference implements CharSequence{
      */
     protected String dataVersion;
 
+    public DataReference() {
+        this.reference = null;
+    }
+
     public DataReference(final String str) {
         this.reference = str;
         computeReferenceParts();
