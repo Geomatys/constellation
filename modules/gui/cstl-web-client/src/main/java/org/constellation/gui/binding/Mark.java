@@ -18,10 +18,11 @@
 package org.constellation.gui.binding;
 
 import juzu.Mapped;
-
-import java.io.Serializable;
+import org.opengis.filter.expression.Literal;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.constellation.gui.util.StyleFactories.FF;
+import static org.constellation.gui.util.StyleFactories.SF;
 
 /**
  * @author Fabien Bernard (Geomatys).
@@ -29,7 +30,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @since 0.9
  */
 @Mapped
-public class Mark implements Serializable {
+public class Mark implements StyleElement<org.opengis.style.GraphicalSymbol> {
 
     private String geometry = "circle";
     private Stroke stroke   = new Stroke();
@@ -67,5 +68,13 @@ public class Mark implements Serializable {
 
     public void setFill(final Fill fill) {
         this.fill = fill;
+    }
+
+    @Override
+    public org.opengis.style.GraphicalSymbol toType() {
+        final Literal geometry                = FF.literal(this.geometry);
+        final org.opengis.style.Fill fill     = this.fill.toType();
+        final org.opengis.style.Stroke stroke = this.stroke.toType();
+        return SF.mark(geometry, fill, stroke);
     }
 }

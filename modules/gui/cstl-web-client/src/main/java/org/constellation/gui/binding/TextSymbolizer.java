@@ -19,6 +19,8 @@ package org.constellation.gui.binding;
 
 import juzu.Mapped;
 
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
@@ -31,5 +33,11 @@ public class TextSymbolizer implements Symbolizer {
     }
 
     public TextSymbolizer(final org.opengis.style.TextSymbolizer symbolizer) {
+        ensureNonNull("symbolizer", symbolizer);
+    }
+
+    @Override
+    public org.opengis.style.Symbolizer toType() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

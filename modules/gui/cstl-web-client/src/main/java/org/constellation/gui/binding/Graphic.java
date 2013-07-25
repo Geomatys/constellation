@@ -17,20 +17,25 @@
 
 package org.constellation.gui.binding;
 
-import juzu.Mapped;
+import org.geotoolkit.style.StyleConstants;
+import org.opengis.filter.expression.Literal;
+import org.opengis.style.AnchorPoint;
+import org.opengis.style.Displacement;
 import org.opengis.style.GraphicalSymbol;
 
-import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.constellation.gui.util.StyleFactories.FF;
+import static org.constellation.gui.util.StyleFactories.SF;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@Mapped
-public class Graphic implements Serializable {
+public class Graphic implements StyleElement<org.opengis.style.Graphic> {
 
     private double size     = 10.0;
     private double opacity  = 1.0;
@@ -83,5 +88,16 @@ public class Graphic implements Serializable {
 
     public void setMark(final Mark mark) {
         this.mark = mark;
+    }
+
+    @Override
+    public org.opengis.style.Graphic toType() {
+        final List<GraphicalSymbol> symbols = Collections.singletonList(mark.toType());
+        final Literal opacity               = FF.literal(this.opacity);
+        final Literal size                  = FF.literal(this.size);
+        final Literal rotation              = FF.literal(this.rotation);
+        final AnchorPoint anchor            = StyleConstants.DEFAULT_ANCHOR_POINT;
+        final Displacement displacement     = StyleConstants.DEFAULT_DISPLACEMENT;
+        return SF.graphic(symbols, opacity, size, rotation, anchor, displacement);
     }
 }

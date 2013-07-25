@@ -15,24 +15,29 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.gui.binding;
+package org.constellation.gui.util;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.style.MutableStyleFactory;
+import org.opengis.filter.FilterFactory2;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="@symbol")
-@JsonSubTypes({
-    @Type(value=PointSymbolizer.class,   name="point"),
-    @Type(value=LineSymbolizer.class,    name="line"),
-    @Type(value=PolygonSymbolizer.class, name="polygon"),
-    @Type(value=TextSymbolizer.class,    name="text"),
-    @Type(value=RasterSymbolizer.class,  name="raster")
-})
-public interface Symbolizer extends StyleElement<org.opengis.style.Symbolizer> {
+public final class StyleFactories {
+
+    /**
+     * Style elements factory.
+     */
+    public static final MutableStyleFactory SF = (MutableStyleFactory) FactoryFinder.getStyleFactory(
+            new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
+
+    /**
+     * Filters factory.
+     */
+    public static final FilterFactory2 FF = (FilterFactory2) FactoryFinder.getFilterFactory(
+            new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
 }

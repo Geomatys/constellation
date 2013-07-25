@@ -17,22 +17,14 @@
 
 package org.constellation.gui.binding;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.io.Serializable;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="@symbol")
-@JsonSubTypes({
-    @Type(value=PointSymbolizer.class,   name="point"),
-    @Type(value=LineSymbolizer.class,    name="line"),
-    @Type(value=PolygonSymbolizer.class, name="polygon"),
-    @Type(value=TextSymbolizer.class,    name="text"),
-    @Type(value=RasterSymbolizer.class,  name="raster")
-})
-public interface Symbolizer extends StyleElement<org.opengis.style.Symbolizer> {
+public interface StyleElement<T> extends Serializable {
+
+    public T toType();
 }

@@ -17,16 +17,14 @@
 
 package org.constellation.gui.binding;
 
-import juzu.Mapped;
-
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.constellation.gui.util.StyleFactories.SF;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@Mapped
 public class PolygonSymbolizer implements Symbolizer {
 
     private Stroke stroke = new Stroke();
@@ -61,7 +59,8 @@ public class PolygonSymbolizer implements Symbolizer {
         this.fill = fill;
     }
 
-    public String getType() {
-        return "polygon";
+    @Override
+    public org.opengis.style.Symbolizer toType() {
+        return SF.polygonSymbolizer(stroke.toType(), fill.toType(), null);
     }
 }

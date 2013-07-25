@@ -17,19 +17,18 @@
 
 package org.constellation.gui.binding;
 
-import juzu.Mapped;
-
-import java.io.Serializable;
+import org.opengis.filter.expression.Literal;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.constellation.gui.util.StyleFactories.FF;
+import static org.constellation.gui.util.StyleFactories.SF;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@Mapped
-public class Fill implements Serializable {
+public class Fill implements StyleElement<org.opengis.style.Fill> {
 
     private String color   = "#000000";
     private double opacity = 1.0;
@@ -57,5 +56,12 @@ public class Fill implements Serializable {
 
     public void setOpacity(final double opacity) {
         this.opacity = opacity;
+    }
+
+    @Override
+    public org.opengis.style.Fill toType() {
+        final Literal color   = FF.literal(this.color);
+        final Literal opacity = FF.literal(this.opacity);
+        return SF.fill(color, opacity);
     }
 }

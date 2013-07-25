@@ -17,16 +17,14 @@
 
 package org.constellation.gui.binding;
 
-import juzu.Mapped;
-
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.constellation.gui.util.StyleFactories.SF;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@Mapped
 public class LineSymbolizer implements Symbolizer {
 
     private Stroke stroke = new Stroke();
@@ -49,7 +47,8 @@ public class LineSymbolizer implements Symbolizer {
         this.stroke = stroke;
     }
 
-    public String getType() {
-        return "line";
+    @Override
+    public org.opengis.style.Symbolizer toType() {
+        return SF.lineSymbolizer(stroke.toType(), null);
     }
 }

@@ -50,6 +50,8 @@
                 @Script(id = "dropdown", src = "js/bootstrap-dropdown.js", depends = "jquery"),
                 @Script(id = "colorpicker", src = "js/bootstrap-colorpicker.js", depends = "jquery"),
                 @Script(id = "slider", src = "js/bootstrap-slider.js", depends = "jquery"),
+                @Script(id = "openlayers", src = "js/openlayers.js", depends = "jquery"),
+                @Script(id = "openlayers-ext", src = "js/openlayers-ext.js", depends = "openlayers"),
                 @Script(id = "service", src = "js/services.js", depends = "jquery"),
                 @Script(id = "styleedition", src = "js/styleedition.js", depends = "jquery")})
 

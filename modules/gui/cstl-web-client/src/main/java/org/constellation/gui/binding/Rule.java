@@ -17,22 +17,27 @@
 
 package org.constellation.gui.binding;
 
-import juzu.Mapped;
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.style.MutableRule;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.constellation.gui.util.StyleFactories.SF;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@Mapped
-public class Rule implements Serializable {
+public class Rule implements StyleElement<MutableRule> {
+
+    private static final Logger LOGGER = Logging.getLogger(Rule.class);
 
     private String name                  = "Change me!";
     private String title                 = "";
@@ -40,6 +45,7 @@ public class Rule implements Serializable {
     private double minScale              = 0.0;
     private double maxScale              = Double.MAX_VALUE;
     private List<Symbolizer> symbolizers = new ArrayList<Symbolizer>(0);
+    private String filter                = null;
 
     public Rule() {
     }
@@ -69,6 +75,9 @@ public class Rule implements Serializable {
             } else if (symbolizer instanceof org.opengis.style.RasterSymbolizer) {
                 symbolizers.add(new RasterSymbolizer((org.opengis.style.RasterSymbolizer) symbolizer));
             }
+        }
+        if (rule.getFilter() != null) {
+            filter = CQL.write(rule.getFilter());
         }
     }
 
@@ -118,5 +127,33 @@ public class Rule implements Serializable {
 
     public void setSymbolizers(final List<Symbolizer> symbolizers) {
         this.symbolizers = symbolizers;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(final String filter) {
+        this.filter = filter;
+    }
+
+    @Override
+    public MutableRule toType() {
+        final MutableRule rule = SF.rule();
+        rule.setName(this.name);
+        rule.setDescription(SF.description(this.title, this.description));
+        rule.setMinScaleDenominator(this.minScale);
+        rule.setMaxScaleDenominator(this.maxScale);
+        for (final Symbolizer symbolizer : this.symbolizers) {
+            rule.symbolizers().add(symbolizer.toType());
+        }
+        if (this.filter != null) {
+            try {
+                rule.setFilter(CQL.parseFilter(this.filter));
+            } catch (CQLException ex) {
+                LOGGER.log(Level.WARNING, "An error occurred during filter parsing.", ex);
+            }
+        }
+        return rule;
     }
 }

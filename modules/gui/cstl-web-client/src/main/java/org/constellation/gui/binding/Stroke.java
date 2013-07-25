@@ -17,17 +17,19 @@
 
 package org.constellation.gui.binding;
 
-import juzu.Mapped;
+import org.geotoolkit.style.StyleConstants;
+import org.opengis.filter.expression.Literal;
 
-import java.io.Serializable;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.constellation.gui.util.StyleFactories.FF;
+import static org.constellation.gui.util.StyleFactories.SF;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@Mapped
-public class Stroke implements Serializable {
+public class Stroke implements StyleElement<org.opengis.style.Stroke> {
 
     private String color   = "#000000";
     private double opacity = 1.0;
@@ -38,12 +40,11 @@ public class Stroke implements Serializable {
     }
 
     public Stroke(final org.opengis.style.Stroke stroke) {
-        if (stroke != null) {
-            color   = stroke.getColor().toString();
-            opacity = Double.parseDouble(stroke.getOpacity().toString());
-            width   = Double.parseDouble(stroke.getWidth().toString());
-            dashed  = (stroke.getDashArray() != null);
-        }
+        ensureNonNull("stroke", stroke);
+        color   = stroke.getColor().toString();
+        opacity = Double.parseDouble(stroke.getOpacity().toString());
+        width   = Double.parseDouble(stroke.getWidth().toString());
+        dashed  = (stroke.getDashArray() != null);
     }
 
     public String getColor() {
@@ -72,5 +73,17 @@ public class Stroke implements Serializable {
 
     public void setDashed(final boolean dashed) {
         this.dashed = dashed;
+    }
+
+    @Override
+    public org.opengis.style.Stroke toType() {
+        final Literal color      = FF.literal(this.color);
+        final Literal width      = FF.literal(this.width);
+        final Literal opacity    = FF.literal(this.opacity);
+        final float[] dashes     = dashed ? new float[]{4, 4} : null;
+        final Literal cap        = StyleConstants.DEFAULT_STROKE_CAP;
+        final Literal join       = StyleConstants.DEFAULT_STROKE_JOIN;
+        final Literal dashOffset = StyleConstants.DEFAULT_STROKE_OFFSET;
+        return SF.stroke(color, opacity, width, join, cap, dashes, dashOffset);
     }
 }

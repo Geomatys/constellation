@@ -24,6 +24,9 @@ import org.geotoolkit.style.MutableStyle;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLDecoder;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * Manager for style provider operations.
@@ -85,6 +88,8 @@ public final class StyleManager {
      * @throws IOException if failed to acquire or parse style for any reason
      */
     public MutableStyle getStyle(final String providerId, final String styleName) throws IOException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("styleName", styleName);
         try {
             final URL url = new URL(constellationUrl.substring(0, constellationUrl.indexOf("api")) + "WS");
             final ConstellationServer server = new ConstellationServer(url, login, password);
@@ -107,5 +112,43 @@ public final class StyleManager {
         final Style style = new Style(mutableStyle);
         final ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(style);
+    }
+
+    /**
+     * Updates a {@link MutableStyle} instance on the constellation server.
+     *
+     * @param providerId the provider id
+     * @param styleName  the style name
+     * @param style      the new style
+     * @throws IOException if failed to update style for any reason
+     */
+    public void updateStyle(final String providerId, final String styleName, final MutableStyle style) throws IOException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("styleName", styleName);
+        try {
+            final URL url = new URL(constellationUrl.substring(0, constellationUrl.indexOf("api")) + "WS");
+            final ConstellationServer server = new ConstellationServer(url, login, password);
+            server.providers.updateStyle(providerId, styleName, style);
+        } catch (Exception ex) {
+            throw new IOException("Failed to update the style named \"" + styleName + "\" in provider with id \"" + providerId + "\".");
+        }
+    }
+
+    /**
+     * Updates a {@link MutableStyle} instance on the constellation server.
+     *
+     * @param providerId the provider id
+     * @param styleName  the style name
+     * @param json       the new style JSON representation
+     * @throws IOException if failed to update style for any reason
+     */
+    public void updateStyleJSON(final String providerId, final String styleName, final String json) throws IOException {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            final Style style = mapper.readValue(json, Style.class);
+            this.updateStyle(providerId, styleName, style.toType());
+        } catch (Exception ex) {
+            throw new IOException("Failed to update the style named \"" + styleName + "\" in provider with id \"" + providerId + "\".");
+        }
     }
 }

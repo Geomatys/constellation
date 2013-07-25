@@ -51,7 +51,7 @@
 
         <div class="footer-actions">
             <a href="#" onclick="CSTL.StyleEdition.cancel();" class="btn">&{edition.style.cancel.label}</a>
-            <a href="#" onclick="CSTL.StyleEdition.validate();" class="btn btn-primary">&{edition.style.validate.label}</a>
+            <a href="#" onclick="CSTL.SldWorkflow.updateStyle('@{StyleEdition.update()}','${providerId}','${styleName}');" class="btn btn-primary">&{edition.style.validate.label}</a>
         </div>
 
         <div data-action="edit-rule" data-url="@{StyleEdition.rule(providerId = providerId, styleName = styleName, method = 'm')}"></div>

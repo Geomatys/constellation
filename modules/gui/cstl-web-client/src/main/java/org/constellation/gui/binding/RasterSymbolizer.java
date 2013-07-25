@@ -17,6 +17,8 @@
 
 package org.constellation.gui.binding;
 
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
@@ -28,5 +30,11 @@ public class RasterSymbolizer implements Symbolizer {
     }
 
     public RasterSymbolizer(final org.opengis.style.RasterSymbolizer symbolizer) {
+        ensureNonNull("symbolizer", symbolizer);
+    }
+
+    @Override
+    public org.opengis.style.Symbolizer toType() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

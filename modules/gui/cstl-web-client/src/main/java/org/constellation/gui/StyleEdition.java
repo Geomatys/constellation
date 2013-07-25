@@ -17,13 +17,20 @@
 
 package org.constellation.gui;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import juzu.Action;
 import juzu.Path;
 import juzu.RequestScoped;
+import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
+import juzu.impl.request.Request;
+import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
+import org.constellation.gui.binding.Style;
 import org.constellation.gui.service.StyleManager;
+import org.geotoolkit.filter.DefaultFilterFactory2;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -145,5 +152,28 @@ public final class StyleEdition {
 
         // Not found.
         return Response.notFound();
+    }
+
+    @Ajax
+    @Resource
+    @Route("edit/update")
+    public Response update(final String providerId, final String styleName) {
+        try {
+            // Get style json body.
+            final String json = Request.getCurrent().getParameters().get("style").getValue();
+
+            // Update the style.
+            api.updateStyleJSON(providerId, styleName, json);
+
+            // Prepare input parameters.
+            final Map<String, Object> parameters = new HashMap<String, Object>(0);
+            parameters.put("providerId", providerId);
+            parameters.put("styleName",  styleName);
+
+            // Return status
+            return Response.status(200);
+        } catch (Exception ex) {
+            return Response.error(ex);
+        }
     }
 }

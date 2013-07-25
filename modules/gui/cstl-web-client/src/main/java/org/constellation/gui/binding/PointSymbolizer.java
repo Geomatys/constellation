@@ -17,16 +17,14 @@
 
 package org.constellation.gui.binding;
 
-import juzu.Mapped;
-
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.constellation.gui.util.StyleFactories.SF;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@Mapped
 public class PointSymbolizer implements Symbolizer {
 
     private Graphic graphic = new Graphic();
@@ -49,7 +47,8 @@ public class PointSymbolizer implements Symbolizer {
         this.graphic = graphic;
     }
 
-    public String getType() {
-        return "point";
+    @Override
+    public org.opengis.style.Symbolizer toType() {
+        return SF.pointSymbolizer(graphic.toType(), null);
     }
 }
