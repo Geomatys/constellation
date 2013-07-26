@@ -24,7 +24,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @version 0.9
  * @since 0.9
  */
-public class RasterSymbolizer implements Symbolizer {
+public final class RasterSymbolizer implements Symbolizer {
 
     public RasterSymbolizer() {
     }

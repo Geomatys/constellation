@@ -25,7 +25,7 @@ import static org.constellation.gui.util.StyleFactories.SF;
  * @version 0.9
  * @since 0.9
  */
-public class PolygonSymbolizer implements Symbolizer {
+public final class PolygonSymbolizer implements Symbolizer {
 
     private Stroke stroke = new Stroke();
     private Fill fill     = new Fill();

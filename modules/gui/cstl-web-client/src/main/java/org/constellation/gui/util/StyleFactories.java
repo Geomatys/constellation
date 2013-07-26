@@ -19,6 +19,8 @@ package org.constellation.gui.util;
 
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.sld.DefaultSLDFactory;
+import org.geotoolkit.sld.MutableSLDFactory;
 import org.geotoolkit.style.MutableStyleFactory;
 import org.opengis.filter.FilterFactory2;
 
@@ -28,6 +30,11 @@ import org.opengis.filter.FilterFactory2;
  * @since 0.9
  */
 public final class StyleFactories {
+
+    /**
+     * SLD factory.
+     */
+    public static final MutableSLDFactory SLDF = new DefaultSLDFactory();
 
     /**
      * Style elements factory.

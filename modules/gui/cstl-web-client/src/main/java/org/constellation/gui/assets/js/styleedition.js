@@ -61,7 +61,7 @@ CSTL.SldWorkflow = {
         '@symbol': 'line',
         stroke: {
             color:   "#000000",
-            opacity: 1,
+            opacity: 1.0,
             width:   2,
             dashed:  false
         }
@@ -70,32 +70,32 @@ CSTL.SldWorkflow = {
         '@symbol': 'polygon',
         stroke: {
             color:   "#000000",
-            opacity: 1,
+            opacity: 1.0,
             width:   2,
             dashed:  false
         },
         fill: {
             color:     "#ffffff",
-            opacity:   100
+            opacity:   1.0
         }
     },
     DEFAULT_POINT_SYMBOL: {
         '@symbol': 'point',
         graphic: {
             size:     10,
-            opacity:  1,
+            opacity:  1.0,
             rotation: 0,
             mark: {
                 geometry: 'circle',
                 stroke: {
                     color:   "#000000",
-                    opacity: 1,
+                    opacity: 1.0,
                     width:   2,
                     dashed:  false
                 },
                 fill: {
                     color:   "#ffffff",
-                    opacity: 1
+                    opacity: 1.0
                 }
             }
         }
@@ -240,6 +240,7 @@ CSTL.StyleEdition = {
      */
     removeRule: function(index) {
         this._style.rules.splice(index, 1);
+        CSTL.SldWorkflow.setStyle(this._style);
     },
 
     /**
@@ -248,6 +249,7 @@ CSTL.StyleEdition = {
     removeAllRules: function() {
         this._style.rules = [];
         $("#rules").empty();
+        CSTL.SldWorkflow.setStyle(this._style);
     },
 
     /**
@@ -429,22 +431,30 @@ CSTL.RuleEdition = {
      * @param index - {Integer} the symbolizer index
      */
     editSymbol: function(index) {
+        this.update();
+
         // Set storage for next step.
         CSTL.SldWorkflow.setRule(this._rule);
         CSTL.SldWorkflow.setSymbolizer(this._rule.symbolizers[index]);
     },
 
     /**
-     * Validates the current edition.
+     * Update the rule from for values.
      */
-    validate: function() {
-        // Apply form values.
+    update: function() {
         this._rule.name        = $("[name='name']").val();
         this._rule.title       = $("[name='title']").val();
         this._rule.description = $("[name='description']").val();
         this._rule.minScale    = $("[name='minScale']").val();
         this._rule.maxScale    = $("[name='maxScale']").val();
         this._rule.filter      = CSTL.AttributesFilter.build();
+    },
+
+    /**
+     * Validates the current edition.
+     */
+    validate: function() {
+        this.update();
 
         // Update the style.
         var style = CSTL.SldWorkflow.getStyle();
@@ -515,10 +525,9 @@ CSTL.PointSymbol = {
     },
 
     /**
-     * Validates the current edition.
+     * Update the symbolizer from for values.
      */
-    validate: function() {
-        // Apply form values.
+    update: function() {
         this._symbol.graphic.size                = $("[name='graphic.size']").val();
         this._symbol.graphic.opacity             = $("[name='graphic.opacity']").val() / 100;
         this._symbol.graphic.rotation            = $("[name='graphic.rotation']").val();
@@ -529,6 +538,13 @@ CSTL.PointSymbol = {
         this._symbol.graphic.mark.stroke.dashed  = $("[name='graphic.mark.stroke.dashed']").hasClass("active");
         this._symbol.graphic.mark.fill.color     = $("[name='graphic.mark.fill.color']").val();
         this._symbol.graphic.mark.fill.opacity   = $("[name='graphic.mark.fill.opacity']").val() / 100;
+    },
+
+    /**
+     * Validates the current edition.
+     */
+    validate: function() {
+        this.update();
 
         // Update the style.
         var rule = CSTL.SldWorkflow.getRule();

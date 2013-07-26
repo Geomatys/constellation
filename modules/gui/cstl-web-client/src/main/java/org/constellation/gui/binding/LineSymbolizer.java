@@ -25,7 +25,7 @@ import static org.constellation.gui.util.StyleFactories.SF;
  * @version 0.9
  * @since 0.9
  */
-public class LineSymbolizer implements Symbolizer {
+public final class LineSymbolizer implements Symbolizer {
 
     private Stroke stroke = new Stroke();
 

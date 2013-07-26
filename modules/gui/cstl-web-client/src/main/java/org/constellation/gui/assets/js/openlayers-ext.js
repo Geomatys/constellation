@@ -432,6 +432,5 @@ OpenLayers.Format.CQL = (function() {
         },
 
         CLASS_NAME: "OpenLayers.Format.CQL"
-
     });
 })();

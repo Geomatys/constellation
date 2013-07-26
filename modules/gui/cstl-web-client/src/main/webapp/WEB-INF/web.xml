@@ -31,6 +31,16 @@
         <url-pattern>/assets/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>GetMap Servlet</servlet-name>
+        <servlet-class>org.constellation.gui.servlet.GetMapServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetMap Servlet</servlet-name>
+        <url-pattern>/overview/*</url-pattern>
+    </servlet-mapping>
+
     <session-config>
         <session-timeout>10</session-timeout>
     </session-config>

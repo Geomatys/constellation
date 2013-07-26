@@ -28,7 +28,7 @@ import static org.constellation.gui.util.StyleFactories.SF;
  * @version 0.9
  * @since 0.9
  */
-public class Fill implements StyleElement<org.opengis.style.Fill> {
+public final class Fill implements StyleElement<org.opengis.style.Fill> {
 
     private String color   = "#000000";
     private double opacity = 1.0;

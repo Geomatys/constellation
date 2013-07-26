@@ -35,7 +35,7 @@ import static org.constellation.gui.util.StyleFactories.SF;
  * @version 0.9
  * @since 0.9
  */
-public class Graphic implements StyleElement<org.opengis.style.Graphic> {
+public final class Graphic implements StyleElement<org.opengis.style.Graphic> {
 
     private double size     = 10.0;
     private double opacity  = 1.0;

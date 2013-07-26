@@ -17,8 +17,6 @@
 
 package org.constellation.gui;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import juzu.Action;
 import juzu.Path;
 import juzu.RequestScoped;
 import juzu.Resource;
@@ -28,9 +26,7 @@ import juzu.View;
 import juzu.impl.request.Request;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
-import org.constellation.gui.binding.Style;
 import org.constellation.gui.service.StyleManager;
-import org.geotoolkit.filter.DefaultFilterFactory2;
 
 import javax.inject.Inject;
 import java.io.IOException;

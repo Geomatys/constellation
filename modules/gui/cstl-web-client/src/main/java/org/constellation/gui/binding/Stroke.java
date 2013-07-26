@@ -29,7 +29,7 @@ import static org.constellation.gui.util.StyleFactories.SF;
  * @version 0.9
  * @since 0.9
  */
-public class Stroke implements StyleElement<org.opengis.style.Stroke> {
+public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
 
     private String color   = "#000000";
     private double opacity = 1.0;

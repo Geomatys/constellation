@@ -27,7 +27,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @since 0.9
  */
 @Mapped
-public class TextSymbolizer implements Symbolizer {
+public final class TextSymbolizer implements Symbolizer {
 
     public TextSymbolizer() {
     }

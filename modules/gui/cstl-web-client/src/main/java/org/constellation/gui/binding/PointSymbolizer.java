@@ -25,7 +25,7 @@ import static org.constellation.gui.util.StyleFactories.SF;
  * @version 0.9
  * @since 0.9
  */
-public class PointSymbolizer implements Symbolizer {
+public final class PointSymbolizer implements Symbolizer {
 
     private Graphic graphic = new Graphic();
 

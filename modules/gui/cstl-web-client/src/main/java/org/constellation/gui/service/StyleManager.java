@@ -24,7 +24,6 @@ import org.geotoolkit.style.MutableStyle;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLDecoder;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 

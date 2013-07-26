@@ -30,7 +30,7 @@ import static org.constellation.gui.util.StyleFactories.SF;
  * @since 0.9
  */
 @Mapped
-public class Mark implements StyleElement<org.opengis.style.GraphicalSymbol> {
+public final class Mark implements StyleElement<org.opengis.style.GraphicalSymbol> {
 
     private String geometry = "circle";
     private Stroke stroke   = new Stroke();

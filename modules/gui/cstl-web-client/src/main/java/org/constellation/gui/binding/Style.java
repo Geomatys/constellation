@@ -31,7 +31,7 @@ import static org.constellation.gui.util.StyleFactories.SF;
  * @version 0.9
  * @since 0.9
  */
-public class Style implements StyleElement<MutableStyle> {
+public final class Style implements StyleElement<MutableStyle> {
 
     private String name;
     private List<Rule> rules = new ArrayList<Rule>();

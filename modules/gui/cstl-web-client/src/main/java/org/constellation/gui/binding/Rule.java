@@ -35,7 +35,7 @@ import static org.constellation.gui.util.StyleFactories.SF;
  * @version 0.9
  * @since 0.9
  */
-public class Rule implements StyleElement<MutableRule> {
+public final class Rule implements StyleElement<MutableRule> {
 
     private static final Logger LOGGER = Logging.getLogger(Rule.class);
 
