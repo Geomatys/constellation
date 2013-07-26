@@ -528,6 +528,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         //final String strRemoteOwsType = getParameter(KEY_REMOTE_OWS_TYPE, false);
         final String strRemoteOwsUrl = getParameter(KEY_REMOTE_OWS_URL, false);
         final String urlSLD          = getParameter(KEY_SLD,            false);
+        final String bodySLD         = getParameter(KEY_SLD_BODY,       false);
         final String strSldVersion   = getParameter(KEY_SLD_VERSION, (urlSLD != null) ? true : false);
         final String strAzimuth      = getParameter(KEY_AZIMUTH,        false);
         final String strStyles       = getParameter(KEY_STYLES, ((urlSLD != null)) ? false : fromGetMap);
@@ -634,7 +635,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                     throw new CstlServiceException("The given sld version "+ strSldVersion +" is not known.",
                             INVALID_PARAMETER_VALUE, KEY_SLD_VERSION.toLowerCase());
                 }
-                sld = QueryAdapter.toSLD(urlSLD, sldVersion);
+                sld = QueryAdapter.toSLD(bodySLD, urlSLD, sldVersion);
             } catch (MalformedURLException ex) {
                 throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
             }

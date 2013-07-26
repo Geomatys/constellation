@@ -16,6 +16,7 @@
  */
 package org.constellation.query;
 
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -78,29 +79,27 @@ public final class QueryAdapter {
         return queryLayers;
     }
 
-    public static MutableStyledLayerDescriptor toSLD(final String sldURL, final StyledLayerDescriptor version)
-                                                                                  throws MalformedURLException
-    {
+    public static MutableStyledLayerDescriptor toSLD(final String sldBody, final String sldURL,
+                                                     final StyledLayerDescriptor version) throws MalformedURLException {
+        final Object src;
 
-        if (sldURL == null || sldURL.trim().isEmpty()) {
+        if (sldBody != null && !sldBody.trim().isEmpty()) {
+            src = new StringReader(sldBody);
+        } else if (sldURL != null && !sldURL.trim().isEmpty()) {
+            src = new URL(sldURL);
+        } else {
             return null;
         }
 
-        final URL url = new URL(sldURL.trim());
-
-
-        MutableStyledLayerDescriptor sld = null;
-
-        final StyleXmlIO sldUtilities = new StyleXmlIO();
-
+        final StyleXmlIO styleIO = new StyleXmlIO();
         try {
-            sld = sldUtilities.readSLD(url, version);
+            return styleIO.readSLD(src, version);
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         } catch (FactoryException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
 
-        return sld;
+        return null;
     }
 }
