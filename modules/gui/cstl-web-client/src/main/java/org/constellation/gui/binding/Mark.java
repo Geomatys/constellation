@@ -17,7 +17,6 @@
 
 package org.constellation.gui.binding;
 
-import juzu.Mapped;
 import org.opengis.filter.expression.Literal;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
@@ -29,7 +28,6 @@ import static org.constellation.gui.util.StyleFactories.SF;
  * @version 0.9
  * @since 0.9
  */
-@Mapped
 public final class Mark implements StyleElement<org.opengis.style.GraphicalSymbol> {
 
     private String geometry = "circle";

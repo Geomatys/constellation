@@ -58,6 +58,7 @@
                                             <li><a onclick="CSTL.RuleEdition.newSymbol('point')" class="symbol-point" href="@{StyleEdition.symbol(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex, type = 'point')}">Point</a></li>
                                             <li><a onclick="CSTL.RuleEdition.newSymbol('line')" class="symbol-line" href="@{StyleEdition.symbol(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex, type = 'line')}">Ligne</a></li>
                                             <li><a onclick="CSTL.RuleEdition.newSymbol('polygon')" class="symbol-polygon" href="@{StyleEdition.symbol(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex, type = 'polygon')}">Polygone</a></li>
+                                            <li><a onclick="CSTL.RuleEdition.newSymbol('text')" class="symbol-text" href="@{StyleEdition.symbol(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex, type = 'text')}">Text</a></li>
                                         </ul>
                                     </div>
                                 </div>

@@ -26,12 +26,12 @@ CSTL.msg["fr"] = {
     "edit":           "Editer",
     "no.description": "Aucune description disponible.",
     "delete":         "Supprimer"
-}
+};
 CSTL.msg["en"] = {
     "edit":           "Edit",
     "no.description": "No description available.",
     "delete":         "Delete"
-}
+};
 
 /**
  * JavaScript controller for StyledLayerDescriptor edition pages.
@@ -101,7 +101,17 @@ CSTL.SldWorkflow = {
         }
     },
     DEFAULT_TEXT_SYMBOL: {
-
+        '@symbol': 'text',
+        label: "",
+        font: {
+            size: 12,
+            bold: false,
+            italic: false
+        },
+        fill: {
+            color:   "#000000",
+            opacity: 1.0
+        }
     },
 
     updateStyle: function(url, providerId, styleName) {
@@ -687,6 +697,79 @@ CSTL.PolygonSymbol = {
         this._symbol.stroke.dashed  = $("[name='stroke.dashed']").hasClass("active");
         this._symbol.fill.color     = $("[name='fill.color']").val();
         this._symbol.fill.opacity   = $("[name='fill.opacity']").val() / 100;
+
+        // Update the style.
+        var rule = CSTL.SldWorkflow.getRule();
+        if (this._symbolIndex != null) {
+            rule.symbolizers[this._symbolIndex] = this._symbol;
+        } else {
+            rule.symbolizers.push(this._symbol);
+        }
+        CSTL.SldWorkflow.setRule(rule);
+
+        // Clear local storage.
+        CSTL.SldWorkflow.clearSymbolizer();
+    },
+
+    /**
+     * Cancels the current edition.
+     */
+    cancel: function() {
+        // Clear local storage.
+        CSTL.SldWorkflow.clearSymbolizer();
+    }
+};
+
+CSTL.TextSymbol = {
+
+    // The current edited symbol.
+    _symbol: null,
+
+    // The edited symbol index.
+    _symbolIndex: null,
+
+    /**
+     * Initializes the "ruleedition.gtpml" page.
+     */
+    init: function(symbolIndex) {
+        this._symbol      = CSTL.SldWorkflow.getSymbolizer();
+        this._symbolIndex = symbolIndex;
+
+        // Set form values.
+        $("[name='label']").val(this._symbol.label);
+        $("[name='font.size']").val(this._symbol.font.size);
+        if (this._symbol.font.bold) {
+            $("[name='font.bold']").addClass("active");
+        }
+        if (this._symbol.font.italic == true) {
+            $("[name='font.italic']").addClass("active");
+        }
+        $("[name='fill.color']").val(this._symbol.fill.color);
+        $("[name='fill.opacity']").val(this._symbol.fill.opacity * 100);
+        $(".color-overview").each(function() {
+            var input = $(this).siblings("input[type=text]");
+            $(this).css("background-color", input.val());
+        });
+
+        // Create widgets.
+        $("[name$='.opacity']").slider({min:0,max:100,step:1});
+        $("[name$='.color']").colorpicker({format:'hex'}).on('changeColor', function(e) {
+            $(this).siblings(".color-overview").css("background-color", e.color.toHex());
+        });
+        $(".btn-group").button();
+    },
+
+    /**
+     * Validates the current edition.
+     */
+    validate: function() {
+        // Apply form values.
+        this._symbol.label        = $("[name='label']").val();
+        this._symbol.font.size    = $("[name='font.size']").val();
+        this._symbol.font.bold    = $("[name='font.bold']").hasClass("active");
+        this._symbol.font.italic  = $("[name='font.italic']").hasClass("active");
+        this._symbol.fill.color   = $("[name='fill.color']").val();
+        this._symbol.fill.opacity = $("[name='fill.opacity']").val() / 100;
 
         // Update the style.
         var rule = CSTL.SldWorkflow.getRule();

@@ -17,27 +17,73 @@
 
 package org.constellation.gui.binding;
 
-import juzu.Mapped;
+import org.opengis.filter.expression.Expression;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.constellation.gui.util.StyleFactories.FF;
+import static org.constellation.gui.util.StyleFactories.SF;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@Mapped
 public final class TextSymbolizer implements Symbolizer {
+
+    private String label = null;
+    private Font font    = new Font();
+    private Fill fill    = new Fill();
 
     public TextSymbolizer() {
     }
 
     public TextSymbolizer(final org.opengis.style.TextSymbolizer symbolizer) {
         ensureNonNull("symbolizer", symbolizer);
+        if (symbolizer.getLabel() != null) {
+            this.label = symbolizer.getLabel().toString();
+        }
+        if (symbolizer.getFont() != null) {
+            this.font = new Font(symbolizer.getFont());
+        }
+        if (symbolizer.getFill() != null) {
+            this.fill = new Fill(symbolizer.getFill());
+        }
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(final String label) {
+        this.label = label;
+    }
+
+    public Font getFont() {
+        return font;
+    }
+
+    public void setFont(final Font font) {
+        this.font = font;
+    }
+
+    public Fill getFill() {
+        return fill;
+    }
+
+    public void setFill(final Fill fill) {
+        this.fill = fill;
     }
 
     @Override
     public org.opengis.style.Symbolizer toType() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        final org.opengis.style.Fill fill = this.fill.toType();
+        final org.opengis.style.Font font = this.font.toType();
+        final Expression label;
+        if (this.label.startsWith("{") && this.label.endsWith("}")) {
+            label = FF.property(this.label.substring(1, this.label.length() - 1));
+        } else {
+            label = FF.literal(this.label);
+        }
+        return SF.textSymbolizer(fill, font, null, label, null, null);
     }
 }
