@@ -32,13 +32,8 @@
                     <button type="button" class="btn btn-info btn-small">selectionner toutes les couches</button></div>
                 <div class="span3">
                     <div class="pagination" style="margin: 0px;">
-                        <ul>
-                            <li><a href="#" class="text-info">&laquo;</a></li>
-                            <li><a href="#" class="text-info">1</a> </li>
-                            <li><a href="#" class="text-info">2</a> </li>
-                            <li><a href="#" class="text-info">3</a> </li>
-                            <li><a href="#" class="text-info">4</a> </li>
-                            <li><a href="#" class="text-info">&raquo;</a></li>
+                        <ul id="paging">
+
                         </ul>
                     </div>
                 </div>
@@ -47,7 +42,7 @@
                         <option value="10" selected="selected">10 couches</option>
                         <option value="20">20 couches</option>
                         <option value="100">100 couches</option>
-                        <option value="all">Toutes les couches</option>
+                        <option value="${layers.getLayer().size()}">Toutes les couches</option>
                     </select>
                 </div>
             </div>
@@ -65,14 +60,27 @@
     </div>
 </div>
 <script type="text/javascript" >
+    /**
+     * ajax juzu call to refresh list for pagination and filtrering
+     * @param startElement : first element on page
+     * @param counter : element number on page
+     * @param orderBy : list sort by this attribute
+     * @param filter : filter String
+     */
+    function generateList(startElement, counter, orderBy, filter){
+        $('#datalist').jzLoad(
+                "Controller.generateDataList()",
+                {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter});
+    }
+
     $(function() {
-        $("#nbLayersselect").on('change', function(){
-            var counter = $(this).val();
-            var test= "test";
-//            $('#datalist').jzAjax("Controller.generateDataList()",{data:{"servicename":"test"}});
-            $('#datalist').jzLoad(
-                    "Controller.generateDataList()",
-                    {"serviceName":"${service.name}", "startElement":"0", "counter":counter, "orderBy":"", "filter":""});
-        });
+
+        //init page
+        generateList(0,5,"","");
+        var nbPage = ${layers.getLayer().size()}/5;
+        generatePagination(nbPage);
+        addLayerSelectAction(${layers.getLayer().size()});
+        $("#previous").addClass("active");
+        $("#nbLayersselect").val("5")
     });
 </script>

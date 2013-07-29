@@ -173,22 +173,42 @@ public class Controller {
         return success.with().service(createdService).type(type).versions(versionList).created(create).ok().withMimeType("text/html");
     }
 
+    /**
+     * Generate datalist to show it in ajax
+     * @param serviceName Service where we want to see data
+     * @param startElement First element list counter
+     * @param counter Element number by page
+     * @param orderBy String to order by this attribute
+     * @param filter String to filter list
+     */
     @Ajax
     @Resource
     @Route("/datalist")
     public void generateDataList(String serviceName, String startElement, String counter, String orderBy, String filter){
         LayerList layers = servicesManager.getLayers(serviceName, "WMS");
         Map<String, Object> parameters = new HashMap<String, Object>(0);
+        int nbByPage =  Integer.parseInt(counter);
 
-        if(layers.getLayer().size()<Integer.parseInt(counter)){
-            parameters.put("layers", layers);
-        }else{
-            List<Layer> layerList = new ArrayList<Layer>(Integer.parseInt(counter));
-            for (int i = Integer.parseInt(startElement); i < Integer.parseInt(counter); i++) {
+        //show filtrered element if list is higher than element number by page
+        if(layers.getLayer().size()>nbByPage){
+            int start =  Integer.parseInt(startElement);
+            int boundary = start+nbByPage;
+
+            //define higher bound on list
+            if(boundary>layers.getLayer().size()){
+                boundary = layers.getLayer().size();
+            }
+
+            // create layer list
+            List<Layer> layerList = new ArrayList<Layer>(nbByPage);
+            for (int i = start; i < boundary; i++) {
                 layerList.add(layers.getLayer().get(i));
             }
-            parameters.put("layers", layerList);
+            layers.getLayer().clear();
+            layers.getLayer().addAll(layerList);
+
         }
+        parameters.put("layers", layers);
         dataElement.with(parameters).render();
     }
 }
