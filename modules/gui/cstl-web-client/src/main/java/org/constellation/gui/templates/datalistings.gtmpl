@@ -55,8 +55,40 @@
             </div>
         </div>
     </div>
-    <div class="span3">
-        detail part
+    <div class="span3 pull-right">
+        <div class="row pull-right">
+            <button class="btn btn-info">ajouter une donnee</button>
+            <a href="#myModal" role="button" class="btn btn-info" data-toggle="modal">creer une donnee</a>
+            <!-- Modal -->
+            <form action="@{upload()}" enctype="multipart/form-data" method="post">
+                <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3 id="myModalLabel">Upload data</h3>
+                    </div>
+                    <div class="modal-body">
+                            <div class="fileupload fileupload-new" data-provides="fileupload">
+                                <div class="input-append">
+                                    <div class="uneditable-input span3">
+                                        <i class="icon-file fileupload-exists"></i>
+                                        <span class="fileupload-preview"></span>
+                                    </div>
+                                    <span class="btn btn-file">
+                                        <span class="fileupload-new">Select file</span>
+                                        <span class="fileupload-exists">Change</span>
+                                        <input type="file" name="file" id="file"/>
+                                    </span>
+                                    <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                        <button class="btn btn-info" type="submit">Save changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 <script type="text/javascript" >
@@ -76,11 +108,11 @@
     $(function() {
 
         //init page
-        generateList(0,5,"","");
-        var nbPage = ${layers.getLayer().size()}/5;
+        generateList(0,10,"","");
+        var nbPage = ${layers.getLayer().size()}/10;
         generatePagination(nbPage);
         addLayerSelectAction(${layers.getLayer().size()});
         $("#previous").addClass("active");
-        $("#nbLayersselect").val("5")
+        $("#nbLayersselect").val("10")
     });
 </script>

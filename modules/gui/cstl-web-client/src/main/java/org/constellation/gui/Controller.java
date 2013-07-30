@@ -26,6 +26,7 @@ import juzu.Route;
 import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
+import org.apache.commons.fileupload.FileItem;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AccessConstraint;
@@ -35,13 +36,18 @@ import org.constellation.gui.service.InstanceSummary;
 import org.constellation.gui.service.ServicesManager;
 
 import javax.inject.Inject;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Constellation web client main Juzu controller. Manage linkage with other controller and homepages
@@ -53,6 +59,7 @@ import java.util.ResourceBundle;
 public class Controller {
 
 
+    private static final Logger LOGGER = Logger.getLogger(Controller.class.toString());
     /**
      * Manager used to call constellation server side.
      */
@@ -210,5 +217,31 @@ public class Controller {
         }
         parameters.put("layers", layers);
         dataElement.with(parameters).render();
+    }
+
+    @Resource
+    @Route("/upload")
+    public Response upload(FileItem file) {
+        if (file != null) {
+            try {
+                final InputStream stream = file.getInputStream();
+                // Create file on temporary folder
+                String tempDir= System.getProperty("java.io.tmpdir");
+                final File newFile = new File(tempDir +"/"+ file.getName());
+                final FileOutputStream fos = new FileOutputStream(newFile);
+                int intVal = stream.read();
+                while (intVal != -1) {
+                    fos.write(intVal);
+                    intVal = stream.read();
+                }
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "error when saving file on server", e);
+                return Response.error("error when saving file on server");
+            }
+        }else{
+            return Response.error("error when saving file on server");
+        }
+
+        return Response.ok("redirect to data loading").withMimeType("text/html");
     }
 }
