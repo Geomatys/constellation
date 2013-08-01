@@ -22,6 +22,7 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -119,7 +120,7 @@ public class ServicesManager {
                 instancesSummary.add(instanceSum);
             }
         } catch (MalformedURLException e) {
-            LOGGER.log(Level.WARNING, "", e);
+            LOGGER.log(Level.WARNING, "error on url", e);
         }
 
         return instancesSummary;
@@ -138,10 +139,24 @@ public class ServicesManager {
             ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
             layers = cs.services.getLayers(serviceType, serviceName);
         } catch (MalformedURLException e) {
-            LOGGER.log(Level.WARNING, "", e);
+            LOGGER.log(Level.WARNING, "error on url", e);
         }
         return layers;
     }
 
 
+    /**
+     * Send file on server via webservices
+     * @param newFile file sent
+     */
+    public void uploadToServer(File newFile) {
+        URL serverUrl = null;
+        try {
+            serverUrl = new URL(constellationUrl);
+            ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
+            cs.providers.uploadData(newFile);
+        } catch (MalformedURLException e) {
+            LOGGER.log(Level.WARNING, "error on url", e);
+        }
+    }
 }

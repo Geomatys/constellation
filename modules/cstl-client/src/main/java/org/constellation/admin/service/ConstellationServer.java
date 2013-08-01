@@ -17,6 +17,15 @@
 package org.constellation.admin.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.header.ContentDisposition;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.FormDataBodyPart;
+import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.util.ArgumentChecks;
 import org.constellation.admin.service.ConstellationServer.Csws;
 import org.constellation.admin.service.ConstellationServer.Providers;
@@ -56,6 +65,7 @@ import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
 
 import javax.swing.event.EventListenerList;
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -68,9 +78,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1120,6 +1132,32 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
+        }
+
+        /**
+         * Send file on constellation server
+         * @param file file to sent
+         * @return true if file sent without problem
+         */
+        public Boolean uploadData(final File file){
+            //create form body part
+            FormDataBodyPart body = new FormDataBodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE) ;
+            MultiPart multi = new MultiPart();
+            multi.bodyPart(body);
+            try {
+                // create content disposition do give file name on server
+                FormDataContentDisposition cd = new FormDataContentDisposition("form-data; name=\"file\"; filename=\""+file.getName()+"\"");
+                body.setContentDisposition(cd);
+            } catch (ParseException e) {
+                LOGGER.log(Level.WARNING, "error on cd building", e);
+                return false;
+            }
+
+            // generate jersey client to send file
+            Client c = Client.create();
+            WebResource service = c.resource(getURLWithEndSlash());
+            ClientResponse response = service.path("data/upload").type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multi);
+            return true;
         }
 
     }

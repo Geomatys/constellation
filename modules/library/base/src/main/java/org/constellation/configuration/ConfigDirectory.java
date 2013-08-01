@@ -73,6 +73,8 @@ public final class ConfigDirectory {
      */
     public static String USER_DIRECTORY = null;
 
+    public static String DATA_DIRECTORY = null;
+
     /**
      * This should be a class loader from the main constellation application.
      */
@@ -87,6 +89,7 @@ public final class ConfigDirectory {
             try {
                 Properties prop = FileUtilities.getPropertiesFromFile(propertiesFile);
                 USER_DIRECTORY = prop.getProperty("configuration_directory");
+                DATA_DIRECTORY = prop.getProperty("data_directory");
             } catch (IOException ex) {
                 LOGGER.warning("IOException while reading the constellation properties file");
             }
@@ -105,6 +108,31 @@ public final class ConfigDirectory {
         f = f.getParentFile(); // lib
         f = f.getParentFile(); // WEB-INF
         return f;
+    }
+
+    /**
+     * Give a data directory {@link java.io.File} defined on constellation.properties or
+     * by default on .constellation-data from user home directory
+     *
+     * @return data directory as {@link java.io.File}
+     */
+    public static File getDataDirectory() {
+        File constellationDataDirectory = null;
+
+        if (DATA_DIRECTORY != null && !DATA_DIRECTORY.isEmpty()) {
+            constellationDataDirectory = new File(DATA_DIRECTORY);
+            if (!constellationDataDirectory.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", DATA_DIRECTORY);
+            } else if (!constellationDataDirectory.isDirectory()) {
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", DATA_DIRECTORY);
+            }
+        } else {
+            constellationDataDirectory = new File(System.getProperty("user.home"), ".constellation-data");
+            if(!constellationDataDirectory.exists()){
+                constellationDataDirectory.mkdir();
+            }
+        }
+        return constellationDataDirectory;
     }
 
     /**
