@@ -36,7 +36,7 @@ import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -106,7 +106,7 @@ public class UtilsTest {
         phyID  = Utils.getPhysicalID(sensor);
         assertEquals(null, phyID);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     /**
@@ -128,7 +128,7 @@ public class UtilsTest {
         expNames = new ArrayList<String>();
         assertEquals(expNames, names);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     /**
@@ -150,7 +150,7 @@ public class UtilsTest {
 
         assertEquals(expResult, result);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     /**

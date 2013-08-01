@@ -29,7 +29,7 @@ import org.constellation.configuration.utils.WMSPortrayalUtils;
 import org.geotoolkit.display2d.ext.grid.DefaultGridTemplate;
 import org.geotoolkit.display2d.ext.grid.GridTemplate;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
 

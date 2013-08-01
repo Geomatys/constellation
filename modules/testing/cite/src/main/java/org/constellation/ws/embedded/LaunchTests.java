@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import org.apache.maven.plugin.MojoFailureException;
 
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 
 /**

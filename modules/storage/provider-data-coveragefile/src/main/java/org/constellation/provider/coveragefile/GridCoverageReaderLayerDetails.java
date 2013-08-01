@@ -26,6 +26,8 @@ import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 
+import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef;
 import org.constellation.provider.AbstractLayerDetails;
 import org.constellation.provider.CoverageLayerDetails;
@@ -37,19 +39,14 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.MeasurementRange;
 
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.Layer;
 import org.opengis.style.FeatureTypeStyle;
 import org.opengis.style.RasterSymbolizer;

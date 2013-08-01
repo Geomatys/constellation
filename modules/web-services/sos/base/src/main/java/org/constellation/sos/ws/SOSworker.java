@@ -60,7 +60,7 @@ import static org.constellation.sos.ws.Normalizer.*;
 import static org.constellation.sos.ws.DatablockParser.*;
 
 // Geotoolkit dependencies
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.AbstractOperation;
@@ -122,7 +122,7 @@ import org.geotoolkit.swes.xml.ObservationTemplate;
 import org.geotoolkit.swes.xml.InsertSensorResponse;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.logging.MonolineFormatter;
+import org.apache.sis.util.logging.MonolineFormatter;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -304,7 +304,7 @@ public class SOSworker extends AbstractWorker {
             if (configFile.exists()) {
                 final Unmarshaller configUM = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 final Object object = configUM.unmarshal(configFile);
-                GenericDatabaseMarshallerPool.getInstance().release(configUM);
+                GenericDatabaseMarshallerPool.getInstance().recycle(configUM);
                 if (object instanceof SOSConfiguration) {
                     configuration = (SOSConfiguration) object;
                 } else {
@@ -589,7 +589,7 @@ public class SOSworker extends AbstractWorker {
         if (configFile.exists()) {
             final Unmarshaller capaUM = SOSMarshallerPool.getInstance().acquireUnmarshaller();
             Object object = capaUM.unmarshal(configFile);
-            SOSMarshallerPool.getInstance().release(capaUM);
+            SOSMarshallerPool.getInstance().recycle(capaUM);
             if (object instanceof JAXBElement) {
                 object = ((JAXBElement)object).getValue();
             }

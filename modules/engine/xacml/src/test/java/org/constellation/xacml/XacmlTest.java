@@ -64,7 +64,7 @@ import org.geotoolkit.xacml.xml.policy.SubjectAttributeDesignatorType;
 import org.geotoolkit.xacml.xml.policy.TargetType;
 
 // Junit dependencies
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -121,7 +121,7 @@ public class XacmlTest {
              Marshaller marshaller = XACMLMarshallerPool.getInstance().acquireMarshaller();
              marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
              marshaller.marshal(policySet, System.out);
-             XACMLMarshallerPool.getInstance().release(marshaller);
+             XACMLMarshallerPool.getInstance().recycle(marshaller);
          }
          
          PDP = new CstlPDP(policySet);
@@ -149,7 +149,7 @@ public class XacmlTest {
              Marshaller marshaller = XACMLMarshallerPool.getInstance().acquireMarshaller();
              marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
              marshaller.marshal(examplePolicy, System.out);
-             XACMLMarshallerPool.getInstance().release(marshaller);
+             XACMLMarshallerPool.getInstance().recycle(marshaller);
          }
         
         XACMLPolicy policy = PolicyFactory.createPolicy(examplePolicy);
@@ -493,17 +493,12 @@ public class XacmlTest {
             return;
         }
         Object p = null;
-        Unmarshaller unmarshaller = null;
         try {
-            unmarshaller = XACMLMarshallerPool.getInstance().acquireUnmarshaller();
-            
+            final Unmarshaller unmarshaller = XACMLMarshallerPool.getInstance().acquireUnmarshaller();
             p = unmarshaller.unmarshal(is);
+            XACMLMarshallerPool.getInstance().recycle(unmarshaller);
         } catch (JAXBException e) {
             LOGGER.severe("JAXB exception while unmarshalling policyFile " + "csw" + "Policy.xml");
-        } finally {
-            if (unmarshaller != null) {
-                XACMLMarshallerPool.getInstance().release(unmarshaller);
-            }
         }
         
         if (p instanceof JAXBElement) {
@@ -672,7 +667,7 @@ public class XacmlTest {
              Marshaller marshaller = XACMLMarshallerPool.getInstance().acquireMarshaller();
              marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
              marshaller.marshal(policySet, System.out);
-             XACMLMarshallerPool.getInstance().release(marshaller);
+             XACMLMarshallerPool.getInstance().recycle(marshaller);
          }
 
          
@@ -729,7 +724,7 @@ public class XacmlTest {
              Marshaller marshaller = XACMLMarshallerPool.getInstance().acquireMarshaller();
              marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
              marshaller.marshal(policySet, System.out);
-             XACMLMarshallerPool.getInstance().release(marshaller);
+             XACMLMarshallerPool.getInstance().recycle(marshaller);
          }
          
          PDP = new CstlPDP(policySet);
@@ -988,7 +983,7 @@ public class XacmlTest {
             JAXBElement<PolicyType> jb = (JAXBElement<PolicyType>) unmarshaller.unmarshal(is);  
             policies.add(jb.getValue());
         }
-        XACMLMarshallerPool.getInstance().release(unmarshaller);
+        XACMLMarshallerPool.getInstance().recycle(unmarshaller);
         
         return policies;
     }

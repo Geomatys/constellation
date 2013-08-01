@@ -186,7 +186,7 @@ public class SOService extends OGCWebService<SOSworker> {
             
             final Marshaller m = getMarshallerPool().acquireMarshaller();
             m.marshal(owsFactory.createException(exceptionType), detail);
-            getMarshallerPool().release(m);
+            getMarshallerPool().recycle(m);
                     
             //detail.appendChild(n);
             return response;

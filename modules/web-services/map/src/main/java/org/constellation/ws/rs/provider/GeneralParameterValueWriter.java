@@ -28,7 +28,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
 import org.opengis.parameter.GeneralParameterValue;
 

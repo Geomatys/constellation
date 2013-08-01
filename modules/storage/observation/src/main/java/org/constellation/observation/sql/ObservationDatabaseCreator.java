@@ -29,7 +29,7 @@ import javax.sql.DataSource;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.PostgisInstaller;
 import org.geotoolkit.internal.sql.ScriptRunner;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *

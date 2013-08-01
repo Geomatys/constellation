@@ -44,6 +44,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 //Constellation dependencies
+import org.apache.sis.util.logging.MonolineFormatter;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.filter.FilterParser;
@@ -74,7 +75,7 @@ import org.geotoolkit.csw.xml.*;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.lucene.IndexingException;
@@ -93,9 +94,8 @@ import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.logging.MonolineFormatter;
-import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.xml.Namespaces;
+import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.Namespaces;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
@@ -239,7 +239,7 @@ public class CSWworker extends AbstractWorker {
                 } else {
                     candidate = (Automatic) configUnmarshaller.unmarshal(configFile);
                 }
-                pool.release(configUnmarshaller);
+                pool.recycle(configUnmarshaller);
             }
             configuration = candidate;
 
@@ -382,7 +382,7 @@ public class CSWworker extends AbstractWorker {
             acceptedResourceType.add(Namespaces.GFC);
         }
         if (supportedDataTypes.contains(DUBLINCORE)) {
-            acceptedResourceType.add(Namespaces.CSW_202);
+            acceptedResourceType.add(Namespaces.CSW);
         }
         if (supportedDataTypes.contains(EBRIM)) {
             acceptedResourceType.add(EBRIM_30);
@@ -413,7 +413,7 @@ public class CSWworker extends AbstractWorker {
             schemas.put(METADATA_QNAME,            unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/metadata.xsd")));
             schemas.put(EXTRINSIC_OBJECT_QNAME,    unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd")));
             schemas.put(EXTRINSIC_OBJECT_25_QNAME, unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd")));
-             XSDMarshallerPool.getInstance().release(unmarshaller);
+             XSDMarshallerPool.getInstance().recycle(unmarshaller);
 
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB Exception when trying to parse xsd file", ex, NO_APPLICABLE_CODE);
@@ -709,7 +709,7 @@ public class CSWworker extends AbstractWorker {
         initializeOutputFormat(request);
 
         //we get the output schema and verify that we handle it
-        String outputSchema = Namespaces.CSW_202;
+        String outputSchema = Namespaces.CSW;
         if (request.getOutputSchema() != null) {
             outputSchema = request.getOutputSchema();
             if (!acceptedResourceType.contains(outputSchema)) {
@@ -911,7 +911,7 @@ public class CSWworker extends AbstractWorker {
             mode = ISO_19115;
         } else if (outputSchema.equals(EBRIM_30) || outputSchema.equals(EBRIM_25)) {
             mode = EBRIM;
-        } else if (outputSchema.equals(Namespaces.CSW_202)) {
+        } else if (outputSchema.equals(Namespaces.CSW)) {
             mode = DUBLINCORE;
         } else {
             throw new IllegalArgumentException("undefined outputSchema");
@@ -1066,7 +1066,7 @@ public class CSWworker extends AbstractWorker {
         }
 
         //we get the output schema and verify that we handle it
-        String outputSchema = Namespaces.CSW_202;
+        String outputSchema = Namespaces.CSW;
         if (request.getOutputSchema() != null) {
             outputSchema = request.getOutputSchema();
             if (!acceptedResourceType.contains(outputSchema)) {
@@ -1087,7 +1087,7 @@ public class CSWworker extends AbstractWorker {
 
         final Class expectedType;
         final int mode;
-        if (outputSchema.equals(Namespaces.CSW_202)) {
+        if (outputSchema.equals(Namespaces.CSW)) {
             expectedType = AbstractRecordType.class;
             mode         = DUBLINCORE;
         } else if (outputSchema.equals(Namespaces.GMD))  {
@@ -1217,7 +1217,7 @@ public class CSWworker extends AbstractWorker {
 
         if (typeNames.contains(RECORD_QNAME)) {
             final Object object = schemas.get(RECORD_QNAME);
-            final SchemaComponent component = CswXmlFactory.createSchemaComponent(version, Namespaces.CSW_202, schemaLanguage, object);
+            final SchemaComponent component = CswXmlFactory.createSchemaComponent(version, Namespaces.CSW, schemaLanguage, object);
             components.add(component);
         }
 

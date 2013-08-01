@@ -32,6 +32,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
+import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -40,10 +41,10 @@ import static org.constellation.metadata.CSWConstants.*;
 
 // geotoolkit dependencies
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
@@ -89,11 +90,11 @@ import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLessThanOrEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
-import org.geotoolkit.util.SimpleInternationalString;
-import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.xml.Namespaces;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.Namespaces;
 import org.apache.sis.util.ComparisonMode;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -480,7 +481,7 @@ public class CSWworkerTest {
 
         ebrimEquals(expRpResult, rpResult);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     public void getRecordByIdErrorTest() throws Exception {
@@ -938,7 +939,7 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 0);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -1104,7 +1105,7 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     public void getRecordsErrorTest() throws Exception {
@@ -1452,7 +1453,7 @@ public class CSWworkerTest {
         }
         assertTrue(exLaunched);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
 
     }
 
@@ -1486,7 +1487,7 @@ public class CSWworkerTest {
         DescribeRecordResponse result = worker.describeRecord(request);
 
         assertEquals(result.getSchemaComponent().size(), 2);
-        assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), Namespaces.CSW_202);
+        assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), Namespaces.CSW);
         assertEquals(result.getSchemaComponent().get(1).getTargetNamespace(), Namespaces.GMD);
 
         /**
@@ -1607,7 +1608,7 @@ public class CSWworkerTest {
 
         RecordType dcResult =  (RecordType) obj;
         assertEquals(ExpResult2, dcResult);
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -2478,7 +2479,7 @@ public class CSWworkerTest {
         isoResult = (DefaultMetadata) obj;
         metadataEquals(replacement, isoResult);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
 }

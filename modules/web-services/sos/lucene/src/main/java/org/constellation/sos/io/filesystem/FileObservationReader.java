@@ -36,11 +36,11 @@ import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swe.xml.DataArrayProperty;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.opengis.observation.Observation;
@@ -147,7 +147,7 @@ public class FileObservationReader implements ObservationReader {
                 try {
                     final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                     Object obj = unmarshaller.unmarshal(offeringFile);
-                    MARSHALLER_POOL.release(unmarshaller);
+                    MARSHALLER_POOL.recycle(unmarshaller);
                     if (obj instanceof JAXBElement) {
                         obj = ((JAXBElement)obj).getValue();
                     }
@@ -178,7 +178,7 @@ public class FileObservationReader implements ObservationReader {
                     try {
                         final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                         Object obj = unmarshaller.unmarshal(offeringFile);
-                        MARSHALLER_POOL.release(unmarshaller);
+                        MARSHALLER_POOL.recycle(unmarshaller);
                         if (obj instanceof JAXBElement) {
                             obj = ((JAXBElement)obj).getValue();
                         }
@@ -273,7 +273,7 @@ public class FileObservationReader implements ObservationReader {
             try {
                 final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(samplingFeatureFile);
-                MARSHALLER_POOL.release(unmarshaller);
+                MARSHALLER_POOL.recycle(unmarshaller);
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
@@ -301,7 +301,7 @@ public class FileObservationReader implements ObservationReader {
             try {
                 final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(observationFile);
-                MARSHALLER_POOL.release(unmarshaller);
+                MARSHALLER_POOL.recycle(unmarshaller);
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
@@ -327,7 +327,7 @@ public class FileObservationReader implements ObservationReader {
             try {
                 final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(anyResultFile);
-                MARSHALLER_POOL.release(unmarshaller);
+                MARSHALLER_POOL.recycle(unmarshaller);
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }

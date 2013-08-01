@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 import org.constellation.ws.CstlServiceException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 /**

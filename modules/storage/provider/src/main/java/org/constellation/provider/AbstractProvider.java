@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;

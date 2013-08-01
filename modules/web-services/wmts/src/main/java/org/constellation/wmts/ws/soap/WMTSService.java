@@ -55,7 +55,7 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
  * @author Cédric Briançon (Geomatys)
  */
 @WebService(name = "WMTSService")
-@XmlSeeAlso({org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
+@XmlSeeAlso({org.apache.sis.internal.jaxb.geometry.ObjectFactory.class})
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 @BindingType(value="http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 public class WMTSService extends OGCWebService<WMTSWorker>{

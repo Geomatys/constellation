@@ -17,8 +17,9 @@
 
 package org.constellation.generic.database;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 /**
  *
@@ -29,12 +30,13 @@ public final class GenericDatabaseMarshallerPool {
     private static final MarshallerPool instance;
     static {
         try {
-            instance = new MarshallerPool("org.constellation.configuration:"       +
-                                          "org.constellation.dto:"                 +
-                                          "org.constellation.generic.database:"    +
-                                          "org.geotoolkit.ogc.xml.v110:"           +
-                                          "org.geotoolkit.internal.jaxb.geometry:" +
-                                          "org.geotoolkit.gml.xml.v311");
+            instance = new MarshallerPool(JAXBContext.newInstance(
+                    "org.constellation.configuration:" +
+                    "org.constellation.dto:" +
+                    "org.constellation.generic.database:" +
+                    "org.geotoolkit.ogc.xml.v110:" +
+                    "org.apache.sis.internal.jaxb.geometry:" +
+                    "org.geotoolkit.gml.xml.v311"), null);
         } catch (JAXBException ex) {
             throw new AssertionError(ex); // Should never happen, unless we have a configuration error.
         }

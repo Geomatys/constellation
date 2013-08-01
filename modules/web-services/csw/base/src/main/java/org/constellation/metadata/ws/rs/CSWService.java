@@ -61,7 +61,7 @@ import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.xml.Namespaces;
+import org.apache.sis.xml.Namespaces;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -367,7 +367,7 @@ public class CSWService extends OGCWebService<CSWworker> {
 
         String outputSchema = getParameter("OUTPUTSCHEMA", false);
         if (outputSchema == null) {
-            outputSchema = Namespaces.CSW_202;
+            outputSchema = Namespaces.CSW;
         }
 
         //we get the value of start position, if not set we put default value "1"
@@ -404,7 +404,7 @@ public class CSWService extends OGCWebService<CSWworker> {
 
         //if there is not namespace specified, using the default namespace
         if (namespaces.isEmpty()) {
-            namespaces.put("csw", Namespaces.CSW_202);
+            namespaces.put("csw", Namespaces.CSW);
             namespaces.put("gmd", Namespaces.GMD);
         }
 
@@ -554,7 +554,7 @@ public class CSWService extends OGCWebService<CSWworker> {
 
         String outputSchema = getParameter("OUTPUTSCHEMA", false);
         if (outputSchema == null) {
-            outputSchema = Namespaces.CSW_202;
+            outputSchema = Namespaces.CSW;
         }
 
         final String ids             = getParameter("ID", true);
@@ -593,7 +593,7 @@ public class CSWService extends OGCWebService<CSWworker> {
         //if there is not namespace specified, using the default namespace
         // TODO add gmd...
         if (namespaces.isEmpty()) {
-            namespaces.put("csw", Namespaces.CSW_202);
+            namespaces.put("csw", Namespaces.CSW);
             namespaces.put("gmd", Namespaces.GMD);
         }
 

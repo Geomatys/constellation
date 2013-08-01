@@ -102,7 +102,7 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
     }
     
     public synchronized void setIdOffering(String idOffering) {
-        if (!Utilities.equals(this.idOffering, idOffering)) {
+        if (!(this.idOffering != null ? this.idOffering.equals(idOffering) : idOffering == null)) {
             this.idOffering = idOffering;
             fireStateChanged("idOffering");
         }

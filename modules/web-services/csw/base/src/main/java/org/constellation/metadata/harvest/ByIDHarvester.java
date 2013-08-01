@@ -278,7 +278,7 @@ public class ByIDHarvester extends CatalogueHarvester {
             try {
                 final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 harvested = unmarshaller.unmarshal(in);
-                marshallerPool.release(unmarshaller);
+                marshallerPool.recycle(unmarshaller);
                 if (harvested instanceof JAXBElement) {
                     harvested = ((JAXBElement) harvested).getValue();
                 }

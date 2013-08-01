@@ -34,7 +34,7 @@ import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *

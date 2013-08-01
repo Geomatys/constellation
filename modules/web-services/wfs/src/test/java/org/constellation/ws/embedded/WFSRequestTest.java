@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -44,7 +45,7 @@ import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirect
 // Geotoolkit dependencies
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
@@ -130,13 +131,13 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
             "org.constellation.ws.rs.provider"}, null);
 
         EPSG_VERSION = CRS.getVersion("EPSG").toString();
-        pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110"   +
+        pool = new MarshallerPool(JAXBContext.newInstance("org.geotoolkit.wfs.xml.v110"   +
             		  ":org.geotoolkit.ogc.xml.v110"  +
                           ":org.geotoolkit.wfs.xml.v200"  +
             		  ":org.geotoolkit.gml.xml.v311"  +
                           ":org.geotoolkit.xsd.xml.v2001" +
                           ":org.geotoolkit.sampling.xml.v100" +
-                         ":org.geotoolkit.internal.jaxb.geometry");
+                         ":org.apache.sis.internal.jaxb.geometry"), null);
 
 
        final Configurator config = new Configurator() {

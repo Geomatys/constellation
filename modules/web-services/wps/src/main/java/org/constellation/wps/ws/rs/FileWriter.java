@@ -16,7 +16,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import java.io.File;
 

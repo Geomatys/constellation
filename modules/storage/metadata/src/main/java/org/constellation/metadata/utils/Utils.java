@@ -25,10 +25,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
+
+import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.util.ReflectionUtilities;
-import org.geotoolkit.util.SimpleInternationalString;
 import org.apache.sis.util.Classes;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.opengis.util.InternationalString;
 
 /**
@@ -327,8 +328,8 @@ public final class Utils {
     public static void setTitle(final String title, final Object object) {
 
         final List<String> paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo[org.geotoolkit.metadata.iso.identification.DefaultDataIdentification]:citation[org.geotoolkit.metadata.iso.citation.DefaultCitation]:title");
-        paths.add("ISO 19115-2:MI_Metadata:identificationInfo[org.geotoolkit.metadata.iso.identification.DefaultDataIdentification]:citation[org.geotoolkit.metadata.iso.citation.DefaultCitation]:title");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo[org.apache.sis.metadata.iso.identification.DefaultDataIdentification]:citation[org.apache.sis.metadata.iso.citation.DefaultCitation]:title");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo[org.apache.sis.metadata.iso.identification.DefaultDataIdentification]:citation[org.apache.sis.metadata.iso.citation.DefaultCitation]:title");
         //paths.add("ISO 19115:CI_ResponsibleParty:individualName");
         paths.add("ISO 19115:CI_ResponsibleParty:organisationName");
         paths.add("ISO 19110:FC_FeatureCatalogue:name");

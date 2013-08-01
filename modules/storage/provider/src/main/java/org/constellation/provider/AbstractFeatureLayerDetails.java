@@ -27,6 +27,9 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
+
+import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.apache.sis.storage.DataStoreException;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -41,9 +44,7 @@ import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.MeasurementRange;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;

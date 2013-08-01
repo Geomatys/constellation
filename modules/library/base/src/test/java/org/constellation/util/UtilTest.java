@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.geotoolkit.util.StringUtilities;
-
 // Junit dependencies
+import org.geotoolkit.util.StringUtilities;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -112,7 +111,7 @@ public class UtilTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void cleanStringsTest() throws Exception {
+    public void cleanCharSequencesTest() throws Exception {
 
         List<String> dirtys = new ArrayList<String>();
         dirtys.add("\t blabla              truc machin");
@@ -124,7 +123,7 @@ public class UtilTest {
         expResults.add("boouutcmach");
         expResults.add("bcbcbcbcbcbcbcbcbc");
 
-        List<String> results = StringUtilities.cleanStrings(dirtys);
+        List<String> results = StringUtilities.cleanCharSequences(dirtys);
         assertEquals(expResults, results);
 
     }

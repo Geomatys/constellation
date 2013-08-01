@@ -34,7 +34,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *

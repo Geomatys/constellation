@@ -33,13 +33,14 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
+import org.apache.sis.xml.XML;
 import org.constellation.jaxb.CstlXMLSerializer;
 import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.metadata.utils.SerializerResponse;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.CSWResponse;
-import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.XML;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -66,7 +67,7 @@ public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWrit
         final MarshallWarnings warnings = new MarshallWarnings();
         try {
             final Marshaller m = CSWMarshallerPool.getInstance().acquireMarshaller();
-            m.setProperty(XML.CONVERTERS, warnings);
+            m.setProperty(XML.CONVERTER, warnings);
             if (t instanceof SerializerResponse) {
                 final SerializerResponse response = (SerializerResponse) t;
                 final CstlXMLSerializer serializer    = response.getSerializer();
@@ -81,7 +82,7 @@ public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWrit
             } else {
                 m.marshal(t, out);
             }
-            CSWMarshallerPool.getInstance().release(m);
+            CSWMarshallerPool.getInstance().recycle(m);
 
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the CSW response", ex);

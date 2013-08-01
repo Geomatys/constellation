@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 import org.constellation.configuration.utils.WMSPortrayalUtils;
 import org.geotoolkit.display2d.ext.image.DefaultImageTemplate;
 import org.geotoolkit.display2d.ext.image.ImageTemplate;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *

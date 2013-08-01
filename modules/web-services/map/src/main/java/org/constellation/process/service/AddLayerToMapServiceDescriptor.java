@@ -16,6 +16,7 @@
  */
 package org.constellation.process.service;
 
+import org.apache.sis.util.iso.ResourceInternationalString;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.util.DataReference;
@@ -25,7 +26,6 @@ import static org.constellation.process.service.MapProcessUtils.*;
 import org.geotoolkit.parameter.ExtendedParameterDescriptor;
 import org.geotoolkit.process.AbstractProcessDescriptor;
 import org.geotoolkit.process.Process;
-import org.geotoolkit.util.ResourceInternationalString;
 import org.opengis.filter.Filter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;

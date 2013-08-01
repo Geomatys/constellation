@@ -30,11 +30,11 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.WPSResponse;
 import org.geotoolkit.wps.xml.v100.ExecuteResponse;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 /**
  *
@@ -61,7 +61,7 @@ public class ExecuteWriter<T extends WPSResponse> implements MessageBodyWriter<T
         try {
             final Marshaller m = WPSMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
-            WPSMarshallerPool.getInstance().release(m);
+            WPSMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the feature collection", ex);
         }

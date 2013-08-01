@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
 

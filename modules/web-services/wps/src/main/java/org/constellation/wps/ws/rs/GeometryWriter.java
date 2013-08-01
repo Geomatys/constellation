@@ -31,7 +31,7 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 
 /**
@@ -59,7 +59,7 @@ public class GeometryWriter<T extends AbstractGeometryType> implements MessageBo
         try {
             Marshaller m = WPSMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
-            WPSMarshallerPool.getInstance().release(m);
+            WPSMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the feature collection", ex);
         }

@@ -30,7 +30,7 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 
 import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 import org.opengis.sld.StyledLayerDescriptor;
 import org.opengis.style.Style;

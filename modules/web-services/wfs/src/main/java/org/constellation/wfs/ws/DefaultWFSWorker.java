@@ -28,6 +28,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
@@ -49,7 +51,7 @@ import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 // Geotoolkit dependencies
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.UnauthorizedException;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreUtilities;
 import org.geotoolkit.feature.SchemaException;
@@ -68,7 +70,7 @@ import org.geotoolkit.filter.binding.Bindings;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.visitor.FillCrsVisitor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
@@ -200,7 +202,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 try {
                     final Unmarshaller unmarshaller = getMarshallerPool().acquireUnmarshaller();
                     final Object obj   = unmarshaller.unmarshal(sqFile);
-                    getMarshallerPool().release(unmarshaller);
+                    getMarshallerPool().recycle(unmarshaller);
                     if (obj instanceof StoredQueries) {
                         StoredQueries candidate = (StoredQueries) obj;
                         this.storedQueries = candidate.getStoredQuery();
@@ -259,7 +261,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             try {
                 final Marshaller marshaller = getMarshallerPool().acquireMarshaller();
                 marshaller.marshal(new StoredQueries(storedQueries), sqFile);
-                getMarshallerPool().release(marshaller);
+                getMarshallerPool().recycle(marshaller);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "JAXBExeception while marshalling the stored queries File", ex);
             } 
@@ -778,7 +780,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             featureCollection = FeatureStoreUtilities.collection("collection-1", null);
         }
         if (request.getResultType() == ResultTypeType.HITS) {
-            return buildFeatureCollection(currentVersion, "collection-1", featureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+            final XMLGregorianCalendar calendar;
+            try {
+                calendar = org.apache.sis.internal.jaxb.XmlUtilities.toXML(null, new Date());
+            } catch (DatatypeConfigurationException e) {
+                throw new CstlServiceException("Unable to create XMLGregorianCalendar from Date.");
+            }
+            return buildFeatureCollection(currentVersion, "collection-1", featureCollection.size(), calendar);
         }
         LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
         return new FeatureCollectionWrapper(featureCollection, schemaLocations, gmlVersion, currentVersion, (int)nbMatched);
@@ -796,7 +804,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         } else if (valueReference.isEmpty()) {
             throw new CstlServiceException("ValueReference must not be empty", INVALID_PARAMETER_VALUE, "valueReference");
         }
-        
+
         final String userLogin                     = getUserLogin();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
         final String currentVersion                = request.getVersion().toString();
@@ -862,7 +870,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     throw new CstlServiceException(ex);
                 }
                 final Filter cleanFilter = processFilter(ft, filter, aliases);
-                
+
                 // we ensure that the property names are contained in the feature type and add the mandatory attribute to the list
                 queryBuilder.setProperties(verifyPropertyNames(typeName, ft, requestPropNames));
                 queryBuilder.setFilter(cleanFilter);
@@ -899,7 +907,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
         LOGGER.log(logLevel, "GetPropertyValue request processed in {0} ms", (System.currentTimeMillis() - startTime));
         if (request.getResultType() == ResultTypeType.HITS) {
-            return buildValueCollection(currentVersion, featureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+            final XMLGregorianCalendar calendar;
+            try {
+                calendar = org.apache.sis.internal.jaxb.XmlUtilities.toXML(null, new Date());
+            } catch (DatatypeConfigurationException e) {
+                throw new CstlServiceException("Unable to create XMLGregorianCalendar from Date.");
+            }
+            return buildValueCollection(currentVersion, featureCollection.size(), calendar);
         }
         return new ValueCollectionWrapper(featureCollection, request.getValueReference(), "3.2.1");
     }

@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TimeZone;
+
+import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.storage.DataStoreException;
 
 import org.constellation.provider.LayerDetails;
@@ -34,11 +36,10 @@ import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
-import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.metadata.iso.citation.Citations;
 import org.geotoolkit.referencing.IdentifiedObjects;
-import org.geotoolkit.util.MeasurementRange;
+import org.apache.sis.measure.MeasurementRange;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 
 import org.opengis.feature.type.Name;
@@ -185,7 +186,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
 
         final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
         if (ranges != null && ranges.length > 0 && !ranges[0].toString().equals("")) {
-            builder.append("\t\t\t<unit>").append(ranges[0].getUnits().toString())
+            builder.append("\t\t\t<unit>").append(ranges[0].unit().toString())
                    .append("</unit>").append("\n");
         }
         builder.append("\t\t\t<value>").append(result)

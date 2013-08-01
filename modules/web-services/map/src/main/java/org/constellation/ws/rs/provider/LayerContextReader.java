@@ -58,14 +58,14 @@ public class LayerContextReader implements MessageBodyReader<LayerContext> {
                 JAXBContext cxtx = new JSONJAXBContext("org.constellation.configuration:" +
                         "org.constellation.generic.database:" +
                         "org.geotoolkit.ogc.xml.v110:" +
-                        "org.geotoolkit.internal.jaxb.geometry:" +
+                        "org.apache.sis.internal.jaxb.geometry:" +
                         "org.geotoolkit.gml.xml.v311");
                 JSONUnmarshaller jsonUnmarshaller = new JSONUnmarshallerImpl(cxtx, config);
                 context = jsonUnmarshaller.unmarshalFromJSON(entityStream, LayerContext.class);
             } else {
                 final Unmarshaller m = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 context = (LayerContext) m.unmarshal(entityStream);
-                GenericDatabaseMarshallerPool.getInstance().release(m);
+                GenericDatabaseMarshallerPool.getInstance().recycle(m);
             }
 
         } catch (JAXBException ex) {

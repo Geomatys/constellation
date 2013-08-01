@@ -155,7 +155,7 @@ public class SOSWorkerInitialisationTest {
 
         Marshaller marshaller = SOSMarshallerPool.getInstance().acquireMarshaller();
         marshaller.marshal(request, configFile);
-        SOSMarshallerPool.getInstance().release(marshaller);
+        SOSMarshallerPool.getInstance().recycle(marshaller);
         
         worker = new SOSworker("", configurationDirectory);
 
@@ -294,7 +294,7 @@ public class SOSWorkerInitialisationTest {
 
         assertTrue(exceptionLaunched);
         
-        GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+        GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
     }
 
 }

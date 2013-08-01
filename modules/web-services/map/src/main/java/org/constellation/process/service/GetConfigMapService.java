@@ -96,7 +96,7 @@ public class GetConfigMapService extends AbstractProcess {
                 try {
                     final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                     final Object obj = unmarshaller.unmarshal(configurationFile);
-                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                    GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
                     if (obj instanceof LayerContext) {
                         getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
                     } else {

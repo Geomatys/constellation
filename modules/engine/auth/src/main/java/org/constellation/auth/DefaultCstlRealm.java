@@ -42,7 +42,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.mdweb.io.auth.AuthenticationReader;
 import org.mdweb.io.auth.sql.v24.DataSourceAuthenticationReader;
 import org.mdweb.model.auth.UserAuthnInfo;

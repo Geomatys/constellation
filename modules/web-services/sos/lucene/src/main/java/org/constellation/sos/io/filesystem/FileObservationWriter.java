@@ -40,8 +40,8 @@ import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.util.logging.Logging;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.swe.xml.Phenomenon;
@@ -130,7 +130,7 @@ public class FileObservationWriter implements ObservationWriter {
             }
             
             marshaller.marshal(observation, observationFile);
-            MARSHALLER_POOL.release(marshaller);
+            MARSHALLER_POOL.recycle(marshaller);
             writePhenomenon((Phenomenon) observation.getObservedProperty());
             if (observation.getFeatureOfInterest() !=  null) {
                 writeFeatureOfInterest((SamplingFeature) observation.getFeatureOfInterest());
@@ -167,7 +167,7 @@ public class FileObservationWriter implements ObservationWriter {
             
             final Marshaller marshaller = MARSHALLER_POOL.acquireMarshaller();
             marshaller.marshal(observation, observationFile);
-            MARSHALLER_POOL.release(marshaller);
+            MARSHALLER_POOL.recycle(marshaller);
             
             writePhenomenon((Phenomenon) observation.getObservedProperty());
             if (observation.getFeatureOfInterest() !=  null) {
@@ -195,7 +195,7 @@ public class FileObservationWriter implements ObservationWriter {
                 }
                 final Marshaller marshaller = MARSHALLER_POOL.acquireMarshaller();
                 marshaller.marshal(phenomenon, phenomenonFile);
-                MARSHALLER_POOL.release(marshaller);
+                MARSHALLER_POOL.recycle(marshaller);
             }
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB exception while marshalling the phenomenon file.", ex, NO_APPLICABLE_CODE);
@@ -218,7 +218,7 @@ public class FileObservationWriter implements ObservationWriter {
                 }
                 final Marshaller marshaller = MARSHALLER_POOL.acquireMarshaller();
                 marshaller.marshal(foi, foiFile);
-                MARSHALLER_POOL.release(marshaller);
+                MARSHALLER_POOL.recycle(marshaller);
             }
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB exception while marshalling the feature of interest file.", ex, NO_APPLICABLE_CODE);
@@ -244,7 +244,7 @@ public class FileObservationWriter implements ObservationWriter {
             }
             final Marshaller marshaller = MARSHALLER_POOL.acquireMarshaller();
             marshaller.marshal(offering, offeringFile);
-            MARSHALLER_POOL.release(marshaller);
+            MARSHALLER_POOL.recycle(marshaller);
             return offering.getId();
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB exception while marshalling the offering file.", ex, NO_APPLICABLE_CODE);

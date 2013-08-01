@@ -39,7 +39,7 @@ public class CSWServiceConfiguration implements ServiceConfiguration {
             try {
                 final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
             } catch (JAXBException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
@@ -54,7 +54,7 @@ public class CSWServiceConfiguration implements ServiceConfiguration {
             try {
                 Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
                 if (obj instanceof Automatic) {
                     return obj;
                 } else {

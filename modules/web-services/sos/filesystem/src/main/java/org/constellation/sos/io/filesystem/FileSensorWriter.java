@@ -35,8 +35,8 @@ import org.constellation.sos.factory.SMLFactory;
 
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -94,9 +94,8 @@ public class FileSensorWriter implements SensorWriter {
      */
     @Override
     public boolean writeSensor(String id, final AbstractSensorML sensor) throws CstlServiceException {
-        Marshaller marshaller = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            final Marshaller marshaller = marshallerPool.acquireMarshaller();
             id = id.replace(":", "-");
             final File currentFile = new File(dataDirectory, id + ".xml");
             if (!currentFile.exists()) {
@@ -108,6 +107,7 @@ public class FileSensorWriter implements SensorWriter {
                 LOGGER.log(Level.WARNING, "we overwrite the file: {0}", currentFile.getPath());
             }
             marshaller.marshal(sensor, currentFile);
+            marshallerPool.recycle(marshaller);
         } catch (JAXBException ex) {
             String msg = ex.getMessage();
             if (msg == null && ex.getCause() != null) {
@@ -122,10 +122,6 @@ public class FileSensorWriter implements SensorWriter {
             }
             throw new CstlServiceException("the service has throw a IO Exception:" + msg,
                                            ex, NO_APPLICABLE_CODE);
-        } finally {
-            if (marshaller != null) {
-                marshallerPool.release(marshaller);
-            }
         }
         return true;
     }
@@ -153,12 +149,12 @@ public class FileSensorWriter implements SensorWriter {
      */
     @Override
     public int replaceSensor(String id, final AbstractSensorML sensor) throws CstlServiceException {
-        Marshaller marshaller = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            final Marshaller marshaller = marshallerPool.acquireMarshaller();
             id = id.replace(":", "-");
             final File currentFile = new File(dataDirectory, id + ".xml");
             marshaller.marshal(sensor, currentFile);
+            marshallerPool.recycle(marshaller);
             return 1;//AbstractMetadataWriter.REPLACED;
         } catch (JAXBException ex) {
             String msg = ex.getMessage();
@@ -167,10 +163,6 @@ public class FileSensorWriter implements SensorWriter {
             }
             throw new CstlServiceException("the service has throw a JAXB Exception:" + msg,
                                            ex, NO_APPLICABLE_CODE);
-        } finally {
-            if (marshaller != null) {
-                marshallerPool.release(marshaller);
-            }
         }
     }
 

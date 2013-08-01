@@ -31,7 +31,7 @@ import org.constellation.generic.database.BDD;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.postgresql.ds.PGConnectionPoolDataSource;
 import org.geotoolkit.jdbc.WrappedDataSource;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *

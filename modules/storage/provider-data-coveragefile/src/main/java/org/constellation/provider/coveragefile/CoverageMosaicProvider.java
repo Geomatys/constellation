@@ -35,7 +35,7 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
 

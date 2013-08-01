@@ -34,7 +34,7 @@ import javax.xml.bind.Marshaller;
 import org.constellation.writer.ExceptionFilterWriter;
 import org.geotoolkit.ows.xml.ExceptionResponse;
 import org.geotoolkit.ows.xml.ExceptionReportMarshallerPool;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -98,7 +98,7 @@ public class ExceptionReportWriter<T extends ExceptionResponse> implements Messa
                 throw new IllegalArgumentException("unexpected type:" + t.getClass().getName());
             }
             m.marshal(t, out);
-            ExceptionReportMarshallerPool.getInstance().release(m);
+            ExceptionReportMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the exception report", ex);
         }

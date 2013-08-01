@@ -54,7 +54,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 

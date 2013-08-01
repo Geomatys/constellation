@@ -110,7 +110,7 @@ import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.sld.xml.GetLegendGraphic;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleUtilities;
-import org.geotoolkit.util.MeasurementRange;
+import org.apache.sis.measure.MeasurementRange;
 import org.geotoolkit.util.PeriodUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
@@ -127,7 +127,7 @@ import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
 import org.geotoolkit.wms.xml.DescribeLayer;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.referencing.crs.AbstractSingleCRS;
 import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
@@ -218,7 +218,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             try {
                 final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 mapPortrayal = (WMSPortrayal) unmarshaller.unmarshal(portrayalFile);
-                marshallerPool.release(unmarshaller);
+                marshallerPool.recycle(unmarshaller);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -417,10 +417,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
              */
             if (ranges != null && ranges.length == 1 && ranges[0] != null) {
                 final MeasurementRange<?> firstRange = ranges[0];
-                final double minRange = firstRange.getMinimum();
-                final double maxRange = firstRange.getMaximum();
+                final double minRange = firstRange.getMinDouble();
+                final double maxRange = firstRange.getMaxDouble();
                 final String defaut = minRange + "," + maxRange;
-                final Unit<?> u = firstRange.getUnits();
+                final Unit<?> u = firstRange.unit();
                 final String unit = (u != null) ? u.toString() : null;
                 String unitSymbol;
                 try {

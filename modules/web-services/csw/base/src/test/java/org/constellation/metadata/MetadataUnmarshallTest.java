@@ -41,6 +41,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // Junit dependencies
+import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -50,48 +51,47 @@ import org.constellation.util.Util;
 // geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
-import org.geotoolkit.internal.jaxb.gmx.Anchor;
-import org.geotoolkit.internal.jaxb.gml.GMLAdapter;
+import org.apache.sis.internal.jaxb.metadata.ReferenceSystemMetadata;
+import org.apache.sis.internal.jaxb.gmx.Anchor;
+import org.apache.sis.internal.jaxb.gml.GMLAdapter;
 import org.geotoolkit.internal.referencing.VerticalDatumTypes;
-import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.metadata.iso.DefaultMetadataExtensionInformation;
-import org.geotoolkit.metadata.iso.citation.DefaultAddress;
-import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
-import org.geotoolkit.metadata.iso.citation.DefaultCitation;
+import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.DefaultMetadataExtensionInformation;
+import org.apache.sis.metadata.iso.citation.DefaultAddress;
+import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
+import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.geotoolkit.metadata.iso.citation.DefaultContact;
 import org.geotoolkit.metadata.iso.citation.DefaultOnlineResource;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
-import org.geotoolkit.metadata.iso.citation.DefaultTelephone;
-import org.geotoolkit.metadata.iso.constraint.DefaultLegalConstraints;
-import org.geotoolkit.metadata.iso.content.DefaultImageDescription;
-import org.geotoolkit.metadata.iso.distribution.DefaultDigitalTransferOptions;
-import org.geotoolkit.metadata.iso.distribution.DefaultDistribution;
-import org.geotoolkit.metadata.iso.distribution.DefaultDistributor;
-import org.geotoolkit.metadata.iso.distribution.DefaultFormat;
-import org.geotoolkit.metadata.iso.extent.DefaultExtent;
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
-import org.geotoolkit.metadata.iso.extent.DefaultTemporalExtent;
-import org.geotoolkit.metadata.iso.extent.DefaultVerticalExtent;
-import org.geotoolkit.metadata.iso.identification.DefaultAggregateInformation;
-import org.geotoolkit.metadata.iso.identification.DefaultBrowseGraphic;
-import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
-import org.geotoolkit.metadata.iso.identification.DefaultKeywords;
-import org.geotoolkit.metadata.iso.spatial.DefaultGeometricObjects;
-import org.geotoolkit.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
-import org.geotoolkit.referencing.DefaultReferenceIdentifier;
+import org.apache.sis.metadata.iso.citation.DefaultTelephone;
+import org.apache.sis.metadata.iso.constraint.DefaultLegalConstraints;
+import org.apache.sis.metadata.iso.content.DefaultImageDescription;
+import org.apache.sis.metadata.iso.distribution.DefaultDigitalTransferOptions;
+import org.apache.sis.metadata.iso.distribution.DefaultDistribution;
+import org.apache.sis.metadata.iso.distribution.DefaultDistributor;
+import org.apache.sis.metadata.iso.distribution.DefaultFormat;
+import org.apache.sis.metadata.iso.extent.DefaultExtent;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.metadata.iso.extent.DefaultTemporalExtent;
+import org.apache.sis.metadata.iso.extent.DefaultVerticalExtent;
+import org.apache.sis.metadata.iso.identification.DefaultAggregateInformation;
+import org.apache.sis.metadata.iso.identification.DefaultBrowseGraphic;
+import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
+import org.apache.sis.metadata.iso.identification.DefaultKeywords;
+import org.apache.sis.metadata.iso.spatial.DefaultGeometricObjects;
+import org.apache.sis.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
 import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DefaultVerticalCS;
 import org.geotoolkit.referencing.datum.DefaultVerticalDatum;
 import org.geotoolkit.temporal.object.TemporalUtilities;
-import org.geotoolkit.util.SimpleInternationalString;
+import org.apache.sis.util.iso.SimpleInternationalString;
 
 // GeoAPI dependencies
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.citation.CitationDate;
@@ -138,11 +138,11 @@ public class MetadataUnmarshallTest {
     @After
     public void releaseMarshallers() {
         if (marshaller != null) {
-            testPool.release(marshaller);
+            testPool.recycle(marshaller);
             marshaller = null;
         }
         if (unmarshaller != null) {
-            testPool.release(unmarshaller);
+            testPool.recycle(unmarshaller);
             unmarshaller = null;
         }
     }
@@ -238,11 +238,11 @@ public class MetadataUnmarshallTest {
         set.add(new SimpleInternationalString("L101"));
         RScitation.setAlternateTitles(set);
         set = new HashSet();
-        set.add(new DefaultReferenceIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
+        set.add(new ImmutableIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
         RScitation.setIdentifiers(set);
         RScitation.setEdition(new Anchor(new URI("SDN:C371:1:2"),"2"));
 
-        DefaultReferenceIdentifier Nidentifier = new DefaultReferenceIdentifier(RScitation, "L101", code);
+        ImmutableIdentifier Nidentifier = new ImmutableIdentifier(RScitation, "L101", code);
         ReferenceSystemMetadata rs = new ReferenceSystemMetadata(Nidentifier);
         set = new HashSet();
         set.add(rs);
@@ -543,7 +543,7 @@ public class MetadataUnmarshallTest {
         }
 
         // vertical datum
-        DefaultReferenceIdentifier datumID = new DefaultReferenceIdentifier(null, null, "D28");
+        ImmutableIdentifier datumID = new ImmutableIdentifier(null, null, "D28");
         DefaultVerticalCRS vcrs = null;
 
         Map<String, Object> prop = new HashMap<String, Object>();
@@ -556,17 +556,17 @@ public class MetadataUnmarshallTest {
         HashMap<String, Object> propCoo = new HashMap<String, Object>();
 
 
-        propCoo.put(DefaultCoordinateSystemAxis.NAME_KEY, new DefaultReferenceIdentifier(null, null, "meters"));
+        propCoo.put(DefaultCoordinateSystemAxis.NAME_KEY, new ImmutableIdentifier(null, null, "meters"));
 //        propCoo.put(DefaultCoordinateSystemAxis.ALIAS_KEY, "");
         DefaultCoordinateSystemAxis axis = new DefaultCoordinateSystemAxis(propCoo, "meters", AxisDirection.DOWN, Unit.valueOf("m"));
 
         HashMap<String,Object> csProp = new HashMap<String, Object>();
-        DefaultReferenceIdentifier i = new DefaultReferenceIdentifier(null, null, "meters");
+        ImmutableIdentifier i = new ImmutableIdentifier(null, null, "meters");
         csProp.put(DefaultVerticalCRS.NAME_KEY, i);
         DefaultVerticalCS cs = new DefaultVerticalCS(csProp, axis);
 
         prop = new HashMap<String, Object>();
-        DefaultReferenceIdentifier idVert = new DefaultReferenceIdentifier(null, null, "idvertCRS");
+        ImmutableIdentifier idVert = new ImmutableIdentifier(null, null, "idvertCRS");
         prop.put(DefaultVerticalCRS.NAME_KEY, idVert);
         prop.put(DefaultVerticalCRS.SCOPE_KEY, null);
         //prop.put(DefaultVerticalCRS.ALIAS_KEY, DefaultCoordinateSystemAxis.UNDEFINED.getAlias());
@@ -958,7 +958,7 @@ public class MetadataUnmarshallTest {
         citation.setDates(set);
         citation.setEdition(new Anchor(URI.create("SDN:C371:1:35"), version));
         set = new HashSet();
-        set.add(new DefaultReferenceIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
+        set.add(new ImmutableIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
         citation.setIdentifiers(set);
         keyword.setThesaurusName(citation);
 
@@ -1077,11 +1077,11 @@ public class MetadataUnmarshallTest {
         set.add(new SimpleInternationalString("L101"));
         RScitation.setAlternateTitles(set);
         set = new HashSet();
-        set.add(new DefaultReferenceIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
+        set.add(new ImmutableIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
         RScitation.setIdentifiers(set);
         RScitation.setEdition(new Anchor(new URI("SDN:C371:1:2"),"2"));
 
-        DefaultReferenceIdentifier Nidentifier = new DefaultReferenceIdentifier(RScitation, "L101", code);
+        ImmutableIdentifier Nidentifier = new ImmutableIdentifier(RScitation, "L101", code);
         ReferenceSystemMetadata rs = new ReferenceSystemMetadata(Nidentifier);
         set = new HashSet();
         set.add(rs);
@@ -1362,7 +1362,8 @@ public class MetadataUnmarshallTest {
         DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
         DefaultInstant end = new DefaultInstant(new DefaultPosition(stop));*/
         TimePeriodType period = new TimePeriodType(null, "1990-06-05", "1990-07-02");
-        GMLAdapter.IDs.setUUID(period, "extent");
+// (31/07/13: GMLAdapter.IDs has disappeared)
+//        GMLAdapter.IDs.setUUID(period, "extent");
         tempExtent.setExtent(period);
 
         set = new HashSet();

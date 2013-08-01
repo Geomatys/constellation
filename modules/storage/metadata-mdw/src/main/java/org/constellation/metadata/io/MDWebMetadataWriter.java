@@ -35,18 +35,18 @@ import javax.xml.bind.JAXBElement;
 
 // constellation dependencies
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.apache.sis.metadata.iso.extent.DefaultGeographicDescription;
+import org.apache.sis.util.iso.DefaultInternationalString;
+import org.apache.sis.xml.IdentifiedObject;
+import org.apache.sis.xml.IdentifierSpace;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
-import org.geotoolkit.metadata.iso.MetadataEntity;
 
 // Geotoolkit dependencies
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription;
-import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.xml.IdentifierSpace;
-import org.geotoolkit.xml.IdentifiedObject;
 import org.apache.sis.xml.XLink;
 import org.apache.sis.xml.XLink.Type;
 

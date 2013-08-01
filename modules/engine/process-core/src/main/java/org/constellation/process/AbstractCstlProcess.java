@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 import org.geotoolkit.io.X364;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**

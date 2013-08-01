@@ -71,7 +71,7 @@ import org.constellation.ws.WSEngine;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 
@@ -150,9 +150,7 @@ public final class ConfigurationService extends WebService  {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) {
-        Marshaller marshaller = null;
         try {
-            marshaller = getMarshallerPool().acquireMarshaller();
             final String request = getParameter("REQUEST", true);
 
             for (AbstractConfigurer configurer: configurers) {
@@ -230,11 +228,6 @@ public final class ConfigurationService extends WebService  {
                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
 
 
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "Error while marshalling the configuration service response", ex);
-            final AcknowlegementType response = new AcknowlegementType("Error", "JAXB Exception");
-            return Response.ok(response).build();
-
         } catch (CstlServiceException ex) {
             final String code = StringUtilities.transformCodeName(ex.getExceptionCode().name());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code);
@@ -247,12 +240,7 @@ public final class ConfigurationService extends WebService  {
             }
             return Response.ok(report).build();
 
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
         }
-
     }
 
     /**

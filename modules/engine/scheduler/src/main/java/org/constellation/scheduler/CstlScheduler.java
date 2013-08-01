@@ -35,7 +35,7 @@ import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.process.ProcessFinder;
 
 import org.geotoolkit.process.ProcessingRegistry;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.opengis.feature.type.Name;
 
 import org.quartz.Scheduler;

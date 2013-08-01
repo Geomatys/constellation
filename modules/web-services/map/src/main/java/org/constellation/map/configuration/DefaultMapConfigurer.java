@@ -429,7 +429,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                                         final File configurationFile =  new File(instanceDirectory, "layerContext.xml");
                                         final Marshaller marshaller  = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                                         marshaller.marshal(configuration, configurationFile);
-                                        GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                                        GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
                                     } catch (JAXBException ex) {
                                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                                     }

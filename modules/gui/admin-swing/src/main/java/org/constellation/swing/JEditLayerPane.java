@@ -39,7 +39,7 @@ import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.opengis.filter.Filter;
 import org.opengis.util.FactoryException;

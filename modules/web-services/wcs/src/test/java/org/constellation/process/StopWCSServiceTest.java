@@ -43,17 +43,13 @@ public class StopWCSServiceTest extends StopServiceTest {
 
         final File configFile = new File(instance, "layerContext.xml");
         final LayerContext configuration = new LayerContext();
-        Marshaller marshaller = null;
         try {
-            marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+            Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
+            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
 
         } catch (JAXBException ex) {
             //
-        } finally {
-            if (marshaller != null) {
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-            }
         }
     }
 

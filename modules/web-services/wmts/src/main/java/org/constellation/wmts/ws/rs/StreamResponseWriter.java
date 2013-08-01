@@ -17,7 +17,6 @@
 
 package org.constellation.wmts.ws.rs;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.annotation.Annotation;
@@ -29,17 +28,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
-import javax.imageio.ImageWriter;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+
+import org.apache.commons.io.IOUtils;
 import org.geotoolkit.coverage.TileReference;
-import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.util.ImageIOUtilities;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -103,7 +102,7 @@ public class StreamResponseWriter implements MessageBodyWriter<TileReference>  {
         }
         
         try {
-            IOUtilities.copy(stream, out);
+            IOUtils.copy(stream, out);
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         } finally {

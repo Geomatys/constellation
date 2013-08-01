@@ -18,7 +18,8 @@ package org.constellation.test;
 
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
-import org.geotoolkit.test.xml.DomComparator;
+
+import org.apache.sis.test.XMLComparator;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -26,7 +27,7 @@ import org.xml.sax.SAXException;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class CstlDOMComparator extends DomComparator {
+public class CstlDOMComparator extends XMLComparator {
 
     public CstlDOMComparator(final Node expected, final Node actual) {
         super(expected, actual);

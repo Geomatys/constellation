@@ -41,7 +41,7 @@ public class SOSServiceConfiguration implements ServiceConfiguration {
             try {
                 Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
             } catch(JAXBException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
@@ -56,7 +56,7 @@ public class SOSServiceConfiguration implements ServiceConfiguration {
             try {
                 final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 final Object obj = unmarshaller.unmarshal(configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
                 if (obj instanceof SOSConfiguration) {
                     return obj;
                 } else {

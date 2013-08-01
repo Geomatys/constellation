@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import org.constellation.configuration.ConfigDirectory;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 

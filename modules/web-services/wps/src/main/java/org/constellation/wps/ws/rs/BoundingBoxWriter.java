@@ -31,9 +31,9 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 /**
  *
@@ -60,7 +60,7 @@ public class BoundingBoxWriter<T extends BoundingBoxType> implements MessageBody
         try {
             final Marshaller m = WPSMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
-            WPSMarshallerPool.getInstance().release(m);
+            WPSMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the feature collection", ex);
         }

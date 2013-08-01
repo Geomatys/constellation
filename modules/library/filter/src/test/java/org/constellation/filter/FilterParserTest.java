@@ -39,7 +39,7 @@ import org.geotoolkit.ogc.xml.v110.LowerBoundaryType;
 import org.geotoolkit.ogc.xml.v110.ObjectFactory;
 import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -390,7 +390,7 @@ public class FilterParserTest {
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "(CloudCover:{12 TO 2147483648} AND objectType:\"MD_Metadata\")");
 
-        pool.release(filterUnmarshaller);
+        pool.recycle(filterUnmarshaller);
     }
 
     @Test
@@ -487,7 +487,7 @@ public class FilterParserTest {
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "(identifier:(*chain_acq_1*) AND objectType:\"MD_Metadata\")");
         
-        pool.release(filterUnmarshaller);
+        pool.recycle(filterUnmarshaller);
     }
 
     /**
@@ -724,7 +724,7 @@ public class FilterParserTest {
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.AND);
         assertEquals(spaQuery.getSubQueries().get(0).getQuery(),"CreationDate:[\"20070602000000\" 30000101000000]"); 
         assertEquals(spaQuery.getSubQueries().get(0).getLogicalOperator(), SerialChainFilter.NOT);
-        pool.release(filterUnmarshaller);
+        pool.recycle(filterUnmarshaller);
     }
 
 
@@ -843,7 +843,7 @@ public class FilterParserTest {
 
         assertTrue(spatialFilter.getOGCFilter() instanceof Intersects);
 
-        pool.release(filterUnmarshaller);
+        pool.recycle(filterUnmarshaller);
     }
 
     /**
@@ -1038,7 +1038,7 @@ public class FilterParserTest {
         }
         assertTrue(error);
 
-        pool.release(filterUnmarshaller);
+        pool.recycle(filterUnmarshaller);
     }
 
     /**
@@ -1384,7 +1384,7 @@ public class FilterParserTest {
         f2 = (LuceneOGCFilter) chainFilter.getChain().get(1);
         assertTrue(f2.getOGCFilter() instanceof BBOX);
 
-        pool.release(filterUnmarshaller);
+        pool.recycle(filterUnmarshaller);
     }
 
     /**
@@ -2003,7 +2003,7 @@ public class FilterParserTest {
 
         assertTrue (spaFilter.getOGCFilter() instanceof  DWithin);
 
-        pool.release(filterUnmarshaller);
+        pool.recycle(filterUnmarshaller);
     }
 
 

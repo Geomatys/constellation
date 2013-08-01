@@ -36,7 +36,7 @@ import org.glassfish.grizzly.http.server.HttpServer;
 
 import org.geotoolkit.console.CommandLine;
 import org.geotoolkit.console.Option;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  * An Abstract class to run the web service in an embedded container.

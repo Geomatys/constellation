@@ -44,7 +44,7 @@ import static org.constellation.sos.ws.SOSConstants.*;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;

@@ -65,7 +65,7 @@ import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
 import org.geotoolkit.swe.xml.v101.TimeType;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import static org.constellation.sos.ws.SOSConstants.*;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.observation.xml.v100.MeasureType;
@@ -101,7 +101,7 @@ public abstract class SOSWorkerTest {
         marshallerPool = SOSMarshallerPool.getInstance();
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         capabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
     
     public abstract void initWorker();
@@ -359,7 +359,7 @@ public abstract class SOSWorkerTest {
 
         MetadataUtilities.componentEquals(expResult, result);
 
-        SensorMLMarshallerPool.getInstance().release(unmarshaller);
+        SensorMLMarshallerPool.getInstance().recycle(unmarshaller);
     }
 
     /**
@@ -1458,7 +1458,7 @@ public abstract class SOSWorkerTest {
         assertEquals(collExpResult, result);
 
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
      /**
@@ -1609,7 +1609,7 @@ public abstract class SOSWorkerTest {
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     
@@ -1648,7 +1648,7 @@ public abstract class SOSWorkerTest {
         assertEquals(expResult.getSamplingTime(), result.getSamplingTime());
         assertEquals(expResult, result);
         
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
     
     /**
@@ -2102,7 +2102,7 @@ public abstract class SOSWorkerTest {
         assertEquals(expResult.getResult(), result.getResult());
         assertEquals(expResult, result);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
 
     }
 
@@ -2164,7 +2164,7 @@ public abstract class SOSWorkerTest {
         assertEquals(expResult.getResult(), result.getResult());
         assertEquals(expResult, result);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     /**
@@ -2211,7 +2211,7 @@ public abstract class SOSWorkerTest {
 
         assertTrue(exLaunched);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     /**
@@ -2253,7 +2253,7 @@ public abstract class SOSWorkerTest {
 
         MetadataUtilities.systemSMLEquals(expResult, result);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     /**
@@ -2358,7 +2358,7 @@ public abstract class SOSWorkerTest {
 
 
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
     /**
      * Tests the destroy method

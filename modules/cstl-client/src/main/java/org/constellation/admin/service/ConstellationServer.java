@@ -43,8 +43,8 @@ import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
@@ -1525,11 +1525,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         Object response = null;
         readSessionId(conec);
-        Unmarshaller unmarshaller = null;
         try {
-            unmarshaller = unmarshallerPool.acquireUnmarshaller();
+            final Unmarshaller unmarshaller = unmarshallerPool.acquireUnmarshaller();
             final InputStream responseStream = AbstractRequest.openRichException(conec, getClientSecurity());
             response = unmarshaller.unmarshal(responseStream);
+            unmarshallerPool.recycle(unmarshaller);
             if (response instanceof JAXBElement) {
                 JAXBElement element = (JAXBElement) response;
                 if (element.getName().equals(ObjectFactory.SOURCE_QNAME)
@@ -1542,17 +1542,12 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     response = ((JAXBElement) response).getValue();
                 }
             }
-
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read xml response document.\ncause: {0}", ex.getMessage());
         } catch (IllegalAccessError ex) {
             LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
-        } finally {
-            if (unmarshaller != null) {
-                unmarshallerPool.release(unmarshaller);
-            }
         }
         return response;
     }
@@ -1630,16 +1625,12 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 in.close();
             }
         } else {
-            Marshaller marshaller = null;
             try {
-                marshaller = POOL.acquireMarshaller();
+                final Marshaller marshaller = POOL.acquireMarshaller();
                 marshaller.marshal(request, conec.getOutputStream());
+                POOL.recycle(marshaller);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
-            } finally {
-                if (marshaller != null) {
-                    POOL.release(marshaller);
-                }
             }
         }
     }
@@ -1668,16 +1659,12 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
                 conec.setDoOutput(true);
                 conec.setRequestProperty("Content-Type", "text/xml");
-                Marshaller marshaller = null;
                 try {
-                    marshaller = POOL.acquireMarshaller();
+                    final Marshaller marshaller = POOL.acquireMarshaller();
                     marshaller.marshal(request, conec.getOutputStream());
+                    POOL.recycle(marshaller);
                 } catch (JAXBException ex) {
                     LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
-                } finally {
-                    if (marshaller != null) {
-                        POOL.release(marshaller);
-                    }
                 }
 
             }

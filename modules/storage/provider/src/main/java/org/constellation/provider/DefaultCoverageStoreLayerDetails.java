@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
+
+import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
@@ -38,7 +40,6 @@ import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
-import org.geotoolkit.util.MeasurementRange;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.geometry.Envelope;

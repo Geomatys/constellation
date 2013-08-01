@@ -60,8 +60,8 @@ import org.geotoolkit.csw.xml.v202.TransactionType;
 @WebService(name = "CSWService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 @BindingType(value="http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
-@XmlSeeAlso({org.geotoolkit.metadata.iso.DefaultMetadata.class,
-             org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class,
+@XmlSeeAlso({org.apache.sis.metadata.iso.DefaultMetadata.class,
+             org.apache.sis.internal.jaxb.geometry.ObjectFactory.class,
              org.geotoolkit.metadata.fra.FRA_Constraints.class,
              org.geotoolkit.metadata.fra.FRA_DataIdentification.class,
              org.geotoolkit.metadata.fra.FRA_DirectReferenceSystem.class,

@@ -368,7 +368,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
                         }
                     }
                 }
-                GenericDatabaseMarshallerPool.getInstance().release(configUnmarshaller);
+                GenericDatabaseMarshallerPool.getInstance().recycle(configUnmarshaller);
 
             } catch (JAXBException ex) {
                 throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service", ex.getMessage());
@@ -600,7 +600,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             for (File importedFile: files) {
                 if (importedFile != null) {
                     Object unmarshalled = u.unmarshal(importedFile);
-                    EBRIMMarshallerPool.getInstance().release(u);
+                    EBRIMMarshallerPool.getInstance().recycle(u);
                     if (unmarshalled instanceof JAXBElement) {
                         unmarshalled = ((JAXBElement)unmarshalled).getValue();
                     }

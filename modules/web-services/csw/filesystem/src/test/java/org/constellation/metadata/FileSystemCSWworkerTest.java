@@ -77,14 +77,14 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             configuration.putParameter("shiroAccessible", "false");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
         }
 
         pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         Unmarshaller u = pool.acquireUnmarshaller();
-        pool.release(u);
+        pool.recycle(u);
 
         worker = new CSWworker("", configDir);
         worker.setLogLevel(Level.FINER);

@@ -31,7 +31,7 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 
@@ -60,7 +60,7 @@ public class SchemaWriter<T extends Schema> implements MessageBodyWriter<T>  {
         try {
             final Marshaller m = XSDMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
-            XSDMarshallerPool.getInstance().release(m);
+            XSDMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the WFS Schema response", ex);
         } 

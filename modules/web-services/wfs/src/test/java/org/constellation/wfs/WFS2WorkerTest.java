@@ -92,7 +92,7 @@ import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v200.*;
 import org.geotoolkit.wfs.xml.v200.Title;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
@@ -184,7 +184,7 @@ public class WFS2WorkerTest {
             File configFile = new File(configDir, "layerContext.xml");
             marshaller.marshal(lc, configFile);
 
-            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
 
             final List<StoredQueryDescription> descriptions = new ArrayList<StoredQueryDescription>();
             final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
@@ -201,7 +201,7 @@ public class WFS2WorkerTest {
             marshaller = WFSMarshallerPool.getInstance().acquireMarshaller();
             configFile = new File(configDir, "StoredQueries.xml");
             marshaller.marshal(storesQueries, configFile);
-            WFSMarshallerPool.getInstance().release(marshaller);
+            WFSMarshallerPool.getInstance().recycle(marshaller);
 
         }
 
@@ -355,7 +355,7 @@ public class WFS2WorkerTest {
         domCompare(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0.xml"),
                 sw.toString());
 
-        pool.release(marshaller);
+        pool.recycle(marshaller);
     }
 
      /**
@@ -1438,7 +1438,7 @@ public class WFS2WorkerTest {
         }
         assertEquals(ExpResult, result);
 
-        XSDMarshallerPool.getInstance().release(unmarshaller);
+        XSDMarshallerPool.getInstance().recycle(unmarshaller);
     }
 
     /**

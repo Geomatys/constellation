@@ -61,8 +61,8 @@ import org.constellation.xml.PrefixMappingInvocationHandler;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotoolkit dependencies
-import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.opengis.util.CodeList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -326,7 +326,7 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
             if (request instanceof JAXBElement) {
                 request = ((JAXBElement) request).getValue();
             }
-            marshallerPool.release(ummarshaller);
+            marshallerPool.recycle(ummarshaller);
             
             final Object result = treatIncomingRequest(request, worker);
             
@@ -334,7 +334,7 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
             final DocumentBuilderFactory dfactory = DocumentBuilderFactory.newInstance();
             final Document resultNode             = dfactory.newDocumentBuilder().newDocument();
             m.marshal(result, resultNode);
-            marshallerPool.release(m);
+            marshallerPool.recycle(m);
             
             final MessageFactory factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
             final SOAPMessage response = factory.createMessage();

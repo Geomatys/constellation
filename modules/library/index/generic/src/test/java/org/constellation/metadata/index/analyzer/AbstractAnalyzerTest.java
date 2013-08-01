@@ -22,13 +22,14 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.opengis.filter.FilterFactory2;
 
 /**
@@ -94,7 +95,7 @@ public abstract class AbstractAnalyzerTest {
         } else {
             throw new IllegalArgumentException("resource file must be DefaultMetadata:" + obj);
         }
-        CSWMarshallerPool.getInstance().release(unmarshaller);
+        CSWMarshallerPool.getInstance().recycle(unmarshaller);
         return result;
     }
 }

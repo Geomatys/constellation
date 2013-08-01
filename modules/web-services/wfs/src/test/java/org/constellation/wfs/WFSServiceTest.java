@@ -20,8 +20,8 @@ package org.constellation.wfs;
 import org.constellation.configuration.Layers;
 import java.util.Arrays;
 import org.constellation.configuration.Source;
-import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 import java.io.IOException;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.util.Util;
@@ -103,7 +103,7 @@ public class WFSServiceTest {
 
         Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
         m.marshal(context, LayerContext);
-        GenericDatabaseMarshallerPool.getInstance().release(m);
+        GenericDatabaseMarshallerPool.getInstance().recycle(m);
 
         ConfigDirectory.setConfigDirectory(configDirectory);
         service = new WFSService();

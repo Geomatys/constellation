@@ -64,7 +64,7 @@ import org.geotoolkit.swes.xml.InsertSensorResponse;
 import org.geotoolkit.swes.xml.v200.InsertSensorType;
 import org.geotoolkit.swes.xml.v200.DescribeSensorType;
 import org.geotoolkit.swes.xml.v200.InsertSensorResponseType;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -110,7 +110,7 @@ public abstract class SOS2WorkerTest {
         marshallerPool = SOSMarshallerPool.getInstance();
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         capabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
     
     public abstract void initWorker();
@@ -368,7 +368,7 @@ public abstract class SOS2WorkerTest {
 
         MetadataUtilities.componentEquals(expResult, result);
 
-        SensorMLMarshallerPool.getInstance().release(unmarshaller);
+        SensorMLMarshallerPool.getInstance().recycle(unmarshaller);
     }
 
     /**
@@ -983,7 +983,7 @@ public abstract class SOS2WorkerTest {
         assertEquals(collExpResult, result);
 
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     /**
@@ -1071,7 +1071,7 @@ public abstract class SOS2WorkerTest {
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     public void GetObservationByIdTest() throws Exception {
@@ -1097,7 +1097,7 @@ public abstract class SOS2WorkerTest {
         
         assertEquals(expResult.getResult(), result.getResult());
         assertEquals(expResult, result);
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
     
     /**
@@ -1140,7 +1140,7 @@ public abstract class SOS2WorkerTest {
 
         assertTrue(exLaunched);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
     
     /**
@@ -1183,7 +1183,7 @@ public abstract class SOS2WorkerTest {
         MetadataUtilities.systemSMLEquals(expResult, result);
 
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
     
     public void DeleteSensorTest() throws Exception {
@@ -1313,7 +1313,7 @@ public abstract class SOS2WorkerTest {
 
 
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
     
     public void GetFeatureOfInterestObservedPropertiesTest() throws Exception {
@@ -1349,7 +1349,7 @@ public abstract class SOS2WorkerTest {
         sf1 = (SFSpatialSamplingFeatureType) collection.getFeatureMember().get(0).getAbstractFeature();
         assertEquals("station-006", sf1.getId());
         
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     /**
@@ -1572,7 +1572,7 @@ public abstract class SOS2WorkerTest {
         assertEquals(expResult.getResultValues(), result.getResultValues());
         assertEquals(expResult, result);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
 
     }
     
@@ -1626,7 +1626,7 @@ public abstract class SOS2WorkerTest {
         assertEquals(expResult.getResultValues(), result.getResultValues());
         assertEquals(expResult, result);
 
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
     
     /**
@@ -1686,7 +1686,7 @@ public abstract class SOS2WorkerTest {
 
         Marshaller marshaller = marshallerPool.acquireMarshaller();
         marshaller.marshal(obsResult, System.out);
-        marshallerPool.release(marshaller);
+        marshallerPool.recycle(marshaller);
         
         assertTrue(obsResult != null);
         obsResult.setName(null);
@@ -1772,7 +1772,7 @@ public abstract class SOS2WorkerTest {
         }
         assertTrue(exLaunched);
         
-        marshallerPool.release(unmarshaller);
+        marshallerPool.recycle(unmarshaller);
     }
 
     /**

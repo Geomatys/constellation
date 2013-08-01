@@ -42,7 +42,7 @@ import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.ws.CstlServiceException;
 
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -134,7 +134,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
             } else {
                 throw new CstlServiceException("Unable to find affinage.xml", NO_APPLICABLE_CODE);
             }
-            GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+            GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXBException in Generic Observation Filter constructor", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {

@@ -24,7 +24,7 @@ import javax.servlet.ServletContextListener;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.internal.io.Installation;
 import org.geotoolkit.lang.Setup;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  * Class responsible for starting and stopping geotoolkit.

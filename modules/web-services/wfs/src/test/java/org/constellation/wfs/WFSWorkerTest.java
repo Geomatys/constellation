@@ -87,7 +87,7 @@ import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.ValueType;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
@@ -141,7 +141,7 @@ public class WFSWorkerTest {
             File configFile = new File(configDir, "layerContext.xml");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(lc, configFile);
-            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
         }
 
         worker = new DefaultWFSWorker("default", configDir);
@@ -281,7 +281,7 @@ public class WFSWorkerTest {
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml"),
                 sw.toString());
 
-        pool.release(marshaller);
+        pool.recycle(marshaller);
     }
 
     /**
@@ -1067,7 +1067,7 @@ public class WFSWorkerTest {
 
         assertEquals(ExpResult, result);
 
-        XSDMarshallerPool.getInstance().release(unmarshaller);
+        XSDMarshallerPool.getInstance().recycle(unmarshaller);
     }
 
     /**

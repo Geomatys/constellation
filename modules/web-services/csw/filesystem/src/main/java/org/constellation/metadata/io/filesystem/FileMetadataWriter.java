@@ -39,9 +39,9 @@ import javax.xml.bind.Unmarshaller;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.util.SimpleInternationalString;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.apache.sis.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Constellation dependencies
@@ -108,9 +108,8 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     @Override
     public boolean storeMetadata(Object obj) throws MetadataIoException {
         File f = null;
-        Marshaller marshaller = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            final Marshaller marshaller = marshallerPool.acquireMarshaller();
             final String identifier = Utils.findIdentifier(obj);
             // for windows we avoid to create file with ':'
             if (System.getProperty("os.name", "").startsWith("Windows")) {
@@ -121,6 +120,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             }
             f.createNewFile();
             marshaller.marshal(obj, f);
+            marshallerPool.recycle(marshaller);
             if (indexer != null) {
                 indexer.indexDocument(obj);
             }
@@ -129,10 +129,6 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             throw new MetadataIoException("Unable to marshall the object: " + obj, ex, NO_APPLICABLE_CODE);
         } catch (IOException ex) {
             throw new MetadataIoException("Unable to write the file: " + f.getPath(), ex, NO_APPLICABLE_CODE);
-        } finally {
-            if (marshaller != null) {
-                marshallerPool.release(marshaller);
-            }
         }
         return true;
     }
@@ -554,10 +550,10 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     private Object getObjectFromFile(String identifier) throws MetadataIoException {
         final File metadataFile = FileMetadataReader.getFileFromIdentifier(identifier, dataDirectory);
         if (metadataFile.exists()) {
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 Object metadata = unmarshaller.unmarshal(metadataFile);
+                marshallerPool.recycle(unmarshaller);
                 if (metadata instanceof JAXBElement) {
                     metadata = ((JAXBElement) metadata).getValue();
                 }
@@ -565,10 +561,6 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             } catch (JAXBException ex) {
                 throw new MetadataIoException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
-            } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
-                }
             }
         } else {
             throw new MetadataIoException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);

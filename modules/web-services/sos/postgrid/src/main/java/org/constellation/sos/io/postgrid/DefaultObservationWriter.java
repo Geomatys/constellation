@@ -39,7 +39,7 @@ import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.NoSuchTableException;
 import org.geotoolkit.observation.xml.OMXmlFactory;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureType;

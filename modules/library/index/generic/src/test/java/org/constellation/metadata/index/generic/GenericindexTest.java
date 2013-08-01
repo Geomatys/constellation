@@ -18,10 +18,16 @@
 package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
+import org.apache.sis.geometry.GeneralEnvelope;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.citation.DefaultCitation;
+import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
+import org.apache.sis.metadata.iso.extent.DefaultExtent;
+import org.apache.sis.metadata.iso.extent.DefaultTemporalExtent;
+import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
-import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
@@ -44,17 +50,11 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.metadata.iso.citation.DefaultCitation;
-import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
-import org.geotoolkit.metadata.iso.extent.DefaultExtent;
-import org.geotoolkit.metadata.iso.extent.DefaultTemporalExtent;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
@@ -995,7 +995,7 @@ public class GenericindexTest {
 
         Unmarshaller unmarshaller    = CSWMarshallerPool.getInstance().acquireUnmarshaller();
         DefaultMetadata meta3 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
-        CSWMarshallerPool.getInstance().release(unmarshaller);
+        CSWMarshallerPool.getInstance().recycle(unmarshaller);
 
         List<String> paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition");
@@ -1076,7 +1076,7 @@ public class GenericindexTest {
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/metaNan.xml"));
         result.add(obj);
 
-        CSWMarshallerPool.getInstance().release(unmarshaller);
+        CSWMarshallerPool.getInstance().recycle(unmarshaller);
 
         return result;
     }

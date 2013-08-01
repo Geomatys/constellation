@@ -21,14 +21,16 @@ import java.io.StringWriter;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 
+import org.apache.sis.test.XMLComparator;
 import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -89,9 +91,9 @@ public class WMTSWorkerTest {
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(result, sw);
-        assertEquals(FileUtilities.getStringFromFile(
-                FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-cont.xml")),
-                sw.toString());
+        XMLComparator comparator = new XMLComparator(FileUtilities.getStringFromFile(
+                FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-cont.xml")), sw.toString());
+        comparator.compare();
         
         
         request = new GetCapabilities("WMTS");
@@ -99,9 +101,9 @@ public class WMTSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        assertEquals(FileUtilities.getStringFromFile(
-                FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0.xml")),
-                sw.toString());
+        comparator = new XMLComparator(FileUtilities.getStringFromFile(
+                FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0.xml")), sw.toString());
+        comparator.compare();
 
         acceptVersion = new AcceptVersionsType("2.3.0");
         request = new GetCapabilities(acceptVersion, null, null, null, "WMTS");
@@ -143,9 +145,9 @@ public class WMTSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        assertEquals(FileUtilities.getStringFromFile(
-                FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-om.xml")),
-                sw.toString());
+        comparator = new XMLComparator(FileUtilities.getStringFromFile(
+                FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-om.xml")), sw.toString());
+        comparator.compare();
 
         acceptVersion = new AcceptVersionsType("1.0.0");
         sections      = new SectionsType("serviceIdentification");
@@ -155,9 +157,9 @@ public class WMTSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        assertEquals(FileUtilities.getStringFromFile(
-                FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-si.xml")),
-                sw.toString());
+        comparator = new XMLComparator(FileUtilities.getStringFromFile(
+                FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-si.xml")), sw.toString());
+        comparator.compare();
 
         acceptVersion = new AcceptVersionsType("1.0.0");
         sections      = new SectionsType("serviceProvider");
@@ -167,11 +169,11 @@ public class WMTSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        assertEquals(FileUtilities.getStringFromFile(
-                FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-sp.xml")),
-                sw.toString());
+        comparator = new XMLComparator(FileUtilities.getStringFromFile(
+                FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-sp.xml")), sw.toString());
+        comparator.compare();
 
-        pool.release(marshaller);
+        pool.recycle(marshaller);
     }
 
 }

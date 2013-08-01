@@ -34,7 +34,7 @@ import org.constellation.portrayal.internal.CstlPortrayalService;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.*;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  * Write a portrayal response in the stream.

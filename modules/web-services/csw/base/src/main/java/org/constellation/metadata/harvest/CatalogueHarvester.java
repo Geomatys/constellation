@@ -38,9 +38,9 @@ import org.constellation.metadata.io.MetadataIoException;
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.xml.Namespaces;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.Namespaces;
+import org.apache.sis.util.logging.Logging;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -109,12 +109,12 @@ public abstract class CatalogueHarvester {
         final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
         if (Namespaces.GMD.equals(resourceType) ||
-            Namespaces.CSW_202.equals(resourceType) ||
+            Namespaces.CSW.equals(resourceType) ||
            "http://www.isotc211.org/2005/gfc".equals(resourceType)) {
 
             final InputStream in      = getSingleMetadata(sourceURL);
             final Object harvested    = unmarshaller.unmarshal(in);
-            marshallerPool.release(unmarshaller);
+            marshallerPool.recycle(unmarshaller);
 
             if (harvested == null) {
                 throw new CstlServiceException("The resource can not be parsed.",

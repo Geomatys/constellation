@@ -41,7 +41,7 @@ import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.sql.Layer;
 import org.geotoolkit.coverage.sql.LayerCoverageReader;
-import org.geotoolkit.storage.DataStoreException;
+import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
@@ -51,10 +51,10 @@ import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.DateRange;
-import org.geotoolkit.util.MeasurementRange;
+import org.apache.sis.measure.MeasurementRange;
 
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
@@ -332,7 +332,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
         final String[] split = strDimRange.split(",");
         final double min = Double.valueOf(split[0]);
         final double max = Double.valueOf(split[1]);
-        return MeasurementRange.create(min, max, null);
+        return MeasurementRange.create(min, true, max, true, null);
     }
 
 }

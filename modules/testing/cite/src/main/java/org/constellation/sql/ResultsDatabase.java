@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.io.X364;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 
 /**

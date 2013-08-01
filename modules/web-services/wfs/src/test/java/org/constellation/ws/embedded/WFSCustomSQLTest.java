@@ -22,16 +22,17 @@ import java.net.MalformedURLException;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import org.apache.sis.test.XMLComparator;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
 
 import org.geotoolkit.xsd.xml.v2001.Schema;
-import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.test.xml.DomComparator;
+import org.apache.sis.xml.MarshallerPool;
 
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
@@ -68,12 +69,12 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
             "org.constellation.configuration.ws.rs",
             "org.constellation.ws.rs.provider"}, null);
 
-        pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110"   +
+        pool = new MarshallerPool(JAXBContext.newInstance("org.geotoolkit.wfs.xml.v110"   +
             		  ":org.geotoolkit.ogc.xml.v110"  +
             		  ":org.geotoolkit.gml.xml.v311"  +
                           ":org.geotoolkit.xsd.xml.v2001" +
                           ":org.geotoolkit.sampling.xml.v100" +
-                         ":org.geotoolkit.internal.jaxb.geometry");
+                         ":org.apache.sis.internal.jaxb.geometry"), null);
 
         final Configurator config = new Configurator() {
             @Override
@@ -142,7 +143,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
         final List elements = schema.getElements();
         assertEquals(1, elements.size());
 
-        final DomComparator comparator = new DomComparator(WFSCustomSQLTest.class.getResource("/expected/customsqlquery.xsd"), getfeatsUrl);
+        final XMLComparator comparator = new XMLComparator(WFSCustomSQLTest.class.getResource("/expected/customsqlquery.xsd"), getfeatsUrl);
         comparator.compare();
 
     }

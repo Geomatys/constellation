@@ -47,7 +47,7 @@ import org.geotoolkit.wps.io.WPSMimeType;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
 import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
@@ -178,7 +178,7 @@ public class WPSWorker extends AbstractWorker {
                 try {
                     final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                     Object obj = unmarshaller.unmarshal(lcFile);
-                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                    GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
                     if (obj instanceof ProcessContext) {
                         candidate = (ProcessContext) obj;
                         isStarted = true;
@@ -428,7 +428,7 @@ public class WPSWorker extends AbstractWorker {
             try {
                 final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(webdavCtx, new File(webDavInstanceDir, "WebdavContext.xml"));
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;

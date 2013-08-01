@@ -43,7 +43,7 @@ import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.QueryList;
 import org.constellation.metadata.io.MetadataIoException;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *

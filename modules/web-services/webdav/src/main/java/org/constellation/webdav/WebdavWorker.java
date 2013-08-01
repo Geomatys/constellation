@@ -25,7 +25,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.WebdavContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -49,10 +49,10 @@ public class WebdavWorker {
         if (configurationDirectory != null) {
             final File lcFile = new File(configurationDirectory, "WebdavContext.xml");
             if (lcFile.exists()) {
-                Unmarshaller unmarshaller = null;
                 try {
-                    unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                     Object obj = unmarshaller.unmarshal(lcFile);
+                    GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
                     if (obj instanceof WebdavContext) {
                         candidate = (WebdavContext) obj;
                         isStarted = true;
@@ -65,10 +65,6 @@ public class WebdavWorker {
                     startError = "JAXBExeception while unmarshalling the webdav context File";
                     isStarted = false;
                     LOGGER.log(Level.WARNING, startError, ex);
-                } finally {
-                    if (unmarshaller != null) {
-                        GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                    }
                 }
             } else {
                 startError = "The configuration file processContext.xml has not been found";

@@ -36,7 +36,7 @@ import org.geotoolkit.csw.xml.v202.ElementSetNameType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 
@@ -83,14 +83,14 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
             configuration.putParameter("shiroAccessible", "false");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
         }
 
         pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         Unmarshaller u = pool.acquireUnmarshaller();
-        pool.release(u);
+        pool.recycle(u);
 
         worker = new CSWworker("", configDir);
         worker.setLogLevel(Level.FINER);
@@ -279,7 +279,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         assertEquals(expSumResult1, sumResult);
 
        */
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
 

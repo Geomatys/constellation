@@ -30,6 +30,7 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.measure.unit.Unit;
@@ -44,16 +45,16 @@ import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
-import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.apache.sis.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.isoonjts.JTSUtils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.internal.jaxb.ObjectFactory;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.util.DateRange;
-import org.geotoolkit.util.MeasurementRange;
-import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
 
 import org.opengis.feature.Feature;
@@ -100,7 +101,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor implements GetFe
             final Map<String, String> properties = new HashMap<String, String>();
             properties.put(Marshaller.JAXB_FRAGMENT, "true");
             properties.put(Marshaller.JAXB_FORMATTED_OUTPUT, "false");
-            candidate = new MarshallerPool(properties, ObjectFactory.class);
+            candidate = new MarshallerPool(JAXBContext.newInstance(ObjectFactory.class), properties);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB Exception while initalizing the marshaller pool", ex);
         }
@@ -176,7 +177,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor implements GetFe
                              ObjectFactory factory =  new ObjectFactory();
                              m.setProperty(Marshaller.JAXB_FRAGMENT, true);
                              m.marshal(factory.buildAnyGeometry(gmlGeometry), sw);
-                             pool.release(m);
+                             pool.recycle(m);
                              builder.append(sw.toString());
                         } catch (JAXBException ex) {
                             LOGGER.log(Level.WARNING, "JAXB exception while marshalling the geometry", ex);
@@ -347,7 +348,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor implements GetFe
         if (ranges != null && ranges.length > 0) {
             final MeasurementRange range = ranges[0];
             if (range != null) {
-                final Unit unit = range.getUnits();
+                final Unit unit = range.unit();
                 if (unit != null && !unit.toString().isEmpty()) {
                     builder.append("\t\t\t<unit>").append(unit.toString())
                             .append("</unit>").append("\n");

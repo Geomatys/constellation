@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -34,7 +35,7 @@ import static org.constellation.metadata.io.AbstractMetadataReader.*;
 
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -69,7 +70,7 @@ public abstract class SDNGenericMetadataReader extends GenericMetadataReader {
     public SDNGenericMetadataReader(Automatic configuration) throws MetadataIoException {
         super(configuration);
         try {
-            marshallerPool   = new MarshallerPool(getJAXBContext());
+            marshallerPool   = new MarshallerPool(JAXBContext.newInstance(getJAXBContext()), null);
             contacts         = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
         } catch (JAXBException ex) {
             throw new MetadataIoException("JAXBException while initializing the Generic reader: \n cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -90,7 +91,7 @@ public abstract class SDNGenericMetadataReader extends GenericMetadataReader {
         }
         try {
             this.contacts      = contacts;
-            marshallerPool     = new MarshallerPool(getJAXBContext());
+            marshallerPool     = new MarshallerPool(JAXBContext.newInstance(getJAXBContext()), null);
         } catch (JAXBException ex) {
             throw new MetadataIoException("JAXBException while initializing the Generic reader: \n cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
@@ -107,10 +108,10 @@ public abstract class SDNGenericMetadataReader extends GenericMetadataReader {
             }
             for (File f : contactDirectory.listFiles()) {
                 if (f.getName().startsWith("EDMO.") && f.getName().endsWith(".xml")) {
-                    Unmarshaller unmarshaller = null;
                     try {
-                        unmarshaller = marshallerPool.acquireUnmarshaller();
+                        final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                         final Object obj = unmarshaller.unmarshal(f);
+                        marshallerPool.recycle(unmarshaller);
                         if (obj instanceof ResponsibleParty) {
                             final ResponsibleParty contact = (ResponsibleParty) obj;
                             String code = f.getName();
@@ -120,10 +121,6 @@ public abstract class SDNGenericMetadataReader extends GenericMetadataReader {
                     } catch (JAXBException ex) {
                         LOGGER.severe("Unable to unmarshall the contact file : " + f.getPath());
                         LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-                    } finally {
-                        if (unmarshaller != null) {
-                            marshallerPool.release(unmarshaller);
-                        }
                     }
                 }
             }

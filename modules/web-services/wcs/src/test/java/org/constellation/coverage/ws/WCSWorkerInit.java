@@ -113,7 +113,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
                 File configFile = new File(configDir, "layerContext.xml");
                 final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(lc, configFile);
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
             }
 
         } catch (Exception ex) {

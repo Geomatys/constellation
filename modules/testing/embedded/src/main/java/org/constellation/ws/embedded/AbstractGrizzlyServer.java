@@ -44,7 +44,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 /**
  * Launches a Grizzly server in a thread at the beginning of the testing process
@@ -312,7 +312,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(conec.getInputStream());
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
 
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
@@ -332,7 +332,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         }
         Object obj = unmarshaller.unmarshal(is);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
 
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();

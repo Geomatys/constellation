@@ -126,7 +126,7 @@ public class CreateMapService extends AbstractProcess {
                 try {
                     final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                     final Object obj = unmarshaller.unmarshal(configurationFile);
-                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                    GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
                     if (obj instanceof LayerContext) {
                         configuration = (LayerContext) obj;
                     } else {
@@ -143,7 +143,7 @@ public class CreateMapService extends AbstractProcess {
                     try {
                         final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                         marshaller.marshal(new WMSPortrayal(), portrayalFile);
-                        GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                        GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
                     } catch (JAXBException ex) {
                         throw new ProcessException(ex.getMessage(), this, ex);
                     }
@@ -185,7 +185,7 @@ public class CreateMapService extends AbstractProcess {
             try {
                 final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
 
             } catch (JAXBException ex) {
                 throw new ProcessException(ex.getMessage(), this, ex);
@@ -237,7 +237,7 @@ public class CreateMapService extends AbstractProcess {
         final Marshaller marshaller = WMSMarshallerPool.getInstance().acquireMarshaller();
         File capabilitiesDescriptionV111 = new File(instanceDirectory, "WMSCapabilities1.1.1.xml");
         marshaller.marshal(capabilities, capabilitiesDescriptionV111);
-        WMSMarshallerPool.getInstance().release(marshaller);
+        WMSMarshallerPool.getInstance().recycle(marshaller);
     }
 
     /**
@@ -283,6 +283,6 @@ public class CreateMapService extends AbstractProcess {
         final Marshaller marshaller = WMSMarshallerPool.getInstance().acquireMarshaller();
         File capabilitiesDescriptionV111 = new File(instanceDirectory, "WMSCapabilities1.3.0.xml");
         marshaller.marshal(capabilities, capabilitiesDescriptionV111);
-        WMSMarshallerPool.getInstance().release(marshaller);
+        WMSMarshallerPool.getInstance().recycle(marshaller);
     }
 }

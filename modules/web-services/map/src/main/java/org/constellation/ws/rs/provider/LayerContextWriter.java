@@ -87,7 +87,7 @@ public final class LayerContextWriter implements MessageBodyWriter {
                 JAXBContext cxtx = new JSONJAXBContext("org.constellation.configuration:" +
                         "org.constellation.generic.database:" +
                         "org.geotoolkit.ogc.xml.v110:" +
-                        "org.geotoolkit.internal.jaxb.geometry:" +
+                        "org.apache.sis.internal.jaxb.geometry:" +
                         "org.geotoolkit.gml.xml.v311");
 
                 // create marshaller
@@ -99,7 +99,7 @@ public final class LayerContextWriter implements MessageBodyWriter {
                 // Default : use xml marshaller
                 final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 m.marshal(r, out);
-                GenericDatabaseMarshallerPool.getInstance().release(m);
+                GenericDatabaseMarshallerPool.getInstance().recycle(m);
             }
 
         } catch (JAXBException ex) {

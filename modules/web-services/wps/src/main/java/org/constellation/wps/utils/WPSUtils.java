@@ -42,11 +42,11 @@ import org.geotoolkit.ows.xml.v110.LanguageStringType;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.apache.sis.util.ArgumentChecks;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.wps.io.WPSIO;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import org.opengis.feature.type.FeatureType;
@@ -541,7 +541,7 @@ public class WPSUtils {
             final File outputFile = new File(folderPath, fileName);
             final Marshaller marshaller = marshallerPool.acquireMarshaller();
             marshaller.marshal(obj, outputFile);
-            marshallerPool.release(marshaller);
+            marshallerPool.recycle(marshaller);
             success = outputFile.exists();
 
         } catch (JAXBException ex) {

@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // MDWeb dependencies
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.mdweb.model.storage.Value;
 import org.mdweb.io.Reader;
 import org.mdweb.model.storage.FullRecord;
@@ -49,14 +50,13 @@ import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 // GeoAPI dependencies

@@ -17,6 +17,7 @@
 
 package org.constellation.generic.database;
 
+import org.apache.sis.test.XMLComparator;
 import org.w3c.dom.Node;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -31,7 +32,7 @@ import javax.xml.bind.Unmarshaller;
 //Junit dependencies
 import org.constellation.configuration.SOSConfiguration;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -55,10 +56,10 @@ public class GenericConfigurationXMLBindingTest {
     @After
     public void tearDown() throws JAXBException {
         if (unmarshaller != null) {
-            pool.release(unmarshaller);
+            pool.recycle(unmarshaller);
         }
         if (marshaller != null) {
-            pool.release(marshaller);
+            pool.recycle(marshaller);
         }
     }
 
@@ -100,7 +101,7 @@ public class GenericConfigurationXMLBindingTest {
         String result =  StringUtilities.removeXmlns(sw.toString());
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                + '\n' +
-        "<automatic format=\"MDWEB\" >"                                                + '\n' +
+        "<automatic format=\"MDWEB\">"                                                 + '\n' +
         "    <bdd>"                                                                    + '\n' +
         "        <className>org.driver.test</className>"                               + '\n' +
         "        <connectURL>http://somehost/blablabla</connectURL>"                   + '\n' +
@@ -163,8 +164,8 @@ public class GenericConfigurationXMLBindingTest {
         "    </queries>"                                                               + '\n' +
         "</automatic>" + '\n';
 
-        assertEquals(expResult, result);
-
+        final XMLComparator comparator = new XMLComparator(expResult, result);
+        comparator.compare();
     }
 
     @Test
@@ -186,7 +187,7 @@ public class GenericConfigurationXMLBindingTest {
         String result =  StringUtilities.removeXmlns(sw.toString());
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"            + '\n' +
-        "<ns2:SOSConfiguration >"                                                  + '\n' +
+        "<ns2:SOSConfiguration>"                                                   + '\n' +
         "    <ns2:SMLConfiguration format=\"MDWEB\">"                              + '\n' +
         "        <bdd>"                                                            + '\n' +
         "            <className>org.driver.test</className>"                       + '\n' +
@@ -224,8 +225,8 @@ public class GenericConfigurationXMLBindingTest {
         "    <ns2:keepCapabilities>false</ns2:keepCapabilities>"                   + '\n' +
         "</ns2:SOSConfiguration>" + '\n';
 
-        assertEquals(expResult, result);
-
+        final XMLComparator comparator = new XMLComparator(expResult, result);
+        comparator.compare();
     }
 
     /**
@@ -502,9 +503,9 @@ public class GenericConfigurationXMLBindingTest {
 
         marshaller.marshal(query, sw);
 
-        String result =  StringUtilities.removeXmlns(sw.toString());
-
-        assertEquals(expResult, result);
+        final String result =  StringUtilities.removeXmlns(sw.toString());
+        final XMLComparator comparator = new XMLComparator(expResult, result);
+        comparator.compare();
     }
 
     /*

@@ -73,8 +73,8 @@ import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
@@ -233,10 +233,10 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     private Object getObjectFromFile(final String identifier) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
         if (metadataFile != null && metadataFile.exists()) {
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 Object metadata = unmarshaller.unmarshal(metadataFile);
+                marshallerPool.recycle(unmarshaller);
                 if (metadata instanceof JAXBElement) {
                     metadata = ((JAXBElement) metadata).getValue();
                 }
@@ -250,10 +250,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             } catch (IllegalArgumentException ex) {
                 throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
-            } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
-                }
             }
         } 
         throw new MetadataIoException(METAFILE_MSG + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
@@ -574,13 +570,13 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     private List<String> getAllValuesFromPaths(final List<String> paths, final File directory) throws MetadataIoException {
         final List<String> result = new ArrayList<String>();
-        Unmarshaller unmarshaller = null;
         try {
-            unmarshaller    = marshallerPool.acquireUnmarshaller();
+            final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             for (File metadataFile : directory.listFiles()) {
                 if (!metadataFile.isDirectory()) {
                     try {
                         Object metadata = unmarshaller.unmarshal(metadataFile);
+                        marshallerPool.recycle(unmarshaller);
                         if (metadata instanceof JAXBElement) {
                             metadata = ((JAXBElement) metadata).getValue();
                         }
@@ -604,10 +600,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         } catch (JAXBException ex) {
             throw new MetadataIoException("Error while getting unmarshaller from pool\ncause: " + ex.getMessage(), NO_APPLICABLE_CODE);
 
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
-            }
         }
         
         Collections.sort(result);
@@ -647,10 +639,10 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             final String fileName = f.getName();
             if (fileName.endsWith(XML_EXT)) {
                 final String identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
-                Unmarshaller unmarshaller = null;
                 try {
-                    unmarshaller = marshallerPool.acquireUnmarshaller();
+                    final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                     Object metadata = unmarshaller.unmarshal(f);
+                    marshallerPool.recycle(unmarshaller);
                     if (metadata instanceof JAXBElement) {
                         metadata = ((JAXBElement) metadata).getValue();
                     }
@@ -662,10 +654,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                     // throw or continue to the next file?
                     throw new MetadataIoException(METAFILE_MSG + f.getPath() + " can not be unmarshalled\ncause: "
                             + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
-                } finally {
-                    if (unmarshaller != null) {
-                        marshallerPool.release(unmarshaller);
-                    }
                 }
             } else if (f.isDirectory()) {
                 results.addAll(getAllEntries(f));

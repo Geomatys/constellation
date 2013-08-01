@@ -55,7 +55,7 @@ import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.ImageCoverageReader;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 

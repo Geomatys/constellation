@@ -20,6 +20,9 @@ package org.constellation.metadata.io;
 
 import java.util.Objects;
 import java.io.File;
+
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.Utilities;
 import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
 import javax.xml.bind.JAXBElement;
 import java.io.InputStreamReader;
@@ -40,12 +43,10 @@ import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.v100.SensorML;
 import org.apache.sis.util.ComparisonMode;
-import org.geotoolkit.util.Utilities;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 
 // Junit dependencies
@@ -150,7 +151,7 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof RecordType);
         assertEquals(expResult, (RecordType)result);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -176,7 +177,7 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result, ComparisonMode.BY_CONTRACT);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -196,7 +197,7 @@ public class MDWebMetadataReaderTest {
         metadataEquals(expResult, (DefaultMetadata)result);
 
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -219,10 +220,10 @@ public class MDWebMetadataReaderTest {
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_21));
 
         assertTrue(result instanceof DefaultMetadata);
-        assertTrue(Utilities.deepEquals(expResult, (DefaultMetadata)result, ComparisonMode.BY_CONTRACT));
+        assertTrue(Utilities.deepEquals(expResult, (DefaultMetadata) result, ComparisonMode.BY_CONTRACT));
         assertFalse(Objects.equals(expResult, (DefaultMetadata)result));
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
      /**
@@ -323,7 +324,7 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
       /**
@@ -342,7 +343,7 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
      /**
@@ -361,7 +362,7 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof FeatureCatalogueImpl);
         catalogueEquals(expResult, (FeatureCatalogueImpl)result);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -381,7 +382,7 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -401,7 +402,7 @@ public class MDWebMetadataReaderTest {
         //pool.acquireMarshaller().marshal(expResult, System.out);
         metadataEquals(expResult, (DefaultMetadata)result);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -432,7 +433,7 @@ public class MDWebMetadataReaderTest {
 
         absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system2.xml"));
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);
@@ -458,7 +459,7 @@ public class MDWebMetadataReaderTest {
 
         AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);
@@ -489,7 +490,7 @@ public class MDWebMetadataReaderTest {
 
         expResult =  (ExtrinsicObjectType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim2.xml"))).getValue();
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof ExtrinsicObjectType);
@@ -510,7 +511,7 @@ public class MDWebMetadataReaderTest {
         assertTrue(absResult instanceof RegistryPackageType);
         RegistryPackageType result = (RegistryPackageType) absResult;
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
 
         ebrimEquals(expResult, result);
     }
@@ -534,6 +535,6 @@ public class MDWebMetadataReaderTest {
         metadataEquals(expResult, (DefaultMetadata)result);
         
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 }

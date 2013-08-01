@@ -19,6 +19,7 @@ package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
 import java.lang.reflect.Proxy;
+import javax.xml.bind.JAXBContext;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLEventReader;
 import java.io.InputStream;
@@ -76,7 +77,7 @@ import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.wfs.xml.AllSomeType;
 import org.geotoolkit.wfs.xml.ResultTypeType;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 import org.opengis.filter.sort.SortOrder;
 
@@ -105,13 +106,13 @@ public class WFSService extends GridWebService<WFSWorker> {
         super(Specification.WFS);
         utils.getServiceUtilities().put(ServiceType.WFS, new WFSServiceConfiguration());
         try {
-            final MarshallerPool pool = new MarshallerPool(
+            final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance(
                            "org.geotoolkit.wfs.xml.v110"   +
             		  ":org.geotoolkit.ogc.xml.v110"  +
                           ":org.geotoolkit.wfs.xml.v200"  +
             		  ":org.geotoolkit.gml.xml.v311"  +
                           ":org.geotoolkit.xsd.xml.v2001" +
-                          ":org.geotoolkit.internal.jaxb.geometry");
+                          ":org.apache.sis.internal.jaxb.geometry"), null);
             setXMLContext(pool);
             LOGGER.log(Level.INFO, "WFS REST service running ({0} instances)\n", getWorkerMapSize());
 
@@ -910,7 +911,7 @@ public class WFSService extends GridWebService<WFSWorker> {
                     new Class[]{XMLEventReader.class}, new PrefixMappingInvocationHandler(rootEventReader, prefixMapping));
             final Unmarshaller unmarshaller = getMarshallerPool().acquireUnmarshaller();
             Object result = unmarshaller.unmarshal(eventReader);
-            getMarshallerPool().release(unmarshaller);
+            getMarshallerPool().recycle(unmarshaller);
             if (result instanceof JAXBElement) {
                 result = ((JAXBElement)result).getValue();
             }

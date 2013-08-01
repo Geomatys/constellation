@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.provider.AbstractLayerProvider;
@@ -33,7 +34,7 @@ import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -142,10 +143,10 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
 
         // write finalMapContext
         if (mapContextFile != null) {
-            final MarshallerPool pool = new MarshallerPool(org.geotoolkit.providers.xml.MapContext.class, org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class);
+            final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance(org.geotoolkit.providers.xml.MapContext.class, org.apache.sis.internal.jaxb.geometry.ObjectFactory.class), null);
             final Marshaller marshaller = pool.acquireMarshaller();
             marshaller.marshal(finalMapContext, mapContextFile);
-            pool.release(marshaller);
+            pool.recycle(marshaller);
         }
     }
 

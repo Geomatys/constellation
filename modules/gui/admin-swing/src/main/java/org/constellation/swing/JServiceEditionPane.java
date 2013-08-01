@@ -19,7 +19,7 @@ package org.constellation.swing;
 import java.awt.BorderLayout;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *

@@ -33,7 +33,7 @@ import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.temporal.object.ISODateParser;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 // GeoAPI dependencies
 import org.opengis.filter.Filter;

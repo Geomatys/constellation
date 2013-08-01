@@ -27,7 +27,7 @@ import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  * Temporary copy of static methods from the WebService class (in module web-base),

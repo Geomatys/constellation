@@ -37,9 +37,9 @@ import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.sld.SLDProviderService;
 
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
-import org.geotoolkit.internal.io.IOUtilities;
+import org.apache.sis.internal.storage.IOUtilities;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.image.jai.Registry;
 
 import org.opengis.parameter.ParameterDescriptorGroup;

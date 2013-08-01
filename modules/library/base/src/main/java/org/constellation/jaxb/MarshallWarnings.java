@@ -21,21 +21,23 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import org.geotoolkit.internal.io.IOUtilities;
-import org.geotoolkit.xml.ObjectConverters;
+
+import org.apache.sis.xml.MarshalContext;
+import org.apache.sis.xml.ValueConverter;
+import org.apache.sis.internal.storage.IOUtilities;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class MarshallWarnings extends ObjectConverters {
+public class MarshallWarnings extends ValueConverter {
 
     // The warnings collected during (un)marshalling.
     private final List<String> messages = new ArrayList<String>();
 
     // Collects the warnings and allows the process to continue.
     @Override
-    protected <T> boolean exceptionOccured(final T value, final Class<T> sourceType, final Class<?> targetType, final Exception exception) {
+    protected <T> boolean exceptionOccured(final MarshalContext context, final T value, final Class<T> sourceType, final Class<?> targetType, final Exception exception) {
         messages.add(exception.getLocalizedMessage() + " value=[" + value + "] sourceType:" + sourceType + " targetType:" + targetType);
         return true;
     }
@@ -52,7 +54,7 @@ public class MarshallWarnings extends ObjectConverters {
     }
     
    @Override
-   public URI toURI(String value) throws URISyntaxException {
+   public URI toURI(final MarshalContext context, String value) throws URISyntaxException {
         if (value != null && !(value = value.trim()).isEmpty()) try {
             value = IOUtilities.encodeURI(value);
             if (value.contains("\\")) {
@@ -60,7 +62,7 @@ public class MarshallWarnings extends ObjectConverters {
             }
             return new URI(value);
         } catch (URISyntaxException e) {
-            if (!exceptionOccured(value, String.class, URI.class, e)) {
+            if (!exceptionOccured(context, value, String.class, URI.class, e)) {
                 throw e;
             }
         }

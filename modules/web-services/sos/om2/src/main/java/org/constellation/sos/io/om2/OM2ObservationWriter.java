@@ -43,7 +43,7 @@ import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
 // Geotoolkit dependencies
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;

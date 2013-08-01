@@ -23,6 +23,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -36,8 +37,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.jdbc.DBCPDataSource;
 import org.geotoolkit.jdbc.WrappedDataSource;
-import org.geotoolkit.util.Utilities;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 import javax.sql.ConnectionPoolDataSource;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -505,11 +505,11 @@ public class BDD {
         if (object instanceof BDD) {
             final BDD that = (BDD) object;
 
-            return Utilities.equals(this.className,  that.className)  &&
-                   Utilities.equals(this.connectURL, that.connectURL) &&
-                   Utilities.equals(this.user  ,     that.user)       &&
-                   Utilities.equals(this.schema  ,   that.schema)     &&
-                   Utilities.equals(this.password,   that.password);
+            return Objects.equals(this.className,  that.className)  &&
+                   Objects.equals(this.connectURL, that.connectURL) &&
+                   Objects.equals(this.user  ,     that.user)       &&
+                   Objects.equals(this.schema  ,   that.schema)     &&
+                   Objects.equals(this.password,   that.password);
         }
         return false;
     }

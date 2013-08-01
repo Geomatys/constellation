@@ -16,9 +16,8 @@
  */
 package org.constellation.provider;
 
+import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.geotoolkit.storage.DataStoreException;
-import org.opengis.geometry.Envelope;
 
 /**
  * Coverage extension of a {@link LayerDetails}, which add some methods specific

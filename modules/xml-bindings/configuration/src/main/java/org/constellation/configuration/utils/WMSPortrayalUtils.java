@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingConstants;
 import org.constellation.configuration.PositionableDecoration;
 import org.geotoolkit.util.Converters;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *

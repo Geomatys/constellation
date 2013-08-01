@@ -31,7 +31,7 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.WMTSResponse;
 
@@ -61,7 +61,7 @@ public class WMTSResponseWriter<T extends WMTSResponse> implements MessageBodyWr
         try {
             final Marshaller m = WMTSMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
-            WMTSMarshallerPool.getInstance().release(m);
+            WMTSMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the wmts response", ex);
         }

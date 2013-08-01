@@ -60,7 +60,7 @@ import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.wmts.WMTSUtilities;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.*;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 

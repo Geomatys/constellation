@@ -196,7 +196,7 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
      * La valeur {@code null} recherche toutes les stations.
      */
     public synchronized void setStation(final SamplingFeature station) {
-        if (!Utilities.equals(station, this.featureOfInterest)) {
+        if (!(this.featureOfInterest != null ? this.featureOfInterest.equals(station) : station == null)) {
             this.featureOfInterest = station;
             fireStateChanged("Station");
         }

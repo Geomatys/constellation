@@ -52,7 +52,7 @@ import org.geotoolkit.wps.xml.v100.*;
 @WebService(name = "WPSService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 @BindingType(value="http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
-@XmlSeeAlso({org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
+@XmlSeeAlso({org.apache.sis.internal.jaxb.geometry.ObjectFactory.class})
 public class WPSService extends OGCWebService<WPSWorker> {
 
     /**

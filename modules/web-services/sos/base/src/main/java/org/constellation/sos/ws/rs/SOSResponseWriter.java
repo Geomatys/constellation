@@ -34,7 +34,7 @@ import javax.xml.bind.Marshaller;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.swes.xml.SOSResponse;
 import org.geotoolkit.sos.xml.SOSResponseWrapper;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -75,7 +75,7 @@ public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWrit
             } else {
                 m.marshal(t, out);
             }
-             SOSMarshallerPool.getInstance().release(m);
+             SOSMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the SOSResponse File", ex);
         }

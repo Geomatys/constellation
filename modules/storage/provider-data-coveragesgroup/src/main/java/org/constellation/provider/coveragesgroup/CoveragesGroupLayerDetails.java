@@ -26,6 +26,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.ServiceDef.Query;
@@ -35,11 +36,11 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
-import org.geotoolkit.storage.DataStoreException;
+import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.MeasurementRange;
-import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 
@@ -75,7 +76,7 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
     }
 
     private MapContext createMapContextForFile(final File file, final String login, final String password) throws JAXBException {
-        pool = new MarshallerPool(org.geotoolkit.providers.xml.MapContext.class, org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class);
+        pool = new MarshallerPool(JAXBContext.newInstance(org.geotoolkit.providers.xml.MapContext.class, org.apache.sis.internal.jaxb.geometry.ObjectFactory.class), null);
         unmarshaller = pool.acquireUnmarshaller();
         final Object result = unmarshaller.unmarshal(file);
         if (!(result instanceof org.geotoolkit.providers.xml.MapContext)) {

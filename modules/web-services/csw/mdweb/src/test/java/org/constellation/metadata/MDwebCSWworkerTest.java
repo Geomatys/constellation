@@ -89,7 +89,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             configuration.putParameter("shiroAccessible", "false");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
         }
         pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);

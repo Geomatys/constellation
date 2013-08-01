@@ -144,7 +144,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
                      LOGGER.info("The template observation file " + observationFile.getName() + " does not contains an observation:" + observation);
                 }
             }
-            SOSMarshallerPool.getInstance().release(unmarshaller);
+            SOSMarshallerPool.getInstance().recycle(unmarshaller);
             template = false;
             // writer.optimize(); no longer justified
             writer.close();

@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef.Query;
 
@@ -33,12 +35,11 @@ import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.DateRange;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
@@ -251,10 +252,12 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         try {
             final Envelope env = getEnvelope();
             if (env != null) {
-                return new DefaultGeographicBoundingBox(env);
+                final DefaultGeographicBoundingBox result = new DefaultGeographicBoundingBox();
+                result.setBounds(env);
+                return result;
             } else {
-                LOGGER.warning("Null boundingBox for Layer:" + name + ". Returning World BBOX");
-                return DefaultGeographicBoundingBox.WORLD;
+                LOGGER.warning("Null boundingBox for Layer:" + name + ". Returning World BBOX.");
+                return new DefaultGeographicBoundingBox(-180, 180, -90, 90);
             }
         } catch (TransformException ex) {
             throw new DataStoreException(ex);

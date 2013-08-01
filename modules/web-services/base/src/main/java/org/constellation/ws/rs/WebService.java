@@ -26,8 +26,8 @@ import org.constellation.ws.WebServiceUtilities;
 import org.constellation.xml.PrefixMappingInvocationHandler;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Versioned;
-import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -364,7 +364,7 @@ public abstract class WebService {
                 } else {
                     request = unmarshallRequest(unmarshaller, is);
                 }
-                pool.release(unmarshaller);
+                pool.recycle(unmarshaller);
             } catch (JAXBException e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg == null) {
@@ -595,7 +595,7 @@ public abstract class WebService {
             try {
                 final Marshaller m = pool.acquireMarshaller();
                 m.marshal(request, System.out);
-                pool.release(m);
+                pool.recycle(m);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error while marshalling the request", ex);
             }
@@ -631,7 +631,7 @@ public abstract class WebService {
             }
             final StringReader sr = new StringReader(list.get(0));
             Object result = unmarshaller.unmarshal(sr);
-            marshallerPool.release(unmarshaller);
+            marshallerPool.recycle(unmarshaller);
             if (result instanceof JAXBElement) {
                 result = ((JAXBElement)result).getValue();
             }

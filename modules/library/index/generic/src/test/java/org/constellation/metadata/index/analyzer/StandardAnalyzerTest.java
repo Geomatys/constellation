@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.index.analyzer;
 
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +33,6 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.util.Version;
 
-import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;

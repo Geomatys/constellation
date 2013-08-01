@@ -41,8 +41,8 @@ import static org.constellation.sos.ws.SOSConstants.*;
 // Geotoolkit dependendies
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.util.logging.Logging;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.util.StringUtilities;
@@ -111,10 +111,10 @@ public class FileSensorReader implements SensorReader {
             sensorFile = new File(dataDirectory, sensorIdTmp + ".xml");
         }
         if (sensorFile.exists()){
-            Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object unmarshalled = unmarshaller.unmarshal(sensorFile);
+                MARSHALLER_POOL.recycle(unmarshaller);
                 if (unmarshalled instanceof JAXBElement) {
                     unmarshalled = ((JAXBElement) unmarshalled).getValue();
                 }
@@ -125,10 +125,6 @@ public class FileSensorReader implements SensorReader {
                 }
             } catch (JAXBException ex) {
                 throw new CstlServiceException("JAXBException while unmarshalling the sensor", ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (unmarshaller != null) {
-                    MARSHALLER_POOL.release(unmarshaller);
-                }
             }
         } else {
             LOGGER.log(Level.INFO, "the file: {0} does not exist", sensorFile.getPath());

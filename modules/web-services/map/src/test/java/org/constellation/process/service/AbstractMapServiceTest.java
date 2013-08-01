@@ -47,17 +47,12 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
 
         final File configFile = new File(instance, "layerContext.xml");
         final LayerContext configuration = context != null ? context : new LayerContext();
-        Marshaller marshaller = null;
         try {
-            marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
-
+            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
         } catch (JAXBException ex) {
             //
-        } finally {
-            if (marshaller != null) {
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-            }
         }
     }
 
@@ -87,17 +82,12 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
 
         final File configFile = new File(instance, "layerContext.xml");
         final LayerContext configuration = context;
-        Marshaller marshaller = null;
         try {
-            marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
-
+            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
         } catch (JAXBException ex) {
             //
-        } finally {
-            if (marshaller != null) {
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-            }
         }
     }
 
@@ -111,17 +101,13 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
         final File instance = new File(wms, identifier);
         final File configFile = new File(instance, "layerContext.xml");
 
-        Unmarshaller unmarshaller = null;
         LayerContext  context = null;
         try {
-            unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+            final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
             context = (LayerContext) unmarshaller.unmarshal(configFile);
+            GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
         } catch (JAXBException ex) {
             //
-        } finally {
-            if (unmarshaller != null) {
-                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-            }
         }
         return context;
     }

@@ -34,7 +34,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -90,7 +90,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
             SMLConfiguration.setFormat("nosml");
 
             Automatic OMConfiguration = (Automatic) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/generic-config.xml"));
-            pool.release(unmarshaller);
+            pool.recycle(unmarshaller);
 
             OMConfiguration.getBdd().setConnectURL(url);
 
@@ -109,7 +109,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
             marshaller.marshal(configuration, configFile);
 
         }
-        pool.release(marshaller);
+        pool.recycle(marshaller);
         init();
         worker = new SOSworker("", configDir);
         worker.setServiceUrl(URL);

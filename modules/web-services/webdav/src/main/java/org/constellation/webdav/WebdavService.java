@@ -10,7 +10,7 @@ import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.ResourceFactory;
 import org.constellation.configuration.ConfigDirectory;
 
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  * A resource factory which provides access to files in a file system.

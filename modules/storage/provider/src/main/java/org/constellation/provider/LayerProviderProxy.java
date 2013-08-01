@@ -93,8 +93,8 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
                 final Name nk = (Name) key;
                 for(int i=0;i<candidates.size();i++){
                     final LayerDetails ld = candidates.get(i);
-                    if(   Utilities.equals(ld.getName().getNamespaceURI(), nk.getNamespaceURI())
-                            && Utilities.equals(ld.getName().getLocalPart(),nk.getLocalPart())){
+                    if(Objects.equals(ld.getName().getNamespaceURI(), nk.getNamespaceURI())
+                            && Objects.equals(ld.getName().getLocalPart(), nk.getLocalPart())){
                         return ld;
                     }
                 }

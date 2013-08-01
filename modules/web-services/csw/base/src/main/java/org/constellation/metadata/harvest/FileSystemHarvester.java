@@ -34,7 +34,7 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.GetRecordsRequest;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -130,7 +130,7 @@ public class FileSystemHarvester extends CatalogueHarvester {
                     nbRecordInserted = nbRecordInserted + harvestDirectory(dataFile);
                 }
             }
-            marshallerPool.release(unmarshaller);
+            marshallerPool.recycle(unmarshaller);
             return nbRecordInserted;
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex);

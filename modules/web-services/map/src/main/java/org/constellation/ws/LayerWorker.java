@@ -74,7 +74,7 @@ public abstract class LayerWorker extends AbstractWorker {
                 try {
                     final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                     final Object obj   = unmarshaller.unmarshal(lcFile);
-                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                    GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
                     if (obj instanceof LayerContext) {
                         candidate = (LayerContext) obj;
                         final String sec = candidate.getSecurity();

@@ -102,6 +102,11 @@
         <groupId>javax.xml.ws</groupId>
         <artifactId>jaxws-api</artifactId>
     </dependency>
+
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+    </dependency>
     
     <!-- geotoolkit -->
     <dependency>

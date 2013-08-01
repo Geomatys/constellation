@@ -34,7 +34,7 @@ import org.apache.lucene.search.SortField;
 
 // Geotoolkit dependencies
 import org.apache.lucene.util.Version;
-import org.geotoolkit.geometry.GeneralEnvelope;
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;

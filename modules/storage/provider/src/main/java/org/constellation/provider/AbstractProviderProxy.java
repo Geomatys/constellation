@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -169,8 +170,8 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
                 final Name nk = (Name) key;
                 for(int i=0;i<candidates.size();i++){
                     final LayerDetails ld = (LayerDetails) candidates.get(i);
-                    if(   Utilities.equals(ld.getName().getNamespaceURI(),nk.getNamespaceURI())
-                       && Utilities.equals(ld.getName().getLocalPart(),nk.getLocalPart())){
+                    if(Objects.equals(ld.getName().getNamespaceURI(), nk.getNamespaceURI())
+                            && Objects.equals(ld.getName().getLocalPart(), nk.getLocalPart())) {
                         return (V)ld;
                     }
                 }

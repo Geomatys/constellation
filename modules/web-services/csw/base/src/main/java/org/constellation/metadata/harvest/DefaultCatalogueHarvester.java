@@ -17,6 +17,7 @@
 package org.constellation.metadata.harvest;
 
 // J2SE dependencies
+import org.apache.sis.xml.Namespaces;
 import org.constellation.metadata.utils.Utils;
 import org.geotoolkit.csw.xml.AbstractRecord;
 import org.geotoolkit.csw.xml.SearchResults;
@@ -77,7 +78,6 @@ import org.geotoolkit.ogc.xml.v110.NotType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.xml.Namespaces;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.metadata.CSWConstants.*;
@@ -133,7 +133,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
     /**
      * a QName for csw:Record type
      */
-    private static final QName RECORD_QNAME = new QName(Namespaces.CSW_202, "Record");
+    private static final QName RECORD_QNAME = new QName(Namespaces.CSW, "Record");
 
     /**
      * a QName for gmd:Dataset type
@@ -180,7 +180,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
         final QueryConstraintType constraint = new QueryConstraintType(filter1, "1.1.0");
         typeNames.add(RECORD_QNAME);
         final QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        fullGetRecordsRequestv202 = new GetRecordsType(CSW, CSW_202_VERSION, ResultType.RESULTS, null, MimeType.APPLICATION_XML, Namespaces.CSW_202, 1, 20, query, null);
+        fullGetRecordsRequestv202 = new GetRecordsType(CSW, CSW_202_VERSION, ResultType.RESULTS, null, MimeType.APPLICATION_XML, Namespaces.CSW, 1, 20, query, null);
 
 
         //we build the base request to harvest another CSW service (2.0.0)
@@ -424,7 +424,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
             //we look for the different output schema available
             final DomainType outputDomain = getRecordOp.getParameterIgnoreCase("outputSchema");
             if (outputDomain != null) {
-                final List<String> availableOutputSchema = StringUtilities.cleanStrings(outputDomain.getValue());
+                final List<String> availableOutputSchema = StringUtilities.cleanCharSequences(outputDomain.getValue());
                 final String defaultValue                = outputDomain.getDefaultValue();
 
                 if (defaultValue != null && !defaultValue.isEmpty() && !availableOutputSchema.contains(defaultValue))
@@ -446,7 +446,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                 report.append("No outputSchema specified using default: http://www.opengis.net/cat/csw/2.0.2");
 
                 //we add the default outputSchema used
-                bestDistantOuputSchema = Namespaces.CSW_202;
+                bestDistantOuputSchema = Namespaces.CSW;
             }
 
             // we look for the different Type names
@@ -511,7 +511,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
     private String getBestOutputSchema(List<String> availableOutputSchema) {
         if (availableOutputSchema.isEmpty()) {
             //default case
-            return Namespaces.CSW_202;
+            return Namespaces.CSW;
 
         } else if (availableOutputSchema.size() == 1) {
             return availableOutputSchema.get(0);
@@ -524,8 +524,8 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
             return "csw:profile";
 
         // else to Dublincore schema
-        } else if (availableOutputSchema.contains(Namespaces.CSW_202)) {
-            return Namespaces.CSW_202;
+        } else if (availableOutputSchema.contains(Namespaces.CSW)) {
+            return Namespaces.CSW;
 
         } else if (availableOutputSchema.contains("csw:record")) {
             return "csw:record";
@@ -543,7 +543,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
             return "DublinCore";
         } else {
             LOGGER.severe("unable to found a outputSchema!!!");
-            return Namespaces.CSW_202;
+            return Namespaces.CSW;
         }
     }
 
@@ -577,7 +577,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                 try {
                     final Marshaller marshaller = marshallerPool.acquireMarshaller();
                     marshaller.marshal(request, sw);
-                    marshallerPool.release(marshaller);
+                    marshallerPool.recycle(marshaller);
                 } catch (JAXBException ex) {
                     throw new CstlServiceException("Unable to marshall the request: " + ex.getMessage(),
                                                  NO_APPLICABLE_CODE);
@@ -671,7 +671,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
             try {
                 Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 harvested = unmarshaller.unmarshal(new StringReader(decodedString));
-                marshallerPool.release(unmarshaller);
+                marshallerPool.recycle(unmarshaller);
                 if (harvested instanceof JAXBElement) {
                     harvested = ((JAXBElement) harvested).getValue();
                 }
@@ -699,7 +699,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
     private String getNamespaceURIFromprefix(String prefix, String distantVersion) {
         if (distantVersion.equals(CSW_202_VERSION)) {
             if ("csw".equals(prefix))
-                return Namespaces.CSW_202;
+                return Namespaces.CSW;
 
             else if ("ebrim".equals(prefix) || "rim".equals(prefix))
                 return "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";

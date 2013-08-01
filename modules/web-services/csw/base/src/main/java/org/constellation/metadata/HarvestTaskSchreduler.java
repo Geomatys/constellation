@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -40,9 +41,9 @@ import org.constellation.configuration.HarvestTasks;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.utils.MailSendingUtilities;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 /**
  *
@@ -77,7 +78,7 @@ public class HarvestTaskSchreduler {
     public HarvestTaskSchreduler(final File configDir, final CatalogueHarvester catalogueHarvester) {
         MarshallerPool candidate = null;
         try {
-            candidate = new MarshallerPool(HarvestTasks.class);
+            candidate = new MarshallerPool(JAXBContext.newInstance(HarvestTasks.class), null);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
         }
@@ -99,7 +100,7 @@ public class HarvestTaskSchreduler {
             if (f.exists()) {
                 final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 final Object obj = unmarshaller.unmarshal(f);
-                marshallerPool.release(unmarshaller);
+                marshallerPool.recycle(unmarshaller);
                 final Timer t = new Timer();
                 if (obj instanceof HarvestTasks) {
                     final HarvestTasks tasks = (HarvestTasks) obj;
@@ -153,7 +154,7 @@ public class HarvestTaskSchreduler {
             if (f.exists()) {
                 final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 final Object obj   = unmarshaller.unmarshal(f);
-                marshallerPool.release(unmarshaller);
+                marshallerPool.recycle(unmarshaller);
                 if (obj instanceof HarvestTasks) {
                     final HarvestTasks tasks = (HarvestTasks) obj;
                     tasks.addTask(newTask);
@@ -171,7 +172,7 @@ public class HarvestTaskSchreduler {
                     marshaller.marshal(tasks, f);
                 }
             }
-             marshallerPool.release(marshaller);
+             marshallerPool.recycle(marshaller);
 
         } catch (IOException ex) {
             LOGGER.severe("unable to create a file for schreduled harvest task");
@@ -195,7 +196,7 @@ public class HarvestTaskSchreduler {
             if (f.exists()) {
                 final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
                 final Object obj   = unmarshaller.unmarshal(f);
-                marshallerPool.release(unmarshaller);
+                marshallerPool.recycle(unmarshaller);
                 if (obj instanceof HarvestTasks) {
                     final HarvestTasks tasks = (HarvestTasks) obj;
                     final HarvestTask task   = tasks.getTaskFromSource(sourceURL);
@@ -209,7 +210,7 @@ public class HarvestTaskSchreduler {
             } else {
                 LOGGER.severe("There is no Harvest task file to update");
             }
-            marshallerPool.release(marshaller);
+            marshallerPool.recycle(marshaller);
 
         } catch (JAXBException ex) {
             LOGGER.severe("A JAXB exception occurs when trying to marshall the shreduled harvest task (update)");

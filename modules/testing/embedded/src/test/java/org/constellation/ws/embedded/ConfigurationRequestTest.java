@@ -18,11 +18,13 @@ package org.constellation.ws.embedded;
 
 // JUnit dependencies
 import org.constellation.configuration.ExceptionReport;
+
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.File;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import java.net.URLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -53,12 +55,12 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         map.put("sos", new SOService());
         initServer(null, map);
         // Get the list of layers
-        pool = new MarshallerPool("org.constellation.configuration:"
+        pool = new MarshallerPool(JAXBContext.newInstance("org.constellation.configuration:"
                                 + "org.constellation.generic.database:"
                                 + "org.geotoolkit.ows.xml.v110:"
                                 + "org.geotoolkit.csw.xml.v202:"
-                                + "org.geotoolkit.internal.jaxb.geometry:"
-                                + "org.geotoolkit.ows.xml.v100");
+                                + "org.apache.sis.internal.jaxb.geometry:"
+                                + "org.geotoolkit.ows.xml.v100"), null);
     }
 
     @AfterClass
@@ -165,7 +167,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         Marshaller m = pool.acquireMarshaller();
         m.marshal(record, f);
         m.marshal(record2, f2);
-        pool.release(m);
+        pool.recycle(m);
 
 
         niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
@@ -240,7 +242,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
 
         Marshaller m = pool.acquireMarshaller();
         m.marshal(record, f);
-        pool.release(m);
+        pool.recycle(m);
 
         // add a metadata to the index
         niUrl = new URL(getConfigurationURL() + "request=addToIndex&id=default&identifiers=urn_test");

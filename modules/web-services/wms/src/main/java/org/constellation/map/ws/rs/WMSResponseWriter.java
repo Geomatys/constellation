@@ -32,12 +32,12 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.writer.CapabilitiesFilterWriter;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.wms.xml.WMSResponse;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
 import org.geotoolkit.wms.xml.v130.WMSCapabilities;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 /**
  *
@@ -98,7 +98,7 @@ public class WMSResponseWriter<T extends WMSResponse> implements MessageBodyWrit
                 m = pool.acquireMarshaller();
                 m.marshal(t, out);
             } 
-            pool.release(m);
+            pool.recycle(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the WMS response", ex);
         }

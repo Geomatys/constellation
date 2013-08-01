@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
+import org.apache.sis.test.XMLComparator;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
-import org.geotoolkit.test.xml.DomComparator;
 
 import org.junit.Test;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -90,7 +90,7 @@ public class TasksWriterTest {
         writer.write(tasks);
         writer.dispose();
         
-        final DomComparator comparator = new DomComparator(
+        final XMLComparator comparator = new XMLComparator(
                 TasksReaderTest.class.getResource("/org/constellation/scheduler/tasks.xml"), 
                 tempfile);
         comparator.tolerance = 0.0000001;

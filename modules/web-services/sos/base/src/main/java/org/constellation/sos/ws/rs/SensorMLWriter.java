@@ -33,7 +33,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -72,7 +72,7 @@ public class SensorMLWriter<T extends AbstractSensorML> implements MessageBodyWr
                 m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, SML_100_XSD);
             }
             m.marshal(t, out);
-            SensorMLMarshallerPool.getInstance().release(m);
+            SensorMLMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the SensorML response", ex);
         }

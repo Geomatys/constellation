@@ -17,15 +17,17 @@
 package org.constellation.metadata.utils;
 
 // J2SE dependencies
-import org.geotoolkit.util.SimpleInternationalString;
+import org.apache.sis.internal.jaxb.gmi.MI_Metadata;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.citation.DefaultCitation;
+import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
+import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
+import org.apache.sis.util.iso.DefaultInternationalString;
+import org.apache.sis.util.iso.SimpleInternationalString;
 import org.geotoolkit.sml.xml.v100.ComponentType;
 import java.util.Arrays;
 
 // geotoolkit dependencies
-import org.geotoolkit.util.DefaultInternationalString;
-import org.geotoolkit.metadata.iso.citation.DefaultCitation;
-import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.csw.xml.v202.RecordType;
@@ -36,10 +38,8 @@ import org.geotoolkit.sml.xml.v100.Member;
 import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.sml.xml.v100.SystemType;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
-import org.geotoolkit.internal.jaxb.gmi.MI_Metadata;
 
 // JUnit dependencies
-import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.junit.*;
 import static org.junit.Assert.*;
 

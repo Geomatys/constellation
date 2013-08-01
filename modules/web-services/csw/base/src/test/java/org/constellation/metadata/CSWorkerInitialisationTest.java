@@ -34,7 +34,7 @@ import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // JUnit dependencies
@@ -63,7 +63,7 @@ public class CSWorkerInitialisationTest {
         pool = CSWMarshallerPool.getInstance();
         Unmarshaller u = pool.acquireUnmarshaller();
 
-        pool.release(u);
+        pool.recycle(u);
     }
 
     @AfterClass
@@ -166,13 +166,9 @@ public class CSWorkerInitialisationTest {
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
 
-        Marshaller m = null;
-        try {
-             m = pool.acquireMarshaller();
-             m.marshal(request, configFile);
-        } finally {
-            pool.release(m);
-        }
+        final Marshaller m = pool.acquireMarshaller();
+        m.marshal(request, configFile);
+        pool.recycle(m);
 
 
         worker = new CSWworker("",  configurationDirectory);

@@ -17,7 +17,7 @@
 package org.constellation.ws.embedded;
 
 import org.constellation.admin.service.ConstellationServer;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +29,8 @@ import org.junit.*;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
+
+import javax.xml.bind.JAXBContext;
 
 /**
  *
@@ -43,12 +45,12 @@ public class ConstellationServerTest extends AbstractGrizzlyServer {
         map.put("sos", new SOService());
         initServer(null, map);
         // Get the list of layers
-        pool = new MarshallerPool("org.constellation.configuration:"
+        pool = new MarshallerPool(JAXBContext.newInstance("org.constellation.configuration:"
                                 + "org.constellation.generic.database:"
                                 + "org.geotoolkit.ows.xml.v110:"
                                 + "org.geotoolkit.csw.xml.v202:"
-                                + "org.geotoolkit.internal.jaxb.geometry:"
-                                + "org.geotoolkit.ows.xml.v100");
+                                + "org.apache.sis.internal.jaxb.geometry:"
+                                + "org.geotoolkit.ows.xml.v100"), null);
     }
 
     @AfterClass

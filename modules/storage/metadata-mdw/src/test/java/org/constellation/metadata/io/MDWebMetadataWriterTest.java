@@ -20,7 +20,7 @@ package org.constellation.metadata.io;
 
 
 import java.io.File;
-import org.geotoolkit.xml.IdentifiedObject;
+import org.apache.sis.xml.IdentifiedObject;
 import org.opengis.metadata.identification.DataIdentification;
 import java.net.URI;
 import org.geotoolkit.service.ServiceIdentificationImpl;
@@ -44,13 +44,13 @@ import static org.constellation.test.utils.MetadataUtilities.*;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.v100.SensorML;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.ComparisonMode;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
-import org.geotoolkit.xml.IdentifierSpace;
+import org.apache.sis.xml.IdentifierSpace;
 
 import org.opengis.feature.catalog.FeatureCatalogue;
 
@@ -165,7 +165,7 @@ public class MDWebMetadataWriterTest {
         SensorML result = (SensorML) absResult;
         SensorML expResult =  (SensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component2.xml"));
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
 
         componentEquals(expResult, result);
     }
@@ -201,7 +201,7 @@ public class MDWebMetadataWriterTest {
 
         absResult = (AbstractSensorML) reader.getMetadata("sensor-system2", AbstractMetadataReader.SENSORML);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);
@@ -252,7 +252,7 @@ public class MDWebMetadataWriterTest {
 
         metadataEquals(expResult, result, ComparisonMode.BY_CONTRACT);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -366,7 +366,7 @@ public class MDWebMetadataWriterTest {
 
         metadataEquals(expResult,result);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
 
     }
 
@@ -395,7 +395,7 @@ public class MDWebMetadataWriterTest {
 
         metadataEquals(expResult,result);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -417,7 +417,7 @@ public class MDWebMetadataWriterTest {
         FeatureCatalogueImpl result = (FeatureCatalogueImpl) absResult;
         FeatureCatalogueImpl expResult =  (FeatureCatalogueImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/featcatalog1.xml"));
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
         catalogueEquals(expResult,result);
     }
 
@@ -439,7 +439,7 @@ public class MDWebMetadataWriterTest {
         RecordType result = (RecordType) absResult;
         RecordType expResult =  (RecordType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
         assertEquals(expResult,result);
     }
 
@@ -484,7 +484,7 @@ public class MDWebMetadataWriterTest {
 
         metadataEquals(expResult,result, ComparisonMode.BY_CONTRACT);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -506,7 +506,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata result = (DefaultMetadata) absResult;
         DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/imageMetadata.xml"));
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
         metadataEquals(expResult,result);
     }
 
@@ -542,7 +542,7 @@ public class MDWebMetadataWriterTest {
         final String expTitle = "Sea surface temperature and history derived from an analysis of MODIS Level 3 data for the Gulf of Mexico";
         final String title = Utils.findTitle(result);
         assertEquals(expTitle, title);*/
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     /**
@@ -564,7 +564,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata result = (DefaultMetadata) absResult;
         DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta-19119.xml"));
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
         metadataEquals(expResult, result);
     }
 
@@ -595,7 +595,7 @@ public class MDWebMetadataWriterTest {
 
         ebrimEquals(expResult, result);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     @Test
@@ -614,7 +614,7 @@ public class MDWebMetadataWriterTest {
 
         ebrimEquals(expResult, result);
 
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
     }
 
     @Test
@@ -628,7 +628,7 @@ public class MDWebMetadataWriterTest {
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
         DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta-19119.xml"));
-        pool.release(unmarshaller);
+        pool.recycle(unmarshaller);
         metadataEquals(expResult, result);
 
         /*

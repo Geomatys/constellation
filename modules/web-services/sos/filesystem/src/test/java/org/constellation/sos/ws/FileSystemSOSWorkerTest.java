@@ -32,7 +32,7 @@ import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.xml.MarshallerPool;
+import org.apache.sis.xml.MarshallerPool;
 
 
 import org.junit.*;
@@ -89,7 +89,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             marshaller.marshal(configuration, configFile);
 
         }
-        pool.release(marshaller);
+        pool.recycle(marshaller);
         init();
         worker = new SOSworker("", configDir);
         worker.setServiceUrl(URL);

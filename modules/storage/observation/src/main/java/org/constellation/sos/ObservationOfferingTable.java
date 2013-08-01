@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.namespace.QName;
+
+import org.apache.sis.xml.Namespaces;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.NoSuchTableException;
@@ -47,7 +49,6 @@ import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
-import org.geotoolkit.xml.Namespaces;
 
 /**
  *

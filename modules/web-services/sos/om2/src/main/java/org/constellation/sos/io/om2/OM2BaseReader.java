@@ -26,7 +26,7 @@ import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;

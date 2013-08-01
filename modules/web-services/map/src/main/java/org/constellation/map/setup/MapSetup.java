@@ -28,7 +28,7 @@ import org.constellation.provider.StyleProviderProxy;
 
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.internal.SetupService;
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 /**
  * specific setup for map service 
  * 

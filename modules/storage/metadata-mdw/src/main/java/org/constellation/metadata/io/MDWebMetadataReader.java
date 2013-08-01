@@ -37,6 +37,13 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 // Constellation Dependencies
+import org.apache.sis.metadata.iso.ISOMetadata;
+import org.apache.sis.util.Locales;
+import org.apache.sis.util.iso.DefaultInternationalString;
+import org.apache.sis.util.iso.DefaultLocalName;
+import org.apache.sis.util.iso.DefaultNameFactory;
+import org.apache.sis.xml.IdentifiedObject;
+import org.apache.sis.xml.IdentifierSpace;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.ReflectionUtilities;
@@ -55,21 +62,14 @@ import org.mdweb.io.MD_IOFactory;
 import org.mdweb.io.Reader;
 
 // Geotoolkit dependencies
-import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.apache.sis.util.iso.Types;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
-import org.geotoolkit.naming.DefaultLocalName;
-import org.geotoolkit.naming.DefaultNameFactory;
-import org.geotoolkit.resources.Locales;
 import org.geotoolkit.temporal.object.TemporalUtilities;
-import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.UnlimitedInteger;
-import org.geotoolkit.xml.IdentifierSpace;
 import org.apache.sis.xml.XLink;
 
 // GeoAPI dependencies
-import org.geotoolkit.xml.IdentifiedObject;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
 import org.opengis.util.TypeName;
@@ -716,8 +716,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             //if the result is a subClasses of MetaDataEntity
             Map<String, Object> metaMap = null;
             boolean isMeta  = false;
-            if (result instanceof MetadataEntity) {
-                final MetadataEntity meta = (MetadataEntity) result;
+            if (result instanceof ISOMetadata) {
+                final ISOMetadata meta = (ISOMetadata) result;
                 metaMap = meta.asMap();
                 isMeta  = true;
             }
@@ -758,7 +758,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
                 boolean putSuceed = false;
                 if (isMeta) {
-                    putSuceed = putMeta(metaMap, attribName, param, (MetadataEntity)result, path);
+                    putSuceed = putMeta(metaMap, attribName, param, (ISOMetadata)result, path);
                 }
 
                 if (!putSuceed) {
@@ -791,7 +791,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     }
 
 
-    private boolean putMeta(final Map<String, Object> metaMap, String attribName, final Object param, final MetadataEntity result, final Path path) {
+    private boolean putMeta(final Map<String, Object> metaMap, String attribName, final Object param, final ISOMetadata result, final Path path) {
         // special case for identifier
         if ("id".equals(attribName)) {
             result.getIdentifierMap().putSpecialized(IdentifierSpace.ID, (String)param);

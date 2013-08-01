@@ -161,9 +161,10 @@
   -->
     <properties>
         <!-- Define parent projects versions -->
+        <sis.version>0.4-jdk7-SNAPSHOT</sis.version>
         <geoapi.version>3.1-M04</geoapi.version>
-        <geotoolkit.version>4.0-M0</geotoolkit.version>
-        <mdweb-meta.version>2.4.3</mdweb-meta.version>
+        <geotoolkit.version>4.x-SNAPSHOT</geotoolkit.version>
+        <mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>
         <jersey.version>1.11</jersey.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>

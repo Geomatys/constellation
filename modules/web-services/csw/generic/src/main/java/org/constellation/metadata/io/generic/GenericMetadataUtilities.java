@@ -31,13 +31,13 @@ import java.util.logging.Logger;
 import org.constellation.generic.Values;
 
 // Geotoolkit dependencies
-import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
-import org.geotoolkit.util.SimpleInternationalString;
+import org.apache.sis.util.iso.SimpleInternationalString;
 
 // GeoAPI dependencies
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.extent.GeographicExtent;
