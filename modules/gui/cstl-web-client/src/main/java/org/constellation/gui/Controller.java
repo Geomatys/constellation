@@ -226,7 +226,7 @@ public class Controller {
      */
     @Resource
     @Route("/upload")
-    public Response upload(FileItem file) {
+    public Response upload(final FileItem file, final String name, final String dataType) {
         if (file != null) {
             try {
                 //open stream on file
@@ -248,7 +248,7 @@ public class Controller {
                 Runnable run = new Runnable() {
                     @Override
                     public void run() {
-                        servicesManager.uploadToServer(newFile);
+                        servicesManager.uploadToServer(newFile, name, dataType);
                     }
                 };
 

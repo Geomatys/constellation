@@ -1,9 +1,16 @@
 package org.constellation.ws.rest;
 
+import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.io.CoverageIO;
+import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.referencing.crs.ImageCRS;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -16,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,17 +47,43 @@ public class Data {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadFile(MultiPart multi){
 
-        String fileName = multi.getBodyParts().get(0).getContentDisposition().getFileName();
-        BodyPartEntity bpe = (BodyPartEntity) multi.getBodyParts().get(0).getEntity();
-        InputStream uploadedInputStream = bpe.getInputStream();
-        int extensionPoint = fileName.lastIndexOf('.');
-        String folderName = fileName.substring(0,extensionPoint);
 
-        String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath()+"/"+ folderName;
-        String uploadedFileName = uploadedFileLocation+"/"+fileName;
+        String dataName = "";
+        String dataType = "";
+        String extension = "";
+        InputStream uploadedInputStream = null;
+
+        for (BodyPart bodyPart : multi.getBodyParts()) {
+
+            Map<String, String> cdParameter = bodyPart.getContentDisposition().getParameters();
+            String name = cdParameter.get("name");
+            switch (name){
+                case "file" :
+                    BodyPartEntity bpe = (BodyPartEntity) bodyPart.getEntity();
+                    uploadedInputStream = bpe.getInputStream();
+                    String fileName = bodyPart.getContentDisposition().getFileName();
+                    int extensionPoint = fileName.lastIndexOf('.');
+                    extension = fileName.substring(extensionPoint);
+                    break;
+                case "name" :
+                    dataName = bodyPart.getEntityAs(String.class);
+                    break;
+                case "type" :
+                    //TODO : using it when generate data provider
+                    dataType = bodyPart.getEntityAs(String.class);
+                    break;
+                default:
+                    LOGGER.log(Level.INFO, "property not use");
+            }
+        }
+
+
+        String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath()+"/"+ dataName;
+        String uploadedFileName = uploadedFileLocation+"/"+dataName+extension;
         // save it
         try {
             writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName);
+
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when saving file", e);
             return Response.status(500).entity("upload file "+ uploadedFileLocation+" is not saved").build();
@@ -63,20 +97,24 @@ public class Data {
     private void writeToFile(final InputStream uploadedInputStream,
                              final String uploadedFileLocation, String uploadedFileName) throws IOException {
 
-        // create spécific directory for data
-        File folder = new File(uploadedFileLocation);
-        if(!folder.exists()){
-            folder.mkdir();
-        }
+        if(uploadedInputStream!=null){
 
-        int read = 0;
-        byte[] bytes = new byte[4096];
+            // create spécific directory for data
+            File folder = new File(uploadedFileLocation);
+            if(!folder.exists()){
+                folder.mkdir();
+            }
 
-        final OutputStream out = new FileOutputStream(new File(uploadedFileName));
-        while ((read = uploadedInputStream.read(bytes)) != -1) {
-            out.write(bytes, 0, read);
+            int read = 0;
+            byte[] bytes = new byte[4096];
+
+            File file = new File(uploadedFileName);
+            final OutputStream out = new FileOutputStream(file);
+            while ((read = uploadedInputStream.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
+            }
+            out.flush();
+            out.close();
         }
-        out.flush();
-        out.close();
     }
 }

@@ -1136,22 +1136,36 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Send file on constellation server
+         *
          * @param file file to sent
+         * @param name future data name
+         * @param dataType data type (raster, vector or sensor)
          * @return true if file sent without problem
          */
-        public Boolean uploadData(final File file){
+        public Boolean uploadData(final File file, String name, String dataType){
             //create form body part
-            FormDataBodyPart body = new FormDataBodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE) ;
-            MultiPart multi = new MultiPart();
-            multi.bodyPart(body);
+            FormDataBodyPart fileBody = new FormDataBodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+            FormDataBodyPart dataNameBody = new FormDataBodyPart(name, MediaType.TEXT_PLAIN_TYPE);
+            FormDataBodyPart dataTypeBody = new FormDataBodyPart(dataType, MediaType.TEXT_PLAIN_TYPE);
+
+
             try {
                 // create content disposition do give file name on server
-                FormDataContentDisposition cd = new FormDataContentDisposition("form-data; name=\"file\"; filename=\""+file.getName()+"\"");
-                body.setContentDisposition(cd);
+                FormDataContentDisposition cdFile = new FormDataContentDisposition("form-data; name=\"file\"; filename=\""+file.getName()+"\"");
+                fileBody.setContentDisposition(cdFile);
+                FormDataContentDisposition cdDataName = new FormDataContentDisposition("form-data; name=\"name\"");
+                dataNameBody.setContentDisposition(cdDataName);
+                FormDataContentDisposition cdDataType = new FormDataContentDisposition("form-data; name=\"type\"");
+                dataTypeBody.setContentDisposition(cdDataType);
             } catch (ParseException e) {
                 LOGGER.log(Level.WARNING, "error on cd building", e);
                 return false;
             }
+
+            MultiPart multi = new MultiPart();
+            multi.bodyPart(fileBody);
+            multi.bodyPart(dataNameBody);
+            multi.bodyPart(dataTypeBody);
 
             // generate jersey client to send file
             Client c = Client.create();

@@ -10,7 +10,7 @@
     <context:property-placeholder location="classpath:/constellation.properties"/>
 
     <bean class="java.lang.String" id="constellationURL">
-        <constructor-arg type="java.lang.String" value="http://localhost:8080/constellation/api/1/" />
+        <constructor-arg type="java.lang.String" value="http://localhost:8090/constellation/api/1/" />
     </bean>
     <bean class="java.lang.String" id="constellationlogin">
         <constructor-arg type="java.lang.String" value="admin" />

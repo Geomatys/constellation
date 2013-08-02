@@ -148,13 +148,15 @@ public class ServicesManager {
     /**
      * Send file on server via webservices
      * @param newFile file sent
+     * @param name future data name
+     * @param dataType data type (raster, vector or sensor)
      */
-    public void uploadToServer(File newFile) {
+    public void uploadToServer(File newFile, String name, String dataType) {
         URL serverUrl = null;
         try {
             serverUrl = new URL(constellationUrl);
             ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
-            cs.providers.uploadData(newFile);
+            cs.providers.uploadData(newFile, name, dataType);
         } catch (MalformedURLException e) {
             LOGGER.log(Level.WARNING, "error on url", e);
         }
