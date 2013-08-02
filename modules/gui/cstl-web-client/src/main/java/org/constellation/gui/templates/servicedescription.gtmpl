@@ -32,8 +32,12 @@
        <li class="active"><a href="#data" data-toggle="tab">&{service.description.tab.data.title}</a> </li>
    </ul>
     <div class="tab-content">
-        <div class="tab-pane" id="description">Description</div>
-        <div class="tab-pane" id="metadata">Metadata</div>
+        <div class="tab-pane" id="description">
+            #{include path=wmsformpart1.gtmpl/}
+        </div>
+        <div class="tab-pane" id="metadata">
+            #{include path=wmsformpart2.gtmpl/}
+        </div>
         <div class="tab-pane active" id="data">
             #{include path=datalistings.gtmpl/}
         </div>
