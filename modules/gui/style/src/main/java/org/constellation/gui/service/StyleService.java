@@ -19,6 +19,7 @@ package org.constellation.gui.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.dto.CoverageInfo;
 import org.constellation.gui.binding.Style;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.feature.type.FeatureType;
@@ -149,11 +150,11 @@ public final class StyleService {
     }
 
     /**
-     * Gets a layer {@link org.opengis.feature.type.FeatureType} instance from the constellation server.
+     * Gets a layer {@link FeatureType} instance from the constellation server.
      *
      * @param providerId the provider id
      * @param layerName  the layer name
-     * @throws java.io.IOException if failed to update style for any reason
+     * @throws IOException if failed to update style for any reason
      */
     public FeatureType getLayerFeatureType(final String providerId, final String layerName) throws IOException {
         ensureNonNull("providerId", providerId);
@@ -164,6 +165,25 @@ public final class StyleService {
             return server.providers.getLayerFeatureType(providerId, layerName);
         } catch (Exception ex) {
             throw new IOException("Unable to get feature type for layer named \"" + layerName + "\" on the provider with id \"" + providerId + "\".");
+        }
+    }
+
+    /**
+     * Gets a layer {@link CoverageInfo} instance from the constellation server.
+     *
+     * @param providerId the provider id
+     * @param layerName  the layer name
+     * @throws IOException if failed to update style for any reason
+     */
+    public CoverageInfo getLayerCoverageInfo(final String providerId, final String layerName) throws IOException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("layerName", layerName);
+        try {
+            final URL url = new URL(constellationUrl.substring(0, constellationUrl.indexOf("api")) + "WS");
+            final ConstellationServer server = new ConstellationServer(url, login, password);
+            return server.providers.getLayerCoverageInfo(providerId, layerName);
+        } catch (Exception ex) {
+            throw new IOException("Unable to get coverage info for layer named \"" + layerName + "\" on the provider with id \"" + providerId + "\".");
         }
     }
 }

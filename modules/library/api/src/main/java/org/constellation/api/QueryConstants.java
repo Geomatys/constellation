@@ -49,10 +49,11 @@ public final class QueryConstants {
     public static final String REQUEST_RESTART_PROVIDER             = "restartProvider"; 
     
     //Layer operations
-    public static final String REQUEST_CREATE_LAYER           = "createLayer";
-    public static final String REQUEST_UPDATE_LAYER           = "updateLayer";
-    public static final String REQUEST_GET_LAYER_FEATURE_TYPE = "getFeatureType";
-    public static final String REQUEST_DELETE_LAYER           = "deleteLayer";
+    public static final String REQUEST_CREATE_LAYER            = "createLayer";
+    public static final String REQUEST_UPDATE_LAYER            = "updateLayer";
+    public static final String REQUEST_GET_LAYER_FEATURE_TYPE  = "getFeatureType";
+    public static final String REQUEST_GET_LAYER_COVERAGE_INFO = "getCOverageInfo";
+    public static final String REQUEST_DELETE_LAYER            = "deleteLayer";
     
     //Style operations
     public static final String REQUEST_DOWNLOAD_STYLE   = "downloadStyle";
