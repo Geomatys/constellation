@@ -87,13 +87,13 @@
                         </div>
                         <div>
                             <label class="radio">
-                                <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="../../images/little/vecteur.png" class="img-rounded"> &{layer.listing.data.upload.vector.label}
+                                <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="../../images/icon/vecteur.png" class="img-rounded"> &{layer.listing.data.upload.vector.label}
                             </label>
                             <label class="radio">
-                                <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="../../images/little/raster.png" class="img-rounded"> &{layer.listing.data.upload.raster.label}
+                                <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="../../images/icon/raster.png" class="img-rounded"> &{layer.listing.data.upload.raster.label}
                             </label>
                             <label class="radio">
-                                <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="../../images/little/capteur.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
+                                <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="../../images/icon/capteur.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
                             </label>
                         </div>
 
