@@ -1,21 +1,21 @@
 <div class="row">
     <div class="span9">
         <div style="border-bottom: 1px solid #ddd;">
-            <h4>Liste des Couches</h4>
+            <h4>&{layer.listing.title}</h4>
         </div>
         <div>
-            <h5><%= layers.getLayer().size() %> couches</h5>
+            <h5><%= layers.getLayer().size() %> &{layer.listing.layer.label}</h5>
         </div>
         <div class="navbar">
             <div class="navbar-inner">
                 <ul class="nav">
-                    <li><a href="#">Titre</a></li>
+                    <li><a href="#">&{layer.listing.orderby.title}</a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#">Date</a></li>
+                    <li><a href="#">&{layer.listing.orderby.date}</a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#">Propriétaire</a></li>
+                    <li><a href="#">&{layer.listing.orderby.owner}</a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#">Type de donnée</a></li>
+                    <li><a href="#">&{layer.listing.orderby.type}</a></li>
                     <li class="divider-vertical"></li>
                 </ul>
                 <form class="navbar-form pull-left">
@@ -29,7 +29,7 @@
         <div class="container">
             <div class="row">
                 <div class="span3">
-                    <button type="button" class="btn btn-info btn-small">selectionner toutes les couches</button></div>
+                    <button type="button" class="btn btn-info btn-small">&{layer.listing.selectall.button}</button></div>
                 <div class="span3">
                     <div class="pagination" style="margin: 0px;">
                         <ul id="paging">
@@ -39,16 +39,16 @@
                 </div>
                 <div class="span3">
                     <select class="pull-right" id="nbLayersselect">
-                        <option value="10" selected="selected">10 couches</option>
-                        <option value="20">20 couches</option>
-                        <option value="100">100 couches</option>
-                        <option value="${layers.getLayer().size()}">Toutes les couches</option>
+                        <option value="10" selected="selected">&{layer.listing.numberbypage.10.label}</option>
+                        <option value="20">&{layer.listing.numberbypage.20.label}</option>
+                        <option value="100">&{layer.listing.numberbypage.100.label}</option>
+                        <option value="${layers.getLayer().size()}">&{layer.listing.numberbypage.all.label}</option>
                     </select>
                 </div>
             </div>
             <div class="row">
                 <div class="span9">
-                    <button type="button" class="btn btn-info btn-block">réduire ou agrandir</button>
+                    <button type="button" class="btn btn-info btn-block">&{layer.listing.reduce.button.label}</button>
                 </div>
             </div>
             <div id="datalist">
@@ -57,18 +57,18 @@
     </div>
     <div class="span3 pull-right">
         <div class="row pull-right">
-            <button class="btn btn-info">ajouter une donnee</button>
-            <a href="#myModal" role="button" class="btn btn-info" data-toggle="modal">creer une donnee</a>
+            <button class="btn btn-info">&{layer.listing.data.add.button.label}</button>
+            <a href="#myModal" role="button" class="btn btn-info" data-toggle="modal">&{layer.listing.data.create.button.label}</a>
             <!-- Modal -->
             <form action="@{upload()}" enctype="multipart/form-data" method="post">
                 <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                        <h3 id="myModalLabel">Upload data</h3>
+                        <h3 id="myModalLabel">&{layer.listing.data.upload.title}</h3>
                     </div>
                     <div class="modal-body">
                         <div>
-                            <label>Nom</label>
+                            <label>&{layer.listing.data.upload.name.label}</label>
                             <input type="text" name="name"/>
                         </div>
                         <div class="fileupload fileupload-new" data-provides="fileupload">
@@ -78,29 +78,29 @@
                                     <span class="fileupload-preview"></span>
                                 </div>
                                 <span class="btn btn-file">
-                                    <span class="fileupload-new">Select file</span>
-                                    <span class="fileupload-exists">Change</span>
+                                    <span class="fileupload-new">&{layer.listing.data.upload.select.label}</span>
+                                    <span class="fileupload-exists">&{layer.listing.data.upload.change.label}</span>
                                     <input type="file" name="file" id="file"/>
                                 </span>
-                                <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
+                                <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">&{layer.listing.data.upload.remove.label}</a>
                             </div>
                         </div>
                         <div>
                             <label class="radio">
-                                <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="../../images/little/vecteur.png" class="img-rounded"> Donnee vecteur
+                                <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="../../images/little/vecteur.png" class="img-rounded"> &{layer.listing.data.upload.vector.label}
                             </label>
                             <label class="radio">
-                                <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="../../images/little/raster.png" class="img-rounded"> Donnee raster
+                                <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="../../images/little/raster.png" class="img-rounded"> &{layer.listing.data.upload.raster.label}
                             </label>
                             <label class="radio">
-                                <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="../../images/little/capteur.png" class="img-rounded"> Donnee capteur
+                                <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="../../images/little/capteur.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
                             </label>
                         </div>
 
                     </div>
                     <div class="modal-footer">
-                        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                        <button class="btn btn-info" type="submit">Save changes</button>
+                        <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>
+                        <button class="btn btn-info" type="submit">&{layer.listing.data.upload.button}</button>
                     </div>
                 </div>
             </form>
