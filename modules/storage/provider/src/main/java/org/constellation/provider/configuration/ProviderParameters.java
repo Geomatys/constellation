@@ -31,6 +31,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.xml.stream.XMLStreamException;
+
+import org.constellation.provider.LayerProvider;
+import org.constellation.provider.Provider;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.apache.sis.util.ArgumentChecks;
@@ -39,6 +42,7 @@ import org.geotoolkit.xml.parameter.ParameterValueWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.parameter.Parameters.*;
@@ -51,6 +55,7 @@ import static org.geotoolkit.parameter.Parameters.*;
 public final class ProviderParameters {
 
     public static final String CONFIG_DESCRIPTOR_NAME = "config";
+    public static final String NAMESPACE_DESCRIPTOR_NAME = "namespace";
 
     ////////////////////////////////////////////////////////////////////////////
     // Source parameters ///////////////////////////////////////////////////////
@@ -196,6 +201,19 @@ public final class ProviderParameters {
         }else{
             return null;
         }
+    }
+
+    public static ParameterValueGroup getSourceConfiguration(final Provider provider) {
+        return getSourceConfiguration(provider.getSource(), provider.getService().getServiceDescriptor());
+    }
+
+    public static String getNamespace(final LayerProvider provider) {
+        try {
+            final String namespace = getSourceConfiguration(provider).parameter(NAMESPACE_DESCRIPTOR_NAME).stringValue();
+            return "no namespace".equals(namespace) ? null : namespace;
+        } catch (ParameterNotFoundException ignore) {
+        }
+        return "http://geotoolkit.org"; // return default
     }
 
     public static List<ParameterValueGroup> getSources(final ParameterValueGroup config){

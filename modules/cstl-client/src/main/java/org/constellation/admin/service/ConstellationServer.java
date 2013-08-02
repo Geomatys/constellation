@@ -45,6 +45,7 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.client.ServerFactory;
+import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
@@ -57,6 +58,9 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
+import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -107,6 +111,7 @@ import static org.constellation.api.QueryConstants.REQUEST_DELETE_TASK;
 import static org.constellation.api.QueryConstants.REQUEST_DOWNLOAD_STYLE;
 import static org.constellation.api.QueryConstants.REQUEST_FULL_RESTART;
 import static org.constellation.api.QueryConstants.REQUEST_GET_CONFIG_PATH;
+import static org.constellation.api.QueryConstants.REQUEST_GET_LAYER_FEATURE_TYPE;
 import static org.constellation.api.QueryConstants.REQUEST_GET_PROCESS_DESC;
 import static org.constellation.api.QueryConstants.REQUEST_GET_PROVIDER_CONFIG;
 import static org.constellation.api.QueryConstants.REQUEST_GET_SERVICE_DESCRIPTOR;
@@ -1174,6 +1179,20 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return true;
         }
 
+        public FeatureType getLayerFeatureType(final String id, final String layerName) {
+            ArgumentChecks.ensureNonNull("id", id);
+            ArgumentChecks.ensureNonNull("layerName", layerName);
+            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_LAYER_FEATURE_TYPE + "&id=" + id + "&layerName=" + layerName;
+            try {
+                final Object response = sendRequest(url, null, null, XSDMarshallerPool.getInstance(), false);
+                if (response instanceof Schema) {
+                    return new JAXBFeatureTypeReader().getFeatureTypeFromSchema((Schema) response, layerName);
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+            return null;
+        }
     }
 
     /**
