@@ -25,11 +25,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.constellation.gui</groupId>
-            <artifactId>wms</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.constellation.web-services</groupId>
             <artifactId>cstl-web-dto</artifactId>
             <version>${project.version}</version>
@@ -40,15 +35,17 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- GUI parts -->
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.2.2</version>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>wms</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>1.3</version>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>style</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

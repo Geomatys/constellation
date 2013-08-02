@@ -1,19 +1,44 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>gui</artifactId>
-        <groupId>org.constellation</groupId>
-        <version>0.9-SNAPSHOT</version>
-    </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>gui</artifactId>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
+
+
+    <!-- =================================================================== -->
+    <!--                         Module Description.                         -->
+    <!-- =================================================================== -->
+
+    <groupId>org.constellation.gui</groupId>
     <artifactId>style</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
+    <name>GUI - Style</name>
 
-    <name>style</name>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <!-- =================================================================== -->
+    <!--                            Dependencies.                            -->
+    <!-- =================================================================== -->
 
+    <dependencies>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-xml-sld</artifactId>
+            <version>${geotoolkit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.2</version>
+        </dependency>
+    </dependencies>
 </project>

@@ -1,0 +1,63 @@
+#{decorate path=menu.gtmpl/}
+
+#{param name=providerId/}
+#{param name=styleName/}
+#{param name=style/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="../images/constellation.png"/>
+    </div>
+</div>
+
+<div class="style-edition">
+    <div class="header-bar">
+        <span class="big-title">&{edition.style.title}</span>
+        <form class="form-inline pull-right">
+            <label for="name">&{edition.style.name.label}:</label>
+            <input type="text" id="name" name="name" value="${styleName}" />
+            <input type="submit" class="btn" value="&{edition.style.update.label}" />
+        </form>
+    </div>
+
+    <div class="body-container">
+        <div class="row">
+            <div class="span6">
+                <div id="left">
+                    <div class="title-row">
+                        <span class="medium-title">&{edition.style.rules.title}:</span>
+                        <div class="btn pull-right" onclick="CSTL.StyleEdition.removeAllRules();">
+                            <span class="icon-trash"></span>
+                            &{edition.style.delete.all.label}
+                        </div>
+                        <div class="btn-group pull-right">
+                            <div class="btn dropdown-toggle" data-toggle="dropdown">
+                                <span class="icon-plus"></span>
+                                &{edition.style.new.rules.label}
+                            </div>
+                            <ul class="dropdown-menu">
+                                <li><a href="@{StyleController.rule(providerId = providerId, styleName = styleName, method = 'm')}" onclick="CSTL.StyleEdition.newRule();">&{edition.style.method.manual} <i>(unique)</i></a></li>
+                                <li><a href="@{StyleController.rule(providerId = providerId, styleName = styleName, method = 'ai')}">&{edition.style.method.auto.intervals} <i>(multiple)</i></a></li>
+                                <li><a href="@{StyleController.rule(providerId = providerId, styleName = styleName, method = 'auv')}">&{edition.style.method.auto.unique} <i>(multiple)</i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="rules" class="list">
+                    </div>
+                </div>
+            </div>
+            #{include path=style_overview.gtmpl/}
+        </div>
+
+        <div class="footer-actions">
+            <a href="#" onclick="CSTL.StyleEdition.cancel();" class="btn">&{edition.style.cancel.label}</a>
+            <a href="#" onclick="CSTL.SldWorkflow.updateStyle('@{StyleController.update()}','${providerId}','${styleName}');" class="btn btn-primary">&{edition.style.validate.label}</a>
+        </div>
+
+        <div data-action="edit-rule" data-url="@{StyleController.rule(providerId = providerId, styleName = styleName, method = 'm')}"></div>
+        <script type="text/javascript">
+            CSTL.StyleEdition.init(${style});
+        </script>
+    </div>
+</div>
+
