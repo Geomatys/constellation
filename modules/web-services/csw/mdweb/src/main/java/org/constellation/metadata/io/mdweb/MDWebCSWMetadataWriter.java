@@ -17,8 +17,10 @@
 
 package org.constellation.metadata.io.mdweb;
 
+import java.util.HashMap;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 // Constellation dependencies
@@ -129,8 +131,9 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                     final String parentIdValue = mp.idValue.substring(0, mp.idValue.lastIndexOf(':'));
                     final List<Value> parentValues    = f.getValueFromNumberedPath(mp.path.getParent(), parentIdValue);
                     if (parentValues != null && !parentValues.isEmpty()) {
+                        final Map<Object, Value> alreadyWrite = new HashMap<Object, Value>();
                         for (Value parentValue : parentValues) {
-                            final List<Value> toInsert = addValueFromObject(f, value, mp.path, parentValue);
+                            final List<Value> toInsert = addValueFromObject(f, value, mp.path, parentValue, alreadyWrite);
                             for (Value ins : toInsert) {
                                 mdWriter.writeValue(ins);
                             }
@@ -141,6 +144,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
 
                 // if the value(s) already exist
                 } else {
+                    final Map<Object, Value> alreadyWrite = new HashMap<Object, Value>();
                     for (Value v : matchingValues) {
                         if (v instanceof TextValue && value instanceof String) {
                             // TODO verify more Type
@@ -170,7 +174,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                             } else {
                                 LOGGER.finer("value updated");
                                 mdWriter.deleteValue(v);
-                                final List<Value> toInsert = addValueFromObject(f, value, mp.path, v.getParent());
+                                final List<Value> toInsert = addValueFromObject(f, value, mp.path, v.getParent(), alreadyWrite);
                                 for (Value ins : toInsert) {
                                     mdWriter.writeValue(ins);
                                 }
