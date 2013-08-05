@@ -281,7 +281,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 final ExtraMappingFactory currentFactory = ite.next();
                 extraStandard.putAll(currentFactory.getExtraStandard());
             }
-                
+
             for (Entry<String, List<String>> entry : extraStandard.entrySet()) {
                 final String mainStandardName = entry.getKey();
                 final Standard newMainStandard = mdWriter.getStandard(mainStandardName);
@@ -711,7 +711,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             if (mdWriter.getPath(childPath.getId()) == null) {
                                 mdWriter.writePath(childPath);
                             }
-                            result.addAll(addValueFromObject(record, propertyValue, childPath, value));
+                            result.addAll(addValueFromObject(record, propertyValue, childPath, value, alreadyWrite));
                         }
                     } else if ("xLink".equals(propName) && object instanceof IdentifiedObject) {
                         final Object propertyValue = ((IdentifiedObject)object).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK);
