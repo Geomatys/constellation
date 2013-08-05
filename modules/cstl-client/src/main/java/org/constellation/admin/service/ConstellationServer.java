@@ -20,10 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.header.ContentDisposition;
 import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.util.ArgumentChecks;
@@ -40,13 +37,12 @@ import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringTreeNode;
-import org.constellation.dto.CoverageInfo;
+import org.constellation.dto.DataInfo;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.client.ServerFactory;
-import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
@@ -59,9 +55,6 @@ import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
-import org.geotoolkit.xsd.xml.v2001.Schema;
-import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -83,7 +76,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -1142,29 +1134,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return true;
         }
 
-        public FeatureType getLayerFeatureType(final String id, final String layerName) {
-            ArgumentChecks.ensureNonNull("id", id);
+        public DataInfo getLayerDataInfo(final String providerId, final String layerName) {
+            ArgumentChecks.ensureNonNull("providerId", providerId);
             ArgumentChecks.ensureNonNull("layerName", layerName);
-            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_LAYER_FEATURE_TYPE + "&id=" + id + "&layerName=" + layerName;
-            try {
-                final Object response = sendRequest(url, null, null, XSDMarshallerPool.getInstance(), false);
-                if (response instanceof Schema) {
-                    return new JAXBFeatureTypeReader().getFeatureTypeFromSchema((Schema) response, layerName);
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
 
-        public CoverageInfo getLayerCoverageInfo(final String id, final String layerName) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("layerName", layerName);
-            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_LAYER_COVERAGE_INFO + "&id=" + id + "&layerName=" + layerName;
+            final String url = getURLWithEndSlash() + "provider/" + providerId + "/" + layerName + "/info";
             try {
-                final Object response = sendRequest(url, null, null, XSDMarshallerPool.getInstance(), false);
-                if (response instanceof CoverageInfo) {
-                    return (CoverageInfo) response;
+                final Object response = sendRequest(url, null);
+                if (response instanceof DataInfo) {
+                    return (DataInfo) response;
                 }
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
@@ -1528,7 +1506,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         applySessionId(conec);
 
         try {
-
             // for a POST request
             if (request != null) {
 
@@ -1545,7 +1522,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
                 } else {
                     doXMLPost(request, conec);
-
                 }
             }
             
@@ -1606,7 +1582,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      * @param request JSON object which define object to send
      * @param conec {@link HttpURLConnection} to access to constellation server side
      */
-    private void doJsonPost(String request, HttpURLConnection conec) {
+    private void doJsonPost(Object request, HttpURLConnection conec) {
         try {
             //Define request
             conec.setRequestMethod("POST");
@@ -1614,7 +1590,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
             //Send request
             OutputStream os = conec.getOutputStream();
-            os.write(request.getBytes());
+            os.write(request.toString().getBytes());
             os.flush();
             if (conec.getResponseCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
