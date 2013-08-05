@@ -15,10 +15,10 @@
                 <a class="brand" href="#">${service.name}</a>
                 <form class="navbar-form pull-right" style="margin-top: 2px;">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-small">GetCapabilities</button>
-                        <button type="button" class="btn btn-small">Logs du service</button>
-                        <button type="button" class="btn btn-small btn-info">Reload</button>
-                        <button type="button" class="btn btn-small btn-danger">Stop</button>
+                        <button type="button" class="btn btn-small">&{service.description.getcapabilities.button}</button>
+                        <button type="button" class="btn btn-small">&{service.description.logs.button}</button>
+                        <button type="button" class="btn btn-small btn-info">&{service.description.reload.button}</button>
+                        <button type="button" class="btn btn-small btn-danger">&{service.description.stop.button}</button>
                     </div>
                 </form>
             </div>
@@ -27,13 +27,17 @@
 </div>
 <div class="row">
    <ul class="nav nav-tabs">
-       <li><a href="#description" data-toggle="tab">Description du service</a> </li>
-       <li><a href="#metadata" data-toggle="tab">Metadonnee du service</a> </li>
-       <li class="active"><a href="#data" data-toggle="tab">Donnees</a> </li>
+       <li><a href="#description" data-toggle="tab">&{service.description.tab.description.title}</a> </li>
+       <li><a href="#metadata" data-toggle="tab">&{service.description.tab.metadata.title}</a> </li>
+       <li class="active"><a href="#data" data-toggle="tab">&{service.description.tab.data.title}</a> </li>
    </ul>
     <div class="tab-content">
-        <div class="tab-pane" id="description">Description</div>
-        <div class="tab-pane" id="metadata">Metadata</div>
+        <div class="tab-pane" id="description">
+            #{include path=wmsformpart1.gtmpl/}
+        </div>
+        <div class="tab-pane" id="metadata">
+            #{include path=wmsformpart2.gtmpl/}
+        </div>
         <div class="tab-pane active" id="data">
             #{include path=datalistings.gtmpl/}
         </div>

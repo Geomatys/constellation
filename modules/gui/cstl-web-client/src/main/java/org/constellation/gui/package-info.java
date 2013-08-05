@@ -19,11 +19,25 @@
  * Juzu application declaration. List all alias need to run cstl-web-client
  */
 @juzu.Application(defaultController = Controller.class, resourceAliases = {
-        @Alias(of = "/org/constellation/gui/templates/menu.gtmpl", as = "menu.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wmsdescription.gtmpl", as = "wmsdescription.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wmsmetadata.gtmpl", as = "wmsmetadata.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wmscreate.gtmpl", as = "wmscreate.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style/overview.gtmpl", as = "overview.gtmpl")})
+        @Alias(of = "/org/constellation/gui/templates/menu.gtmpl",                  as = "menu.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wmsdescription.gtmpl",        as = "wmsdescription.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wmsmetadata.gtmpl",           as = "wmsmetadata.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wmscreate.gtmpl",             as = "wmscreate.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wmsformpart1.gtmpl",          as = "wmsformpart1.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wmsformpart2.gtmpl",          as = "wmsformpart2.gtmpl"),
+
+        // Style
+        @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",       as = "style_dashboard.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_overview.gtmpl",        as = "style_overview.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_edition.gtmpl",         as = "style_edition.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_rule_manual.gtmpl",     as = "style_rule_manual.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_rule_ai.gtmpl",         as = "style_rule_ai.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_rule_auv.gtmpl",        as = "style_rule_auv.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_point.gtmpl",    as = "style_symbol_point.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_line.gtmpl",     as = "style_symbol_line.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_polygon.gtmpl",  as = "style_symbol_polygon.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_text.gtmpl",     as = "style_symbol_text.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_raster.gtmpl",   as = "style_symbol_raster.gtmpl")})
 
 /*
  * Declare servlet Base URL and which bundle used
@@ -39,16 +53,16 @@
  * javascript and css loaded
  */
 @Assets(stylesheets = @Stylesheet(src = "cstl-web-client.css"),
-        scripts = {@Script(id = "jquery", src = "js/jquery-2.0.0.js"),
-                @Script(id = "json", src = "js/jquery.json-2.4.js", depends = "jquery"),
-                @Script(id = "bootstrap", src = "js/bootstrap.min.js", depends = "jquery"),
-                @Script(id = "colorpicker", src = "js/bootstrap-colorpicker.js", depends = "bootstrap"),
-                @Script(id = "slider", src = "js/bootstrap-slider.js", depends = "bootstrap"),
-                @Script(id = "upload", src = "js/bootstrap-fileupload.js", depends = "bootstrap"),
-                @Script(id = "openlayers", src = "js/openlayers.js", depends = "jquery"),
-                @Script(id = "openlayers-ext", src = "js/openlayers-ext.js", depends = "openlayers"),
-                @Script(id = "service", src = "js/services.js", depends = "jquery"),
-                @Script(id = "wmsedition", src = "js/wmsedition.js", depends = "jquery"),
+        scripts = {@Script(id = "jquery", src = "js/jquery-2.0.0.js", location = AssetLocation.SERVER),
+                @Script(id = "json", src = "js/jquery.json-2.4.js", depends = "jquery", location = AssetLocation.SERVER),
+                @Script(id = "bootstrap", src = "js/bootstrap.min.js", depends = "jquery", location = AssetLocation.SERVER),
+                @Script(id = "colorpicker", src = "js/bootstrap-colorpicker.js", depends = "bootstrap", location = AssetLocation.SERVER),
+                @Script(id = "slider", src = "js/bootstrap-slider.js", depends = "bootstrap", location = AssetLocation.SERVER),
+                @Script(id = "upload", src = "js/bootstrap-fileupload.js", depends = "bootstrap", location = AssetLocation.SERVER),
+                @Script(id = "openlayers", src = "js/openlayers.js", depends = "jquery", location = AssetLocation.SERVER),
+                @Script(id = "openlayers-ext", src = "js/openlayers-ext.js", depends = "openlayers", location = AssetLocation.SERVER),
+                @Script(id = "service", src = "js/services.js", depends = "jquery", location = AssetLocation.SERVER),
+                @Script(id = "wmsedition", src = "js/wmsedition.js", depends = "jquery", location = AssetLocation.SERVER),
                 @Script(id = "styleedition", src = "js/styleedition.js", depends = "jquery")})
 
 /**
@@ -62,6 +76,7 @@
 package org.constellation.gui;
 
 import juzu.Alias;
+import juzu.asset.AssetLocation;
 import juzu.plugin.asset.Assets;
 import juzu.plugin.asset.Script;
 import juzu.plugin.asset.Stylesheet;

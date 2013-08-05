@@ -219,21 +219,42 @@ public class Controller {
         dataElement.with(parameters).render();
     }
 
+    /**
+     * juzu Upload utilisation. Save file on temp directory before create a thread to send it on server.
+     * @param file file set by client for constellation server
+     * @return a {@link Response} to redirect on another page
+     */
     @Resource
     @Route("/upload")
-    public Response upload(FileItem file) {
+    public Response upload(final FileItem file, final String name, final String dataType) {
         if (file != null) {
             try {
+                //open stream on file
                 final InputStream stream = file.getInputStream();
+
                 // Create file on temporary folder
                 String tempDir= System.getProperty("java.io.tmpdir");
                 final File newFile = new File(tempDir +"/"+ file.getName());
+
+                // write on file
                 final FileOutputStream fos = new FileOutputStream(newFile);
                 int intVal = stream.read();
                 while (intVal != -1) {
                     fos.write(intVal);
                     intVal = stream.read();
                 }
+
+                //create thread to send on server
+                Runnable run = new Runnable() {
+                    @Override
+                    public void run() {
+                        servicesManager.uploadToServer(newFile, name, dataType);
+                    }
+                };
+
+                Thread sendingThread = new Thread(run, "SENDING_FILE");
+                sendingThread.start();
+
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "error when saving file on server", e);
                 return Response.error("error when saving file on server");

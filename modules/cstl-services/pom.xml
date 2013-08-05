@@ -78,6 +78,11 @@
             </activation>
             <dependencies>
                 <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>jersey-multipart</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-sos-mdw</artifactId>
                     <version>${project.version}</version>

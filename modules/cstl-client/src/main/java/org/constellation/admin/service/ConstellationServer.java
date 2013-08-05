@@ -17,6 +17,15 @@
 package org.constellation.admin.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.header.ContentDisposition;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.FormDataBodyPart;
+import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.util.ArgumentChecks;
 import org.constellation.admin.service.ConstellationServer.Csws;
 import org.constellation.admin.service.ConstellationServer.Providers;
@@ -31,11 +40,13 @@ import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringTreeNode;
+import org.constellation.dto.CoverageInfo;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.client.ServerFactory;
+import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
@@ -48,6 +59,9 @@ import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
+import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -56,6 +70,7 @@ import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
 
 import javax.swing.event.EventListenerList;
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -68,9 +83,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -79,44 +96,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.constellation.api.QueryConstants.REQUEST_ACCESS;
-import static org.constellation.api.QueryConstants.REQUEST_ADD_TO_INDEX;
-import static org.constellation.api.QueryConstants.REQUEST_AVAILABLE_SOURCE_TYPE;
-import static org.constellation.api.QueryConstants.REQUEST_CLEAR_CACHE;
-import static org.constellation.api.QueryConstants.REQUEST_CREATE_LAYER;
-import static org.constellation.api.QueryConstants.REQUEST_CREATE_PROVIDER;
-import static org.constellation.api.QueryConstants.REQUEST_CREATE_STYLE;
-import static org.constellation.api.QueryConstants.REQUEST_CREATE_TASK;
-import static org.constellation.api.QueryConstants.REQUEST_DELETE_LAYER;
-import static org.constellation.api.QueryConstants.REQUEST_DELETE_PROVIDER;
-import static org.constellation.api.QueryConstants.REQUEST_DELETE_RECORDS;
-import static org.constellation.api.QueryConstants.REQUEST_DELETE_STYLE;
-import static org.constellation.api.QueryConstants.REQUEST_DELETE_TASK;
-import static org.constellation.api.QueryConstants.REQUEST_DOWNLOAD_STYLE;
-import static org.constellation.api.QueryConstants.REQUEST_FULL_RESTART;
-import static org.constellation.api.QueryConstants.REQUEST_GET_CONFIG_PATH;
-import static org.constellation.api.QueryConstants.REQUEST_GET_PROCESS_DESC;
-import static org.constellation.api.QueryConstants.REQUEST_GET_PROVIDER_CONFIG;
-import static org.constellation.api.QueryConstants.REQUEST_GET_SERVICE_DESCRIPTOR;
-import static org.constellation.api.QueryConstants.REQUEST_GET_SOURCE_DESCRIPTOR;
-import static org.constellation.api.QueryConstants.REQUEST_GET_TASK_PARAMS;
-import static org.constellation.api.QueryConstants.REQUEST_IMPORT_RECORDS;
-import static org.constellation.api.QueryConstants.REQUEST_LIST_PROCESS;
-import static org.constellation.api.QueryConstants.REQUEST_LIST_SERVICE;
-import static org.constellation.api.QueryConstants.REQUEST_LIST_SERVICES;
-import static org.constellation.api.QueryConstants.REQUEST_LIST_TASKS;
-import static org.constellation.api.QueryConstants.REQUEST_METADATA_EXIST;
-import static org.constellation.api.QueryConstants.REQUEST_REFRESH_INDEX;
-import static org.constellation.api.QueryConstants.REQUEST_REMOVE_FROM_INDEX;
-import static org.constellation.api.QueryConstants.REQUEST_RESTART_ALL_LAYER_PROVIDERS;
-import static org.constellation.api.QueryConstants.REQUEST_RESTART_ALL_STYLE_PROVIDERS;
-import static org.constellation.api.QueryConstants.REQUEST_RESTART_PROVIDER;
-import static org.constellation.api.QueryConstants.REQUEST_SET_CONFIG_PATH;
-import static org.constellation.api.QueryConstants.REQUEST_UPDATE_CAPABILITIES;
-import static org.constellation.api.QueryConstants.REQUEST_UPDATE_LAYER;
-import static org.constellation.api.QueryConstants.REQUEST_UPDATE_PROVIDER;
-import static org.constellation.api.QueryConstants.REQUEST_UPDATE_STYLE;
-import static org.constellation.api.QueryConstants.REQUEST_UPDATE_TASK;
+import static org.constellation.api.QueryConstants.*;
 
 /**
  * convenient class to perform actions on constellation web services.
@@ -1122,6 +1102,75 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return null;
         }
 
+        /**
+         * Send file on constellation server
+         *
+         * @param file file to sent
+         * @param name future data name
+         * @param dataType data type (raster, vector or sensor)
+         * @return true if file sent without problem
+         */
+        public Boolean uploadData(final File file, String name, String dataType){
+            //create form body part
+            FormDataBodyPart fileBody = new FormDataBodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+            FormDataBodyPart dataNameBody = new FormDataBodyPart(name, MediaType.TEXT_PLAIN_TYPE);
+            FormDataBodyPart dataTypeBody = new FormDataBodyPart(dataType, MediaType.TEXT_PLAIN_TYPE);
+
+
+            try {
+                // create content disposition do give file name on server
+                FormDataContentDisposition cdFile = new FormDataContentDisposition("form-data; name=\"file\"; filename=\""+file.getName()+"\"");
+                fileBody.setContentDisposition(cdFile);
+                FormDataContentDisposition cdDataName = new FormDataContentDisposition("form-data; name=\"name\"");
+                dataNameBody.setContentDisposition(cdDataName);
+                FormDataContentDisposition cdDataType = new FormDataContentDisposition("form-data; name=\"type\"");
+                dataTypeBody.setContentDisposition(cdDataType);
+            } catch (ParseException e) {
+                LOGGER.log(Level.WARNING, "error on cd building", e);
+                return false;
+            }
+
+            MultiPart multi = new MultiPart();
+            multi.bodyPart(fileBody);
+            multi.bodyPart(dataNameBody);
+            multi.bodyPart(dataTypeBody);
+
+            // generate jersey client to send file
+            Client c = Client.create();
+            WebResource service = c.resource(getURLWithEndSlash());
+            ClientResponse response = service.path("data/upload").type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multi);
+            return true;
+        }
+
+        public FeatureType getLayerFeatureType(final String id, final String layerName) {
+            ArgumentChecks.ensureNonNull("id", id);
+            ArgumentChecks.ensureNonNull("layerName", layerName);
+            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_LAYER_FEATURE_TYPE + "&id=" + id + "&layerName=" + layerName;
+            try {
+                final Object response = sendRequest(url, null, null, XSDMarshallerPool.getInstance(), false);
+                if (response instanceof Schema) {
+                    return new JAXBFeatureTypeReader().getFeatureTypeFromSchema((Schema) response, layerName);
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+            return null;
+        }
+
+        public CoverageInfo getLayerCoverageInfo(final String id, final String layerName) {
+            ArgumentChecks.ensureNonNull("id", id);
+            ArgumentChecks.ensureNonNull("layerName", layerName);
+            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_LAYER_COVERAGE_INFO + "&id=" + id + "&layerName=" + layerName;
+            try {
+                final Object response = sendRequest(url, null, null, XSDMarshallerPool.getInstance(), false);
+                if (response instanceof CoverageInfo) {
+                    return (CoverageInfo) response;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+            return null;
+        }
     }
 
     /**
