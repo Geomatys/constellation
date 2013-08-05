@@ -1,0 +1,17 @@
+#{decorate path=menu.gtmpl/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="../images/constellation.png"/>
+    </div>
+</div>
+<div class="row">
+    <div class="row">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <a class="brand" href="#">Information sur la donnee</a>
+                <a class="brand pull-right" href="#">Nom du raster</a>
+            </div>
+        </div>
+    </div>
+</div>
