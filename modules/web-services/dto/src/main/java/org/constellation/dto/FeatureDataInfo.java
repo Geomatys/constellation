@@ -18,7 +18,6 @@
 package org.constellation.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,19 +27,19 @@ import java.util.List;
  * @since 0.9
  */
 @XmlRootElement
-public class CoverageInfo implements Serializable {
+public class FeatureDataInfo implements DataInfo {
 
-    private List<BandInfo> bands;
+    private List<AttributeInfo> attributes;
 
-    public CoverageInfo() {
-        bands = new ArrayList<BandInfo>(0);
+    public FeatureDataInfo() {
+        this.attributes = new ArrayList<AttributeInfo>(0);
     }
 
-    public List<BandInfo> getBands() {
-        return bands;
+    public List<AttributeInfo> getAttributes() {
+        return attributes;
     }
 
-    public void setBands(final List<BandInfo> bands) {
-        this.bands = bands;
+    public void setAttributes(final List<AttributeInfo> attributes) {
+        this.attributes = attributes;
     }
 }

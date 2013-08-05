@@ -31,11 +31,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.sis.storage.DataStoreException;
-import org.constellation.dto.BandInfo;
-import org.constellation.dto.CoverageInfo;
 import org.constellation.provider.*;
-import org.geotoolkit.coverage.GridSampleDimension;
 import org.quartz.TriggerBuilder;
 import org.quartz.SimpleScheduleBuilder;
 
@@ -181,10 +177,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         //Layer operations
         else if (REQUEST_CREATE_LAYER.equalsIgnoreCase(request)) {
             return createLayer(parameters, objectRequest);
-        } else if (REQUEST_GET_LAYER_FEATURE_TYPE.equalsIgnoreCase(request)) {
-            return getLayerFeatureType(parameters);
-        } else if (REQUEST_GET_LAYER_COVERAGE_INFO.equalsIgnoreCase(request)) {
-            return getLayerCoverageInfo(parameters);
         } else if (REQUEST_UPDATE_LAYER.equalsIgnoreCase(request)) {
             return updateLayer(parameters, objectRequest);
         } else if (REQUEST_DELETE_LAYER.equalsIgnoreCase(request)) {
@@ -556,73 +548,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 //        } catch (IOException ex) {
 //            throw new CstlServiceException(ex);
 //        }
-    }
-
-    /**
-     * Return a feature layer {@link org.opengis.feature.type.FeatureType} value.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     * @return the {@link org.opengis.feature.type.FeatureType} value of an acknowledgment on error
-     * @throws CstlServiceException if some mandatory parameters are missing
-     */
-    private Object getLayerFeatureType(final MultivaluedMap<String, String> parameters) throws CstlServiceException {
-        final String sourceId = getParameter("id", true, parameters);
-        final String layerName = getParameter("layerName", true, parameters);
-
-        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-        for (final LayerProvider provider : providers) {
-            if (provider.getId().equals(sourceId)) {
-                final Name key = new DefaultName(ProviderParameters.getNamespace(provider), layerName);
-                final LayerDetails details = provider.get(key);
-                if (details instanceof FeatureLayerDetails) {
-                    try {
-                        return ((FeatureLayerDetails) details).getStore().getFeatureType(details.getName());
-                    } catch (DataStoreException ex) {
-                        return new AcknowlegementType("Failure", "An error occurred while trying to get feature type:" + sourceId);
-                    }
-                } else {
-                    return new AcknowlegementType("Failure", "The layer is not a feature layer:" + layerName);
-                }
-            }
-        }
-        return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
-    }
-
-    /**
-     * Return a coverage layer {@link CoverageInfo} value.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     * @return the {@link CoverageInfo} value of an acknowledgment on error
-     * @throws CstlServiceException if some mandatory parameters are missing
-     */
-    private Object getLayerCoverageInfo(final MultivaluedMap<String, String> parameters) throws CstlServiceException {
-        final String sourceId = getParameter("id", true, parameters);
-        final String layerName = getParameter("layerName", true, parameters);
-
-        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-        for (final LayerProvider provider : providers) {
-            if (provider.getId().equals(sourceId)) {
-                final Name key = new DefaultName(ProviderParameters.getNamespace(provider), layerName);
-                final LayerDetails details = provider.get(key);
-                if (details instanceof CoverageLayerDetails) {
-                    try {
-                        final GridSampleDimension[] dims = details.getCoverage(null, null, null, null).getSampleDimensions();
-                        final CoverageInfo coverageInfo = new CoverageInfo();
-                        for (final GridSampleDimension dim : dims) {
-                            coverageInfo.getBands().add(new BandInfo(dim.getMinimumValue(), dim.getMaximumValue()));
-                        }
-                        return coverageInfo;
-                    } catch (DataStoreException ex) {
-                        return new AcknowlegementType("Failure", "An error occurred while trying to get sample dimension:" + sourceId);
-                    } catch (IOException ex) {
-                        return new AcknowlegementType("Failure", "An error occurred while trying to get sample dimension:" + sourceId);
-                    }
-                } else {
-                    return new AcknowlegementType("Failure", "The layer is not a coverage layer:" + layerName);
-                }
-            }
-        }
-        return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
     }
 
     /**
