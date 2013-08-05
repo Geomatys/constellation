@@ -440,7 +440,7 @@
     <gmd:contentInfo>
         <gmd:MD_ImageDescription>
             <gmd:cloudCoverPercentage>
-                <gco:Decimal>50.0</gco:Decimal>
+                <gco:Real>50.0</gco:Real>
             </gmd:cloudCoverPercentage>
         </gmd:MD_ImageDescription>
     </gmd:contentInfo>
