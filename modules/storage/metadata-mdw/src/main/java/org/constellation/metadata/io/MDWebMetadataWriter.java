@@ -105,15 +105,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     private Map<String, Classe> classBinding;
 
     /**
-     * A List of the already see object for the current metadata read
-     * (in order to avoid infinite loop)
-     */
-    private Map<Object, Value> alreadyWrite;
-
-    /**
      * A List of contact record.
      */
-    private Map<Object, Value> contacts;
+    private final Map<Object, Value> contacts = new HashMap<Object, Value>();;
 
     /**
      * A flag indicating that we don't want to write predefined values.
@@ -178,8 +172,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 } else {
                     noIndexation = false;
                 }
-
-                this.contacts = new HashMap<Object, Value>();
                 initStandardMapping();
                 initContactMap();
             } else {
@@ -194,7 +186,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
 
         this.classBinding = new HashMap<String, Classe>();
-        this.alreadyWrite = new HashMap<Object, Value>();
     }
 
     /**
@@ -207,7 +198,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         try {
             this.mdRecordSet = getRecordSet(defaultrecordSet);
             this.defaultUser = mdWriter.getUser(userLogin);
-            this.contacts    = new HashMap<Object, Value>();
             initStandardMapping();
             initContactMap();
         } catch (MD_IOException ex) {
@@ -216,7 +206,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
         this.noIndexation = false;
         this.classBinding = new HashMap<String, Classe>();
-        this.alreadyWrite = new HashMap<Object, Value>();
     }
 
     public MDWebMetadataWriter(final Writer mdWriter) throws MetadataIoException {
@@ -225,7 +214,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         try {
             this.mdRecordSet = RecordSet.DATA_RECORDSET;
             this.defaultUser = User.INTERNAL_USER;
-            this.contacts    = new HashMap<Object, Value>();
             initStandardMapping();
             initContactMap();
         } catch (MD_IOException ex) {
@@ -234,7 +222,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
         this.noIndexation = false;
         this.classBinding = new HashMap<String, Classe>();
-        this.alreadyWrite = new HashMap<Object, Value>();
     }
 
     protected MDWebMetadataWriter() throws MetadataIoException {
@@ -443,10 +430,15 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             final Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
-                alreadyWrite.clear();
+               /**
+                * A List of the already see object for the current metadata read
+                * (in order to avoid infinite loop)
+                */
+                final Map<Object, Value> alreadyWrite = new HashMap<Object, Value>();
                 final Path rootPath = new Path(rootClasse.getStandard(), rootClasse);
-                final List<Value> collection = addValueFromObject(record, object, rootPath, null);
+                final List<Value> collection = addValueFromObject(record, object, rootPath, null, alreadyWrite);
                 collection.clear();
+                alreadyWrite.clear();
                 return record;
             } else {
                 LOGGER.log(Level.SEVERE, "unable to find the root class:{0}", object.getClass().getSimpleName());
@@ -464,7 +456,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @param record The created record.
      *
      */
-    protected List<Value> addValueFromObject(final FullRecord record, Object object, Path path, Value parentValue) throws MD_IOException {
+    protected List<Value> addValueFromObject(final FullRecord record, Object object, Path path, final Value parentValue, final Map<Object, Value> alreadyWrite) throws MD_IOException {
 
         final List<Value> result = new ArrayList<Value>();
 
@@ -491,7 +483,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     final String parentID = path.getParent().getId();
                     path = mdWriter.getPath(parentID + ":geographicElement3");
                 }
-                result.addAll(addValueFromObject(record, obj, path, parentValue));
+                result.addAll(addValueFromObject(record, obj, path, parentValue, alreadyWrite));
 
             }
             return result;
@@ -697,7 +689,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                 if (mdWriter.getPath(childPath.getId()) == null) {
                                     mdWriter.writePath(childPath);
                                 }
-                                result.addAll(addValueFromObject(record, propertyValue, childPath, value));
+                                result.addAll(addValueFromObject(record, propertyValue, childPath, value, alreadyWrite));
                             }
 
                         } catch (IllegalAccessException e) {
@@ -730,7 +722,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             if (mdWriter.getPath(childPath.getId()) == null) {
                                 mdWriter.writePath(childPath);
                             }
-                            result.addAll(addValueFromObject(record, propertyValue, childPath, value));
+                            result.addAll(addValueFromObject(record, propertyValue, childPath, value, alreadyWrite));
                         }
                     } else if (!"unitOfMeasure".equals(propName) && !"verticalDatum".equals(propName)) {
                         final Class valueClass     = object.getClass();
@@ -742,7 +734,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             if (mdWriter.getPath(childPath.getId()) == null) {
                                 mdWriter.writePath(childPath);
                             }
-                            result.addAll(addValueFromObject(record, propertyValue, childPath, value));
+                            result.addAll(addValueFromObject(record, propertyValue, childPath, value, alreadyWrite));
                         }
                     } else {
                         LOGGER.warning("no getter found for:" + propName + " class: " + object.getClass().getName());
@@ -1123,8 +1115,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 mdWriter.close();
             }
             classBinding.clear();
-            alreadyWrite.clear();
-
         } catch (MD_IOException ex) {
             LOGGER.info("SQL Exception while destroying Metadata writer");
         }
