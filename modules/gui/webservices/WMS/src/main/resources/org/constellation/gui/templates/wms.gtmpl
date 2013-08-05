@@ -8,8 +8,8 @@
         <img src="../../images/constellation.png"/>
     </div>
 </div>
-<div class="row">
-    <div class="row">
+<div class="row" >
+    <div class="row" style="background-color:white;">
         <div class="navbar">
             <div class="navbar-inner">
                 <a class="brand" href="#">${service.name}</a>
@@ -26,21 +26,24 @@
     </div>
 </div>
 <div class="row">
-   <ul class="nav nav-tabs">
-       <li><a href="#description" data-toggle="tab">&{service.description.tab.description.title}</a> </li>
-       <li><a href="#metadata" data-toggle="tab">&{service.description.tab.metadata.title}</a> </li>
-       <li class="active"><a href="#data" data-toggle="tab">&{service.description.tab.data.title}</a> </li>
-   </ul>
-    <div class="tab-content">
-        <div class="tab-pane" id="description">
-            #{include path=wmsformpart1.gtmpl/}
-        </div>
-        <div class="tab-pane" id="metadata">
-            #{include path=wmsformpart2.gtmpl/}
-        </div>
-        <div class="tab-pane active" id="data">
-            #{include path=datalistings.gtmpl/}
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+        <div class="span12">
+            <ul class="nav nav-tabs">
+                <li><a href="#description" data-toggle="tab">&{service.description.tab.description.title}</a> </li>
+                <li><a href="#metadata" data-toggle="tab">&{service.description.tab.metadata.title}</a> </li>
+                <li class="active"><a href="#data" data-toggle="tab">&{service.description.tab.data.title}</a> </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane" id="description">
+                    #{include path=wms_description.gtmpl/}
+                </div>
+                <div class="tab-pane" id="metadata">
+                    #{include path=wms_metadata.gtmpl/}
+                </div>
+                <div class="tab-pane active" id="data">
+                    #{include path=layer_listings.gtmpl/}
+                </div>
+            </div>
         </div>
     </div>
-
 </div>

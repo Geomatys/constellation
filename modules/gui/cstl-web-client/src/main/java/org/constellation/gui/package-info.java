@@ -20,11 +20,20 @@
  */
 @juzu.Application(defaultController = Controller.class, resourceAliases = {
         @Alias(of = "/org/constellation/gui/templates/menu.gtmpl",                  as = "menu.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wmsdescription.gtmpl",        as = "wmsdescription.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wmsmetadata.gtmpl",           as = "wmsmetadata.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wmscreate.gtmpl",             as = "wmscreate.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wmsformpart1.gtmpl",          as = "wmsformpart1.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wmsformpart2.gtmpl",          as = "wmsformpart2.gtmpl"),
+
+        //WMS
+        @Alias(of = "/org/constellation/gui/templates/layer.gtmpl",                 as = "layer.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/layer_listings.gtmpl",        as = "layer_listings.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wms_description.gtmpl",       as = "wms_description.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wms_metadata.gtmpl",          as = "wms_metadata.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wms.gtmpl",                   as = "wms.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wms_create_description.gtmpl",as = "wms_create_description.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wms_create_metadata.gtmpl",   as = "wms_create_metadata.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/wms_create.gtmpl",            as = "wms_create.gtmpl"),
+
+        //Raster
+        @Alias(of = "/org/constellation/gui/templates/raster_description.gtmpl",    as = "raster_description.gtmpl"),
+
 
         // Style
         @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",       as = "style_dashboard.gtmpl"),
@@ -38,6 +47,8 @@
         @Alias(of = "/org/constellation/gui/templates/style_symbol_polygon.gtmpl",  as = "style_symbol_polygon.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_symbol_text.gtmpl",     as = "style_symbol_text.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_symbol_raster.gtmpl",   as = "style_symbol_raster.gtmpl")})
+
+
 
 /*
  * Declare servlet Base URL and which bundle used

@@ -53,11 +53,11 @@ public class WMSController {
      * root wms service page
      */
     @Inject
-    @Path("wmscreate.gtmpl")
+    @Path("wms_create.gtmpl")
     Template index;
 
     @Inject
-    @Path("servicedescription.gtmpl")
+    @Path("wms.gtmpl")
     Template serviceDescription;
 
 

@@ -1,0 +1,160 @@
+<!-- wms creation metadata part. Its the second form part. -->
+<div id="metadata">
+    <div class="row" style="height:30px;">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <a class="brand" href="#">
+                    &{wms.create.metadata.title}
+                </a>
+                <ul class="nav pull-right">
+                    <li id="NewServiceName">
+                        &{wms.create.metadata.subtitle}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+        <div class="span6">
+            <!-- contact part -->
+            <fieldset>
+                <legend>&{wms.create.contact.legend}</legend>
+
+                <div class="control-group">
+                    <label class="control-label" for="contactName">&{wms.create.contact.name.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactName" name="serviceContact.fullname"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="contactOrganisation">&{wms.create.contact.organisation.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactOrganisation" name="serviceContact.organisation"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="contactPosition">&{wms.create.contact.position.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactPosition" name="serviceContact.position"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="contactPhone">&{wms.create.contact.phone.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactPhone" name="serviceContact.phone"/>
+                    </div>
+                </div>
+                <div class="control-group" id="faxDiv">
+                    <label class="control-label" for="contactFax">&{wms.create.contact.fax.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactFax" name="serviceContact.fax"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="contactemail">&{wms.create.contact.email.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactEmail" name="serviceContact.email"/>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- address part -->
+            <fieldset>
+                <legend>&{wms.create.contact.address.legend}</legend>
+
+                <div class="control-group">
+                    <label class="control-label" for="contactAddress">&{wms.create.contact.address.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactAddress" name="serviceContact.address"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="contactCity">&{wms.create.contact.address.city.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactCity" name="serviceContact.city"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="contactState">&{wms.create.contact.address.state.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactState" name="serviceContact.state"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="contactPostcode">&{wms.create.contact.address.postcode.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactPostcode" name="serviceContact.zipCode"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="contactCountry">&{wms.create.contact.address.country.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactCountry" name="serviceContact.country"/>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="span6">
+            <!-- access constraints part -->
+            <fieldset>
+                <legend>&{wms.create.accessconstraint.legend}</legend>
+
+                <div class="control-group">
+                    <label class="control-label" for="fees">&{wms.create.accessconstraint.fees.label}</label>
+                    <div class="controls">
+                        <input id="fees" type="text" name="serviceConstraint.fees"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="accessConstraints">&{wms.create.accessconstraint.label}</label>
+                    <div class="controls">
+                        <textarea id="accessConstraints" name="serviceConstraint.accessConstraint"></textarea>
+                    </div>
+                </div>
+
+                <div class="control-group" data-toggle="tooltip" title="&{wms.create.accessconstraint.layerlimit.tooltip}" id="layerlimitGroup">
+                    <label class="control-label" for="layerLimit">&{wms.create.accessconstraint.layerlimit.label}</label>
+                    <div class="controls">
+                        <input type="text" id="layerLimit" name="serviceConstraint.layerLimit"/>
+                    </div>
+
+                </div>
+
+                <div class="control-group" data-toggle="tooltip" title="&{wms.create.accessconstraint.maxwidth.tooltip}" id="maxWidthGroup">
+                    <label class="control-label" for="maxWidth">&{wms.create.accessconstraint.maxwidth.label}</label>
+                    <div class="controls" >
+                        <input type="text" id="maxWidth" name="serviceConstraint.maxWidth"/>
+                    </div>
+                </div>
+
+
+                <div class="control-group" data-toggle="tooltip" title="&{wms.create.accessconstraint.maxheight.tooltip}" id="maxHeightGroup">
+                    <label class="control-label" for="maxHeight">&{wms.create.accessconstraint.maxheight.label}</label>
+                    <div class="controls">
+                        <input type="text" id="maxHeight" name="serviceConstraint.maxHeight"/>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <!-- button part to manage pagination -->
+        <div class="row">
+            <div class="span3 offset9">
+            </br>
+                <a href="@{webservices()}">&{wms.create.cancel.label}</a>
+                <button class="btn btn-primary" onclick="goToDescription();" type="button">&{wms.create.previous.label}</button>
+                <button class="btn btn-primary" type="submit" id="buttonSubmit">&{wms.create.save.label}</button>
+            </div>
+        </div>
+    </div>
+</div>

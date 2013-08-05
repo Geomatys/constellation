@@ -89,7 +89,7 @@ public class Controller {
 
 
     @Inject
-    @Path("dataElement.gtmpl")
+    @Path("layer.gtmpl")
     Template dataElement;
 
     /**
