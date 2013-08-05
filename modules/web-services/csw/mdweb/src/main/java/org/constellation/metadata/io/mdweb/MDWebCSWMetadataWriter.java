@@ -134,6 +134,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                         final Map<Object, Value> alreadyWrite = new HashMap<Object, Value>();
                         for (Value parentValue : parentValues) {
                             final List<Value> toInsert = addValueFromObject(f, value, mp.path, parentValue, alreadyWrite);
+                            alreadyWrite.clear();
                             for (Value ins : toInsert) {
                                 mdWriter.writeValue(ins);
                             }
@@ -175,6 +176,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                                 LOGGER.finer("value updated");
                                 mdWriter.deleteValue(v);
                                 final List<Value> toInsert = addValueFromObject(f, value, mp.path, v.getParent(), alreadyWrite);
+                                alreadyWrite.clear();
                                 for (Value ins : toInsert) {
                                     mdWriter.writeValue(ins);
                                 }
