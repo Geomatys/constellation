@@ -144,7 +144,7 @@ public final class LayerProviders extends Static {
             final QueryBuilder qb = new QueryBuilder();
             qb.setProperties(new String[]{property});
             qb.setTypeName(layer.getName());
-            final FeatureCollection collection = session.getFeatureCollection(qb.buildQuery());
+            final FeatureCollection<Feature> collection = session.getFeatureCollection(qb.buildQuery());
 
             // Visit collection.
             final Object[] values = new Object[collection.size()];
