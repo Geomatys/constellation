@@ -1,77 +1,45 @@
-#{decorate path=menu.gtmpl/}
+<div id="left" data-edition="symbol-raster" style="display:none;padding:45px 20px 0 35px;">
+    <div class="hide" data-action="classify">@{StyleController.rasterClassification()}</div>
 
-#{param name=providerId/}
-#{param name=styleName/}
-#{param name=ruleIndex/}
-#{param name=symbolIndex/}
-
-<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
-    <div class="span2">
-        <img src="../images/constellation.png"/>
+    <div class="title-row">
+        <span class="medium-title">Channel:</span>
     </div>
-</div>
-
-<div class="symbolizer-edition">
-    <div class="header-bar">
-        <span class="big-title">Symbol</span>
+    <div class="form-row">
+        <label for="select.channel" class="pull-left">Type:</label>
+        <select id="select.channel" onchange="$('.channel-panel').toggleClass('hide');" name="select.channel">
+            <option value="grey">GreyChannel</option>
+            <option value="rgb">RGBChannels</option>
+        </select>
     </div>
-
-    <div class="body-container">
-        <div class="row">
-            <div class="span6">
-                <div id="left">
-                    <div class="title-row">
-                        <span class="medium-title">Channel:</span>
-                    </div>
-                    <div class="form-row">
-                        <label for="select.channel" class="pull-left">Type:</label>
-                        <select id="select.channel" onchange="$('.channel-panel').toggleClass('hide');" name="select.channel">
-                            <option value="grey">GreyChannel</option>
-                            <option value="rgb">RGBChannels</option>
-                        </select>
-                    </div>
-                    <div class="channel-panel panel-grey hide">
-                        <div class="form-row">
-                            <label for="channel.grey.name" class="pull-left">Grey channel name:</label>
-                            <input type="text" id="channel.grey.name" name="channel.grey.name" value="0" />
-                        </div>
-                    </div>
-                    <div class="channel-panel panel-rgb hide">
-                        <div class="form-row">
-                            <label for="channel.red.name" class="pull-left">Red channel name:</label>
-                            <input type="text" id="channel.red.name" name="channel.red.name" value="0" />
-                        </div>
-                        <div class="form-row">
-                            <label for="channel.green.name" class="pull-left">Green channel name:</label>
-                            <input type="text" id="channel.green.name" name="channel.green.name" value="1" />
-                        </div>
-                        <div class="form-row">
-                            <label for="channel.blue.name" class="pull-left">Blue channel name:</label>
-                            <input type="text" id="channel.blue.name" name="channel.blue.name" value="2" />
-                        </div>
-                    </div>
-                    <div class="title-row">
-                        <span class="medium-title">Color map:</span>
-                    </div>
-                    <div id="colorMap">
-                        <div class="map-entry">
-                            <input type="text" class="small" value="NaN" />
-                            <input type="text" class="small" value="#000000" />
-                            <div class="color-overview"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            #{include path=style_overview.gtmpl/}
+    <div class="channel-panel panel-grey hide">
+        <div class="form-row">
+            <label for="channel.grey.name" class="pull-left">Grey channel name:</label>
+            <input type="text" id="channel.grey.name" name="channel.grey.name" value="0" />
         </div>
-
-        <div class="footer-actions">
-            <a onclick="CSTL.RasterSymbol.cancel();" href="@{StyleController.rule(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex, method = 'm')}" class="btn">&{edition.style.cancel.label}</a>
-            <a onclick="CSTL.RasterSymbol.validate();" href="@{StyleController.rule(providerId = providerId, styleName = styleName, ruleIndex = ruleIndex, method = 'm')}" class="btn btn-primary">&{edition.style.validate.label}</a>
+        <div class="title-row">
+            <span class="medium-title">Color map:</span>
         </div>
+        <div class="form-row">
+            <label for="nbIntervals" class="pull-left">Intervals:</label>
+            <input type="text" id="nbIntervals" name="nbIntervals" class="small" value="10" />
+            <div class="btn" onclick="CSTL.STYLE.SymbolEdition['raster'].classify('bigdata', 'bluemarble');">Generate</div>
+        </div>
+        <div id="colorMap">
 
-        <script type="text/javascript">
-            CSTL.RasterSymbol.init(${symbolIndex});
-        </script>
+        </div>
+    </div>
+    <div class="channel-panel panel-rgb hide">
+        <div class="form-row">
+            <label for="channel.red.name" class="pull-left">Red channel name:</label>
+            <input type="text" id="channel.red.name" name="channel.red.name" value="0" />
+        </div>
+        <div class="form-row">
+            <label for="channel.green.name" class="pull-left">Green channel name:</label>
+            <input type="text" id="channel.green.name" name="channel.green.name" value="1" />
+        </div>
+        <div class="form-row">
+            <label for="channel.blue.name" class="pull-left">Blue channel name:</label>
+            <input type="text" id="channel.blue.name" name="channel.blue.name" value="2" />
+        </div>
     </div>
 </div>

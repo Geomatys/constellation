@@ -17,29 +17,16 @@
 
 package org.constellation.dto;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@XmlRootElement
-public class FeatureDataInfo implements DataInfo {
+public interface DataDescription extends Serializable {
 
-    private List<AttributeInfo> attributes;
+    public double[] getBoundingBox();
 
-    public FeatureDataInfo() {
-        this.attributes = new ArrayList<AttributeInfo>(0);
-    }
-
-    public List<AttributeInfo> getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(final List<AttributeInfo> attributes) {
-        this.attributes = attributes;
-    }
+    public void setBoundingBox(final double[] boundingBox);
 }

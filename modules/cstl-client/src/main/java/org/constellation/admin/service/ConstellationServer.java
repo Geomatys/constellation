@@ -37,7 +37,7 @@ import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringTreeNode;
-import org.constellation.dto.DataInfo;
+import org.constellation.dto.DataDescription;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.client.AbstractRequest;
@@ -828,7 +828,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             try {
                 final StringBuilder url = new StringBuilder();
                 url.append(getURLWithEndSlash()).append("configuration?request=").append(REQUEST_DELETE_PROVIDER)
-                   .append("&id=").append(id);
+                        .append("&id=").append(id);
                 if (deleteData) {
                     url.append("&deleteData=").append(deleteData);
                 }
@@ -1134,15 +1134,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return true;
         }
 
-        public DataInfo getLayerDataInfo(final String providerId, final String layerName) {
+        public DataDescription getLayerDataDescription(final String providerId, final String layerName) {
             ArgumentChecks.ensureNonNull("providerId", providerId);
             ArgumentChecks.ensureNonNull("layerName", layerName);
 
-            final String url = getURLWithEndSlash() + "provider/" + providerId + "/" + layerName + "/info";
+            final String url = getURLWithEndSlash() + "provider/" + providerId + "/" + layerName + "/dataDescription";
             try {
                 final Object response = sendRequest(url, null);
-                if (response instanceof DataInfo) {
-                    return (DataInfo) response;
+                if (response instanceof DataDescription) {
+                    return (DataDescription) response;
                 }
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
@@ -1524,7 +1524,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     doXMLPost(request, conec);
                 }
             }
-            
+
             return readResponse(descriptor, unmarshallerPool, conec);
 
         } catch (IOException ex) {

@@ -1,4 +1,3 @@
-#{decorate path=menu.gtmpl/}
+<div id="left" data-edition="rule-ai" style="display:none;">
 
-#{param name=providerId/}
-#{param name=styleName/}
+</div>

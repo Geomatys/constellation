@@ -24,17 +24,19 @@ import java.io.Serializable;
  * @version 0.9
  * @since 0.9
  */
-public class BandInfo implements Serializable {
+public class BandDescription implements Serializable {
 
     private double minValue;
     private double maxValue;
+    private double[] noDataValues;
 
-    public BandInfo() {
+    public BandDescription() {
     }
 
-    public BandInfo(final double minValue, final double maxValue) {
-        this.minValue = minValue;
-        this.maxValue = maxValue;
+    public BandDescription(final double minValue, final double maxValue, final double[] noDataValues) {
+        this.minValue     = minValue;
+        this.maxValue     = maxValue;
+        this.noDataValues = noDataValues;
     }
 
     public double getMinValue() {
@@ -51,5 +53,13 @@ public class BandInfo implements Serializable {
 
     public void setMaxValue(final double maxValue) {
         this.maxValue = maxValue;
+    }
+
+    public double[] getNoDataValues() {
+        return noDataValues;
+    }
+
+    public void setNoDataValues(final double[] noDataValues) {
+        this.noDataValues = noDataValues;
     }
 }

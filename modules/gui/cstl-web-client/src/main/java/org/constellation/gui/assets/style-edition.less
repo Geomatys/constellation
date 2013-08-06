@@ -31,9 +31,7 @@
 @style-edition-body-background: #FFFFFF;
 @style-edition-rule-hover-background: #EEEEEE;
 
-.style-edition,
-.rule-edition,
-.symbolizer-edition {
+.style-edition {
 
   form {
     margin: 0;
@@ -185,43 +183,6 @@
       height: 512px;
     }
   }
-}
-
-
-/**************************************************************************
- *                                  Rule                                  *
- **************************************************************************/
-
-.rule-edition {
-  .tab-pane {
-    overflow-y: auto;
-
-    .tab-pane-inner {
-      padding: 15px;
-      min-height: 150px;
-    }
-    li a.symbol-point,
-    li a.symbol-line,
-    li a.symbol-polygon,
-    li a.symbol-text {
-      line-height: 30px;
-      padding: 3px 20px 3px 50px;
-      background-repeat: no-repeat;
-      background-position: 10px center;
-    }
-    .symbol-point {
-      background-image: url('img/point-symbol.png');
-    }
-    .symbol-line {
-      background-image: url('img/line-symbol.png');
-    }
-    .symbol-polygon {
-      background-image: url('img/polygon-symbol.png');
-    }
-    .symbol-text {
-      background-image: url('img/text-symbol.png');
-    }
-  }
 
   #symbolizers {
     height: 350px;
@@ -230,7 +191,8 @@
       .symbol-point,
       .symbol-line,
       .symbol-polygon,
-      .symbol-text {
+      .symbol-text,
+      .symbol-raster {
         float: left;
         margin: 5px 5px 5px 20px;
         height: 30px;
@@ -254,26 +216,48 @@
       margin-bottom: 0;
     }
   }
-}
 
+  .tab-pane {
+    overflow-y: auto;
 
-/**************************************************************************
- *                                Symbol                                  *
- **************************************************************************/
-
-.symbolizer-edition {
-  .body-container {
-    #left {
-      padding: 45px 20px 0 35px;
+    .tab-pane-inner {
+      padding: 15px;
+      min-height: 150px;
     }
-    .form-row {
-      .color-overview {
-        float: left;
-        height: 28px;
-        width: 28px;
-        margin: 1px 1px 1px 10px;
-        .box-shadow(~"0 0 3px rgba(0,0,0,0.5)");
-      }
+    li a.symbol-point,
+    li a.symbol-line,
+    li a.symbol-polygon,
+    li a.symbol-text,
+    li a.symbol-raster {
+      line-height: 30px;
+      padding: 3px 20px 3px 50px;
+      background-repeat: no-repeat;
+      background-position: 10px center;
+    }
+    .symbol-point {
+      background-image: url('img/point-symbol.png');
+    }
+    .symbol-line {
+      background-image: url('img/line-symbol.png');
+    }
+    .symbol-polygon {
+      background-image: url('img/polygon-symbol.png');
+    }
+    .symbol-text {
+      background-image: url('img/text-symbol.png');
+    }
+    .symbol-raster {
+      background-image: url('img/raster-symbol.jpg');
+    }
+  }
+
+  .form-row {
+    .color-overview {
+      float: left;
+      height: 28px;
+      width: 28px;
+      margin: 1px 1px 1px 10px;
+      .box-shadow(~"0 0 3px rgba(0,0,0,0.5)");
     }
   }
 }

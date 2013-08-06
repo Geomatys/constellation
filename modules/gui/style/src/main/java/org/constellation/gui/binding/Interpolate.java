@@ -32,7 +32,7 @@ import static org.constellation.gui.util.StyleUtilities.listType;
  * @version 0.9
  * @since 0.9
  */
-public class Interpolate implements Function {
+public final class Interpolate implements Function {
 
     private List<InterpolationPoint> points = new ArrayList<InterpolationPoint>();
 

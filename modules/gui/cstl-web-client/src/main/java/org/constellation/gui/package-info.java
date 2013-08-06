@@ -34,11 +34,11 @@
         //Raster
         @Alias(of = "/org/constellation/gui/templates/raster_description.gtmpl",    as = "raster_description.gtmpl"),
 
-
         // Style
         @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",       as = "style_dashboard.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_overview.gtmpl",        as = "style_overview.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_edition.gtmpl",         as = "style_edition.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_fts.gtmpl",             as = "style_fts.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_rule_manual.gtmpl",     as = "style_rule_manual.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_rule_ai.gtmpl",         as = "style_rule_ai.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_rule_auv.gtmpl",        as = "style_rule_auv.gtmpl"),
@@ -74,7 +74,12 @@
                 @Script(id = "openlayers-ext", src = "js/openlayers-ext.js", depends = "openlayers", location = AssetLocation.SERVER),
                 @Script(id = "service", src = "js/services.js", depends = "jquery", location = AssetLocation.SERVER),
                 @Script(id = "wmsedition", src = "js/wmsedition.js", depends = "jquery", location = AssetLocation.SERVER),
-                @Script(id = "styleedition", src = "js/styleedition.js", depends = "jquery")})
+
+                // Style
+                @Script(id = "style_edition",   src = "js/style_edition.js",  depends = "jquery"),
+                @Script(id = "style_filter",    src = "js/style_filter.js",   depends = "style_edition"),
+                @Script(id = "style_rule",      src = "js/style_rule.js",     depends = "style_edition"),
+                @Script(id = "style_symbol",    src = "js/style_symbol.js",   depends = "style_edition")})
 
 /**
  * Constellation web client main part.

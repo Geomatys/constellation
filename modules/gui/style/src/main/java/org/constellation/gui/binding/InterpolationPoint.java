@@ -26,7 +26,7 @@ import static org.constellation.gui.util.StyleUtilities.literal;
  * @version 0.9
  * @since 0.9
  */
-public class InterpolationPoint implements StyleElement<org.geotoolkit.style.function.InterpolationPoint> {
+public final class InterpolationPoint implements StyleElement<org.geotoolkit.style.function.InterpolationPoint> {
 
     private Number data  = null;
     private String color = "#000000";

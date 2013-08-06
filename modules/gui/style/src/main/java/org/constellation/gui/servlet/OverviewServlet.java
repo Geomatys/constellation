@@ -56,7 +56,7 @@ import static org.constellation.gui.util.StyleFactories.SLDF;
  * @version 0.9
  * @since 0.9
  */
-public class OverviewServlet extends HttpServlet {
+public final class OverviewServlet extends HttpServlet {
 
     /**
      * Use for debugging purpose.
@@ -148,6 +148,10 @@ public class OverviewServlet extends HttpServlet {
         final HttpEntity entity = response.getEntity();
         if (entity != null) {
             final OutputStream os = resp.getOutputStream();
+            resp.setContentType("image/png");
+            resp.addHeader("Pragma", "no-cache");
+            resp.setHeader("Cache-Control", "no-cache,no-store");
+            resp.addHeader("Expires", "0");
             try {
                 os.write(EntityUtils.toByteArray(entity));
             } finally {

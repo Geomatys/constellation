@@ -2,7 +2,8 @@
 
 #{param name=providerId/}
 #{param name=styleName/}
-#{param name=style/}
+#{param name=styleBody/}
+#{param name=dataDescription/}
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
@@ -23,40 +24,34 @@
     <div class="body-container">
         <div class="row">
             <div class="span6">
-                <div id="left">
-                    <div class="title-row">
-                        <span class="medium-title">&{edition.style.rules.title}:</span>
-                        <div class="btn pull-right" onclick="CSTL.StyleEdition.removeAllRules();">
-                            <span class="icon-trash"></span>
-                            &{edition.style.delete.all.label}
-                        </div>
-                        <div class="btn-group pull-right">
-                            <div class="btn dropdown-toggle" data-toggle="dropdown">
-                                <span class="icon-plus"></span>
-                                &{edition.style.new.rules.label}
-                            </div>
-                            <ul class="dropdown-menu">
-                                <li><a href="@{StyleController.rule(providerId = providerId, styleName = styleName, method = 'm')}" onclick="CSTL.StyleEdition.newRule();">&{edition.style.method.manual} <i>(unique)</i></a></li>
-                                <li><a href="@{StyleController.rule(providerId = providerId, styleName = styleName, method = 'ai')}">&{edition.style.method.auto.intervals} <i>(multiple)</i></a></li>
-                                <li><a href="@{StyleController.rule(providerId = providerId, styleName = styleName, method = 'auv')}">&{edition.style.method.auto.unique} <i>(multiple)</i></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div id="rules" class="list">
-                    </div>
-                </div>
+                #{include path=style_fts.gtmpl/}
+                #{include path=style_rule_ai.gtmpl/}
+                #{include path=style_rule_auv.gtmpl/}
+                #{include path=style_rule_manual.gtmpl/}
+                #{include path=style_symbol_line.gtmpl/}
+                #{include path=style_symbol_point.gtmpl/}
+                #{include path=style_symbol_polygon.gtmpl/}
+                #{include path=style_symbol_raster.gtmpl/}
+                #{include path=style_symbol_text.gtmpl/}
             </div>
-            #{include path=style_overview.gtmpl/}
+            <div class="span6">
+                #{include path=style_overview.gtmpl/}
+            </div>
         </div>
 
         <div class="footer-actions">
-            <a href="#" onclick="CSTL.StyleEdition.cancel();" class="btn">&{edition.style.cancel.label}</a>
-            <a href="#" onclick="CSTL.SldWorkflow.updateStyle('@{StyleController.update()}','${providerId}','${styleName}');" class="btn btn-primary">&{edition.style.validate.label}</a>
+            <a href="#" onclick="CSTL.STYLE.Workflow.previous();return false;" class="btn">&{edition.style.cancel.label}</a>
+            <a href="#" onclick="CSTL.STYLE.Workflow.validate();return false;" class="btn btn-primary">&{edition.style.validate.label}</a>
         </div>
 
-        <div data-action="edit-rule" data-url="@{StyleController.rule(providerId = providerId, styleName = styleName, method = 'm')}"></div>
+        <form id="updateForm" class="hide" action="@{StyleController.update(providerId = providerId, styleName = styleName)}" method="post">
+            <input type="hidden" id="json" name="json" />
+            <input type="submit" />
+        </form>
+
         <script type="text/javascript">
-            CSTL.StyleEdition.init(${style});
+            CSTL.STYLE.StyleEdition.init();
+            CSTL.STYLE.StyleEdition.start(${styleBody}, ${dataDescription});
         </script>
     </div>
 </div>

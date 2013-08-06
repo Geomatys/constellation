@@ -18,6 +18,22 @@ public class ObjectFactory {
         return new Service();
     }
 
+    public CoverageDataDescription createCoverageDataDescription(){
+        return new CoverageDataDescription();
+    }
+
+    public FeatureDataDescription createFeatureDataDescription(){
+        return new FeatureDataDescription();
+    }
+
+    public BandDescription createBandDescription(){
+        return new BandDescription();
+    }
+
+    public PropertyDescription createPropertyDescription(){
+        return new PropertyDescription();
+    }
+
     public AccessConstraint createAccessConstraint(){
         return new AccessConstraint();
     }
@@ -25,5 +41,4 @@ public class ObjectFactory {
     public Contact getContact(){
         return new Contact();
     }
-
 }

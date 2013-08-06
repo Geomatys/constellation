@@ -24,16 +24,16 @@ import java.io.Serializable;
  * @version 0.9
  * @since 0.9
  */
-public class AttributeInfo implements Serializable {
+public class PropertyDescription implements Serializable {
 
     private String namespace;
     private String name;
     private Class type;
 
-    public AttributeInfo() {
+    public PropertyDescription() {
     }
 
-    public AttributeInfo(final String namespace, final String name, final Class type) {
+    public PropertyDescription(final String namespace, final String name, final Class type) {
         this.namespace = namespace;
         this.name      = name;
         this.type      = type;

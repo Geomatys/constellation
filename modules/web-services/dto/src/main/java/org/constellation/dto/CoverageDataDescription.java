@@ -27,19 +27,31 @@ import java.util.List;
  * @since 0.9
  */
 @XmlRootElement
-public class CoverageDataInfo implements DataInfo {
+public class CoverageDataDescription implements DataDescription {
 
-    private List<BandInfo> bands;
+    private double[] boundingBox;
+    private List<BandDescription> bands;
 
-    public CoverageDataInfo() {
-        bands = new ArrayList<BandInfo>(0);
+    public CoverageDataDescription() {
+        this.boundingBox = new double[]{-180,-90,180,90};
+        bands = new ArrayList<BandDescription>(0);
     }
 
-    public List<BandInfo> getBands() {
+    public List<BandDescription> getBands() {
         return bands;
     }
 
-    public void setBands(final List<BandInfo> bands) {
+    public void setBands(final List<BandDescription> bands) {
         this.bands = bands;
+    }
+
+    @Override
+    public double[] getBoundingBox() {
+        return boundingBox;
+    }
+
+    @Override
+    public void setBoundingBox(final double[] boundingBox) {
+        this.boundingBox = boundingBox;
     }
 }

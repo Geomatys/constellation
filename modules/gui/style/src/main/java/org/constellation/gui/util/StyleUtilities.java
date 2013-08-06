@@ -17,14 +17,21 @@
 
 package org.constellation.gui.util;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.sis.util.Static;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.gui.binding.Style;
 import org.constellation.gui.binding.StyleElement;
 import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
+import org.geotoolkit.style.MutableStyle;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 
+import java.awt.Color;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -86,5 +93,19 @@ public final class StyleUtilities extends Static {
             LOGGER.log(Level.WARNING, "An error occurred during filter parsing.", ex);
         }
         return null;
+    }
+
+    public static String writeJson(final Object object) throws JsonProcessingException {
+        final ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(object);
+    }
+
+    public static <T> T readJson(final String json, final Class<T> clazz) throws IOException {
+        final ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, clazz);
+    }
+
+    public static String toHex(final Color color) {
+        return String.format("#%06X", (0xFFFFFF & color.getRGB()));
     }
 }
