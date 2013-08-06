@@ -19,11 +19,10 @@ package org.constellation.ws.rest;
 
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.LayerProviderConfiguration;
+import org.constellation.ws.rs.LayerProviders;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -43,21 +42,21 @@ import javax.ws.rs.core.Response;
 public final class Provider {
 
     /**
-     * @see LayerProviderConfiguration#getDataDescription(String, String)
+     * @see LayerProviders#getDataDescription(String, String)
      */
     @GET
     @Path("{id}/{layerName}/dataDescription")
     public Response dataDescription(final @PathParam("id") String id,
                                     final @PathParam("layerName") String layerName) {
         try {
-            return Response.ok(LayerProviderConfiguration.getDataDescription(id, layerName)).build();
+            return Response.ok(LayerProviders.getDataDescription(id, layerName)).build();
         } catch (CstlServiceException ex) {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }
 
     /**
-     * @see LayerProviderConfiguration#getPropertyValues(String, String, String)
+     * @see LayerProviders#getPropertyValues(String, String, String)
      */
     @GET
     @Path("{id}/{layerName}/{property}/propertyValues")
@@ -65,14 +64,14 @@ public final class Provider {
                                    final @PathParam("layerName") String layerName,
                                    final @PathParam("property") String property) {
         try {
-            return Response.ok(LayerProviderConfiguration.getPropertyValues(id, layerName, property)).build();
+            return Response.ok(LayerProviders.getPropertyValues(id, layerName, property)).build();
         } catch (CstlServiceException ex) {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }
 
     /**
-     * @see LayerProviderConfiguration#getBandValues(String, String, int)
+     * @see LayerProviders#getBandValues(String, String, int)
      */
     @GET
     @Path("{id}/{layerName}/{bandIndex}/bandValues")
@@ -80,7 +79,7 @@ public final class Provider {
                                final @PathParam("layerName") String layerName,
                                final @PathParam("bandIndex") int bandIndex) {
         try {
-            return Response.ok(LayerProviderConfiguration.getBandValues(id, layerName, bandIndex)).build();
+            return Response.ok(LayerProviders.getBandValues(id, layerName, bandIndex)).build();
         } catch (CstlServiceException ex) {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
