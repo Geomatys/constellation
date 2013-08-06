@@ -255,8 +255,14 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     private void initPackage() {
 
-        this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.geotoolkit.metadata.iso", "org.geotoolkit.referencing",
-                                                                 "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
+        this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.apache.sis.metadata.iso", 
+                                                                 "org.geotoolkit.metadata.iso",
+                                                                 "org.apache.sis.referencing",
+                                                                 "org.geotoolkit.referencing",
+                                                                 "org.geotoolkit.service",
+                                                                 "org.apache.sis.util.iso",
+                                                                 "org.geotoolkit.naming",
+                                                                 "org.geotoolkit.feature.catalog",
                                                                  "org.geotoolkit.metadata.fra", "org.geotoolkit.util", "org.geotoolkit.xml");
         this.sensorMLPackage    = FileUtilities.searchSubPackage("org.geotoolkit.sml.xml.v100");
         this.swePackage         = FileUtilities.searchSubPackage("org.geotoolkit.swe.xml.v100");
@@ -268,9 +274,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                                "org.geotoolkit.ogc.xml.v110","org.geotoolkit.csw.xml");
         this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
-        this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.geotoolkit.internal.jaxb.gmi", "org.geotoolkit.metadata.iso.acquisition",
-                                                                      "org.geotoolkit.metadata.iso.quality", "org.geotoolkit.metadata.iso.spatial",
-                                                                      "org.geotoolkit.metadata.iso.lineage", "org.geotoolkit.metadata.iso.content",
+        this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.apache.sis.internal.jaxb.gmi",
+                                                                      "org.apache.sis.metadata.iso.acquisition",
+                                                                      "org.geotoolkit.metadata.iso.quality",
+                                                                      "org.apache.sis.metadata.iso.quality",
+                                                                      "org.apache.sis.metadata.iso.spatial",
+                                                                      "org.apache.sis.metadata.iso.lineage",
+                                                                      "org.apache.sis.metadata.iso.content",
                                                                       "org.opengis.metadata.acquisition", "org.opengis.metadata.content");
         this.otherPackage       = FileUtilities.searchSubPackage("org.geotoolkit.gts.xml");
         // we add the extra binding
@@ -1004,7 +1014,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         if ("CI_Date".equals(className)) {
             className = "CitationDate";
         } else if ("RS_Identifier".equals(className)) {
-            className = "ReferenceIdentifier";
+            className = "ImmutableIdentifier";
         } else if ("MD_ReferenceSystem".equals(className)) {
             className = "ReferenceSystemMetadata";
         }
@@ -1023,9 +1033,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             } else if (className.startsWith("FRA_")) {
                 packageName = "org.geotoolkit.metadata.fra";
             } else if ("ReferenceSystemMetadata".equals(className)) {
-                packageName = "org.geotoolkit.internal.jaxb.metadata";
+                packageName = "org.apache.sis.internal.jaxb.metadata";
             } else if ("Anchor".equals(className)) {
-                packageName = "org.geotoolkit.internal.jaxb.gmx";
+                packageName = "org.apache.sis.internal.jaxb.gmx";
                 className = "GMX_Anchor";
             } else if ("XLink".equals(className)) {
                 packageName = "org.apache.sis.xml";

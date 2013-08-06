@@ -525,27 +525,29 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             // 2. The default value
             final String defaultValue = dis.toString(null);
             final Path defaultValuePath = new Path(path, classe.getPropertyByName("value"));
-            final TextValue textValue = new TextValue(defaultValuePath, record , ordinal, defaultValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), rootValue, null);
+            final TextValue textValue = new TextValue(defaultValuePath, record , 1, defaultValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), rootValue, null);
             result.add(textValue);
 
             // 3. the localised values
             final Classe localisedString = mdWriter.getClasse("LocalisedCharacterString", Standard.ISO_19103);
+            int localeOrdinal = 1;
             for (Locale locale : dis.getLocales())  {
                 if (locale == null) {continue;}
 
                 final Path valuePath = new Path(path, classe.getPropertyByName("textGroup"));
-                final Value value = new Value(valuePath, record, ordinal, localisedString, rootValue, null);
+                final Value value = new Value(valuePath, record, localeOrdinal, localisedString, rootValue, null);
                 result.add(value);
 
                 final String localisedValue = dis.toString(locale);
                 final Path locValuePath = new Path(valuePath, localisedString.getPropertyByName("value"));
-                final TextValue locValValue = new TextValue(locValuePath, record , ordinal, localisedValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value, null);
+                final TextValue locValValue = new TextValue(locValuePath, record , localeOrdinal, localisedValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value, null);
                 result.add(locValValue);
 
                 final Path localePath = new Path(valuePath, localisedString.getPropertyByName("locale"));
                 final String localeDesc = "#locale-" + locale.getISO3Language();
-                final TextValue localeValue = new TextValue(localePath, record , ordinal, localeDesc, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value, null);
+                final TextValue localeValue = new TextValue(localePath, record , localeOrdinal, localeDesc, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value, null);
                 result.add(localeValue);
+                localeOrdinal++;
             }
 
         //Special case for PT_Locale
