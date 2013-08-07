@@ -1,9 +1,12 @@
 #{decorate path=menu.gtmpl/}
 
-#{param name=providerId/}
+#{param name=layerProvider/}
+#{param name=layerName/}
+#{param name=styleProvider/}
 #{param name=styleName/}
 #{param name=styleBody/}
 #{param name=dataDescription/}
+#{param name=portrayUrl/}
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
@@ -44,14 +47,14 @@
             <a href="#" onclick="CSTL.STYLE.Workflow.validate();return false;" class="btn btn-primary">&{edition.style.validate.label}</a>
         </div>
 
-        <form id="updateForm" class="hide" action="@{StyleController.update(providerId = providerId, styleName = styleName)}" method="post">
+        <form id="updateForm" class="hide" action="@{StyleController.update(providerId = styleProvider, styleName = styleName)}" method="post">
             <input type="hidden" id="json" name="json" />
             <input type="submit" />
         </form>
 
         <script type="text/javascript">
             CSTL.STYLE.StyleEdition.init();
-            CSTL.STYLE.StyleEdition.start(${styleBody}, ${dataDescription});
+            CSTL.STYLE.StyleEdition.start(${styleBody},[${dataDescription.boundingBox[0]},${dataDescription.boundingBox[1]},${dataDescription.boundingBox[2]},${dataDescription.boundingBox[3]}]);
         </script>
     </div>
 </div>

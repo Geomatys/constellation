@@ -62,6 +62,13 @@ public final class StyleService {
     }
 
     /**
+     * Get the constellation server URL.
+     */
+    public String getConstellationUrl() {
+        return constellationUrl;
+    }
+
+    /**
      * Set the constellation server user login.
      *
      * @param login the user login

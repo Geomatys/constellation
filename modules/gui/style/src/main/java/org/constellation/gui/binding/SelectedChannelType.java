@@ -31,10 +31,10 @@ public final class SelectedChannelType implements StyleElement<org.opengis.style
 
     private String name = "";
 
-    protected SelectedChannelType() {
+    public SelectedChannelType() {
     }
 
-    protected SelectedChannelType(final org.opengis.style.SelectedChannelType selectedChannelType) {
+    public SelectedChannelType(final org.opengis.style.SelectedChannelType selectedChannelType) {
         ensureNonNull("selectedChannelType", selectedChannelType);
         this.name = selectedChannelType.getChannelName();
     }

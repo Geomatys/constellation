@@ -39,11 +39,13 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.session.Session;
+import org.geotoolkit.display.canvas.control.NeverFailMonitor;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
@@ -62,6 +64,7 @@ import org.opengis.util.FactoryException;
 
 import javax.xml.bind.JAXBException;
 import java.awt.Dimension;
+import java.awt.RenderingHints;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -76,6 +79,15 @@ import static org.apache.sis.util.ArgumentChecks.ensurePositive;
  * @since 0.9
  */
 public final class LayerProviders extends Static {
+
+    /**
+     * Default rendering options.
+     */
+    private static final NeverFailMonitor DEFAULT_MONITOR = new NeverFailMonitor();
+    private static final Hints DEFAULT_HINTS = new Hints(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON,
+            RenderingHints.KEY_INTERPOLATION,
+            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
     /**
      * Gives a {@link DataDescription} instance describing the layer data source.
@@ -156,9 +168,9 @@ public final class LayerProviders extends Static {
             mapContext.items().add(mapItem);
 
             // Inputs.
-            final SceneDef sceneDef   = new SceneDef(mapContext);
+            final SceneDef sceneDef   = new SceneDef(mapContext, DEFAULT_HINTS);
             final CanvasDef canvasDef = new CanvasDef(dimension, null);
-            final ViewDef viewDef     = new ViewDef(envelope);
+            final ViewDef viewDef     = new ViewDef(envelope, 0, DEFAULT_MONITOR);
             final OutputDef outputDef = new OutputDef(context.getFormat(), new Object());
             if (context.isLonFirstOutput()) {
                 viewDef.setLongitudeFirst();

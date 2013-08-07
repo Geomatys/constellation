@@ -35,11 +35,15 @@
                             New symbol
                         </div>
                         <ul class="dropdown-menu">
-                            <li><a href="#" onclick="CSTL.STYLE.RuleEdition['m'].newSymbol('point');return false;" class="symbol-point">Point</a></li>
-                            <li><a href="#" onclick="CSTL.STYLE.RuleEdition['m'].newSymbol('line');return false;" class="symbol-line">Ligne</a></li>
-                            <li><a href="#" onclick="CSTL.STYLE.RuleEdition['m'].newSymbol('polygon');return false;" class="symbol-polygon">Polygone</a></li>
-                            <li><a href="#" onclick="CSTL.STYLE.RuleEdition['m'].newSymbol('text');return false;" class="symbol-text">Text</a></li>
-                            <li><a href="#" onclick="CSTL.STYLE.RuleEdition['m'].newSymbol('raster');return false;" class="symbol-raster">Raster</a></li>
+                            <% if (dataDescription == null || dataDescription instanceof org.constellation.dto.FeatureDataDescription) { %>
+                                <li><a href="#" onclick="CSTL.STYLE.RuleEdition['m'].newSymbol('point');return false;" class="symbol-point">Point</a></li>
+                                <li><a href="#" onclick="CSTL.STYLE.RuleEdition['m'].newSymbol('line');return false;" class="symbol-line">Ligne</a></li>
+                                <li><a href="#" onclick="CSTL.STYLE.RuleEdition['m'].newSymbol('polygon');return false;" class="symbol-polygon">Polygone</a></li>
+                                <li><a href="#" onclick="CSTL.STYLE.RuleEdition['m'].newSymbol('text');return false;" class="symbol-text">Text</a></li>
+                            <% } %>
+                            <% if (dataDescription == null || dataDescription instanceof org.constellation.dto.CoverageDataDescription) { %>
+                                <li><a href="#" onclick="CSTL.STYLE.RuleEdition['m'].newSymbol('raster');return false;" class="symbol-raster">Raster</a></li>
+                            <% } %>
                         </ul>
                     </div>
                 </div>

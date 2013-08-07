@@ -158,7 +158,6 @@ public final class OverviewServlet extends HttpServlet {
         if ("Portray".equalsIgnoreCase(request)) {
             final String method      = req.getParameter("METHOD");
             final String providerId  = req.getParameter("PROVIDER");
-            final String dataName    = req.getParameter("DATA");
             final String[] coords    = bbox.split(",");
 
             // Handle style JSON body.
@@ -183,7 +182,7 @@ public final class OverviewServlet extends HttpServlet {
             // Prepare portrayal context.
             final PortrayalContext context = new PortrayalContext();
             context.setProviderId(providerId);
-            context.setDataName(dataName);
+            context.setDataName(layers);
             context.setProjection(crs);
             context.setFormat(format);
             context.setStyleBody(styleXml);
@@ -212,19 +211,6 @@ public final class OverviewServlet extends HttpServlet {
         resp.addHeader(HttpHeaders.PRAGMA, "no-cache");
         resp.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache,no-store");
         resp.addHeader(HttpHeaders.EXPIRES, "0");
-    }
-
-    public static MutableStyle getStyleXml(final String json) throws IOException {
-        return StyleUtilities.readJson(json, Style.class).toType();
-    }
-
-    public static StyledLayerDescriptor getSldXml(final String json, final String layerName) throws IOException {
-        final MutableNamedLayer layer = SLDF.createNamedLayer();
-        layer.setName(layerName);
-        layer.styles().add(getStyleXml(json));
-        final MutableStyledLayerDescriptor sld = SLDF.createSLD();
-        sld.layers().add(layer);
-        return sld;
     }
 
     public static void execute(final HttpPost post, final OutputStream out) throws IOException {

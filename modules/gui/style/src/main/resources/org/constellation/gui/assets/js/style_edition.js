@@ -199,9 +199,8 @@ CSTL.STYLE.StyleEdition = {
         $('[data-toggle="buttons-radio"] [data-toggle="buttons-checkbox"]').button();
     },
 
-    start: function(style, dataDescription) {
+    start: function(style, dataExtent) {
         this.style = style;
-        this.dataDescription = dataDescription;
 
         // Draw rule list.
         this.drawRules();
@@ -210,8 +209,8 @@ CSTL.STYLE.StyleEdition = {
         this.$panel.show();
 
         // Zoom to data extent.
-        if (dataDescription) {
-            map.zoomToExtent(new OpenLayers.Bounds(dataDescription.boundingBox));
+        if (dataExtent) {
+            map.zoomToExtent(new OpenLayers.Bounds(dataExtent));
         } else {
             map.zoomToExtent(new OpenLayers.Bounds(-180, -90, 180, 90));
         }

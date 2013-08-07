@@ -51,6 +51,6 @@ public class RasterController {
         DataInformation information = informationContainer.getInformation();
         //create provider
         providerManager.createProvider("coverage-file", information.getName(), information.getPath());
-        return StyleController_.edition(information.getName(), information.getName());
+        return StyleController_.edition(information.getName(), information.getName(), null, null);
     }
 }

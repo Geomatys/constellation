@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.constellation.gui.util.StyleUtilities.createDefaultStyle;
 import static org.constellation.gui.util.StyleUtilities.readJson;
 import static org.constellation.gui.util.StyleUtilities.toHex;
 import static org.constellation.gui.util.StyleUtilities.writeJson;
@@ -84,28 +85,46 @@ public final class StyleController {
     /**
      * View for the style edition.
      *
-     * @param providerId the provider id
-     * @param styleName  the style name
+     * @param layerProvider the layer provider id
+     * @param layerName     the layer name
+     * @param styleProvider the style provider id
+     * @param styleName     the style name
      * @return the {@link juzu.Response} view
      */
     @View
     @Route("style/edition")
-    public Response edition(final String providerId, final String styleName) {
+    public Response edition(final String layerProvider,
+                            final String layerName,
+                            final String styleProvider,
+                            final String styleName) {
         try {
-            // Load the style body.
-            final Style style = service.getStyle(providerId, styleName);
-            final String styleBody = writeJson(style);
+            final DataDescription dataDescription;
+            if (layerProvider != null && layerName != null) {
+                // Existing data, load its description.
+                dataDescription = service.getLayerDataDescription(layerProvider, layerName);
+            } else {
+                // No data, free edition.
+                dataDescription = null;
+            }
 
-            // Load source data description.
-            final DataDescription description = service.getLayerDataDescription("bigdata", "bluemarble");
-            final String dataDescription = writeJson(description);
+            final Style styleBody;
+            if (styleProvider != null && styleName != null) {
+                // Existing style, load it.
+                styleBody = service.getStyle(styleProvider, styleName);
+            } else {
+                // New style, create a default.
+                styleBody = createDefaultStyle(dataDescription);
+            }
 
             // Go to view with appropriate input parameters.
-            final Map<String, Object> parameters = new HashMap<String, Object>(0);
-            parameters.put("providerId",      providerId);
+            final Map<String, Object> parameters = new HashMap<>(0);
+            parameters.put("layerProvider",   layerProvider);
+            parameters.put("layerName",       layerName);
+            parameters.put("styleProvider",   styleProvider);
             parameters.put("styleName",       styleName);
-            parameters.put("styleBody",       styleBody);
             parameters.put("dataDescription", dataDescription);
+            parameters.put("styleBody",       writeJson(styleBody));
+            parameters.put("portrayUrl",      service.getConstellationUrl() + "portrayal/portray");
             return edition.ok(parameters).withMimeType("text/html");
         } catch (IOException ex) {
             return Response.error(ex);

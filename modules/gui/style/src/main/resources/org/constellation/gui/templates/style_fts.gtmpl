@@ -12,7 +12,7 @@
             </div>
             <ul class="dropdown-menu">
                 <li><a href="#" onclick="CSTL.STYLE.StyleEdition.newRule('m');return false;">&{edition.style.method.manual} <i>(unique)</i></a></li>
-                <% if (dataDescription instanceof org.constellation.dto.FeatureDataDescription) { %>
+                <% if (dataDescription == null || dataDescription instanceof org.constellation.dto.FeatureDataDescription) { %>
                     <li><a href="#" onclick="CSTL.STYLE.StyleEdition.newRule('ai');return false;">&{edition.style.method.auto.intervals} <i>(multiple)</i></a></li>
                     <li><a href="#" onclick="CSTL.STYLE.StyleEdition.newRule('auv');return false;">&{edition.style.method.auto.unique} <i>(multiple)</i></a></li>
                 <% } %>

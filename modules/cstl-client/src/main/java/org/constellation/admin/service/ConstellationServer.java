@@ -75,6 +75,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -1174,9 +1175,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return information;
         }
 
-        public DataDescription getLayerDataDescription(final String providerId, final String layerName) {
+        public DataDescription getLayerDataDescription(String providerId, String layerName) {
             ArgumentChecks.ensureNonNull("providerId", providerId);
             ArgumentChecks.ensureNonNull("layerName", layerName);
+
+            try {
+                providerId = URLEncoder.encode(providerId, "UTF-8");
+                layerName  = URLEncoder.encode(layerName, "UTF-8");
+            } catch (UnsupportedEncodingException ignore) {
+            }
 
             final String url = getURLWithEndSlash() + "provider/" + providerId + "/" + layerName + "/dataDescription";
             try {

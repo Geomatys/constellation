@@ -43,4 +43,6 @@
         <property name="login" ref="constellationlogin"/>
         <property name="password" ref="constellationPassword"/>
     </bean>
+
+    <bean class="org.constellation.gui.DataInformationContainer" id="informationContainer" scope="session" />
 </beans>
