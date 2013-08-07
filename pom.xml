@@ -556,11 +556,6 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
-                <artifactId>geotk-jdbc-postgis</artifactId>
-                <version>${geotoolkit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-go2</artifactId>
                 <version>${geotoolkit.version}</version>
             </dependency>
@@ -829,11 +824,6 @@
                 <artifactId>geotk-jaxp-core</artifactId>
                 <version>${geotoolkit.version}</version>
                 <classifier>tests</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.geotoolkit.pending</groupId>
-                <artifactId>geotk-jdbc-mysql</artifactId>
-                <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>

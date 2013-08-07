@@ -56,7 +56,8 @@ import static org.junit.Assert.*;
 import static org.constellation.provider.featurestore.FeatureStoreProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
-import static org.geotoolkit.data.postgis.PostgisNGFeatureStoreFactory.*;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.*;
+import org.geotoolkit.db.postgres.PostgresFeatureStoreFactory;
 
 
 /**
@@ -206,7 +207,7 @@ public class WFSCIteWorkerTest {
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("src");
                     
                     final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);                    
-                    final ParameterValueGroup pgconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    final ParameterValueGroup pgconfig = getOrCreate(PostgresFeatureStoreFactory.PARAMETERS_DESCRIPTOR,source);
                     pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
                     pgconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
                     pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
