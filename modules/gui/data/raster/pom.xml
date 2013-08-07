@@ -18,4 +18,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.constellation.web-services-rest</groupId>
+            <artifactId>cstl-web-restfull</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>

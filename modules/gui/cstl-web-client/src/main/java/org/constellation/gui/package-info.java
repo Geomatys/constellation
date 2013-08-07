@@ -33,6 +33,7 @@
 
         //Raster
         @Alias(of = "/org/constellation/gui/templates/raster_description.gtmpl",    as = "raster_description.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/raster_bands.gtmpl",           as = "raster_bands.gtmpl"),
 
         // Style
         @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",       as = "style_dashboard.gtmpl"),

@@ -1,5 +1,7 @@
 #{decorate path=menu.gtmpl/}
 
+#{param name=datainformation/}
+
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
         <img src="../images/constellation.png"/>
@@ -9,7 +11,7 @@
     <div class="row" style="background-color:white;" >
         <div class="navbar">
             <div class="navbar-inner">
-                <a class="brand" href="#">Choix de la variable</a>
+                <a class="brand" href="#">Information sur la donnee</a>
                 <a class="pull-right" href="#" style="display:block;padding:10px 20px 10px;margin-left:-20px;font-size:20px;font-weight:200;color:#777777;text-shadow:0 1px 0 #ffffff;">Nom du raster</a>
             </div>
         </div>
@@ -19,16 +21,16 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#description" data-toggle="tab">Informations</a> </li>
                 <li><a href="#metadata" data-toggle="tab">Métadonnées</a> </li>
-                <li><a href="#show" data-toggle="tab">Visualisation</a> </li>
             </ul>
             <div class="tab-content">
-                <div class="tab-pane" id="description">1
+                <div class="tab-pane" id="description">${datainformation.path}
                 </div>
                 <div class="tab-pane" id="metadata">2
                 </div>
-                <div class="tab-pane active" id="show">3
-                </div>
             </div>
+            <form action="@{RasterController.createProvider()}" method="POST">
+                <button type="submit" class="btn btn-info pull-right"/>Open</button>
+            </form>
         </div>
     </div>
 </div>

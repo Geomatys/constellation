@@ -21,6 +21,7 @@ import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
+import org.constellation.ws.rest.post.DataInformation;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -151,14 +152,15 @@ public class ServicesManager {
      * @param name future data name
      * @param dataType data type (raster, vector or sensor)
      */
-    public void uploadToServer(File newFile, String name, String dataType) {
+    public DataInformation uploadToServer(File newFile, String name, String dataType) {
         URL serverUrl = null;
         try {
             serverUrl = new URL(constellationUrl);
             ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
-            cs.providers.uploadData(newFile, name, dataType);
+            return cs.providers.uploadData(newFile, name, dataType);
         } catch (MalformedURLException e) {
             LOGGER.log(Level.WARNING, "error on url", e);
         }
+        return null;
     }
 }

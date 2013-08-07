@@ -3,14 +3,17 @@ package org.constellation.ws.rest;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
-import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.constellation.ws.rest.post.DataInformation;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.opengis.coverage.grid.GridCoverage;
+import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.opengis.referencing.crs.ImageCRS;
+import org.opengis.util.GenericName;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -18,11 +21,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,22 +83,23 @@ public class Data {
 
         String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath()+"/"+ dataName;
         String uploadedFileName = uploadedFileLocation+"/"+dataName+extension;
+        DataInformation information  = null;
+
         // save it
         try {
-            writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName);
-
+            information = writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName, dataType);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when saving file", e);
             return Response.status(500).entity("upload file "+ uploadedFileLocation+" is not saved").build();
         }
 
         String output = "File uploaded to : " + uploadedFileLocation;
-        return Response.status(200).entity(output).build();
+        return Response.status(200).entity(information).build();
     }
 
     // save uploaded file to new location
-    private void writeToFile(final InputStream uploadedInputStream,
-                             final String uploadedFileLocation, String uploadedFileName) throws IOException {
+    private DataInformation writeToFile(final InputStream uploadedInputStream,
+                             final String uploadedFileLocation, String uploadedFileName, String dataType) throws IOException {
 
         if(uploadedInputStream!=null){
 
@@ -115,6 +119,26 @@ public class Data {
             }
             out.flush();
             out.close();
+
+            try {
+                GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
+                if(!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)){
+
+                    DataInformation information = new DataInformation(file.getPath(), dataType, (DefaultMetadata) coverageReader.getMetadata());
+                    Map<String, String> nameSpatialMetadataMap = new HashMap<>(0);
+                    for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
+                        GenericName name  = coverageReader.getCoverageNames().get(i);
+//                        GeneralGridGeometry geometry = coverageReader.getGridGeometry(i);
+
+                        nameSpatialMetadataMap.put(name.toString(), coverageReader.getCoverageMetadata(i).toString());
+                    }
+                    information.setCoveragesMetadata(nameSpatialMetadataMap);
+                    return information;
+                }
+            } catch (CoverageStoreException e) {
+                LOGGER.log(Level.WARNING, "", e);
+            }
         }
+        return null;
     }
 }

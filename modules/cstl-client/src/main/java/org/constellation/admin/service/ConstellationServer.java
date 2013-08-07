@@ -24,6 +24,8 @@ import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.util.ArgumentChecks;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.service.ConstellationServer.Csws;
 import org.constellation.admin.service.ConstellationServer.Providers;
 import org.constellation.admin.service.ConstellationServer.Services;
@@ -40,6 +42,7 @@ import org.constellation.configuration.StringTreeNode;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.ws.rest.post.DataInformation;
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.client.ServerFactory;
@@ -50,8 +53,6 @@ import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.StringUtilities;
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
@@ -88,7 +89,44 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.constellation.api.QueryConstants.*;
+import static org.constellation.api.QueryConstants.REQUEST_ACCESS;
+import static org.constellation.api.QueryConstants.REQUEST_ADD_TO_INDEX;
+import static org.constellation.api.QueryConstants.REQUEST_AVAILABLE_SOURCE_TYPE;
+import static org.constellation.api.QueryConstants.REQUEST_CLEAR_CACHE;
+import static org.constellation.api.QueryConstants.REQUEST_CREATE_LAYER;
+import static org.constellation.api.QueryConstants.REQUEST_CREATE_PROVIDER;
+import static org.constellation.api.QueryConstants.REQUEST_CREATE_STYLE;
+import static org.constellation.api.QueryConstants.REQUEST_CREATE_TASK;
+import static org.constellation.api.QueryConstants.REQUEST_DELETE_LAYER;
+import static org.constellation.api.QueryConstants.REQUEST_DELETE_PROVIDER;
+import static org.constellation.api.QueryConstants.REQUEST_DELETE_RECORDS;
+import static org.constellation.api.QueryConstants.REQUEST_DELETE_STYLE;
+import static org.constellation.api.QueryConstants.REQUEST_DELETE_TASK;
+import static org.constellation.api.QueryConstants.REQUEST_DOWNLOAD_STYLE;
+import static org.constellation.api.QueryConstants.REQUEST_FULL_RESTART;
+import static org.constellation.api.QueryConstants.REQUEST_GET_CONFIG_PATH;
+import static org.constellation.api.QueryConstants.REQUEST_GET_PROCESS_DESC;
+import static org.constellation.api.QueryConstants.REQUEST_GET_PROVIDER_CONFIG;
+import static org.constellation.api.QueryConstants.REQUEST_GET_SERVICE_DESCRIPTOR;
+import static org.constellation.api.QueryConstants.REQUEST_GET_SOURCE_DESCRIPTOR;
+import static org.constellation.api.QueryConstants.REQUEST_GET_TASK_PARAMS;
+import static org.constellation.api.QueryConstants.REQUEST_IMPORT_RECORDS;
+import static org.constellation.api.QueryConstants.REQUEST_LIST_PROCESS;
+import static org.constellation.api.QueryConstants.REQUEST_LIST_SERVICE;
+import static org.constellation.api.QueryConstants.REQUEST_LIST_SERVICES;
+import static org.constellation.api.QueryConstants.REQUEST_LIST_TASKS;
+import static org.constellation.api.QueryConstants.REQUEST_METADATA_EXIST;
+import static org.constellation.api.QueryConstants.REQUEST_REFRESH_INDEX;
+import static org.constellation.api.QueryConstants.REQUEST_REMOVE_FROM_INDEX;
+import static org.constellation.api.QueryConstants.REQUEST_RESTART_ALL_LAYER_PROVIDERS;
+import static org.constellation.api.QueryConstants.REQUEST_RESTART_ALL_STYLE_PROVIDERS;
+import static org.constellation.api.QueryConstants.REQUEST_RESTART_PROVIDER;
+import static org.constellation.api.QueryConstants.REQUEST_SET_CONFIG_PATH;
+import static org.constellation.api.QueryConstants.REQUEST_UPDATE_CAPABILITIES;
+import static org.constellation.api.QueryConstants.REQUEST_UPDATE_LAYER;
+import static org.constellation.api.QueryConstants.REQUEST_UPDATE_PROVIDER;
+import static org.constellation.api.QueryConstants.REQUEST_UPDATE_STYLE;
+import static org.constellation.api.QueryConstants.REQUEST_UPDATE_TASK;
 
 /**
  * convenient class to perform actions on constellation web services.
@@ -1102,7 +1140,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * @param dataType data type (raster, vector or sensor)
          * @return true if file sent without problem
          */
-        public Boolean uploadData(final File file, String name, String dataType){
+        public DataInformation uploadData(final File file, String name, String dataType){
             //create form body part
             FormDataBodyPart fileBody = new FormDataBodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
             FormDataBodyPart dataNameBody = new FormDataBodyPart(name, MediaType.TEXT_PLAIN_TYPE);
@@ -1119,7 +1157,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 dataTypeBody.setContentDisposition(cdDataType);
             } catch (ParseException e) {
                 LOGGER.log(Level.WARNING, "error on cd building", e);
-                return false;
+                return null;
             }
 
             MultiPart multi = new MultiPart();
@@ -1131,7 +1169,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             Client c = Client.create();
             WebResource service = c.resource(getURLWithEndSlash());
             ClientResponse response = service.path("data/upload").type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multi);
-            return true;
+
+            DataInformation information = response.getEntity(DataInformation.class);
+            return information;
         }
 
         public DataDescription getLayerDataDescription(final String providerId, final String layerName) {

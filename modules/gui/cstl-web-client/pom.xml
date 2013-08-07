@@ -47,11 +47,11 @@
             <artifactId>style</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.constellation.gui</groupId>
-            <artifactId>raster</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.constellation.gui</groupId>-->
+            <!--<artifactId>raster</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
     </dependencies>
 
     <build>

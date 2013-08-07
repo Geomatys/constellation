@@ -34,12 +34,16 @@ import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.InstanceSummary;
 import org.constellation.gui.service.ServicesManager;
+import org.constellation.ws.rest.post.DataInformation;
+import org.opengis.feature.type.PropertyType;
+import org.w3c.dom.Element;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -228,6 +232,7 @@ public class Controller {
     @Route("/upload")
     public Response upload(final FileItem file, final String name, final String dataType) {
         if (file != null) {
+            DataInformation di = null;
             try {
                 //open stream on file
                 final InputStream stream = file.getInputStream();
@@ -244,25 +249,19 @@ public class Controller {
                     intVal = stream.read();
                 }
 
-                //create thread to send on server
-                Runnable run = new Runnable() {
-                    @Override
-                    public void run() {
-                        servicesManager.uploadToServer(newFile, name, dataType);
-                    }
-                };
-
-                Thread sendingThread = new Thread(run, "SENDING_FILE");
-                sendingThread.start();
+                di = servicesManager.uploadToServer(newFile, name, dataType);
 
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "error when saving file on server", e);
                 return Response.error("error when saving file on server");
             }
+
+            DataInformationContainer.setInformation(di);
+            return RasterController_.showRaster();
+
         }else{
             return Response.error("error when saving file on server");
         }
 
-        return Response.ok("redirect to data loading").withMimeType("text/html");
     }
 }
