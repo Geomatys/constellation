@@ -88,7 +88,8 @@ public class ProviderManager {
             final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
             ParameterValueGroup sources = sourceDesc.createValue();
             sources.parameter("id").setValue(fileIdentifier);
-            sources.groups("coveragefile").get(0).parameter("path").setValue(path);
+            String folderPath = path.substring(0, path.lastIndexOf('/'));
+            sources.groups("coveragefile").get(0).parameter("path").setValue(folderPath);
 
             cs.providers.createProvider(type, sources);
         } catch (MalformedURLException e) {

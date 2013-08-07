@@ -1,24 +1,26 @@
 package org.constellation.gui;
 
+import juzu.SessionScoped;
 import org.constellation.ws.rest.post.DataInformation;
 
+import javax.inject.Named;
 import java.util.logging.Logger;
 
 /**
  * @author Benjamin Garcia (Geomatys)
  */
+@Named("informationContainer")
+@SessionScoped
 public class DataInformationContainer {
-
-    private static final Logger LOGGER = Logger.getLogger(DataInformationContainer.class.getName());
 
     private static DataInformation information;
 
 
-    public static DataInformation getInformation() {
+    public DataInformation getInformation() {
         return information;
     }
 
-    public static void setInformation(DataInformation information) {
-        DataInformationContainer.information = information;
+    public void setInformation(DataInformation information) {
+        this.information = information;
     }
 }

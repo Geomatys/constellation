@@ -70,6 +70,9 @@ public class Controller {
     @Inject
     protected ServicesManager servicesManager;
 
+    @Inject
+    protected DataInformationContainer informationContainer;
+
     /**
      * Home page juzu template.
      */
@@ -256,7 +259,7 @@ public class Controller {
                 return Response.error("error when saving file on server");
             }
 
-            DataInformationContainer.setInformation(di);
+            informationContainer.setInformation(di);
             return RasterController_.showRaster();
 
         }else{

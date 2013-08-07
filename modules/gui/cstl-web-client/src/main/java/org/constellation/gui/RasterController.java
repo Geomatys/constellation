@@ -36,30 +36,28 @@ public class RasterController {
     @Path("raster_description.gtmpl")
     raster_description rasterDescription;
 
+    @Inject
+    DataInformationContainer informationContainer;
+
     @View
     @Route("/raster/description")
     public Response showRaster() throws IOException {
-        return rasterDescription.with().datainformation(DataInformationContainer.getInformation()).ok().withMimeType("text/html");
+        return rasterDescription.with().datainformation(informationContainer.getInformation()).ok().withMimeType("text/html");
     }
 
     @Action
     @Route("/raster/create")
     public Response createProvider(){
-        DataInformation information = DataInformationContainer.getInformation();
+        DataInformation information = informationContainer.getInformation();
 
-        String providerId = information.getPath().substring(information.getPath().lastIndexOf('/') + 1);
+        int indexfileName = information.getPath().lastIndexOf('/')+1;
+        int extention = information.getPath().lastIndexOf('.');
+        String dataName = information.getPath().substring(indexfileName, extention);
 
-        // boucle tant que l'écran de sélection de couche n'est pas fait => on prend la première couche.
-        Set<String> keys = information.getCoveragesMetadata().keySet();
-        String dataName = "";
-        for (String key : keys) {
-            dataName = key;
-            break;
-        }
 
         //TODO create provider
-        providerManager.createProvider("coverage-file", providerId, information.getPath());
+        providerManager.createProvider("coverage-file", dataName, information.getPath());
 
-        return StyleController_.edition(providerId, dataName);
+        return StyleController_.edition(dataName, dataName);
     }
 }
