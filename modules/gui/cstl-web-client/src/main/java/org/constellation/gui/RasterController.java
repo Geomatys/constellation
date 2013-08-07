@@ -49,15 +49,8 @@ public class RasterController {
     @Route("/raster/create")
     public Response createProvider(){
         DataInformation information = informationContainer.getInformation();
-
-        int indexfileName = information.getPath().lastIndexOf('/')+1;
-        int extention = information.getPath().lastIndexOf('.');
-        String dataName = information.getPath().substring(indexfileName, extention);
-
-
-        //TODO create provider
-        providerManager.createProvider("coverage-file", dataName, information.getPath());
-
-        return StyleController_.edition(dataName, dataName);
+        //create provider
+        providerManager.createProvider("coverage-file", information.getName(), information.getPath());
+        return StyleController_.edition(information.getName(), information.getName());
     }
 }

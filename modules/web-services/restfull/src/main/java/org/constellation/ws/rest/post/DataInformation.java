@@ -25,6 +25,8 @@ public class DataInformation {
 
     private static final Logger LOGGER = Logger.getLogger(DataInformation.class.getName());
 
+    private String name;
+
     private String path;
 
     private String dataType;
@@ -40,6 +42,14 @@ public class DataInformation {
         this.path = path;
         this.dataType = dataType;
         this.fileMetadata = fileMetadata;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPath() {

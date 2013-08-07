@@ -259,6 +259,7 @@ public class Controller {
                 return Response.error("error when saving file on server");
             }
 
+            di.setName(name);
             informationContainer.setInformation(di);
             return RasterController_.showRaster();
 
