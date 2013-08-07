@@ -32,6 +32,12 @@
         <property name="password" ref="constellationPassword"/>
     </bean>
 
+    <bean class="org.constellation.gui.service.ProviderManager" id="providerManager" scope="session">
+        <property name="constellationUrl" value="http://localhost:8080/constellation/WS/"/>
+        <property name="login" ref="constellationlogin"/>
+        <property name="password" ref="constellationPassword"/>
+    </bean>
+
     <bean class="org.constellation.gui.service.StyleService" id="styleService" scope="request">
         <property name="constellationUrl" ref="constellationURL"/>
         <property name="login" ref="constellationlogin"/>
