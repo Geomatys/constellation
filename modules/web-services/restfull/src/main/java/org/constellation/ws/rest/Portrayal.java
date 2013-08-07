@@ -17,14 +17,16 @@
 
 package org.constellation.ws.rest;
 
-import org.constellation.ws.rest.post.PortrayalContext;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.dto.PortrayalContext;
+import org.constellation.ws.rs.LayerProviders;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.xml.ws.Response;
+import javax.ws.rs.core.Response;
 
 /**
  * RestFull API for provider data rendering/portraying.
@@ -34,13 +36,19 @@ import javax.xml.ws.Response;
  * @since 0.9
  */
 @Path("/1/portrayal")
-@Produces("application/png")
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public final class Portrayal {
 
+    /**
+     * @see LayerProviders#portray(PortrayalContext);
+     */
     @POST
     @Path("portray")
     public Response portray(final PortrayalContext context) {
-        return null;
+        try {
+            return Response.ok(LayerProviders.portray(context)).build();
+        } catch (CstlServiceException ex) {
+            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+        }
     }
 }

@@ -31,6 +31,5 @@
         );
 
         map.addLayer(layer);
-        map.zoomToExtent(new OpenLayers.Bounds(1.478, 41.628, 7.41, 44.922));
     </script>
 </div>

@@ -24,7 +24,9 @@ import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.FeatureDataDescription;
+import org.constellation.dto.PortrayalContext;
 import org.constellation.dto.PropertyDescription;
+import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
@@ -37,19 +39,31 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.session.Session;
+import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
+import org.geotoolkit.display2d.service.OutputDef;
+import org.geotoolkit.display2d.service.SceneDef;
+import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapContext;
+import org.geotoolkit.map.MapItem;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.sld.xml.Specification;
+import org.geotoolkit.sld.xml.StyleXmlIO;
+import org.geotoolkit.style.MutableStyle;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
+import javax.xml.bind.JAXBException;
+import java.awt.Dimension;
 import java.io.IOException;
+import java.io.StringReader;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensurePositive;
@@ -98,21 +112,62 @@ public final class LayerProviders extends Static {
         }
     }
 
-    public static BufferedImage portray(final Object context) throws CstlServiceException {
+    /**
+     * Produces a {@link PortrayalResponse} from the specified {@link PortrayalContext}.
+     * <p>
+     * This method allow to perform data rendering without WMS layer.
+     *
+     * @param context the context for portraying
+     * @return the {@link PortrayalResponse} instance
+     * @throws CstlServiceException if the portrayal process has failed for any reason
+     */
+    public static PortrayalResponse portray(final PortrayalContext context) throws CstlServiceException {
         ensureNonNull("context", context);
 
-        // Get the provider.
-        final LayerProvider provider = getProvider(null);
-
         try {
-            // Build portrayal inputs from context.
-            final Envelope envelope = new Envelope2D(CRS.decode(null), 0.0, 0.0, 0.0, 0.0);
+            // Envelope.
+            final Envelope envelope = new Envelope2D(
+                    CRS.decode(context.getProjection()),
+                    context.getWest(),
+                    context.getSouth(),
+                    context.getEast() - context.getWest(),
+                    context.getNorth() - context.getSouth());
 
-            final CanvasDef canvasDef = new CanvasDef(new Dimension(0, 0), null);
+            // Dimension.
+            final Dimension dimension = new Dimension(context.getWidth(), context.getHeight());
 
-            return null;
-        } catch (FactoryException ex) {
-            throw new CstlServiceException("");
+            // Style.
+            final MutableStyle style;
+            if (context.getStyleBody() != null) {
+                final StringReader reader = new StringReader(context.getStyleBody());
+                if ("1.1.0".equals(context.getSldVersion())) {
+                    style = new StyleXmlIO().readStyle(reader, Specification.SymbologyEncoding.V_1_1_0);
+                } else {
+                    style = new StyleXmlIO().readStyle(reader, Specification.SymbologyEncoding.SLD_1_0_0);
+                }
+            } else {
+                style = null;
+            }
+
+            // Map context.
+            final MapContext mapContext     = MapBuilder.createContext();
+            final LayerDetails layerDetails = getLayer(context.getProviderId(), context.getDataName());
+            final MapItem mapItem           = layerDetails.getMapLayer(style, null);
+            mapContext.items().add(mapItem);
+
+            // Inputs.
+            final SceneDef sceneDef   = new SceneDef(mapContext);
+            final CanvasDef canvasDef = new CanvasDef(dimension, null);
+            final ViewDef viewDef     = new ViewDef(envelope);
+            final OutputDef outputDef = new OutputDef(context.getFormat(), new Object());
+            if (context.isLonFirstOutput()) {
+                viewDef.setLongitudeFirst();
+            }
+
+            // Portray.
+            return new PortrayalResponse(canvasDef, sceneDef, viewDef, outputDef);
+        } catch (FactoryException | JAXBException | PortrayalException | TransformException ex) {
+            throw new CstlServiceException(ex.getLocalizedMessage());
         }
     }
 
