@@ -53,7 +53,6 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.apache.sis.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.apache.sis.internal.jaxb.gmx.Anchor;
-import org.apache.sis.internal.jaxb.gml.GMLAdapter;
 import org.geotoolkit.internal.referencing.VerticalDatumTypes;
 import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -61,9 +60,9 @@ import org.apache.sis.metadata.iso.DefaultMetadataExtensionInformation;
 import org.apache.sis.metadata.iso.citation.DefaultAddress;
 import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
-import org.geotoolkit.metadata.iso.citation.DefaultContact;
-import org.geotoolkit.metadata.iso.citation.DefaultOnlineResource;
-import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
+import org.apache.sis.metadata.iso.citation.DefaultContact;
+import org.apache.sis.metadata.iso.citation.DefaultOnlineResource;
+import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
 import org.apache.sis.metadata.iso.citation.DefaultTelephone;
 import org.apache.sis.metadata.iso.constraint.DefaultLegalConstraints;
 import org.apache.sis.metadata.iso.content.DefaultImageDescription;
@@ -81,6 +80,7 @@ import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.metadata.iso.spatial.DefaultGeometricObjects;
 import org.apache.sis.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
+import org.apache.sis.test.XMLComparator;
 import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DefaultVerticalCS;
@@ -1515,93 +1515,12 @@ public class MetadataUnmarshallTest {
         while ((size = in.read(buffer, 0, 1024)) > 0) {
             out.write(new String(buffer, 0, size));
         }
-
+        
         String expResult = out.toString();
-
-        //we remove the header (variable)
-        expResult = expResult.substring(expResult.indexOf("<gmd:fileIdentifier>"));
-        result    = result.substring(result.indexOf("<gmd:fileIdentifier>"));
-
-        //we split the result into several piece to easier debug
-        int startPosition = 0;
-        String expResult1 = expResult.substring(startPosition, expResult.indexOf("<gco:DateTime>"));
-        String result1    =    result.substring(startPosition, result.indexOf("<gco:DateTime>"));
-
-        assertEquals(expResult1, result1);
-
-        startPosition     += expResult1.length();
-        String expResult2 = expResult.substring(startPosition, expResult.indexOf("</gmd:dateStamp>"));
-        String result2    =    result.substring(startPosition, result.indexOf("</gmd:dateStamp>"));
-
-        // for date comparison we compare directly the date
-        String expd1 = expResult2.substring(expResult2.indexOf('>') + 1, expResult2.lastIndexOf('<') -3) + "00";
-        String resd1 =    result2.substring(   result2.indexOf('>') + 1,    result2.lastIndexOf('<') -3) + "00";
-
-
-        Date expDate1 = TemporalUtilities.parseDate(expd1);
-        Date resDate1 = TemporalUtilities.parseDate(resd1);
-        assertEquals(expDate1, resDate1);
-        //assertEquals(expResult2, result2);
-
-        startPosition     += expResult2.length();
-        String expResult3 = expResult.substring(startPosition, expResult.indexOf("</gmd:referenceSystemInfo>"));
-        String result3    =    result.substring(startPosition, result.indexOf("</gmd:referenceSystemInfo>"));
-
-        assertEquals(expResult3, result3);
-
-        startPosition     = startPosition + expResult3.length();
-        String expResult4 = expResult.substring(startPosition, expResult.indexOf("<gmd:identificationInfo>"));
-        String result4    =    result.substring(startPosition, result.indexOf("<gmd:identificationInfo>"));
-
-        assertEquals(expResult4, result4);
-
-        startPosition     = startPosition + expResult4.length();
-        String expResult5 = expResult.substring(startPosition, expResult.indexOf("</gmd:abstract>"));
-        String result5    =    result.substring(startPosition, result.indexOf("</gmd:abstract>"));
-
-        assertEquals(expResult5, result5);
-
-        startPosition     = startPosition + expResult5.length();
-        String expResult6 = expResult.substring(startPosition, expResult.indexOf("<gmd:descriptiveKeywords>"));
-        String result6    =    result.substring(startPosition, result.indexOf("<gmd:descriptiveKeywords>"));
-
-        assertEquals(expResult6, result6);
-
-        startPosition     = startPosition + expResult6.length();
-        String expResult7 = expResult.substring(startPosition, expResult.indexOf("<gco:DateTime>2008"));
-        String result7    =    result.substring(startPosition, result.indexOf("<gco:DateTime>2008"));
-
-        assertEquals(expResult7, result7);
-
-
-
-
-        startPosition     = startPosition + expResult7.length() + 40;
-        String expResult8 = expResult.substring(startPosition, expResult.indexOf("</gmd:aggregationInfo>"));
-        String result8    =    result.substring(startPosition, result.indexOf("</gmd:aggregationInfo>"));
-
-        assertEquals(expResult8, result8);
-
-        startPosition     = startPosition + expResult8.length();
-        String expResult9 = expResult.substring(startPosition, expResult.indexOf("</gmd:temporalElement>"));
-        String result9    =    result.substring(startPosition, result.indexOf("</gmd:temporalElement>"));
-
-        assertEquals(expResult9, result9);
-
-        startPosition     = startPosition + expResult9.length();
-        String expResult10 = expResult.substring(startPosition, expResult.indexOf("</gmd:identificationInfo>"));
-        String result10    =    result.substring(startPosition, result.indexOf("</gmd:identificationInfo>"));
-
-        assertEquals(expResult10, result10);
-
-        startPosition     = startPosition + expResult10.length();
-        String expResult11 = expResult.substring(startPosition, expResult.indexOf("</gmd:MD_Metadata>"));
-        String result11    =    result.substring(startPosition, result.indexOf("</gmd:MD_Metadata>"));
-
-        assertEquals(expResult11, result11);
-
-        //assertEquals(expResult, result);
-
+        XMLComparator comparator = new XMLComparator(expResult, result);
+        comparator.ignoredAttributes.add("xmlns:*");
+        comparator.ignoredAttributes.add("xsi:schemaLocation");
+        comparator.compare();
     }
 
 }
