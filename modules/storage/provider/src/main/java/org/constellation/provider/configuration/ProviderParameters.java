@@ -40,6 +40,7 @@ import org.apache.sis.util.ArgumentChecks;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -55,7 +56,6 @@ import static org.geotoolkit.parameter.Parameters.*;
 public final class ProviderParameters {
 
     public static final String CONFIG_DESCRIPTOR_NAME = "config";
-    public static final String NAMESPACE_DESCRIPTOR_NAME = "namespace";
 
     ////////////////////////////////////////////////////////////////////////////
     // Source parameters ///////////////////////////////////////////////////////
@@ -203,16 +203,31 @@ public final class ProviderParameters {
         }
     }
 
-    public static ParameterValueGroup getSourceConfiguration(final Provider provider) {
-        return getSourceConfiguration(provider.getSource(), provider.getService().getServiceDescriptor());
-    }
-
     public static String getNamespace(final LayerProvider provider) {
+        ParameterValueGroup group = provider.getSource();
+
+        // Get choice if exists.
         try {
-            final String namespace = getSourceConfiguration(provider).parameter(NAMESPACE_DESCRIPTOR_NAME).stringValue();
-            return "no namespace".equals(namespace) ? null : namespace;
+            group = group.groups("choice").get(0);
         } catch (ParameterNotFoundException ignore) {
         }
+
+        // Get provider type configuration.
+        final List<GeneralParameterValue> values = group.values();
+        for (final GeneralParameterValue value : values) {
+            if (value instanceof ParameterValueGroup) {
+                group = (ParameterValueGroup) value;
+            }
+        }
+
+        // Get namespace.
+        try {
+            final String namespace = group.parameter("namespace").stringValue();
+            return "no namespace".equals(namespace) ? null : namespace;
+        } catch (ParameterNotFoundException | IllegalStateException ignore) {
+        }
+
+        // Return default.
         return "http://geotoolkit.org"; // return default
     }
 

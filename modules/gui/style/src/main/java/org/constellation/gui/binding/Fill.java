@@ -29,7 +29,7 @@ import static org.constellation.gui.util.StyleUtilities.opacity;
  */
 public final class Fill implements StyleElement<org.opengis.style.Fill> {
 
-    private String color   = "#000000";
+    private String color   = "#555555";
     private double opacity = 1.0;
 
     public Fill() {
