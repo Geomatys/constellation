@@ -140,26 +140,6 @@ CSTL.STYLE = {
     }
 };
 
-CSTL.STYLE.Workflow = {
-
-    current: CSTL.STYLE.StyleEdition,
-
-    validate: function() {
-        this.current.validate();
-        this.updateOverview();
-    },
-
-    updateOverview: function() {
-        map.layers[0].params['SLD_BODY'] = $.toJSON(CSTL.STYLE.StyleEdition.getCurrent());
-        map.layers[0].redraw(true);
-    },
-
-    previous: function() {
-        this.current.previous();
-        this.updateOverview();
-    }
-};
-
 /**
  * Global style edition controller.
  */
@@ -318,8 +298,29 @@ CSTL.STYLE.StyleEdition = {
     },
 
     validate: function() {
-        var form = $('#updateForm');
-        form.find('input[type=hidden]').val($.toJSON(this.style));
-        form.find('input[type=submit]').trigger('click');
+        var form = $('#submitForm');
+        form.find('#styleJson').val($.toJSON(this.style));
+        form.find('#styleName').val($('#name').val());
+        form.find('#submit').trigger('click');
+    }
+};
+
+CSTL.STYLE.Workflow = {
+
+    current: CSTL.STYLE.StyleEdition,
+
+    validate: function() {
+        this.current.validate();
+        this.updateOverview();
+    },
+
+    updateOverview: function() {
+        map.layers[0].params['SLD_BODY'] = $.toJSON(CSTL.STYLE.StyleEdition.getCurrent());
+        map.layers[0].redraw(true);
+    },
+
+    previous: function() {
+        this.current.previous();
+        this.updateOverview();
     }
 };

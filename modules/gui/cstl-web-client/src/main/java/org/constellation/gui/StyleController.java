@@ -34,6 +34,7 @@ import org.constellation.gui.binding.ColorMap;
 import org.constellation.gui.binding.Interpolate;
 import org.constellation.gui.binding.InterpolationPoint;
 import org.constellation.gui.binding.Style;
+import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.service.StyleService;
 import org.geotoolkit.style.interval.DefaultIntervalPalette;
 import org.geotoolkit.style.interval.IntervalPalette;
@@ -58,6 +59,11 @@ import static org.constellation.gui.util.StyleUtilities.writeJson;
  */
 @RequestScoped
 public final class StyleController {
+
+    private static final String DEFAULT_PROVIDER_ID = "sld";
+
+    @Inject
+    private ProviderManager provider;
 
     @Inject
     private StyleService service;
@@ -134,20 +140,47 @@ public final class StyleController {
     /**
      * Action for style update.
      *
-     * @param providerId the provider id
-     * @param styleName  the style name
+     * @param styleProvider the style provider id
+     * @param styleName     the style name
+     * @param styleJson     the style json
      * @return a status {@link juzu.Response}
      */
     @Action
     @Route("style/update")
-    public Response update(final String providerId, final String styleName) {
+    public Response update(final String styleProvider, final String styleName, final String styleJson) {
         try {
             // Read edited JSON body.
-            final String json = Request.getCurrent().getParameters().get("json").getValue();
-            final Style style = readJson(json, Style.class);
+            final Style style = readJson(styleJson, Style.class);
 
             // Update the style constellation side.
-            service.updateStyle(providerId, styleName, style);
+            service.updateStyle(styleProvider, styleName, style);
+
+            // Return to dashboard.
+            return StyleController_.dashboard();
+        } catch (IOException ex) {
+            return Response.error(ex);
+        }
+    }
+
+    /**
+     * Action for style creation.
+     *
+     * @param styleName  the style name
+     * @param styleJson     the style json
+     * @return a status {@link juzu.Response}
+     */
+    @Action
+    @Route("style/create")
+    public Response create(final String styleName, final String styleJson) {
+        try {
+            // Read edited JSON body.
+            final Style style = readJson(styleJson, Style.class);
+
+            // TODO: add method to create a default style provider named "sld" in the constellation-data directory.
+            provider.createProvider(null, null, null);
+
+            // Create the style.
+            service.createStyle(DEFAULT_PROVIDER_ID, styleName, style);
 
             // Return to dashboard.
             return StyleController_.dashboard();

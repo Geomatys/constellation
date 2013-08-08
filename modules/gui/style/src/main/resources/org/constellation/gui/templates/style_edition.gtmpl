@@ -48,9 +48,14 @@
             <a href="#" onclick="CSTL.STYLE.Workflow.validate();return false;" class="btn btn-primary">&{edition.style.label.validate}</a>
         </div>
 
-        <form id="updateForm" class="hide" action="@{StyleController.update(providerId = styleProvider, styleName = styleName)}" method="post">
-            <input type="hidden" id="json" name="json" />
-            <input type="submit" />
+        <% if (styleName != null) { %>
+            <form id="submitForm" class="hide" action="@{StyleController.update(styleProvider = styleProvider, styleName = styleName)}" method="post">
+        <% } else { %>
+            <form id="submitForm" class="hide" action="@{StyleController.create()}" method="post">
+                <input type="hidden" id="styleName" name="styleName" />
+        <% } %>
+            <input type="hidden" id="styleJson" name="styleJson" />
+            <input type="submit" id="submit" />
         </form>
 
         <script type="text/javascript">

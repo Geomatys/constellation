@@ -121,7 +121,7 @@ public final class StyleService {
      * @param providerId the style provider id
      * @param styleName  the style name
      * @param style      the new style content
-     * @throws IOException if failed to update object for any reason
+     * @throws IOException if failed to update style for any reason
      */
     public void updateStyle(final String providerId, final String styleName, final Style style) throws IOException {
         ensureNonNull("providerId", providerId);
@@ -135,6 +135,29 @@ public final class StyleService {
             server.providers.updateStyle(providerId, styleName, style.toType());
         } catch (Exception ex) {
             throw new IOException("Failed to update the style named \"" + styleName + "\" in provider with id \"" + providerId + "\".");
+        }
+    }
+
+    /**
+     * Create a {@link MutableStyle} on the constellation server.
+     *
+     * @param providerId the style provider id
+     * @param styleName  the style name
+     * @param style      the new style content
+     * @throws IOException if failed to create style for any reason
+     */
+    public void createStyle(final String providerId, final String styleName, final Style style) throws IOException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("styleName",  styleName);
+        ensureNonNull("style",      style);
+
+        // Create the style on the constellation server.
+        try {
+            final URL url = new URL(constellationUrl.substring(0, constellationUrl.indexOf("api")) + "WS");
+            final ConstellationServer server = new ConstellationServer(url, login, password);
+            server.providers.createStyle(providerId, styleName, style.toType());
+        } catch (Exception ex) {
+            throw new IOException("Failed to create the style named \"" + styleName + "\" in provider with id \"" + providerId + "\".");
         }
     }
 
