@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.spi.ImageWriterSpi;
@@ -37,7 +38,7 @@ import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.sld.SLDProviderService;
 
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
-import org.apache.sis.internal.storage.IOUtilities;
+import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.image.jai.Registry;
@@ -177,7 +178,7 @@ public final class GrizzlyServer {
                         getOrCreateValue(source, "load_all").setValue(true);                        
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup pgconfig = createGroup(choice, "PostGISParameters");
+                        final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
                         getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
                         getOrCreateValue(pgconfig,"port").setValue(5432);
                         getOrCreateValue(pgconfig,"database").setValue("cite-wfs-2");
