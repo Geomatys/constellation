@@ -256,10 +256,10 @@ FilterNode.prototype.draw = function() {
     else {
         isUndefined = true;
         this.clear();
-        CSTL.STYLE.FilterEdition._createButton("Logical").
+        CSTL.STYLE.FilterEdition._createButton(CSTL.i18n("logical")).
             click($.proxy(this.toLogical, this)).
             appendTo(this.panel);
-        CSTL.STYLE.FilterEdition._createButton("Comparison").
+        CSTL.STYLE.FilterEdition._createButton(CSTL.i18n("comparison")).
             click($.proxy(this.toComparison, this)).
             appendTo(this.panel);
     }

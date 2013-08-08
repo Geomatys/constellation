@@ -1,15 +1,18 @@
 <div id="right">
     <div class="title-row">
-        <span class="medium-title">&{edition.style.overview.title}: </span><span>BlueMarble</span>
+        <span class="medium-title">&{edition.style.label.overview}: </span>
+        <% if (layerName == null) { %>
+            <span>${layerName}</span>
+        <% } %>
     </div>
     <div id="map"></div>
     <script type="text/javascript">
         var map = new OpenLayers.Map('map', {
             controls: [new OpenLayers.Control.Navigation()],
             projection: new OpenLayers.Projection('EPSG:4326'),
-            maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90)
+            maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
+            fractionalZoom: true
         });
-
         var layer = new OpenLayers.Layer.WMS('Test',
             '/cstl-web-client/overview',
             {
@@ -30,7 +33,6 @@
                 }
             }
         );
-
         map.addLayer(layer);
     </script>
 </div>

@@ -28,14 +28,8 @@
  */
 var CSTL = {
 
-    _locale: 'fr',
-
-    init: function(locale) {
-        this._locale = locale;
-    },
-
     i18n: function(key) {
-        return CSTL.msg[this._locale][key];
+        return CSTL.msg[OpenLayers.Lang.getCode()][key];
     }
 };
 
@@ -46,14 +40,18 @@ var CSTL = {
  */
 CSTL.msg = {};
 CSTL.msg["fr"] = {
+    "comparison":     "Comparaison",
+    "delete":         "Supprimer",
     "edit":           "Editer",
-    "no.description": "Aucune description disponible.",
-    "delete":         "Supprimer"
+    "logical":        "Logique",
+    "no.description": "Aucune description disponible."
 };
 CSTL.msg["en"] = {
+    "comparison":     "Comparison",
+    "delete":         "Delete",
     "edit":           "Edit",
-    "no.description": "No description available.",
-    "delete":         "Delete"
+    "logical":        "Logical",
+    "no.description": "No description available."
 };
 
 /**

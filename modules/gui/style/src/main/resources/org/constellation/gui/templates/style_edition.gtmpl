@@ -16,12 +16,13 @@
 
 <div class="style-edition">
     <div class="header-bar">
-        <span class="big-title">&{edition.style.title}</span>
-        <form class="form-inline pull-right">
-            <label for="name">&{edition.style.name.label}:</label>
-            <input type="text" id="name" name="name" value="${styleName}" />
-            <input type="submit" class="btn" value="&{edition.style.update.label}" />
-        </form>
+        <span class="big-title">&{edition.style.label.style}</span>
+        <% if (styleName == null) { %>
+            <form class="form-inline pull-right">
+                <label for="name">&{edition.style.label.style.name}:</label>
+                <input type="text" id="name" name="name" placeholder="&{edition.style.placeholder.name}" />
+            </form>
+        <% } %>
     </div>
 
     <div class="body-container">
@@ -43,8 +44,8 @@
         </div>
 
         <div class="footer-actions">
-            <a href="#" onclick="CSTL.STYLE.Workflow.previous();return false;" class="btn">&{edition.style.cancel.label}</a>
-            <a href="#" onclick="CSTL.STYLE.Workflow.validate();return false;" class="btn btn-primary">&{edition.style.validate.label}</a>
+            <a href="#" onclick="CSTL.STYLE.Workflow.previous();return false;" class="btn">&{edition.style.label.cancel}</a>
+            <a href="#" onclick="CSTL.STYLE.Workflow.validate();return false;" class="btn btn-primary">&{edition.style.label.validate}</a>
         </div>
 
         <form id="updateForm" class="hide" action="@{StyleController.update(providerId = styleProvider, styleName = styleName)}" method="post">
