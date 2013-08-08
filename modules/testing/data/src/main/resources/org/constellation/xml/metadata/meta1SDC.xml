@@ -6,7 +6,7 @@
         <dc:subject>Transmittance and attenuance of the water column</dc:subject>
         <dc:subject>oceans</dc:subject>
         <!--dc:format>MEDATLAS ASCII</dc:format-->
-        <dct:modified>2009-01-01T06:00:00+01:00</dct:modified>
+        <dct:modified>2009-01-01T06:00:00+02:00</dct:modified>
         <dct:abstract>Donnees CTD NEDIPROD VI 120</dct:abstract>
         <ows:BoundingBox dimensions="2" crs="EPSG:4326">
             <ows:LowerCorner>1.1667 36.6</ows:LowerCorner>

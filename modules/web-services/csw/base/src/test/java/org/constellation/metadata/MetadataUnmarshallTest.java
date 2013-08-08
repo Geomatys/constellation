@@ -23,7 +23,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -34,11 +36,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.apache.sis.internal.jaxb.gml.GMLAdapter;
 
 // Junit dependencies
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
@@ -92,6 +96,8 @@ import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.XML;
+import org.constellation.test.utils.MetadataUtilities;
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.citation.CitationDate;
@@ -211,7 +217,7 @@ public class MetadataUnmarshallTest {
         /*
          * creation date
          */
-        expResult.setDateStamp(TemporalUtilities.parseDate("2009-01-01T06:00:00+0100"));
+        expResult.setDateStamp(TemporalUtilities.parseDate("2009-01-01T06:00:00+0200"));
 
         /*
          * Spatial representation info
@@ -392,33 +398,8 @@ public class MetadataUnmarshallTest {
         //parameter
         Set<String> keys = new HashSet<String>();
         keys.add("Transmittance and attenuance of the water column");
-        /*keys.add("Electrical conductivity of the water column");
-        keys.add("Dissolved oxygen parameters in the water column");
-        keys.add("Light extinction and diffusion coefficients");
-        keys.add("Dissolved noble gas concentration parameters in the water column");
-        keys.add("Optical backscatter");
-        keys.add("Salinity of the water column");
-        keys.add("Dissolved concentration parameters for 'other' gases in the water column");
-        keys.add("Temperature of the water column");
-        keys.add("Visible waveband radiance and irradiance measurements in the atmosphere");
-        keys.add("Visible waveband radiance and irradiance measurements in the water column");*/
-        Keywords keyword = createKeyword(keys, "parameter", "BODC Parameter Discovery Vocabulary", "P021", "2008-11-26T00:00:00+0200", "35");
+        Keywords keyword = createKeyword(keys, "parameter", "BODC Parameter Discovery Vocabulary", "P021", "2008-11-26T01:00:00+0200", "35");
         keywords.add(keyword);
-
-        /*
-        set = new HashSet();
-        set.add("CTD profilers");
-        keyword = createKeyword(set, "instrument", "SeaDataNet device categories", "L05", "2008-01-11T0200:04", "4");
-        keywords.add(keyword);
-
-        //platform
-        set = new HashSet();
-        set.add("research vessel");
-        keyword = createKeyword(set, "platform_class", "SeaDataNet Platform Classes", "L061", "2008-02-21T10:55:40", "6");
-        keywords.add(keyword);*/
-
-        //projects
-
 
         dataIdentification.setDescriptiveKeywords(keywords);
 
@@ -460,42 +441,7 @@ public class MetadataUnmarshallTest {
         aggregateInfo.setAssociationType(AssociationType.LARGER_WORD_CITATION);
         aggregateInfos.add(aggregateInfo);
 
-        /* station
-        aggregateInfo = new AggregateInformationImpl();
-        citation = new DefaultCitation();
-        citation.setTitle(new SimpleInternationalString("5p"));
-        set = new HashSet();
-        set.add(new SimpleInternationalString("5p"));
-        citation.setAlternateTitles(set);
-        revisionDate = new DefaultCitationDate();
-        revisionDate.setDateType(DateType.REVISION);
-        d = TemporalUtilities.parseDate("1990-06-09T00:00:00+0200");
-        revisionDate.setDate(d);
-        set = new HashSet();
-        set.add(revisionDate);
-        citation.setDates(set);
-        aggregateInfo.setAggregateDataSetName(citation);
-        aggregateInfo.setInitiativeType(InitiativeType.CAMPAIGN);
-        aggregateInfo.setAssociationType(AssociationType.LARGER_WORD_CITATION);
-        aggregateInfos.add(aggregateInfo);*/
-
         dataIdentification.setAggregationInfo(aggregateInfos);
-
-        /*
-         * data scale TODO UOM
-
-        String scale = getVariable("var21");
-        String uom   = getVariable("var22");
-        if (scale != null) {
-            try {
-                ResolutionImpl resolution = new ResolutionImpl();
-                resolution.setDistance(Double.parseDouble(scale));
-                resolution.setUnitOfMeasure(uom);
-                dataIdentification.setSpatialResolutions(Arrays.asList(resolution));
-            }  catch (NumberFormatException ex) {
-                logger.severe("parse exception while parsing scale => scale:" + scale + " for record: " + identifier);
-            }
-        }*/
 
         //static part
         set = new HashSet();
@@ -516,11 +462,6 @@ public class MetadataUnmarshallTest {
         //temporal extent
         DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
 
-        /*Date start = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
-        Date stop  = TemporalUtilities.parseDate("1990-07-02T00:00:00+0200");
-
-        TimePosition Instant begin = new DefaultInstant(new DefaultPosition(start));
-        TimePosition end = new DefaultInstant(new DefaultPosition(stop));*/
         TimePeriodType period = new TimePeriodType(null, "1990-06-05", "1990-07-02");
         tempExtent.setExtent(period);
 
@@ -672,146 +613,7 @@ public class MetadataUnmarshallTest {
 
         expResult.setDistributionInfo(distributionInfo);
 
-        assertEquals(expResult.getApplicationSchemaInfo(), result.getApplicationSchemaInfo());
-        assertEquals(expResult.getCharacterSet(), result.getCharacterSet());
-        assertEquals(expResult.getContacts().iterator().next().getContactInfo().getAddress().getAdministrativeArea(), result.getContacts().iterator().next().getContactInfo().getAddress().getAdministrativeArea());
-        assertEquals(expResult.getContacts().iterator().next().getContactInfo().getAddress().getCity(), result.getContacts().iterator().next().getContactInfo().getAddress().getCity());
-        assertEquals(expResult.getContacts().iterator().next().getContactInfo().getAddress().getCountry(), result.getContacts().iterator().next().getContactInfo().getAddress().getCountry());
-        assertEquals(expResult.getContacts().iterator().next().getContactInfo().getAddress().getDeliveryPoints(), result.getContacts().iterator().next().getContactInfo().getAddress().getDeliveryPoints());
-        assertEquals(expResult.getContacts().iterator().next().getContactInfo().getAddress().getElectronicMailAddresses(), result.getContacts().iterator().next().getContactInfo().getAddress().getElectronicMailAddresses());
-        assertEquals(expResult.getContacts().iterator().next().getContactInfo().getAddress().getPostalCode(), result.getContacts().iterator().next().getContactInfo().getAddress().getPostalCode());
-        assertEquals(expResult.getContacts().iterator().next().getContactInfo().getAddress(), result.getContacts().iterator().next().getContactInfo().getAddress());
-        assertEquals(expResult.getContacts().iterator().next().getContactInfo(), result.getContacts().iterator().next().getContactInfo());
-        assertEquals(expResult.getContacts().iterator().next(), result.getContacts().iterator().next());
-        assertEquals(expResult.getContentInfo(), result.getContentInfo());
-        assertEquals(expResult.getDataQualityInfo(), result.getDataQualityInfo());
-        assertEquals(expResult.getDataSetUri(), result.getDataSetUri());
-        assertEquals(expResult.getDateStamp(), result.getDateStamp());
-        assertEquals(expResult.getDistributionInfo().getDistributionFormats(), result.getDistributionInfo().getDistributionFormats());
-        assertEquals(expResult.getDistributionInfo().getDistributors(), result.getDistributionInfo().getDistributors());
-        assertEquals(expResult.getDistributionInfo().getTransferOptions(), result.getDistributionInfo().getTransferOptions());
-        assertEquals(expResult.getDistributionInfo(), result.getDistributionInfo());
-        assertEquals(expResult.getFileIdentifier(), result.getFileIdentifier());
-        assertEquals(expResult.getHierarchyLevelNames(), result.getHierarchyLevelNames());
-        assertEquals(expResult.getHierarchyLevels(), result.getHierarchyLevels());
-        assertEquals(expResult.getLanguage(), result.getLanguage());
-        assertEquals(expResult.getLocales(), result.getLocales());
-        assertEquals(expResult.getMetadataExtensionInfo(), result.getMetadataExtensionInfo());
-        assertEquals(expResult.getMetadataConstraints(), result.getMetadataConstraints());
-        assertEquals(expResult.getMetadataMaintenance(), result.getMetadataMaintenance());
-        assertEquals(expResult.getMetadataStandardName(), result.getMetadataStandardName());
-        assertEquals(expResult.getMetadataStandardVersion(), result.getMetadataStandardVersion());
-        assertEquals(expResult.getParentIdentifier(), result.getParentIdentifier());
-        assertEquals(expResult.getPortrayalCatalogueInfo(), result.getPortrayalCatalogueInfo());
-        assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getAuthority().getAlternateTitles(), result.getReferenceSystemInfo().iterator().next().getName().getAuthority().getAlternateTitles());
-        assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getAuthority().getCitedResponsibleParties(), result.getReferenceSystemInfo().iterator().next().getName().getAuthority().getCitedResponsibleParties());
-        assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getAuthority(), result.getReferenceSystemInfo().iterator().next().getName().getAuthority());
-        assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getVersion(), result.getReferenceSystemInfo().iterator().next().getName().getVersion());
-        assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getCodeSpace(), result.getReferenceSystemInfo().iterator().next().getName().getCodeSpace());
-        assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName(), result.getReferenceSystemInfo().iterator().next().getName());
-        assertEquals(expResult.getReferenceSystemInfo().iterator().next().getDomainOfValidity(), result.getReferenceSystemInfo().iterator().next().getDomainOfValidity());
-        assertEquals(expResult.getReferenceSystemInfo().iterator().next().getScope(), result.getReferenceSystemInfo().iterator().next().getScope());
-        assertEquals(expResult.getReferenceSystemInfo().iterator().next(), result.getReferenceSystemInfo().iterator().next());
-        assertEquals(expResult.getReferenceSystemInfo(), result.getReferenceSystemInfo());
-
-        assertEquals(expResult.getSpatialRepresentationInfo().size(), result.getSpatialRepresentationInfo().size());
-        DefaultVectorSpatialRepresentation expSpatial = (DefaultVectorSpatialRepresentation) expResult.getSpatialRepresentationInfo().iterator().next();
-        DefaultVectorSpatialRepresentation resSpatial =  (DefaultVectorSpatialRepresentation) result.getSpatialRepresentationInfo().iterator().next();
-        assertEquals(expSpatial.getGeometricObjects().iterator().next().getGeometricObjectCount(), resSpatial.getGeometricObjects().iterator().next().getGeometricObjectCount());
-        assertEquals(expSpatial.getGeometricObjects().iterator().next().getGeometricObjectType(), resSpatial.getGeometricObjects().iterator().next().getGeometricObjectType());
-        assertEquals(expSpatial.getGeometricObjects().iterator().next(), resSpatial.getGeometricObjects().iterator().next());
-        assertEquals(expSpatial.getGeometricObjects(), resSpatial.getGeometricObjects());
-        assertEquals(expResult.getSpatialRepresentationInfo().iterator().next(), result.getSpatialRepresentationInfo().iterator().next());
-        assertEquals(expResult.getSpatialRepresentationInfo(), result.getSpatialRepresentationInfo());
-
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getAbstract(), result.getIdentificationInfo().iterator().next().getAbstract());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getAggregationInfo().iterator().next().getAggregateDataSetIdentifier(), result.getIdentificationInfo().iterator().next().getAggregationInfo().iterator().next().getAggregateDataSetIdentifier());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getAggregationInfo().iterator().next().getAggregateDataSetName(), result.getIdentificationInfo().iterator().next().getAggregationInfo().iterator().next().getAggregateDataSetName());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getAggregationInfo().iterator().next().getAssociationType(), result.getIdentificationInfo().iterator().next().getAggregationInfo().iterator().next().getAssociationType());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getAggregationInfo().iterator().next().getInitiativeType(), result.getIdentificationInfo().iterator().next().getAggregationInfo().iterator().next().getInitiativeType());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getAggregationInfo().iterator().next(), result.getIdentificationInfo().iterator().next().getAggregationInfo().iterator().next());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getAggregationInfo(), result.getIdentificationInfo().iterator().next().getAggregationInfo());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().size(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().size());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getAdministrativeArea(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getAdministrativeArea());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getCity(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getCity());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getCountry(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getCountry());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getDeliveryPoints(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getDeliveryPoints());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getElectronicMailAddresses(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getElectronicMailAddresses());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getPostalCode(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress().getPostalCode());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getAddress());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getPhone(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo().getPhone());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getContactInfo());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getIndividualName(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next().getIndividualName());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties().iterator().next());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties(), result.getIdentificationInfo().iterator().next().getCitation().getCitedResponsibleParties());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCitation(), result.getIdentificationInfo().iterator().next().getCitation());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getCredits(), result.getIdentificationInfo().iterator().next().getCredits());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getDescriptiveKeywords().iterator().next(), result.getIdentificationInfo().iterator().next().getDescriptiveKeywords().iterator().next());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getDescriptiveKeywords(), result.getIdentificationInfo().iterator().next().getDescriptiveKeywords());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getGraphicOverviews(), result.getIdentificationInfo().iterator().next().getGraphicOverviews());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getPointOfContacts(), result.getIdentificationInfo().iterator().next().getPointOfContacts());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getPurpose(), result.getIdentificationInfo().iterator().next().getPurpose());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getResourceConstraints(), result.getIdentificationInfo().iterator().next().getResourceConstraints());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getResourceSpecificUsages(), result.getIdentificationInfo().iterator().next().getResourceSpecificUsages());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getResourceFormats(), result.getIdentificationInfo().iterator().next().getResourceFormats());
-        assertEquals(expResult.getIdentificationInfo().iterator().next().getStatus(), result.getIdentificationInfo().iterator().next().getStatus());
-        DefaultDataIdentification expDataIdent = (DefaultDataIdentification) expResult.getIdentificationInfo().iterator().next();
-        DefaultDataIdentification resDataIdent = (DefaultDataIdentification) result.getIdentificationInfo().iterator().next();
-        assertEquals(expDataIdent.getCharacterSets(), resDataIdent.getCharacterSets());
-        assertEquals(expDataIdent.getEnvironmentDescription(), resDataIdent.getEnvironmentDescription());
-        assertEquals(expDataIdent.getExtents().iterator().next().getDescription(), resDataIdent.getExtents().iterator().next().getDescription());
-        assertEquals(expDataIdent.getExtents().iterator().next().getGeographicElements(), resDataIdent.getExtents().iterator().next().getGeographicElements());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getMaximumValue(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getMaximumValue());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getMinimumValue(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getMinimumValue());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getMaximumValue(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getMaximumValue(), 0.0);
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getCode(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getCode());
-       // assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getCodeSpace(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getCodeSpace());
-       // assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getAuthority(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getAuthority());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getMinimumValue(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getMinimumValue(), 0.0);
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getRemarks(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getRemarks());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getAlias(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0).getAlias());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAxis(0));
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAlias(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getAlias());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getDimension(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getDimension());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getIdentifiers(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getIdentifiers());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName().getAuthority(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName().getAuthority());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName().getCodeSpace(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName().getCodeSpace());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem().getName());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getCoordinateSystem());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getVerticalDatumType(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getVerticalDatumType());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getName(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getName());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getScope(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getScope());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getAlias(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getAlias());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getAnchorPoint(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getAnchorPoint());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getDomainOfValidity(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getDomainOfValidity());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getIdentifiers(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getIdentifiers());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getRealizationEpoch(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum().getRealizationEpoch());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getDatum());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getName(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getName());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getScope(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getScope());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getAlias(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS().getAlias());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next().getVerticalCRS());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next(), resDataIdent.getExtents().iterator().next().getVerticalElements().iterator().next());
-        assertEquals(expDataIdent.getExtents().iterator().next().getVerticalElements(), resDataIdent.getExtents().iterator().next().getVerticalElements());
-        assertEquals(expDataIdent.getExtents().iterator().next().getTemporalElements(), resDataIdent.getExtents().iterator().next().getTemporalElements());
-        assertEquals(expDataIdent.getExtents().iterator().next(), resDataIdent.getExtents().iterator().next());
-        assertEquals(expDataIdent.getExtents(), resDataIdent.getExtents());
-        assertEquals(expDataIdent.getLanguages(), resDataIdent.getLanguages());
-        assertEquals(expDataIdent.getSpatialRepresentationTypes(), resDataIdent.getSpatialRepresentationTypes());
-        assertEquals(expDataIdent.getSpatialResolutions(), resDataIdent.getSpatialResolutions());
-        assertEquals(expDataIdent.getSupplementalInformation(), resDataIdent.getSupplementalInformation());
-        assertEquals(expDataIdent.getTopicCategories(), resDataIdent.getTopicCategories());
-        assertEquals(expDataIdent, resDataIdent);
-        assertEquals(expResult.getIdentificationInfo(), result.getIdentificationInfo());
-
-        assertEquals(expResult, result);
+        MetadataUtilities.metadataEquals(expResult, result);
 
         String xml =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + '\n' +
@@ -1050,7 +852,7 @@ public class MetadataUnmarshallTest {
         /*
          * creation date
          */
-        metadata.setDateStamp(TemporalUtilities.parseDate("2009-01-01T06:00:00+0100"));
+        metadata.setDateStamp(TemporalUtilities.parseDate("2009-01-01T06:00:00+0200"));
 
         /*
          * Spatial representation info
@@ -1097,30 +899,6 @@ public class MetadataUnmarshallTest {
         //EDMO
         ExtendedElementInformation edmo =  createExtensionInfo("SDN:EDMO::");
         elements.add(edmo);
-
-        /*L021
-        ExtendedElementInformation L021 = createExtensionInfo("SDN:L021:1:");
-        elements.add(L021);
-
-        //L031
-        ExtendedElementInformation L031 = createExtensionInfo("SDN:L031:2:");
-        elements.add(L031);
-
-        //L071
-        ExtendedElementInformation L071 = createExtensionInfo("SDN:L071:1:");
-        elements.add(L071);
-
-        //L081
-        ExtendedElementInformation L081 = createExtensionInfo("SDN:L081:1:");
-        elements.add(L081);
-
-        //L231
-        ExtendedElementInformation L231 = createExtensionInfo("SDN:L231:3:");
-        elements.add(L231);
-
-        //L241
-        ExtendedElementInformation L241 = createExtensionInfo("SDN:L241:1:");
-        elements.add(L241);*/
 
         extensionInfo.setExtendedElementInformation(elements);
 
@@ -1232,32 +1010,8 @@ public class MetadataUnmarshallTest {
         //parameter
         Set<String> keys = new HashSet<String>();
         keys.add("Transmittance and attenuance of the water column");
-        /*keys.add("Electrical conductivity of the water column");
-        keys.add("Dissolved oxygen parameters in the water column");
-        keys.add("Light extinction and diffusion coefficients");
-        keys.add("Dissolved noble gas concentration parameters in the water column");
-        keys.add("Optical backscatter");
-        keys.add("Salinity of the water column");
-        keys.add("Dissolved concentration parameters for 'other' gases in the water column");
-        keys.add("Temperature of the water column");
-        keys.add("Visible waveband radiance and irradiance measurements in the atmosphere");
-        keys.add("Visible waveband radiance and irradiance measurements in the water column");*/
         Keywords keyword = createKeyword(keys, "parameter", "BODC Parameter Discovery Vocabulary", "P021", "2008-11-26T00:00:00+0200", "35");
         keywords.add(keyword);
-
-        /*
-        set = new HashSet();
-        set.add("CTD profilers");
-        keyword = createKeyword(set, "instrument", "SeaDataNet device categories", "L05", "2008-01-11T0200:04", "4");
-        keywords.add(keyword);
-
-        //platform
-        set = new HashSet();
-        set.add("research vessel");
-        keyword = createKeyword(set, "platform_class", "SeaDataNet Platform Classes", "L061", "2008-02-21T10:55:40", "6");
-        keywords.add(keyword);*/
-
-        //projects
 
 
         dataIdentification.setDescriptiveKeywords(keywords);
@@ -1300,42 +1054,7 @@ public class MetadataUnmarshallTest {
         aggregateInfo.setAssociationType(AssociationType.LARGER_WORD_CITATION);
         aggregateInfos.add(aggregateInfo);
 
-        /* station
-        aggregateInfo = new AggregateInformationImpl();
-        citation = new DefaultCitation();
-        citation.setTitle(new SimpleInternationalString("5p"));
-        set = new HashSet();
-        set.add(new SimpleInternationalString("5p"));
-        citation.setAlternateTitles(set);
-        revisionDate = new DefaultCitationDate();
-        revisionDate.setDateType(DateType.REVISION);
-        d = TemporalUtilities.parseDate("1990-06-09T00:00:00");
-        revisionDate.setDate(d);
-        set = new HashSet();
-        set.add(revisionDate);
-        citation.setDates(set);
-        aggregateInfo.setAggregateDataSetName(citation);
-        aggregateInfo.setInitiativeType(InitiativeType.CAMPAIGN);
-        aggregateInfo.setAssociationType(AssociationType.LARGER_WORD_CITATION);
-        aggregateInfos.add(aggregateInfo);*/
-
         dataIdentification.setAggregationInfo(aggregateInfos);
-
-        /*
-         * data scale TODO UOM
-
-        String scale = getVariable("var21");
-        String uom   = getVariable("var22");
-        if (scale != null) {
-            try {
-                ResolutionImpl resolution = new ResolutionImpl();
-                resolution.setDistance(Double.parseDouble(scale));
-                resolution.setUnitOfMeasure(uom);
-                dataIdentification.setSpatialResolutions(Arrays.asList(resolution));
-            }  catch (NumberFormatException ex) {
-                logger.severe("parse exception while parsing scale => scale:" + scale + " for record: " + identifier);
-            }
-        }*/
 
         //static part
         set = new HashSet();
@@ -1356,14 +1075,10 @@ public class MetadataUnmarshallTest {
         //temporal extent
         DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
 
-        /*Date start = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
-        Date stop  = TemporalUtilities.parseDate("1990-07-02T00:00:00+0200");
-
-        DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
-        DefaultInstant end = new DefaultInstant(new DefaultPosition(stop));*/
+        
         TimePeriodType period = new TimePeriodType(null, "1990-06-05", "1990-07-02");
-// (31/07/13: GMLAdapter.IDs has disappeared)
-//        GMLAdapter.IDs.setUUID(period, "extent");
+        period.setId("extent");
+        
         tempExtent.setExtent(period);
 
         set = new HashSet();
@@ -1504,6 +1219,7 @@ public class MetadataUnmarshallTest {
 
         StringWriter sw = new StringWriter();
         marshaller = testPool.acquireMarshaller();
+        marshaller.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2"));
         marshaller.marshal(metadata, sw);
         String result = sw.toString();
 

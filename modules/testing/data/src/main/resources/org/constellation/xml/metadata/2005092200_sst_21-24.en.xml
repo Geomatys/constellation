@@ -188,10 +188,10 @@
                     <gmd:verticalElement>
                         <gmd:EX_VerticalExtent>
                             <gmd:minimumValue>
-                                <gco:Decimal>0.0</gco:Decimal>
+                                <gco:Real>0.0</gco:Real>
                             </gmd:minimumValue>
                             <gmd:maximumValue>
-                                <gco:Decimal>0.0</gco:Decimal>
+                                <gco:Real>0.0</gco:Real>
                             </gmd:maximumValue>
                             <gmd:verticalCRS>
                                 <gml:VerticalCRS gml:id="Gravity-related height">

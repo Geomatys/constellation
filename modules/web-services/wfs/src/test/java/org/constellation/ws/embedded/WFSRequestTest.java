@@ -194,7 +194,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
                         getOrCreateValue(source, "load_all").setValue(true);                        
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup pgconfig = createGroup(choice, " PostGISParameters");
+                        final ParameterValueGroup pgconfig = createGroup(choice, " PostgresParameters");
                         getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
                         getOrCreateValue(pgconfig,"port").setValue(5432);
                         getOrCreateValue(pgconfig,"database").setValue("cite-wfs");

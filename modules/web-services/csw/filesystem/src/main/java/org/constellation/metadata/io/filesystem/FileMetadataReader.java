@@ -30,6 +30,7 @@ import java.util.Map;
 
 // JAXB dependencies
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -104,6 +105,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     private static final DateFormat FORMATTER;
     static {
         FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        FORMATTER.setTimeZone(TimeZone.getTimeZone("GMT+2"));
     }
 
     /**

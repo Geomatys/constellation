@@ -32,7 +32,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
-import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -168,12 +167,12 @@ public class CSWworkerTest {
         GetCapabilitiesType request = new GetCapabilitiesType("CSW");
         AbstractCapabilities result = worker.getCapabilities(request);
 
+        assertTrue(result != null);
         assertTrue(result.getVersion().equals("2.0.2"));
         assertTrue(result.getFilterCapabilities() != null);
         assertTrue(result.getOperationsMetadata() != null);
         assertTrue(result.getServiceIdentification() != null);
         assertTrue(result.getServiceProvider() != null);
-        assertTrue(result != null);
 
         /*
          *  TEST 2 : full get capabilities
@@ -185,12 +184,12 @@ public class CSWworkerTest {
 
         result = worker.getCapabilities(request);
 
+        assertTrue(result != null);
         assertTrue(result.getVersion().equals("2.0.2"));
         assertTrue(result.getFilterCapabilities() != null);
         assertTrue(result.getOperationsMetadata() != null);
         assertTrue(result.getServiceIdentification() != null);
         assertTrue(result.getServiceProvider() != null);
-        assertTrue(result != null);
 
         /*
          *  TEST 3 : get capabilities section Operation metadata
@@ -202,12 +201,12 @@ public class CSWworkerTest {
 
         result         = worker.getCapabilities(request);
 
+        assertTrue(result != null);
         assertTrue(result.getVersion().equals("2.0.2"));
         assertTrue(result.getFilterCapabilities() != null);
         assertTrue(result.getOperationsMetadata() != null);
         assertTrue(result.getServiceIdentification() == null);
         assertTrue(result.getServiceProvider() == null);
-        assertTrue(result != null);
 
         /*
          *  TEST 4 : get capabilities section Service provider
@@ -219,12 +218,12 @@ public class CSWworkerTest {
 
         result = worker.getCapabilities(request);
 
+        assertTrue(result != null);
         assertTrue(result.getVersion().equals("2.0.2"));
         assertTrue(result.getFilterCapabilities() != null);
         assertTrue(result.getOperationsMetadata() == null);
         assertTrue(result.getServiceIdentification() == null);
         assertTrue(result.getServiceProvider() != null);
-        assertTrue(result != null);
 
         /*
          *  TEST 5 : get capabilities section Service Identification
@@ -236,12 +235,12 @@ public class CSWworkerTest {
 
         result = worker.getCapabilities(request);
 
+        assertTrue(result != null);
         assertTrue(result.getVersion().equals("2.0.2"));
         assertTrue(result.getFilterCapabilities() != null);
         assertTrue(result.getOperationsMetadata() == null);
         assertTrue(result.getServiceIdentification() != null);
         assertTrue(result.getServiceProvider() == null);
-        assertTrue(result != null);
 
         /*
          *  TEST 6 : get capabilities with wrong version (waiting for an exception)
@@ -794,11 +793,11 @@ public class CSWworkerTest {
 
         expCustomResult1 =  new RecordType();
         expCustomResult1.setIdentifier(new SimpleLiteral("42292_5p_19900609195600"));
-        expCustomResult1.setModified(new SimpleLiteral("2009-01-01T06:00:00+01:00"));
+        expCustomResult1.setModified(new SimpleLiteral("2009-01-01T06:00:00+02:00"));
         expCustomResult1.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.1667, 36.6, 1.1667, 36.6));
         expCustomResult2 =  new RecordType();
         expCustomResult2.setIdentifier(new SimpleLiteral("42292_9s_19900610041000"));
-        expCustomResult2.setModified(new SimpleLiteral("2009-01-26T12:00:00+01:00"));
+        expCustomResult2.setModified(new SimpleLiteral("2009-01-26T13:00:00+02:00"));
         expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.3667, 36.6, 1.3667, 36.6));
         expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 12.1, 31.2, 12.1, 31.2));
 
@@ -851,19 +850,19 @@ public class CSWworkerTest {
 
         expCustomResult2 =  new RecordType();
         expCustomResult2.setIdentifier(new SimpleLiteral("42292_9s_19900610041000"));
-        expCustomResult2.setModified(new SimpleLiteral("2009-01-26T12:00:00+01:00"));
+        expCustomResult2.setModified(new SimpleLiteral("2009-01-26T13:00:00+02:00"));
         expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.3667, 36.6, 1.3667, 36.6));
         expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 12.1, 31.2, 12.1, 31.2));
 
         RecordType expCustomResult3 =  new RecordType();
         expCustomResult3.setIdentifier(new SimpleLiteral("39727_22_19750113062500"));
-        expCustomResult3.setModified(new SimpleLiteral("2009-01-26T12:21:45+01:00"));
+        expCustomResult3.setModified(new SimpleLiteral("2009-01-26T13:21:45+02:00"));
         expCustomResult3.setBoundingBox(new BoundingBoxType("EPSG:4326", -4.967, -6.95, -4.967, -6.95));
         expCustomResult3.setBoundingBox(new BoundingBoxType("EPSG:4326", -5.1, -7.2, -5.1, -7.2));
 
         RecordType expCustomResult4 =  new RecordType();
         expCustomResult4.setIdentifier(new SimpleLiteral("11325_158_19640418141800"));
-        expCustomResult4.setModified(new SimpleLiteral("2009-01-26T12:22:24+01:00"));
+        expCustomResult4.setModified(new SimpleLiteral("2009-01-26T13:22:24+02:00"));
         expCustomResult4.setBoundingBox(new BoundingBoxType("EPSG:4326", 9.2667, 3.55, 9.2667, 3.55));
 
         assertEquals(expCustomResult1, customResult1);
