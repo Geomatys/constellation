@@ -165,7 +165,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                 final GetCapabilities requestCapab         = (GetCapabilities) request;
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
 
-                return Response.ok(capabilities).build();
+                return Response.ok(capabilities, requestCapab.getFormat()).build();
             }
             if (request instanceof GetLegendGraphic) {
                 final GetLegendGraphic requestLegend = (GetLegendGraphic)request;
@@ -175,7 +175,7 @@ public class WMSService extends GridWebService<WMSWorker> {
             if (request instanceof DescribeLayer) {
                 final DescribeLayer describeLayer        = (DescribeLayer)request;
                 final DescribeLayerResponseType response = worker.describeLayer(describeLayer);
-                return Response.ok(response).build();
+                return Response.ok(response, MimeType.TEXT_XML).build();
             }
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                            OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
@@ -251,8 +251,8 @@ public class WMSService extends GridWebService<WMSWorker> {
             schemaLocation = "http://www.opengis.net/ogc http://schemas.opengis.net/wms/1.3.0/exceptions_1_3_0.xsd";
         }
         final SchemaLocatedExceptionResponse response = new SchemaLocatedExceptionResponse(report, schemaLocation);
-//        final String mimeException = (serviceDef.version.equals(ServiceDef.WMS_1_1_1_SLD.version)) ? MimeType.APP_SE_XML : MimeType.TEXT_XML;
-        return Response.ok(response).build();
+        final String mimeException = (serviceDef.version.equals(ServiceDef.WMS_1_1_1_SLD.version)) ? MimeType.APP_SE_XML : MimeType.TEXT_XML;
+        return Response.ok(response, mimeException).build();
     }
 
     /**
