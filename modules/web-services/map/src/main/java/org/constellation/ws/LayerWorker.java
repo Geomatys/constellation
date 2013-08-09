@@ -340,9 +340,9 @@ public abstract class LayerWorker extends AbstractWorker {
         if (styleName != null) {
             //try to grab the style if provided
             //a style has been given for this layer, try to use it
-            style = StyleProviderProxy.getInstance().get(styleName.getLayerId().getLocalPart(), styleName.getServiceId());
+            style = StyleProviderProxy.getInstance().get(styleName.getLayerId().getLocalPart(), styleName.getProviderId());
             if (style == null) {
-                throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
+                throw new CstlServiceException("Style provided: " + styleName.getReference() + " not found.", STYLE_NOT_DEFINED);
             }
         } else {
             //no defined styles, use the favorite one, let the layer get it himself.

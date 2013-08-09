@@ -1273,7 +1273,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 final DataReference ref = layer.getStyle(namedStyle);
                 style = getStyle(ref);
                 if (style == null) {
-                    throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
+                    throw new CstlServiceException("Style provided: " + namedStyle + " not found.", STYLE_NOT_DEFINED);
                 }
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
