@@ -41,6 +41,7 @@ public abstract class GridServiceConfiguration implements ServiceConfiguration {
 
     protected static final Logger LOGGER = Logging.getLogger(GridServiceConfiguration.class);
 
+    @Override
     public void configureInstance(File instanceDirectory, Object configuration, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
         if (configuration instanceof LayerContext) {
             if (instanceDirectory.isDirectory()) {
@@ -90,6 +91,7 @@ public abstract class GridServiceConfiguration implements ServiceConfiguration {
         }
     }
 
+    @Override
     public Object getInstanceConfiguration(File instanceDirectory, String serviceType) throws CstlServiceException {
         try {
             final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigMapServiceDescriptor.NAME);
@@ -111,10 +113,12 @@ public abstract class GridServiceConfiguration implements ServiceConfiguration {
         }
     }
 
+    @Override
     public void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
         configureInstance(instanceDirectory, new LayerContext(), capabilitiesConfiguration, serviceType);
     }
 
+    @Override
     public String getAbstract(File instanceDirectory){
         try{
             //unmarshall serviceMetadata.xml File to create Service object
@@ -129,6 +133,7 @@ public abstract class GridServiceConfiguration implements ServiceConfiguration {
         return "";
     }
 
+    @Override
     public List<Layer> getlayersNumber(Worker worker) {
         if(worker instanceof LayerWorker){
             final LayerWorker layerWorker = (LayerWorker)worker;
