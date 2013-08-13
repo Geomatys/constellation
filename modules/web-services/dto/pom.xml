@@ -25,5 +25,14 @@
             <artifactId>juzu-core</artifactId>
             <version>0.7.0-beta16-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.sis.core</groupId>
+            <artifactId>sis-utility</artifactId>
+            <version>0.4-jdk7-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-coverageio</artifactId>
+        </dependency>
     </dependencies>
 </project>

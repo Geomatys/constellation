@@ -1,16 +1,12 @@
 package org.constellation.ws.rest.post;
 
 import juzu.Mapped;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.geotoolkit.coverage.grid.GeneralGridGeometry;
-import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.opengis.metadata.Metadata;
-import org.opengis.util.GenericName;
+import org.constellation.utils.CoverageMetadataBean;
+import org.constellation.utils.SimplyMetadataTreeNode;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Pojo which contains all metadata for a specific data and his path and type (vector, raster, sensor)
@@ -23,22 +19,20 @@ import java.util.logging.Logger;
 @Mapped
 public class DataInformation {
 
-    private static final Logger LOGGER = Logger.getLogger(DataInformation.class.getName());
-
     private String name;
 
     private String path;
 
     private String dataType;
 
-    private Map<String, String> coveragesMetadata;
+    private HashMap<String, CoverageMetadataBean> coveragesMetadata;
 
-    private DefaultMetadata fileMetadata;
+    private ArrayList<SimplyMetadataTreeNode> fileMetadata;
 
     public DataInformation() {
     }
 
-    public DataInformation(String path, String dataType, DefaultMetadata fileMetadata) {
+    public DataInformation(String path, String dataType, ArrayList<SimplyMetadataTreeNode> fileMetadata) {
         this.path = path;
         this.dataType = dataType;
         this.fileMetadata = fileMetadata;
@@ -68,19 +62,19 @@ public class DataInformation {
         this.dataType = dataType;
     }
 
-    public Map<String, String> getCoveragesMetadata() {
+    public HashMap<String, CoverageMetadataBean> getCoveragesMetadata() {
         return coveragesMetadata;
     }
 
-    public void setCoveragesMetadata(Map<String, String> coveragesMetadata) {
+    public void setCoveragesMetadata(HashMap<String,CoverageMetadataBean> coveragesMetadata) {
         this.coveragesMetadata = coveragesMetadata;
     }
 
-    public DefaultMetadata getFileMetadata() {
+    public ArrayList<SimplyMetadataTreeNode> getFileMetadata() {
         return fileMetadata;
     }
 
-    public void setFileMetadata(DefaultMetadata fileMetadata) {
+    public void setFileMetadata(ArrayList<SimplyMetadataTreeNode> fileMetadata) {
         this.fileMetadata = fileMetadata;
     }
 }

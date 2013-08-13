@@ -9,18 +9,16 @@ import java.util.logging.Logger;
 /**
  * @author Benjamin Garcia (Geomatys)
  */
-@Named("informationContainer")
-@SessionScoped
 public class DataInformationContainer {
 
     private static DataInformation information;
 
 
-    public DataInformation getInformation() {
+    public static DataInformation getInformation() {
         return information;
     }
 
-    public void setInformation(DataInformation information) {
-        this.information = information;
+    public static void setInformation(DataInformation information) {
+        DataInformationContainer.information = information;
     }
 }

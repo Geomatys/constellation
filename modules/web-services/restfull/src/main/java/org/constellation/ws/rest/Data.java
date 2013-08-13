@@ -4,16 +4,20 @@ import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.collection.TreeTable;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.utils.CoverageMetadataBean;
+import org.constellation.utils.MetadataMapBuilder;
+import org.constellation.utils.SimplyMetadataTreeNode;
 import org.constellation.ws.rest.post.DataInformation;
-import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.GenericName;
+import org.w3c.dom.Node;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -25,7 +29,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -93,7 +99,6 @@ public class Data {
             return Response.status(500).entity("upload file "+ uploadedFileLocation+" is not saved").build();
         }
 
-        String output = "File uploaded to : " + uploadedFileLocation;
         return Response.status(200).entity(information).build();
     }
 
@@ -124,13 +129,28 @@ public class Data {
                 GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
                 if(!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)){
 
-                    DataInformation information = new DataInformation(file.getPath(), dataType, (DefaultMetadata) coverageReader.getMetadata());
-                    Map<String, String> nameSpatialMetadataMap = new HashMap<>(0);
+                    // get Metadata as a List
+                    DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
+                    TreeTable.Node rootNode = fileMetadata.asTreeTable().getRoot();
+
+                    MetadataMapBuilder.setCounter(0);
+                    ArrayList<SimplyMetadataTreeNode> metadataList =  MetadataMapBuilder.createMetadataList(rootNode, null, 11);
+
+                    DataInformation information = new DataInformation(file.getPath(), dataType, metadataList);
+
+                    //coverage data
+                    HashMap<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
                     for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
                         GenericName name  = coverageReader.getCoverageNames().get(i);
-//                        GeneralGridGeometry geometry = coverageReader.getGridGeometry(i);
+                        SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
+                        String rootNodeName = sm.getNativeMetadataFormatName();
+                        Node coverateRootNode = sm.getAsTree(rootNodeName);
 
-                        nameSpatialMetadataMap.put(name.toString(), coverageReader.getCoverageMetadata(i).toString());
+                        MetadataMapBuilder.setCounter(0);
+                        List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11);
+
+                        CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
+                        nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
                     }
                     information.setCoveragesMetadata(nameSpatialMetadataMap);
                     return information;

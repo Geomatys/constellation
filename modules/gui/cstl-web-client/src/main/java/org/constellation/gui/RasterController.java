@@ -5,18 +5,14 @@ import juzu.Path;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
-import juzu.template.Template;
-import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.utils.SimplyMetadataTreeNode;
 import org.constellation.gui.service.ProviderManager;
-import org.constellation.gui.service.ServicesManager;
 import org.constellation.gui.templates.raster_description;
 import org.constellation.ws.rest.post.DataInformation;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -36,14 +32,17 @@ public class RasterController {
     @Path("raster_description.gtmpl")
     raster_description rasterDescription;
 
-    @Inject
-    DataInformationContainer informationContainer;
+//    @Inject
+    public DataInformationContainer informationContainer;
 
     @View
     @Route("/raster/description")
     public Response showRaster() throws IOException {
-        return rasterDescription.with().datainformation(informationContainer.getInformation()).ok().withMimeType("text/html");
+        List<SimplyMetadataTreeNode> metadataList= informationContainer.getInformation().getFileMetadata();
+        return rasterDescription.with().datainformation(informationContainer.getInformation()).metadataMap(metadataList).ok().withMimeType("text/html");
     }
+
+
 
     @Action
     @Route("/raster/create")

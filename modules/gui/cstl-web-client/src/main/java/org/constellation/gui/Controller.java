@@ -70,7 +70,7 @@ public class Controller {
     @Inject
     protected ServicesManager servicesManager;
 
-    @Inject
+//    @Inject
     protected DataInformationContainer informationContainer;
 
     /**
@@ -266,6 +266,5 @@ public class Controller {
         }else{
             return Response.error("error when saving file on server");
         }
-
     }
 }

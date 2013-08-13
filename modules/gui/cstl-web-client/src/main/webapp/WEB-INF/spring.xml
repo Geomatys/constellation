@@ -9,8 +9,14 @@
 
     <context:property-placeholder location="classpath:/constellation.properties"/>
 
+    <!-- new constellation service REST URL -->
     <bean class="java.lang.String" id="constellationURL">
         <constructor-arg type="java.lang.String" value="http://localhost:8080/constellation/api/1/" />
+    </bean>
+
+    <!-- constellation service URL -->
+    <bean class="java.lang.String" id="constellationOldURL">
+        <constructor-arg type="java.lang.String" value="http://localhost:8080/constellation/WS/" />
     </bean>
     <bean class="java.lang.String" id="constellationlogin">
         <constructor-arg type="java.lang.String" value="admin" />
@@ -33,7 +39,7 @@
     </bean>
 
     <bean class="org.constellation.gui.service.ProviderManager" id="providerManager" scope="session">
-        <property name="constellationUrl" value="http://localhost:8080/constellation/WS/"/>
+        <property name="constellationUrl" ref="constellationOldURL"/>
         <property name="login" ref="constellationlogin"/>
         <property name="password" ref="constellationPassword"/>
     </bean>
@@ -44,5 +50,5 @@
         <property name="password" ref="constellationPassword"/>
     </bean>
 
-    <bean class="org.constellation.gui.DataInformationContainer" id="informationContainer" scope="session" />
+    <!--<bean class="org.constellation.gui.DataInformationContainer" id="informationContainer" scope="session" />-->
 </beans>
