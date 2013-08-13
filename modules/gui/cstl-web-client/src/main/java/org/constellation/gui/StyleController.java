@@ -27,6 +27,7 @@ import juzu.View;
 import juzu.impl.request.Request;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
@@ -176,8 +177,8 @@ public final class StyleController {
             // Read edited JSON body.
             final Style style = readJson(styleJson, Style.class);
 
-            // TODO: add method to create a default style provider named "sld" in the constellation-data directory.
-            provider.createProvider(null, null, null);
+            String stylePath = ConfigDirectory.getDataDirectory().getAbsolutePath()+"/styles/";
+            provider.createProvider("sld", "sld", stylePath);
 
             // Create the style.
             service.createStyle(DEFAULT_PROVIDER_ID, styleName, style);

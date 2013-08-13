@@ -79,17 +79,28 @@ public class ProviderManager {
         this.password = password;
     }
 
-    public void createProvider(String type, String fileIdentifier, String path) {
-        URL serverUrl = null;
+    public void createProvider(final String type, final String fileIdentifier, final String path) {
         try {
-            serverUrl = new URL(constellationUrl);
-            ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
+            final URL serverUrl = new URL(constellationUrl);
+            final ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
             final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup) cs.providers.getServiceDescriptor(type);
             final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
-            ParameterValueGroup sources = sourceDesc.createValue();
+            final ParameterValueGroup sources = sourceDesc.createValue();
             sources.parameter("id").setValue(fileIdentifier);
             String folderPath = path.substring(0, path.lastIndexOf('/'));
-            sources.groups("coveragefile").get(0).parameter("path").setValue(folderPath);
+
+            switch (type){
+                case "coverage-file":
+                    sources.groups("coveragefile").get(0).parameter("path").setValue(folderPath);
+                    break;
+                case "sld":
+                    sources.groups("sldFolder").get(0).parameter("path").setValue(folderPath);
+                    break;
+                default:
+                    if(LOGGER.isLoggable(Level.FINER)){
+                        LOGGER.log(Level.FINER, "Provider type not known");
+                    }
+            }
 
             cs.providers.createProvider(type, sources);
         } catch (MalformedURLException e) {

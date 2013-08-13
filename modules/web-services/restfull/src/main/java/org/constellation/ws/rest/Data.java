@@ -89,7 +89,7 @@ public class Data {
 
         String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath()+"/"+ dataName;
         String uploadedFileName = uploadedFileLocation+"/"+dataName+extension;
-        DataInformation information  = null;
+        DataInformation information;
 
         // save it
         try {
