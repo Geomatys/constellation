@@ -35,18 +35,24 @@ public class ProviderReport {
 
     @XmlAttribute
     private String id;
+
     @XmlAttribute
     private String type;
+
+    @XmlAttribute
+    private String date;
+
     @XmlElement(name = "item")
     private List<String> items;
 
     public ProviderReport() {
     }
 
-    public ProviderReport(final String id, final String type, final List<String> items) {
+    public ProviderReport(final String id, final String type, final List<String> items, final String date) {
         this.id = id;
         this.type = type;
         this.items = items;
+        this.date = date;
     }
 
     /**
@@ -92,6 +98,14 @@ public class ProviderReport {
      */
     public void setItems(List<String> items) {
         this.items = items;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(final String date) {
+        this.date = date;
     }
 
     @Override

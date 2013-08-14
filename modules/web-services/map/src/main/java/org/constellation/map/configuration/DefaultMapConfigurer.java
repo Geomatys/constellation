@@ -898,7 +898,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                         keys.add(DefaultName.toJCRExtendedForm(n));
                     }
 
-                    providerReports.add(new ProviderReport(p.getId(), service.getName(), keys));
+                    String date = (String) p.getSource().parameter("date").getValue();
+                    providerReports.add(new ProviderReport(p.getId(), service.getName(), keys, date));
                 }
             }
             for (StyleProvider p : styleProviders) {
@@ -907,7 +908,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                     for(String n : p.getKeys()){
                         keys.add(n);
                     }
-                    providerReports.add(new ProviderReport(p.getId(), service.getName(), keys));
+                    String date = (String) p.getSource().parameter("date").getValue();
+                    providerReports.add(new ProviderReport(p.getId(), service.getName(), keys, date));
                 }
             }
             providerServ.add(new ProviderServiceReport(service.getName(),
