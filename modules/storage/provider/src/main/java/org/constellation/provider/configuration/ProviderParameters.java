@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,6 +66,8 @@ public final class ProviderParameters {
              new DefaultParameterDescriptor<String>("id","source id",String.class,null,true);
     public static final ParameterDescriptor<Boolean> SOURCE_LOADALL_DESCRIPTOR =
              new DefaultParameterDescriptor<Boolean>("load_all","source load all datas",Boolean.class,true,true);
+    public static final ParameterDescriptor<String> SOURCE_DATE_DESCRIPTOR =
+             new DefaultParameterDescriptor<String>("date","source creation date",String.class,null,false);
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -118,7 +121,7 @@ public final class ProviderParameters {
     public static ParameterDescriptorGroup createDescriptor(final GeneralParameterDescriptor sourceConfigDescriptor){
         final ParameterDescriptorGroup sourceDescriptor = new DefaultParameterDescriptorGroup(
             Collections.singletonMap("name", SOURCE_DESCRIPTOR_NAME),
-            0, Integer.MAX_VALUE,SOURCE_ID_DESCRIPTOR,SOURCE_LOADALL_DESCRIPTOR,
+            0, Integer.MAX_VALUE,SOURCE_ID_DESCRIPTOR,SOURCE_LOADALL_DESCRIPTOR,SOURCE_DATE_DESCRIPTOR,
             sourceConfigDescriptor,LAYER_DESCRIPTOR);
         final ParameterDescriptorGroup configDescriptor =
             new DefaultParameterDescriptorGroup(CONFIG_DESCRIPTOR_NAME,sourceDescriptor);

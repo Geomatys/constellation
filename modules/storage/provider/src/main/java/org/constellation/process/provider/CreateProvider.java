@@ -16,7 +16,9 @@
  */
 package org.constellation.process.provider;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.process.AbstractCstlProcess;
@@ -69,6 +71,10 @@ public final class CreateProvider extends AbstractCstlProcess {
                         throw new ProcessException("Provider ID is already used : " + id, this, null);
                     }
                 }
+
+                final Date date = new Date();
+                final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY X");
+                source.parameter("date").setValue(dateFormat.format(date));
                 LayerProviderProxy.getInstance().createProvider((LayerProviderService) service, source);
             }
 

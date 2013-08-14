@@ -17,6 +17,7 @@
 
 package org.constellation.configuration;
 
+import java.util.Date;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -38,6 +39,9 @@ public class Source {
 
     @XmlAttribute(name="load_all")
     private Boolean loadAll;
+
+    @XmlAttribute
+    private String date;
 
     @XmlElement
     private LayerList include;
@@ -92,6 +96,14 @@ public class Source {
             this.include = new LayerList();
         }
         this.loadAll = loadAll;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(final String date) {
+        this.date = date;
     }
 
     /**
