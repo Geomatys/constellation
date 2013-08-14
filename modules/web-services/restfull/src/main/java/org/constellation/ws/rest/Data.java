@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 
 /**
  * Manage data sending
+ *
  * @author Benjamin Garcia (Geomatys)
  */
 @Path("/1/data")
@@ -48,13 +49,14 @@ public class Data {
 
     /**
      * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
+     *
      * @param multi {@link MultiPart} with the file
      * @return A {@link Response} with 200 code if upload work, 500 if not work.
      */
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadFile(MultiPart multi){
+    public Response uploadFile(MultiPart multi) {
 
 
         String dataName = "";
@@ -66,18 +68,18 @@ public class Data {
 
             Map<String, String> cdParameter = bodyPart.getContentDisposition().getParameters();
             String name = cdParameter.get("name");
-            switch (name){
-                case "file" :
+            switch (name) {
+                case "file":
                     BodyPartEntity bpe = (BodyPartEntity) bodyPart.getEntity();
                     uploadedInputStream = bpe.getInputStream();
                     String fileName = bodyPart.getContentDisposition().getFileName();
                     int extensionPoint = fileName.lastIndexOf('.');
                     extension = fileName.substring(extensionPoint);
                     break;
-                case "name" :
+                case "name":
                     dataName = bodyPart.getEntityAs(String.class);
                     break;
-                case "type" :
+                case "type":
                     //TODO : using it when generate data provider
                     dataType = bodyPart.getEntityAs(String.class);
                     break;
@@ -87,34 +89,43 @@ public class Data {
         }
 
 
-        String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath()+"/"+ dataName;
-        String uploadedFileName = uploadedFileLocation+"/"+dataName+extension;
+        String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath() + "/" + dataName;
+        String uploadedFileName = uploadedFileLocation + "/" + dataName + extension;
         DataInformation information;
 
         // save it
         try {
-            information = writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName, dataType);
+            File file = writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName);
+            information = generateMetadatasInformation(file, dataType);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when saving file", e);
-            return Response.status(500).entity("upload file "+ uploadedFileLocation+" is not saved").build();
+            return Response.status(500).entity("upload file " + uploadedFileLocation + " is not saved").build();
         }
 
         return Response.status(200).entity(information).build();
     }
 
-    // save uploaded file to new location
-    private DataInformation writeToFile(final InputStream uploadedInputStream,
-                             final String uploadedFileLocation, String uploadedFileName, String dataType) throws IOException {
+    /**
+     * Write file with http input stream reveived
+     *
+     * @param uploadedInputStream  stream from client
+     * @param uploadedFileLocation folder path to save file
+     * @param uploadedFileName     file name
+     * @return {@link File} saved
+     * @throws IOException
+     */
+    private File writeToFile(final InputStream uploadedInputStream,
+                             final String uploadedFileLocation, String uploadedFileName) throws IOException {
 
-        if(uploadedInputStream!=null){
+        if (uploadedInputStream != null) {
 
             // create spécific directory for data
             File folder = new File(uploadedFileLocation);
-            if(!folder.exists()){
+            if (!folder.exists()) {
                 folder.mkdir();
             }
 
-            int read = 0;
+            int read;
             byte[] bytes = new byte[4096];
 
             File file = new File(uploadedFileName);
@@ -125,39 +136,51 @@ public class Data {
             out.flush();
             out.close();
 
-            try {
-                GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
-                if(!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)){
+            return file;
+        }
+        return null;
+    }
 
-                    // get Metadata as a List
-                    DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
-                    TreeTable.Node rootNode = fileMetadata.asTreeTable().getRoot();
+    /**
+     * Generate {@link DataInformation} for require file data
+     *
+     * @param file     data {@link File}
+     * @param dataType data type (raster, sensor or vector)
+     * @return a {@link DataInformation}
+     */
+    private DataInformation generateMetadatasInformation(final File file, final String dataType) {
+        try {
+            GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
+            if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
+
+                // get Metadata as a List
+                DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
+                TreeTable.Node rootNode = fileMetadata.asTreeTable().getRoot();
+
+                MetadataMapBuilder.setCounter(0);
+                ArrayList<SimplyMetadataTreeNode> metadataList = MetadataMapBuilder.createMetadataList(rootNode, null, 11);
+
+                DataInformation information = new DataInformation(file.getPath(), dataType, metadataList);
+
+                //coverage data
+                HashMap<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
+                for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
+                    GenericName name = coverageReader.getCoverageNames().get(i);
+                    SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
+                    String rootNodeName = sm.getNativeMetadataFormatName();
+                    Node coverateRootNode = sm.getAsTree(rootNodeName);
 
                     MetadataMapBuilder.setCounter(0);
-                    ArrayList<SimplyMetadataTreeNode> metadataList =  MetadataMapBuilder.createMetadataList(rootNode, null, 11);
+                    List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11);
 
-                    DataInformation information = new DataInformation(file.getPath(), dataType, metadataList);
-
-                    //coverage data
-                    HashMap<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
-                    for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
-                        GenericName name  = coverageReader.getCoverageNames().get(i);
-                        SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
-                        String rootNodeName = sm.getNativeMetadataFormatName();
-                        Node coverateRootNode = sm.getAsTree(rootNodeName);
-
-                        MetadataMapBuilder.setCounter(0);
-                        List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11);
-
-                        CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
-                        nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
-                    }
-                    information.setCoveragesMetadata(nameSpatialMetadataMap);
-                    return information;
+                    CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
+                    nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
                 }
-            } catch (CoverageStoreException e) {
-                LOGGER.log(Level.WARNING, "", e);
+                information.setCoveragesMetadata(nameSpatialMetadataMap);
+                return information;
             }
+        } catch (CoverageStoreException e) {
+            LOGGER.log(Level.WARNING, "", e);
         }
         return null;
     }
