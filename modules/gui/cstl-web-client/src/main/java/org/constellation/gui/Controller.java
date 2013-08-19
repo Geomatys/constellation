@@ -233,7 +233,7 @@ public class Controller {
      */
     @Resource
     @Route("/upload")
-    public Response upload(final FileItem file, final String name, final String dataType) {
+    public Response upload(final FileItem file, final String name, final String dataType, final String returnURL) {
         if (file != null) {
             DataInformation di = null;
             try {
@@ -261,7 +261,7 @@ public class Controller {
 
             di.setName(name);
             informationContainer.setInformation(di);
-            return RasterController_.showRaster();
+            return RasterController_.showRaster(returnURL);
 
         }else{
             return Response.error("error when saving file on server");

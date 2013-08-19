@@ -35,21 +35,22 @@ public class RasterController {
 //    @Inject
     public DataInformationContainer informationContainer;
 
+
     @View
     @Route("/raster/description")
-    public Response showRaster() throws IOException {
+    public Response showRaster(final String returnURL) throws IOException {
         List<SimplyMetadataTreeNode> metadataList= informationContainer.getInformation().getFileMetadata();
-        return rasterDescription.with().datainformation(informationContainer.getInformation()).metadataMap(metadataList).ok().withMimeType("text/html");
+        return rasterDescription.with().datainformation(informationContainer.getInformation()).metadataMap(metadataList).returnURL(returnURL).ok().withMimeType("text/html");
     }
 
 
 
     @Action
     @Route("/raster/create")
-    public Response createProvider(){
+    public Response createProvider(final String returnURL){
         DataInformation information = informationContainer.getInformation();
         //create provider
         providerManager.createProvider("coverage-file", information.getName(), information.getPath());
-        return StyleController_.edition(information.getName(), information.getName(), null, null);
+        return StyleController_.edition(information.getName(), information.getName(), null, null, returnURL);
     }
 }

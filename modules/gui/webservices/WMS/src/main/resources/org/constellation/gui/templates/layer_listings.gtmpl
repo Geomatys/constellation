@@ -95,8 +95,8 @@
                             <label class="radio">
                                 <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="../../images/icon/capteur.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
                             </label>
+                            <input type="hidden" value="@{WMSController.editWMS(serviceName = service.name)}" name="returnURL"/>
                         </div>
-
                     </div>
                     <div class="modal-footer">
                         <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>

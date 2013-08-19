@@ -2,6 +2,7 @@
 
 #{param name=datainformation/}
 #{param name=metadataMap /}
+#{param name=returnURL /}
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
@@ -29,7 +30,7 @@
                 <div class="tab-pane" id="metadata">
                 </div>
             </div>
-            <form action="@{RasterController.createProvider()}" method="POST">
+            <form action="@{RasterController.createProvider(returnURL = returnURL)}" method="POST">
                 <button type="submit" class="btn btn-info pull-right"/>Open</button>
             </form>
         </div>

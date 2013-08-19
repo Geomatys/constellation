@@ -7,6 +7,7 @@
 #{param name=styleBody/}
 #{param name=dataDescription/}
 #{param name=portrayUrl/}
+#{param name=returnURL/}
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
@@ -55,6 +56,7 @@
                 <input type="hidden" id="styleName" name="styleName" />
         <% } %>
             <input type="hidden" id="styleJson" name="styleJson" />
+            <input type="hidden" id="returnURL" name="returnURL" value="${returnURL}" />
             <input type="submit" id="submit" />
         </form>
 

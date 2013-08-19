@@ -103,7 +103,9 @@ public final class StyleController {
     public Response edition(final String layerProvider,
                             final String layerName,
                             final String styleProvider,
-                            final String styleName) {
+                            final String styleName,
+                            final String returnURL) {
+
         try {
             final DataDescription dataDescription;
             if (layerProvider != null && layerName != null) {
@@ -131,6 +133,7 @@ public final class StyleController {
             parameters.put("styleName",       styleName);
             parameters.put("dataDescription", dataDescription);
             parameters.put("styleBody",       writeJson(styleBody));
+            parameters.put("returnURL",       returnURL);
             parameters.put("portrayUrl",      service.getConstellationUrl() + "portrayal/portray");
             return edition.ok(parameters).withMimeType("text/html");
         } catch (IOException ex) {
@@ -172,7 +175,7 @@ public final class StyleController {
      */
     @Action
     @Route("style/create")
-    public Response create(final String styleName, final String styleJson) {
+    public Response create(final String styleName, final String styleJson, final String returnURL) {
         try {
             // Read edited JSON body.
             final Style style = readJson(styleJson, Style.class);
@@ -184,7 +187,8 @@ public final class StyleController {
             service.createStyle(DEFAULT_PROVIDER_ID, styleName, style);
 
             // Return to dashboard.
-            return StyleController_.dashboard();
+            return Response.redirect(returnURL);
+//            return StyleController_.dashboard();
         } catch (IOException ex) {
             return Response.error(ex);
         }

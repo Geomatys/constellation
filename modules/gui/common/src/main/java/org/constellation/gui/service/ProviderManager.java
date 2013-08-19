@@ -17,23 +17,11 @@
 package org.constellation.gui.service;
 
 import org.constellation.admin.service.ConstellationServer;
-import org.constellation.configuration.Instance;
-import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.LayerList;
-import org.constellation.dto.Service;
-import org.constellation.ws.rest.post.DataInformation;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.parameter.ParameterGroup;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,9 +75,10 @@ public class ProviderManager {
             final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
             final ParameterValueGroup sources = sourceDesc.createValue();
             sources.parameter("id").setValue(fileIdentifier);
-            String folderPath = path.substring(0, path.lastIndexOf('/'));
 
-            switch (type){
+            final String folderPath = path.substring(0, path.lastIndexOf('/'));
+
+            switch (type) {
                 case "coverage-file":
                     sources.groups("coveragefile").get(0).parameter("path").setValue(folderPath);
                     break;
@@ -97,7 +86,7 @@ public class ProviderManager {
                     sources.groups("sldFolder").get(0).parameter("path").setValue(folderPath);
                     break;
                 default:
-                    if(LOGGER.isLoggable(Level.FINER)){
+                    if (LOGGER.isLoggable(Level.FINER)) {
                         LOGGER.log(Level.FINER, "Provider type not known");
                     }
             }
