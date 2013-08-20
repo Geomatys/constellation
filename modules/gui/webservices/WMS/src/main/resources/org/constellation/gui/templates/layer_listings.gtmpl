@@ -156,8 +156,9 @@
             var keyCode = (event.keyCode ? event.keyCode : event.which);
             if (keyCode == '13') {
                 generateList(0, counter, null, $(this).val(), null);
+                event.stopPropagation();
+                event.preventDefault();
             }
-            event.stopPropagation();
         });
 
         // Reset filter action...
