@@ -27,6 +27,7 @@ import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.StringUtils;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AccessConstraint;
@@ -34,18 +35,17 @@ import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.InstanceSummary;
 import org.constellation.gui.service.ServicesManager;
+import org.constellation.gui.util.LayerComparator;
 import org.constellation.ws.rest.post.DataInformation;
-import org.opengis.feature.type.PropertyType;
-import org.w3c.dom.Element;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -198,30 +198,37 @@ public class Controller {
     @Ajax
     @Resource
     @Route("/datalist")
-    public void generateDataList(String serviceName, String startElement, String counter, String orderBy, String filter){
+    public void generateDataList(String serviceName, String startElement, String counter, String orderBy, String direction, String filter){
         LayerList layers = servicesManager.getLayers(serviceName, "WMS");
         Map<String, Object> parameters = new HashMap<String, Object>(0);
         int nbByPage =  Integer.parseInt(counter);
 
-        //show filtrered element if list is higher than element number by page
-        if(layers.getLayer().size()>nbByPage){
-            int start =  Integer.parseInt(startElement);
-            int boundary = start+nbByPage;
+        //show filtered element if list is higher than element number by page
+        int start =  Integer.parseInt(startElement);
+        int boundary = start+nbByPage;
 
-            //define higher bound on list
-            if(boundary>layers.getLayer().size()){
-                boundary = layers.getLayer().size();
-            }
-
-            // create layer list
-            List<Layer> layerList = new ArrayList<Layer>(nbByPage);
-            for (int i = start; i < boundary; i++) {
-                layerList.add(layers.getLayer().get(i));
-            }
-            layers.getLayer().clear();
-            layers.getLayer().addAll(layerList);
-
+        //define higher bound on list
+        if(boundary>layers.getLayer().size()){
+            boundary = layers.getLayer().size();
         }
+
+        // create layer list
+        List<Layer> layerList = new ArrayList<Layer>(nbByPage);
+        for (int i = start; i < boundary; i++) {
+            final Layer layer = layers.getLayer().get(i);
+            if (StringUtils.isBlank(filter) || StringUtils.containsIgnoreCase(layer.getName().getLocalPart(), filter)) {
+                layerList.add(layer);
+            }
+        }
+
+        // sort layers if necessary
+        if (!StringUtils.isBlank(orderBy) && !StringUtils.isBlank(direction)) {
+            Collections.sort(layerList, new LayerComparator(orderBy, direction));
+        }
+
+        layers.getLayer().clear();
+        layers.getLayer().addAll(layerList);
+
         parameters.put("layers", layers);
         dataElement.with(parameters).render();
     }

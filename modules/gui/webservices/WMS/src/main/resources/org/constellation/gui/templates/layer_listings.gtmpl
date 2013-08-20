@@ -9,20 +9,20 @@
         <div class="navbar">
             <div class="navbar-inner">
                 <ul class="nav">
-                    <li><a href="#">&{layer.listing.orderby.title}</a></li>
+                    <li><a href="#" data-order-by="title">&{layer.listing.orderby.title}<i class="icon-caret" style="display:none;"></i></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#">&{layer.listing.orderby.date}</a></li>
+                    <li><a href="#" data-order-by="date">&{layer.listing.orderby.date}<i class="icon-caret" style="display:none;"></i></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#">&{layer.listing.orderby.owner}</a></li>
+                    <li><a href="#" data-order-by="owner">&{layer.listing.orderby.owner}<i class="icon-caret" style="display:none;"></i></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#">&{layer.listing.orderby.type}</a></li>
+                    <li><a href="#" data-order-by="type">&{layer.listing.orderby.type}<i class="icon-caret" style="display:none;"></i></a></li>
                     <li class="divider-vertical"></li>
                 </ul>
                 <form class="navbar-form pull-left">
-                    <button type="button" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                    <button type="button" id="resetFilters" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
                 </form>
                 <form class="navbar-form pull-right">
-                    <input type="text" class="search-query" placeholder="Filtrer">
+                    <input type="text" id="searchFilter" class="search-query" placeholder="Filtrer" />
                 </form>
             </div>
         </div>
@@ -108,17 +108,19 @@
     </div>
 </div>
 <script type="text/javascript" >
+
     /**
-     * ajax juzu call to refresh list for pagination and filtrering
+     * ajax juzu call to refresh list for pagination and filtering
      * @param startElement : first element on page
      * @param counter : element number on page
      * @param orderBy : list sort by this attribute
      * @param filter : filter String
+     * @param direction : sort direction (ascending, descending)
      */
-    function generateList(startElement, counter, orderBy, filter){
+    function generateList(startElement, counter, orderBy, filter, direction){
         $('#datalist').jzLoad(
                 "Controller.generateDataList()",
-                {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter});
+                {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction});
     }
 
     $(function() {
@@ -129,6 +131,42 @@
         generatePagination(nbPage);
         addLayerSelectAction(${layers.getLayer().size()});
         $("#previous").addClass("active");
-        $("#nbLayersselect").val("10")
+        $("#nbLayersselect").val("10");
+
+        // OrderBy actions...
+        $('[data-order-by]').click(function() {
+            var orderBy   = $(this).data('order-by');
+            var counter   = $('#nbLayersselect').val();
+            var filter    = $('#searchFilter').val();
+            var direction = $(this).hasClass('descending') ? 'ascending' : 'descending'; // opposite direction
+
+            generateList(0, counter, orderBy, filter, direction);
+
+            $(this).parents('.nav').find('a').removeClass('ascending descending').
+                    find('.icon-caret').removeClass('icon-caret-up icon-caret-down');
+            if (direction === 'ascending') {
+                $(this).addClass('ascending').find('.icon-caret').addClass('icon-caret-up').show();
+            } else {
+                $(this).addClass('descending').find('.icon-caret').addClass('icon-caret-down').show();
+            }
+        });
+
+        $('#searchFilter').keypress(function(event) {
+            var counter   = $('#nbLayersselect').val();
+            var keyCode = (event.keyCode ? event.keyCode : event.which);
+            if (keyCode == '13') {
+                generateList(0, counter, null, $(this).val(), null);
+            }
+            event.stopPropagation();
+        });
+
+        // Reset filter action...
+        $('#resetFilters').click(function() {
+            var counter   = $('#nbLayersselect').val();
+            $('#searchFilter').val('');
+            $('[data-order-by]').removeClass('ascending descending').
+                    find('.icon-caret').removeClass('icon-caret-up icon-caret-down').hide();
+            generateList(0, counter, null, null, null);
+        });
     });
 </script>
