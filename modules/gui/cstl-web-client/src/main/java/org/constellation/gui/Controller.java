@@ -24,6 +24,7 @@ import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
+import juzu.impl.request.Request;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.apache.commons.fileupload.FileItem;
@@ -34,7 +35,9 @@ import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.InstanceSummary;
+import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.service.ServicesManager;
+import org.constellation.gui.service.bean.LayerData;
 import org.constellation.gui.util.LayerComparator;
 import org.constellation.ws.rest.post.DataInformation;
 
@@ -48,6 +51,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -69,6 +73,9 @@ public class Controller {
      */
     @Inject
     protected ServicesManager servicesManager;
+
+    @Inject
+    protected ProviderManager providerManager;
 
 //    @Inject
     protected DataInformationContainer informationContainer;
@@ -94,10 +101,17 @@ public class Controller {
     @Path("success.gtmpl")
     org.constellation.gui.templates.success success;
 
-
     @Inject
     @Path("layer.gtmpl")
     Template dataElement;
+
+    @Inject
+    @Path("add_data.gtmpl")
+    protected Template addData;
+
+    @Inject
+    @Path("add_data_listing.gtmpl")
+    org.constellation.gui.templates.add_data_listing  dataListing;
 
     /**
      * {@link ResourceBundle} used on this application
@@ -231,6 +245,17 @@ public class Controller {
 
         parameters.put("layers", layers);
         dataElement.with(parameters).render();
+    }
+
+    @Ajax
+    @Resource
+    @Route("/availabledata")
+    public void getAvailableData(){
+        Map<String, Object> parameters = new HashMap<>(0);
+        Locale userLocale = Request.getCurrent().getUserContext().getLocale();
+        List<LayerData> layerDatas = providerManager.getDataListing(userLocale);
+        parameters.put("providers", layerDatas);
+        dataListing.with(parameters).render();
     }
 
     /**

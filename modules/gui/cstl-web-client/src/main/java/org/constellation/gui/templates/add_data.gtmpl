@@ -1,0 +1,67 @@
+<div id="addModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="addModalLabel">Ajout de donnée</h3>
+    </div>
+    <div class="modal-body">
+        <div class="alert alert-info">
+            Sélectionnez la donnée à importer puis cliquez sur continuer
+        </div>
+        <div class="span1">
+            <h5><%= layers.getLayer().size() %> &{layer.listing.layer.label}</h5>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <div class="input-prepend">
+                    <input class="span2" id="inputIcon" type="text">
+                    <span class="add-on"><i class="icon-search"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="navbar">
+            <div class="navbar-inner">
+                <ul class="nav">
+                    <li><a href="#">&{layer.listing.orderby.title}</a></li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="#">&{layer.listing.orderby.date}</a></li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="#">&{layer.listing.orderby.owner}</a></li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="#">&{layer.listing.orderby.type}</a></li>
+                    <li class="divider-vertical"></li>
+                </ul>
+                <form class="navbar-form pull-left">
+                    <button type="button" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+                <div class="span3">
+                <div class="pagination" style="margin: 0px;">
+                    <ul id="paging">
+
+                    </ul>
+                </div>
+            </div>
+            <div class="span3">
+                <select class="pull-right" id="nbLayersselect">
+                    <option value="10" selected="selected">&{layer.listing.numberbypage.10.label}</option>
+                    <option value="20">&{layer.listing.numberbypage.20.label}</option>
+                    <option value="100">&{layer.listing.numberbypage.100.label}</option>
+                    <option value="${layers.getLayer().size()}">&{layer.listing.numberbypage.all.label}</option>
+                </select>
+            </div>
+        </div>
+        <div id="availableData">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>
+        <button class="btn btn-info" type="submit">continuer</button>
+    </div>
+    <script type="text/javascript" language="JavaScript">
+        function loadData(){
+            $('#availableData').jzLoad("Controller.getAvailableData()");
+        }
+    </script>
+</div>

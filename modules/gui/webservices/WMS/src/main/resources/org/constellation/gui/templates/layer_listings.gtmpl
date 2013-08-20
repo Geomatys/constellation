@@ -57,7 +57,8 @@
     </div>
     <div class="span3 pull-right">
         <div class="row pull-right">
-            <button class="btn btn-info">&{layer.listing.data.add.button.label}</button>
+            <a href="#addModal" role="button" class="btn btn-info" data-toggle="modal" onmousedown="loadData();">&{layer.listing.data.add.button.label}</a>
+            #{include path=add_data.gtmpl/}
             <a href="#myModal" role="button" class="btn btn-info" data-toggle="modal">&{layer.listing.data.create.button.label}</a>
             <!-- Modal -->
             <form action="@{upload()}" enctype="multipart/form-data" method="post">

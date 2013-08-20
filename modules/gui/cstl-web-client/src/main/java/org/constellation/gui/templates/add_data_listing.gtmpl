@@ -1,0 +1,26 @@
+#{param name=providers /}
+
+<% for (def provider : providers){%>
+        <br/>
+        <div>
+            <% if(provider.type.equals("raster")){%>
+            <div style="background: url(../../images/raster.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;">
+                <% }else{%>
+                <div style="background: url(../../images/vecteur.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;">
+                    <%}%>
+                    <div class="row">
+                        <div class="span3" style="padding-left: 15px;">
+                            <p>${provider.name}</p>
+                        </div>
+                        <div class="span2 pull-right">
+                            <p class="text-center text-info">${provider.type}</p>
+                        </div>
+                    </div>
+                    <div class="row" >
+                        <div class="span2" style="border: 1px solid #5bc0de; border-top: 1px solid #5bc0de;">
+                            <p class="text-center">${provider.date}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<%}%>

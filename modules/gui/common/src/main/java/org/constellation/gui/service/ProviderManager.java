@@ -17,11 +17,21 @@
 package org.constellation.gui.service;
 
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.ProviderReport;
+import org.constellation.configuration.ProviderServiceReport;
+import org.constellation.configuration.ProvidersReport;
+import org.constellation.gui.service.bean.LayerData;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,6 +77,12 @@ public class ProviderManager {
         this.password = password;
     }
 
+    /**
+     *
+     * @param type
+     * @param fileIdentifier
+     * @param path
+     */
     public void createProvider(final String type, final String fileIdentifier, final String path) {
         try {
             final URL serverUrl = new URL(constellationUrl);
@@ -95,5 +111,60 @@ public class ProviderManager {
         } catch (MalformedURLException e) {
             LOGGER.log(Level.WARNING, "", e);
         }
+    }
+
+    /**
+     *
+     * @return
+     * @param userLocale
+     */
+    public List<LayerData> getDataListing(final Locale userLocale){
+        final List<LayerData> layerDatas = new ArrayList<>(0);
+        try {
+            final URL serverUrl = new URL(constellationUrl);
+            final ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
+            final ProvidersReport report = cs.providers.listProviders();
+
+            for (ProviderServiceReport providerServiceReport : report.getProviderServices()) {
+                for (ProviderReport providerReport : providerServiceReport.getProviders()) {
+                    String type;
+                    switch (providerReport.getType()){
+                        case "feature-store":
+                            type = "vector";
+                            break;
+                        case "coverage-file":
+                            type = "raster";
+                            break;
+                        default:
+                            type = null;
+
+                    }
+
+                    if (type != null) {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY X");
+                        Date createDate = new Date();
+                        try {
+                            createDate = dateFormat.parse(providerReport.getDate());
+                        } catch (ParseException e) {
+                            LOGGER.log(Level.WARNING, "", e);
+                        }
+
+                        dateFormat = new SimpleDateFormat("dd-MM-YYYY", userLocale);
+                        String date = dateFormat.format(createDate);
+
+                        for (String name : providerReport.getItems()) {
+                            int rightBracket = name.indexOf('}')+1;
+                            name = name.substring(rightBracket);
+                            LayerData layerData = new LayerData(providerReport.getId(), type, name, date);
+                            layerDatas.add(layerData);
+                        }
+                    }
+                }
+            }
+            return layerDatas;
+        } catch (MalformedURLException e) {
+            LOGGER.log(Level.WARNING, "URL malformed", e);
+        }
+        return layerDatas;
     }
 }
