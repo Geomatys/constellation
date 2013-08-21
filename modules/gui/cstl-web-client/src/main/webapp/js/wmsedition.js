@@ -2,17 +2,17 @@
  * Add action on nbLayerselect element
  * @param size : max layer number
  */
-function addLayerSelectAction(root, size){
+function addLayerSelectAction(root, method, size){
     $(root + " [data-name=nbLayersselect]").on('change', function(){
         var counter = $(this).val();
-        generateList(0, counter, "", "");
+        eval(method+"(0, "+counter+", '', '', '')");
         var nbPage = size/counter;
         generatePagination(nbPage);
         $(root+" [data-name=previous]").addClass("active");
     });
 }
 
-function addOrderByAction(root){
+function addOrderByAction(root, method){
     // OrderBy actions...
     $(root + ' [data-order-by]').click(function() {
         var orderBy   = $(this).data('order-by');
@@ -20,7 +20,7 @@ function addOrderByAction(root){
         var filter    = $(root + " [data-name=searchFilter]").val();
         var direction = $(this).hasClass('descending') ? 'ascending' : 'descending'; // opposite direction
 
-        generateList(0, counter, orderBy, filter, direction);
+        eval(method+"(0, "+counter+", "+orderBy+", "+filter+", "+direction+")");
 
         $(this).parents('.nav').find('a').removeClass('ascending descending').
             find('.icon-caret').removeClass('icon-caret-up icon-caret-down').hide();
@@ -32,26 +32,26 @@ function addOrderByAction(root){
     });
 }
 
-function addFilterAction(root){
+function addFilterAction(root, method){
     $(root + " [data-name=searchFilter]").keypress(function(event) {
         var counter   = $(root + " [data-name=nbLayersselect]").val();
         var keyCode = (event.keyCode ? event.keyCode : event.which);
         if (keyCode == '13') {
-            generateList(0, counter, null, $(this).val(), null);
+            eval(method+"(0, "+counter+", null, "+$(this).val()+", null)");
             event.stopPropagation();
             event.preventDefault();
         }
     });
 }
 
-function addResetFilterAction(root){
+function addResetFilterAction(root, method){
     // Reset filter action...
     $(root + ' [data-name=resetFilters]').click(function() {
         var counter   = $(root + " [data-name=nbLayersselect]").val();
         $(root + " [data-name=searchFilter]").val('');
         $(root + ' [data-order-by]').removeClass('ascending descending').
             find('.icon-caret').removeClass('icon-caret-up icon-caret-down').hide();
-        generateList(0, counter, null, null, null);
+        eval(method+"(0, "+counter+", null, null, null)");
     });
 }
 
@@ -60,7 +60,7 @@ function addResetFilterAction(root){
  * @param pageSearched : int to know in which page we go
  * @param pageActivated : DOM element we need to activate
  */
-function changePage(root, pageSearched, pageActivated){
+function changePage(root, method, pageSearched, pageActivated){
 
     //get number element on page selected
     var nbByPage = $(root + " [data-name=nbLayersselect]").val();
@@ -69,7 +69,7 @@ function changePage(root, pageSearched, pageActivated){
     var startElement = (pageSearched-1)*nbByPage;
 
     //call ajax
-    generateList(startElement, nbByPage, "", "");
+    eval(method+"("+startElement+", "+nbByPage+", null, null, null)");
 
     //remove all style active on pagination
     $(root + " [data-name=paging] > .active").removeClass("active");
@@ -92,7 +92,7 @@ function changePage(root, pageSearched, pageActivated){
  * Generate pagination part when element number is change
  * @param nbPage : element number by page
  */
-function generatePagination(root, nbPage){
+function generatePagination(root, method, nbPage){
     //clear paging
     $(root + " [data-name=paging]").empty();
 
@@ -121,7 +121,7 @@ function generatePagination(root, nbPage){
             if(!$(this).hasClass("active")){
                 var currentPage = $(root + " [data-name=paging] > .page.active").text();
                 var pageSearched = new Number(currentPage)-1;
-                changePage(pageSearched, $(root + " [data-name=paging] > .page").get(pageSearched-1));
+                changePage(root, method, pageSearched, $(root + " [data-name=paging] > .page").get(pageSearched-1));
             }
         });
 
@@ -130,7 +130,7 @@ function generatePagination(root, nbPage){
             if(!$(this).hasClass("active")){
                 var currentPage = $(root + " [data-name=paging] > .page.active").text();
                 var pageSearched = new Number(currentPage)+1;
-                changePage(pageSearched, $(root + " [data-name=paging] > .page").get(pageSearched-1));
+                changePage(root, method, pageSearched, $(root + " [data-name=paging] > .page").get(pageSearched-1));
             }
         });
 
@@ -138,7 +138,7 @@ function generatePagination(root, nbPage){
         $(root + " [data-name=paging] > .page").on('click', function(){
             if(!$(this).hasClass("active")){
                 var pageSearched = $(this).text();
-                changePage(pageSearched, this);
+                changePage(root, method, pageSearched, this);
             }
         });
     }

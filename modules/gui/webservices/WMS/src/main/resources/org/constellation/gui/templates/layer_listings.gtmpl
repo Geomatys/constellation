@@ -129,11 +129,11 @@
         //init page
         generateList(0,10,"","");
         var nbPage = ${layers.getLayer().size()}/10;
-        generatePagination(nbPage);
-        addLayerSelectAction("#layerList", ${layers.getLayer().size()});
-        addOrderByAction("#layerList");
-        addFilterAction("#layerList");
-        addResetFilterAction("#layerList");
+        generatePagination("#layerList", "generateList", nbPage);
+        addLayerSelectAction("#layerList", "generateList", ${layers.getLayer().size()});
+        addOrderByAction("#layerList", "generateList");
+        addFilterAction("#layerList", "generateList");
+        addResetFilterAction("#layerList", "generateList");
 
         $("#layerList [data-name=previous]").addClass("active");
         $("#layerList [data-name=nbLayersselect]").val("10");
