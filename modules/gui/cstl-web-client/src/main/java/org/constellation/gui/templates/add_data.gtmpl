@@ -3,48 +3,43 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="addModalLabel">Ajout de donnée</h3>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" id="dataList">
         <div class="alert alert-info">
             Sélectionnez la donnée à importer puis cliquez sur continuer
         </div>
         <div class="span1">
             <h5><%= layers.getLayer().size() %> &{layer.listing.layer.label}</h5>
         </div>
-        <div class="control-group">
-            <div class="controls">
-                <div class="input-prepend">
-                    <input class="span2" id="inputIcon" type="text">
-                    <span class="add-on"><i class="icon-search"></i></span>
-                </div>
-            </div>
-        </div>
         <div class="navbar">
             <div class="navbar-inner">
                 <ul class="nav">
-                    <li><a href="#">&{layer.listing.orderby.title}</a></li>
+                    <li><a href="#" data-order-by="title">&{layer.listing.orderby.title}<i class="icon-caret" style="display:none;"></i></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#">&{layer.listing.orderby.date}</a></li>
+                    <li><a href="#" data-order-by="date">&{layer.listing.orderby.date}<i class="icon-caret" style="display:none;"></i></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#">&{layer.listing.orderby.owner}</a></li>
+                    <li><a href="#" data-order-by="owner">&{layer.listing.orderby.owner}<i class="icon-caret" style="display:none;"></i></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#">&{layer.listing.orderby.type}</a></li>
+                    <li><a href="#" data-order-by="type">&{layer.listing.orderby.type}<i class="icon-caret" style="display:none;"></i></a></li>
                     <li class="divider-vertical"></li>
                 </ul>
                 <form class="navbar-form pull-left">
-                    <button type="button" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                    <button type="button" data-name="resetFilters" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                </form>
+                <form class="navbar-form pull-right">
+                    <input type="text" data-name="searchFilter" class="search-query" placeholder="Filtrer" />
                 </form>
             </div>
         </div>
         <div class="row">
                 <div class="span3">
                 <div class="pagination" style="margin: 0px;">
-                    <ul id="paging">
+                    <ul data-name="paging">
 
                     </ul>
                 </div>
             </div>
-            <div class="span3">
-                <select class="pull-right" id="nbLayersselect">
+            <div class="span2">
+                <select class="span1 pull-right" data-name="nbLayersselect">
                     <option value="10" selected="selected">&{layer.listing.numberbypage.10.label}</option>
                     <option value="20">&{layer.listing.numberbypage.20.label}</option>
                     <option value="100">&{layer.listing.numberbypage.100.label}</option>
@@ -52,7 +47,7 @@
                 </select>
             </div>
         </div>
-        <div id="availableData">
+        <div data-name="datalist">
         </div>
     </div>
     <div class="modal-footer">
@@ -60,8 +55,22 @@
         <button class="btn btn-info" type="submit">continuer</button>
     </div>
     <script type="text/javascript" language="JavaScript">
-        function loadData(){
-            $('#availableData').jzLoad("Controller.getAvailableData()");
+        function loadData(startElement, counter, orderBy, filter, direction){
+                $('#dataList [data-name=datalist]').jzLoad("Controller.getAvailableData()",
+                        {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction});
         }
+
+        function setPaginationDataPage(){
+            var nbPage = totalProvider/10;
+            generatePagination("#dataList", "loadData", nbPage);
+            addLayerSelectAction("#dataList", "loadData", ${layers.getLayer().size()});
+            addOrderByAction("#dataList", "loadData");
+            addFilterAction("#dataList", "loadData");
+            addResetFilterAction("#dataList", "loadData");
+
+            $("#dataList [data-name=previous]").addClass("active");
+            $("#dataList [data-name=nbLayersselect]").val("10");
+        }
+
     </script>
 </div>

@@ -57,7 +57,7 @@
     </div>
     <div class="span3 pull-right">
         <div class="row pull-right">
-            <a href="#addModal" role="button" class="btn btn-info" data-toggle="modal" onmousedown="loadData();">&{layer.listing.data.add.button.label}</a>
+            <a href="#addModal" role="button" class="btn btn-info" data-toggle="modal" onmousedown="loadData();setPaginationDataPage(); ">&{layer.listing.data.add.button.label}</a>
             #{include path=add_data.gtmpl/}
             <a href="#myModal" role="button" class="btn btn-info" data-toggle="modal">&{layer.listing.data.create.button.label}</a>
             <!-- Modal -->

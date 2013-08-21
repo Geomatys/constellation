@@ -117,7 +117,7 @@ function generatePagination(root, method, nbPage){
         $(root + " [data-name=paging]").append('<li data-name="next"><a href="#" class="text-info" >&raquo;</a></li>');
 
         //add action on previous button
-        $(root + "[data-name=previous]").on('click', function(){
+        $(root + " [data-name=previous]").on('click', function(){
             if(!$(this).hasClass("active")){
                 var currentPage = $(root + " [data-name=paging] > .page.active").text();
                 var pageSearched = new Number(currentPage)-1;
@@ -126,7 +126,7 @@ function generatePagination(root, method, nbPage){
         });
 
         //add action on next button
-        $(root + "[data-name=next]").on('click', function(){
+        $(root + " [data-name=next]").on('click', function(){
             if(!$(this).hasClass("active")){
                 var currentPage = $(root + " [data-name=paging] > .page.active").text();
                 var pageSearched = new Number(currentPage)+1;

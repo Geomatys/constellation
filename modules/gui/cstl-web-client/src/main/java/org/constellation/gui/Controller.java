@@ -254,6 +254,7 @@ public class Controller {
         Map<String, Object> parameters = new HashMap<>(0);
         Locale userLocale = Request.getCurrent().getUserContext().getLocale();
         List<LayerData> layerDatas = providerManager.getDataListing(userLocale);
+        parameters.put("totalProvider", layerDatas.size());
         parameters.put("providers", layerDatas);
         dataListing.with(parameters).render();
     }

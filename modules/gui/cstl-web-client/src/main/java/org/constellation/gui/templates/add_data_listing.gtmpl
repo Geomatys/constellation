@@ -1,4 +1,5 @@
 #{param name=providers /}
+#{param name=totalProvider/}
 
 <% for (def provider : providers){%>
         <br/>
@@ -24,3 +25,6 @@
                 </div>
             </div>
 <%}%>
+<script language="JavaScript" type="text/javascript">
+    var totalProvider = ${totalProvider};
+</script>
