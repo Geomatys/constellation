@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="span9">
+    <div class="span9" id="layerList">
         <div style="border-bottom: 1px solid #ddd;">
             <h4>&{layer.listing.title}</h4>
         </div>
@@ -19,10 +19,10 @@
                     <li class="divider-vertical"></li>
                 </ul>
                 <form class="navbar-form pull-left">
-                    <button type="button" id="resetFilters" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                    <button type="button" data-name="resetFilters" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
                 </form>
                 <form class="navbar-form pull-right">
-                    <input type="text" id="searchFilter" class="search-query" placeholder="Filtrer" />
+                    <input type="text" data-name="searchFilter" class="search-query" placeholder="Filtrer" />
                 </form>
             </div>
         </div>
@@ -32,13 +32,13 @@
                     <button type="button" class="btn btn-info btn-small">&{layer.listing.selectall.button}</button></div>
                 <div class="span3">
                     <div class="pagination" style="margin: 0px;">
-                        <ul id="paging">
+                        <ul data-name="paging">
 
                         </ul>
                     </div>
                 </div>
                 <div class="span3">
-                    <select class="pull-right" id="nbLayersselect">
+                    <select class="pull-right" data-name="nbLayersselect">
                         <option value="10" selected="selected">&{layer.listing.numberbypage.10.label}</option>
                         <option value="20">&{layer.listing.numberbypage.20.label}</option>
                         <option value="100">&{layer.listing.numberbypage.100.label}</option>
@@ -51,7 +51,7 @@
                     <button type="button" class="btn btn-info btn-block">&{layer.listing.reduce.button.label}</button>
                 </div>
             </div>
-            <div id="datalist">
+            <div data-name="datalist">
             </div>
         </div>
     </div>
@@ -119,7 +119,7 @@
      * @param direction : sort direction (ascending, descending)
      */
     function generateList(startElement, counter, orderBy, filter, direction){
-        $('#datalist').jzLoad(
+        $('#layerList [data-name=datalist]').jzLoad(
                 "Controller.generateDataList()",
                 {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction});
     }
@@ -130,45 +130,12 @@
         generateList(0,10,"","");
         var nbPage = ${layers.getLayer().size()}/10;
         generatePagination(nbPage);
-        addLayerSelectAction(${layers.getLayer().size()});
-        $("#previous").addClass("active");
-        $("#nbLayersselect").val("10");
+        addLayerSelectAction("#layerList", ${layers.getLayer().size()});
+        addOrderByAction("#layerList");
+        addFilterAction("#layerList");
+        addResetFilterAction("#layerList");
 
-        // OrderBy actions...
-        $('[data-order-by]').click(function() {
-            var orderBy   = $(this).data('order-by');
-            var counter   = $('#nbLayersselect').val();
-            var filter    = $('#searchFilter').val();
-            var direction = $(this).hasClass('descending') ? 'ascending' : 'descending'; // opposite direction
-
-            generateList(0, counter, orderBy, filter, direction);
-
-            $(this).parents('.nav').find('a').removeClass('ascending descending').
-                    find('.icon-caret').removeClass('icon-caret-up icon-caret-down').hide();
-            if (direction === 'ascending') {
-                $(this).addClass('ascending').find('.icon-caret').addClass('icon-caret-up').show();
-            } else {
-                $(this).addClass('descending').find('.icon-caret').addClass('icon-caret-down').show();
-            }
-        });
-
-        $('#searchFilter').keypress(function(event) {
-            var counter   = $('#nbLayersselect').val();
-            var keyCode = (event.keyCode ? event.keyCode : event.which);
-            if (keyCode == '13') {
-                generateList(0, counter, null, $(this).val(), null);
-                event.stopPropagation();
-                event.preventDefault();
-            }
-        });
-
-        // Reset filter action...
-        $('#resetFilters').click(function() {
-            var counter   = $('#nbLayersselect').val();
-            $('#searchFilter').val('');
-            $('[data-order-by]').removeClass('ascending descending').
-                    find('.icon-caret').removeClass('icon-caret-up icon-caret-down').hide();
-            generateList(0, counter, null, null, null);
-        });
+        $("#layerList [data-name=previous]").addClass("active");
+        $("#layerList [data-name=nbLayersselect]").val("10");
     });
 </script>
