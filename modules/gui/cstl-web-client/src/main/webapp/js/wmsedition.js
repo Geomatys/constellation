@@ -79,12 +79,12 @@ function changePage(root, method, pageSearched, pageActivated){
 
     //if it's last page, next paging is disabled
     if(pageSearched==$(root + " [data-name=paging]> .page").length){
-        $(root + "[data-name=next]").addClass("active");
+        $(root + " [data-name=next]").addClass("active");
     }
 
     //if it's first page, previous paging is disabled
     if(pageSearched==1){
-        $(root + "[data-name=previous]").addClass("active");
+        $(root + " [data-name=previous]").addClass("active");
     }
 }
 

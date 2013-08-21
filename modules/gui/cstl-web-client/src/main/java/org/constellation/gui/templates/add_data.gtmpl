@@ -43,7 +43,6 @@
                     <option value="10" selected="selected">&{layer.listing.numberbypage.10.label}</option>
                     <option value="20">&{layer.listing.numberbypage.20.label}</option>
                     <option value="100">&{layer.listing.numberbypage.100.label}</option>
-                    <option value="${layers.getLayer().size()}">&{layer.listing.numberbypage.all.label}</option>
                 </select>
             </div>
         </div>
@@ -57,19 +56,25 @@
     <script type="text/javascript" language="JavaScript">
         function loadData(startElement, counter, orderBy, filter, direction){
                 $('#dataList [data-name=datalist]').jzLoad("Controller.getAvailableData()",
-                        {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction});
+                        {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction},
+                        setPaginationDataPage);
         }
+        var firstTime = 0;
 
         function setPaginationDataPage(){
-            var nbPage = totalProvider/10;
-            generatePagination("#dataList", "loadData", nbPage);
-            addLayerSelectAction("#dataList", "loadData", ${layers.getLayer().size()});
-            addOrderByAction("#dataList", "loadData");
-            addFilterAction("#dataList", "loadData");
-            addResetFilterAction("#dataList", "loadData");
+            if(firstTime==0){
+                var nbPage = totalProvider/10;
+                generatePagination("#dataList", "loadData", nbPage);
+                addLayerSelectAction("#dataList", "loadData", totalProvider);
+                addOrderByAction("#dataList", "loadData");
+                addFilterAction("#dataList", "loadData");
+                addResetFilterAction("#dataList", "loadData");
 
-            $("#dataList [data-name=previous]").addClass("active");
-            $("#dataList [data-name=nbLayersselect]").val("10");
+                $("#dataList [data-name=previous]").addClass("active");
+                $("#dataList [data-name=nbLayersselect]").val("10");
+                firstTime=1;
+            }
+
         }
 
     </script>

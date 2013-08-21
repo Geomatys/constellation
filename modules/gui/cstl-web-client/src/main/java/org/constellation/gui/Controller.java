@@ -39,6 +39,7 @@ import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.service.ServicesManager;
 import org.constellation.gui.service.bean.LayerData;
 import org.constellation.gui.util.LayerComparator;
+import org.constellation.gui.util.LayerDataComparator;
 import org.constellation.ws.rest.post.DataInformation;
 
 import javax.inject.Inject;
@@ -250,12 +251,37 @@ public class Controller {
     @Ajax
     @Resource
     @Route("/availabledata")
-    public void getAvailableData(){
+    public void getAvailableData(String startElement, String counter, String orderBy, String direction, String filter){
         Map<String, Object> parameters = new HashMap<>(0);
         Locale userLocale = Request.getCurrent().getUserContext().getLocale();
         List<LayerData> layerDatas = providerManager.getDataListing(userLocale);
+
+        int nbByPage =  Integer.parseInt(counter);
+
+        //show filtered element if list is higher than element number by page
+        int start =  Integer.parseInt(startElement);
+        int boundary = start+nbByPage;
+
+        //define higher bound on list
+        if(boundary>layerDatas.size()){
+            boundary = layerDatas.size();
+        }
+        // create layer list
+        List<LayerData> layerList = new ArrayList(nbByPage);
+        for (int i = start; i < boundary; i++) {
+            final LayerData layerData = layerDatas.get(i);
+            if (StringUtils.isBlank(filter) || StringUtils.containsIgnoreCase(layerData.getName(), filter)) {
+                layerList.add(layerData);
+            }
+        }
+
+        // sort layers if necessary
+        if (!StringUtils.isBlank(orderBy) && !StringUtils.isBlank(direction)) {
+            Collections.sort(layerDatas, new LayerDataComparator(orderBy, direction));
+        }
+
         parameters.put("totalProvider", layerDatas.size());
-        parameters.put("providers", layerDatas);
+        parameters.put("providers", layerList);
         dataListing.with(parameters).render();
     }
 
