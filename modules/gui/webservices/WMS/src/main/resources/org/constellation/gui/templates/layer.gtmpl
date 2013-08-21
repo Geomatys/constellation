@@ -3,9 +3,9 @@
 <br/>
 <div class="row">
 <% if(layer.type.equals("RASTER")){%>
-<div class="span9" style="background: url(../../images/raster.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;">
+<div class="span9" style="background: url(../../images/raster.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;" onclick="selectElement(this)">
     <% }else{%>
-    <div class="span9" style="background: url(../../images/vecteur.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;">
+    <div class="span9" style="background: url(../../images/vecteur.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;" onclick="selectElement(this)">
         <%}%>
         <div class="row">
             <div class="span4" style="padding-left: 15px;">

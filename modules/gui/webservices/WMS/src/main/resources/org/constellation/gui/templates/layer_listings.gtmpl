@@ -57,7 +57,7 @@
     </div>
     <div class="span3 pull-right">
         <div class="row pull-right">
-            <a href="#addModal" role="button" class="btn btn-info" data-toggle="modal" onmousedown="loadData();setPaginationDataPage(); ">&{layer.listing.data.add.button.label}</a>
+            <a href="#addModal" role="button" class="btn btn-info" data-toggle="modal" onmousedown="loadData(0,10,'',''); ">&{layer.listing.data.add.button.label}</a>
             #{include path=add_data.gtmpl/}
             <a href="#myModal" role="button" class="btn btn-info" data-toggle="modal">&{layer.listing.data.create.button.label}</a>
             <!-- Modal -->
@@ -138,4 +138,18 @@
         $("#layerList [data-name=previous]").addClass("active");
         $("#layerList [data-name=nbLayersselect]").val("10");
     });
+
+    function selectElement(element){
+        var dataState = $(element).attr("data-state");
+        if(dataState == "selected"){
+            $(element).children().css("background-color", "rgba(0,0,0,0)")
+            $(element).css("color", "rgb(51, 51, 51)");
+            $(element).attr("data-state", "");
+        }else{
+            $(element).children().css("background-color", "rgba(0,0,0,0.5)")
+            $(element).css("color", "white");
+            $(element).attr("data-state", "selected");
+
+        }
+    }
 </script>

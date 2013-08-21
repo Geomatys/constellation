@@ -161,6 +161,8 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         inputContext.getLayers().add(new Source(COUNTRIES_DATA_REF.getProviderOrServiceId(), false, null, null));
         createCustomInstance("addLayer2", inputContext);
         startInstance("addLayer2");
+        DataReference layerRef = DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE,"providerID", "LayerID");
+        DataReference styleRef = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE,"providerID", "LayerID");
         
         final Filter bbox = FF.bbox("geom", 10, 0, 30, 50, null);
 
