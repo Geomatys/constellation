@@ -106,13 +106,22 @@ public class Controller {
     @Path("layer.gtmpl")
     Template dataElement;
 
+
     @Inject
-    @Path("add_data.gtmpl")
-    protected Template addData;
+    @Path("part02.gtmpl")
+    protected Template part02;
+
+    @Inject
+    @Path("part03.gtmpl")
+    protected Template part03;
 
     @Inject
     @Path("add_data_listing.gtmpl")
     org.constellation.gui.templates.add_data_listing  dataListing;
+
+    @Inject
+    @Path("add_data.gtmpl")
+    protected Template addData;
 
     /**
      * {@link ResourceBundle} used on this application
@@ -256,7 +265,7 @@ public class Controller {
         Locale userLocale = Request.getCurrent().getUserContext().getLocale();
         List<LayerData> layerDatas = providerManager.getDataListing(userLocale);
 
-        int nbByPage =  Integer.parseInt(counter);
+        int nbByPage = Integer.parseInt(counter);
 
         //show filtered element if list is higher than element number by page
         int start =  Integer.parseInt(startElement);
