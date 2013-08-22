@@ -30,10 +30,10 @@
             <label class="control-label">&{wms.create.description.version.title}</label>
             <div class="controls">
                 <label class="checkbox inline" for="v111">
-                    <input type="checkbox" value="111" id="v111" name="v111" checked="${service.versions.contains('111')}"> 1.1.1
+                    <input type="checkbox" value="1.1.1" id="v111" name="v111" <%if(service.versions.contains('1.1.1')){%>checked="checked"<%}%>> 1.1.1
                 </label>
                 <label class="checkbox inline" for="v130">
-                    <input type="checkbox" value="130" id="v130" name="v130" checked="${service.versions.contains('130')}"> 1.3.0
+                    <input type="checkbox" value="1.3.0" id="v130" name="v130" <%if(service.versions.contains('1.3.0')){%>checked="checked"<%}%>> 1.3.0
                 </label>
             </div>
         </div>
