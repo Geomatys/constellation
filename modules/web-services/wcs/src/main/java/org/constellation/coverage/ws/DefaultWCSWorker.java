@@ -52,7 +52,7 @@ import org.constellation.util.DataReference;
 
 // Geotoolkit dependencies
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;

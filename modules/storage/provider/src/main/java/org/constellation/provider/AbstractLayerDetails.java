@@ -16,20 +16,11 @@
  */
 package org.constellation.provider;
 
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Query;
-
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.DefaultLegendService;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.DefaultGlyphService;
@@ -39,13 +30,20 @@ import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.DateRange;
-import org.apache.sis.util.logging.Logging;
-
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.style.Style;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**

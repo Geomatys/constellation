@@ -16,7 +16,7 @@
  */
 package org.constellation.map.visitor;
 
-import org.geotoolkit.display.canvas.GraphicVisitor;
+import org.geotoolkit.display2d.GraphicVisitor;
 
 /**
  * Extend graphic visitor with and additional getResult method to grab

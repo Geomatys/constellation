@@ -42,7 +42,7 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.sql.Layer;
 import org.geotoolkit.coverage.sql.LayerCoverageReader;
 import org.apache.sis.storage.DataStoreException;
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;

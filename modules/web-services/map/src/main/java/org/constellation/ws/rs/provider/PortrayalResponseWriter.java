@@ -32,7 +32,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.constellation.portrayal.internal.CstlPortrayalService;
 import org.constellation.portrayal.internal.PortrayalResponse;
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.*;
 import org.apache.sis.util.logging.Logging;
 

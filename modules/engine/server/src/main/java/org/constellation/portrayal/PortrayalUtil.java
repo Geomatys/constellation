@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.constellation.provider.LayerDetails;
 
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;

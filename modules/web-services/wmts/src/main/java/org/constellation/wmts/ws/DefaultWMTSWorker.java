@@ -43,7 +43,7 @@ import org.constellation.ws.MimeType;
 
 // Geotoolkit dependencies
 import org.geotoolkit.coverage.*;
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;

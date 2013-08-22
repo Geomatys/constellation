@@ -24,7 +24,7 @@ import org.constellation.portrayal.PortrayalServiceIF;
 import org.geotoolkit.display.canvas.control.CanvasMonitor;
 import org.geotoolkit.display.canvas.control.NeverFailMonitor;
 import org.geotoolkit.display.canvas.control.StopOnErrorMonitor;
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.display2d.service.OutputDef;

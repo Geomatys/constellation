@@ -28,9 +28,9 @@ import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
