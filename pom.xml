@@ -917,6 +917,14 @@
   -->
     <repositories>
         <repository>
+            <id>apache.snapshots</id>
+            <name>Apache Snapshot Repository</name>
+            <url>http://repository.apache.org/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <repository>
             <id>snapshots</id>
             <name>geomatys repo snapshots</name>
             <url>http://maven2.geomatys.com/repository/snapshots/</url>
@@ -948,6 +956,14 @@
         </repository>
     </repositories>
     <pluginRepositories>
+        <pluginRepository>
+            <id>apache.snapshots</id>
+            <name>Apache Snapshot Repository</name>
+            <url>http://repository.apache.org/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
         <pluginRepository>
             <id>internal</id>
             <name>geomatys repo internal</name>
