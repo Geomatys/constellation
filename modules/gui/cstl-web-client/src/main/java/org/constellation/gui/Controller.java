@@ -106,15 +106,6 @@ public class Controller {
     @Path("layer.gtmpl")
     Template dataElement;
 
-
-    @Inject
-    @Path("part02.gtmpl")
-    protected Template part02;
-
-    @Inject
-    @Path("part03.gtmpl")
-    protected Template part03;
-
     @Inject
     @Path("add_data_listing.gtmpl")
     org.constellation.gui.templates.add_data_listing  dataListing;
