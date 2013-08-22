@@ -49,7 +49,7 @@ function addOrderByAction(root, method){
         var filter    = $(root + " [data-name=searchFilter]").val();
         var direction = $(this).hasClass('descending') ? 'ascending' : 'descending'; // opposite direction
 
-        eval(method+"(0, "+counter+", "+orderBy+", "+filter+", "+direction+")");
+        eval(method + "(0," + counter + "," + orderBy + "," + (filter != "" ? filter : "null") + "," + direction + ")");
 
         $(this).parents('.nav').find('a').removeClass('ascending descending').
             find('.icon-caret').removeClass('icon-caret-up icon-caret-down').hide();
@@ -66,7 +66,7 @@ function addFilterAction(root, method){
         var counter   = $(root + " [data-name=nbLayersselect]").val();
         var keyCode = (event.keyCode ? event.keyCode : event.which);
         if (keyCode == '13') {
-            eval(method+"(0, "+counter+", null, "+$(this).val()+", null)");
+            eval(method+"(0, "+counter+", null, '"+$(this).val()+"', null)");
             event.stopPropagation();
             event.preventDefault();
         }
