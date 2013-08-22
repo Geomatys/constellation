@@ -40,55 +40,55 @@ public final class WMSManager {
     /**
      * Loads a service metadata.
      *
-     * @param serviceName the service name
+     * @param serviceId   the service identifier
      * @param serviceType the service type (WMS, CSW, WPS...)
      * @return the {@link Service} instance
      */
-    public Service getServiceMetadata(final String serviceName, final String serviceType) {
-        return cstl.openServer().services.getMetadata(serviceType, serviceName);
+    public Service getServiceMetadata(final String serviceId, final String serviceType) {
+        return cstl.openServer().services.getMetadata(serviceType, serviceId);
     }
 
     /**
      * Loads a service layer list.
      *
-     * @param serviceName the service name
+     * @param serviceId   the service identifier
      * @param serviceType the service type (WMS, CSW, WPS...)
      * @return the {@link LayerList} instance
      */
-    public LayerList getLayers(final String serviceName, final String serviceType) {
-        return cstl.openServer().services.getLayers(serviceType, serviceName);
+    public LayerList getLayers(final String serviceId, final String serviceType) {
+        return cstl.openServer().services.getLayers(serviceType, serviceId);
     }
 
     /**
      * Restarts a service.
      *
-     * @param serviceName the service name
+     * @param serviceId   the service identifier
      * @param serviceType the service type (WMS, CSW, WPS...)
      * @return {@code true} on success, otherwise {@code false}
      */
-    public boolean restartService(final String serviceName, final String serviceType) {
-        return cstl.openServer(true).services.restartInstance(serviceType, serviceName);
+    public boolean restartService(final String serviceId, final String serviceType) {
+        return cstl.openServer(true).services.restartInstance(serviceType, serviceId);
     }
 
     /**
      * Stops a service.
      *
-     * @param serviceName the service name
+     * @param serviceId   the service identifier
      * @param serviceType the service type (WMS, CSW, WPS...)
      * @return {@code true} on success, otherwise {@code false}
      */
-    public boolean stopService(final String serviceName, final String serviceType) {
-        return cstl.openServer(true).services.stopInstance(serviceType, serviceName);
+    public boolean stopService(final String serviceId, final String serviceType) {
+        return cstl.openServer(true).services.stopInstance(serviceType, serviceId);
     }
 
     /**
      * Starts a service.
      *
-     * @param serviceName the service name
+     * @param serviceId   the service identifier
      * @param serviceType the service type (WMS, CSW, WPS...)
      * @return {@code true} on success, otherwise {@code false}
      */
-    public boolean startService(final String serviceName, final String serviceType) {
-        return cstl.openServer(true).services.startInstance(serviceType, serviceName);
+    public boolean startService(final String serviceId, final String serviceType) {
+        return cstl.openServer(true).services.startInstance(serviceType, serviceId);
     }
 }

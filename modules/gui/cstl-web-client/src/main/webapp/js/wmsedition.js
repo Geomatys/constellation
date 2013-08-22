@@ -5,7 +5,7 @@
  * @param name - {string} the WMS service name
  */
 function reloadWMS(name) {
-    var status = CSTL.jzAction('WMSController.reloadWMS', {serviceName:name});
+    var status = CSTL.jzAction('WMSController.reloadWMS', {serviceId:name});
     if (!status) {
         CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-restart'));
     } else {
@@ -19,7 +19,7 @@ function reloadWMS(name) {
  * @param name - {string} the WMS service name
  */
 function stopWMS(name) {
-    var status = CSTL.jzAction('WMSController.stopWMS', {serviceName:name});
+    var status = CSTL.jzAction('WMSController.stopWMS', {serviceId:name});
     if (!status) {
         CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-stop'));
     } else {

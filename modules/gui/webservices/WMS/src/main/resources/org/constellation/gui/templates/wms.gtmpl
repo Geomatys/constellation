@@ -18,8 +18,8 @@
                     <div class="btn-group">
                         <button type="button" class="btn btn-small" data-action="open-capabilities" data-capabilities-url="${capabilitiesUrl}">&{service.description.getcapabilities.button}</button>
                         <button type="button" class="btn btn-small" data-action="open-logs">&{service.description.logs.button}</button>
-                        <button type="button" class="btn btn-small btn-info" data-action="reload-service" data-service-name="${service.name}">&{service.description.reload.button}</button>
-                        <button type="button" class="btn btn-small btn-danger" data-action="stop-service" data-service-name="${service.name}">&{service.description.stop.button}</button>
+                        <button type="button" class="btn btn-small btn-info" data-action="reload-service" data-service-name="${service.identifier}">&{service.description.reload.button}</button>
+                        <button type="button" class="btn btn-small btn-danger" data-action="stop-service" data-service-name="${service.identifier}">&{service.description.stop.button}</button>
                     </div>
                     <script type=text/javascript>
                         $('[data-action=open-capabilities]').click(function() {

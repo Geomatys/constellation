@@ -63,28 +63,28 @@ public class WMSController {
 
 
     /**
-     * Generate wms service main page
-     * @return a {@link Response} with right mime type
-     * @throws IOException
+     * Generate wms service main page.
+     *
+     * @return the view {@link Response}
      */
     @View
     @Route("/create/wms")
-    public Response index() throws IOException {
+    public Response index() {
         return index.ok().withMimeType("text/html");
     }
 
     /**
-     * generate wms service editon page
-     * @param serviceName service name
-     * @return a {@link Response} with right mime type
-     * @throws IOException
+     * Generate WMS service edition page.
+     *
+     * @param serviceId the service identifier
+     * @return the view {@link Response}
      */
     @View
-    @Route("edit/wms/{serviceName}")
-    public Response editWMS(String serviceName) throws IOException{
-        Service service = wmsManager.getServiceMetadata(serviceName, "WMS");
-        LayerList layers = wmsManager.getLayers(serviceName, "WMS");
-        String capabilitiesUrl = cstl.getUrl() + "WS/wms/" + serviceName +"?REQUEST=GetCapabilities&SERVICE=WMS";
+    @Route("edit/wms/{serviceId}")
+    public Response editWMS(String serviceId) {
+        Service service = wmsManager.getServiceMetadata(serviceId, "WMS");
+        LayerList layers = wmsManager.getLayers(serviceId, "WMS");
+        String capabilitiesUrl = cstl.getUrl() + "WS/wms/" + serviceId +"?REQUEST=GetCapabilities&SERVICE=WMS";
         if (service.getVersions().size() == 1) {
             capabilitiesUrl += "&VERSION=" + service.getVersions().get(0);
         }
@@ -98,41 +98,41 @@ public class WMSController {
     }
 
     /**
-     * Reloads the WMS service with the specified name.
+     * Reloads the WMS service with the specified identifier.
      *
-     * @param serviceName the service name
+     * @param serviceId the service identifier
      * @return a status {@link Response}
      */
     @Ajax
     @Resource
     @Route("reload/wms")
-    public Response reloadWMS(final String serviceName) {
-        return wmsManager.restartService(serviceName, "WMS") ? Response.status(200) : Response.status(500);
+    public Response reloadWMS(final String serviceId) {
+        return wmsManager.restartService(serviceId, "WMS") ? Response.status(200) : Response.status(500);
     }
 
     /**
-     * Stops the WMS service with the specified name.
+     * Stops the WMS service with the specified identifier.
      *
-     * @param serviceName the service name
+     * @param serviceId the service identifier
      * @return a status {@link Response}
      */
     @Ajax
     @Resource
     @Route("stop/wms")
-    public Response stopWMS(final String serviceName) {
-        return wmsManager.stopService(serviceName, "WMS") ? Response.status(200) : Response.status(500);
+    public Response stopWMS(final String serviceId) {
+        return wmsManager.stopService(serviceId, "WMS") ? Response.status(200) : Response.status(500);
     }
 
     /**
-     * Stars the WMS service with the specified name.
+     * Stars the WMS service with the specified identifier.
      *
-     * @param serviceName the service name
+     * @param serviceId the service identifier
      * @return a status {@link Response}
      */
     @Ajax
     @Resource
     @Route("start/wms")
-    public Response startWMS(final String serviceName) {
-        return wmsManager.startService(serviceName, "WMS") ? Response.status(200) : Response.status(500);
+    public Response startWMS(final String serviceId) {
+        return wmsManager.startService(serviceId, "WMS") ? Response.status(200) : Response.status(500);
     }
 }
