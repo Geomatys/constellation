@@ -16,17 +16,12 @@
  */
 
 package org.constellation.gui.service;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.dto.DataDescription;
 import org.constellation.gui.binding.Style;
 import org.geotoolkit.style.MutableStyle;
 
+import javax.inject.Inject;
 import java.io.IOException;
-import java.net.URL;
-
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * Manager for style provider operations.
@@ -40,51 +35,10 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 public final class StyleService {
 
     /**
-     * Constellation server URL.
+     * Constellation manager used to communicate with the Constellation server.
      */
-    private String constellationUrl;
-
-    /**
-     * Constellation server user login.
-     */
-    private String login;
-
-    /**
-     * Constellation server user password.
-     */
-    private String password;
-
-    /**
-     * Set the constellation server URL.
-     */
-    public void setConstellationUrl(final String constellationUrl) {
-        this.constellationUrl = constellationUrl;
-    }
-
-    /**
-     * Get the constellation server URL.
-     */
-    public String getConstellationUrl() {
-        return constellationUrl;
-    }
-
-    /**
-     * Set the constellation server user login.
-     *
-     * @param login the user login
-     */
-    public void setLogin(final String login) {
-        this.login = login;
-    }
-
-    /**
-     * Set the constellation server user password.
-     *
-     * @param password the user password
-     */
-    public void setPassword(final String password) {
-        this.password = password;
-    }
+    @Inject
+    private ConstellationService cstl;
 
     /**
      * Gets a {@link MutableStyle} body form constellation server.
@@ -95,20 +49,12 @@ public final class StyleService {
      * @throws IOException if failed to acquire/parse response for any reason
      */
     public Style getStyle(final String providerId, final String styleName) throws IOException {
-        ensureNonNull("providerId", providerId);
-        ensureNonNull("styleName", styleName);
-
-        // Load style from constellation server.
         final MutableStyle style;
         try {
-            final URL url = new URL(constellationUrl.substring(0, constellationUrl.indexOf("api")) + "WS");
-            final ConstellationServer server = new ConstellationServer(url, login, password);
-            style = server.providers.downloadStyle(providerId, styleName);
+            style = cstl.openServer(true).providers.downloadStyle(providerId, styleName);
         } catch (Exception ex) {
             throw new IOException("The style named \"" + styleName + "\" for provider with id \"" + providerId + "\" doesn't exists.");
         }
-
-        // Ensure non null response.
         if (style == null) {
             throw new IOException("Null response for style named \"" + styleName + "\" for provider with id \"" + providerId + "\".");
         }
@@ -124,15 +70,8 @@ public final class StyleService {
      * @throws IOException if failed to update style for any reason
      */
     public void updateStyle(final String providerId, final String styleName, final Style style) throws IOException {
-        ensureNonNull("providerId", providerId);
-        ensureNonNull("styleName",  styleName);
-        ensureNonNull("style",      style);
-
-        // Update the style body on the constellation server.
         try {
-            final URL url = new URL(constellationUrl.substring(0, constellationUrl.indexOf("api")) + "WS");
-            final ConstellationServer server = new ConstellationServer(url, login, password);
-            server.providers.updateStyle(providerId, styleName, style.toType());
+            cstl.openServer(true).providers.updateStyle(providerId, styleName, style.toType());
         } catch (Exception ex) {
             throw new IOException("Failed to update the style named \"" + styleName + "\" in provider with id \"" + providerId + "\".");
         }
@@ -147,15 +86,8 @@ public final class StyleService {
      * @throws IOException if failed to create style for any reason
      */
     public void createStyle(final String providerId, final String styleName, final Style style) throws IOException {
-        ensureNonNull("providerId", providerId);
-        ensureNonNull("styleName",  styleName);
-        ensureNonNull("style",      style);
-
-        // Create the style on the constellation server.
         try {
-            final URL url = new URL(constellationUrl.substring(0, constellationUrl.indexOf("api")) + "WS");
-            final ConstellationServer server = new ConstellationServer(url, login, password);
-            server.providers.createStyle(providerId, styleName, style.toType());
+            cstl.openServer(true).providers.createStyle(providerId, styleName, style.toType());
         } catch (Exception ex) {
             throw new IOException("Failed to create the style named \"" + styleName + "\" in provider with id \"" + providerId + "\".");
         }
@@ -170,20 +102,12 @@ public final class StyleService {
      * @throws IOException if failed to acquire/parse response for any reason
      */
     public DataDescription getLayerDataDescription(final String providerId, final String layerName) throws IOException {
-        ensureNonNull("providerId", providerId);
-        ensureNonNull("layerName", layerName);
-
-        // Load data information from constellation server.
         final DataDescription dataDescription;
         try {
-            final URL url = new URL(constellationUrl);
-            final ConstellationServer server = new ConstellationServer(url, login, password);
-            dataDescription = server.providers.getLayerDataDescription(providerId, layerName);
+            dataDescription = cstl.openServer().providers.getLayerDataDescription(providerId, layerName);
         } catch (Exception ex) {
             throw new IOException("Unable to get data info for layer named \"" + layerName + "\" for provider with id \"" + providerId + "\".");
         }
-
-        // Ensure non null response.
         if (dataDescription == null) {
             throw new IOException("Null response for layer named \"" + layerName + "\" for provider with id \"" + providerId + "\".");
         }

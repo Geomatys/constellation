@@ -1,54 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
-
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
     <context:property-placeholder location="classpath:/constellation.properties"/>
 
-    <!-- new constellation service REST URL -->
-    <bean class="java.lang.String" id="constellationURL">
-        <constructor-arg type="java.lang.String" value="http://localhost:8080/constellation/api/1/" />
+    <!-- Constellation service configuration -->
+    <bean class="java.net.URL" id="cstlUrl">
+        <constructor-arg type="java.lang.String" value="http://localhost:8080/constellation/" />
+    </bean>
+    <bean class="java.lang.String" id="cstlApiVersion">
+        <constructor-arg type="java.lang.String" value="1" />
+    </bean>
+    <bean class="java.lang.String" id="cstlLogin">
+        <constructor-arg type="java.lang.String" value="admin" />
+    </bean>
+    <bean class="java.lang.String" id="cstlPassword">
+        <constructor-arg type="java.lang.String" value="admin" />
     </bean>
 
-    <!-- constellation service URL -->
-    <bean class="java.lang.String" id="constellationOldURL">
-        <constructor-arg type="java.lang.String" value="http://localhost:8080/constellation/WS/" />
-    </bean>
-    <bean class="java.lang.String" id="constellationlogin">
-        <constructor-arg type="java.lang.String" value="admin" />
-    </bean>
-    <bean class="java.lang.String" id="constellationPassword">
-        <constructor-arg type="java.lang.String" value="admin" />
+    <!-- Main service bean used to communicate with the Constellation server -->
+    <bean class="org.constellation.gui.service.ConstellationService" id="constellationManager" scope="singleton">
+        <property name="url"        ref="cstlUrl"/>
+        <property name="apiVersion" ref="cstlApiVersion"/>
+        <property name="login"      ref="cstlLogin"/>
+        <property name="password"   ref="cstlPassword"/>
     </bean>
     
-    <!-- service bean used to call constellation server-->
-    <bean class="org.constellation.gui.service.ServicesManager" id="serviceManager" scope="session">
-        <property name="constellationUrl" ref="constellationURL"/>
-        <property name="login" ref="constellationlogin"/>
-        <property name="password" ref="constellationPassword"/>
-    </bean>
-
-    <bean class="org.constellation.gui.service.WMSManager" id="wmsManager" scope="session">
-        <property name="constellationUrl" ref="constellationURL"/>
-        <property name="login" ref="constellationlogin"/>
-        <property name="password" ref="constellationPassword"/>
-    </bean>
-
-    <bean class="org.constellation.gui.service.ProviderManager" id="providerManager" scope="session">
-        <property name="constellationUrl" ref="constellationOldURL"/>
-        <property name="login" ref="constellationlogin"/>
-        <property name="password" ref="constellationPassword"/>
-    </bean>
-
-    <bean class="org.constellation.gui.service.StyleService" id="styleService" scope="request">
-        <property name="constellationUrl" ref="constellationURL"/>
-        <property name="login" ref="constellationlogin"/>
-        <property name="password" ref="constellationPassword"/>
-    </bean>
-
+    <!-- Configuration service beans by type/target -->
+    <bean class="org.constellation.gui.service.ServicesManager" id="serviceManager"     scope="session" />
+    <bean class="org.constellation.gui.service.WMSManager"      id="wmsManager"         scope="session" />
+    <bean class="org.constellation.gui.service.ProviderManager" id="providerManager"    scope="session" />
+    <bean class="org.constellation.gui.service.StyleService"    id="styleService"       scope="session" />
     <!--<bean class="org.constellation.gui.DataInformationContainer" id="informationContainer" scope="session" />-->
 </beans>

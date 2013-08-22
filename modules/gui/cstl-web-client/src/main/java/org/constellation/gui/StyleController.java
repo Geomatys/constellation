@@ -24,7 +24,6 @@ import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
-import juzu.impl.request.Request;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.constellation.configuration.ConfigDirectory;
@@ -35,6 +34,7 @@ import org.constellation.gui.binding.ColorMap;
 import org.constellation.gui.binding.Interpolate;
 import org.constellation.gui.binding.InterpolationPoint;
 import org.constellation.gui.binding.Style;
+import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.service.StyleService;
 import org.geotoolkit.style.interval.DefaultIntervalPalette;
@@ -65,6 +65,9 @@ public final class StyleController {
 
     @Inject
     private ProviderManager provider;
+
+    @Inject
+    private ConstellationService cstl;
 
     @Inject
     private StyleService service;
@@ -134,7 +137,7 @@ public final class StyleController {
             parameters.put("dataDescription", dataDescription);
             parameters.put("styleBody",       writeJson(styleBody));
             parameters.put("returnURL",       returnURL);
-            parameters.put("portrayUrl",      service.getConstellationUrl() + "portrayal/portray");
+            parameters.put("portrayUrl",      cstl.getUrlWithEndSlash() + "api/1/portrayal/portray");
             return edition.ok(parameters).withMimeType("text/html");
         } catch (IOException ex) {
             return Response.error(ex);

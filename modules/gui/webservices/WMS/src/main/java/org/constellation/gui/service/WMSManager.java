@@ -1,85 +1,94 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2007 - 2012, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 package org.constellation.gui.service;
 
-
-import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.inject.Inject;
 
 /**
- * @author Benjamin Garcia (Geomatys)
+ * Manager for WMS service operations.
+ *
+ * @author Benjamin Garcia (Geomatys).
+ * @author Bernard Fabien (Geomatys).
+ * @since 0.9
  */
-public class WMSManager {
-
-    private static final Logger LOGGER = Logging.getLogger(WMSManager.class.getName());
+public final class WMSManager {
 
     /**
-     * constellation server URL
+     * Constellation manager used to communicate with the Constellation server.
      */
-    private String constellationUrl;
+    @Inject
+    private ConstellationService cstl;
 
     /**
-     * constellation server user login
-     */
-    private String login;
-
-    /**
-     * constellation server user password
-     */
-    private String password;
-
-    public void setConstellationUrl(String constellationUrl) {
-        this.constellationUrl = constellationUrl;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    /**
+     * Loads a service metadata.
      *
-     * @param serviceName
-     * @param serviceType
-     * @return
+     * @param serviceName the service name
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return the {@link Service} instance
      */
-    public Service getServiceMetadata(final String serviceName, final String serviceType){
-        Service service = new Service();
-        service.setName(serviceName);
-        try{
-            URL serverUrl = new URL(constellationUrl);
-            ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
-            service = cs.services.getMetadata(serviceType, serviceName);
-        }catch (MalformedURLException e){
-            LOGGER.log(Level.WARNING, "error on url", e);
-        }
-        return service;
+    public Service getServiceMetadata(final String serviceName, final String serviceType) {
+        return cstl.openServer().services.getMetadata(serviceType, serviceName);
     }
 
     /**
+     * Loads a service layer list.
      *
-     * @param serviceName
-     * @param serviceType
-     * @return
+     * @param serviceName the service name
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return the {@link LayerList} instance
      */
-    public LayerList getLayers(final String serviceName, final String serviceType){
-        LayerList layers = new LayerList();
-        try {
-            URL serverUrl = new URL(constellationUrl);
-            ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
-            layers = cs.services.getLayers(serviceType, serviceName);
-        } catch (MalformedURLException e) {
-            LOGGER.log(Level.WARNING, "", e);
-        }
-        return layers;
+    public LayerList getLayers(final String serviceName, final String serviceType) {
+        return cstl.openServer().services.getLayers(serviceType, serviceName);
     }
 
+    /**
+     * Restarts a service.
+     *
+     * @param serviceName the service name
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return {@code true} on success, otherwise {@code false}
+     */
+    public boolean restartService(final String serviceName, final String serviceType) {
+        return cstl.openServer(true).services.restartInstance(serviceType, serviceName);
+    }
+
+    /**
+     * Stops a service.
+     *
+     * @param serviceName the service name
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return {@code true} on success, otherwise {@code false}
+     */
+    public boolean stopService(final String serviceName, final String serviceType) {
+        return cstl.openServer(true).services.stopInstance(serviceType, serviceName);
+    }
+
+    /**
+     * Starts a service.
+     *
+     * @param serviceName the service name
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return {@code true} on success, otherwise {@code false}
+     */
+    public boolean startService(final String serviceName, final String serviceType) {
+        return cstl.openServer(true).services.startInstance(serviceType, serviceName);
+    }
 }

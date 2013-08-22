@@ -16,16 +16,14 @@
  */
 package org.constellation.gui.service;
 
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.ws.rest.post.DataInformation;
 
+import javax.inject.Inject;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -43,35 +41,10 @@ public class ServicesManager {
     private static final Logger LOGGER = Logger.getLogger(ServicesManager.class.getName());
 
     /**
-     * constellation server URL
+     * Constellation manager used to communicate with the Constellation server.
      */
-    private String constellationUrl;
-
-    /**
-     * constellation server user login
-     */
-    private String login;
-
-    /**
-     * constellation server user password
-     */
-    private String password;
-
-
-    public ServicesManager() {
-    }
-
-    public void setConstellationUrl(String constellationUrl) {
-        this.constellationUrl = constellationUrl;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    @Inject
+    private ConstellationService cstl;
 
     /**
      * create service with {@link Service} capabilities information
@@ -83,13 +56,7 @@ public class ServicesManager {
     public boolean createServices(Service createdService, String service) {
         if (createdService != null) {
             LOGGER.log(Level.INFO, "service will be created : " + createdService.getName());
-            try {
-                URL serverUrl = new URL(constellationUrl);
-                ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
-                return cs.services.newInstance(service, createdService);
-            } catch (MalformedURLException e) {
-                LOGGER.log(Level.WARNING, "error on url", e);
-            }
+            return cstl.openServer().services.newInstance(service, createdService);
         }
         return false;
     }
@@ -102,65 +69,30 @@ public class ServicesManager {
     public List<InstanceSummary> getServiceList() {
         List<InstanceSummary> instancesSummary = new ArrayList<InstanceSummary>(0);
 
-        try {
-            URL serverUrl = new URL(constellationUrl);
-            ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
-            InstanceReport report = cs.services.listInstance();
-            //map server side object on client side object
-            for (Instance instance : report.getInstances()) {
-                InstanceSummary instanceSum = new InstanceSummary();
-                if(instance.get_abstract().isEmpty()){
-                    instanceSum.set_abstract("-");
-                }else{
-                    instanceSum.set_abstract(instance.get_abstract());
-                }
-                instanceSum.setLayersNumber(instance.getLayersNumber());
-                instanceSum.setName(instance.getName());
-                instanceSum.setStatus(instance.getStatus().toString());
-                instanceSum.setType(instance.getType().toLowerCase());
-                instancesSummary.add(instanceSum);
+        InstanceReport report = cstl.openServer().services.listInstance();
+        //map server side object on client side object
+        for (Instance instance : report.getInstances()) {
+            InstanceSummary instanceSum = new InstanceSummary();
+            if(instance.get_abstract().isEmpty()){
+                instanceSum.set_abstract("-");
+            }else{
+                instanceSum.set_abstract(instance.get_abstract());
             }
-        } catch (MalformedURLException e) {
-            LOGGER.log(Level.WARNING, "error on url", e);
+            instanceSum.setLayersNumber(instance.getLayersNumber());
+            instanceSum.setName(instance.getName());
+            instanceSum.setStatus(instance.getStatus().toString());
+            instanceSum.setType(instance.getType().toLowerCase());
+            instancesSummary.add(instanceSum);
         }
 
         return instancesSummary;
     }
 
-    /**
-     *
-     * @param serviceName
-     * @param serviceType
-     * @return
-     */
     public LayerList getLayers(final String serviceName, final String serviceType){
-        LayerList layers = new LayerList();
-        try {
-            URL serverUrl = new URL(constellationUrl);
-            ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
-            layers = cs.services.getLayers(serviceType, serviceName);
-        } catch (MalformedURLException e) {
-            LOGGER.log(Level.WARNING, "error on url", e);
-        }
-        return layers;
+        return cstl.openServer().services.getLayers(serviceType, serviceName);
     }
 
-
-    /**
-     * Send file on server via webservices
-     * @param newFile file sent
-     * @param name future data name
-     * @param dataType data type (raster, vector or sensor)
-     */
     public DataInformation uploadToServer(File newFile, String name, String dataType) {
-        URL serverUrl = null;
-        try {
-            serverUrl = new URL(constellationUrl);
-            ConstellationServer cs = new ConstellationServer(serverUrl, login, password);
-            return cs.providers.uploadData(newFile, name, dataType);
-        } catch (MalformedURLException e) {
-            LOGGER.log(Level.WARNING, "error on url", e);
-        }
-        return null;
+        return cstl.openServer().providers.uploadData(newFile, name, dataType);
     }
 }

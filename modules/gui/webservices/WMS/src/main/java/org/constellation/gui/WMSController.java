@@ -24,16 +24,14 @@ import juzu.Route;
 import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
-import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
+import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.WMSManager;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +43,9 @@ import java.util.Map;
  *
  */
 public class WMSController {
+
+    @Inject
+    private ConstellationService cstl;
 
     @Inject
     private WMSManager wmsManager;
@@ -83,11 +84,55 @@ public class WMSController {
     public Response editWMS(String serviceName) throws IOException{
         Service service = wmsManager.getServiceMetadata(serviceName, "WMS");
         LayerList layers = wmsManager.getLayers(serviceName, "WMS");
+        String capabilitiesUrl = cstl.getUrl() + "WS/wms/" + serviceName +"?REQUEST=GetCapabilities&SERVICE=WMS";
+        if (service.getVersions().size() == 1) {
+            capabilitiesUrl += "&VERSION=" + service.getVersions().get(0);
+        }
 
         //use parameter map (not type safe technique) because we aren't on juzu projet => gtmpl aren't build.
         Map<String, Object> parameters = new HashMap<String, Object>(0);
         parameters.put("service", service);
         parameters.put("layers", layers);
+        parameters.put("capabilitiesUrl", capabilitiesUrl);
         return serviceDescription.ok(parameters).withMimeType("text/html");
+    }
+
+    /**
+     * Reloads the WMS service with the specified name.
+     *
+     * @param serviceName the service name
+     * @return a status {@link Response}
+     */
+    @Ajax
+    @Resource
+    @Route("reload/wms")
+    public Response reloadWMS(final String serviceName) {
+        return wmsManager.restartService(serviceName, "WMS") ? Response.status(200) : Response.status(500);
+    }
+
+    /**
+     * Stops the WMS service with the specified name.
+     *
+     * @param serviceName the service name
+     * @return a status {@link Response}
+     */
+    @Ajax
+    @Resource
+    @Route("stop/wms")
+    public Response stopWMS(final String serviceName) {
+        return wmsManager.stopService(serviceName, "WMS") ? Response.status(200) : Response.status(500);
+    }
+
+    /**
+     * Stars the WMS service with the specified name.
+     *
+     * @param serviceName the service name
+     * @return a status {@link Response}
+     */
+    @Ajax
+    @Resource
+    @Route("start/wms")
+    public Response startWMS(final String serviceName) {
+        return wmsManager.startService(serviceName, "WMS") ? Response.status(200) : Response.status(500);
     }
 }
