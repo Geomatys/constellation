@@ -2,24 +2,40 @@
 
 #{param name=service/}
 #{param name=layers/}
+#{param name=capabilitiesUrl/}
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
         <img src="../../images/constellation.png"/>
     </div>
 </div>
-<div class="row" >
+<div class="row">
     <div class="row" style="background-color:white;">
         <div class="navbar">
             <div class="navbar-inner">
                 <a class="brand" href="#">${service.name}</a>
                 <form class="navbar-form pull-right" style="margin-top: 2px;">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-small">&{service.description.getcapabilities.button}</button>
-                        <button type="button" class="btn btn-small">&{service.description.logs.button}</button>
-                        <button type="button" class="btn btn-small btn-info">&{service.description.reload.button}</button>
-                        <button type="button" class="btn btn-small btn-danger">&{service.description.stop.button}</button>
+                        <button type="button" class="btn btn-small" data-action="open-capabilities" data-capabilities-url="${capabilitiesUrl}">&{service.description.getcapabilities.button}</button>
+                        <button type="button" class="btn btn-small" data-action="open-logs">&{service.description.logs.button}</button>
+                        <button type="button" class="btn btn-small btn-info" data-action="reload-service" data-service-name="${service.name}">&{service.description.reload.button}</button>
+                        <button type="button" class="btn btn-small btn-danger" data-action="stop-service" data-service-name="${service.name}">&{service.description.stop.button}</button>
                     </div>
+                    <script type=text/javascript>
+                        $('[data-action=open-capabilities]').click(function() {
+                            window.open($(this).data('capabilities-url'));
+                        });
+                        $('[data-action=reload-service]').click(function() {
+                            $(this).attr('disabled','disabled');
+                            reloadWMS($(this).data('service-name'));
+                            $(this).removeAttr('disabled');
+                        });
+                        $('[data-action=stop-service]').click(function() {
+                            $(this).attr('disabled','disabled');
+                            stopWMS($(this).data('service-name'));
+                            $(this).removeAttr('disabled');
+                        });
+                    </script>
                 </form>
             </div>
         </div>

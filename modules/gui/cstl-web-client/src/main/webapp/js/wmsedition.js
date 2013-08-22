@@ -1,3 +1,32 @@
+
+/**
+ * Restarts a WMS service instance.
+ *
+ * @param name - {string} the WMS service name
+ */
+function reloadWMS(name) {
+    var status = CSTL.jzAction('WMSController.reloadWMS', {serviceName:name});
+    if (!status) {
+        CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-restart'));
+    } else {
+        CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-restart'));
+    }
+}
+
+/**
+ * Stops a WMS service instance.
+ *
+ * @param name - {string} the WMS service name
+ */
+function stopWMS(name) {
+    var status = CSTL.jzAction('WMSController.stopWMS', {serviceName:name});
+    if (!status) {
+        CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-stop'));
+    } else {
+        CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-stop'));
+    }
+}
+
 /**
  * Add action on nbLayerselect element
  * @param size : max layer number
