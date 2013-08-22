@@ -29,7 +29,7 @@ import javax.inject.Inject;
  * @author Bernard Fabien (Geomatys).
  * @since 0.9
  */
-public final class WMSManager {
+public class WMSManager {
 
     /**
      * Constellation manager used to communicate with the Constellation server.

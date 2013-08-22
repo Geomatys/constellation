@@ -148,7 +148,6 @@
             $(element).children().css("background-color", "rgba(0,0,0,0.5)")
             $(element).css("color", "white");
             $(element).attr("data-state", "selected");
-
         }
     }
 </script>

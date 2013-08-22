@@ -102,6 +102,15 @@ public class Controller {
     @Path("success.gtmpl")
     org.constellation.gui.templates.success success;
 
+
+    @Inject
+    @Path("part02.gtmpl")
+    Template part02;
+
+    @Inject
+    @Path("part03.gtmpl")
+    Template part03;
+
     @Inject
     @Path("layer.gtmpl")
     Template dataElement;

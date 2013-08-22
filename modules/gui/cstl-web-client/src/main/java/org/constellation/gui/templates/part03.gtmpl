@@ -1,0 +1,5 @@
+<div data-part="selectedData"></div>
+<br/>
+<div class="alert alert-info">
+    Sélectionnez le style par défaut de la donnée ou ajoutez un style de la bibliothèque.
+</div>
