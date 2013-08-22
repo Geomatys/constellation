@@ -33,7 +33,7 @@
 
         //Raster
         @Alias(of = "/org/constellation/gui/templates/raster_description.gtmpl",    as = "raster_description.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/raster_bands.gtmpl",           as = "raster_bands.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/raster_bands.gtmpl",          as = "raster_bands.gtmpl"),
 
         // Style
         @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",       as = "style_dashboard.gtmpl"),
@@ -67,6 +67,7 @@
 @Assets(stylesheets = @Stylesheet(src = "cstl-web-client.css"),
         scripts = {@Script(id = "jquery", src = "js/jquery-2.0.0.js", location = AssetLocation.SERVER),
                 @Script(id = "json", src = "js/jquery.json-2.4.js", depends = "jquery", location = AssetLocation.SERVER),
+                @Script(id = "jquery-growl", src = "js/jquery.growl.js", depends = "jquery", location = AssetLocation.SERVER),
                 @Script(id = "bootstrap", src = "js/bootstrap.min.js", depends = "jquery", location = AssetLocation.SERVER),
                 @Script(id = "colorpicker", src = "js/bootstrap-colorpicker.js", depends = "bootstrap", location = AssetLocation.SERVER),
                 @Script(id = "slider", src = "js/bootstrap-slider.js", depends = "bootstrap", location = AssetLocation.SERVER),
@@ -75,6 +76,9 @@
                 @Script(id = "openlayers-ext", src = "js/openlayers-ext.js", depends = "openlayers", location = AssetLocation.SERVER),
                 @Script(id = "service", src = "js/services.js", depends = "jquery", location = AssetLocation.SERVER),
                 @Script(id = "wmsedition", src = "js/wmsedition.js", depends = "jquery", location = AssetLocation.SERVER),
+
+                // Constellation commons
+                @Script(id = "cstl",    src = "js/cstl.js",    depends = "jquery", location = AssetLocation.SERVER),
 
                 // Style
                 @Script(id = "style_edition",   src = "js/style_edition.js",  depends = "jquery"),

@@ -22,39 +22,6 @@
  */
 
 /**
- * Constellation namespace and utility functions.
- *
- * @type {Object}
- */
-var CSTL = {
-
-    i18n: function(key) {
-        return CSTL.msg[OpenLayers.Lang.getCode()][key];
-    }
-};
-
-/**
- * Constellation message bundle registry.
- *
- * @type {Object}
- */
-CSTL.msg = {};
-CSTL.msg["fr"] = {
-    "comparison":     "Comparaison",
-    "delete":         "Supprimer",
-    "edit":           "Editer",
-    "logical":        "Logique",
-    "no.description": "Aucune description disponible."
-};
-CSTL.msg["en"] = {
-    "comparison":     "Comparison",
-    "delete":         "Delete",
-    "edit":           "Edit",
-    "logical":        "Logical",
-    "no.description": "No description available."
-};
-
-/**
  * Constellation UI Style namespace.
  */
 CSTL.STYLE = {
@@ -208,7 +175,7 @@ CSTL.STYLE.StyleEdition = {
             // Row
             var $row = $("<div />", {
                 "class": "item rule",
-                "data-content": rule.description || CSTL.i18n("no.description")
+                "data-content": rule.description || CSTL.i18n("no-description")
             }).appendTo($rules);
 
             // Title

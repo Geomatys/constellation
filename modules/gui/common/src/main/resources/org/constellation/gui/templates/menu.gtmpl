@@ -28,3 +28,17 @@
 <div class="container" style="margin-top: 30px;">
     #{insert/}
 </div>
+
+<!-- dictionary -->
+<div id="dictionary" class="hide"
+     data-comparison="&{edition.style.label.comparison}"
+     data-delete="&{edition.style.label.delete}"
+     data-edit="&{edition.style.label.edit}"
+     data-error="&{label.error}"
+     data-error-service-restart="&{growl.error.service.restart}"
+     data-error-service-stop="&{growl.error.service.stop}"
+     data-logical="&{edition.style.label.logical}"
+     data-no-description="&{edition.style.label.no.description}"
+     data-success="&{label.success}"
+     data-success-service-restart="&{growl.success.service.restart}"
+     data-success-service-stop="&{growl.success.service.stop}"></div>
