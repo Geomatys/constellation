@@ -189,7 +189,9 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
      */
     @Override
     public Envelope getEnvelope() throws DataStoreException {
-        return store.getEnvelope(QueryBuilder.all(name));
+        final QueryBuilder query = new QueryBuilder(name);
+        query.setVersionDate(versionDate);
+        return store.getEnvelope(query.buildQuery());
     }
     
 
@@ -219,6 +221,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
                 final QueryBuilder builder = new QueryBuilder();
                 builder.setTypeName(name);
                 builder.setProperties(new String[]{dateStartField.getPropertyName()});
+                builder.setVersionDate(versionDate);
                 final Query query = builder.buildQuery();
 
                 final FeatureCollection<SimpleFeature> coll = store.createSession(false).getFeatureCollection(query);
@@ -267,6 +270,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
                 final QueryBuilder builder = new QueryBuilder();
                 builder.setTypeName(name);
                 builder.setProperties(new String[]{elevationStartField.getPropertyName()});
+                builder.setVersionDate(versionDate);
                 final Query query = builder.buildQuery();
 
                 final FeatureCollection<SimpleFeature> coll = store.createSession(false).getFeatureCollection(query);
