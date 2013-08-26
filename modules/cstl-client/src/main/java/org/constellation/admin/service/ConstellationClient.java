@@ -95,6 +95,7 @@ public final class ConstellationClient {
         this.client = Client.create();
         connectTimeout(5000);
         readTimeout(20000);
+
     }
 
     /**
@@ -194,7 +195,7 @@ public final class ConstellationClient {
 		 * @return the list of available styles
 		 */
 		public StyleListBean getStyleList() throws IOException {
-            return get("/style", MediaType.APPLICATION_XML_TYPE, StyleListBean.class);
+            return get("style", MediaType.APPLICATION_XML_TYPE, StyleListBean.class);
 		}
     }
 

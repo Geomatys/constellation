@@ -1,0 +1,69 @@
+<div data-part="selectedData"></div>
+<br/>
+<div class="alert alert-info">
+    Sélectionnez le style par défaut de la donnée ou ajoutez un style de la bibliothèque.
+</div>
+<div id="styleList">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <ul class="nav">
+                <li><a href="#" data-order-by="title">&{layer.listing.orderby.title}<i class="icon-caret" style="display:none;"></i></a></li>
+                <li class="divider-vertical"></li>
+                <li><a href="#" data-order-by="date">&{layer.listing.orderby.date}<i class="icon-caret" style="display:none;"></i></a></li>
+                <li class="divider-vertical"></li>
+                <li><a href="#" data-order-by="owner">&{layer.listing.orderby.owner}<i class="icon-caret" style="display:none;"></i></a></li>
+                <li class="divider-vertical"></li>
+                <li><a href="#" data-order-by="type">&{layer.listing.orderby.type}<i class="icon-caret" style="display:none;"></i></a></li>
+                <li class="divider-vertical"></li>
+            </ul>
+            <form class="navbar-form pull-left">
+                <button type="button" data-name="resetFilters" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+            </form>
+            <form class="navbar-form pull-right">
+                <input type="text" data-name="searchFilter" class="search-query" placeholder="Filtrer" />
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span3">
+            <div class="pagination" style="margin: 0px;">
+                <ul data-name="paging">
+
+                </ul>
+            </div>
+        </div>
+        <div class="span2">
+            <select class="span1 pull-right" data-name="nbLayersselect">
+                <option value="10" selected="selected">10 styles</option>
+                <option value="20">20 styles</option>
+                <option value="100">100 styles</option>
+            </select>
+        </div>
+    </div>
+    <div data-name="datalist">
+    </div>
+    <script type="text/javascript" language="JavaScript">
+        function loadStyle(startElement, counter, orderBy, filter, direction){
+            $('#styleList [data-name=datalist]').jzLoad("Controller.getStyleList()",
+                    {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction},
+                    setPaginationDataPage);
+        }
+        var firstTime = 0;
+
+        function setPaginationDataPage(){
+            if(firstTime==0){
+                var nbPage = totalProvider/10;
+                generatePagination("#styleList", "loadStyle", nbPage);
+                addLayerSelectAction("#styleList", "loadStyle", totalProvider);
+                addOrderByAction("#styleList", "loadStyle");
+                addFilterAction("#styleList", "loadStyle");
+                addResetFilterAction("#styleList", "loadStyle");
+
+                $("#dataList [data-name=previous]").addClass("active");
+                $("#dataList [data-name=nbLayersselect]").val("10");
+                firstTime=1;
+            }
+
+        }
+    </script>
+</div>

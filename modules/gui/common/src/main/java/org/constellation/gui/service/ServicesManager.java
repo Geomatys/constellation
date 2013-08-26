@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  * @version 0.9
  * @since 0.9
  */
-public class ServicesManager {
+public class  ServicesManager {
 
     private static final Logger LOGGER = Logger.getLogger(ServicesManager.class.getName());
 
