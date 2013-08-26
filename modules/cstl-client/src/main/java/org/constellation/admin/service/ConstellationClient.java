@@ -19,16 +19,22 @@ package org.constellation.admin.service;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.dto.Service;
+import org.constellation.dto.StyleListBean;
 import org.constellation.ws.rs.ServiceType;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Bernard Fabien (Geomatys).
@@ -37,6 +43,7 @@ import java.text.MessageFormat;
 public final class ConstellationClient {
 
     private static final MessageFormat TEMPLATE_SERVICES_SET_METADATA = new MessageFormat("{0}/configure");
+    private static final Logger LOGGER = Logging.getLogger(ConstellationClient.class);
 
     private final Client client;
     private final String url;
@@ -73,6 +80,24 @@ public final class ConstellationClient {
     public ConstellationClient auth(final String login, final String password) {
         this.client.addFilter(new HTTPBasicAuthFilter(login, password));
         return this;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public StyleListBean getStyleList() {
+        StyleListBean slb = null;
+        try {
+            URI styleURI = new URI(this.url + "/" + "style");
+            slb = get(styleURI, MediaType.APPLICATION_XML_TYPE, StyleListBean.class);
+        } catch (URISyntaxException e) {
+            LOGGER.log(Level.
+                    WARNING, "Error on URI synthax", e);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error on message receive", e);
+        }
+        return slb;
     }
 
     public final class Services {

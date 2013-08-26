@@ -1,7 +1,5 @@
 package org.constellation.dto;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * Just bean to acces to style information
  *
@@ -9,7 +7,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @version 0.9
  * @since 0.9
  */
-@XmlRootElement
 public class StyleBean {
 
     /**

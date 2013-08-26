@@ -17,6 +17,7 @@
 
 package org.constellation.gui.service;
 
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
 
 import java.net.MalformedURLException;
@@ -165,5 +166,13 @@ public final class ConstellationService {
         } catch (MalformedURLException unexpected) { // should never happen
             throw new IllegalStateException("An unexpected exception occurred.", unexpected);
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public ConstellationClient openClient(){
+        return new ConstellationClient(getUrlWithEndSlash().toString(), apiVersion).auth(login, password);
     }
 }
