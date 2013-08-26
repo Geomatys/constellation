@@ -166,7 +166,7 @@ public final class ConstellationClient {
         public Service getMetadata(final ServiceType serviceType, final String identifier) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("identifier",  identifier);
-            return get(serviceType + "/metadata", MediaType.APPLICATION_XML_TYPE, Service.class);
+            return get(serviceType + "/" + identifier + "/metadata", MediaType.APPLICATION_XML_TYPE, Service.class);
         }
 
         /**
@@ -180,7 +180,7 @@ public final class ConstellationClient {
         public AcknowlegementType setMetadata(final ServiceType serviceType, final Service metadata) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("metadata",    metadata);
-            return post(serviceType + "/configure", MediaType.APPLICATION_XML_TYPE, metadata, AcknowlegementType.class);
+            return post(serviceType + "/metadata", MediaType.APPLICATION_XML_TYPE, metadata, AcknowlegementType.class);
         }
     }
 

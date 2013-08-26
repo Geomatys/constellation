@@ -16,26 +16,11 @@
                 <a class="brand" href="#">${service.name}</a>
                 <form class="navbar-form pull-right" style="margin-top: 2px;">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-small" data-action="open-capabilities" data-capabilities-url="${capabilitiesUrl}">&{service.description.getcapabilities.button}</button>
+                        <button type="button" class="btn btn-small" onclick="window.open('${capabilitiesUrl}')">&{service.description.getcapabilities.button}</button>
                         <button type="button" class="btn btn-small" data-action="open-logs">&{service.description.logs.button}</button>
-                        <button type="button" class="btn btn-small btn-info" data-action="reload-service" data-service-name="${service.identifier}">&{service.description.reload.button}</button>
-                        <button type="button" class="btn btn-small btn-danger" data-action="stop-service" data-service-name="${service.identifier}">&{service.description.stop.button}</button>
+                        <button type="button" class="btn btn-small btn-info" onclick="reloadWMS('${service.identifier}',$(this));">&{service.description.reload.button}</button>
+                        <button type="button" class="btn btn-small btn-danger" onclick="stopWMS('${service.identifier}',$(this));">&{service.description.stop.button}</button>
                     </div>
-                    <script type=text/javascript>
-                        $('[data-action=open-capabilities]').click(function() {
-                            window.open($(this).data('capabilities-url'));
-                        });
-                        $('[data-action=reload-service]').click(function() {
-                            $(this).attr('disabled','disabled');
-                            reloadWMS($(this).data('service-name'));
-                            $(this).removeAttr('disabled');
-                        });
-                        $('[data-action=stop-service]').click(function() {
-                            $(this).attr('disabled','disabled');
-                            stopWMS($(this).data('service-name'));
-                            $(this).removeAttr('disabled');
-                        });
-                    </script>
                 </form>
             </div>
         </div>

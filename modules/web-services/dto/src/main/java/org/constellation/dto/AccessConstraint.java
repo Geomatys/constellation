@@ -68,6 +68,14 @@ public class AccessConstraint {
         this.layerLimit = layerLimit;
     }
 
+    public void setLayerLimit(String layerLimit) {
+        try {
+            this.layerLimit = Integer.parseInt(layerLimit);
+        } catch (NumberFormatException ex) {
+            this.layerLimit = 0;
+        }
+    }
+
     public int getMaxWidth() {
         return maxWidth;
     }
@@ -76,11 +84,27 @@ public class AccessConstraint {
         this.maxWidth = maxWidth;
     }
 
+    public void setMaxWidth(String maxWidth) {
+        try {
+            this.maxWidth = Integer.parseInt(maxWidth);
+        } catch (NumberFormatException ex) {
+            this.maxWidth = 0;
+        }
+    }
+
     public int getMaxHeight() {
         return maxHeight;
     }
 
     public void setMaxHeight(int maxHeight) {
         this.maxHeight = maxHeight;
+    }
+
+    public void setMaxHeight(String maxHeight) {
+        try {
+            this.maxHeight = Integer.parseInt(maxHeight);
+        } catch (NumberFormatException ex) {
+            this.maxHeight = 0;
+        }
     }
 }

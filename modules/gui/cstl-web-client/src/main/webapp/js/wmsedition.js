@@ -2,41 +2,67 @@
 /**
  * Restarts a WMS service instance.
  *
- * @param name - {string} the WMS service name
+ * @param id      - {string} the WMS service id
+ * @param $button - {jQuery} the action button
  */
-function reloadWMS(name) {
-    var status = CSTL.jzAction('WMSController.reloadWMS', {serviceId:name});
-    if (!status) {
-        CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-restart'));
-    } else {
+function reloadWMS(id, $button) {
+    $button.attr('disabled', 'disabled');
+    CSTL.jzAjax('WMSController.reloadWMS', {
+        data: {serviceId:id}
+    }).done(function() {
         CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-restart'));
-    }
+    }).fail(function() {
+        CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-restart'));
+    }).always(function() {
+        $button.removeAttr('disabled');
+    });
 }
 
 /**
  * Stops a WMS service instance.
  *
- * @param name - {string} the WMS service name
+ * @param id      - {string} the WMS service id
+ * @param $button - {jQuery} the action button
  */
-function stopWMS(name) {
-    var status = CSTL.jzAction('WMSController.stopWMS', {serviceId:name});
-    if (!status) {
-        CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-stop'));
-    } else {
+function stopWMS(id, $button) {
+    $button.attr('disabled', 'disabled');
+    CSTL.jzAjax('WMSController.stopWMS', {
+        data: {serviceId:id}
+    }).done(function() {
         CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-stop'));
-    }
+    }).fail(function() {
+        CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-stop'));
+    }).always(function() {
+        $button.removeAttr('disabled');
+    });
 }
 
 /**
  * Updates a WMS service description.
  */
 function updateDescriptionWMS() {
-    var status = CSTL.jzAction('WMSController.updateDescription', $('#wmsDescription').serialize());
-    if (!status) {
-        CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-description'));
-    } else {
+    CSTL.jzAjax('WMSController.updateDescription', {
+        method: 'POST',
+        data: $('#wmsDescription').serialize()
+    }).done(function() {
         CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-description'));
-    }
+    }).fail(function() {
+        CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-description'));
+    });
+}
+
+/**
+ * Updates a WMS service metadata.
+ */
+function updateMetadataWMS() {
+    CSTL.jzAjax('WMSController.updateMetadata', {
+        method: 'POST',
+        data: $('#wmsMetadata').serialize()
+    }).done(function() {
+        CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-metadata'));
+    }).fail(function() {
+        CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-metadata'));
+    });
 }
 
 /**

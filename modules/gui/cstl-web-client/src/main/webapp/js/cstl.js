@@ -67,40 +67,28 @@ CSTL = {
     },
 
     /**
-     * Performs an AJAX request to execute a method returning data.
+     * Performs an AJAX request to execute a server site method.
      *
-     * @param mid    - {string} the method id to execute
-     * @param params - {string} the request parameters
-     * @returns {string} the response body or null
+     * @param mid     - {string} the method id to execute
+     * @param options - {string} the request parameters
+     * @returns {boolean} true on action success otherwise false
      */
-    jzData: function(mid, params) {
-        var result = null;
-        $.ajax({
-            async: false,
-            url: $('.jz').jzURL(mid),
-            data: params
-        }).done(function(data) {
-            result = data.substring(data.indexOf('<body>') + 6, data.indexOf('</body>'));
-        });
-        return result;
+    jzAjax: function(mid, options) {
+        options     = options || {};
+        options.url = $('[data-method-id="' + mid + '"]').data('url');
+        return $.ajax(options);
     },
 
     /**
-     * Performs an AJAX request to execute a void method.
+     * Extracts the data body from a Juzu AJAX resource response.
      *
-     * @param mid    - {string} the method id to execute
-     * @param params - {string} the request parameters
-     * @returns {boolean} true on action success otherwise false
+     * @param data - {string} the response data
+     * @returns {string} the response body or null
      */
-    jzAction: function(mid, params) {
-        var status = true;
-        $.ajax({
-            async: false,
-            url: $('.jz').jzURL(mid),
-            data: params
-        }).error(function() {
-            status = false;
-        });
-        return status;
+    handleJzData: function(data) {
+        if (typeof data === "string") {
+            return data.substring(data.indexOf('<body>') + 6, data.indexOf('</body>'));
+        }
+        return null;
     }
 };

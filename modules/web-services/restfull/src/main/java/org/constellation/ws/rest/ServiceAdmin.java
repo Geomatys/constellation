@@ -190,7 +190,7 @@ public class ServiceAdmin {
      * @throws CstlServiceException
      */
     @POST
-    @Path("metadata")
+    @Path("create")
     public Response metadata(final @PathParam("serviceType") String serviceType, Service service) throws CstlServiceException {
         LOGGER.info("creating an instance");
         final AcknowlegementType response = serviceConfiguration.newInstance(serviceType, service.getIdentifier(), service);
@@ -198,7 +198,7 @@ public class ServiceAdmin {
     }
 
     @GET
-    @Path("{id}/create")
+    @Path("{id}/metadata")
     public Response metadata(final @PathParam("serviceType") String serviceType, final @PathParam("id") String identifier) throws CstlServiceException {
         Service service = serviceConfiguration.getMetadata(serviceType, identifier);
         return Response.ok(service).build();
