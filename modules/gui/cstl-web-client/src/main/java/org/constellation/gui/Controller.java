@@ -213,7 +213,7 @@ public class Controller {
 
     /**
      * Generate datalist to show it in ajax
-     * @param serviceName Service where we want to see data
+     * @param serviceId Service where we want to see data
      * @param startElement First element list counter
      * @param counter Element number by page
      * @param orderBy String to order by this attribute
@@ -222,8 +222,8 @@ public class Controller {
     @Ajax
     @Resource
     @Route("/datalist")
-    public void generateDataList(String serviceName, String startElement, String counter, String orderBy, String direction, String filter){
-        LayerList layers = servicesManager.getLayers(serviceName, "WMS");
+    public void generateDataList(String serviceId, String startElement, String counter, String orderBy, String direction, String filter){
+        LayerList layers = servicesManager.getLayers(serviceId, "WMS");
         Map<String, Object> parameters = new HashMap<String, Object>(0);
         int nbByPage =  Integer.parseInt(counter);
 

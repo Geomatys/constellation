@@ -24,14 +24,19 @@ import juzu.Route;
 import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
+import org.apache.commons.lang.StringUtils;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.WMSManager;
+import org.constellation.ws.rs.ServiceType;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,8 +86,8 @@ public class WMSController {
      */
     @View
     @Route("edit/wms/{serviceId}")
-    public Response editWMS(String serviceId) {
-        Service service = wmsManager.getServiceMetadata(serviceId, "WMS");
+    public Response editWMS(String serviceId) throws IOException {
+        Service service = wmsManager.getServiceMetadata(serviceId, ServiceType.WMS);
         LayerList layers = wmsManager.getLayers(serviceId, "WMS");
         String capabilitiesUrl = cstl.getUrl() + "WS/wms/" + serviceId +"?REQUEST=GetCapabilities&SERVICE=WMS";
         if (service.getVersions().size() == 1) {
@@ -134,5 +139,49 @@ public class WMSController {
     @Route("start/wms")
     public Response startWMS(final String serviceId) {
         return wmsManager.startService(serviceId, "WMS") ? Response.status(200) : Response.status(500);
+    }
+
+    /**
+     * Updates the WMS service description.
+     *
+     * @param name        the (new) service name
+     * @param identifier  the (new) service identifier
+     * @param keywords    the (new) service keywords
+     * @param description the (new) service description
+     * @param v111        the (new) service v111 state
+     * @param v130        the (new) service v130 state
+     * @return a status {@link Response}
+     */
+    @Ajax
+    @Resource
+    @Route("update/description/wms")
+    public Response updateDescription(final String name,
+                                      final String identifier,
+                                      final String keywords,
+                                      final String description,
+                                      final String v111,
+                                      final String v130) throws IOException {
+
+        final Service service = wmsManager.getServiceMetadata(identifier, ServiceType.WMS);
+        service.setName(name);
+        service.setKeywords(Arrays.asList(keywords.split(",")));
+        service.setDescription(description);
+        
+        final List<String> kwds = new ArrayList<>();
+        if (!StringUtils.isBlank(keywords)) {
+            kwds.addAll(Arrays.asList(keywords.split(",")));
+        }
+        service.setKeywords(kwds);
+        
+        final List<String> versions = new ArrayList<>();
+        if (v111 != null) {
+            versions.add(v111);    
+        }
+        if (v130 != null) {
+            versions.add(v130);
+        }
+        service.setVersions(versions);
+
+        return wmsManager.setServiceMetadata(service, ServiceType.WMS) ? Response.status(200) : Response.status(500);
     }
 }

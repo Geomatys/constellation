@@ -25,6 +25,7 @@ import org.constellation.ws.rest.post.DataInformation;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -97,7 +98,12 @@ public class ServicesManager {
         return cstl.openServer().providers.uploadData(newFile, name, dataType);
     }
 
-    public StyleListBean getStyleList(){
-        return cstl.openClient().getStyleList();
+    public StyleListBean getStyleList() {
+        try {
+            return cstl.openClient().providers.getStyleList();
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error on message receive", e);
+        }
+        return null;
     }
 }

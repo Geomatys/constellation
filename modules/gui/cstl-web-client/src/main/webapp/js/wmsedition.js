@@ -28,6 +28,18 @@ function stopWMS(name) {
 }
 
 /**
+ * Updates a WMS service description.
+ */
+function updateDescriptionWMS() {
+    var status = CSTL.jzAction('WMSController.updateDescription', $('#wmsDescription').serialize());
+    if (!status) {
+        CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-description'));
+    } else {
+        CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-description'));
+    }
+}
+
+/**
  * Add action on nbLayerselect element
  * @param size : max layer number
  */

@@ -121,7 +121,7 @@ public final class StyleService {
      *
      * @return
      */
-    public StyleListBean getStyleList(){
-        return cstl.openClient().getStyleList();
+    public StyleListBean getStyleList() throws IOException {
+        return cstl.openClient().providers.getStyleList();
     }
 }

@@ -30,11 +30,13 @@
      data-delete="&{label.delete}"
      data-edit="&{label.edit}"
      data-error="&{label.error}"
+     data-error-service-description="&{growl.error.service.description}"
      data-error-service-restart="&{growl.error.service.restart}"
      data-error-service-stop="&{growl.error.service.stop}"
      data-logical="&{label.logical}"
      data-no-description="&{label.no.description}"
      data-success="&{label.success}"
+     data-success-service-description="&{growl.success.service.description}"
      data-success-service-restart="&{growl.success.service.restart}"
      data-success-service-stop="&{growl.success.service.stop}"></div>
 

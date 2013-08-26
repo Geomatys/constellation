@@ -120,7 +120,7 @@
     function generateList(startElement, counter, orderBy, filter, direction){
         $('#layerList [data-name=datalist]').jzLoad(
                 "Controller.generateDataList()",
-                {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction});
+                {"serviceId": "${service.identifier}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction});
     }
 
     $(function() {
