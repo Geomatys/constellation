@@ -24,6 +24,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
@@ -54,10 +55,12 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AttributionType;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.FormatURL;
 import org.constellation.configuration.Reference;
 import org.constellation.converter.DataReferenceConverter;
+import org.constellation.dto.Service;
 import org.constellation.map.visitor.GetFeatureInfoVisitor;
 import org.constellation.map.visitor.WMSVisitorFactory;
 import org.constellation.portrayal.PortrayalUtil;
@@ -77,6 +80,7 @@ import static org.constellation.query.wms.WMSQuery.*;
 import static org.constellation.map.ws.WMSConstant.*;
 
 //Geotoolkit dependencies
+import org.constellation.ws.rs.MapServices;
 import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.data.query.QueryBuilder;
@@ -114,18 +118,8 @@ import org.apache.sis.measure.MeasurementRange;
 import org.geotoolkit.util.PeriodUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.wms.xml.AbstractLegendURL;
-import org.geotoolkit.wms.xml.AbstractOnlineResource;
+import org.geotoolkit.wms.xml.*;
 import org.geotoolkit.wms.xml.v130.Capability;
-import org.geotoolkit.wms.xml.AbstractDimension;
-import org.geotoolkit.wms.xml.AbstractLayer;
-import org.geotoolkit.wms.xml.AbstractRequest;
-import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
-import org.geotoolkit.wms.xml.WMSMarshallerPool;
-import org.geotoolkit.wms.xml.GetCapabilities;
-import org.geotoolkit.wms.xml.GetMap;
-import org.geotoolkit.wms.xml.GetFeatureInfo;
-import org.geotoolkit.wms.xml.DescribeLayer;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.referencing.ReferencingUtilities;
@@ -142,9 +136,6 @@ import org.apache.sis.storage.DataStoreException;
 
 import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.wms.xml.AbstractBoundingBox;
-import org.geotoolkit.wms.xml.AbstractGeographicBoundingBox;
-import org.geotoolkit.wms.xml.AbstractLogoURL;
 
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
@@ -285,7 +276,21 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return (AbstractWMSCapabilities) cachedCapabilities;
         }
 
-        final AbstractWMSCapabilities inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS", currentLanguage);
+        // Get service metadata.
+        final Service metadata;
+        try {
+            metadata = MapServices.readMetadata(getId(), "WMS");
+        } catch (IOException | ConfigurationException ex) {
+            throw new CstlServiceException("An error occurred while trying to read the service metadata.", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
+        }
+
+        // Ensure supported version.
+        if (!metadata.getVersions().contains(queryVersion)) {
+            throw new CstlServiceException("The version \"" + queryVersion + "\" is not enabled for this service.", OWSExceptionCode.NO_APPLICABLE_CODE);
+        }
+
+        // Create base capabilities from the service metadata.
+        final AbstractWMSCapabilities inCapabilities = WMSServices.createCapabilities(metadata, WMSVersion.getVersion(queryVersion));
 
         final AbstractRequest request;
         final List<String> exceptionFormats;

@@ -17,6 +17,7 @@
 package org.constellation.process.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -33,6 +34,7 @@ import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.process.service.CreateMapServiceDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.*;
+import org.constellation.ws.rs.MapServices;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -74,7 +76,7 @@ public class CreateMapService extends AbstractProcess {
         final String identifier = value(IDENTIFIER, inputParameters);
         LayerContext configuration = value(CONFIGURATION, inputParameters);
         File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
-        Object capabilitiesService = value(CAPABILITIES_CONFIGURATION, inputParameters);
+        Service serviceMetadata = value(SERVICE_METADATA, inputParameters);
 
         if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName)
                 || "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName))) {
@@ -137,41 +139,13 @@ public class CreateMapService extends AbstractProcess {
                 }
             }
 
-            if (serviceName.equalsIgnoreCase("WMS")) {
-                //create default portrayal file if not exist ONLY for WMS services
-                if (!portrayalFile.exists()) {
-                    try {
-                        final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                        marshaller.marshal(new WMSPortrayal(), portrayalFile);
-                        GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-                    } catch (JAXBException ex) {
-                        throw new ProcessException(ex.getMessage(), this, ex);
-                    }
+            // Write the service metadata.
+            if (serviceMetadata != null) {
+                try {
+                    MapServices.writeMetadata(instanceDirectory, serviceMetadata);
+                } catch (IOException ex) {
+                    throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
                 }
-
-                try{
-                    //Create capabilities from received
-                    if(capabilitiesService instanceof Service){
-                        Service capabilitiesInformation = (Service) capabilitiesService;
-                        for (String version : capabilitiesInformation.getVersions()) {
-                            // create service versions files
-                            if (version.equals("111")) {
-                                createV110Capabilities(instanceDirectory, capabilitiesInformation);
-
-                            } else {
-                                createV130Capabilities(instanceDirectory, capabilitiesInformation);
-                            }
-
-                            JAXBContext context = JAXBContext.newInstance(Service.class, Contact.class, AccessConstraint.class);
-                            final Marshaller marshaller = context.createMarshaller();
-                            final File WMSServiceMetadata = new File(instanceDirectory, "serviceMetadata.xml");
-                            marshaller.marshal(capabilitiesInformation, WMSServiceMetadata);
-                        }
-                    }
-                }catch (JAXBException ex) {
-                    throw new ProcessException(ex.getMessage(), this, ex);
-                }
-
             }
 
         } else if (instanceDirectory.mkdir()) {

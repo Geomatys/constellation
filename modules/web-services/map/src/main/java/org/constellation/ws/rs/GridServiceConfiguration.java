@@ -54,7 +54,7 @@ public abstract class GridServiceConfiguration implements ServiceConfiguration {
                         inputs.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
                         inputs.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue(configuration);
                         inputs.parameter(CreateMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
-                        inputs.parameter(CreateMapServiceDescriptor.CAPABILITIES_CONFIG).setValue(capabilitiesConfiguration);
+                        inputs.parameter(CreateMapServiceDescriptor.SERVICE_METADATA_NAME).setValue(capabilitiesConfiguration);
 
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();
@@ -75,6 +75,7 @@ public abstract class GridServiceConfiguration implements ServiceConfiguration {
                         inputs.parameter(SetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
                         inputs.parameter(SetConfigMapServiceDescriptor.CONFIG_NAME).setValue(configuration);
                         inputs.parameter(SetConfigMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+                        inputs.parameter(SetConfigMapServiceDescriptor.SERVICE_METADATA_NAME).setValue(capabilitiesConfiguration);
 
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();

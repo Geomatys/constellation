@@ -18,10 +18,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -169,6 +167,19 @@ public class ServiceAdmin {
         return Response.ok(response).build();
     }
 
+    /**
+     * @see OGCServiceConfiguration#setMetadata(String, Service)
+     */
+    @POST
+    @Path("metadata")
+    public Response configure(final @PathParam("serviceType") String serviceType, final Service service) {
+        try {
+            serviceConfiguration.setMetadata(serviceType, service);
+            return Response.ok(new AcknowlegementType("Success", "The service has been updated.")).build();
+        } catch (CstlServiceException ex) {
+            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+        }
+    }
 
     /**
      * create a new service instance
@@ -187,7 +198,7 @@ public class ServiceAdmin {
     }
 
     @GET
-    @Path("{id}/metadata")
+    @Path("{id}/create")
     public Response metadata(final @PathParam("serviceType") String serviceType, final @PathParam("id") String identifier) throws CstlServiceException {
         Service service = serviceConfiguration.getMetadata(serviceType, identifier);
         return Response.ok(service).build();

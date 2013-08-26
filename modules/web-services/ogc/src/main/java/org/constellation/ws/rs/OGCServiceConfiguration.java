@@ -5,6 +5,7 @@ import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.Layer;
+import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
@@ -26,6 +27,7 @@ import org.opengis.util.NoSuchIdentifierException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 
@@ -492,5 +495,28 @@ public class OGCServiceConfiguration {
             }
         }
         return null;
+    }
+
+    /**
+     * Updates the a service metadata with the specified {@link Service} object.
+     *
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @param service     the new service metadata
+     * @throws CstlServiceException if failed to update the service metadata
+     */
+    public void setMetadata(final String serviceType, final Service service) throws CstlServiceException {
+        ensureNonNull("serviceType", serviceType);
+        ensureNonNull("service",     service);
+
+        final File serviceDirectory  = getServiceDirectory(serviceType);
+        final File instanceDirectory = new File(serviceDirectory, service.getIdentifier());
+        if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
+            final ServiceType type = ServiceType.valueOf(serviceType);
+            final Object configuration = WSEngine.getInstance("WMS", service.getIdentifier()).getConfiguration();
+            serviceUtilities.get(type).configureInstance(instanceDirectory, configuration, service, serviceType);
+        } else {
+            throw new CstlServiceException("The " + serviceType + " service with identifier \"" +
+                    service.getIdentifier() + "\" does not exists.");
+        }
     }
 }

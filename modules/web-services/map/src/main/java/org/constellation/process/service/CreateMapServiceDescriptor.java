@@ -74,18 +74,15 @@ public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
             new DefaultParameterDescriptor(INSTANCE_DIRECTORY_NAME, INSTANCE_DIRECTORY_REMARKS, File.class, null, false);
 
 
-    /*
-     * GetCapabilities service part define on sent object
-     */
-    public static final String CAPABILITIES_CONFIG= "capabilities_service_description";
-    private static final String CAPABILITIES_CONFIG_REMARKS = "The capabilities configuration for the new instance.";
-    public static final ParameterDescriptor<LayerContext> CAPABILITIES_CONFIGURATION =
-            new DefaultParameterDescriptor(CAPABILITIES_CONFIG, CAPABILITIES_CONFIG_REMARKS, Object.class, null, false);
+    public static final String SERVICE_METADATA_NAME = "serviceMetadata";
+    private static final String SERVICE_METADATA_REMARKS = "The service metadata for new instance.";
+    public static final ParameterDescriptor<Service> SERVICE_METADATA =
+            new DefaultParameterDescriptor(SERVICE_METADATA_NAME, SERVICE_METADATA_REMARKS, Service.class, null, false);
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY, CAPABILITIES_CONFIGURATION});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY, SERVICE_METADATA});
 
 
     public static final String OUT_CONFIG_NAME = "out_configuration";

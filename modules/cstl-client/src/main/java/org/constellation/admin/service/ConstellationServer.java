@@ -533,7 +533,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean newInstance(String serviceType, Service service) {
             try {
-                final String url = getURLWithEndSlash() + serviceType.toUpperCase() + "/metadata";
+                final String url = getURLWithEndSlash() + serviceType.toUpperCase() + "/create";
 
                 // transform object to JSON
                 ObjectMapper mapper = new ObjectMapper();
