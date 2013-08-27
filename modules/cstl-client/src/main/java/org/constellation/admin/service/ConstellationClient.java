@@ -21,8 +21,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.core.header.InBoundHeaders;
-import com.sun.jersey.spi.MessageBodyWorkers;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.LayerList;
@@ -38,7 +36,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import java.io.InputStream;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
@@ -162,7 +159,7 @@ public final class ConstellationClient {
         public AcknowlegementType newInstance(final ServiceType serviceType, final Service metadata) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("metadata",    metadata);
-            return post(serviceType + "/create", MediaType.APPLICATION_XML_TYPE, metadata).getContent(AcknowlegementType.class);
+            return post(serviceType + "/create", MediaType.APPLICATION_XML_TYPE, metadata).getEntity(AcknowlegementType.class);
         }
 
         /**
@@ -176,7 +173,7 @@ public final class ConstellationClient {
         public Service getMetadata(final ServiceType serviceType, final String identifier) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("identifier",  identifier);
-            return get(serviceType + "/" + identifier + "/metadata", MediaType.APPLICATION_XML_TYPE).getContent(Service.class);
+            return get(serviceType + "/" + identifier + "/metadata", MediaType.APPLICATION_XML_TYPE).getEntity(Service.class);
         }
 
         /**
@@ -190,7 +187,7 @@ public final class ConstellationClient {
         public AcknowlegementType setMetadata(final ServiceType serviceType, final Service metadata) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("metadata",    metadata);
-            return post(serviceType + "/metadata", MediaType.APPLICATION_XML_TYPE, metadata).getContent(AcknowlegementType.class);
+            return post(serviceType + "/metadata", MediaType.APPLICATION_XML_TYPE, metadata).getEntity(AcknowlegementType.class);
         }
 
         /**
@@ -204,7 +201,7 @@ public final class ConstellationClient {
         public LayerList getLayers(final ServiceType serviceType, final String identifier) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("identifier",  identifier);
-            return get(serviceType + "/" + identifier + "/layers", MediaType.APPLICATION_XML_TYPE).getContent(LayerList.class);
+            return get(serviceType + "/" + identifier + "/layers", MediaType.APPLICATION_XML_TYPE).getEntity(LayerList.class);
         }
     }
 
@@ -219,7 +216,7 @@ public final class ConstellationClient {
 		 * @return the list of available styles
 		 */
 		public StyleListBean getStyleList() throws IOException {
-            return get("style", MediaType.APPLICATION_XML_TYPE).getContent(StyleListBean.class);
+            return get("style", MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
 		}
     }
 
@@ -231,7 +228,7 @@ public final class ConstellationClient {
      * @return the response instance
      */
     private Response get(final String path, final MediaType type) throws IOException {
-        return newRequest(path, type).get(Response.class);
+        return new Response(newRequest(path, type).get(ClientResponse.class));
     }
 
     /**
@@ -243,7 +240,7 @@ public final class ConstellationClient {
      * @return the response instance
      */
     private Response post(final String path, final MediaType type, final Object body) throws IOException {
-        return newRequest(path, type).post(Response.class, body);
+        return new Response(newRequest(path, type).post(ClientResponse.class, body));
     }
 
     /**
@@ -255,7 +252,7 @@ public final class ConstellationClient {
      * @return the response instance
      */
     private Response put(final String path, final MediaType type, final Object body) throws IOException {
-        return newRequest(path, type).put(Response.class, body);
+        return new Response(newRequest(path, type).put(ClientResponse.class, body));
     }
 
     /**
@@ -267,7 +264,7 @@ public final class ConstellationClient {
      * @return the response instance
      */
     private Response delete(final String path, final MediaType type, final Object body) throws IOException {
-        return newRequest(path, type).delete(Response.class, body);
+        return new Response(newRequest(path, type).delete(ClientResponse.class, body));
     }
 
     /**
@@ -282,12 +279,22 @@ public final class ConstellationClient {
     }
 
     /**
-     * Custom {@link ClientResponse} implementation for specific response handling.
+     * {@link ClientResponse} wrapper class for specific response handling.
      */
-    public final static class Response extends ClientResponse {
+    private final static class Response {
 
-        public Response(final int status, final InBoundHeaders headers, final InputStream entity, final MessageBodyWorkers workers) {
-            super(status, headers, entity, workers);
+        /**
+         * Wrapped {@link ClientResponse} instance.
+         */
+        private final ClientResponse response;
+
+        /**
+         * Creates a {@link ClientResponse} wrapper instance.
+         * 
+         * @param response the response to wrap
+         */
+        public Response(final ClientResponse response) {
+            this.response = response;
         }
 
         /**
@@ -298,10 +305,10 @@ public final class ConstellationClient {
          * @return an instance of the type {@code c}
          * @throws IOException on HTTP communication error or response entity parsing error
          */
-        public <T> T getContent(final Class<T> c) throws IOException {
+        public <T> T getEntity(final Class<T> c) throws IOException {
             ensureNonNull("c", c);
-            ensureSuccessStatus(this);
-            return super.getEntity(c);
+            ensureSuccessStatus();
+            return response.getEntity(c);
         }
 
         /**
@@ -312,17 +319,17 @@ public final class ConstellationClient {
          * @return a {@link GeneralParameterValue} instance
          * @throws IOException on HTTP communication error or response entity parsing error
          */
-        public GeneralParameterValue getContent(final ParameterDescriptorGroup descriptor) throws IOException {
+        public GeneralParameterValue getEntity(final ParameterDescriptorGroup descriptor) throws IOException {
             ensureNonNull("descriptor", descriptor);
-            ensureSuccessStatus(this);
+            ensureSuccessStatus();
             try {
                 final ParameterValueReader reader = new ParameterValueReader(descriptor);
-                reader.setInput(getEntityInputStream());
+                reader.setInput(response.getEntityInputStream());
                 return reader.read();
             } catch (XMLStreamException ex) {
                 throw new IOException("GeneralParameterValue entity parsing has failed", ex);
             } finally {
-                close();
+                response.close();
             }
         }
 
@@ -333,28 +340,27 @@ public final class ConstellationClient {
          * @return a response binding object instance
          * @throws IOException on HTTP communication error or response entity parsing error
          */
-        public Object getContent(final MarshallerPool pool) throws IOException {
+        public Object getEntity(final MarshallerPool pool) throws IOException {
             ensureNonNull("pool", pool);
-            ensureSuccessStatus(this);
+            ensureSuccessStatus();
             try {
                 final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(getEntityInputStream());
+                final Object obj = unmarshaller.unmarshal(response.getEntityInputStream());
                 pool.recycle(unmarshaller);
                 return obj;
             } catch (JAXBException ex) {
                 throw new IOException("XML entity unmarshalling has failed", ex);
             } finally {
-                close();
+                response.close();
             }
         }
 
         /**
          * Checks if the response has a "ok" status code.
          *
-         * @param response the response to check
          * @throws IOException if the response does not have a "ok" status code
          */
-        private static void ensureSuccessStatus(final ClientResponse response) throws IOException {
+        private void ensureSuccessStatus() throws IOException {
             if (response.getStatus() >= 300) {
                 throw new IOException(response.toString());
             }
@@ -365,7 +371,7 @@ public final class ConstellationClient {
          */
         @Override
         public String toString() {
-            return super.toString();
+            return response.toString();
         }
     }
 
