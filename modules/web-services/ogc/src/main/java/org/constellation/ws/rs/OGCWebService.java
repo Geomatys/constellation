@@ -25,9 +25,6 @@ import java.util.*;
 import java.util.logging.Level;
 import net.iharder.Base64;
 
-// Jackson dependencies
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 // Jersey dependencies
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Consumes;
@@ -450,29 +447,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             // should never happen
             return null;
         }
-    }
-
-    /**
-     * Map {@link InputStream} send on object required. Call if request content JSON
-     *
-     * @param is {@link InputStream} send by client side
-     *
-     * @return {@link Response} with status
-     */
-    @POST
-    @Consumes("application/json")
-    public Response doPostjSon(InputStream is){
-        try {
-            //transform JSON to Service object.
-            ObjectMapper mapper = new ObjectMapper();
-            Service toCreateService = mapper.readValue(is, Service.class);
-
-            // Call treat
-            return treatIncomingRequest(toCreateService);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "", e);
-        }
-        return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     /**

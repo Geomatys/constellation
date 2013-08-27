@@ -210,14 +210,14 @@ public final class ConstellationClient {
      */
     public final class Providers {
 
-		/**
+        /**
          * Queries the entire list of styles from the Constellation server.
-		 *
-		 * @return the list of available styles
-		 */
-		public StyleListBean getStyleList() throws IOException {
+         *
+         * @return the list of available styles
+         */
+        public StyleListBean getStyleList() throws IOException {
             return get("style", MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
-		}
+        }
     }
 
     /**
