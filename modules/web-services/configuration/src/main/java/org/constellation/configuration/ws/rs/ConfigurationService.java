@@ -17,9 +17,6 @@
 package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
-import java.util.Arrays;
-import java.io.FileInputStream;
-import java.util.Properties;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,16 +35,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MultivaluedMap;
 import com.sun.jersey.spi.resource.Singleton;
-import javax.xml.bind.JAXBElement;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
+import javax.xml.bind.JAXBElement;
 
 // Constellation dependencies
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
@@ -56,30 +51,24 @@ import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.configuration.filter.ConfigurerFilter;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.generic.database.BDD;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.constellation.ws.WSEngine;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.ws.ExceptionCode.*;
-import org.constellation.ws.WSEngine;
 
 // Geotoolkit dependencies
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.util.StringUtilities;
-import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.internal.sql.DefaultDataSource;
 
-// Mdweb metamodel auth dependencies
-import org.mdweb.io.auth.AuthenticationReader;
-import org.mdweb.io.auth.sql.v24.DataSourceAuthenticationReader;
-import org.mdweb.model.auth.AuthenticationException;
-import org.mdweb.model.auth.UserAuthnInfo;
+// SIS dependencies
+import org.apache.sis.xml.MarshallerPool;
 
 /**
  * Web service for administration and configuration operations.

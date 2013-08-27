@@ -50,11 +50,11 @@
             <div data-name="datalist">
             </div>
         </div>
-        <div id="part02" >
-            #{include path=part02.gtmpl/}
+        <div id="dataName">
+            #{include path=add_data_alias.gtmpl/}
         </div>
         <div id="styleList">
-            #{include path=part03.gtmpl/}
+            #{include path=add_data_style.gtmpl/}
         </div>
     </div>
     <div class="modal-footer">
@@ -85,10 +85,10 @@
 
         }
 
-        function goToPart01(){
+        function goToDataListing(){
             $("#dataList").fadeIn("slow");
-            $("#part02").fadeOut("slow");
-            $("#dataList").fadeOut("slow");
+            $("#dataName").fadeOut("slow");
+            $("#styleList").fadeOut("slow");
             $("#continue").off("click");
             $("#continue").on("click", function(){
                 $("#dataList [data-state=selected]").children().css("background-color", "rgba(0,0,0,0)")
@@ -99,26 +99,27 @@
                 $("[data-part=selectedData]").append(htmlSelectedElement);
                 $("[data-part=selectedData] [data-state=selected]").off("click");
                 $("[data-part=selectedData] [data-state=selected]").attr("data-state", "");
-               goToPart02();
+                goToAlias();
             });
         }
 
-        function goToPart02(){
+        function goToAlias(){
             $("#dataList").fadeToggle(function(){
-                $("#part02").fadeToggle();
+                $("#dataName").fadeToggle();
                 $("#continue").off("click");
                 $("#continue").on("click", function(){
+                    loadStyle(0, 10, "", "", "");
                     goToStyleList();
                 });
             });
         }
 
         function goToStyleList(){
-            $("#part02").fadeToggle(function(){
-                $("#dataList").fadeToggle();
+            $("#dataName").fadeToggle(function(){
+                $("#styleList").fadeToggle();
                 $("#continue").off("click");
                 $("#continue").on("click", function(){
-                    alert("end");
+                        alert("end");
                 });
             });
         }

@@ -18,6 +18,7 @@ package org.constellation.process.service;
 
 import java.io.File;
 import org.constellation.configuration.LayerContext;
+import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -65,10 +66,15 @@ public class SetConfigMapServiceDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<File> INSTANCE_DIRECTORY =
             new DefaultParameterDescriptor(INSTANCE_DIRECTORY_NAME, INSTANCE_DIRECTORY_REMARKS, File.class, null, false);
 
+    public static final String SERVICE_METADATA_NAME = "serviceMetadata";
+    private static final String SERVICE_METADATA_REMARKS = "The service metadata to apply.";
+    public static final ParameterDescriptor<Service> SERVICE_METADATA =
+            new DefaultParameterDescriptor(SERVICE_METADATA_NAME, SERVICE_METADATA_REMARKS, Service.class, null, false);
+
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY, SERVICE_METADATA});
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");

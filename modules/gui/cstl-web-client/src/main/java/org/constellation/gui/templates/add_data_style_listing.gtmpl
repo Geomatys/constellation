@@ -1,0 +1,14 @@
+#{param name=styleList /}
+
+<% for (def style : styleList.styles){%>
+<br/>
+<div>
+    <div style="background: url(../../images/style.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;" onclick="selectElement(this);">
+        <div class="row">
+            <div class="span3" style="padding-left: 15px;">
+                <p>${style.name}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<%}%>

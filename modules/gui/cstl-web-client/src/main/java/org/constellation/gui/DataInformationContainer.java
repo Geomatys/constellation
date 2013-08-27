@@ -1,7 +1,7 @@
 package org.constellation.gui;
 
 import juzu.SessionScoped;
-import org.constellation.ws.rest.post.DataInformation;
+import org.constellation.dto.DataInformation;
 
 import javax.inject.Named;
 import java.util.logging.Logger;

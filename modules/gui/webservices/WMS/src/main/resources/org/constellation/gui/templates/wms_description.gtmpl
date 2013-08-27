@@ -1,47 +1,48 @@
-<form action="@{createWMSService()}">
-    <fieldset>
-        <legend>&{wms.create.description.service.legend}</legend>
-        <div class="control-group">
-            <label class="control-label" for="name">&{wms.create.description.service.name.label}</label>
-            <div class="controls">
-                <input type="text" id="name" name="service.name" value="${service.name}">
+<form id="wmsDescription" class="row">
+    <div class="span6">
+        <fieldset style="padding-left:20px;">
+            <legend>&{wms.create.description.service.legend}</legend>
+            <div class="control-group">
+                <label class="control-label" for="name">&{wms.create.description.service.name.label}</label>
+                <div class="controls">
+                    <input type="text" id="name" name="name" value="${service.name}">
+                </div>
             </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="identifier">&{wms.create.description.service.identifier.label}</label>
-            <div class="controls">
-                <input type="text" id="identifier" name="createdService.identifier" value="${service.identifier}">
+            <div class="control-group">
+                <label class="control-label" for="identifier">&{wms.create.description.service.identifier.label}</label>
+                <div class="controls">
+                    <input type="text" readonly id="identifier" name="identifier" value="${service.identifier}">
+                </div>
             </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="keywords">&{wms.create.description.service.keywords.label}</label>
-
-            <div class="controls">
-                <input type="text" id="keywords" name="keywords" value="<% service.keywords.each({keyword -> out.print(keyword+" ")})%>"/>
+            <div class="control-group">
+                <label class="control-label" for="keywords">&{wms.create.description.service.keywords.label}</label>
+                <div class="controls">
+                    <input type="text" id="keywords" name="keywords" value="<% service.keywords.each({keyword -> out.print(keyword+" ")})%>"/>
+                </div>
             </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="inputDescription">&{wms.create.description.service.description.label}</label>
-            <div class="controls">
-                <textarea cols="50" id="inputDescription" name="createdService.description" class="input-xxlarge" >${service.description}</textarea>
+            <div class="control-group">
+                <label class="control-label" for="inputDescription">&{wms.create.description.service.description.label}</label>
+                <div class="controls">
+                    <textarea cols="50" id="inputDescription" name="description" class="input-xxlarge" >${service.description}</textarea>
+                </div>
             </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label">&{wms.create.description.version.title}</label>
-            <div class="controls">
-                <label class="checkbox inline" for="v111">
-                    <input type="checkbox" value="1.1.1" id="v111" name="v111" <%if(service.versions.contains('1.1.1')){%>checked="checked"<%}%>> 1.1.1
-                </label>
-                <label class="checkbox inline" for="v130">
-                    <input type="checkbox" value="1.3.0" id="v130" name="v130" <%if(service.versions.contains('1.3.0')){%>checked="checked"<%}%>> 1.3.0
-                </label>
+            <div class="control-group">
+                <label class="control-label">&{wms.create.description.version.title}</label>
+                <div class="controls">
+                    <label class="checkbox inline" for="v111">
+                        <input type="checkbox" value="1.1.1" id="v111" name="v111" <%if(service.versions.contains('1.1.1')){%>checked="checked"<%}%>> 1.1.1
+                    </label>
+                    <label class="checkbox inline" for="v130">
+                        <input type="checkbox" value="1.3.0" id="v130" name="v130" <%if(service.versions.contains('1.3.0')){%>checked="checked"<%}%>> 1.3.0
+                    </label>
+                </div>
             </div>
-        </div>
-    </fieldset>
-    <div class="row">
-        <div class="span3 offset9">
-        </br>
-            <button class="btn btn-info" type="submit" id="buttonSubmit">&{wms.create.save.label}</button>
+        </fieldset>
+        <div class="row">
+            <div class="span3 offset9">
+            </br>
+                <button class="btn btn-info" type="button" onclick="updateDescriptionWMS();">&{wms.create.save.label}</button>
+            </div>
         </div>
     </div>
 </form>

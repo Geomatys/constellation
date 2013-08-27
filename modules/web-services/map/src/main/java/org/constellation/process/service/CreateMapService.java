@@ -17,6 +17,7 @@
 package org.constellation.process.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -33,6 +34,7 @@ import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.process.service.CreateMapServiceDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.*;
+import org.constellation.ws.rs.MapServices;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -74,7 +76,7 @@ public class CreateMapService extends AbstractProcess {
         final String identifier = value(IDENTIFIER, inputParameters);
         LayerContext configuration = value(CONFIGURATION, inputParameters);
         File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
-        Object capabilitiesService = value(CAPABILITIES_CONFIGURATION, inputParameters);
+        Service serviceMetadata = value(SERVICE_METADATA, inputParameters);
 
         if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName)
                 || "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName))) {
@@ -137,41 +139,13 @@ public class CreateMapService extends AbstractProcess {
                 }
             }
 
-            if (serviceName.equalsIgnoreCase("WMS")) {
-                //create default portrayal file if not exist ONLY for WMS services
-                if (!portrayalFile.exists()) {
-                    try {
-                        final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                        marshaller.marshal(new WMSPortrayal(), portrayalFile);
-                        GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-                    } catch (JAXBException ex) {
-                        throw new ProcessException(ex.getMessage(), this, ex);
-                    }
+            // Write the service metadata.
+            if (serviceMetadata != null) {
+                try {
+                    MapServices.writeMetadata(instanceDirectory, serviceMetadata);
+                } catch (IOException ex) {
+                    throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
                 }
-
-                try{
-                    //Create capabilities from received
-                    if(capabilitiesService instanceof Service){
-                        Service capabilitiesInformation = (Service) capabilitiesService;
-                        for (String version : capabilitiesInformation.getVersions()) {
-                            // create service versions files
-                            if (version.equals("111")) {
-                                createV110Capabilities(instanceDirectory, capabilitiesInformation);
-
-                            } else {
-                                createV130Capabilities(instanceDirectory, capabilitiesInformation);
-                            }
-
-                            JAXBContext context = JAXBContext.newInstance(Service.class, Contact.class, AccessConstraint.class);
-                            final Marshaller marshaller = context.createMarshaller();
-                            final File WMSServiceMetadata = new File(instanceDirectory, "serviceMetadata.xml");
-                            marshaller.marshal(capabilitiesInformation, WMSServiceMetadata);
-                        }
-                    }
-                }catch (JAXBException ex) {
-                    throw new ProcessException(ex.getMessage(), this, ex);
-                }
-
             }
 
         } else if (instanceDirectory.mkdir()) {
@@ -193,96 +167,5 @@ public class CreateMapService extends AbstractProcess {
         }
 
         getOrCreate(OUT_CONFIGURATION, outputParameters).setValue(configuration);
-
-    }
-
-    /**
-     * Create V1.1.1 getCapabilities file for service
-     * @param instanceDirectory folder where file description will be save
-     * @param capabilitiesInformation GetCapabilitie service part description
-     */
-    private void createV110Capabilities(File instanceDirectory, Service capabilitiesInformation) throws JAXBException{
-
-        List<Keyword> keywords = new ArrayList<Keyword>(0);
-        for (String keywordString : capabilitiesInformation.getKeywords()) {
-            Keyword keyword = new Keyword(keywordString);
-            keywords.add(keyword);
-        }
-        KeywordList keywordList = new KeywordList(keywords);
-
-        Contact currentContact = capabilitiesInformation.getServiceContact();
-
-        //create address part
-        ContactAddress address = new ContactAddress("POSTAL", currentContact.getAddress(),
-                currentContact.getCity(), currentContact.getState(),
-                currentContact.getZipCode(), currentContact.getCountry());
-
-
-        //create contact part
-        ContactPersonPrimary personPrimary = new ContactPersonPrimary(currentContact.getFullname(),
-                currentContact.getOrganisation());
-        ContactInformation contact = new ContactInformation(personPrimary, currentContact.getPosition(),
-                address, currentContact.getPhone(),
-                currentContact.getFax(), currentContact.getEmail());
-
-        // Create Service
-        org.geotoolkit.wms.xml.v111.Service newService = new org.geotoolkit.wms.xml.v111.Service(capabilitiesInformation.getName(),
-                capabilitiesInformation.getIdentifier(), capabilitiesInformation.getDescription(), keywordList, null, contact,
-                capabilitiesInformation.getServiceConstraints().getFees(), capabilitiesInformation.getServiceConstraints().getAccessConstraint());
-
-        org.geotoolkit.wms.xml.v111.Capability capability = new org.geotoolkit.wms.xml.v111.Capability(null, null, null, null);
-        WMT_MS_Capabilities capabilities = new WMT_MS_Capabilities(newService, capability, "1.1.1", null);
-
-        // save new service capabilities
-        final Marshaller marshaller = WMSMarshallerPool.getInstance().acquireMarshaller();
-        File capabilitiesDescriptionV111 = new File(instanceDirectory, "WMSCapabilities1.1.1.xml");
-        marshaller.marshal(capabilities, capabilitiesDescriptionV111);
-        WMSMarshallerPool.getInstance().recycle(marshaller);
-    }
-
-    /**
-     * Create V1.3.0 getCapabilities file for service
-     * @param instanceDirectory folder where file description will be save
-     * @param capabilitiesInformation GetCapabilitie service part description
-     */
-    private void createV130Capabilities(File instanceDirectory, Service capabilitiesInformation) throws JAXBException {
-
-        List<org.geotoolkit.wms.xml.v130.Keyword> keywords = new ArrayList<org.geotoolkit.wms.xml.v130.Keyword>(0);
-        for (String keywordString : capabilitiesInformation.getKeywords()) {
-            org.geotoolkit.wms.xml.v130.Keyword keyword = new org.geotoolkit.wms.xml.v130.Keyword(keywordString);
-            keywords.add(keyword);
-        }
-        org.geotoolkit.wms.xml.v130.KeywordList keywordsList = new org.geotoolkit.wms.xml.v130.KeywordList(keywords);
-
-        Contact currentContact = capabilitiesInformation.getServiceContact();
-
-
-        //create address part
-        org.geotoolkit.wms.xml.v130.ContactAddress address = new org.geotoolkit.wms.xml.v130.ContactAddress("POSTAL",
-                currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
-                currentContact.getZipCode(), currentContact.getCountry());
-
-
-        //create contact part
-        org.geotoolkit.wms.xml.v130.ContactPersonPrimary personPrimary = new org.geotoolkit.wms.xml.v130.ContactPersonPrimary(currentContact.getFullname(), currentContact.getOrganisation());
-        org.geotoolkit.wms.xml.v130.ContactInformation contact = new org.geotoolkit.wms.xml.v130.ContactInformation(personPrimary, currentContact.getPosition(),
-                address, currentContact.getPhone(), currentContact.getFax(), currentContact.getEmail());
-
-        //create service part
-        org.geotoolkit.wms.xml.v130.Service newService = new org.geotoolkit.wms.xml.v130.Service(capabilitiesInformation.getName(),
-                capabilitiesInformation.getIdentifier(), capabilitiesInformation.getDescription(), keywordsList, null, contact,
-                capabilitiesInformation.getServiceConstraints().getFees(), capabilitiesInformation.getServiceConstraints().getAccessConstraint(),
-                capabilitiesInformation.getServiceConstraints().getLayerLimit(), capabilitiesInformation.getServiceConstraints().getMaxWidth(),
-                capabilitiesInformation.getServiceConstraints().getMaxHeight());
-
-        Capability capability = new Capability(null, null, null, null);
-
-        WMSCapabilities capabilities = new WMSCapabilities(newService, capability, "1.3.0", null);
-
-        // save new service capabilities
-        final Marshaller marshaller = WMSMarshallerPool.getInstance().acquireMarshaller();
-        File capabilitiesDescriptionV111 = new File(instanceDirectory, "WMSCapabilities1.3.0.xml");
-        marshaller.marshal(capabilities, capabilitiesDescriptionV111);
-        WMSMarshallerPool.getInstance().recycle(marshaller);
     }
 }

@@ -16,7 +16,6 @@
  */
 package org.constellation.admin.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -42,7 +41,7 @@ import org.constellation.configuration.StringTreeNode;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.ws.rest.post.DataInformation;
+import org.constellation.dto.DataInformation;
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.client.ServerFactory;
@@ -90,44 +89,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.constellation.api.QueryConstants.REQUEST_ACCESS;
-import static org.constellation.api.QueryConstants.REQUEST_ADD_TO_INDEX;
-import static org.constellation.api.QueryConstants.REQUEST_AVAILABLE_SOURCE_TYPE;
-import static org.constellation.api.QueryConstants.REQUEST_CLEAR_CACHE;
-import static org.constellation.api.QueryConstants.REQUEST_CREATE_LAYER;
-import static org.constellation.api.QueryConstants.REQUEST_CREATE_PROVIDER;
-import static org.constellation.api.QueryConstants.REQUEST_CREATE_STYLE;
-import static org.constellation.api.QueryConstants.REQUEST_CREATE_TASK;
-import static org.constellation.api.QueryConstants.REQUEST_DELETE_LAYER;
-import static org.constellation.api.QueryConstants.REQUEST_DELETE_PROVIDER;
-import static org.constellation.api.QueryConstants.REQUEST_DELETE_RECORDS;
-import static org.constellation.api.QueryConstants.REQUEST_DELETE_STYLE;
-import static org.constellation.api.QueryConstants.REQUEST_DELETE_TASK;
-import static org.constellation.api.QueryConstants.REQUEST_DOWNLOAD_STYLE;
-import static org.constellation.api.QueryConstants.REQUEST_FULL_RESTART;
-import static org.constellation.api.QueryConstants.REQUEST_GET_CONFIG_PATH;
-import static org.constellation.api.QueryConstants.REQUEST_GET_PROCESS_DESC;
-import static org.constellation.api.QueryConstants.REQUEST_GET_PROVIDER_CONFIG;
-import static org.constellation.api.QueryConstants.REQUEST_GET_SERVICE_DESCRIPTOR;
-import static org.constellation.api.QueryConstants.REQUEST_GET_SOURCE_DESCRIPTOR;
-import static org.constellation.api.QueryConstants.REQUEST_GET_TASK_PARAMS;
-import static org.constellation.api.QueryConstants.REQUEST_IMPORT_RECORDS;
-import static org.constellation.api.QueryConstants.REQUEST_LIST_PROCESS;
-import static org.constellation.api.QueryConstants.REQUEST_LIST_SERVICE;
-import static org.constellation.api.QueryConstants.REQUEST_LIST_SERVICES;
-import static org.constellation.api.QueryConstants.REQUEST_LIST_TASKS;
-import static org.constellation.api.QueryConstants.REQUEST_METADATA_EXIST;
-import static org.constellation.api.QueryConstants.REQUEST_REFRESH_INDEX;
-import static org.constellation.api.QueryConstants.REQUEST_REMOVE_FROM_INDEX;
-import static org.constellation.api.QueryConstants.REQUEST_RESTART_ALL_LAYER_PROVIDERS;
-import static org.constellation.api.QueryConstants.REQUEST_RESTART_ALL_STYLE_PROVIDERS;
-import static org.constellation.api.QueryConstants.REQUEST_RESTART_PROVIDER;
-import static org.constellation.api.QueryConstants.REQUEST_SET_CONFIG_PATH;
-import static org.constellation.api.QueryConstants.REQUEST_UPDATE_CAPABILITIES;
-import static org.constellation.api.QueryConstants.REQUEST_UPDATE_LAYER;
-import static org.constellation.api.QueryConstants.REQUEST_UPDATE_PROVIDER;
-import static org.constellation.api.QueryConstants.REQUEST_UPDATE_STYLE;
-import static org.constellation.api.QueryConstants.REQUEST_UPDATE_TASK;
+import static org.constellation.api.QueryConstants.*;
+
 
 /**
  * convenient class to perform actions on constellation web services.
@@ -141,9 +104,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
-
-    private final static String XML_POST = "XML";
-    private final static String JSON_POST = "JSON";
 
     private final EventListenerList listeners = new EventListenerList();
 
@@ -522,29 +482,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
 
-        }
-
-        /**
-         * Create a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
-         *
-         * @param serviceType : The service type (wms, wfs, csw,...).
-         * @param service     : {@link Service} DTO object to post JSON
-         * @return true if the operation succeed
-         */
-        public boolean newInstance(String serviceType, Service service) {
-            try {
-                final String url = getURLWithEndSlash() + serviceType.toUpperCase() + "/metadata";
-
-                // transform object to JSON
-                ObjectMapper mapper = new ObjectMapper();
-                String json = mapper.writeValueAsString(service);
-
-                //send request
-                return sendRequestAck(url, json);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "error", ex);
-            }
-            return false;
         }
 
         /**

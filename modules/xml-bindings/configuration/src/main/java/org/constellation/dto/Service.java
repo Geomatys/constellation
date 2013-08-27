@@ -20,6 +20,8 @@ package org.constellation.dto;
 import juzu.Mapped;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -100,6 +102,14 @@ public class Service {
 
     public void setKeywords(List<String> keywords) {
         this.keywords = keywords;
+    }
+
+    public void setKeywords(final String keywords) {
+        if (keywords != null && !keywords.isEmpty()) {
+            this.keywords = Arrays.asList(keywords.split(","));
+        } else {
+            this.keywords = new ArrayList<>();
+        }
     }
 
     public List<String> getVersions() {

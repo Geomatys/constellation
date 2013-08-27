@@ -17,37 +17,7 @@
  */
 package org.constellation.ws.rs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.core.HttpContext;
-import org.constellation.dto.Service;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
-import org.constellation.ws.WebServiceUtilities;
-import org.constellation.xml.PrefixMappingInvocationHandler;
-import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.Versioned;
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.validation.Schema;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.Proxy;
@@ -59,16 +29,43 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.constellation.ws.ExceptionCode.INVALID_REQUEST;
-import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
-import static org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED;
+// Jersey dependencies
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import com.sun.jersey.api.core.HttpContext;
 
-// jersey dependencies
-// JAXB xml binding dependencies
+// JAXB dependencies
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.validation.Schema;
+
 // Constellation dependencies
-// Geotoolkit dependencies
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
+import org.constellation.ws.WebServiceUtilities;
+import org.constellation.xml.PrefixMappingInvocationHandler;
 
+import static org.constellation.ws.ExceptionCode.*;
+
+// Geotoolkit dependencies
+import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.util.Versioned;
+
+// Apache SIS dependencies
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 
 /**
  * Abstract parent of all REST facade classes for Constellation web services.
@@ -398,29 +395,6 @@ public abstract class WebService {
         } else {
             return Response.ok("This service is not running", MimeType.TEXT_PLAIN).build();
         }
-    }
-
-    /**
-     * Map {@link InputStream} send on object required. Call if request content JSON
-     *
-     * @param is {@link InputStream} send by client side
-     *
-     * @return {@link Response} with status
-     */
-    @POST
-    @Consumes("application/json")
-    public Response doPostjSon(InputStream is){
-        try {
-            //transform JSON to Service object.
-            ObjectMapper mapper = new ObjectMapper();
-            Service toCreateService = mapper.readValue(is, Service.class);
-
-            // Call treat
-            return treatIncomingRequest(toCreateService);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "", e);
-        }
-        return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     protected abstract boolean isRequestValidationActivated(final String workerID);

@@ -1,4 +1,4 @@
-package org.constellation.gui.mock;
+package org.constellation.gui.Mock;
 
 import org.constellation.dto.Service;
 import org.constellation.gui.service.ServicesManager;
@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
+import org.constellation.ServiceDef.Specification;
 
 /**
  * ServiceManager mock
@@ -31,7 +32,7 @@ public class ServicesManagerMock extends ServicesManager{
      * @return <code>true</code> if succeded, <code>false</code> if not succeded
      */
     @Override
-    public boolean createServices(Service createdService, String service) {
+    public boolean createServices(Service createdService, Specification service) {
         LOGGER.log(Level.INFO, createdService.getName());
         LOGGER.log(Level.INFO, createdService.getIdentifier());
         LOGGER.log(Level.INFO, createdService.getDescription());

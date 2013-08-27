@@ -7,7 +7,7 @@ import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.ws.rs.ConfigurationUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
-import org.constellation.ws.rest.post.Configuration;
+import org.constellation.dto.Configuration;
 import org.constellation.ws.rs.OGCServiceConfiguration;
 import org.constellation.ws.rs.ServiceConfiguration;
 
@@ -18,8 +18,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**

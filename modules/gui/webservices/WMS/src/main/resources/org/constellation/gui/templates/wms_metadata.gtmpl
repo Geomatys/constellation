@@ -1,86 +1,88 @@
-<form action="@{createWMSService()}">
+<form id="wmsMetadata" class="row">
+    <input type="hidden" id="identifier" name="identifier" value="${service.identifier}">
+
     <div class="span6">
         <!-- contact part -->
-        <fieldset>
+        <fieldset style="padding-left:20px;">
             <legend>&{wms.create.contact.legend}</legend>
 
             <div class="control-group">
                 <label class="control-label" for="contactName">&{wms.create.contact.name.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactName" name="serviceContact.fullname" value="${service.serviceContact.fullname}"/>
+                    <input type="text" id="contactName" name="contact.fullname" value="${service.serviceContact.fullname}"/>
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" for="contactOrganisation">&{wms.create.contact.organisation.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactOrganisation" name="serviceContact.organisation" value="${service.serviceContact.organisation}"/>
+                    <input type="text" id="contactOrganisation" name="contact.organisation" value="${service.serviceContact.organisation}"/>
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" for="contactPosition">&{wms.create.contact.position.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactPosition" name="serviceContact.position" value="${service.serviceContact.position}"/>
+                    <input type="text" id="contactPosition" name="contact.position" value="${service.serviceContact.position}"/>
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" for="contactPhone">&{wms.create.contact.phone.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactPhone" name="serviceContact.phone" value="${service.serviceContact.phone}"/>
+                    <input type="text" id="contactPhone" name="contact.phone" value="${service.serviceContact.phone}"/>
                 </div>
             </div>
             <div class="control-group" id="faxDiv">
                 <label class="control-label" for="contactFax">&{wms.create.contact.fax.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactFax" name="serviceContact.fax" value="${service.serviceContact.fax}"/>
+                    <input type="text" id="contactFax" name="contact.fax" value="${service.serviceContact.fax}"/>
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="contactemail">&{wms.create.contact.email.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactEmail" name="serviceContact.email" value="${service.serviceContact.email}"/>
+                    <input type="text" id="contactEmail" name="contact.email" value="${service.serviceContact.email}"/>
                 </div>
             </div>
         </fieldset>
 
         <!-- address part -->
-        <fieldset>
+        <fieldset style="padding-left:20px;">
             <legend>&{wms.create.contact.address.legend}</legend>
 
             <div class="control-group">
                 <label class="control-label" for="contactAddress">&{wms.create.contact.address.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactAddress" name="serviceContact.address" value="${service.serviceContact.address}"/>
+                    <input type="text" id="contactAddress" name="contact.address" value="${service.serviceContact.address}"/>
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" for="contactCity">&{wms.create.contact.address.city.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactCity" name="serviceContact.city" value="${service.serviceContact.city}"/>
+                    <input type="text" id="contactCity" name="contact.city" value="${service.serviceContact.city}"/>
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" for="contactState">&{wms.create.contact.address.state.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactState" name="serviceContact.state" value="${service.serviceContact.state}"/>
+                    <input type="text" id="contactState" name="contact.state" value="${service.serviceContact.state}"/>
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" for="contactPostcode">&{wms.create.contact.address.postcode.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactPostcode" name="serviceContact.zipCode" value="${service.serviceContact.zipCode}"/>
+                    <input type="text" id="contactPostcode" name="contact.zipCode" value="${service.serviceContact.zipCode}"/>
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" for="contactCountry">&{wms.create.contact.address.country.label}</label>
                 <div class="controls">
-                    <input type="text" id="contactCountry" name="serviceContact.country" value="${service.serviceContact.country}"/>
+                    <input type="text" id="contactCountry" name="contact.country" value="${service.serviceContact.country}"/>
                 </div>
             </div>
         </fieldset>
@@ -88,27 +90,27 @@
 
     <div class="span6">
         <!-- access constraints part -->
-        <fieldset>
+        <fieldset style="padding-right:20px;">
             <legend>&{wms.create.accessconstraint.legend}</legend>
 
             <div class="control-group">
                 <label class="control-label" for="fees">&{wms.create.accessconstraint.fees.label}</label>
                 <div class="controls">
-                    <input id="fees" type="text" name="serviceConstraint.fees" value="${service.serviceConstraints.fees}"/>
+                    <input id="fees" type="text" name="constraint.fees" value="${service.serviceConstraints.fees}"/>
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" for="accessConstraints">&{wms.create.accessconstraint.label}</label>
                 <div class="controls">
-                    <textarea id="accessConstraints" name="serviceConstraint.accessConstraint" value="${service.serviceConstraints.accessConstraint}"></textarea>
+                    <textarea id="accessConstraints" name="constraint.accessConstraint">${service.serviceConstraints.accessConstraint}</textarea>
                 </div>
             </div>
 
             <div class="control-group" data-toggle="tooltip" title="&{wms.create.accessconstraint.layerlimit.tooltip}" id="layerlimitGroup">
                 <label class="control-label" for="layerLimit">&{wms.create.accessconstraint.layerlimit.label}</label>
                 <div class="controls">
-                    <input type="text" id="layerLimit" name="serviceConstraint.layerLimit" value="${service.serviceConstraints.layerLimit}"/>
+                    <input type="text" id="layerLimit" name="constraint.layerLimit" value="${service.serviceConstraints.layerLimit}"/>
                 </div>
 
             </div>
@@ -116,7 +118,7 @@
             <div class="control-group" data-toggle="tooltip" title="&{wms.create.accessconstraint.maxwidth.tooltip}" id="maxWidthGroup">
                 <label class="control-label" for="maxWidth">&{wms.create.accessconstraint.maxwidth.label}</label>
                 <div class="controls" >
-                    <input type="text" id="maxWidth" name="serviceConstraint.maxWidth" value="${service.serviceConstraints.maxWidth}"/>
+                    <input type="text" id="maxWidth" name="constraint.maxWidth" value="${service.serviceConstraints.maxWidth}"/>
                 </div>
             </div>
 
@@ -124,7 +126,7 @@
             <div class="control-group" data-toggle="tooltip" title="&{wms.create.accessconstraint.maxheight.tooltip}" id="maxHeightGroup">
                 <label class="control-label" for="maxHeight">&{wms.create.accessconstraint.maxheight.label}</label>
                 <div class="controls">
-                    <input type="text" id="maxHeight" name="serviceConstraint.maxHeight" value="${service.serviceConstraints.maxHeight}"/>
+                    <input type="text" id="maxHeight" name="constraint.maxHeight" value="${service.serviceConstraints.maxHeight}"/>
                 </div>
             </div>
         </fieldset>
@@ -132,7 +134,7 @@
     <div class="row">
         <div class="span3 offset9">
         </br>
-            <button class="btn btn-info" type="submit" id="buttonSubmit">&{wms.create.save.label}</button>
+            <button class="btn btn-info" type="button" onclick="updateMetadataWMS();">&{wms.create.save.label}</button>
         </div>
     </div>
 </form>

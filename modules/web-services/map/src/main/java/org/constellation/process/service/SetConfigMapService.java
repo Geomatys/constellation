@@ -17,11 +17,14 @@
 package org.constellation.process.service;
 
 import java.io.File;
+import java.io.IOException;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
+import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.ws.rs.MapServices;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -54,6 +57,7 @@ public class SetConfigMapService extends AbstractProcess {
         final String identifier = value(IDENTIFIER, inputParameters);
         LayerContext configuration = value(CONFIGURATION, inputParameters);
         File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
+        final Service serviceMetadata = value(SERVICE_METADATA, inputParameters);
 
         if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName)
                 || "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName))) {
@@ -104,6 +108,15 @@ public class SetConfigMapService extends AbstractProcess {
 
             } catch (JAXBException ex) {
                 throw new ProcessException(ex.getMessage(), this, ex);
+            }
+
+            // Override the service metadata.
+            if (serviceMetadata != null) {
+                try {
+                    MapServices.writeMetadata(instanceDirectory, serviceMetadata);
+                } catch (IOException ex) {
+                    throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
+                }
             }
 
         } else {

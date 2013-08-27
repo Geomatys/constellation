@@ -1,4 +1,4 @@
-package org.constellation.ws.rest.post;
+package org.constellation.dto;
 
 import juzu.Mapped;
 import org.constellation.utils.CoverageMetadataBean;

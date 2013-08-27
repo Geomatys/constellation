@@ -1,6 +1,7 @@
 package org.constellation.ws.rest;
 
 import org.constellation.dto.StyleBean;
+import org.constellation.dto.StyleListBean;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.style.MutableStyle;
@@ -35,8 +36,9 @@ public class Style {
      */
     @GET
     @Path("/")
-    public List<StyleBean> getLayerStyle() {
+    public StyleListBean getLayerStyle() {
         List<StyleBean> styles = new ArrayList<>(0);
+        StyleListBean stylesList = new StyleListBean();
         final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
         for (StyleProvider provider : providers) {
             Set<String> keys = provider.getKeys();
@@ -51,6 +53,7 @@ public class Style {
             }
 
         }
-        return styles;
+        stylesList.setStyles(styles);
+        return stylesList;
     }
 }

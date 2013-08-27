@@ -1,24 +1,28 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2013, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.constellation.metadata.ws.rs;
 
-import org.constellation.configuration.Layer;
-import org.constellation.dto.Service;
+import java.io.File;
+
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.metadata.CSWworker;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.Worker;
 import org.constellation.ws.rs.ServiceConfiguration;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import org.constellation.ws.rs.AbstractServiceConfiguration;
 
 /**
  * CSW {@link org.constellation.ws.rs.ServiceConfiguration} implementation
@@ -27,58 +31,14 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
  * @version 0.9
  * @since 0.9
  */
-public class CSWServiceConfiguration implements ServiceConfiguration {
+public class CSWServiceConfiguration extends AbstractServiceConfiguration implements ServiceConfiguration {
 
-    public Class getWorkerClass() {
-        return CSWworker.class;
+    public CSWServiceConfiguration(final Class workerClass) {
+        super(workerClass, Automatic.class, "config.xml");
     }
 
-    public void configureInstance(File instanceDirectory, Object configuration, Object o, String serviceType) throws CstlServiceException {
-        if (configuration instanceof Automatic) {
-            final File configurationFile = new File(instanceDirectory, "config.xml");
-            try {
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            }
-        } else {
-            throw new CstlServiceException("The configuration Object is not an Automatic object", INVALID_PARAMETER_VALUE);
-        }
-    }
-
-    public Object getInstanceConfiguration(File instanceDirectory, String serviceType) throws CstlServiceException {
-        final File configurationFile = new File(instanceDirectory, "config.xml");
-        if (configurationFile.exists()) {
-            try {
-                Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-                if (obj instanceof Automatic) {
-                    return obj;
-                } else {
-                    throw new CstlServiceException("The config.xml file does not contain a Automatic object");
-                }
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex);
-            }
-        } else {
-            throw new CstlServiceException("Unable to find a file config.xml");
-        }
-    }
-
+    @Override
     public void basicConfigure(File instanceDirectory, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
         configureInstance(instanceDirectory, new Automatic("filesystem", new BDD()), null, serviceType);
-    }
-
-    public String getAbstract(File instanceDirectory) {
-        //TODO
-        return "";
-    }
-
-    public List<Layer> getlayersNumber(Worker worker) {
-        //TODO
-        return new ArrayList<Layer>(0);
     }
 }

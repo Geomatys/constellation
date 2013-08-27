@@ -1,4 +1,4 @@
-package org.constellation.ws.rest.post;
+package org.constellation.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

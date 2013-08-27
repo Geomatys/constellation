@@ -21,6 +21,7 @@ import org.constellation.ServiceDef.Specification;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.Worker;
+import static org.constellation.ws.rs.OGCWebService.utils;
 
 /**
  * A Super class for WMS, WMTS, WFS and WCS web-service.
@@ -37,6 +38,7 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
 
     public GridWebService(final Specification specification) {
         super(specification);
+        utils.getServiceUtilities().put(specification, new GridServiceConfiguration(getWorkerClass()));
     }
 
     /**

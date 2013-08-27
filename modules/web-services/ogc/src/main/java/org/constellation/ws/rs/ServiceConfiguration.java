@@ -1,12 +1,25 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2013, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.constellation.ws.rs;
 
-import org.constellation.configuration.Instance;
 import org.constellation.configuration.Layer;
-import org.constellation.dto.Service;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.util.List;
 
@@ -37,7 +50,7 @@ public interface ServiceConfiguration {
      *
      * @throws CstlServiceException if they have an error on configure process
      */
-    public void configureInstance(File instanceDirectory, Object configuration, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException;
+    public void configureInstance(final File instanceDirectory, final Object configuration, final Object capabilitiesConfiguration, final String serviceType) throws CstlServiceException;
 
     /**
      * Return the configuration object of the instance.
@@ -49,7 +62,7 @@ public interface ServiceConfiguration {
      *
      * @throws CstlServiceException if they have an error on configure process
      */
-    public Object getInstanceConfiguration(File instanceDirectory, String serviceType) throws CstlServiceException;
+    public Object getInstanceConfiguration(final File instanceDirectory, final String serviceType) throws CstlServiceException;
 
     /**
      * create an empty configuration for the service.
@@ -58,7 +71,7 @@ public interface ServiceConfiguration {
      * @param capabilitiesConfiguration Define GetCapabilities service part.
      * @param serviceType instance service type
      */
-    public void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException;
+    public void basicConfigure(final File instanceDirectory, final Object capabilitiesConfiguration, final String serviceType) throws CstlServiceException;
 
 
     /**
@@ -66,7 +79,7 @@ public interface ServiceConfiguration {
      * @param instanceDirectory instance folder which contain metadata file
      * @return service abstract information
      */
-    String getAbstract(File instanceDirectory);
+    String getAbstract(final File instanceDirectory);
 
     /**
      * Give instance layer number
@@ -74,6 +87,6 @@ public interface ServiceConfiguration {
      * @param worker current instance worker to count data number
      * @return an <code>int</code> which is layer number configurated on instance
      */
-    List<Layer> getlayersNumber(Worker worker);
+    List<Layer> getlayersNumber(final Worker worker);
 
 }

@@ -16,18 +16,22 @@
  */
 package org.constellation.gui.service;
 
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
-import org.constellation.ws.rest.post.DataInformation;
+import org.constellation.dto.StyleListBean;
+import org.constellation.dto.DataInformation;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.ServiceDef.Specification;
 
 /**
  * Juzu service to call constellation services server side
@@ -36,7 +40,7 @@ import java.util.logging.Logger;
  * @version 0.9
  * @since 0.9
  */
-public class ServicesManager {
+public class  ServicesManager {
 
     private static final Logger LOGGER = Logger.getLogger(ServicesManager.class.getName());
 
@@ -47,18 +51,16 @@ public class ServicesManager {
     private ConstellationService cstl;
 
     /**
-     * create service with {@link Service} capabilities information
+     * Creates a new service instance with specified {@link Service} metadata.
      *
-     * @param createdService {@link Service} object which contain capability service information
-     * @param service        service type as {@link String}
-     * @return <code>true</code> if succeded, <code>false</code> if not succeded
+     * @param metadata    the service metadata
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return {@code true} on success, {@code false} on fail
+     * @throws IOException on HTTP communication error or response entity parsing error
      */
-    public boolean createServices(Service createdService, String service) {
-        if (createdService != null) {
-            LOGGER.log(Level.INFO, "service will be created : " + createdService.getName());
-            return cstl.openServer().services.newInstance(service, createdService);
-        }
-        return false;
+    public boolean createServices(final Service metadata, final Specification serviceType) throws IOException {
+        final AcknowlegementType response = cstl.openClient().services.newInstance(serviceType, metadata);
+        return "success".equalsIgnoreCase(response.getStatus());
     }
 
     /**
@@ -94,5 +96,14 @@ public class ServicesManager {
 
     public DataInformation uploadToServer(File newFile, String name, String dataType) {
         return cstl.openServer().providers.uploadData(newFile, name, dataType);
+    }
+
+    public StyleListBean getStyleList() {
+        try {
+            return cstl.openClient().providers.getStyleList();
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error on message receive", e);
+        }
+        return null;
     }
 }
