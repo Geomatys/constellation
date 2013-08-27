@@ -109,7 +109,6 @@ public class WMSService extends GridWebService<WMSWorker> {
      */
     public WMSService() {
         super(Specification.WMS);
-        utils.getServiceUtilities().put(Specification.WMS, new WMSServiceConfiguration());
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WMSMarshallerPool.getInstance());
 

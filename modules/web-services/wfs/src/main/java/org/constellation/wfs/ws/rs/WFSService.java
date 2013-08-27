@@ -103,7 +103,6 @@ public class WFSService extends GridWebService<WFSWorker> {
      */
     public WFSService() {
         super(Specification.WFS);
-        utils.getServiceUtilities().put(Specification.WFS, new WFSServiceConfiguration());
         try {
             final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance(
                            "org.geotoolkit.wfs.xml.v110"   +

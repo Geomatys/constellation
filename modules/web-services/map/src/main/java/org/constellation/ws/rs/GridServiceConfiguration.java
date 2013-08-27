@@ -37,9 +37,20 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
  * @version 0.9
  * @since 0.9
  */
-public abstract class GridServiceConfiguration implements ServiceConfiguration {
+public class GridServiceConfiguration implements ServiceConfiguration {
 
     protected static final Logger LOGGER = Logging.getLogger(GridServiceConfiguration.class);
+
+    private final Class workerClass;
+
+    public GridServiceConfiguration(final Class workerClass) {
+        this.workerClass = workerClass;
+    }
+
+    @Override
+    public Class getWorkerClass() {
+        return workerClass;
+    }
 
     @Override
     public void configureInstance(File instanceDirectory, Object configuration, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {

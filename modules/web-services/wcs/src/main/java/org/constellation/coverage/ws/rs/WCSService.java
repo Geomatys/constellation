@@ -113,9 +113,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      */
     public WCSService() {
         super(Specification.WCS);
-
         setFullRequestLog(true);
-        utils.getServiceUtilities().put(Specification.WCS, new WCSServiceConfiguration());
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WCSMarshallerPool.getInstance());
 
