@@ -20,7 +20,7 @@ package org.constellation.gui.service;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
-import org.constellation.ws.rs.ServiceType;
+import org.constellation.api.ServiceType;
 
 import javax.inject.Inject;
 import java.io.IOException;

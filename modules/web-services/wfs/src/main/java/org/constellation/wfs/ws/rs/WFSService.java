@@ -56,12 +56,12 @@ import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.UnauthorizedException;
+import org.constellation.api.ServiceType;
+import org.constellation.xml.PrefixMappingInvocationHandler;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wfs.ws.WFSConstants.*;
 import org.constellation.ws.Worker;
-import org.constellation.ws.rs.ServiceType;
-import org.constellation.xml.PrefixMappingInvocationHandler;
 
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;

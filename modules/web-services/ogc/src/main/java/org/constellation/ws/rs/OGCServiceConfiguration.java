@@ -1,11 +1,11 @@
 package org.constellation.ws.rs;
 
+import org.constellation.api.ServiceType;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
@@ -27,7 +27,6 @@ import org.opengis.util.NoSuchIdentifierException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.ArrayList;
@@ -39,8 +38,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 
 /**
  * Utility class to configure and manage OGC Services. Contains static map to find specific implementation for each service type.

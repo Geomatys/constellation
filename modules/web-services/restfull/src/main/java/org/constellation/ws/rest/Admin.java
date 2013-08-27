@@ -7,7 +7,7 @@ import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.ws.rs.ConfigurationUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
-import org.constellation.ws.rest.post.Configuration;
+import org.constellation.dto.Configuration;
 import org.constellation.ws.rs.OGCServiceConfiguration;
 import org.constellation.ws.rs.ServiceConfiguration;
 

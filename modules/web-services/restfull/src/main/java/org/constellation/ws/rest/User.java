@@ -44,7 +44,7 @@ public class User {
      */
     @POST
     @Path("/{id}")
-    public Response user(final @PathParam("id") String id, final org.constellation.ws.rest.post.User user){
+    public Response user(final @PathParam("id") String id, final org.constellation.dto.User user){
         return Response.ok(ConfigurationUtilities.updateUser(user.getLogin(), user.getPassword(), id)).build();
     }
 

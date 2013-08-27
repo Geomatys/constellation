@@ -4,7 +4,7 @@ import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.WMSManager;
-import org.constellation.ws.rs.ServiceType;
+import org.constellation.api.ServiceType;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;

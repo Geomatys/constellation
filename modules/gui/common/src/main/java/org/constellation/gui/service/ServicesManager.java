@@ -22,8 +22,8 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
-import org.constellation.ws.rest.post.DataInformation;
-import org.constellation.ws.rs.ServiceType;
+import org.constellation.dto.DataInformation;
+import org.constellation.api.ServiceType;
 
 import javax.inject.Inject;
 import java.io.File;

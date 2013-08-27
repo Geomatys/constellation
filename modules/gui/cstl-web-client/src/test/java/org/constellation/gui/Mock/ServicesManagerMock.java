@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotSame;
-import org.constellation.ws.rs.ServiceType;
+import org.constellation.api.ServiceType;
 
 /**
  * ServiceManager mock

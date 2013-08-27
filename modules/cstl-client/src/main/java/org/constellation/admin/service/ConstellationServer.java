@@ -42,7 +42,7 @@ import org.constellation.configuration.StringTreeNode;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.ws.rest.post.DataInformation;
+import org.constellation.dto.DataInformation;
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.client.ServerFactory;

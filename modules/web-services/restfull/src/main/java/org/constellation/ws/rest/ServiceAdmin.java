@@ -7,8 +7,8 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rest.post.Rename;
-import org.constellation.ws.rest.post.Restart;
+import org.constellation.dto.Rename;
+import org.constellation.dto.Restart;
 import org.constellation.ws.rs.OGCServiceConfiguration;
 
 import javax.ws.rs.Consumes;

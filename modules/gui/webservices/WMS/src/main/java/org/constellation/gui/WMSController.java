@@ -24,21 +24,19 @@ import juzu.Route;
 import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
-import org.apache.commons.lang.StringUtils;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.WMSManager;
-import org.constellation.ws.rs.ServiceType;
+import org.constellation.api.ServiceType;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

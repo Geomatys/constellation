@@ -42,7 +42,7 @@ import static org.constellation.api.QueryConstants.*;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 
-import org.constellation.ws.rs.ServiceType;
+import org.constellation.api.ServiceType;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;

@@ -51,13 +51,18 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
-import org.constellation.ws.rs.ServiceType;
+import org.constellation.api.ServiceType;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
+import org.constellation.ws.Worker;
+
+import static org.constellation.query.wms.WMSQuery.*;
+import static org.constellation.api.QueryConstants.*;
 
 //GeotoolKit dependencies
 import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
@@ -67,7 +72,6 @@ import org.geotoolkit.sld.xml.GetLegendGraphic;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.TimeParser;
-import org.apache.sis.util.Version;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.geotoolkit.wms.xml.GetCapabilities;
@@ -75,17 +79,14 @@ import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
 import org.geotoolkit.wms.xml.DescribeLayer;
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.util.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.query.wms.WMSQuery.*;
-import static org.constellation.api.QueryConstants.*;
-import org.constellation.ws.Worker;
-import org.geotoolkit.ows.xml.RequestBase;
+import org.apache.sis.util.Version;
 
 /**
  * The REST facade to an OGC Web Map Service, implementing versions 1.1.1 and

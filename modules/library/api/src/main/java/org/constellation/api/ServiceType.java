@@ -1,4 +1,4 @@
-package org.constellation.ws.rs;
+package org.constellation.api;
 
 /**
  * Service type listing. Used to know which implementation use on serviceConfigurations implementation

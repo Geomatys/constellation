@@ -45,7 +45,7 @@ import static org.constellation.api.QueryConstants.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
-import org.constellation.ws.rs.ServiceType;
+import org.constellation.api.ServiceType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;

@@ -21,24 +21,24 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
-import org.constellation.ws.rs.ServiceType;
-import org.geotoolkit.xml.parameter.ParameterValueReader;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
+import org.constellation.api.ServiceType;
 
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
+import org.apache.sis.xml.MarshallerPool;
+import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
 
 /**
  * @author Bernard Fabien (Geomatys).

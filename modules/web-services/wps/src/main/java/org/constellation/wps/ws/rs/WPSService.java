@@ -22,7 +22,7 @@ import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ws.rs.ServiceType;
+import org.constellation.api.ServiceType;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;

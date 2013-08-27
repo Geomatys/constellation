@@ -10,7 +10,7 @@ import org.constellation.configuration.ConfigDirectory;
 import org.constellation.utils.CoverageMetadataBean;
 import org.constellation.utils.MetadataMapBuilder;
 import org.constellation.utils.SimplyMetadataTreeNode;
-import org.constellation.ws.rest.post.DataInformation;
+import org.constellation.dto.DataInformation;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;

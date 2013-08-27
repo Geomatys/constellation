@@ -33,7 +33,7 @@ import org.constellation.ws.WSEngine;
 import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ws.Worker;
 import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ws.rs.ServiceType;
+import org.constellation.api.ServiceType;
 import org.geotoolkit.csw.xml.CSWResponse;
 import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.DescribeRecord;
