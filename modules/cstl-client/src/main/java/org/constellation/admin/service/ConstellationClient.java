@@ -23,6 +23,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
 import org.constellation.ws.rs.ServiceType;
@@ -142,7 +143,7 @@ public final class ConstellationClient {
     public final class Services {
 
         /**
-         * Queries a service metadata from the Constellation server.
+         * Creates a new service instance on the Constellation server.
          *
          * @param serviceType the service type (WMS, CSW, WPS...)
          * @param metadata    the service metadata
@@ -170,7 +171,7 @@ public final class ConstellationClient {
         }
 
         /**
-         * Updates an existing service metadata.
+         * Updates a service metadata on the Constellation server.
          *
          * @param serviceType the service type (WMS, CSW, WPS...)
          * @param metadata    the service metadata
@@ -181,6 +182,20 @@ public final class ConstellationClient {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("metadata",    metadata);
             return post(serviceType + "/metadata", MediaType.APPLICATION_XML_TYPE, metadata, AcknowlegementType.class);
+        }
+
+        /**
+         * Queries a service layer list from the Constellation server.
+         *
+         * @param serviceType the service type (WMS, CSW, WPS...)
+         * @param identifier  the service identifier
+         * @return the layer list
+         * @throws IOException on HTTP communication error or response entity parsing error
+         */
+        public LayerList getLayers(final ServiceType serviceType, final String identifier) throws IOException {
+            ensureNonNull("serviceType", serviceType);
+            ensureNonNull("identifier",  identifier);
+            return get(serviceType + "/" + identifier + "/layers", MediaType.APPLICATION_XML_TYPE, LayerList.class);
         }
     }
 
@@ -200,7 +215,7 @@ public final class ConstellationClient {
     }
 
     /**
-     * Submits a HTTP GET request and returns the result.
+     * Submits a HTTP GET request and returns the response.
      *
      * @param path   the request path
      * @param type   the submitted/expected media type
@@ -212,7 +227,7 @@ public final class ConstellationClient {
     }
 
     /**
-     * Submits a HTTP POST request and returns the result.
+     * Submits a HTTP POST request and returns the response.
      *
      * @param path   the request path
      * @param type   the submitted/expected media type
@@ -222,6 +237,32 @@ public final class ConstellationClient {
      */
     private <T> T post(final String path, final MediaType type, final Object body, final Class<T> _class) throws IOException {
         return handleResponse(newRequest(path, type).post(ClientResponse.class, body), _class);
+    }
+
+    /**
+     * Submits a HTTP PUT request and returns the response.
+     *
+     * @param path   the request path
+     * @param type   the submitted/expected media type
+     * @param _class the expected response {@link Class}
+     * @param body   the request entity
+     * @return the response binding object
+     */
+    private <T> T put(final String path, final MediaType type, final Object body, final Class<T> _class) throws IOException {
+        return handleResponse(newRequest(path, type).put(ClientResponse.class, body), _class);
+    }
+
+    /**
+     * Submits a HTTP DELETE request and returns the response.
+     *
+     * @param path   the request path
+     * @param type   the submitted/expected media type
+     * @param _class the expected response {@link Class}
+     * @param body   the request entity
+     * @return the response binding object
+     */
+    private <T> T delete(final String path, final MediaType type, final Object body, final Class<T> _class) throws IOException {
+        return handleResponse(newRequest(path, type).delete(ClientResponse.class, body), _class);
     }
 
     /**

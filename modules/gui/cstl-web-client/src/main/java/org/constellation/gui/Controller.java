@@ -46,6 +46,7 @@ import org.constellation.gui.templates.webservices;
 import org.constellation.gui.util.LayerComparator;
 import org.constellation.gui.util.LayerDataComparator;
 import org.constellation.ws.rest.post.DataInformation;
+import org.constellation.ws.rs.ServiceType;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -199,7 +200,7 @@ public class Controller {
         createdService.setServiceContact(serviceContact);
 
         //call service
-        boolean created = servicesManager.createServices(createdService, "WMS");
+        boolean created = servicesManager.createServices(createdService, ServiceType.WMS);
 
         //return generated view
         return Controller_.succeded(createdService, "WMS", versionList, created + "");

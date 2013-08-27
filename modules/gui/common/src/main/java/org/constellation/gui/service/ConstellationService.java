@@ -169,8 +169,9 @@ public final class ConstellationService {
     }
 
     /**
+     * Open a new {@link ConstellationClient} to communicate with the Constellation server.
      *
-     * @return
+     * @return the {@link ConstellationClient} instance
      */
     public ConstellationClient openClient(){
         return new ConstellationClient(getUrlWithEndSlash().toString(), apiVersion).auth(login, password);
