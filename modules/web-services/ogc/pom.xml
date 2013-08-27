@@ -107,7 +107,14 @@
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
     </dependency>
-    
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+    </dependency>
     <!-- geotoolkit -->
     <dependency>
      <groupId>org.geotoolkit.pending</groupId>
