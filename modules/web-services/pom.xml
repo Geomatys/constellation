@@ -155,7 +155,6 @@
     <module>ogc</module>
     <module>configuration</module>
     <module>webdav</module>
-    <module>dto</module>
   </modules>
 
 </project>

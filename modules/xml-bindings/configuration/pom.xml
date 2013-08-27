@@ -120,6 +120,11 @@
             <artifactId>cstl-lib-base</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.juzu</groupId>
+            <artifactId>juzu-core</artifactId>
+            <version>0.7.0-beta16-SNAPSHOT</version>
+        </dependency>
         <!-- dependency>
             <groupId>ojdbc</groupId>
             <artifactId>ojdbc</artifactId>

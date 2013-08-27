@@ -23,12 +23,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Level;
+import net.iharder.Base64;
+
+// Jackson dependencies
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+// Jersey dependencies
 import javax.annotation.PreDestroy;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.validation.Schema;
-import net.iharder.Base64;
+
+// Shiro dependencies
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 
@@ -44,19 +55,22 @@ import org.constellation.process.service.StartServiceDescriptor;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.security.SecurityManager;
+import org.constellation.ws.Worker;
+import org.constellation.dto.Service;
 
 // Geotoolkit dependencies
-import org.constellation.ws.Worker;
-import org.apache.sis.util.iso.Types;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.apache.sis.xml.MarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// Apache SIS dependencies
+import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.util.iso.Types;
 
 // GeoAPI dependencies
 import org.opengis.parameter.ParameterValueGroup;
@@ -436,6 +450,29 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             // should never happen
             return null;
         }
+    }
+
+    /**
+     * Map {@link InputStream} send on object required. Call if request content JSON
+     *
+     * @param is {@link InputStream} send by client side
+     *
+     * @return {@link Response} with status
+     */
+    @POST
+    @Consumes("application/json")
+    public Response doPostjSon(InputStream is){
+        try {
+            //transform JSON to Service object.
+            ObjectMapper mapper = new ObjectMapper();
+            Service toCreateService = mapper.readValue(is, Service.class);
+
+            // Call treat
+            return treatIncomingRequest(toCreateService);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "", e);
+        }
+        return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     /**

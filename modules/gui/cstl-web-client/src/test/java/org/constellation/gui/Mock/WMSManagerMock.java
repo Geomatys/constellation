@@ -1,9 +1,10 @@
-package org.constellation.gui.mock;
+package org.constellation.gui.Mock;
 
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.WMSManager;
+import org.constellation.ws.rs.ServiceType;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -26,7 +27,7 @@ public class WMSManagerMock extends WMSManager{
      * @return
      */
     @Override
-    public Service getServiceMetadata(String serviceName, String serviceType) {
+    public Service getServiceMetadata(String serviceName, ServiceType serviceType) {
         return new Service();
     }
 

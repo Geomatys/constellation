@@ -44,11 +44,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.constellation.web-services</groupId>
-            <artifactId>cstl-web-dto</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.constellation.web-services-rest</groupId>
             <artifactId>cstl-web-restfull</artifactId>
             <version>${project.version}</version>
