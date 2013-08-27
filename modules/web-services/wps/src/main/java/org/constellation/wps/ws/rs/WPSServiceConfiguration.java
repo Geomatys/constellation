@@ -1,23 +1,28 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2013, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.constellation.wps.ws.rs;
 
-import org.constellation.configuration.Layer;
+import java.io.File;
+
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.Processes;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.Worker;
 import org.constellation.ws.rs.ServiceConfiguration;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import org.constellation.ws.rs.AbstractServiceConfiguration;
 
 /**
  * WPS {@link org.constellation.ws.rs.ServiceConfiguration} implementation
@@ -26,62 +31,14 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
  * @version 0.9
  * @since 0.9
  */
-public class WPSServiceConfiguration implements ServiceConfiguration {
+public class WPSServiceConfiguration extends AbstractServiceConfiguration implements ServiceConfiguration {
 
-
-    public Class getWorkerClass() {
-        return WPSWorker.class;
+    public WPSServiceConfiguration(final Class workerClass) {
+        super(workerClass, ProcessContext.class, "processContext.xml");
     }
 
-
-    public void configureInstance(File instanceDirectory, Object configuration, Object o, String serviceType) throws CstlServiceException {
-        if (configuration instanceof ProcessContext) {
-            final File configurationFile = new File(instanceDirectory, "processContext.xml");
-            try {
-                Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            }
-        } else {
-            throw new CstlServiceException("The configuration Object is not a process context", INVALID_PARAMETER_VALUE);
-        }
-    }
-
-
-    public Object getInstanceConfiguration(File instanceDirectory, String serviceType) throws CstlServiceException {
-        final File configurationFile = new File(instanceDirectory, "processContext.xml");
-        if (configurationFile.exists()) {
-            try {
-                final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-                if (obj instanceof ProcessContext) {
-                    return obj;
-                } else {
-                    throw new CstlServiceException("The processContext.xml file does not contain a ProcessContext object");
-                }
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex);
-            }
-        } else {
-            throw new CstlServiceException("Unable to find a file processContext.xml");
-        }
-    }
-
-
+    @Override
     public void basicConfigure(File instanceDirectory, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
         configureInstance(instanceDirectory, new ProcessContext(new Processes(true)), capabilitiesConfiguration, serviceType);
-    }
-
-    public String getAbstract(File instanceDirectory) {
-        //TODO
-        return "";
-    }
-
-    public List<Layer> getlayersNumber(Worker worker) {
-        //TODO
-        return new ArrayList<Layer>(0);
     }
 }

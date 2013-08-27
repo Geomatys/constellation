@@ -96,7 +96,7 @@ public class SOService extends OGCWebService<SOSworker> {
     public SOService() throws CstlServiceException {
         super(Specification.SOS);
         setXMLContext(SOSMarshallerPool.getInstance());
-        utils.getServiceUtilities().put(Specification.SOS, new SOSServiceConfiguration());
+        utils.getServiceUtilities().put(Specification.SOS, new SOSServiceConfiguration(getWorkerClass()));
         LOGGER.log(Level.INFO, "SOS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 

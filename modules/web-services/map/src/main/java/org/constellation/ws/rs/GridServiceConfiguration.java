@@ -1,10 +1,23 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2013, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.constellation.ws.rs;
 
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
-import org.constellation.dto.AccessConstraint;
-import org.constellation.dto.Contact;
-import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.CreateMapServiceDescriptor;
 import org.constellation.process.service.GetConfigMapServiceDescriptor;
@@ -15,18 +28,12 @@ import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.apache.sis.util.logging.Logging;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 
@@ -37,19 +44,10 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
  * @version 0.9
  * @since 0.9
  */
-public class GridServiceConfiguration implements ServiceConfiguration {
-
-    protected static final Logger LOGGER = Logging.getLogger(GridServiceConfiguration.class);
-
-    private final Class workerClass;
+public class GridServiceConfiguration extends AbstractServiceConfiguration implements ServiceConfiguration {
 
     public GridServiceConfiguration(final Class workerClass) {
-        this.workerClass = workerClass;
-    }
-
-    @Override
-    public Class getWorkerClass() {
-        return workerClass;
+        super(workerClass, null, null);
     }
 
     @Override
@@ -70,9 +68,7 @@ public class GridServiceConfiguration implements ServiceConfiguration {
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();
 
-                    } catch (NoSuchIdentifierException ex) {
-                        throw new CstlServiceException(ex);
-                    } catch (ProcessException ex) {
+                    } catch (NoSuchIdentifierException | ProcessException ex) {
                         throw new CstlServiceException(ex);
                     }
 
@@ -91,9 +87,7 @@ public class GridServiceConfiguration implements ServiceConfiguration {
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();
 
-                    } catch (NoSuchIdentifierException ex) {
-                        throw new CstlServiceException(ex);
-                    } catch (ProcessException ex) {
+                    } catch (NoSuchIdentifierException | ProcessException ex) {
                         throw new CstlServiceException(ex);
                     }
                 }
@@ -118,9 +112,7 @@ public class GridServiceConfiguration implements ServiceConfiguration {
 
             return ouptuts.parameter(GetConfigMapServiceDescriptor.CONFIG_NAME).getValue();
 
-        } catch (NoSuchIdentifierException ex) {
-            throw new CstlServiceException(ex);
-        } catch (ProcessException ex) {
+        } catch (NoSuchIdentifierException | ProcessException ex) {
             throw new CstlServiceException(ex);
         }
     }
@@ -131,26 +123,11 @@ public class GridServiceConfiguration implements ServiceConfiguration {
     }
 
     @Override
-    public String getAbstract(File instanceDirectory){
-        try{
-            //unmarshall serviceMetadata.xml File to create Service object
-            JAXBContext context = JAXBContext.newInstance(Service.class, Contact.class, AccessConstraint.class);
-            final Unmarshaller unmarshaller = context.createUnmarshaller();
-            final File wMSServiceMetadata = new File(instanceDirectory, "serviceMetadata.xml");
-            final Service service = (Service) unmarshaller.unmarshal(wMSServiceMetadata);
-            return service.getDescription();
-        }catch (JAXBException ex){
-            LOGGER.log(Level.FINEST, "no serviceMetadata.xml");
-        }
-        return "";
-    }
-
-    @Override
     public List<Layer> getlayersNumber(Worker worker) {
         if(worker instanceof LayerWorker){
             final LayerWorker layerWorker = (LayerWorker)worker;
             return layerWorker.getConfigurationLayers(null);
         }
-        return new ArrayList<Layer>(0);
+        return new ArrayList<>(0);
     }
 }

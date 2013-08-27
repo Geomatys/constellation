@@ -111,7 +111,7 @@ public class CSWService extends OGCWebService<CSWworker> {
     public CSWService() {
         super(Specification.CSW);
         setXMLContext(EBRIMMarshallerPool.getInstance());
-        utils.getServiceUtilities().put(Specification.CSW, new CSWServiceConfiguration());
+        utils.getServiceUtilities().put(Specification.CSW, new CSWServiceConfiguration(getWorkerClass()));
         LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
@@ -213,30 +213,33 @@ public class CSWService extends OGCWebService<CSWworker> {
      */
     @Override
     protected Response treatSpecificAdminRequest(final String request) throws CstlServiceException {
-        if ("setFederatedCatalog".equals(request)) {
-            final String identifier = getParameter("id", true);
-            final List<String> servers = StringUtilities.toStringList(getParameter("servers", true));
-            final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", identifier);
-            if (worker != null) {
-                worker.setCascadedService(servers);
-                return Response.ok(new AcknowlegementType("Success", "Federated catalogs updated"), "text/xml").build();
-            } else {
-                throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
-                        INVALID_PARAMETER_VALUE, "id");
-            }
-        } else if ("clearCache".equals(request)) {
-            final String identifier = getParameter("id", true);
-            final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", identifier);
-            if (worker != null) {
-                worker.clearCache();
-                return Response.ok(new AcknowlegementType("Success", "CSW cache cleared"), "text/xml").build();
-            } else {
-                throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
-                        INVALID_PARAMETER_VALUE, "id");
-            }
-        } else {
-            throw new CstlServiceException("The operation " + request + " is not supported by the CSW administration service",
-                        INVALID_PARAMETER_VALUE, "request");
+        switch (request) {
+            case "setFederatedCatalog": {
+                    final String identifier = getParameter("id", true);
+                    final List<String> servers = StringUtilities.toStringList(getParameter("servers", true));
+                    final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", identifier);
+                    if (worker != null) {
+                        worker.setCascadedService(servers);
+                        return Response.ok(new AcknowlegementType("Success", "Federated catalogs updated"), "text/xml").build();
+                    } else {
+                        throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
+                                INVALID_PARAMETER_VALUE, "id");
+                    }
+                }
+            case "clearCache": {
+                    final String identifier = getParameter("id", true);
+                    final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", identifier);
+                    if (worker != null) {
+                        worker.clearCache();
+                        return Response.ok(new AcknowlegementType("Success", "CSW cache cleared"), "text/xml").build();
+                    } else {
+                        throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
+                                INVALID_PARAMETER_VALUE, "id");
+                    }
+                }
+            default:
+                throw new CstlServiceException("The operation " + request + " is not supported by the CSW administration service",
+                            INVALID_PARAMETER_VALUE, "request");
         }
     }
 
