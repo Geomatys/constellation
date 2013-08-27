@@ -20,10 +20,10 @@ package org.constellation.gui.service;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
-import org.constellation.api.ServiceType;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import org.constellation.ServiceDef.Specification;
 
 /**
  * Manager for WMS service operations.
@@ -47,7 +47,7 @@ public class WMSManager {
      * @param serviceType the service type (WMS, CSW, WPS...)
      * @return the {@link Service} instance
      */
-    public Service getServiceMetadata(final String serviceId, final ServiceType serviceType) throws IOException {
+    public Service getServiceMetadata(final String serviceId, final Specification serviceType) throws IOException {
         return cstl.openClient().services.getMetadata(serviceType, serviceId);
     }
 
@@ -58,7 +58,7 @@ public class WMSManager {
      * @param serviceType the service type (WMS, CSW, WPS...)
      * @return {@code true} on success, otherwise {@code false}
      */
-    public boolean setServiceMetadata(final Service metadata, final ServiceType serviceType) throws IOException {
+    public boolean setServiceMetadata(final Service metadata, final Specification serviceType) throws IOException {
         final AcknowlegementType response = cstl.openClient().services.setMetadata(serviceType, metadata);
         return "success".equalsIgnoreCase(response.getStatus());
     }

@@ -24,13 +24,14 @@ import juzu.Route;
 import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
+
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.WMSManager;
-import org.constellation.api.ServiceType;
+import org.constellation.ServiceDef.Specification;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -88,7 +89,7 @@ public class WMSController {
     @View
     @Route("edit/wms/{serviceId}")
     public Response editWMS(String serviceId) throws IOException {
-        Service service = wmsManager.getServiceMetadata(serviceId, ServiceType.WMS);
+        Service service = wmsManager.getServiceMetadata(serviceId, Specification.WMS);
         LayerList layers = wmsManager.getLayers(serviceId, "WMS");
         String capabilitiesUrl = cstl.getUrl() + "WS/wms/" + serviceId +"?REQUEST=GetCapabilities&SERVICE=WMS";
         if (service.getVersions().size() == 1) {
@@ -159,7 +160,7 @@ public class WMSController {
     @Route("description/wms")
     public Response updateDescription(final String identifier, final String name, final String keywords,
             final String description, final String v111, final String v130) throws IOException {
-        final Service metadata = wmsManager.getServiceMetadata(identifier, ServiceType.WMS);
+        final Service metadata = wmsManager.getServiceMetadata(identifier, Specification.WMS);
         metadata.setName(name);
         metadata.setKeywords(Arrays.asList(keywords.split(",")));
         metadata.setDescription(description);
@@ -167,7 +168,7 @@ public class WMSController {
         metadata.setVersions(new ArrayList<String>());
         if (v111 != null) metadata.getVersions().add(v111);
         if (v130 != null) metadata.getVersions().add(v130);
-        return wmsManager.setServiceMetadata(metadata, ServiceType.WMS) ? Response.status(200) : Response.status(500);
+        return wmsManager.setServiceMetadata(metadata, Specification.WMS) ? Response.status(200) : Response.status(500);
     }
 
     /**
@@ -183,9 +184,9 @@ public class WMSController {
     @Resource
     @Route("metadata/wms")
     public Response updateMetadata(final String identifier, final Contact contact, final AccessConstraint constraint) throws IOException {
-        final Service metadata = wmsManager.getServiceMetadata(identifier, ServiceType.WMS);
+        final Service metadata = wmsManager.getServiceMetadata(identifier, Specification.WMS);
         metadata.setServiceContact(contact);
         metadata.setServiceConstraints(constraint);
-        return wmsManager.setServiceMetadata(metadata, ServiceType.WMS) ? Response.status(200) : Response.status(500);
+        return wmsManager.setServiceMetadata(metadata, Specification.WMS) ? Response.status(200) : Response.status(500);
     }
 }

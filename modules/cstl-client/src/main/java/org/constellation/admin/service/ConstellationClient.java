@@ -25,7 +25,6 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
-import org.constellation.api.ServiceType;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -36,6 +35,8 @@ import javax.xml.stream.XMLStreamException;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -156,7 +157,7 @@ public final class ConstellationClient {
          * @return the status response
          * @throws IOException on HTTP communication error or response entity parsing error
          */
-        public AcknowlegementType newInstance(final ServiceType serviceType, final Service metadata) throws IOException {
+        public AcknowlegementType newInstance(final Specification serviceType, final Service metadata) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("metadata",    metadata);
             return post(serviceType + "/create", MediaType.APPLICATION_XML_TYPE, metadata).getEntity(AcknowlegementType.class);
@@ -170,7 +171,7 @@ public final class ConstellationClient {
          * @return the service metadata
          * @throws IOException on HTTP communication error or response entity parsing error
          */
-        public Service getMetadata(final ServiceType serviceType, final String identifier) throws IOException {
+        public Service getMetadata(final Specification serviceType, final String identifier) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("identifier",  identifier);
             return get(serviceType + "/" + identifier + "/metadata", MediaType.APPLICATION_XML_TYPE).getEntity(Service.class);
@@ -184,7 +185,7 @@ public final class ConstellationClient {
          * @return the status response
          * @throws IOException on HTTP communication error or response entity parsing error
          */
-        public AcknowlegementType setMetadata(final ServiceType serviceType, final Service metadata) throws IOException {
+        public AcknowlegementType setMetadata(final Specification serviceType, final Service metadata) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("metadata",    metadata);
             return post(serviceType + "/metadata", MediaType.APPLICATION_XML_TYPE, metadata).getEntity(AcknowlegementType.class);
@@ -198,7 +199,7 @@ public final class ConstellationClient {
          * @return the layer list
          * @throws IOException on HTTP communication error or response entity parsing error
          */
-        public LayerList getLayers(final ServiceType serviceType, final String identifier) throws IOException {
+        public LayerList getLayers(final Specification serviceType, final String identifier) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("identifier",  identifier);
             return get(serviceType + "/" + identifier + "/layers", MediaType.APPLICATION_XML_TYPE).getEntity(LayerList.class);

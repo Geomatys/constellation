@@ -1,6 +1,5 @@
 package org.constellation.ws.rs;
 
-import org.constellation.api.ServiceType;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.Instance;
@@ -38,6 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.constellation.ServiceDef.Specification;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 
@@ -55,13 +55,13 @@ public class OGCServiceConfiguration {
     /**
      * List all implementations by service.
      */
-    private static Map<ServiceType, ServiceConfiguration> serviceUtilities = new HashMap<ServiceType, ServiceConfiguration>(0);
+    private static Map<Specification, ServiceConfiguration> serviceUtilities = new HashMap<Specification, ServiceConfiguration>(0);
 
-    public Map<ServiceType, ServiceConfiguration> getServiceUtilities() {
+    public Map<Specification, ServiceConfiguration> getServiceUtilities() {
         return serviceUtilities;
     }
 
-    public void setServiceUtilities(Map<ServiceType, ServiceConfiguration> serviceUtilities) {
+    public void setServiceUtilities(Map<Specification, ServiceConfiguration> serviceUtilities) {
         this.serviceUtilities = serviceUtilities;
     }
 
@@ -118,7 +118,7 @@ public class OGCServiceConfiguration {
                     //get instance name
                     final String name = instanceDirectory.getName();
 
-                    final ServiceType st = ServiceType.valueOf(serviceType);
+                    final Specification st = Specification.valueOf(serviceType);
                     final ServiceConfiguration configuration = serviceUtilities.get(st);
 
                     //get layer number
@@ -362,7 +362,7 @@ public class OGCServiceConfiguration {
         if (serviceDirectory != null) {
             final File instanceDirectory = new File(serviceDirectory, identifier);
             if (instanceDirectory.isDirectory()) {
-                ServiceType st = ServiceType.valueOf(serviceType);
+                Specification st = Specification.valueOf(serviceType);
                 final Worker newWorker = createWorker(instanceDirectory, serviceUtilities.get(st).getWorkerClass());
                 if (newWorker != null) {
                     WSEngine.addServiceInstance(serviceType, instanceDirectory.getName(), newWorker);
@@ -388,7 +388,7 @@ public class OGCServiceConfiguration {
         final File serviceDirectory = getServiceDirectory(serviceType);
         if (serviceDirectory != null && serviceDirectory.isDirectory()) {
             File instanceDirectory = new File(serviceDirectory, identifier);
-            ServiceType st = ServiceType.valueOf(serviceType);
+            Specification st = Specification.valueOf(serviceType);
             serviceUtilities.get(st).configureInstance(instanceDirectory, configuration, null, serviceType);
             response = new AcknowlegementType("Success", "Instance correctly configured");
         } else {
@@ -411,7 +411,7 @@ public class OGCServiceConfiguration {
         if (serviceDirectory != null && serviceDirectory.isDirectory()) {
             File instanceDirectory = new File(serviceDirectory, identifier);
             if (instanceDirectory.isDirectory()) {
-                ServiceType st = ServiceType.valueOf(serviceType);
+                Specification st = Specification.valueOf(serviceType);
                 response = serviceUtilities.get(st).getInstanceConfiguration(instanceDirectory, serviceType);
             } else {
                 throw new CstlServiceException("Unable to find an instance:" + identifier, NO_APPLICABLE_CODE);
@@ -449,7 +449,7 @@ public class OGCServiceConfiguration {
             final File instanceDirectory = new File(serviceDirectory, identifier);
             if (instanceDirectory.mkdir()) {
 //                reset
-                ServiceType st = ServiceType.valueOf(serviceType);
+                Specification st = Specification.valueOf(serviceType);
                 if (objectRequest != null && objectRequest instanceof Service) {
                     Service tocreated = (Service) objectRequest;
                     serviceUtilities.get(st).basicConfigure(instanceDirectory, tocreated, serviceType);
@@ -474,7 +474,7 @@ public class OGCServiceConfiguration {
      */
     public List<Layer> getdatas(String serviceType, String id) {
         Worker worker = buildWorker(serviceType, id);
-        ServiceType type = ServiceType.valueOf(serviceType);
+        Specification type = Specification.valueOf(serviceType);
         return serviceUtilities.get(type).getlayersNumber(worker);
     }
 
@@ -510,7 +510,7 @@ public class OGCServiceConfiguration {
         final File serviceDirectory  = getServiceDirectory(serviceType);
         final File instanceDirectory = new File(serviceDirectory, service.getIdentifier());
         if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
-            final ServiceType type = ServiceType.valueOf(serviceType);
+            final Specification type = Specification.valueOf(serviceType);
             final Object configuration = WSEngine.getInstance("WMS", service.getIdentifier()).getConfiguration();
             serviceUtilities.get(type).configureInstance(instanceDirectory, configuration, service, serviceType);
         } else {

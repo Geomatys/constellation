@@ -44,7 +44,6 @@ import org.constellation.gui.templates.webservices;
 import org.constellation.gui.util.LayerComparator;
 import org.constellation.gui.util.LayerDataComparator;
 import org.constellation.dto.DataInformation;
-import org.constellation.api.ServiceType;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -61,6 +60,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.ServiceDef.Specification;
 
 /**
  * Constellation web client main Juzu controller. Manage linkage with other controller and homepages
@@ -197,7 +197,7 @@ public class Controller {
         createdService.setServiceContact(serviceContact);
 
         //call service
-        boolean created = servicesManager.createServices(createdService, ServiceType.WMS);
+        boolean created = servicesManager.createServices(createdService, Specification.WMS);
 
         //return generated view
         return Controller_.succeded(createdService, "WMS", versionList, created + "");

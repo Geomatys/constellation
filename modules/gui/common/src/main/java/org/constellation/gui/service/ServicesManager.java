@@ -23,7 +23,6 @@ import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
 import org.constellation.dto.DataInformation;
-import org.constellation.api.ServiceType;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -32,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.ServiceDef.Specification;
 
 /**
  * Juzu service to call constellation services server side
@@ -58,7 +58,7 @@ public class  ServicesManager {
      * @return {@code true} on success, {@code false} on fail
      * @throws IOException on HTTP communication error or response entity parsing error
      */
-    public boolean createServices(final Service metadata, final ServiceType serviceType) throws IOException {
+    public boolean createServices(final Service metadata, final Specification serviceType) throws IOException {
         final AcknowlegementType response = cstl.openClient().services.newInstance(serviceType, metadata);
         return "success".equalsIgnoreCase(response.getStatus());
     }

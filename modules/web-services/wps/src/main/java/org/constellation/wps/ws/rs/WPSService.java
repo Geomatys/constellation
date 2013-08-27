@@ -22,7 +22,6 @@ import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
-import org.constellation.api.ServiceType;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
@@ -74,7 +73,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WPSMarshallerPool.getInstance());
-        utils.getServiceUtilities().put(ServiceType.WPS, new WPSServiceConfiguration());
+        utils.getServiceUtilities().put(Specification.WPS, new WPSServiceConfiguration());
         LOGGER.log(Level.INFO, "WPS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 

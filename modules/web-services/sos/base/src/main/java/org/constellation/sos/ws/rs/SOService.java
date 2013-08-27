@@ -45,7 +45,6 @@ import static org.constellation.api.QueryConstants.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
-import org.constellation.api.ServiceType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
@@ -97,7 +96,7 @@ public class SOService extends OGCWebService<SOSworker> {
     public SOService() throws CstlServiceException {
         super(Specification.SOS);
         setXMLContext(SOSMarshallerPool.getInstance());
-        utils.getServiceUtilities().put(ServiceType.SOS, new SOSServiceConfiguration());
+        utils.getServiceUtilities().put(Specification.SOS, new SOSServiceConfiguration());
         LOGGER.log(Level.INFO, "SOS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
