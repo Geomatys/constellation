@@ -255,7 +255,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     private void initPackage() {
 
-        this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.apache.sis.metadata.iso", 
+        this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.apache.sis.metadata.iso",
                                                                  "org.geotoolkit.metadata.iso",
                                                                  "org.apache.sis.referencing",
                                                                  "org.geotoolkit.referencing",
@@ -263,7 +263,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                                  "org.apache.sis.util.iso",
                                                                  "org.geotoolkit.naming",
                                                                  "org.geotoolkit.feature.catalog",
-                                                                 "org.geotoolkit.metadata.fra", "org.geotoolkit.util", "org.geotoolkit.xml");
+                                                                 "org.apache.sis.internal.profile.fra", "org.geotoolkit.util", "org.geotoolkit.xml");
         this.sensorMLPackage    = FileUtilities.searchSubPackage("org.geotoolkit.sml.xml.v100");
         this.swePackage         = FileUtilities.searchSubPackage("org.geotoolkit.swe.xml.v100");
         this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311","org.geotoolkit.gml.xml");
@@ -1031,7 +1031,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             } else if ("SV_ServiceIdentification".equals(className)) {
                 packageName = "org.geotoolkit.service";
             } else if (className.startsWith("FRA_")) {
-                packageName = "org.geotoolkit.metadata.fra";
+                packageName = "org.apache.sis.internal.profile.fra";
+                className = className.substring(4); // Remove "FRA_" prefix.
             } else if ("ReferenceSystemMetadata".equals(className)) {
                 packageName = "org.apache.sis.internal.jaxb.metadata";
             } else if ("Anchor".equals(className)) {

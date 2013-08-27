@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le Développement
+ *    (C) 2005, Institut de Recherche pour le D??veloppement
  *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -62,13 +62,12 @@ import org.geotoolkit.csw.xml.v202.TransactionType;
 @BindingType(value="http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 @XmlSeeAlso({org.apache.sis.metadata.iso.DefaultMetadata.class,
              org.apache.sis.internal.jaxb.geometry.ObjectFactory.class,
-             org.geotoolkit.metadata.fra.FRA_Constraints.class,
-             org.geotoolkit.metadata.fra.FRA_DataIdentification.class,
-             org.geotoolkit.metadata.fra.FRA_DirectReferenceSystem.class,
-             org.geotoolkit.metadata.fra.FRA_IndirectReferenceSystem.class,
-             org.geotoolkit.metadata.fra.FRA_LegalConstraints.class,
-             org.geotoolkit.metadata.fra.FRA_SecurityConstraints.class,
-             org.geotoolkit.metadata.fra.FRA_DirectReferenceSystem.class,
+             org.apache.sis.internal.profile.fra.Constraints.class,
+             org.apache.sis.internal.profile.fra.DataIdentification.class,
+             org.apache.sis.internal.profile.fra.DirectReferenceSystem.class,
+             org.apache.sis.internal.profile.fra.IndirectReferenceSystem.class,
+             org.apache.sis.internal.profile.fra.LegalConstraints.class,
+             org.apache.sis.internal.profile.fra.SecurityConstraints.class,
              org.geotoolkit.service.ServiceIdentificationImpl.class,
              org.geotoolkit.feature.catalog.AssociationRoleImpl.class,
              org.geotoolkit.feature.catalog.BindingImpl.class,

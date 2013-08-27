@@ -71,8 +71,9 @@
       <artifactId>geotk-temporal</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-metadata-fra</artifactId>
+      <groupId>org.apache.sis.profiles</groupId>
+      <artifactId>sis-french-profile</artifactId>
+      <version>${sis.version}</version>
     </dependency>
     <dependency>
      <groupId>org.geotoolkit.pending</groupId>
