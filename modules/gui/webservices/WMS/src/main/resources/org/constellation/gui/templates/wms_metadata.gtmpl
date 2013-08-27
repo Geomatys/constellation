@@ -1,9 +1,9 @@
-<form id="wmsMetadata">
+<form id="wmsMetadata" class="row">
     <input type="hidden" id="identifier" name="identifier" value="${service.identifier}">
 
     <div class="span6">
         <!-- contact part -->
-        <fieldset>
+        <fieldset style="padding-left:20px;">
             <legend>&{wms.create.contact.legend}</legend>
 
             <div class="control-group">
@@ -48,7 +48,7 @@
         </fieldset>
 
         <!-- address part -->
-        <fieldset>
+        <fieldset style="padding-left:20px;">
             <legend>&{wms.create.contact.address.legend}</legend>
 
             <div class="control-group">
@@ -90,7 +90,7 @@
 
     <div class="span6">
         <!-- access constraints part -->
-        <fieldset>
+        <fieldset style="padding-right:20px;">
             <legend>&{wms.create.accessconstraint.legend}</legend>
 
             <div class="control-group">

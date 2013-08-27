@@ -1,4 +1,4 @@
-<form id="wmsDescription">
+<form id="wmsDescription" class="row">
     <fieldset>
         <legend>&{wms.create.description.service.legend}</legend>
         <div class="control-group">

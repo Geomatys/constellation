@@ -18,18 +18,27 @@
 package org.constellation.admin.service;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.spi.MessageBodyWorkers;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
 import org.constellation.ws.rs.ServiceType;
+import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
 
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
@@ -153,7 +162,7 @@ public final class ConstellationClient {
         public AcknowlegementType newInstance(final ServiceType serviceType, final Service metadata) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("metadata",    metadata);
-            return post(serviceType + "/create", MediaType.APPLICATION_XML_TYPE, metadata, AcknowlegementType.class);
+            return post(serviceType + "/create", MediaType.APPLICATION_XML_TYPE, metadata).getContent(AcknowlegementType.class);
         }
 
         /**
@@ -167,7 +176,7 @@ public final class ConstellationClient {
         public Service getMetadata(final ServiceType serviceType, final String identifier) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("identifier",  identifier);
-            return get(serviceType + "/" + identifier + "/metadata", MediaType.APPLICATION_XML_TYPE, Service.class);
+            return get(serviceType + "/" + identifier + "/metadata", MediaType.APPLICATION_XML_TYPE).getContent(Service.class);
         }
 
         /**
@@ -181,7 +190,7 @@ public final class ConstellationClient {
         public AcknowlegementType setMetadata(final ServiceType serviceType, final Service metadata) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("metadata",    metadata);
-            return post(serviceType + "/metadata", MediaType.APPLICATION_XML_TYPE, metadata, AcknowlegementType.class);
+            return post(serviceType + "/metadata", MediaType.APPLICATION_XML_TYPE, metadata).getContent(AcknowlegementType.class);
         }
 
         /**
@@ -195,7 +204,7 @@ public final class ConstellationClient {
         public LayerList getLayers(final ServiceType serviceType, final String identifier) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("identifier",  identifier);
-            return get(serviceType + "/" + identifier + "/layers", MediaType.APPLICATION_XML_TYPE, LayerList.class);
+            return get(serviceType + "/" + identifier + "/layers", MediaType.APPLICATION_XML_TYPE).getContent(LayerList.class);
         }
     }
 
@@ -210,59 +219,55 @@ public final class ConstellationClient {
 		 * @return the list of available styles
 		 */
 		public StyleListBean getStyleList() throws IOException {
-            return get("style", MediaType.APPLICATION_XML_TYPE, StyleListBean.class);
+            return get("style", MediaType.APPLICATION_XML_TYPE).getContent(StyleListBean.class);
 		}
     }
 
     /**
      * Submits a HTTP GET request and returns the response.
      *
-     * @param path   the request path
-     * @param type   the submitted/expected media type
-     * @param _class the expected response {@link Class}
-     * @return the response binding object
+     * @param path the request path
+     * @param type the submitted/expected media type
+     * @return the response instance
      */
-    private <T> T get(final String path, final MediaType type, final Class<T> _class) throws IOException {
-        return handleResponse(newRequest(path, type).get(ClientResponse.class), _class);
+    private Response get(final String path, final MediaType type) throws IOException {
+        return newRequest(path, type).get(Response.class);
     }
 
     /**
      * Submits a HTTP POST request and returns the response.
      *
-     * @param path   the request path
-     * @param type   the submitted/expected media type
-     * @param _class the expected response {@link Class}
-     * @param body   the request entity
-     * @return the response binding object
+     * @param path the request path
+     * @param type the submitted/expected media type
+     * @param body the request entity
+     * @return the response instance
      */
-    private <T> T post(final String path, final MediaType type, final Object body, final Class<T> _class) throws IOException {
-        return handleResponse(newRequest(path, type).post(ClientResponse.class, body), _class);
+    private Response post(final String path, final MediaType type, final Object body) throws IOException {
+        return newRequest(path, type).post(Response.class, body);
     }
 
     /**
      * Submits a HTTP PUT request and returns the response.
      *
-     * @param path   the request path
-     * @param type   the submitted/expected media type
-     * @param _class the expected response {@link Class}
-     * @param body   the request entity
-     * @return the response binding object
+     * @param path the request path
+     * @param type the submitted/expected media type
+     * @param body the request entity
+     * @return the response instance
      */
-    private <T> T put(final String path, final MediaType type, final Object body, final Class<T> _class) throws IOException {
-        return handleResponse(newRequest(path, type).put(ClientResponse.class, body), _class);
+    private Response put(final String path, final MediaType type, final Object body) throws IOException {
+        return newRequest(path, type).put(Response.class, body);
     }
 
     /**
      * Submits a HTTP DELETE request and returns the response.
      *
-     * @param path   the request path
-     * @param type   the submitted/expected media type
-     * @param _class the expected response {@link Class}
-     * @param body   the request entity
-     * @return the response binding object
+     * @param path the request path
+     * @param type the submitted/expected media type
+     * @param body the request entity
+     * @return the response instance
      */
-    private <T> T delete(final String path, final MediaType type, final Object body, final Class<T> _class) throws IOException {
-        return handleResponse(newRequest(path, type).delete(ClientResponse.class, body), _class);
+    private Response delete(final String path, final MediaType type, final Object body) throws IOException {
+        return newRequest(path, type).delete(Response.class, body);
     }
 
     /**
@@ -270,29 +275,97 @@ public final class ConstellationClient {
      *
      * @param path the request path
      * @param type the submitted/expected media type
-     * @return the request base
+     * @return the response instance
      */
     private WebResource.Builder newRequest(final String path, final MediaType type) {
         return this.client.resource(url + "api/" + version + "/").path(path).type(type);
     }
 
     /**
-     * Handles an {@link ClientResponse} to check its status and try to parse its entity.
-     *
-     * @param response the response to handle
-     * @param _class   the expected response {@link Class}
-     * @param <T>      the expected response {@link Class}
-     * @return the response binding object
-     * @throws IOException on HTTP communication error or response entity parsing error
+     * Custom {@link ClientResponse} implementation for specific response handling.
      */
-    private static <T> T handleResponse(final ClientResponse response, final Class<T> _class) throws IOException {
-        if (response.getStatus() >= 300) {
-            throw new IOException(response.toString());
+    public final static class Response extends ClientResponse {
+
+        public Response(final int status, final InBoundHeaders headers, final InputStream entity, final MessageBodyWorkers workers) {
+            super(status, headers, entity, workers);
         }
-        try {
-            return response.getEntity(_class);
-        } catch (ClientHandlerException ex) {
-            throw new IOException("Response entity parsing has failed", ex);
+
+        /**
+         * @see ClientResponse#getEntity(Class)
+         *
+         * @param <T> the type of the response
+         * @param c   the type of the entity
+         * @return an instance of the type {@code c}
+         * @throws IOException on HTTP communication error or response entity parsing error
+         */
+        public <T> T getContent(final Class<T> c) throws IOException {
+            ensureNonNull("c", c);
+            ensureSuccessStatus(this);
+            return super.getEntity(c);
+        }
+
+        /**
+         * Handles and parses the XML response using a {@link ParameterValueReader} in
+         * accordance with the specified {@link ParameterDescriptorGroup}.
+         *
+         * @param descriptor the parameter value descriptor
+         * @return a {@link GeneralParameterValue} instance
+         * @throws IOException on HTTP communication error or response entity parsing error
+         */
+        public GeneralParameterValue getContent(final ParameterDescriptorGroup descriptor) throws IOException {
+            ensureNonNull("descriptor", descriptor);
+            ensureSuccessStatus(this);
+            try {
+                final ParameterValueReader reader = new ParameterValueReader(descriptor);
+                reader.setInput(getEntityInputStream());
+                return reader.read();
+            } catch (XMLStreamException ex) {
+                throw new IOException("GeneralParameterValue entity parsing has failed", ex);
+            } finally {
+                close();
+            }
+        }
+
+        /**
+         * Handles and parses the XML response using a specific {@link MarshallerPool}.
+         *
+         * @param pool the marshaller pool
+         * @return a response binding object instance
+         * @throws IOException on HTTP communication error or response entity parsing error
+         */
+        public Object getContent(final MarshallerPool pool) throws IOException {
+            ensureNonNull("pool", pool);
+            ensureSuccessStatus(this);
+            try {
+                final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+                final Object obj = unmarshaller.unmarshal(getEntityInputStream());
+                pool.recycle(unmarshaller);
+                return obj;
+            } catch (JAXBException ex) {
+                throw new IOException("XML entity unmarshalling has failed", ex);
+            } finally {
+                close();
+            }
+        }
+
+        /**
+         * Checks if the response has a "ok" status code.
+         *
+         * @param response the response to check
+         * @throws IOException if the response does not have a "ok" status code
+         */
+        private static void ensureSuccessStatus(final ClientResponse response) throws IOException {
+            if (response.getStatus() >= 300) {
+                throw new IOException(response.toString());
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return super.toString();
         }
     }
 
