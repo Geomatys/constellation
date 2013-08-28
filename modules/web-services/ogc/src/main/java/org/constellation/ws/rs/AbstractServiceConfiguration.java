@@ -31,6 +31,7 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.Layer;
 
 import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.AddLayer;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -128,5 +129,16 @@ public abstract class AbstractServiceConfiguration implements ServiceConfigurati
     @Override
     public List<Layer> getlayersNumber(final Worker worker) {
         return new ArrayList<>(0);
+    }
+
+    /**
+     * Add layer on service
+     *
+     * @param addLayerData
+     * @return <code>true</code> if layer created, <code>false</code> if layer can't be created
+     */
+    @Override
+    public boolean addLayer(final AddLayer addLayerData) {
+        return false;
     }
 }

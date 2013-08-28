@@ -33,6 +33,7 @@ import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.AddLayer;
 import org.constellation.dto.Contact;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.Service;
@@ -357,5 +358,14 @@ public class Controller {
         StyleListBean aList = servicesManager.getStyleList();
         parameters.put("styleList", aList);
         styleListing.with(parameters).render();
+    }
+
+
+    @Action
+    @Route("layer/add")
+    public Response addLayer(final String providerId, final String layerProviderId, final String styleName, final String layerName, final String serviceId){
+        AddLayer toAddLayer = new AddLayer(layerName, "WMS", serviceId, providerId, layerProviderId, "sld", styleName);
+        providerManager.addLayer(toAddLayer);
+        return WMSController_.editWMS(serviceId);
     }
 }

@@ -17,6 +17,8 @@
 package org.constellation.ws.rs;
 
 import org.constellation.configuration.Layer;
+import org.constellation.dto.AddLayer;
+import org.constellation.dto.Service;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
@@ -87,6 +89,13 @@ public interface ServiceConfiguration {
      * @param worker current instance worker to count data number
      * @return an <code>int</code> which is layer number configurated on instance
      */
-    List<Layer> getlayersNumber(final Worker worker);
+    public List<Layer> getlayersNumber(final Worker worker);
 
+
+    /**
+     * Add layer on service
+     * @return <code>true</code> if layer created, <code>false</code> if layer can't be created
+     * @param addLayerData
+     */
+    public boolean addLayer(final AddLayer addLayerData);
 }

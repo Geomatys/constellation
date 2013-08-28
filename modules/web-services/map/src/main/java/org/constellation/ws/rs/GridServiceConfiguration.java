@@ -18,9 +18,18 @@ package org.constellation.ws.rs;
 
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.AddLayer;
+import org.constellation.dto.Contact;
+import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.process.service.CreateMapServiceDescriptor;
 import org.constellation.process.service.SetConfigMapServiceDescriptor;
+import org.constellation.provider.LayerProvider;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.configuration.ProviderParameters;
+import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.Worker;
@@ -33,6 +42,7 @@ import org.opengis.util.NoSuchIdentifierException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 
@@ -108,5 +118,42 @@ public class GridServiceConfiguration extends AbstractServiceConfiguration imple
             return layerWorker.getConfigurationLayers(null);
         }
         return new ArrayList<>(0);
+    }
+
+
+    @Override
+    public boolean addLayer(final AddLayer addLayerData) {
+        LayerProvider provider = LayerProviderProxy.getInstance().getProvider(addLayerData.getProviderId());
+        String namespace = ProviderParameters.getNamespace(provider);
+        String layerId = "{"+namespace+"}"+addLayerData.getLayerId();
+
+        // set layer and style provider reference
+        final DataReference layerProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, addLayerData.getProviderId(), layerId);
+        final DataReference styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, addLayerData.getStyleProviderId(), addLayerData.getStyleId());
+
+
+        try {
+            //build descriptor
+            final ProcessDescriptor descriptor = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, "service.add_layer");
+            final ParameterValueGroup inputs = descriptor.getInputDescriptor().createValue();
+            inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_REF_PARAM_NAME).setValue(layerProviderReference);
+            inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_ALIAS_PARAM_NAME).setValue(addLayerData.getLayerAlias());
+            inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_STYLE_PARAM_NAME).setValue(styleProviderReference);
+            inputs.parameter(AddLayerToMapServiceDescriptor.SERVICE_TYPE_PARAM_NAME).setValue(addLayerData.getServiceType());
+            inputs.parameter(AddLayerToMapServiceDescriptor.SERVICE_INSTANCE_PARAM_NAME).setValue(addLayerData.getServiceId());
+
+            //call process
+            final org.geotoolkit.process.Process process = descriptor.createProcess(inputs);
+            final ParameterValueGroup outputs = process.call();
+            final LayerContext outputContext = (LayerContext) outputs.parameter(AddLayerToMapServiceDescriptor.OUT_LAYER_CTX_PARAM_NAME).getValue();
+            if(outputContext!=null){
+                return true;
+            }
+        } catch (NoSuchIdentifierException e) {
+            LOGGER.log(Level.WARNING, "error when try to create process descriptor", e);
+        } catch (ProcessException e) {
+            LOGGER.log(Level.WARNING, "error on process call", e);
+        }
+        return false;
     }
 }

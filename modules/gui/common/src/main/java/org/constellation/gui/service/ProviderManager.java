@@ -21,11 +21,13 @@ import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
+import org.constellation.dto.AddLayer;
 import org.constellation.gui.service.bean.LayerData;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -133,5 +135,13 @@ public class ProviderManager {
             }
         }
         return layerDatas;
+    }
+
+    public void addLayer(final AddLayer toAddLayer) {
+        try {
+            cstl.openClient().providers.addLayer(toAddLayer);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "oups...", e);
+        }
     }
 }

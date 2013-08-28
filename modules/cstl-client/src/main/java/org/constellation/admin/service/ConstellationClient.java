@@ -24,6 +24,7 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.dto.AddLayer;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
@@ -292,6 +293,11 @@ public final class ConstellationClient {
          */
         public StyleListBean getStyleList() throws IOException {
             return get("style", MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
+        }
+
+        public Boolean addLayer(AddLayer toAddLayer) throws IOException {
+            Response response = post(toAddLayer.getServiceType() + "/" + toAddLayer.getServiceId() + "/layer", MediaType.APPLICATION_XML_TYPE, toAddLayer);
+            return response.getEntity(Boolean.class);
         }
     }
 

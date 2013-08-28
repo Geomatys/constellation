@@ -2,7 +2,7 @@
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="addModalLabel">Ajout de donnée</h3>
-    </div>
+        </div>
     <div class="modal-body" >
         <div id="dataList">
             <div class="alert alert-info">
@@ -91,8 +91,17 @@
             $("#styleList").fadeOut("slow");
             $("#continue").off("click");
             $("#continue").on("click", function(){
+                //clear css
                 $("#dataList [data-state=selected]").children().css("background-color", "rgba(0,0,0,0)")
                 $("#dataList [data-state=selected]").css("color", "rgb(51, 51, 51)");
+
+                //set form
+                var providerId = $("#dataList [data-state=selected]").attr("data-provider");
+                var layerName =$("#dataList [data-state=selected]").attr("data-layername");
+                $("#providerId").val(providerId);
+                $('#layerProviderId').val(layerName);
+
+                //copy selected div
                 var htmlSelectedElement = $("#dataList [data-state=selected]").parent().html()
                 $("#dataList [data-state=selected]").attr("data-state", "");
                 $("[data-part=selectedData]").empty();
@@ -119,7 +128,7 @@
                 $("#styleList").fadeToggle();
                 $("#continue").off("click");
                 $("#continue").on("click", function(){
-                        alert("end");
+                    $("#addLayerForm").submit();
                 });
             });
         }

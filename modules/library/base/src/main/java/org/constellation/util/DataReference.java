@@ -40,6 +40,8 @@ import java.util.Date;
  *
  * Parameter <code>dataVersion</code> add the version used to extract data only if reference data support versionning.
  *
+ * layer identifier should be with namespace like "{http://geotoolkit.org}myLayer".
+ *
  * @author Johann Sorel (Geomatys)
  * @author Quentin Boileau (Geomatys).
  */
@@ -86,7 +88,7 @@ public class DataReference implements CharSequence{
      * @param serviceURL
      * @param serviceSpec
      * @param serviceId
-     * @param layerId
+     * @param layerId layer identifier with namespace like "{http://geotoolkit.org}myLayer"
      */
     public DataReference (final String dataType, final String providerId, final String serviceURL, final String serviceSpec, final String serviceId, final String layerId) {
         this(dataType, providerId, serviceURL, serviceSpec, serviceId, layerId, null);
@@ -99,7 +101,7 @@ public class DataReference implements CharSequence{
      * @param serviceURL
      * @param serviceSpec
      * @param serviceId
-     * @param layerId
+     * @param layerId layer identifier with namespace like "{http://geotoolkit.org}myLayer"
      * @param dataVersion date of date version. (can be used only if targeted data is versioned).
      */
     public DataReference (final String dataType, final String providerId, final String serviceURL, final String serviceSpec, final String serviceId, final String layerId,
@@ -122,7 +124,7 @@ public class DataReference implements CharSequence{
      * Create a DataReference from a provider layer or style.
      * @param providerType should be  {@link #PROVIDER_LAYER_TYPE} or {@link #PROVIDER_STYLE_TYPE}
      * @param providerId provider identifier
-     * @param layerId layer identifier
+     * @param layerId layer identifier with namespace like "{http://geotoolkit.org}myLayer"
      * @return DataReference
      */
     public static DataReference createProviderDataReference(final String providerType, final String providerId, final String layerId) {
@@ -133,7 +135,7 @@ public class DataReference implements CharSequence{
      * Create a DataReference from a provider layer or style.
      * @param providerType should be  {@link #PROVIDER_LAYER_TYPE} or {@link #PROVIDER_STYLE_TYPE}
      * @param providerId provider identifier
-     * @param layerId layer identifier
+     * @param layerId layer identifier with namespace like "{http://geotoolkit.org}myLayer"
      * @param dataVersion Date of data version.
      * @return DataReference
      */
@@ -148,7 +150,7 @@ public class DataReference implements CharSequence{
      * Create a DataReference from a service.
      * @param serviceSpec like WMS, WFS, ...
      * @param serviceId instance identifier of the service
-     * @param layerId layer identifier
+     * @param layerId layer identifier with namespace like "{http://geotoolkit.org}myLayer"
      * @return DataReference
      */
     public static DataReference createServiceDataReference(final String serviceURL, final String serviceSpec, final String serviceId, final String layerId) {
@@ -159,7 +161,7 @@ public class DataReference implements CharSequence{
      * Create a DataReference from a service.
      * @param serviceSpec like WMS, WFS, ...
      * @param serviceId instance identifier of the service
-     * @param layerId layer identifier
+     * @param layerId layer identifier with namespace like "{http://geotoolkit.org}myLayer"
      * @param dataVersion Date of data version.
      * @return DataReference
      */

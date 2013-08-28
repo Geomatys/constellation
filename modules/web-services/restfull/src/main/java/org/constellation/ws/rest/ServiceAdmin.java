@@ -6,6 +6,7 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.LayerList;
+import org.constellation.dto.AddLayer;
 import org.constellation.dto.Service;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.dto.Rename;
@@ -231,6 +232,17 @@ public class ServiceAdmin {
         List<Layer> list = serviceConfiguration.getdatas(serviceType, id);
         LayerList layers = new LayerList(list);
         return Response.ok(layers).build();
+    }
+
+    @POST
+    @Path("{id}/layer")
+    public Response addLayer(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id, final AddLayer addedLayer){
+        boolean created = serviceConfiguration.addLayer(serviceType, id, addedLayer);
+        if(created){
+            return Response.ok(new Boolean(true)).build();
+        }else{
+            return Response.ok(new Boolean(false)).build();
+        }
     }
 
 }

@@ -16,6 +16,7 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -115,6 +116,7 @@ public class AddLayerToMapService extends AbstractProcess {
             final FilterType filterType = xmlUtilities.getTransformerXMLv110().visit(layerFilter);
             newLayer.setFilter(filterType);
         }
+
 
         //add extra dimension
         if (layerDimension != null && !layerDimension.isEmpty()) {

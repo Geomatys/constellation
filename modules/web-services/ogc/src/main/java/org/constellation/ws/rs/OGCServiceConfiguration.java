@@ -7,6 +7,7 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.AddLayer;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
@@ -495,6 +496,19 @@ public class OGCServiceConfiguration {
         Worker worker = buildWorker(serviceType, id);
         Specification type = Specification.valueOf(serviceType);
         return serviceUtilities.get(type).getlayersNumber(worker);
+    }
+
+    /**
+     *
+     *
+     * @param serviceType
+     * @param id
+     * @param addedLayer
+     * @return
+     */
+    public boolean addLayer(String serviceType, String id, final AddLayer addedLayer){
+        Specification type = Specification.valueOf(serviceType);
+        return serviceUtilities.get(type).addLayer(addedLayer);
     }
 
     public Service getMetadata(String serviceType, String identifier) {

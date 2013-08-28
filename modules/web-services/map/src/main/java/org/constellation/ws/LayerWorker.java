@@ -204,7 +204,7 @@ public abstract class LayerWorker extends AbstractWorker {
         for (final Source source : layerContext.getLayers()) {
             final String sourceID = source.getId();
             final Set<Name> layerNames = namedProxy.getKeys(sourceID);
-            for(final Name layerName : layerNames) {
+                for(final Name layerName : layerNames) {
                 final QName qn = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
                 /*
                  * first case : source is in load-all mode
