@@ -124,7 +124,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * A map of standardName / List of package extract from a properties file
      */
-    private final Map<String, List<String>> extraPackage = new HashMap<String, List<String>>();
+    private final Map<String, List<String>> extraPackage = new HashMap<>();
 
     /**
      * A list of package containing the GML implementation (JAXB binding not referencing)
@@ -160,7 +160,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * A List of the already logged missing MDWeb {@link Classe}.
      */
-    private final List<String> classeNotFound = new ArrayList<String>();
+    private final List<String> classeNotFound = new ArrayList<>();
 
     private boolean storeMapping = false;
 
@@ -234,7 +234,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         initPackage();
         this.classBinding       = initClassBinding(configuration.getConfigurationDirectory());
-        this.alreadyRead        = new HashMap<Value, Object>();
+        this.alreadyRead        = new HashMap<>();
     }
 
     /**
@@ -246,8 +246,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         super(true, false);
         this.mdReader           = mdReader;
         initPackage();
-        this.classBinding       = new HashMap<String, Class>();
-        this.alreadyRead        = new HashMap<Value, Object>();
+        this.classBinding       = new HashMap<>();
+        this.alreadyRead        = new HashMap<>();
     }
 
     /**
@@ -257,8 +257,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.apache.sis.metadata.iso",
                                                                  "org.geotoolkit.metadata.iso",
-                                                                 "org.apache.sis.referencing",
                                                                  "org.geotoolkit.referencing",
+                                                                 "org.apache.sis.referencing",
                                                                  "org.geotoolkit.service",
                                                                  "org.apache.sis.util.iso",
                                                                  "org.geotoolkit.naming",
@@ -298,7 +298,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @return
      */
     private Map<String, Class> initClassBinding(final File configDir) {
-        final Map<String, Class> result = new HashMap<String, Class>();
+        final Map<String, Class> result = new HashMap<>();
         try {
             // we get the configuration file
             final File bindingFile   = new File(configDir, "classMapping.properties");
@@ -649,7 +649,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             } else if ("DefaultInternationalString".equals(className)) {
 
                 String ptvalue = null;
-                final Map<Locale, String> map = new HashMap<Locale, String>();
+                final Map<Locale, String> map = new HashMap<>();
                 //We search the children of the value
                 for (Value childValue : value.getChildren()) {
                     if (childValue instanceof TextValue) {
@@ -942,7 +942,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @return
      */
     private List<String> getPackageFromStandard(final String standardName, final String className, final int mode) {
-        final List<String> packagesName = new ArrayList<String>();
+        final List<String> packagesName = new ArrayList<>();
 
         if ("Catalog Web Service".equals(standardName) || "DublinCore".equals(standardName) ||
             "OGC Web Service".equals(standardName)     || "OGC Filter".equals(standardName)) {
@@ -1183,7 +1183,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     @Override
     public List<? extends Object> getAllEntries() throws MetadataIoException {
-        final List<Object> results = new ArrayList<Object>();
+        final List<Object> results = new ArrayList<>();
         try {
             final List<RecordSet> recordSets   = mdReader.getRecordSets();
             final Collection<FullRecord> records = mdReader.getAllRecord(recordSets);
