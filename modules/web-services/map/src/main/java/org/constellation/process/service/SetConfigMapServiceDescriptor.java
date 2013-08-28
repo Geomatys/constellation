@@ -31,7 +31,7 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
 
-import static org.constellation.process.service.MapProcessUtils.*;
+import static org.constellation.process.service.WSProcessUtils.*;
 /**
  *
  * @author Quentin Boileau (Geomatys).

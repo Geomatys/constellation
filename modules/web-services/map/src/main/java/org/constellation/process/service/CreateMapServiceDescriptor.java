@@ -17,12 +17,10 @@
 package org.constellation.process.service;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import org.constellation.configuration.LayerContext;
 import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
-import static org.constellation.process.service.MapProcessUtils.*;
+import static org.constellation.process.service.WSProcessUtils.*;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.ExtendedParameterDescriptor;
@@ -33,7 +31,6 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.IdentifiedObject;
 import org.opengis.util.InternationalString;
 
 /**

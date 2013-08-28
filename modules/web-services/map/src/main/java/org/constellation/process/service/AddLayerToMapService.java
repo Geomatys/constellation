@@ -21,7 +21,7 @@ import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
 import static org.constellation.process.service.AddLayerToMapServiceDescriptor.*;
-import static org.constellation.process.service.MapProcessUtils.*;
+import static org.constellation.process.service.WSProcessUtils.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

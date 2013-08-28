@@ -20,7 +20,7 @@ import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.CreateMapServiceDescriptor;
-import org.constellation.process.service.GetConfigMapServiceDescriptor;
+import org.constellation.process.service.GetConfigServiceDescriptor;
 import org.constellation.process.service.SetConfigMapServiceDescriptor;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
@@ -100,17 +100,18 @@ public class GridServiceConfiguration extends AbstractServiceConfiguration imple
     @Override
     public Object getInstanceConfiguration(File instanceDirectory, String serviceType) throws CstlServiceException {
         try {
-            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigMapServiceDescriptor.NAME);
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigServiceDescriptor.NAME);
 
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
-            in.parameter(GetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
-            in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
-            in.parameter(GetConfigMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+            in.parameter(GetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
+            in.parameter(GetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+            in.parameter(GetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+            in.parameter(GetConfigServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
 
             final org.geotoolkit.process.Process proc = desc.createProcess(in);
             final ParameterValueGroup ouptuts = proc.call();
 
-            return ouptuts.parameter(GetConfigMapServiceDescriptor.CONFIG_NAME).getValue();
+            return ouptuts.parameter(GetConfigServiceDescriptor.CONFIG_NAME).getValue();
 
         } catch (NoSuchIdentifierException | ProcessException ex) {
             throw new CstlServiceException(ex);

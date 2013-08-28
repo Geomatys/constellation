@@ -20,23 +20,22 @@ import java.io.File;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.LayerContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.process.service.GetConfigMapServiceDescriptor.*;
+import static org.constellation.process.service.GetConfigServiceDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.*;
 
 /**
  *
  * @author Quentin Boileau (Geoamtys)
  */
-public class GetConfigMapService extends AbstractProcess {
+public class GetConfigService extends AbstractProcess {
 
-    public GetConfigMapService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public GetConfigService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
@@ -51,15 +50,20 @@ public class GetConfigMapService extends AbstractProcess {
     @Override
     protected void execute() throws ProcessException {
 
-        String serviceName = value(SERVICE_TYPE, inputParameters);
-        final String identifier = value(IDENTIFIER, inputParameters);
-        File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
+        String serviceName             = value(SERVICE_TYPE, inputParameters);
+        final String identifier        = value(IDENTIFIER, inputParameters);
+        File instanceDirectory         = value(INSTANCE_DIRECTORY, inputParameters);
+        final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
+        final String configFileName    = value(FILENAME, inputParameters);
 
-        if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName)
-                || "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName))) {
+        if (serviceName != null && !serviceName.isEmpty()
+        && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName) ||
+            "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName)  ||
+            "WPS".equalsIgnoreCase(serviceName) || "SOS".equalsIgnoreCase(serviceName)  ||
+            "CSW".equalsIgnoreCase(serviceName))) {
             serviceName = serviceName.toUpperCase();
         } else {
-            throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\").", this, null);
+            throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\", \"WPS\", \"CSW\", \"SOS\").", this, null);
         }
 
         if (identifier == null || identifier.isEmpty()) {
@@ -73,7 +77,7 @@ public class GetConfigMapService extends AbstractProcess {
 
             if (configDirectory != null && configDirectory.isDirectory()) {
 
-                //get service directory ("WMS", "WMTS", "WFS", "WCS")
+                //get service directory ("WMS", "WMTS", "WFS", "WCS", "WPS", "CSW", "SOS")
                 final File serviceDir = new File(configDirectory, serviceName);
                 if (serviceDir.exists() && serviceDir.isDirectory()) {
 
@@ -91,16 +95,16 @@ public class GetConfigMapService extends AbstractProcess {
         if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
 
             //get layerContext.xml file.
-            final File configurationFile = new File(instanceDirectory, "layerContext.xml");
+            final File configurationFile = new File(instanceDirectory, configFileName);
             if (configurationFile.exists()) {
                 try {
                     final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                     final Object obj = unmarshaller.unmarshal(configurationFile);
                     GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-                    if (obj instanceof LayerContext) {
+                    if (obj.getClass().isAssignableFrom(configurationClass)) {
                         getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
                     } else {
-                        throw new ProcessException("The layerContext.xml file does not contain a LayerContext object", this, null);
+                        throw new ProcessException("The " + configFileName + " file does not contain a " + configurationClass.getName() + " object.", this, null);
                     }
                 } catch (JAXBException ex) {
                     throw new ProcessException(ex.getMessage(), this, ex);
