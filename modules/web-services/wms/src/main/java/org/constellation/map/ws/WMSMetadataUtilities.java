@@ -37,7 +37,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @version 0.9
  * @since 0.9
  */
-public final class WMSServices extends Static {
+public final class WMSMetadataUtilities extends Static {
 
     /**
      * Generates the base capabilities for a WMS from the service metadata and the service version.

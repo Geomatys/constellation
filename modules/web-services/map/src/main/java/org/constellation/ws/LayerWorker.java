@@ -22,7 +22,7 @@ import java.beans.PropertyChangeListener;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Language;
 import org.constellation.dto.Service;
-import org.constellation.ws.rs.MapServices;
+import org.constellation.utils.MetadataUtilities;
 import org.constellation.ws.security.SimplePDP;
 import org.constellation.ServiceDef.Specification;
 
@@ -61,7 +61,7 @@ public abstract class LayerWorker extends AbstractWorker {
 
     private final LayerContext layerContext;
 
-    protected final List<String> supportedLanguages = new ArrayList<String>();
+    protected final List<String> supportedLanguages = new ArrayList<>();
 
     protected final String defaultLanguage;
 
@@ -184,7 +184,7 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     protected List<QName> getConfigurationLayerNames(final String login) {
-        final List<QName> result = new ArrayList<QName>();
+        final List<QName> result = new ArrayList<>();
         final List<Layer> layers = getConfigurationLayers(login);
         for (Layer layer : layers) {
             result.add(layer.getName());
@@ -199,10 +199,10 @@ public abstract class LayerWorker extends AbstractWorker {
      */
     public List<Layer> getConfigurationLayers(final String login) {
         if (layerContext == null) {
-            return new ArrayList<Layer>();
+            return new ArrayList<>();
         }
         final LayerProviderProxy namedProxy  = LayerProviderProxy.getInstance();
-        final List<Layer> layers = new ArrayList<Layer>();
+        final List<Layer> layers = new ArrayList<>();
         /*
          * For each source declared in the layer context we search for layers informations.
          */
@@ -252,7 +252,7 @@ public abstract class LayerWorker extends AbstractWorker {
      * @throws CstlServiceException
      */
     protected List<LayerDetails> getLayerReferences(final String login, final Collection<Name> layerNames) throws CstlServiceException {
-        final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+        final List<LayerDetails> layerRefs = new ArrayList<>();
         for (Name layerName : layerNames) {
             layerRefs.add(getLayerReference(login, layerName));
         }
@@ -437,7 +437,7 @@ public abstract class LayerWorker extends AbstractWorker {
     protected Object getStaticCapabilitiesObject(String version, String service, String language) throws CstlServiceException {
         Service metadata = null;
         try {
-            metadata = MapServices.readMetadata(getId(), service);
+            metadata = MetadataUtilities.readMetadata(getId(), service);
         } catch (IOException | ConfigurationException ex) {
             LOGGER.log(Level.WARNING, "An error occurred when trying to read the service metadata. Returning default capabilities.", ex);
         }

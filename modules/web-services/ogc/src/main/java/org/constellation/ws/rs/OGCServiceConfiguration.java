@@ -56,7 +56,7 @@ public class OGCServiceConfiguration {
     /**
      * List all implementations by service.
      */
-    private static Map<Specification, ServiceConfiguration> serviceUtilities = new HashMap<Specification, ServiceConfiguration>(0);
+    private static Map<Specification, ServiceConfiguration> serviceUtilities = new HashMap<>(0);
 
     public Map<Specification, ServiceConfiguration> getServiceUtilities() {
         return serviceUtilities;
@@ -93,7 +93,7 @@ public class OGCServiceConfiguration {
      */
     public InstanceReport listInstance(final String serviceType) {
         LOGGER.finer("listing instances");
-        final List<Instance> instances = new ArrayList<Instance>();
+        final List<Instance> instances = new ArrayList<>();
         // 1- First we list the instance in the map
         for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(serviceType)) {
             final ServiceStatus status;
@@ -199,9 +199,7 @@ public class OGCServiceConfiguration {
             org.geotoolkit.process.Process proc = desc.createProcess(inputs);
             proc.call();
             response = new AcknowlegementType("Success", "instance succesfully stopped");
-        } catch (NoSuchIdentifierException ex) {
-            response = new AcknowlegementType("Error", "unable to stop the instance : " + ex.getMessage());
-        } catch (ProcessException ex) {
+        } catch (NoSuchIdentifierException | ProcessException ex) {
             response = new AcknowlegementType("Error", "unable to stop the instance : " + ex.getMessage());
         }
 
@@ -228,9 +226,7 @@ public class OGCServiceConfiguration {
             org.geotoolkit.process.Process proc = desc.createProcess(inputs);
             proc.call();
             response = new AcknowlegementType("Success", "new instance succefully started");
-        } catch (NoSuchIdentifierException ex) {
-            response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
-        } catch (ProcessException ex) {
+        } catch (NoSuchIdentifierException | ProcessException ex) {
             response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
         }
         return response;
@@ -257,9 +253,7 @@ public class OGCServiceConfiguration {
             org.geotoolkit.process.Process proc = desc.createProcess(inputs);
             proc.call();
             response = new AcknowlegementType("Success", "instances succefully restarted");
-        } catch (NoSuchIdentifierException ex) {
-            response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
-        } catch (ProcessException ex) {
+        } catch (NoSuchIdentifierException | ProcessException ex) {
             response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
         }
         return response;
@@ -286,9 +280,7 @@ public class OGCServiceConfiguration {
             org.geotoolkit.process.Process proc = desc.createProcess(inputs);
             proc.call();
             response = new AcknowlegementType("Success", "instance succesfully deleted");
-        } catch (NoSuchIdentifierException ex) {
-            response = new AcknowlegementType("Error", "unable to delete the instance : " + ex.getMessage());
-        } catch (ProcessException ex) {
+        } catch (NoSuchIdentifierException | ProcessException ex) {
             response = new AcknowlegementType("Error", "unable to delete the instance : " + ex.getMessage());
         }
 

@@ -91,7 +91,7 @@ public final class WMSConstant {
     public static final String EXCEPTION_111_XML        = "application/vnd.ogc.se_xml";
     public static final String EXCEPTION_111_INIMAGE    = "application/vnd.ogc.se_inimage";
     public static final String EXCEPTION_111_BLANK      = "application/vnd.ogc.se_blank";
-    public static final List<String> EXCEPTION_111 = new ArrayList<String>();
+    public static final List<String> EXCEPTION_111 = new ArrayList<>();
     static {
         EXCEPTION_111.add(EXCEPTION_111_XML);
         EXCEPTION_111.add(EXCEPTION_111_INIMAGE);
@@ -102,7 +102,7 @@ public final class WMSConstant {
     public static final String EXCEPTION_130_XML        = "XML";
     public static final String EXCEPTION_130_INIMAGE    = "INIMAGE";
     public static final String EXCEPTION_130_BLANK      = "BLANK";
-    public static final List<String> EXCEPTION_130 = new ArrayList<String>();
+    public static final List<String> EXCEPTION_130 = new ArrayList<>();
     static {
         EXCEPTION_130.add(EXCEPTION_130_XML);
         EXCEPTION_130.add(EXCEPTION_130_INIMAGE);

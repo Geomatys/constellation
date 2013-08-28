@@ -24,7 +24,6 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
@@ -55,7 +54,6 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AttributionType;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.FormatURL;
 import org.constellation.configuration.Reference;
@@ -72,15 +70,14 @@ import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
-import static org.constellation.api.CommonConstants.*;
 import org.constellation.configuration.DimensionDefinition;
 import org.constellation.configuration.WMSPortrayal;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import static org.constellation.api.CommonConstants.*;
 import static org.constellation.query.wms.WMSQuery.*;
 import static org.constellation.map.ws.WMSConstant.*;
 
 //Geotoolkit dependencies
-import org.constellation.ws.rs.MapServices;
 import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.data.query.QueryBuilder;
@@ -172,10 +169,10 @@ import org.opengis.util.FactoryException;
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     private static final WMSVisitorFactory[] VISITOR_FACTORIES;
-    private static final List<String> GFI_MIME_TYPES = new ArrayList<String>();
+    private static final List<String> GFI_MIME_TYPES = new ArrayList<>();
 
     static {
-        final List<WMSVisitorFactory> factories = new ArrayList<WMSVisitorFactory>();
+        final List<WMSVisitorFactory> factories = new ArrayList<>();
 
         final Iterator<WMSVisitorFactory> ite = ServiceRegistry.lookupProviders(WMSVisitorFactory.class);
         while(ite.hasNext()){
@@ -239,7 +236,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws CstlServiceException {
         final OnlineResourceType or = new OnlineResourceType(getServiceUrl());
 
-        final List<LayerDescriptionType> layerDescriptions = new ArrayList<LayerDescriptionType>();
+        final List<LayerDescriptionType> layerDescriptions = new ArrayList<>();
         final List<String> layerNames = descLayer.getLayers();
         for (String layerName : layerNames) {
             final TypeNameType t = new TypeNameType(layerName.trim());
@@ -279,7 +276,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final AbstractWMSCapabilities inCapabilities;
         final Object skeleton = getStaticCapabilitiesObject(queryVersion, "WMS", requestedLanguage);
         if (skeleton instanceof Service) {
-            inCapabilities = WMSServices.createCapabilities((Service) skeleton, WMSVersion.getVersion(queryVersion));
+            inCapabilities = WMSMetadataUtilities.createCapabilities((Service) skeleton, WMSVersion.getVersion(queryVersion));
         } else {
             inCapabilities = (AbstractWMSCapabilities) skeleton;
         }
@@ -304,7 +301,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         //Build the list of layers
-        final List<AbstractLayer> outputLayers = new ArrayList<AbstractLayer>();
+        final List<AbstractLayer> outputLayers = new ArrayList<>();
         final List<Layer> layers = getConfigurationLayers(userLogin);
 
        for (Layer configLayer : layers) {
@@ -352,7 +349,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         inputGeoBox.getEastBoundLongitude(), Math.nextUp(inputGeoBox.getNorthBoundLatitude()));
             }
             // List of elevations, times and dim_range values.
-            final List<AbstractDimension> dimensions = new ArrayList<AbstractDimension>();
+            final List<AbstractDimension> dimensions = new ArrayList<>();
 
             /*
              * Dimension: the available date
@@ -468,7 +465,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                             unitSymbol = unit;
                         }
 
-                        final LinkedList<String> valuesList = new LinkedList<String>();
+                        final LinkedList<String> valuesList = new LinkedList<>();
                         if (axis instanceof DiscreteCoordinateSystemAxis) {
                             final DiscreteCoordinateSystemAxis direcretAxis = (DiscreteCoordinateSystemAxis) axis;
                             final int nbOrdiante = direcretAxis.length();
@@ -511,7 +508,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         for(FeatureMapLayer.DimensionDef ddef : fml.getExtraDimensions()){
                             final Collection<Range> collRefs = fml.getDimensionRange(ddef);
                             // Transform it to a set in order to filter same values
-                            final Set<Range> refs = new HashSet<Range>();
+                            final Set<Range> refs = new HashSet<>();
                             for (Range ref : collRefs) {
                                 refs.add(ref);
                             }
@@ -545,10 +542,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         }
                     }
 
-                } catch (PortrayalException ex) {
-                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
-                    break;
-                } catch (DataStoreException ex) {
+                } catch (PortrayalException | DataStoreException ex) {
                     Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
                     break;
                 }
@@ -616,7 +610,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
             // we build a Style Object
             final List<DataReference> stylesName = configLayer.getStyles();
-            final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<org.geotoolkit.wms.xml.Style>();
+            final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<>();
             if (stylesName != null && !stylesName.isEmpty()) {
                 // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
                 for (DataReference styleName : stylesName) {
@@ -652,7 +646,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             if (inspireExtension != null) {
                 inspireExtension.setMetadataDate(new Date(System.currentTimeMillis()));
 
-                List<LanguageType> languageList = new ArrayList<LanguageType>();
+                List<LanguageType> languageList = new ArrayList<>();
                 for (String language : supportedLanguages) {
                     boolean isDefault = language.equals(defaultLanguage);
                     languageList.add(new LanguageType(language, isDefault));
@@ -692,7 +686,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (configLayer.getStyles() != null && !configLayer.getStyles().isEmpty()) {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
-            final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<org.geotoolkit.wms.xml.Style>();
+            final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<>();
             for (DataReference styl : configLayer.getStyles()) {
                 final MutableStyle ms;
                 Style style = null;
@@ -840,7 +834,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         //       -- create the rendering parameter Map
         final Double elevation                 = getFI.getElevation();
         final Date time                        = getFI.getTime();
-        final Map<String, Object> params       = new HashMap<String, Object>();
+        final Map<String, Object> params       = new HashMap<>();
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_TIME, time);
         params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getFI.getParameters());
@@ -920,9 +914,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         try {
             //force longitude first
             vdef.setLongitudeFirst();
-        } catch (TransformException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        } catch (FactoryException ex) {
+        } catch (TransformException | FactoryException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
@@ -994,7 +986,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     throw new PortrayalException("The given SLD url \""+ sld +"\" is not a valid url", ex);
                 }
 
-                final List<MutableLayer> emptyNameMutableLayers = new ArrayList<MutableLayer>();
+                final List<MutableLayer> emptyNameMutableLayers = new ArrayList<>();
                 for (final MutableLayer mutableLayer : mutableSLD.layers()) {
                     final String mutableLayerName = mutableLayer.getName();
                     if (mutableLayerName == null || mutableLayerName.isEmpty()) {
@@ -1089,7 +1081,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return handleExceptions(getMap, errorInImage, errorBlank, ex, STYLE_NOT_DEFINED, null);
         }
         //       -- create the rendering parameter Map
-        final Map<String, Object> params = new HashMap<String, Object>();
+        final Map<String, Object> params = new HashMap<>();
         params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
         final SceneDef sdef = new SceneDef();
         sdef.extensions().add(mapPortrayal.getExtension());
@@ -1168,9 +1160,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         try {
             //force longitude first
             vdef.setLongitudeFirst();
-        } catch (TransformException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        } catch (FactoryException ex) {
+        } catch (TransformException | FactoryException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
@@ -1213,7 +1203,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             throw new IllegalArgumentException("SLD should not be null");
         }
         
-        final List<MutableNamedLayer> emptyNameSLDLayers = new ArrayList<MutableNamedLayer>();
+        final List<MutableNamedLayer> emptyNameSLDLayers = new ArrayList<>();
         for(final org.opengis.sld.Layer sldLayer : sld.layers()){
             // We can't do anything if it is not a MutableNamedLayer.
             if (!(sldLayer instanceof MutableNamedLayer)) {
@@ -1254,7 +1244,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     private List<MutableStyle> getStyles(final List<LayerDetails> layerRefs, final StyledLayerDescriptor sld,
                                          final List<String> styleNames, final String userLogin) throws CstlServiceException {
-        final List<MutableStyle> styles = new ArrayList<MutableStyle>();
+        final List<MutableStyle> styles = new ArrayList<>();
         for (int i=0; i<layerRefs.size(); i++) {
             final Name layerName = layerRefs.get(i).getName();
             final Layer layer = getConfigurationLayer(layerName, userLogin);

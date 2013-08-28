@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.ws.rs;
+package org.constellation.utils;
 
 import org.apache.sis.util.Static;
 import org.constellation.configuration.ConfigDirectory;
@@ -39,7 +39,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @version 0.9
  * @since 0.9
  */
-public final class MapServices extends Static {
+public final class MetadataUtilities extends Static {
 
     /**
      * Service metadata JAXB context.
