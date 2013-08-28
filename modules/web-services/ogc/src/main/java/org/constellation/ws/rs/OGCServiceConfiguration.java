@@ -536,7 +536,7 @@ public class OGCServiceConfiguration {
         final File instanceDirectory = new File(serviceDirectory, service.getIdentifier());
         if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
             final Specification type = Specification.valueOf(serviceType);
-            final Object configuration = WSEngine.getInstance("WMS", service.getIdentifier()).getConfiguration();
+            final Object configuration = WSEngine.getInstance(serviceType, service.getIdentifier()).getConfiguration();
             serviceUtilities.get(type).configureInstance(instanceDirectory, configuration, service, serviceType);
         } else {
             throw new CstlServiceException("The " + serviceType + " service with identifier \"" +
