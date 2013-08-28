@@ -149,9 +149,7 @@ public final class MapServices extends Static {
                 throw new IOException("Metadata unmarshalling has failed.", ex);
             }
         }
-
-        throw new IllegalStateException("The service metadata file does not exist for the service with identifier \""
-                + directory.getName() + "\".");
+        return null;
     }
 
     /**

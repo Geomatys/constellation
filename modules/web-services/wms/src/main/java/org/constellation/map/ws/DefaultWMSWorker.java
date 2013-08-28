@@ -276,21 +276,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return (AbstractWMSCapabilities) cachedCapabilities;
         }
 
-        // Get service metadata.
-        final Service metadata;
-        try {
-            metadata = MapServices.readMetadata(getId(), "WMS");
-        } catch (IOException | ConfigurationException ex) {
-            throw new CstlServiceException("An error occurred while trying to read the service metadata.", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
-        }
-
-        // Ensure supported version.
-        if (!metadata.getVersions().contains(queryVersion)) {
-            throw new CstlServiceException("The version \"" + queryVersion + "\" is not enabled for this service.", OWSExceptionCode.NO_APPLICABLE_CODE);
-        }
-
-        // Create base capabilities from the service metadata.
-        final AbstractWMSCapabilities inCapabilities = WMSServices.createCapabilities(metadata, WMSVersion.getVersion(queryVersion));
+        final AbstractWMSCapabilities inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS", currentLanguage);
 
         final AbstractRequest request;
         final List<String> exceptionFormats;
