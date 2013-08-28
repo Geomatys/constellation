@@ -18,21 +18,16 @@ package org.constellation.ws.rs;
 
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
-import org.constellation.dto.AccessConstraint;
-import org.constellation.dto.AddLayer;
-import org.constellation.dto.Contact;
-import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.AddLayerToMapServiceDescriptor;
-import org.constellation.process.service.CreateMapServiceDescriptor;
-import org.constellation.process.service.SetConfigMapServiceDescriptor;
+import org.constellation.process.service.CreateServiceDescriptor;
+import org.constellation.process.service.SetConfigServiceDescriptor;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.LayerWorker;
+import org.constellation.ws.Worker;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.LayerWorker;
-import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -43,6 +38,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import org.constellation.dto.AddLayer;
+import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 
@@ -66,13 +63,13 @@ public class GridServiceConfiguration extends AbstractServiceConfiguration imple
                 if (instanceDirectory.listFiles().length == 0) {
                     //Create
                     try {
-                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
+                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
                         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
-                        inputs.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
-                        inputs.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue(configuration);
-                        inputs.parameter(CreateMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
-                        inputs.parameter(CreateMapServiceDescriptor.SERVICE_METADATA_NAME).setValue(capabilitiesConfiguration);
+                        inputs.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
+                        inputs.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+                        inputs.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(configuration);
+                        inputs.parameter(CreateServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+                        inputs.parameter(CreateServiceDescriptor.SERVICE_METADATA_NAME).setValue(capabilitiesConfiguration);
 
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();
@@ -85,13 +82,13 @@ public class GridServiceConfiguration extends AbstractServiceConfiguration imple
 
                     //Update
                     try {
-                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigMapServiceDescriptor.NAME);
+                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigServiceDescriptor.NAME);
                         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(SetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
-                        inputs.parameter(SetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
-                        inputs.parameter(SetConfigMapServiceDescriptor.CONFIG_NAME).setValue(configuration);
-                        inputs.parameter(SetConfigMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
-                        inputs.parameter(SetConfigMapServiceDescriptor.SERVICE_METADATA_NAME).setValue(capabilitiesConfiguration);
+                        inputs.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
+                        inputs.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+                        inputs.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(configuration);
+                        inputs.parameter(SetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+                        inputs.parameter(SetConfigServiceDescriptor.SERVICE_METADATA_NAME).setValue(capabilitiesConfiguration);
 
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();

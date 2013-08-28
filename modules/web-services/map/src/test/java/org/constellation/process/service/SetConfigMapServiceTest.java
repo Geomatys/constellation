@@ -16,14 +16,12 @@
  */
 package org.constellation.process.service;
 
-import org.constellation.process.service.SetConfigMapServiceDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.AbstractMapServiceTest;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -38,7 +36,7 @@ import org.opengis.util.NoSuchIdentifierException;
 public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
 
     public SetConfigMapServiceTest (final String serviceName, final Class workerClass) {
-        super(SetConfigMapServiceDescriptor.NAME,serviceName, workerClass);
+        super(SetConfigServiceDescriptor.NAME,serviceName, workerClass);
     }
 
     @Test
@@ -46,18 +44,21 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
 
         createInstance("updateInstance4", null);
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigMapServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigServiceDescriptor.NAME);
 
-        final List<Source> sources = new ArrayList<Source>();
+        final List<Source> sources = new ArrayList<>();
         sources.add(new Source("source1", Boolean.TRUE, null, null));
         final Layers layers = new Layers(sources);
         final LayerContext conf = new LayerContext(layers);
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(SetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(SetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue("updateInstance4");
-        in.parameter(SetConfigMapServiceDescriptor.CONFIG_NAME).setValue(conf);
+        in.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+        in.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue("updateInstance4");
+        in.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(conf);
+        in.parameter(SetConfigServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
+        in.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
+
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -71,18 +72,20 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
     public void testUpdateNoInstance() throws ProcessException, NoSuchIdentifierException {
 
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigMapServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigServiceDescriptor.NAME);
 
-        final List<Source> sources = new ArrayList<Source>();
+        final List<Source> sources = new ArrayList<>();
         sources.add(new Source("source1", Boolean.TRUE, null, null));
         final Layers layers = new Layers(sources);
         final LayerContext conf = new LayerContext(layers);
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(SetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(SetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance10");
-        in.parameter(SetConfigMapServiceDescriptor.CONFIG_NAME).setValue(conf);
+        in.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+        in.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue("instance10");
+        in.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(conf);
+        in.parameter(SetConfigServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
+        in.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);

@@ -18,35 +18,19 @@ package org.constellation.process.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.WMSPortrayal;
-import org.constellation.dto.AccessConstraint;
-import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import static org.constellation.process.service.CreateMapServiceDescriptor.*;
+import static org.constellation.process.service.CreateServiceDescriptor.*;
+import org.constellation.util.ReflectionUtilities;
 import static org.geotoolkit.parameter.Parameters.*;
-import org.constellation.ws.rs.MapServices;
+//import org.constellation.ws.rs.MapServices;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.wms.xml.WMSMarshallerPool;
-import org.geotoolkit.wms.xml.v111.ContactAddress;
-import org.geotoolkit.wms.xml.v111.ContactInformation;
-import org.geotoolkit.wms.xml.v111.ContactPersonPrimary;
-import org.geotoolkit.wms.xml.v111.Keyword;
-import org.geotoolkit.wms.xml.v111.KeywordList;
-import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
-import org.geotoolkit.wms.xml.v130.Capability;
-import org.geotoolkit.wms.xml.v130.WMSCapabilities;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -56,9 +40,9 @@ import org.opengis.parameter.ParameterValueGroup;
  * a configuration file already exist fo this instance name.
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateMapService extends AbstractProcess {
+public class CreateService extends AbstractProcess {
 
-    public CreateMapService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public CreateService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
@@ -74,15 +58,20 @@ public class CreateMapService extends AbstractProcess {
 
         String serviceName = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
-        LayerContext configuration = value(CONFIGURATION, inputParameters);
+        Object configuration = value(CONFIGURATION, inputParameters);
         File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
         Service serviceMetadata = value(SERVICE_METADATA, inputParameters);
+        final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
+        final String configFileName    = value(FILENAME, inputParameters);
 
-        if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName)
-                || "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName))) {
+        if (serviceName != null && !serviceName.isEmpty()
+        && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName) ||
+            "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName)  ||
+            "WPS".equalsIgnoreCase(serviceName) || "SOS".equalsIgnoreCase(serviceName)  ||
+            "CSW".equalsIgnoreCase(serviceName))) {
             serviceName = serviceName.toUpperCase();
         } else {
-            throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\").", this, null);
+            throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\", \"WPS\", \"CSW\", \"SOS\").", this, null);
         }
 
         if (identifier == null || identifier.isEmpty()) {
@@ -90,7 +79,7 @@ public class CreateMapService extends AbstractProcess {
         }
 
         if (configuration == null) {
-            configuration = new LayerContext();
+            configuration = ReflectionUtilities.newInstance(configurationClass);
         }
 
         //get config directory .constellation if null
@@ -119,8 +108,7 @@ public class CreateMapService extends AbstractProcess {
         File configurationFile = null;
         boolean createConfig = true;
         if (instanceDirectory.exists()) {
-            configurationFile = new File(instanceDirectory, "layerContext.xml");
-            final File portrayalFile = new File(instanceDirectory, "WMSPortrayal.xml");
+            configurationFile = new File(instanceDirectory, configFileName);
 
             //get configuration if aleady exist.
             if (configurationFile.exists()) {
@@ -129,27 +117,28 @@ public class CreateMapService extends AbstractProcess {
                     final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                     final Object obj = unmarshaller.unmarshal(configurationFile);
                     GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-                    if (obj instanceof LayerContext) {
-                        configuration = (LayerContext) obj;
+                    if (obj.getClass().isAssignableFrom(configurationClass)) {
+                        configuration = obj;
                     } else {
-                        throw new ProcessException("The layerContext.xml file does not contain a LayerContext object", this, null);
+                        throw new ProcessException("The " + configFileName + " file does not contain a " + configurationClass.getName() + " object", this, null);
                     }
                 } catch (JAXBException ex) {
                     throw new ProcessException(ex.getMessage(), this, ex);
                 }
             }
 
-            // Write the service metadata.
+            /* TODO RESTORE
+             * Write the service metadata.
             if (serviceMetadata != null) {
                 try {
                     MapServices.writeMetadata(instanceDirectory, serviceMetadata);
                 } catch (IOException ex) {
                     throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
                 }
-            }
+            }*/
 
         } else if (instanceDirectory.mkdir()) {
-            configurationFile = new File(instanceDirectory, "layerContext.xml");
+            configurationFile = new File(instanceDirectory, configFileName);
         } else {
             throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
         }

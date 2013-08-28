@@ -67,8 +67,8 @@ public class AddLayerToMapService extends AbstractProcess {
         final ProcessDescriptor setServiceConfProcess;
         final ProcessDescriptor restartServiceProcess;
         try {
-            getServiceConfProcess = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
-            setServiceConfProcess = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigMapServiceDescriptor.NAME);
+            getServiceConfProcess = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
+            setServiceConfProcess = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigServiceDescriptor.NAME);
             restartServiceProcess = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
         } catch (NoSuchIdentifierException ex) {
             throw new ProcessException("Can't find GetConfig or SetConfig process.", this, ex);
@@ -129,7 +129,7 @@ public class AddLayerToMapService extends AbstractProcess {
 
         //add style if exist
         if (layerStyleRef != null) {
-            final List<DataReference> styles = new ArrayList<DataReference>();
+            final List<DataReference> styles = new ArrayList<>();
             styles.add(layerStyleRef);
             newLayer.setStyles(styles);
         }
@@ -220,7 +220,7 @@ public class AddLayerToMapService extends AbstractProcess {
 
         } else {
             //create source with layer.
-            final List<Layer> includes = new ArrayList<Layer>();
+            final List<Layer> includes = new ArrayList<>();
             includes.add(newLayer);
             final Source newSource = new Source(providerID, false, includes, null);
             layerContext.getLayers().add(newSource);
@@ -270,10 +270,12 @@ public class AddLayerToMapService extends AbstractProcess {
     private LayerContext getServiceConfig(final String serviceType, final String serviceInstance, final ProcessDescriptor processDesc) throws ProcessException {
         if (SUPPORTED_SERVICE_TYPE.contains(serviceType)) {
             final ParameterValueGroup in = processDesc.getInputDescriptor().createValue();
-            in.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
-            in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue(serviceInstance);
+            in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
+            in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue(serviceInstance);
+            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
+            in.parameter(CreateServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
             final ParameterValueGroup out = processDesc.createProcess(in).call();
-            return Parameters.value(CreateMapServiceDescriptor.OUT_CONFIGURATION, out);
+            return Parameters.value(CreateServiceDescriptor.OUT_CONFIGURATION, out);
         } else {
             throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\").", this, null);
         }
@@ -291,9 +293,11 @@ public class AddLayerToMapService extends AbstractProcess {
 
         if (SUPPORTED_SERVICE_TYPE.contains(serviceType)) {
             final ParameterValueGroup in = processDesc.getInputDescriptor().createValue();
-            in.parameter(SetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
-            in.parameter(SetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue(serviceInstance);
-            in.parameter(SetConfigMapServiceDescriptor.CONFIG_NAME).setValue(context);
+            in.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
+            in.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(serviceInstance);
+            in.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(context);
+            in.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
+            in.parameter(SetConfigServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
             processDesc.createProcess(in).call();
         } else {
             throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\").", this, null);
