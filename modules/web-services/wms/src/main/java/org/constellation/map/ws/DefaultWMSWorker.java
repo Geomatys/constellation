@@ -367,9 +367,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 final PeriodUtilities periodFormatter = new PeriodUtilities(df);
                 final String defaut = df.format(dates.last());
-                dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-                    new org.geotoolkit.wms.xml.v111.Dimension("time", "ISO8601", defaut, null) :
-                    new org.geotoolkit.wms.xml.v130.Dimension("time", "ISO8601", defaut, null);
+                dim = createDimension(queryVersion, "time", "ISO8601", defaut, null);
                 dim.setValue(periodFormatter.getDatesRespresentation(dates));
                 dimensions.add(dim);
             }
@@ -386,9 +384,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
             if (elevations != null && !(elevations.isEmpty())) {
                 final String defaut = elevations.first().toString();
-                dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-                    new org.geotoolkit.wms.xml.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
-                    new org.geotoolkit.wms.xml.v130.Dimension("elevation", "EPSG:5030", defaut, null);
+                dim = createDimension(queryVersion, "elevation", "EPSG:5030", defaut, null);
                 final StringBuilder elevs = new StringBuilder();
                 for (final Iterator<Number> it = elevations.iterator(); it.hasNext();) {
                     final Number n = it.next();
@@ -423,11 +419,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     // Workaround for one more bug in javax.measure...
                     unitSymbol = unit;
                 }
-                dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-                    new org.geotoolkit.wms.xml.v111.Dimension(minRange + "," + maxRange, "dim_range", unit,
-                                                              unitSymbol, defaut, null, null, null) :
-                    new org.geotoolkit.wms.xml.v130.Dimension(minRange + "," + maxRange, "dim_range", unit,
-                                                              unitSymbol, defaut, null, null, null);
+                dim = createDimension(queryVersion, minRange + "," + maxRange, "dim_range", unit,unitSymbol, defaut, null, null, null);
                 dimensions.add(dim);
             }
 
@@ -486,10 +478,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         final String defaut = !valuesList.isEmpty() ? valuesList.getFirst() : null;
                         final boolean multipleValues = (valuesList.size() > 1);
 
-                        dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-                            new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName.getCode(), unit,
-                                unitSymbol, defaut, multipleValues, null, null) :
-                            new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName.getCode(), unit,
+                        dim = createDimension(queryVersion, values.toString(), axisName.getCode(), unit,
                                 unitSymbol, defaut, multipleValues, null, null);
 
                         dimensions.add(dim);
@@ -532,10 +521,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                             final String axisName = ddef.getCrs().getCoordinateSystem().getAxis(0).getName().getCode();
                             final String defaut = "";
 
-                            dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-                                new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName, unit,
-                                    unitSymbol, defaut, multipleValues, null, null) :
-                                new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName, unit,
+                            dim = createDimension(queryVersion, values.toString(), axisName, unit,
                                     unitSymbol, defaut, multipleValues, null, null);
 
                             dimensions.add(dim);
