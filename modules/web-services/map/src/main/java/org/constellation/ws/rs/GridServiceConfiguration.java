@@ -57,53 +57,6 @@ public class GridServiceConfiguration extends AbstractServiceConfiguration imple
     }
 
     @Override
-    public void configureInstance(File instanceDirectory, Object configuration, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
-        if (configuration instanceof LayerContext) {
-            if (instanceDirectory.isDirectory()) {
-                if (instanceDirectory.listFiles().length == 0) {
-                    //Create
-                    try {
-                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
-                        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
-                        inputs.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
-                        inputs.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(configuration);
-                        inputs.parameter(CreateServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
-                        inputs.parameter(CreateServiceDescriptor.SERVICE_METADATA_NAME).setValue(capabilitiesConfiguration);
-
-                        final org.geotoolkit.process.Process process = desc.createProcess(inputs);
-                        process.call();
-
-                    } catch (NoSuchIdentifierException | ProcessException ex) {
-                        throw new CstlServiceException(ex);
-                    }
-
-                } else {
-
-                    //Update
-                    try {
-                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigServiceDescriptor.NAME);
-                        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
-                        inputs.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
-                        inputs.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(configuration);
-                        inputs.parameter(SetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
-                        inputs.parameter(SetConfigServiceDescriptor.SERVICE_METADATA_NAME).setValue(capabilitiesConfiguration);
-
-                        final org.geotoolkit.process.Process process = desc.createProcess(inputs);
-                        process.call();
-
-                    } catch (NoSuchIdentifierException | ProcessException ex) {
-                        throw new CstlServiceException(ex);
-                    }
-                }
-            }
-        } else {
-            throw new CstlServiceException("The configuration Object is not an LayerContext object", INVALID_PARAMETER_VALUE);
-        }
-    }
-
-    @Override
     public void basicConfigure(final File instanceDirectory, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
         configureInstance(instanceDirectory, new LayerContext(), capabilitiesConfiguration, serviceType);
     }

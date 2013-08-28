@@ -29,6 +29,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.Layer;
+import org.constellation.configuration.LayerContext;
 
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.AddLayer;
@@ -36,7 +37,9 @@ import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.service.CreateServiceDescriptor;
 import org.constellation.process.service.GetConfigServiceDescriptor;
+import org.constellation.process.service.SetConfigServiceDescriptor;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
@@ -73,18 +76,53 @@ public abstract class AbstractServiceConfiguration implements ServiceConfigurati
     }
 
     @Override
-    public void configureInstance(final File instanceDirectory, final Object configuration, final Object capabilitiesConf, final String serviceType) throws CstlServiceException {
-        if (configuration.getClass().isAssignableFrom(configurationClass)) {
-            final File configurationFile = new File(instanceDirectory, configFileName);
-            try {
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+    public void configureInstance(File instanceDirectory, Object configuration, Object capabilitiesConfiguration, String serviceType) throws CstlServiceException {
+        if (configuration instanceof LayerContext) {
+            if (instanceDirectory.isDirectory()) {
+                if (instanceDirectory.listFiles().length == 0) {
+                    //Create
+                    try {
+                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
+                        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                        inputs.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
+                        inputs.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+                        inputs.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(configuration);
+                        inputs.parameter(CreateServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+                        inputs.parameter(CreateServiceDescriptor.SERVICE_METADATA_NAME).setValue(capabilitiesConfiguration);
+                        inputs.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configurationClass);
+                        inputs.parameter(CreateServiceDescriptor.FILENAME_NAME).setValue(configFileName);
+
+                        final org.geotoolkit.process.Process process = desc.createProcess(inputs);
+                        process.call();
+
+                    } catch (NoSuchIdentifierException | ProcessException ex) {
+                        throw new CstlServiceException(ex);
+                    }
+
+                } else {
+
+                    //Update
+                    try {
+                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigServiceDescriptor.NAME);
+                        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                        inputs.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
+                        inputs.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+                        inputs.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(configuration);
+                        inputs.parameter(SetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+                        inputs.parameter(SetConfigServiceDescriptor.SERVICE_METADATA_NAME).setValue(capabilitiesConfiguration);
+                        inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configurationClass);
+                        inputs.parameter(SetConfigServiceDescriptor.FILENAME_NAME).setValue(configFileName);
+
+                        final org.geotoolkit.process.Process process = desc.createProcess(inputs);
+                        process.call();
+
+                    } catch (NoSuchIdentifierException | ProcessException ex) {
+                        throw new CstlServiceException(ex);
+                    }
+                }
             }
         } else {
-            throw new CstlServiceException("The configuration object is not a: " + configurationClass.getName(), INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException("The configuration Object is not an LayerContext object", INVALID_PARAMETER_VALUE);
         }
     }
 
