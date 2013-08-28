@@ -1,6 +1,7 @@
 package org.constellation.ws.rest;
 
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
@@ -48,6 +49,20 @@ public class ServiceAdmin {
     }
 
     /**
+     * Service to get a service instance.
+     *
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @param id          the service identifier
+     * @return a {@link Response} with service status
+     */
+    @GET
+    @Path("{id}/instance")
+    public Response getInstance(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id) {
+        final Instance instance = serviceConfiguration.getInstance(serviceType, id);
+        return Response.ok(instance).build();
+    }
+
+    /**
      * Service to list service instance by type.
      *
      * @param serviceType a service type (WMS, WPS,...)
@@ -67,7 +82,7 @@ public class ServiceAdmin {
      * @param id          service identifier
      * @return a {@link Response} with server state
      */
-    @POST
+    @GET
     @Path("{id}/operation/stop")
     public Response stop(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id) {
         AcknowlegementType response = serviceConfiguration.stop(serviceType, id);
@@ -81,7 +96,7 @@ public class ServiceAdmin {
      * @param id          service identifier
      * @return a {@link Response} with server state
      */
-    @POST
+    @GET
     @Path("{id}/operation/start")
     public Response start(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id) {
         AcknowlegementType response = serviceConfiguration.start(serviceType, id);

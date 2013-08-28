@@ -66,6 +66,25 @@ public class OGCServiceConfiguration {
     }
 
     /**
+     * Determines and returns a service status.
+     *
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @param identifier  the service identifier
+     */
+    public Instance getInstance(final String serviceType, final String identifier) {
+        for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(serviceType)) {
+            if (entry.getKey().equals(identifier)) {
+                return new Instance(entry.getKey(), serviceType, entry.getValue() ? ServiceStatus.WORKING : ServiceStatus.ERROR);
+            }
+            final File instanceDirectory = new File(getServiceDirectory(serviceType), identifier);
+            if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
+                return new Instance(identifier, serviceType, ServiceStatus.NOT_STARTED);
+            }
+        }
+        return null;
+    }
+
+    /**
      * List all service instance by type
      *
      * @param serviceType service list type

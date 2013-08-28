@@ -1,6 +1,7 @@
 #{decorate path=menu.gtmpl/}
 
 #{param name=service/}
+#{param name=instance/}
 #{param name=layers/}
 #{param name=capabilitiesUrl/}
 

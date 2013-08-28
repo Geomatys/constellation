@@ -17,13 +17,11 @@
 
 package org.constellation.gui.service;
 
-import org.constellation.configuration.AcknowlegementType;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.LayerList;
-import org.constellation.dto.Service;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import org.constellation.ServiceDef.Specification;
 
 /**
  * Manager for WMS service operations.
@@ -41,69 +39,13 @@ public class WMSManager {
     private ConstellationService cstl;
 
     /**
-     * Loads a service metadata.
-     *
-     * @param serviceId   the service identifier
-     * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return the {@link Service} instance
-     */
-    public Service getServiceMetadata(final String serviceId, final Specification serviceType) throws IOException {
-        return cstl.openClient().services.getMetadata(serviceType, serviceId);
-    }
-
-    /**
-     * Configures an existing service metadata.
-     *
-     * @param metadata    the service metadata
-     * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return {@code true} on success, otherwise {@code false}
-     */
-    public boolean setServiceMetadata(final Service metadata, final Specification serviceType) throws IOException {
-        final AcknowlegementType response = cstl.openClient().services.setMetadata(serviceType, metadata);
-        return "success".equalsIgnoreCase(response.getStatus());
-    }
-
-    /**
      * Loads a service layer list.
      *
      * @param serviceId   the service identifier
-     * @param serviceType the service type (WMS, CSW, WPS...)
      * @return the {@link LayerList} instance
+     * @throws IOException on communication error with Constellation server
      */
-    public LayerList getLayers(final String serviceId, final String serviceType) {
-        return cstl.openServer().services.getLayers(serviceType, serviceId);
-    }
-
-    /**
-     * Restarts a service.
-     *
-     * @param serviceId   the service identifier
-     * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return {@code true} on success, otherwise {@code false}
-     */
-    public boolean restartService(final String serviceId, final String serviceType) {
-        return cstl.openServer(true).services.restartInstance(serviceType, serviceId);
-    }
-
-    /**
-     * Stops a service.
-     *
-     * @param serviceId   the service identifier
-     * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return {@code true} on success, otherwise {@code false}
-     */
-    public boolean stopService(final String serviceId, final String serviceType) {
-        return cstl.openServer(true).services.stopInstance(serviceType, serviceId);
-    }
-
-    /**
-     * Starts a service.
-     *
-     * @param serviceId   the service identifier
-     * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return {@code true} on success, otherwise {@code false}
-     */
-    public boolean startService(final String serviceId, final String serviceType) {
-        return cstl.openServer(true).services.startInstance(serviceType, serviceId);
+    public LayerList getLayers(final String serviceId) throws IOException {
+        return cstl.openClient().services.getLayers(Specification.WMS, serviceId);
     }
 }

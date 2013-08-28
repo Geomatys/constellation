@@ -21,25 +21,28 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
+import org.constellation.dto.Restart;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
-
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.ServiceDef;
-import org.constellation.ServiceDef.Specification;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
 
 /**
  * @author Bernard Fabien (Geomatys).
@@ -150,11 +153,12 @@ public final class ConstellationClient {
     public final class Services {
 
         /**
-         * Creates a new service instance on the Constellation server.
+         * Create a new service instance with the specified metadata on the Constellation
+         * server.
          *
          * @param serviceType the service type (WMS, CSW, WPS...)
          * @param metadata    the service metadata
-         * @return the status response
+         * @return an {@link AcknowlegementType} instance
          * @throws IOException on HTTP communication error or response entity parsing error
          */
         public AcknowlegementType newInstance(final Specification serviceType, final Service metadata) throws IOException {
@@ -164,11 +168,38 @@ public final class ConstellationClient {
         }
 
         /**
+         * Queries a service instance from the Constellation server.
+         *
+         * @param serviceType the service type (WMS, CSW, WPS...)
+         * @param identifier  the service identifier
+         * @return a {@link Instance} instance
+         * @throws IOException on HTTP communication error or response entity parsing error
+         */
+        public Instance getInstance(final Specification serviceType, final String identifier) throws IOException {
+            ensureNonNull("serviceType", serviceType);
+            ensureNonNull("identifier",  identifier);
+            return get(serviceType + "/" + identifier + "/instance", MediaType.APPLICATION_XML_TYPE).getEntity(Instance.class);
+        }
+
+        /**
+         * Queries the list of created services matching with the specified type (even if
+         * not running) from the Constellation server.
+         *
+         * @param serviceType the service type (WMS, CSW, WPS...)
+         * @return an {@link InstanceReport} instance
+         * @throws IOException on HTTP communication error or response entity parsing error
+         */
+        public InstanceReport getInstances(final Specification serviceType) throws IOException {
+            ensureNonNull("serviceType", serviceType);
+            return get(serviceType + "/instances", MediaType.APPLICATION_XML_TYPE).getEntity(InstanceReport.class);
+        }
+
+        /**
          * Queries a service metadata from the Constellation server.
          *
          * @param serviceType the service type (WMS, CSW, WPS...)
          * @param identifier  the service identifier
-         * @return the service metadata
+         * @return a {@link Service} instance
          * @throws IOException on HTTP communication error or response entity parsing error
          */
         public Service getMetadata(final Specification serviceType, final String identifier) throws IOException {
@@ -182,7 +213,7 @@ public final class ConstellationClient {
          *
          * @param serviceType the service type (WMS, CSW, WPS...)
          * @param metadata    the service metadata
-         * @return the status response
+         * @return an {@link AcknowlegementType} instance
          * @throws IOException on HTTP communication error or response entity parsing error
          */
         public AcknowlegementType setMetadata(final Specification serviceType, final Service metadata) throws IOException {
@@ -196,13 +227,56 @@ public final class ConstellationClient {
          *
          * @param serviceType the service type (WMS, CSW, WPS...)
          * @param identifier  the service identifier
-         * @return the layer list
+         * @return a {@link LayerList} instance
          * @throws IOException on HTTP communication error or response entity parsing error
          */
         public LayerList getLayers(final Specification serviceType, final String identifier) throws IOException {
             ensureNonNull("serviceType", serviceType);
             ensureNonNull("identifier",  identifier);
-            return get(serviceType + "/" + identifier + "/layers", MediaType.APPLICATION_XML_TYPE).getEntity(LayerList.class);
+            return (LayerList) get(serviceType + "/" + identifier + "/layers", MediaType.APPLICATION_XML_TYPE).getEntity(GenericDatabaseMarshallerPool.getInstance());
+        }
+
+        /**
+         * Starts a service on the Constellation server.
+         *
+         * @param serviceType the service type (WMS, CSW, WPS...)
+         * @param identifier  the service identifier
+         * @return an {@link AcknowlegementType} instance
+         * @throws IOException on HTTP communication error or response entity parsing error
+         */
+        public AcknowlegementType start(final Specification serviceType, final String identifier) throws IOException {
+            ensureNonNull("serviceType", serviceType);
+            ensureNonNull("identifier",  identifier);
+            return get(serviceType + "/" + identifier + "/operation/start", MediaType.APPLICATION_XML_TYPE).getEntity(AcknowlegementType.class);
+        }
+
+        /**
+         * Stops a service on the Constellation server.
+         *
+         * @param serviceType the service type (WMS, CSW, WPS...)
+         * @param identifier  the service identifier
+         * @return an {@link AcknowlegementType} instance
+         * @throws IOException on HTTP communication error or response entity parsing error
+         */
+        public AcknowlegementType stop(final Specification serviceType, final String identifier) throws IOException {
+            ensureNonNull("serviceType", serviceType);
+            ensureNonNull("identifier",  identifier);
+            return get(serviceType + "/" + identifier + "/operation/stop", MediaType.APPLICATION_XML_TYPE).getEntity(AcknowlegementType.class);
+        }
+
+        /**
+         * Restarts a service on the Constellation server.
+         *
+         * @param serviceType the service type (WMS, CSW, WPS...)
+         * @param identifier  the service identifier
+         * @param restart     the restart options
+         * @return an {@link AcknowlegementType} instance
+         * @throws IOException on HTTP communication error or response entity parsing error
+         */
+        public AcknowlegementType restart(final Specification serviceType, final String identifier, final Restart restart) throws IOException {
+            ensureNonNull("serviceType", serviceType);
+            ensureNonNull("identifier",  identifier);
+            return post(serviceType + "/" + identifier + "/operation/restart", MediaType.APPLICATION_XML_TYPE, restart).getEntity(AcknowlegementType.class);
         }
     }
 

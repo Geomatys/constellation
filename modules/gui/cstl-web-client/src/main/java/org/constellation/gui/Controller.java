@@ -29,21 +29,23 @@ import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
+import org.constellation.dto.DataInformation;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
 import org.constellation.gui.service.InstanceSummary;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.service.ServicesManager;
+import org.constellation.gui.service.WMSManager;
 import org.constellation.gui.service.bean.LayerData;
 import org.constellation.gui.templates.add_data_listing;
 import org.constellation.gui.templates.webservices;
 import org.constellation.gui.util.LayerComparator;
 import org.constellation.gui.util.LayerDataComparator;
-import org.constellation.dto.DataInformation;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -60,7 +62,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.ServiceDef.Specification;
 
 /**
  * Constellation web client main Juzu controller. Manage linkage with other controller and homepages
@@ -78,6 +79,9 @@ public class Controller {
      */
     @Inject
     protected ServicesManager servicesManager;
+
+    @Inject
+    protected WMSManager wmsManager;
 
     @Inject
     protected ProviderManager providerManager;
@@ -169,8 +173,7 @@ public class Controller {
      * @param v130 <code>null</code> if service will not have this version
      * @param keywords service keyword list
      * @return a {@link juzu.Response} to create view
-     *
-     * @throws java.io.IOException
+     * @throws IOException on communication error with Constellation server
      */
     @Action
     @Route("/wms/success")
@@ -227,12 +230,13 @@ public class Controller {
      * @param counter Element number by page
      * @param orderBy String to order by this attribute
      * @param filter String to filter list
+     * @throws IOException on communication error with Constellation server
      */
     @Ajax
     @Resource
     @Route("/datalist")
-    public void generateDataList(String serviceId, String startElement, String counter, String orderBy, String direction, String filter){
-        LayerList layers = servicesManager.getLayers(serviceId, "WMS");
+    public void generateDataList(String serviceId, String startElement, String counter, String orderBy, String direction, String filter) throws IOException {
+        LayerList layers = wmsManager.getLayers(serviceId);
         Map<String, Object> parameters = new HashMap<String, Object>(0);
         int nbByPage =  Integer.parseInt(counter);
 

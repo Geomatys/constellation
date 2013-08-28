@@ -112,10 +112,12 @@ public class ProviderManager {
                 if (type != null) {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY X");
                     Date createDate = new Date();
-                    try {
-                        createDate = dateFormat.parse(providerReport.getDate());
-                    } catch (ParseException e) {
-                        LOGGER.log(Level.WARNING, "", e);
+                    if (providerReport.getDate() != null) {
+                        try {
+                            createDate = dateFormat.parse(providerReport.getDate());
+                        } catch (ParseException e) {
+                            LOGGER.log(Level.WARNING, "", e);
+                        }
                     }
 
                     dateFormat = new SimpleDateFormat("dd-MM-YYYY", userLocale);

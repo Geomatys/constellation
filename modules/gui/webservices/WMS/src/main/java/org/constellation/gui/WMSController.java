@@ -24,14 +24,15 @@ import juzu.Route;
 import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
-
+import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.Instance;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.ConstellationService;
+import org.constellation.gui.service.ServicesManager;
 import org.constellation.gui.service.WMSManager;
-import org.constellation.ServiceDef.Specification;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -46,12 +47,14 @@ import java.util.Map;
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9
  * @since 0.9
- *
  */
 public class WMSController {
 
     @Inject
     private ConstellationService cstl;
+
+    @Inject
+    private ServicesManager servicesManager;
 
     @Inject
     private WMSManager wmsManager;
@@ -84,22 +87,26 @@ public class WMSController {
      *
      * @param serviceId the service identifier
      * @return the view {@link Response}
-     * @throws IOException on communication problem with Constellation server
+     * @throws IOException on communication error with Constellation server
      */
     @View
     @Route("edit/wms/{serviceId}")
     public Response editWMS(String serviceId) throws IOException {
-        Service service = wmsManager.getServiceMetadata(serviceId, Specification.WMS);
-        LayerList layers = wmsManager.getLayers(serviceId, "WMS");
+        final Service metadata   = servicesManager.getMetadata(serviceId, Specification.WMS);
+        final Instance instance  = servicesManager.getInstance(serviceId, Specification.WMS);
+        final LayerList layers   = wmsManager.getLayers(serviceId);
+
+        // Build service capabilities URL.
         String capabilitiesUrl = cstl.getUrl() + "WS/wms/" + serviceId +"?REQUEST=GetCapabilities&SERVICE=WMS";
-        if (service.getVersions().size() == 1) {
-            capabilitiesUrl += "&VERSION=" + service.getVersions().get(0);
+        if (metadata.getVersions().size() == 1) {
+            capabilitiesUrl += "&VERSION=" + metadata.getVersions().get(0);
         }
 
-        //use parameter map (not type safe technique) because we aren't on juzu projet => gtmpl aren't build.
-        Map<String, Object> parameters = new HashMap<String, Object>(0);
-        parameters.put("service", service);
+        //use parameter map (not type safe technique) because we aren't on juzu project => gtmpl aren't build.
+        final Map<String, Object> parameters = new HashMap<>(0);
+        parameters.put("service", metadata);
         parameters.put("layers", layers);
+        parameters.put("instance", instance);
         parameters.put("capabilitiesUrl", capabilitiesUrl);
         return serviceDescription.ok(parameters).withMimeType("text/html");
     }
@@ -109,12 +116,13 @@ public class WMSController {
      *
      * @param serviceId the service identifier
      * @return a status {@link Response}
+     * @throws IOException on communication error with Constellation server
      */
     @Ajax
     @Resource
     @Route("reload/wms")
-    public Response reloadWMS(final String serviceId) {
-        return wmsManager.restartService(serviceId, "WMS") ? Response.status(200) : Response.status(500);
+    public Response reloadWMS(final String serviceId) throws IOException {
+        return servicesManager.restartService(serviceId, Specification.WMS) ? Response.status(200) : Response.status(500);
     }
 
     /**
@@ -122,12 +130,13 @@ public class WMSController {
      *
      * @param serviceId the service identifier
      * @return a status {@link Response}
+     * @throws IOException on communication error with Constellation server
      */
     @Ajax
     @Resource
     @Route("stop/wms")
-    public Response stopWMS(final String serviceId) {
-        return wmsManager.stopService(serviceId, "WMS") ? Response.status(200) : Response.status(500);
+    public Response stopWMS(final String serviceId) throws IOException {
+        return servicesManager.stopService(serviceId, Specification.WMS) ? Response.status(200) : Response.status(500);
     }
 
     /**
@@ -135,12 +144,13 @@ public class WMSController {
      *
      * @param serviceId the service identifier
      * @return a status {@link Response}
+     * @throws IOException on communication error with Constellation server
      */
     @Ajax
     @Resource
     @Route("start/wms")
-    public Response startWMS(final String serviceId) {
-        return wmsManager.startService(serviceId, "WMS") ? Response.status(200) : Response.status(500);
+    public Response startWMS(final String serviceId) throws IOException {
+        return servicesManager.startService(serviceId, Specification.WMS) ? Response.status(200) : Response.status(500);
     }
 
     /**
@@ -153,14 +163,14 @@ public class WMSController {
      * @param v111        the (new) service v111 state
      * @param v130        the (new) service v130 state
      * @return a status {@link Response}
-     * @throws IOException on communication problem with Constellation server
+     * @throws IOException on communication error with Constellation server
      */
     @Ajax
     @Resource
     @Route("description/wms")
     public Response updateDescription(final String identifier, final String name, final String keywords,
             final String description, final String v111, final String v130) throws IOException {
-        final Service metadata = wmsManager.getServiceMetadata(identifier, Specification.WMS);
+        final Service metadata = servicesManager.getMetadata(identifier, Specification.WMS);
         metadata.setName(name);
         metadata.setKeywords(Arrays.asList(keywords.split(",")));
         metadata.setDescription(description);
@@ -168,7 +178,7 @@ public class WMSController {
         metadata.setVersions(new ArrayList<String>());
         if (v111 != null) metadata.getVersions().add(v111);
         if (v130 != null) metadata.getVersions().add(v130);
-        return wmsManager.setServiceMetadata(metadata, Specification.WMS) ? Response.status(200) : Response.status(500);
+        return servicesManager.setMetadata(metadata, Specification.WMS) ? Response.status(200) : Response.status(500);
     }
 
     /**
@@ -178,15 +188,15 @@ public class WMSController {
      * @param contact     the service contact
      * @param constraint  the service constraint
      * @return a status {@link Response}
-     * @throws IOException on communication problem with Constellation server
+     * @throws IOException on communication error with Constellation server
      */
     @Ajax
     @Resource
     @Route("metadata/wms")
     public Response updateMetadata(final String identifier, final Contact contact, final AccessConstraint constraint) throws IOException {
-        final Service metadata = wmsManager.getServiceMetadata(identifier, Specification.WMS);
+        final Service metadata = servicesManager.getMetadata(identifier, Specification.WMS);
         metadata.setServiceContact(contact);
         metadata.setServiceConstraints(constraint);
-        return wmsManager.setServiceMetadata(metadata, Specification.WMS) ? Response.status(200) : Response.status(500);
+        return servicesManager.setMetadata(metadata, Specification.WMS) ? Response.status(200) : Response.status(500);
     }
 }

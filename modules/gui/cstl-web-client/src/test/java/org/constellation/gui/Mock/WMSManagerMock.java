@@ -23,21 +23,10 @@ public class WMSManagerMock extends WMSManager{
 
     /**
      * @param serviceName
-     * @param serviceType
      * @return
      */
     @Override
-    public Service getServiceMetadata(String serviceName, Specification serviceType) {
-        return new Service();
-    }
-
-    /**
-     * @param serviceName
-     * @param serviceType
-     * @return
-     */
-    @Override
-    public LayerList getLayers(String serviceName, String serviceType) {
+    public LayerList getLayers(String serviceName) {
         return new LayerList(new ArrayList<Layer>(0));
     }
 }

@@ -16,13 +16,14 @@
  */
 package org.constellation.gui.service;
 
+import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.LayerList;
+import org.constellation.dto.DataInformation;
+import org.constellation.dto.Restart;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
-import org.constellation.dto.DataInformation;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -31,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.ServiceDef.Specification;
 
 /**
  * Juzu service to call constellation services server side
@@ -51,7 +51,7 @@ public class  ServicesManager {
     private ConstellationService cstl;
 
     /**
-     * Creates a new service instance with specified {@link Service} metadata.
+     * Creates a new service instance with specified {@link org.constellation.dto.Service} metadata.
      *
      * @param metadata    the service metadata
      * @param serviceType the service type (WMS, CSW, WPS...)
@@ -60,6 +60,79 @@ public class  ServicesManager {
      */
     public boolean createServices(final Service metadata, final Specification serviceType) throws IOException {
         final AcknowlegementType response = cstl.openClient().services.newInstance(serviceType, metadata);
+        return "success".equalsIgnoreCase(response.getStatus());
+    }
+
+    /**
+     * Loads a service metadata.
+     *
+     * @param serviceId   the service identifier
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return the {@link org.constellation.dto.Service} instance
+     */
+    public Service getMetadata(final String serviceId, final Specification serviceType) throws IOException {
+        return cstl.openClient().services.getMetadata(serviceType, serviceId);
+    }
+
+    /**
+     * Configures an existing service metadata.
+     *
+     * @param metadata    the service metadata
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return {@code true} on success, otherwise {@code false}
+     */
+    public boolean setMetadata(final Service metadata, final Specification serviceType) throws IOException {
+        final AcknowlegementType response = cstl.openClient().services.setMetadata(serviceType, metadata);
+        return "success".equalsIgnoreCase(response.getStatus());
+    }
+
+    /**
+     * Gets and returns a service {@link Instance}.
+     *
+     * @param serviceId   the service identifier
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return an {@link Instance} instance
+     */
+    public Instance getInstance(final String serviceId, final Specification serviceType) throws IOException {
+        return cstl.openClient().services.getInstance(serviceType, serviceId);
+    }
+
+    /**
+     * Restarts a service.
+     *
+     * @param serviceId   the service identifier
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return {@code true} on success, otherwise {@code false}
+     */
+    public boolean restartService(final String serviceId, final Specification serviceType) throws IOException {
+        final Restart restart = new Restart();
+        restart.setForced(true);
+        restart.setCloseFirst(true);
+        final AcknowlegementType response = cstl.openClient().services.restart(serviceType, serviceId, restart);
+        return "success".equalsIgnoreCase(response.getStatus());
+    }
+
+    /**
+     * Stops a service.
+     *
+     * @param serviceId   the service identifier
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return {@code true} on success, otherwise {@code false}
+     */
+    public boolean stopService(final String serviceId, final Specification serviceType) throws IOException {
+        final AcknowlegementType response = cstl.openClient().services.stop(serviceType, serviceId);
+        return "success".equalsIgnoreCase(response.getStatus());
+    }
+
+    /**
+     * Starts a service.
+     *
+     * @param serviceId   the service identifier
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return {@code true} on success, otherwise {@code false}
+     */
+    public boolean startService(final String serviceId, final Specification serviceType) throws IOException {
+        final AcknowlegementType response = cstl.openClient().services.start(serviceType, serviceId);
         return "success".equalsIgnoreCase(response.getStatus());
     }
 
@@ -88,10 +161,6 @@ public class  ServicesManager {
         }
 
         return instancesSummary;
-    }
-
-    public LayerList getLayers(final String serviceName, final String serviceType){
-        return cstl.openServer().services.getLayers(serviceType, serviceName);
     }
 
     public DataInformation uploadToServer(File newFile, String name, String dataType) {
