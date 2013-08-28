@@ -21,11 +21,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import javax.swing.ImageIcon;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -129,9 +126,19 @@ public class JProviderEditPane extends javax.swing.JPanel {
         final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("",
                 ICON_DELETE, Color.WHITE, fontNormal, Color.DARK_GRAY));
 
+        final List<DataBrief> layers = providerReport.getItems();
+
+        Collections.sort(layers, new Comparator<DataBrief>() {
+            @Override
+            public int compare(DataBrief o1, DataBrief o2) {
+                String l1 = o1.getName();
+                String l2 = o2.getName();
+                return l1.toLowerCase().compareTo(l2.toLowerCase());
+            }
+        });
 
         final List<String> itemNames = new ArrayList<>(0);
-        for (DataBrief dataBrief : providerReport.getItems()) {
+        for (DataBrief dataBrief : layers) {
             itemNames.add(dataBrief.getName());
         }
 
