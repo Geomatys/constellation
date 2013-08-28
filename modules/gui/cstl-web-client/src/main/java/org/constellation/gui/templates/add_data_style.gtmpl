@@ -8,19 +8,15 @@
         <div class="navbar-inner">
             <ul class="nav">
                 <li><a href="#" data-order-by="title">&{layer.listing.orderby.title}<i class="icon-caret" style="display:none;"></i></a></li>
-                <li class="divider-vertical"></li>
                 <li><a href="#" data-order-by="date">&{layer.listing.orderby.date}<i class="icon-caret" style="display:none;"></i></a></li>
-                <li class="divider-vertical"></li>
                 <li><a href="#" data-order-by="owner">&{layer.listing.orderby.owner}<i class="icon-caret" style="display:none;"></i></a></li>
-                <li class="divider-vertical"></li>
                 <li><a href="#" data-order-by="type">&{layer.listing.orderby.type}<i class="icon-caret" style="display:none;"></i></a></li>
-                <li class="divider-vertical"></li>
             </ul>
             <form class="navbar-form pull-left">
                 <button type="button" data-name="resetFilters" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
             </form>
             <form class="navbar-form pull-right">
-                <input type="text" data-name="searchFilter" class="search-query" placeholder="Filtrer" />
+                <input type="text" data-name="searchFilter" class="search-query span1" placeholder="Filtrer" />
             </form>
         </div>
     </div>

@@ -141,7 +141,7 @@ public class ProviderManager {
         try {
             cstl.openClient().providers.addLayer(toAddLayer);
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "oups...", e);
+            LOGGER.log(Level.WARNING, "Error when try to add layer on service", e);
         }
     }
 }

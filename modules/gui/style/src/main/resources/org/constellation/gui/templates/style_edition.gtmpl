@@ -46,7 +46,7 @@
 
         <div class="footer-actions">
             <a href="#" onclick="CSTL.STYLE.Workflow.previous();return false;" class="btn">&{edition.style.label.cancel}</a>
-            <a href="#" onclick="CSTL.STYLE.Workflow.validate();return false;" class="btn btn-primary">&{edition.style.label.validate}</a>
+            <a href="#" onclick="CSTL.STYLE.Workflow.validate();return false;" class="btn btn-info">&{edition.style.label.validate}</a>
         </div>
 
         <% if (styleName != null) { %>

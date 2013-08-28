@@ -34,6 +34,16 @@ CSTL = {
      */
     $dictionary: null,
 
+    URL_VECTEUR_PICTURE:"url(../../images/vecteur.png)",
+    URL_VECTEUR_SELECTED_PICTURE:"url(../../images/vecteur-selected.png)",
+    URL_RASTER_PICTURE:"url(../../images/raster.png)",
+    URL_RASTER_SELECTED_PICTURE:"url(../../images/raster-selected.png)",
+    URL_SENSOR_PICTURE:"url(../../images/raster.png)",
+    URL_SENSOR_SELECTED_PICTURE:"url(../../images/sensor-selected.png)",
+    URL_STYLE_PICTURE:"url(../../images/style.png)",
+    URL_STYLE_SELECTED_PICTURE:"url(../../images/style-selected.png)",
+
+
     /**
      * Looks up a key from a dictionary based on the current language string.
      *
@@ -91,4 +101,6 @@ CSTL = {
         }
         return null;
     }
+
+
 };

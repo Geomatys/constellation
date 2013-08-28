@@ -239,9 +239,9 @@ public class ServiceAdmin {
     public Response addLayer(final @PathParam("serviceType") String serviceType, final @PathParam("id") String id, final AddLayer addedLayer){
         boolean created = serviceConfiguration.addLayer(serviceType, id, addedLayer);
         if(created){
-            return Response.ok(new Boolean(true)).build();
+            return Response.ok("true").build();
         }else{
-            return Response.ok(new Boolean(false)).build();
+            return Response.ok("false").build();
         }
     }
 

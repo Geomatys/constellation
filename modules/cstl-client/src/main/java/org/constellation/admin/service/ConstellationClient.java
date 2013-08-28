@@ -295,9 +295,9 @@ public final class ConstellationClient {
             return get("style", MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
         }
 
-        public Boolean addLayer(AddLayer toAddLayer) throws IOException {
+        public String addLayer(AddLayer toAddLayer) throws IOException {
             Response response = post(toAddLayer.getServiceType() + "/" + toAddLayer.getServiceId() + "/layer", MediaType.APPLICATION_XML_TYPE, toAddLayer);
-            return response.getEntity(Boolean.class);
+            return response.getEntity(String.class);
         }
     }
 

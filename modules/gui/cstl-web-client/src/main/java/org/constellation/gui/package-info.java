@@ -74,7 +74,6 @@
                 @Script(id = "upload", src = "js/bootstrap-fileupload.js", depends = "bootstrap", location = AssetLocation.SERVER),
                 @Script(id = "openlayers", src = "js/openlayers.js", depends = "jquery", location = AssetLocation.SERVER),
                 @Script(id = "openlayers-ext", src = "js/openlayers-ext.js", depends = "openlayers", location = AssetLocation.SERVER),
-                @Script(id = "service", src = "js/services.js", depends = "jquery", location = AssetLocation.SERVER),
                 @Script(id = "wmsedition", src = "js/wmsedition.js", depends = "jquery", location = AssetLocation.SERVER),
 
                 // Constellation commons
