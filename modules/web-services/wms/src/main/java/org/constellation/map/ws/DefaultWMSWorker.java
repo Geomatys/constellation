@@ -276,7 +276,13 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return (AbstractWMSCapabilities) cachedCapabilities;
         }
 
-        final AbstractWMSCapabilities inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS", currentLanguage);
+        final AbstractWMSCapabilities inCapabilities;
+        final Object skeleton = getStaticCapabilitiesObject(queryVersion, "WMS", requestedLanguage);
+        if (skeleton instanceof Service) {
+            inCapabilities = WMSServices.createCapabilities((Service) skeleton, WMSVersion.getVersion(queryVersion));
+        } else {
+            inCapabilities = (AbstractWMSCapabilities) skeleton;
+        }
 
         final AbstractRequest request;
         final List<String> exceptionFormats;
