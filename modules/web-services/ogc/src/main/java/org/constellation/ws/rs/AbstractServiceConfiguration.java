@@ -34,10 +34,17 @@ import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.service.GetConfigServiceDescriptor;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  *
@@ -82,24 +89,25 @@ public abstract class AbstractServiceConfiguration implements ServiceConfigurati
 
     @Override
     public Object getInstanceConfiguration(File instanceDirectory, String serviceType) throws CstlServiceException {
-        final File configurationFile = new File(instanceDirectory, configFileName);
-        if (configurationFile.exists()) {
-            try {
-                final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-                if (obj.getClass().isAssignableFrom(configurationClass)) {
-                    return obj;
-                } else {
-                    throw new CstlServiceException("The configuration file does not contain a: " + configurationClass.getName());
-                }
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex);
-            }
-        } else {
-            throw new CstlServiceException("Unable to find a file: " + configFileName);
+        try {
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigServiceDescriptor.NAME);
+
+            ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(GetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
+            in.parameter(GetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+            in.parameter(GetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+            in.parameter(GetConfigServiceDescriptor.FILENAME_NAME).setValue(configFileName);
+
+            final org.geotoolkit.process.Process proc = desc.createProcess(in);
+            final ParameterValueGroup ouptuts = proc.call();
+
+            return ouptuts.parameter(GetConfigServiceDescriptor.CONFIG_NAME).getValue();
+
+        } catch (NoSuchIdentifierException | ProcessException ex) {
+            throw new CstlServiceException(ex);
         }
     }
+
 
     
     @Override
