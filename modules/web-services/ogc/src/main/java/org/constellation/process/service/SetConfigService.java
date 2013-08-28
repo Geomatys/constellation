@@ -31,6 +31,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
 import static org.constellation.process.service.SetConfigServiceDescriptor.*;
 import org.constellation.util.ReflectionUtilities;
+import org.constellation.utils.MetadataUtilities;
 
 /**
  *
@@ -115,15 +116,15 @@ public class SetConfigService extends AbstractProcess {
                 throw new ProcessException(ex.getMessage(), this, ex);
             }
 
-            /* TODO RESTORE
-             * Override the service metadata.
+            
+            // Override the service metadata.
             if (serviceMetadata != null) {
                 try {
-                    MapServices.writeMetadata(instanceDirectory, serviceMetadata);
+                    MetadataUtilities.writeMetadata(instanceDirectory, serviceMetadata);
                 } catch (IOException ex) {
                     throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
                 }
-            }*/
+            }
 
         } else {
             throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);

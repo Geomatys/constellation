@@ -26,6 +26,7 @@ import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.process.service.CreateServiceDescriptor.*;
 import org.constellation.util.ReflectionUtilities;
+import org.constellation.utils.MetadataUtilities;
 import static org.geotoolkit.parameter.Parameters.*;
 //import org.constellation.ws.rs.MapServices;
 import org.geotoolkit.process.AbstractProcess;
@@ -127,15 +128,14 @@ public class CreateService extends AbstractProcess {
                 }
             }
 
-            /* TODO RESTORE
-             * Write the service metadata.
+            // Write the service metadata.
             if (serviceMetadata != null) {
                 try {
-                    MapServices.writeMetadata(instanceDirectory, serviceMetadata);
+                    MetadataUtilities.writeMetadata(instanceDirectory, serviceMetadata);
                 } catch (IOException ex) {
                     throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
                 }
-            }*/
+            }
 
         } else if (instanceDirectory.mkdir()) {
             configurationFile = new File(instanceDirectory, configFileName);
