@@ -109,9 +109,8 @@ public class CSWService extends OGCWebService<CSWworker> {
      * Build a new Restful CSW service.
      */
     public CSWService() {
-        super(Specification.CSW);
+        super(Specification.CSW, new CSWServiceConfiguration(null));
         setXMLContext(EBRIMMarshallerPool.getInstance());
-        utils.getServiceUtilities().put(Specification.CSW, new CSWServiceConfiguration(getWorkerClass()));
         LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
@@ -319,7 +318,7 @@ public class CSWService extends OGCWebService<CSWworker> {
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
         final String section = getParameter(SECTIONS_PARAMETER, false);
-        List<String> requestedSections = new ArrayList<String>();
+        List<String> requestedSections = new ArrayList<>();
         if (section != null && !section.equalsIgnoreCase("All")) {
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
             while (tokens.hasMoreTokens()) {
@@ -411,7 +410,7 @@ public class CSWService extends OGCWebService<CSWworker> {
         }
 
         final String names          = getParameter("TYPENAMES", true);
-        final List<QName> typeNames = new ArrayList<QName>();
+        final List<QName> typeNames = new ArrayList<>();
         StringTokenizer tokens = new StringTokenizer(names, ",;");
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
@@ -441,7 +440,7 @@ public class CSWService extends OGCWebService<CSWworker> {
 
         //we get the list of sort by object
         final String sort                  = getParameter("SORTBY", false);
-        final List<SortPropertyType> sorts = new ArrayList<SortPropertyType>();
+        final List<SortPropertyType> sorts = new ArrayList<>();
         SortByType sortBy = null;
         if (sort != null) {
             tokens = new StringTokenizer(sort, ",;");
@@ -560,7 +559,7 @@ public class CSWService extends OGCWebService<CSWworker> {
         }
 
         final String ids             = getParameter("ID", true);
-        final List<String> id        = new ArrayList<String>();
+        final List<String> id        = new ArrayList<>();
         final StringTokenizer tokens = new StringTokenizer(ids, ",;");
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
@@ -599,7 +598,7 @@ public class CSWService extends OGCWebService<CSWworker> {
             namespaces.put("gmd", Namespaces.GMD);
         }
 
-        final List<QName> typeNames  = new ArrayList<QName>();
+        final List<QName> typeNames  = new ArrayList<>();
         final String names           = getParameter("TYPENAME", false);
         if (names != null) {
             final StringTokenizer tokens = new StringTokenizer(names, ",;");

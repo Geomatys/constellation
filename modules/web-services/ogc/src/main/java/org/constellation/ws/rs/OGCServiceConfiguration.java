@@ -126,7 +126,7 @@ public class OGCServiceConfiguration {
     public InstanceReport listInstance() {
         LOGGER.finer("listing all instance");
         Set<String> serviceTypes =  WSEngine.getRegisteredServices().keySet();
-        List<Instance> instanceReports = new ArrayList<Instance>(0);
+        List<Instance> instanceReports = new ArrayList<>(0);
 
         //  loop on all service type which exist on server
         for (String serviceType : serviceTypes) {

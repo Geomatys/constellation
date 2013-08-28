@@ -94,9 +94,8 @@ public class SOService extends OGCWebService<SOSworker> {
      * Build a new Restfull SOS service.
      */
     public SOService() throws CstlServiceException {
-        super(Specification.SOS);
+        super(Specification.SOS, new SOSServiceConfiguration(null));
         setXMLContext(SOSMarshallerPool.getInstance());
-        utils.getServiceUtilities().put(Specification.SOS, new SOSServiceConfiguration(getWorkerClass()));
         LOGGER.log(Level.INFO, "SOS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
@@ -315,7 +314,7 @@ public class SOService extends OGCWebService<SOSworker> {
         }
         worker.checkVersionSupported(currentVersion, true);
 
-        final List<String> versions = new ArrayList<String>();
+        final List<String> versions = new ArrayList<>();
         if (version != null) {
             String[] vArray = version.split(",");
             versions.addAll(Arrays.asList(vArray));
@@ -337,7 +336,7 @@ public class SOService extends OGCWebService<SOSworker> {
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
         final String section = getParameter(SECTIONS_PARAMETER, false);
-        List<String> requestedSections = new ArrayList<String>();
+        List<String> requestedSections = new ArrayList<>();
         if (section != null && !section.equalsIgnoreCase("All")) {
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
             while (tokens.hasMoreTokens()) {
@@ -432,21 +431,21 @@ public class SOService extends OGCWebService<SOSworker> {
             if (obpList != null) {
                 observedProperties = StringUtilities.toStringList(obpList);
             } else {
-                observedProperties = new ArrayList<String>();
+                observedProperties = new ArrayList<>();
             }
             final String prList = getParameter(PROCEDURE, false);
             final List<String> procedures;
             if (prList != null) {
                 procedures = StringUtilities.toStringList(prList);
             } else {
-                procedures = new ArrayList<String>();
+                procedures = new ArrayList<>();
             }
             final String foList = getParameter(FEATURE_OF_INTEREST, false);
             final List<String> foids;
             if (foList != null) {
                 foids = StringUtilities.toStringList(foList);
             } else {
-                foids = new ArrayList<String>();
+                foids = new ArrayList<>();
             }
             final String bboxStr = getParameter("spatialFilter", false);
             final Filter spatialFilter;
@@ -506,7 +505,7 @@ public class SOService extends OGCWebService<SOSworker> {
             if (foList != null) {
                 foids = StringUtilities.toStringList(foList);
             } else {
-                foids = new ArrayList<String>();
+                foids = new ArrayList<>();
             }
             final String bboxStr = getParameter("spatialFilter", false);
             final Filter spatialFilter;
@@ -516,7 +515,7 @@ public class SOService extends OGCWebService<SOSworker> {
                 spatialFilter = null;
             }
             final String tempStr = getParameter("temporalFilter", false);
-            final List<Filter> temporalFilters = new ArrayList<Filter>();
+            final List<Filter> temporalFilters = new ArrayList<>();
             if (tempStr != null) {
                 temporalFilters.add(parseTemporalFilter(tempStr));
             }
@@ -624,28 +623,28 @@ public class SOService extends OGCWebService<SOSworker> {
             if (offList != null) {
                 offering = StringUtilities.toStringList(offList);
             } else {
-                offering = new ArrayList<String>();
+                offering = new ArrayList<>();
             }
             final String obpList = getParameter(OBSERVED_PROPERTY, false);
             final List<String> observedProperties;
             if (obpList != null) {
                 observedProperties = StringUtilities.toStringList(obpList);
             } else {
-                observedProperties = new ArrayList<String>();
+                observedProperties = new ArrayList<>();
             }
             final String prList = getParameter(PROCEDURE, false);
             final List<String> procedures;
             if (prList != null) {
                 procedures = StringUtilities.toStringList(prList);
             } else {
-                procedures = new ArrayList<String>();
+                procedures = new ArrayList<>();
             }
             final String foList = getParameter(FEATURE_OF_INTEREST, false);
             final List<String> foids;
             if (foList != null) {
                 foids = StringUtilities.toStringList(foList);
             } else {
-                foids = new ArrayList<String>();
+                foids = new ArrayList<>();
             }
             final String responseFormat = getParameter(RESPONSE_FORMAT, false);
             final String bboxStr = getParameter("spatialFilter", false);
@@ -656,7 +655,7 @@ public class SOService extends OGCWebService<SOSworker> {
                 spatialFilter = null;
             }
             final String tempStr = getParameter("temporalFilter", false);
-            final List<Filter> temporalFilters = new ArrayList<Filter>();
+            final List<Filter> temporalFilters = new ArrayList<>();
             if (tempStr != null) {
                 temporalFilters.add(parseTemporalFilter(tempStr));
             }

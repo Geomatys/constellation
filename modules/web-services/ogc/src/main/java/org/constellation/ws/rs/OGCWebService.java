@@ -27,8 +27,6 @@ import net.iharder.Base64;
 
 // Jersey dependencies
 import javax.annotation.PreDestroy;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
 
@@ -53,7 +51,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.security.SecurityManager;
 import org.constellation.ws.Worker;
-import org.constellation.dto.Service;
+import org.constellation.ServiceDef.Specification;
 
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.OWSExceptionCode;
@@ -111,12 +109,15 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * Initialize the basic attributes of a web serviceType.
      *
      */
-    public OGCWebService(final ServiceDef.Specification specification) {
+    public OGCWebService(final Specification specification, final ServiceConfiguration servConfig) {
         super();
         if (specification == null){
             throw new IllegalArgumentException("It is compulsory for a web service to have a specification.");
         }
         utils = new OGCServiceConfiguration();
+        servConfig.setWorkerClass(getWorkerClass());
+        utils.getServiceUtilities().put(specification, servConfig);
+        
         serviceName = specification.name();
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
         WSEngine.registerService(serviceName, "REST", getWorkerClass());
@@ -189,7 +190,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
             return worker.getRequestValidationSchema();
         }
-        return new ArrayList<Schema>();
+        return new ArrayList<>();
     }
     /**
      * {@inheritDoc}

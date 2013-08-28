@@ -75,7 +75,7 @@ public final class Normalizer {
      * @return a normalized document
      */
     private static Capabilities normalizeDocumentv100(final org.geotoolkit.sos.xml.v100.Capabilities capa){
-        final List<PhenomenonProperty> alreadySee = new ArrayList<PhenomenonProperty>();
+        final List<PhenomenonProperty> alreadySee = new ArrayList<>();
         if (capa.getContents() != null) {
             for (ObservationOfferingType off: capa.getContents().getObservationOfferingList().getObservationOffering()) {
                 for (PhenomenonProperty pheno: off.getRealObservedProperty()) {
@@ -109,7 +109,7 @@ public final class Normalizer {
      */
     public static ObservationCollection regroupObservation(final String version, final Envelope bounds, final ObservationCollection collection){
         final List<Observation> members = collection.getMember();
-        final Map<String, Observation> merged = new HashMap<String, Observation>();
+        final Map<String, Observation> merged = new HashMap<>();
         for (Observation obs : members) {
             final Process process = (Process) obs.getProcedure();
             if (merged.containsKey(process.getHref())) {
@@ -176,7 +176,7 @@ public final class Normalizer {
             }
         }
 
-        final List<Observation> obervations = new ArrayList<Observation>();
+        final List<Observation> obervations = new ArrayList<>();
         for (Observation entry: merged.values()) {
             obervations.add(entry);
         }
@@ -196,10 +196,10 @@ public final class Normalizer {
             return SOSXmlFactory.buildObservationCollection(version, "urn:ogc:def:nil:OGC:inapplicable");
         }
 
-        final List<FeatureProperty>          foiAlreadySee   = new ArrayList<FeatureProperty> ();
-        final List<PhenomenonProperty>       phenoAlreadySee = new ArrayList<PhenomenonProperty>();
-        final List<AbstractEncodingProperty> encAlreadySee   = new ArrayList<AbstractEncodingProperty>();
-        final List<DataComponentProperty>    dataAlreadySee  = new ArrayList<DataComponentProperty>();
+        final List<FeatureProperty>          foiAlreadySee   = new ArrayList<>();
+        final List<PhenomenonProperty>       phenoAlreadySee = new ArrayList<>();
+        final List<AbstractEncodingProperty> encAlreadySee   = new ArrayList<>();
+        final List<DataComponentProperty>    dataAlreadySee  = new ArrayList<>();
         for (Observation observation: collection.getMember()) {
             //we do this for the feature of interest
             final FeatureProperty foi =  getPropertyFeatureOfInterest(observation);

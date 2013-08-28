@@ -18,7 +18,6 @@ package org.constellation.ws.rs;
 
 import org.constellation.configuration.Layer;
 import org.constellation.dto.AddLayer;
-import org.constellation.dto.Service;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
@@ -41,6 +40,8 @@ public interface ServiceConfiguration {
      * @return a {@link org.constellation.ws.Worker} implementation {@link Class}
      */
     public Class getWorkerClass();
+
+    public void setWorkerClass(final Class c);
 
     /**
      * Create a new File containing the specific object sent.

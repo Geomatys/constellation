@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.sis.util.logging.Logging;
@@ -35,7 +34,6 @@ import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.AddLayer;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.CreateServiceDescriptor;
 import org.constellation.process.service.GetConfigServiceDescriptor;
@@ -58,7 +56,7 @@ public abstract class AbstractServiceConfiguration implements ServiceConfigurati
 
     protected static final Logger LOGGER = Logging.getLogger(AbstractServiceConfiguration.class);
 
-    private final Class workerClass;
+    private Class workerClass;
 
     private final Class configurationClass;
 
@@ -73,6 +71,11 @@ public abstract class AbstractServiceConfiguration implements ServiceConfigurati
     @Override
     public Class getWorkerClass() {
         return workerClass;
+    }
+
+    @Override
+    public void setWorkerClass(final Class c) {
+        this.workerClass = c;
     }
 
     @Override

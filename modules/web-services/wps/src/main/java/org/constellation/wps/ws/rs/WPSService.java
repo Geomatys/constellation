@@ -22,12 +22,21 @@ import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.ws.Worker;
+
+import static org.constellation.api.QueryConstants.*;
+import static org.constellation.wps.ws.WPSConstant.*;
+
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -38,14 +47,6 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
-import org.constellation.ServiceDef.Specification;
-import org.constellation.ws.Worker;
-
-import static org.constellation.api.QueryConstants.*;
-import static org.constellation.wps.ws.WPSConstant.*;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.ows.xml.RequestBase;
 
 /**
  * WPS web service class.
@@ -68,12 +69,11 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * Build a new instance of the webService and initialize the JAXB context.
      */
     public WPSService() {
-        super(Specification.WPS);
+        super(Specification.WPS, new WPSServiceConfiguration(null));
 
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WPSMarshallerPool.getInstance());
-        utils.getServiceUtilities().put(Specification.WPS, new WPSServiceConfiguration(getWorkerClass()));
         LOGGER.log(Level.INFO, "WPS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
@@ -324,7 +324,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         //extract input data from dataInputs String
         Map<String, Map> inputMap = extractDataFromKvpString(dataInputs);
 
-        final List<InputType> inputList = new ArrayList<InputType>();
+        final List<InputType> inputList = new ArrayList<>();
 
         //Each input
         for (Map.Entry<String, Map> oneInput : inputMap.entrySet()) {
@@ -456,12 +456,12 @@ public class WPSService extends OGCWebService<WPSWorker> {
     private static Map extractDataFromKvpString(final String inputString) throws CstlServiceException {
 
         final String[] allInputs = inputString.split(";");
-        Map<String, Map> inputMap = new HashMap<String, Map>();
+        Map<String, Map> inputMap = new HashMap<>();
         for (String input : allInputs) {
             final String[] attribs = input.split("@");
             final String inputIdent = attribs[0].split("=")[0];
 
-            final Map<String, String> attributsMap = new HashMap<String, String>();
+            final Map<String, String> attributsMap = new HashMap<>();
             for (String attribut : attribs) {
                 String[] splitAttribute = attribut.split("=");
 
