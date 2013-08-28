@@ -37,12 +37,15 @@ import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.provider.featurestore.FeatureStoreProviderService;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.data.shapefile.ShapefileFolderFeatureStoreFactory;
 import org.geotoolkit.parameter.Parameters;
 
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -50,6 +53,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class AdminRequestTest extends AbstractGrizzlyServer {
 
     /**
@@ -136,6 +140,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=1)
     public void testNewInstance() throws Exception {
 
         waitForStart();
@@ -169,7 +174,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof InstanceReport);
 
-        List<Instance> instances = new ArrayList<Instance>();
+        List<Instance> instances = new ArrayList<>();
         instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
         instances.add(new Instance("wms1", "WMS", ServiceStatus.WORKING));
         instances.add(new Instance("wms2", "WMS", ServiceStatus.NOT_STARTED));
@@ -192,6 +197,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=2)
     public void testStartInstance() throws Exception {
 
         /*
@@ -223,7 +229,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof InstanceReport);
 
-        List<Instance> instances = new ArrayList<Instance>();
+        List<Instance> instances = new ArrayList<>();
         instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
         instances.add(new Instance("wms1", "WMS", ServiceStatus.WORKING));
         instances.add(new Instance("wms2", "WMS", ServiceStatus.WORKING));
@@ -233,6 +239,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=3)
     public void testConfigureInstance() throws Exception {
 
         /*
@@ -243,7 +250,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         // for a POST request
         URLConnection conec = niUrl.openConnection();
-        List<Source> sources = new ArrayList<Source>();
+        List<Source> sources = new ArrayList<>();
         sources.add(new Source("coverageTestSrc", true, null, null));
         sources.add(new Source("shapeSrc", true, null, null));
         Layers layerObj = new Layers(sources);
@@ -286,6 +293,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=4)
     public void testStopInstance() throws Exception {
         /*
          * we stop the instance created at the previous test
@@ -316,7 +324,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof InstanceReport);
 
-        List<Instance> instances = new ArrayList<Instance>();
+        List<Instance> instances = new ArrayList<>();
         instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
         instances.add(new Instance("wms1", "WMS", ServiceStatus.WORKING));
         instances.add(new Instance("wms2", "WMS", ServiceStatus.NOT_STARTED));
@@ -325,6 +333,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=5)
     public void testDeleteInstance() throws Exception {
         /*
          * we stop the instance created at the previous test
@@ -355,7 +364,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof InstanceReport);
 
-        List<Instance> instances = new ArrayList<Instance>();
+        List<Instance> instances = new ArrayList<>();
         instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
         instances.add(new Instance("wms1", "WMS", ServiceStatus.WORKING));
         InstanceReport expResult2 = new InstanceReport(instances);

@@ -19,8 +19,6 @@ package org.constellation.ws.rs;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.CreateServiceDescriptor;
-import org.constellation.process.service.SetConfigServiceDescriptor;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.Worker;
@@ -41,8 +39,6 @@ import java.util.logging.Level;
 import org.constellation.dto.AddLayer;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-
 /**
  * WMS, WMTS, WFS and WCS {@link org.constellation.ws.rs.ServiceConfiguration} implementation
  *
@@ -53,7 +49,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 public class GridServiceConfiguration extends AbstractServiceConfiguration implements ServiceConfiguration {
 
     public GridServiceConfiguration(final Class workerClass) {
-        super(workerClass, null, null);
+        super(workerClass, LayerContext.class, "layerContext.xml");
     }
 
     @Override
