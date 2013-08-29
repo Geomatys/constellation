@@ -23,40 +23,56 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.xml.namespace.QName;
 import net.jcip.annotations.Immutable;
+
+import org.constellation.dto.Service;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
+
 import org.geotoolkit.ogc.xml.v110.ArithmeticOperatorsType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorsType;
 import org.geotoolkit.ogc.xml.v110.FilterCapabilities;
-import org.geotoolkit.ogc.xml.v110.GeometryOperandsType;
 import org.geotoolkit.ogc.xml.v110.IdCapabilitiesType;
 import org.geotoolkit.ogc.xml.v110.ScalarCapabilitiesType;
-import org.geotoolkit.ogc.xml.v110.SpatialCapabilitiesType;
-import org.geotoolkit.ogc.xml.v110.SpatialOperatorType;
-import org.geotoolkit.ogc.xml.v110.SpatialOperatorsType;
 import org.geotoolkit.ogc.xml.v200.ConformanceType;
 import org.geotoolkit.ogc.xml.v200.FilterType;
 import org.geotoolkit.ogc.xml.v200.LiteralType;
 import org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v200.ResourceIdentifierType;
+import org.geotoolkit.ogc.xml.FilterXmlFactory;
 import org.geotoolkit.ows.xml.AbstractDomain;
 import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.ows.xml.AbstractContact;
+import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.v100.DCP;
 import org.geotoolkit.ows.xml.v100.DomainType;
 import org.geotoolkit.ows.xml.v100.HTTP;
-import org.geotoolkit.ows.xml.v100.Operation;
 import org.geotoolkit.ows.xml.v100.RequestMethodType;
 import org.geotoolkit.ows.xml.v110.AllowedValues;
 import org.geotoolkit.ows.xml.v110.NoValues;
 import org.geotoolkit.ows.xml.v110.ValueType;
+import org.geotoolkit.wfs.xml.WFSVersion;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
 import org.geotoolkit.wfs.xml.v200.ParameterExpressionType;
 import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
 import org.geotoolkit.wfs.xml.v200.QueryType;
 import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
+import org.geotoolkit.wfs.xml.WFSCapabilities;
+import org.geotoolkit.wfs.xml.WFSXmlFactory;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
+
+import org.opengis.filter.capability.GeometryOperand;
 import org.opengis.filter.capability.Operator;
+import org.opengis.filter.capability.SpatialCapabilities;
 import org.opengis.filter.capability.SpatialOperator;
+import org.opengis.filter.capability.SpatialOperators;
 
 /**
  *  WFS Constants
@@ -95,26 +111,26 @@ public final class WFSConstants {
 
     public static final FilterCapabilities FILTER_CAPABILITIES_V110;
     static {
-        final List<QName> operandList = new ArrayList<QName>();
-        operandList.add(new QName("http://www.opengis.net/gml", "Envelope"));
-        operandList.add(new QName("http://www.opengis.net/gml", "Point"));
-        operandList.add(new QName("http://www.opengis.net/gml", "LineString"));
-        operandList.add(new QName("http://www.opengis.net/gml", "Polygon"));
-        final GeometryOperandsType operands = new GeometryOperandsType(operandList);
+        final GeometryOperand[] geometryOperands = new GeometryOperand[4];
+        geometryOperands[0] = GeometryOperand.Envelope;
+        geometryOperands[1] = GeometryOperand.Point;
+        geometryOperands[2] = GeometryOperand.LineString;
+        geometryOperands[3] = GeometryOperand.Polygon;
+        
         final SpatialOperator[] operatorList = new SpatialOperator[10];
-        operatorList[0] = new SpatialOperatorType("DISJOINT", null);
-        operatorList[1] = new SpatialOperatorType("EQUALS", null);
-        operatorList[2] = new SpatialOperatorType("D_WITHIN", null);
-        operatorList[3] = new SpatialOperatorType("BEYOND", null);
-        operatorList[4] = new SpatialOperatorType("INTERSECTS", null);
-        operatorList[5] = new SpatialOperatorType("TOUCHES", null);
-        operatorList[6] = new SpatialOperatorType("CROSSES", null);
-        operatorList[7] = new SpatialOperatorType("CONTAINS", null);
-        operatorList[8] = new SpatialOperatorType("OVERLAPS", null);
-        operatorList[9] = new SpatialOperatorType("BBOX", null);
+        operatorList[0] = FilterXmlFactory.buildSpatialOperator("1.1.0", "DISJOINT", null);
+        operatorList[1] = FilterXmlFactory.buildSpatialOperator("1.1.0", "EQUALS", null);
+        operatorList[2] = FilterXmlFactory.buildSpatialOperator("1.1.0", "D_WITHIN", null);
+        operatorList[3] = FilterXmlFactory.buildSpatialOperator("1.1.0", "BEYOND", null);
+        operatorList[4] = FilterXmlFactory.buildSpatialOperator("1.1.0", "INTERSECTS", null);
+        operatorList[5] = FilterXmlFactory.buildSpatialOperator("1.1.0", "TOUCHES", null);
+        operatorList[6] = FilterXmlFactory.buildSpatialOperator("1.1.0", "CROSSES", null);
+        operatorList[7] = FilterXmlFactory.buildSpatialOperator("1.1.0", "CONTAINS", null);
+        operatorList[8] = FilterXmlFactory.buildSpatialOperator("1.1.0", "OVERLAPS", null);
+        operatorList[9] = FilterXmlFactory.buildSpatialOperator("1.1.0", "BBOX", null);
 
-        final SpatialOperatorsType spatialOperators = new SpatialOperatorsType(operatorList);
-        final SpatialCapabilitiesType spatialCapabilties = new SpatialCapabilitiesType(operands, spatialOperators);
+        final SpatialOperators spatialOperators = FilterXmlFactory.buildSpatialOperators("1.1.0", operatorList);
+        final SpatialCapabilities spatialCapabilties = FilterXmlFactory.buildSpatialCapabilities("1.1.0", geometryOperands, spatialOperators);
 
         final ArithmeticOperatorsType arithmetic = new ArithmeticOperatorsType(true, null);
         final Operator[] compaOperatorList = new Operator[9];
@@ -139,26 +155,26 @@ public final class WFSConstants {
 
     public static final org.geotoolkit.ogc.xml.v200.FilterCapabilities FILTER_CAPABILITIES_V200;
     static {
-        final List<QName> operandList = new ArrayList<QName>();
-        operandList.add(new QName("http://www.opengis.net/gml/3.2", "Envelope"));
-        operandList.add(new QName("http://www.opengis.net/gml/3.2", "Point"));
-        operandList.add(new QName("http://www.opengis.net/gml/3.2", "LineString"));
-        operandList.add(new QName("http://www.opengis.net/gml/3.2", "Polygon"));
-        final org.geotoolkit.ogc.xml.v200.GeometryOperandsType operands = new org.geotoolkit.ogc.xml.v200.GeometryOperandsType(operandList);
-        final SpatialOperator[] operatorList = new SpatialOperator[10];
-        operatorList[0] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Disjoint", null);
-        operatorList[1] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Equals", null);
-        operatorList[2] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("DWithin", null);
-        operatorList[3] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Beyond", null);
-        operatorList[4] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Intersects", null);
-        operatorList[5] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Touches", null);
-        operatorList[6] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Crosses", null);
-        operatorList[7] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Contains", null);
-        operatorList[8] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("Overlaps", null);
-        operatorList[9] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("BBOX", null);
+        final GeometryOperand[] geometryOperands = new GeometryOperand[4];
+        geometryOperands[0] = GeometryOperand.Envelope;
+        geometryOperands[1] = GeometryOperand.Point;
+        geometryOperands[2] = GeometryOperand.LineString;
+        geometryOperands[3] = GeometryOperand.Polygon;
 
-        final org.geotoolkit.ogc.xml.v200.SpatialOperatorsType spatialOperators = new org.geotoolkit.ogc.xml.v200.SpatialOperatorsType(operatorList);
-        final org.geotoolkit.ogc.xml.v200.SpatialCapabilitiesType spatialCapabilties = new org.geotoolkit.ogc.xml.v200.SpatialCapabilitiesType(operands, spatialOperators);
+        final SpatialOperator[] operatorList = new SpatialOperator[10];
+        operatorList[0] = FilterXmlFactory.buildSpatialOperator("2.0.0", "Disjoint", null);
+        operatorList[1] = FilterXmlFactory.buildSpatialOperator("2.0.0", "Equals", null);
+        operatorList[2] = FilterXmlFactory.buildSpatialOperator("2.0.0", "DWithin", null);
+        operatorList[3] = FilterXmlFactory.buildSpatialOperator("2.0.0", "Beyond", null);
+        operatorList[4] = FilterXmlFactory.buildSpatialOperator("2.0.0", "Intersects", null);
+        operatorList[5] = FilterXmlFactory.buildSpatialOperator("2.0.0", "Touches", null);
+        operatorList[6] = FilterXmlFactory.buildSpatialOperator("2.0.0", "Crosses", null);
+        operatorList[7] = FilterXmlFactory.buildSpatialOperator("2.0.0", "Contains", null);
+        operatorList[8] = FilterXmlFactory.buildSpatialOperator("2.0.0", "Overlaps", null);
+        operatorList[9] = FilterXmlFactory.buildSpatialOperator("2.0.0", "BBOX", null);
+
+        final SpatialOperators spatialOperators = FilterXmlFactory.buildSpatialOperators("2.0.0", operatorList);
+        final SpatialCapabilities spatialCapabilties = FilterXmlFactory.buildSpatialCapabilities("2.0.0", geometryOperands, spatialOperators);
 
         final Operator[] compaOperatorList = new Operator[9];
         compaOperatorList[0] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsBetween");
@@ -177,7 +193,7 @@ public final class WFSConstants {
         final ResourceIdentifierType iden = new ResourceIdentifierType(new QName("http://www.opengis.net/fes/2.0", "ResourceId"));
         final org.geotoolkit.ogc.xml.v200.IdCapabilitiesType idCapabilities = new org.geotoolkit.ogc.xml.v200.IdCapabilitiesType(iden);
         
-        final List<org.geotoolkit.ows.xml.v110.DomainType> constraints = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<org.geotoolkit.ows.xml.v110.DomainType> constraints = new ArrayList<>();
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsQuery",             new NoValues(), new ValueType("TRUE")));
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsAdHocQuery",        new NoValues(), new ValueType("TRUE")));
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsFunctions",         new NoValues(), new ValueType("FALSE")));
@@ -198,46 +214,46 @@ public final class WFSConstants {
 
     public static final AbstractOperationsMetadata OPERATIONS_METADATA_V110;
     static {
-        final List<DCP> dcps = new ArrayList<DCP>();
+        final List<AbstractDCP> dcps = new ArrayList<>();
         dcps.add(new DCP(new HTTP(new RequestMethodType("somURL"), new RequestMethodType("someURL"))));
 
-        final List<DCP> dcps2 = new ArrayList<DCP>();
+        final List<AbstractDCP> dcps2 = new ArrayList<>();
         dcps2.add(new DCP(new HTTP(null, new RequestMethodType("someURL"))));
 
-        final List<AbstractOperation> operations = new ArrayList<AbstractOperation>();
+        final List<AbstractOperation> operations = new ArrayList<>();
 
-        final List<DomainType> gcParameters = new ArrayList<DomainType>();
+        final List<AbstractDomain> gcParameters = new ArrayList<>();
         gcParameters.add(new DomainType("AcceptVersions", "1.1.0"));
         gcParameters.add(new DomainType("AcceptFormats", "text/xml"));
         gcParameters.add(new DomainType("Service", "WFS"));
-        Operation getCapabilities = new Operation(dcps, gcParameters, null, null, "GetCapabilities");
+        AbstractOperation getCapabilities = WFSXmlFactory.buildOperation("1.1.0", dcps, gcParameters, null, "GetCapabilities");
         operations.add(getCapabilities);
 
-        final List<DomainType> dfParameters = new ArrayList<DomainType>();
+        final List<AbstractDomain> dfParameters = new ArrayList<>();
         dfParameters.add(new DomainType("outputFormat", "text/xml; subtype=gml/3.1.1"));
         dfParameters.add(new DomainType("Service", "WFS"));
         dfParameters.add(new DomainType("Version", "1.1.0"));
-        Operation describeFeatureType = new Operation(dcps, dfParameters, null, null, "DescribeFeatureType");
+        AbstractOperation describeFeatureType = WFSXmlFactory.buildOperation("1.1.0", dcps, dfParameters, null, "DescribeFeatureType");
         operations.add(describeFeatureType);
 
-        final List<DomainType> gfParameters = new ArrayList<DomainType>();
+        final List<AbstractDomain> gfParameters = new ArrayList<>();
         gfParameters.add(new DomainType("resultType", Arrays.asList("results","hits")));
         gfParameters.add(new DomainType("outputFormat", "text/xml; subtype=gml/3.1.1"));
         gfParameters.add(new DomainType("Service", "WFS"));
         gfParameters.add(new DomainType("Version", "1.1.0"));
 
-        final List<DomainType> gfConstraints = new ArrayList<DomainType>();
+        final List<AbstractDomain> gfConstraints = new ArrayList<>();
         gfConstraints.add(new DomainType("LocalTraverseXLinkScope", "2")); // ???
-        Operation getFeature = new Operation(dcps, gfParameters, gfConstraints, null, "GetFeature");
+        AbstractOperation getFeature = WFSXmlFactory.buildOperation("1.1.0", dcps, gfParameters, gfConstraints, "GetFeature");
         operations.add(getFeature);
 
-        final List<DomainType> tParameters = new ArrayList<DomainType>();
+        final List<AbstractDomain> tParameters = new ArrayList<>();
         tParameters.add(new DomainType("inputFormat", "text/xml; subtype=gml/3.1.1"));
         tParameters.add(new DomainType("idgen", Arrays.asList("GenerateNew","UseExisting","ReplaceDuplicate")));
         tParameters.add(new DomainType("releaseAction", Arrays.asList("ALL", "SOME")));
         tParameters.add(new DomainType("Service", "WFS"));
         tParameters.add(new DomainType("Version", "1.1.0"));
-        Operation Transaction = new Operation(dcps2, tParameters, null, null, "Transaction");
+        AbstractOperation Transaction = WFSXmlFactory.buildOperation("1.1.0", dcps2, tParameters, null, "Transaction");
         operations.add(Transaction);
 
 
@@ -246,86 +262,86 @@ public final class WFSConstants {
 
     public static final AbstractOperationsMetadata OPERATIONS_METADATA_V200;
     static {
-        final List<org.geotoolkit.ows.xml.v110.DCP> dcps = new ArrayList<org.geotoolkit.ows.xml.v110.DCP>();
+        final List<AbstractDCP> dcps = new ArrayList<>();
         dcps.add(new org.geotoolkit.ows.xml.v110.DCP(new org.geotoolkit.ows.xml.v110.HTTP(new org.geotoolkit.ows.xml.v110.RequestMethodType("somURL"),
                                                                                           new org.geotoolkit.ows.xml.v110.RequestMethodType("someURL"))));
 
-        final List<org.geotoolkit.ows.xml.v110.DCP> dcps2 = new ArrayList<org.geotoolkit.ows.xml.v110.DCP>();
+        final List<AbstractDCP> dcps2 = new ArrayList<>();
         dcps2.add(new org.geotoolkit.ows.xml.v110.DCP(new org.geotoolkit.ows.xml.v110.HTTP(null, new org.geotoolkit.ows.xml.v110.RequestMethodType("someURL"))));
 
-        final List<AbstractOperation> operations = new ArrayList<AbstractOperation>();
+        final List<AbstractOperation> operations = new ArrayList<>();
 
         final org.geotoolkit.ows.xml.v110.DomainType serviceDomain = new org.geotoolkit.ows.xml.v110.DomainType("Service", "WFS");
         final org.geotoolkit.ows.xml.v110.DomainType versionDomain = new org.geotoolkit.ows.xml.v110.DomainType("Version", "2.0.0");
         
-        final List<org.geotoolkit.ows.xml.v110.DomainType> gcParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<AbstractDomain> gcParameters = new ArrayList<>();
         gcParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("AcceptVersions", new AllowedValues(Arrays.asList("2.0.0", "1.1.0"))));
         gcParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("AcceptFormats", "text/xml"));
         gcParameters.add(serviceDomain);
-        org.geotoolkit.ows.xml.v110.Operation getCapabilities = new org.geotoolkit.ows.xml.v110.Operation(dcps, gcParameters, null, null, "GetCapabilities");
+        AbstractOperation getCapabilities = WFSXmlFactory.buildOperation("2.0.0", dcps, gcParameters, null, "GetCapabilities");
         operations.add(getCapabilities);
 
-        final List<org.geotoolkit.ows.xml.v110.DomainType> dfParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<AbstractDomain> dfParameters = new ArrayList<>();
         dfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("outputFormat", "application/gml+xml; version=3.2"));
         dfParameters.add(serviceDomain);
         dfParameters.add(versionDomain);
-        org.geotoolkit.ows.xml.v110.Operation describeFeatureType = new org.geotoolkit.ows.xml.v110.Operation(dcps, dfParameters, null, null, "DescribeFeatureType");
+        AbstractOperation describeFeatureType = WFSXmlFactory.buildOperation("2.0.0", dcps, dfParameters, null, "DescribeFeatureType");
         operations.add(describeFeatureType);
 
-        final List<org.geotoolkit.ows.xml.v110.DomainType> gfParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<AbstractDomain> gfParameters = new ArrayList<>();
         gfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("resultType", new AllowedValues(Arrays.asList("results","hits"))));
         gfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("outputFormat", "application/gml+xml; version=3.2"));
         gfParameters.add(serviceDomain);
         gfParameters.add(versionDomain);
 
-        final List<org.geotoolkit.ows.xml.v110.DomainType> gfConstraints = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<AbstractDomain> gfConstraints = new ArrayList<>();
         gfConstraints.add(new org.geotoolkit.ows.xml.v110.DomainType("LocalTraverseXLinkScope", new AllowedValues(Arrays.asList("2")))); // ???
-        org.geotoolkit.ows.xml.v110.Operation getFeature = new org.geotoolkit.ows.xml.v110.Operation(dcps, gfParameters, gfConstraints, null, "GetFeature");
+        AbstractOperation getFeature =  WFSXmlFactory.buildOperation("2.0.0", dcps, gfParameters, gfConstraints, "GetFeature");
         operations.add(getFeature);
 
-        final List<org.geotoolkit.ows.xml.v110.DomainType> tParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<AbstractDomain> tParameters = new ArrayList<>();
         tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("inputFormat", "application/gml+xml; version=3.2"));
         tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("idgen", new AllowedValues(Arrays.asList("GenerateNew","UseExisting","ReplaceDuplicate"))));
         tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("releaseAction", new AllowedValues(Arrays.asList("ALL", "SOME"))));
         tParameters.add(serviceDomain);
         tParameters.add(versionDomain);
-        org.geotoolkit.ows.xml.v110.Operation Transaction = new org.geotoolkit.ows.xml.v110.Operation(dcps2, tParameters, null, null, "Transaction");
+        AbstractOperation Transaction =  WFSXmlFactory.buildOperation("2.0.0", dcps2, tParameters, null, "Transaction");
         operations.add(Transaction);
         
-        final List<org.geotoolkit.ows.xml.v110.DomainType> lsqParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<AbstractDomain> lsqParameters = new ArrayList<>();
         lsqParameters.add(serviceDomain);
         lsqParameters.add(versionDomain);
-        org.geotoolkit.ows.xml.v110.Operation listStoredQueries = new org.geotoolkit.ows.xml.v110.Operation(dcps, lsqParameters, null, null, "ListStoredQueries");
+        AbstractOperation listStoredQueries =  WFSXmlFactory.buildOperation("2.0.0", dcps, lsqParameters, null, "ListStoredQueries");
         operations.add(listStoredQueries);
         
-        final List<org.geotoolkit.ows.xml.v110.DomainType> dsqParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<AbstractDomain> dsqParameters = new ArrayList<>();
         dsqParameters.add(serviceDomain);
         dsqParameters.add(versionDomain);
-        org.geotoolkit.ows.xml.v110.Operation describeStoredQueries = new org.geotoolkit.ows.xml.v110.Operation(dcps, dsqParameters, null, null, "DescribeStoredQueries");
+        AbstractOperation describeStoredQueries =  WFSXmlFactory.buildOperation("2.0.0", dcps, dsqParameters, null, "DescribeStoredQueries");
         operations.add(describeStoredQueries);
         
-        final List<org.geotoolkit.ows.xml.v110.DomainType> gpvParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<AbstractDomain> gpvParameters = new ArrayList<>();
         gpvParameters.add(serviceDomain);
         gpvParameters.add(versionDomain);
-        org.geotoolkit.ows.xml.v110.Operation getPropertyValue = new org.geotoolkit.ows.xml.v110.Operation(dcps, gpvParameters, null, null, "GetPropertyValue");
+        AbstractOperation getPropertyValue =  WFSXmlFactory.buildOperation("2.0.0", dcps, gpvParameters, null, "GetPropertyValue");
         operations.add(getPropertyValue);
         
-        final List<org.geotoolkit.ows.xml.v110.DomainType> csqParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<AbstractDomain> csqParameters = new ArrayList<>();
         csqParameters.add(serviceDomain);
         csqParameters.add(versionDomain);
-        org.geotoolkit.ows.xml.v110.Operation createStoredQuery = new org.geotoolkit.ows.xml.v110.Operation(dcps, csqParameters, null, null, "CreateStoredQuery");
+        AbstractOperation createStoredQuery =  WFSXmlFactory.buildOperation("2.0.0", dcps, csqParameters, null, "CreateStoredQuery");
         operations.add(createStoredQuery);
         
-        final List<org.geotoolkit.ows.xml.v110.DomainType> dsqParameters2 = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        final List<AbstractDomain> dsqParameters2 = new ArrayList<>();
         dsqParameters2.add(serviceDomain);
         dsqParameters2.add(versionDomain);
-        org.geotoolkit.ows.xml.v110.Operation dropStoredQuery = new org.geotoolkit.ows.xml.v110.Operation(dcps, dsqParameters2, null, null, "DropStoredQuery");
+        AbstractOperation dropStoredQuery =  WFSXmlFactory.buildOperation("2.0.0", dcps, dsqParameters2, null, "DropStoredQuery");
         operations.add(dropStoredQuery);
 
-        final List<AbstractDomain> parameters = new ArrayList<AbstractDomain>();
+        final List<AbstractDomain> parameters = new ArrayList<>();
         parameters.add(new org.geotoolkit.ows.xml.v110.DomainType("version", new AllowedValues(Arrays.asList("2.0.0"))));
         
-        final List<AbstractDomain> constraints = new ArrayList<AbstractDomain>();
+        final List<AbstractDomain> constraints = new ArrayList<>();
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsSimpleWFS",         new NoValues(), new ValueType("TRUE")));
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsBasicWFS",          new NoValues(), new ValueType("TRUE")));
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsTransactionalWFS",  new NoValues(), new ValueType("TRUE")));
@@ -363,5 +379,42 @@ public final class WFSConstants {
         final ObjectFactory factory = new ObjectFactory();
         queryEx.getContent().add(factory.createQuery(query));
         IDENTIFIER_STORED_QUERY = new StoredQueryDescriptionType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
+    }
+
+    /**
+     * Generates the base capabilities for a WMS from the service metadata.
+     *
+     * @param metadata the service metadata
+     * @return the service base capabilities
+     */
+    public static WFSCapabilities createCapabilities(final String version, final Service metadata) {
+        ensureNonNull("metadata", metadata);
+        ensureNonNull("version",  version);
+
+        final Contact currentContact = metadata.getServiceContact();
+        final AccessConstraint constraint = metadata.getServiceConstraints();
+
+        final AbstractServiceIdentification servIdent = WFSXmlFactory.buildServiceIdentification(version,
+                                                                                                 metadata.getName(),
+                                                                                                 metadata.getDescription(),
+                                                                                                 metadata.getKeywords(),
+                                                                                                 "WFS",
+                                                                                                 metadata.getVersions(),
+                                                                                                 constraint.getFees(),
+                                                                                                 Arrays.asList(constraint.getAccessConstraint()));
+
+        // Create provider part.
+        final AbstractContact contact = WFSXmlFactory.buildContact(version, currentContact.getPhone(), currentContact.getFax(),
+                currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
+                currentContact.getZipCode(), currentContact.getCountry());
+
+        final AbstractResponsiblePartySubset responsible = WFSXmlFactory.buildResponsiblePartySubset(version, currentContact.getFullname(), currentContact.getPosition(), contact, null);
+
+
+         final AbstractServiceProvider servProv = WFSXmlFactory.buildServiceProvider(version, currentContact.getOrganisation(), null, responsible);
+
+
+        // Create capabilities base.
+        return WFSXmlFactory.buildWFSCapabilities(version, servIdent, servProv, null, null, null);
     }
 }

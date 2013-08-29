@@ -14,7 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.ws.rs;
 
 import java.util.ArrayList;
@@ -41,13 +40,13 @@ import org.opengis.feature.type.Name;
  */
 public class MapUtilities {
 
-    private static Logger LOGGER = Logging.getLogger(MapUtilities.class);
+    private static final Logger LOGGER = Logging.getLogger(MapUtilities.class);
 
     public static List<Layer> getConfigurationLayers(final LayerContext layerContext, final LayerSecurityFilter securityFilter, final String login) {
         if (layerContext == null) {
             return new ArrayList<>();
         }
-        final LayerProviderProxy namedProxy  = LayerProviderProxy.getInstance();
+        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
         final List<Layer> layers = new ArrayList<>();
         /*
          * For each source declared in the layer context we search for layers informations.
@@ -55,7 +54,7 @@ public class MapUtilities {
         for (final Source source : layerContext.getLayers()) {
             final String sourceID = source.getId();
             final Set<Name> layerNames = namedProxy.getKeys(sourceID);
-                for(final Name layerName : layerNames) {
+            for (final Name layerName : layerNames) {
                 final QName qn = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
                 Layer layer = null;
 
@@ -66,7 +65,7 @@ public class MapUtilities {
                     // we look if the layer is excluded
                     if (source.isExcludedLayer(qn)) {
                         continue;
-                    // we look for detailled informations in the include sections
+                        // we look for detailled informations in the include sections
                     } else {
                         if (securityFilter.allowed(login, layerName)) {
                             layer = source.isIncludedLayer(qn);
@@ -74,33 +73,33 @@ public class MapUtilities {
                                 layer = new Layer(qn);
                             }
                             layer.setProviderID(sourceID);
-                            layers.add(layer);
                         }
                     }
-                /*
-                 * second case : we include only the layer in the balise include
-                 */
+                    /*
+                     * second case : we include only the layer in the balise include
+                     */
                 } else {
                     layer = source.isIncludedLayer(qn);
                     if (layer != null && securityFilter.allowed(login, layerName)) {
                         layer.setProviderID(sourceID);
-                        layers.add(layer);
                     }
                 }
 
                 //set layer type
-                try {
-                        DataType dt = LayerProviders.getDataType(sourceID, layerName.getLocalPart());
+                if (layer != null) {
+                    try {
+                        final DataType dt = LayerProviders.getDataType(sourceID, layerName.getLocalPart());
                         layer.setType(dt.toString());
                     } catch (CstlServiceException e) {
                         LOGGER.log(Level.WARNING, "", e);
                     }
 
-                //set layer date
-                LayerProvider provider = LayerProviderProxy.getInstance().getProvider(sourceID);
-                String date = (String) provider.getSource().parameter("date").getValue();
-                layer.setDate(date);
-                layers.add(layer);
+                    //set layer date
+                    final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(sourceID);
+                    final String date = (String) provider.getSource().parameter("date").getValue();
+                    layer.setDate(date);
+                    layers.add(layer);
+                }
             }
         }
         return layers;

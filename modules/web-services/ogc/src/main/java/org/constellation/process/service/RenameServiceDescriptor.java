@@ -38,7 +38,7 @@ import org.opengis.util.InternationalString;
  */
 public class RenameServiceDescriptor extends AbstractProcessDescriptor {
 
-    public static final String NAME = "service.create";
+    public static final String NAME = "service.rename";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("rename a new ogc service in constellation.");
 
     public static final String SERVICE_TYPE_NAME = "service_type";

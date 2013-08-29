@@ -276,7 +276,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final AbstractWMSCapabilities inCapabilities;
         final Object skeleton = getStaticCapabilitiesObject(queryVersion, "WMS", requestedLanguage);
         if (skeleton instanceof Service) {
-            inCapabilities = WMSMetadataUtilities.createCapabilities(WMSVersion.getVersion(queryVersion), (Service) skeleton);
+            inCapabilities = WMSConstant.createCapabilities(queryVersion, (Service) skeleton);
         } else {
             inCapabilities = (AbstractWMSCapabilities) skeleton;
         }
