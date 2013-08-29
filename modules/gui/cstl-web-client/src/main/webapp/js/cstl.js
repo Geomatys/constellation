@@ -81,7 +81,7 @@ CSTL = {
      *
      * @param mid     - {string} the method id to execute
      * @param options - {string} the request parameters
-     * @returns {boolean} true on action success otherwise false
+     * @returns {jQuery.ajax} the jQuery.ajax instance
      */
     jzAjax: function(mid, options) {
         options     = options || {};

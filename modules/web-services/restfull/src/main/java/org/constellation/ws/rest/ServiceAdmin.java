@@ -7,10 +7,10 @@ import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AddLayer;
-import org.constellation.dto.Service;
-import org.constellation.ws.CstlServiceException;
 import org.constellation.dto.Rename;
 import org.constellation.dto.Restart;
+import org.constellation.dto.Service;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCServiceConfiguration;
 
 import javax.ws.rs.Consumes;
@@ -70,7 +70,7 @@ public class ServiceAdmin {
      * @return a {@link Response} with service listing
      */
     @GET
-    @Path("status")
+    @Path("instances")
     public Response listInstance(final @PathParam("serviceType") String serviceType) {
         InstanceReport report = serviceConfiguration.listInstance(serviceType);
         return Response.ok(report).build();

@@ -17,10 +17,13 @@
                 <a class="brand" href="#">${service.name}</a>
                 <form class="navbar-form pull-right" style="margin-top: 2px;">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-small" onclick="window.open('${capabilitiesUrl}')">&{service.description.getcapabilities.button}</button>
+                        <button type="button" class="btn btn-small" data-action="open-capabilities" data-capabilities="${capabilitiesUrl}">&{service.description.getcapabilities.button}</button>
                         <button type="button" class="btn btn-small" data-action="open-logs">&{service.description.logs.button}</button>
-                        <button type="button" class="btn btn-small btn-info" onclick="reloadWMS('${service.identifier}',$(this));">&{service.description.reload.button}</button>
-                        <button type="button" class="btn btn-small btn-danger" onclick="stopWMS('${service.identifier}',$(this));">&{service.description.stop.button}</button>
+                        <button type="button" class="btn btn-small btn-info" data-action="restart-service" data-service-type="WMS" data-service-id="${service.identifier}">&{service.description.reload.button}</button>
+                        <button type="button" class="btn btn-small <%if(instance.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-action="toggle-service" data-service-type="WMS" data-service-id="${service.identifier}">
+                            <span class="label-start">&{service.description.start.button}</span>
+                            <span class="label-stop">&{service.description.stop.button}</span>
+                        </button>
                     </div>
                 </form>
             </div>

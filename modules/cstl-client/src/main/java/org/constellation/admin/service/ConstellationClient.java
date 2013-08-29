@@ -196,6 +196,16 @@ public final class ConstellationClient {
         }
 
         /**
+         * Queries the list of created services  (even if not running) from the Constellation server.
+         *
+         * @return an {@link InstanceReport} instance
+         * @throws IOException on HTTP communication error or response entity parsing error
+         */
+        public InstanceReport getInstances() throws IOException {
+            return get("admin/instances", MediaType.APPLICATION_XML_TYPE).getEntity(InstanceReport.class);
+        }
+
+        /**
          * Queries a service metadata from the Constellation server.
          *
          * @param serviceType the service type (WMS, CSW, WPS...)
@@ -371,7 +381,7 @@ public final class ConstellationClient {
 
         /**
          * Creates a {@link ClientResponse} wrapper instance.
-         * 
+         *
          * @param response the response to wrap
          */
         public Response(final ClientResponse response) {

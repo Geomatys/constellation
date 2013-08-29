@@ -90,10 +90,10 @@ public class OGCServiceConfiguration {
             if (entry.getKey().equals(identifier)) {
                 return new Instance(entry.getKey(), serviceType, entry.getValue() ? ServiceStatus.WORKING : ServiceStatus.ERROR);
             }
-            final File instanceDirectory = new File(getServiceDirectory(serviceType), identifier);
-            if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
-                return new Instance(identifier, serviceType, ServiceStatus.NOT_STARTED);
-            }
+        }
+        final File instanceDirectory = new File(getServiceDirectory(serviceType), identifier);
+        if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
+            return new Instance(identifier, serviceType, ServiceStatus.NOT_STARTED);
         }
         return null;
     }

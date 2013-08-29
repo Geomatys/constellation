@@ -567,7 +567,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public InstanceReport listInstance() {
             try {
-                final String url = getURLWithEndSlash() + "admin/status";
+                final String url = getURLWithEndSlash() + "admin/instances";
                 final Object response = sendRequest(url, null);
                 if (response instanceof InstanceReport) {
                     return (InstanceReport) response;

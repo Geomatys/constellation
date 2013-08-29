@@ -175,10 +175,40 @@ public enum ServiceDef {
         PDP("Policy Decision Point"),
         MDW("MDWeb"),
         THW("Thesaurus");
+
         public final String fullName;
 
         private Specification(String full) {
             fullName = full;
+        }
+
+        public static Specification fromShortName(final String shortName) {
+            if (NONE.name().equalsIgnoreCase(shortName)) {
+                return NONE;
+            } else if (CSW.name().equalsIgnoreCase(shortName)) {
+                return CSW;
+            } else if (SOS.name().equalsIgnoreCase(shortName)) {
+                return SOS;
+            } else if (WCS.name().equalsIgnoreCase(shortName)) {
+                return WCS;
+            } else if (WPS.name().equalsIgnoreCase(shortName)) {
+                return WPS;
+            } else if (WFS.name().equalsIgnoreCase(shortName)) {
+                return WFS;
+            } else if (WMS.name().equalsIgnoreCase(shortName)) {
+                return WMS;
+            } else if (WMTS.name().equalsIgnoreCase(shortName)) {
+                return WMTS;
+            } else if (PEP.name().equalsIgnoreCase(shortName)) {
+                return PEP;
+            } else if (PDP.name().equalsIgnoreCase(shortName)) {
+                return PDP;
+            } else if (MDW.name().equalsIgnoreCase(shortName)) {
+                return MDW;
+            } else if (THW.name().equalsIgnoreCase(shortName)) {
+                return THW;
+            }
+            throw new IllegalArgumentException("Unknown service specification: " + shortName);
         }
     }
 

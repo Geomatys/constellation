@@ -13,3 +13,36 @@
   background-image: url(../../../images/raster.png);
   .background-size(cover)
 }
+
+.btn-started.active,
+.btn-stopped.active {
+  color: rgba(255,255,255,.75);
+}
+.btn.started {
+  .buttonBackground(@btnDangerBackground, @btnDangerBackgroundHighlight);
+  .icon-play,
+  .label-start {
+    display: none;
+  }
+  .icon-stop,
+  .label-stop {
+    display: inline-block;
+  }
+}
+.btn.stopped {
+  .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
+  .icon-play,
+  .label-start {
+    display: inline-block;
+  }
+  .icon-stop,
+  .label-stop {
+    display: none;
+  }
+}
+.well.started {
+  border-left: #cedd9c 20px solid;
+}
+.well.stopped {
+  border-left: #db9080 20px solid;
+}

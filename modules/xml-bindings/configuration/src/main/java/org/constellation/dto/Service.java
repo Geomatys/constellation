@@ -116,14 +116,6 @@ public class Service {
         this.keywords = keywords;
     }
 
-    public void setKeywords(final String keywords) {
-        if (keywords != null && !keywords.isEmpty()) {
-            this.keywords = Arrays.asList(keywords.split(","));
-        } else {
-            this.keywords = new ArrayList<>();
-        }
-    }
-
     public List<String> getVersions() {
         return versions;
     }

@@ -77,7 +77,8 @@
                 @Script(id = "wmsedition", src = "js/wmsedition.js", depends = "jquery", location = AssetLocation.SERVER),
 
                 // Constellation commons
-                @Script(id = "cstl",    src = "js/cstl.js",    depends = "jquery", location = AssetLocation.SERVER),
+                @Script(id = "cstl",            src = "js/cstl.js",             depends = "jquery", location = AssetLocation.SERVER),
+                @Script(id = "cstl.services",   src = "js/cstl.services.js",    depends = "jquery", location = AssetLocation.SERVER),
 
                 // Style
                 @Script(id = "style_edition",   src = "js/style_edition.js",  depends = "jquery"),

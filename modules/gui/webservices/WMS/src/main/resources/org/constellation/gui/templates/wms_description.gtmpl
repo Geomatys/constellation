@@ -41,7 +41,7 @@
         <div class="row">
             <div class="span3 offset9">
             </br>
-                <button class="btn btn-info" type="button" onclick="updateDescriptionWMS();">&{wms.create.save.label}</button>
+                <button class="btn btn-info" type="button" data-action="service-description" data-form="wmsDescription" data-service-type="WMS" data-service-id="${service.identifier}">&{wms.create.save.label}</button>
             </div>
         </div>
     </div>
