@@ -26,7 +26,7 @@
             <div class="navbar-inner">
                 <a class="brand" href="#">Services disponibles</a>
                 <ul class="nav pull-right">
-                    <li class="active"><a href="#" onclick="filter('')">Tous</a></li>
+                    <li class="active"><a href="#" onclick="filter('', this)">Tous</a></li>
                     <li><a href="#" onclick="filter('csw', this)">CSW</a></li>
                     <li><a href="#" onclick="filter('wms', this)">WMS</a></li>
                     <li><a href="#" onclick="filter('wmts', this)">WMTS</a></li>
