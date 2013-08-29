@@ -73,7 +73,7 @@ public final class CreateProvider extends AbstractCstlProcess {
                 }
 
                 final Date date = new Date();
-                final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY X");
+                final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy X");
                 source.parameter("date").setValue(dateFormat.format(date));
                 LayerProviderProxy.getInstance().createProvider((LayerProviderService) service, source);
             }

@@ -28,6 +28,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -112,7 +113,7 @@ public class ProviderManager {
                 }
 
                 if (type != null) {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY X");
+                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy X");
                     Date createDate = new Date();
                     if (providerReport.getDate() != null) {
                         try {
@@ -122,7 +123,7 @@ public class ProviderManager {
                         }
                     }
 
-                    dateFormat = new SimpleDateFormat("dd-MM-YYYY", userLocale);
+                    dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale) ;
                     String date = dateFormat.format(createDate);
 
                     for (String name : providerReport.getItems()) {

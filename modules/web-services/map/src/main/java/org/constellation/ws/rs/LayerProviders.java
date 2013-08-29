@@ -23,6 +23,7 @@ import org.apache.sis.util.Static;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
+import org.constellation.dto.DataType;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PortrayalContext;
 import org.constellation.dto.PropertyDescription;
@@ -121,6 +122,28 @@ public final class LayerProviders extends Static {
             throw new CstlServiceException("An error occurred while trying get/open datastore for provider with id \"" + providerId + "\".");
         } catch (IOException ex) {
             throw new CstlServiceException("An error occurred while trying get data for provider with id \"" + providerId + "\".");
+        }
+    }
+
+    /**
+     *
+     * @param providerId
+     * @param layerName
+     * @return
+     * @throws CstlServiceException
+     */
+    public static DataType getDataType(final String providerId, final String layerName) throws CstlServiceException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("layerName",  layerName);
+
+        // Get the layer.
+        final LayerDetails layer = getLayer(providerId, layerName);
+
+        // Try to extract layer data info.
+        if (layer instanceof FeatureLayerDetails) {
+            return DataType.RASTER;
+        } else {
+            return DataType.VECTOR;
         }
     }
 

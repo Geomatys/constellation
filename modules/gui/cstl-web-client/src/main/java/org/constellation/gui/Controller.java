@@ -53,9 +53,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -254,6 +258,19 @@ public class Controller {
         List<Layer> layerList = new ArrayList<Layer>(nbByPage);
         for (int i = start; i < boundary; i++) {
             final Layer layer = layers.getLayer().get(i);
+
+            //set data as user Locale
+            Locale userLocale = Request.getCurrent().getUserContext().getLocale();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy X");
+            Date layerDate = new Date();
+            try {
+                layerDate = dateFormat.parse(layer.getDate());
+            } catch (ParseException e) {
+                LOGGER.log(Level.WARNING, "date parsing error. Pattern : "+dateFormat.toPattern()+" date as String : "+layer.getDate(), e);
+            }
+            DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale);
+            layer.setDate(df.format(layerDate));
+
             if (StringUtils.isBlank(filter) || StringUtils.containsIgnoreCase(layer.getName().getLocalPart(), filter)) {
                 layerList.add(layer);
             }
