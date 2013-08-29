@@ -76,8 +76,10 @@ CSTL.Services = {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
             CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-restart'));
+            $('[data-state="' + id + '"]').removeClass('stopped').addClass('started');
         }).fail(function() {
             CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-restart'));
+            $('[data-state="' + id + '"]').removeClass('started').addClass('stopped');
         });
     },
 
