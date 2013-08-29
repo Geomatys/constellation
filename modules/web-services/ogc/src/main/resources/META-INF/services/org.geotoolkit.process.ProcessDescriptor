@@ -5,3 +5,4 @@ org.constellation.process.service.DeleteServiceDescriptor
 org.constellation.process.service.GetConfigServiceDescriptor
 org.constellation.process.service.SetConfigServiceDescriptor
 org.constellation.process.service.CreateServiceDescriptor
+org.constellation.process.service.RenameServiceDescriptor

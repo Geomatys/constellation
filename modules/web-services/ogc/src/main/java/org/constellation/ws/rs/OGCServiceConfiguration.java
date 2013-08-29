@@ -324,41 +324,6 @@ public class OGCServiceConfiguration {
         } catch (NoSuchIdentifierException | ProcessException ex) {
             response = new AcknowlegementType("Error", "unable to rename the instance : " + ex.getMessage());
         }
-
-        return response;
-
-        // we stop the current worker
-        WSEngine.shutdownInstance(serviceType, id);
-        final File serviceDirectory = getServiceDirectory(serviceType);
-        if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-            final File instanceDirectory = new File(serviceDirectory, id);
-            final File newDirectory = new File(serviceDirectory, newName);
-
-            if (instanceDirectory.isDirectory()) {
-                if (!newDirectory.exists()) {
-                    if (instanceDirectory.renameTo(newDirectory)) {
-                        final Worker newWorker = buildWorker(serviceType, newName);
-                        if (newWorker == null) {
-                            throw new CstlServiceException("The instance " + newName + " can be started, maybe there is no configuration directory with this name.", INVALID_PARAMETER_VALUE);
-                        } else {
-                            if (newWorker.isStarted()) {
-                                response = new AcknowlegementType("Success", "instance succefully renamed");
-                            } else {
-                                response = new AcknowlegementType("Error", "unable to start the renamed instance");
-                            }
-                        }
-                    } else {
-                        response = new AcknowlegementType("Error", "Unable to rename the directory");
-                    }
-                } else {
-                    response = new AcknowlegementType("Error", "already existing instance:" + newName);
-                }
-            } else {
-                response = new AcknowlegementType("Error", "no existing instance:" + id);
-            }
-        } else {
-            throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
-        }
         return response;
     }
 
