@@ -13,7 +13,7 @@
     <div class="row" style="background-color:white;" >
         <div class="navbar">
             <div class="navbar-inner">
-                <a class="brand" href="#">Information sur la donnee</a>
+                <a class="brand" href="#">&{data.information.page.title}</a>
                 <a class="pull-right" href="#" style="display:block;padding:10px 20px 10px;margin-left:-20px;font-size:20px;font-weight:200;color:#777777;text-shadow:0 1px 0 #ffffff;">${datainformation.name}</a>
             </div>
         </div>
@@ -21,8 +21,8 @@
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <div class="span12">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#description" data-toggle="tab">Informations</a> </li>
-                <li><a href="#metadata" data-toggle="tab">Métadonnées</a> </li>
+                <li class="active"><a href="#description" data-toggle="tab">&{data.information.tab.title}</a> </li>
+                <li><a href="#metadata" data-toggle="tab">&{metadata.information.tab.title}</a> </li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane" id="description">

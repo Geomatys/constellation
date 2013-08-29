@@ -1,12 +1,12 @@
 <div id="addModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="addModalLabel">Ajout de donnée</h3>
+        <h3 id="addModalLabel">&{adddata.popup.title}</h3>
         </div>
     <div class="modal-body" >
         <div id="dataList">
             <div class="alert alert-info">
-                Sélectionnez la donnée à importer puis cliquez sur continuer
+                &{adddata.popup.datalist.subtitle.label}
             </div>
             <div class="navbar">
                 <div class="navbar-inner">
@@ -52,7 +52,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>
-        <button class="btn btn-info" type="submit" id="continue">continuer</button>
+        <button class="btn btn-info" type="submit" id="continue">&{layer.listing.data.upload.continue.button}</button>
     </div>
     <script type="text/javascript" language="JavaScript">
         function loadData(startElement, counter, orderBy, filter, direction){

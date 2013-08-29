@@ -1,7 +1,7 @@
 <div data-part="selectedData"></div>
 <br/>
 <div class="alert alert-info">
-    Sélectionnez le style par défaut de la donnée ou ajoutez un style de la bibliothèque.
+    &{adddata.popup.style.subtitle.label}
 </div>
 <div id="styleList">
     <div class="navbar">
@@ -30,9 +30,9 @@
         </div>
         <div class="span2">
             <select class="span1 pull-right" data-name="nbLayersselect">
-                <option value="10" selected="selected">10 styles</option>
-                <option value="20">20 styles</option>
-                <option value="100">100 styles</option>
+                <option value="10" selected="selected">&{style.listing.numberbypage.10.label}</option>
+                <option value="20">&{style.listing.numberbypage.20.label}</option>
+                <option value="100">&{style.listing.numberbypage.100.label}</option>
             </select>
         </div>
     </div>
@@ -59,7 +59,6 @@
                 $("#dataList [data-name=nbLayersselect]").val("10");
                 firstTime=1;
             }
-
         }
     </script>
 </div>

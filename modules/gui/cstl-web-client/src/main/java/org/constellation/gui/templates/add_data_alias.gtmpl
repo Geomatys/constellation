@@ -1,7 +1,7 @@
 <div data-part="selectedData"></div>
 <br/>
 <div class="alert alert-info">
-    Complétez les informations sur cette donnée.
+    &{adddata.popup.informations.subtitle.label}
 </div>
 <div>
     <form class="form-horizontal" id="addLayerForm" action="@{addLayer()}" method="post">
@@ -10,7 +10,7 @@
         <input type="hidden" id="styleName" name="styleName"/>
         <input type="hidden" id="serviceId" name="serviceId" value="${service.identifier}"/>
         <div class="control-group">
-            <label class="control-label" for="LayerName">Nom</label>
+            <label class="control-label" for="LayerName">&{adddata.popup.informations.name.label}</label>
             <div class="controls">
                 <input type="text" name="layerName" id="layerName" placeholder="Nom de la couche">
             </div>
