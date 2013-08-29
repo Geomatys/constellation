@@ -26,21 +26,21 @@
             <div class="navbar-inner">
                 <a class="brand" href="#">Services disponibles</a>
                 <ul class="nav pull-right">
-                    <li class="active"><a href="#">Tous</a></li>
-                    <li><a href="#">CSW</a></li>
-                    <li><a href="#">WMS</a></li>
-                    <li><a href="#">WMTS</a></li>
-                    <li><a href="#">WFS</a></li>
-                    <li><a href="#">WCS</a></li>
-                    <li><a href="#">SOS</a></li>
-                    <li><a href="#">WPS</a></li>
+                    <li class="active"><a href="#" onclick="filter('')">Tous</a></li>
+                    <li><a href="#" onclick="filter('csw', this)">CSW</a></li>
+                    <li><a href="#" onclick="filter('wms', this)">WMS</a></li>
+                    <li><a href="#" onclick="filter('wmts', this)">WMTS</a></li>
+                    <li><a href="#" onclick="filter('wfs', this)">WFS</a></li>
+                    <li><a href="#" onclick="filter('wcs', this)">WCS</a></li>
+                    <li><a href="#" onclick="filter('sos', this)">SOS</a></li>
+                    <li><a href="#" onclick="filter('wps', this)">WPS</a></li>
                 </ul>
             </div>
         </div>
     </div>
-    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;" id="main">
         <% for (def service : services) {%>
-          <div class="span6">
+          <div class="span6" data-servicetype="${service.type}">
             <a href="edit/${service.type}/${service.name}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
             <div class="well <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${service.name}">
                 <div class="row">
@@ -81,3 +81,27 @@
         <%}%>
     </div>
 </div>
+<script type="text/javascript" language="JavaScript">
+    function filter(type, tabSelected){
+        var services = $("#main [data-servicetype]");
+
+        if(type==''){
+            $(services).show();
+        }
+        else{
+            for (var i = 0; i < services.length; i++) {
+                var currentService = services [i];
+                var currentServiceType = $(currentService).attr("data-servicetype");
+                if(type != ''){
+                    if(currentServiceType != type){
+                        $(currentService).hide();
+                    }else{
+                        $(currentService).show();
+                    }
+                }
+            }
+        }
+        $(tabSelected).parent().parent().children().removeClass('active')
+        $(tabSelected).parent().addClass('active')
+    }
+</script>
