@@ -1,4 +1,31 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2013, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.constellation.ws.rs;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
@@ -6,9 +33,7 @@ import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.ServiceStatus;
-import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.AddLayer;
-import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.DeleteServiceDescriptor;
@@ -19,28 +44,20 @@ import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.utils.MetadataUtilities;
+
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.constellation.ServiceDef.Specification;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
+import org.constellation.process.service.RenameServiceDescriptor;
 
 /**
  * Utility class to configure and manage OGC Services. Contains static map to find specific implementation for each service type.
@@ -56,14 +73,10 @@ public class OGCServiceConfiguration {
     /**
      * List all implementations by service.
      */
-    private static Map<Specification, ServiceConfiguration> serviceUtilities = new HashMap<>(0);
+    private final static Map<Specification, ServiceConfiguration> serviceUtilities = new HashMap<>(0);
 
     public Map<Specification, ServiceConfiguration> getServiceUtilities() {
         return serviceUtilities;
-    }
-
-    public void setServiceUtilities(Map<Specification, ServiceConfiguration> serviceUtilities) {
-        this.serviceUtilities = serviceUtilities;
     }
 
     /**
@@ -125,8 +138,8 @@ public class OGCServiceConfiguration {
      */
     public InstanceReport listInstance() {
         LOGGER.finer("listing all instance");
-        Set<String> serviceTypes =  WSEngine.getRegisteredServices().keySet();
-        List<Instance> instanceReports = new ArrayList<>(0);
+        final Set<String> serviceTypes =  WSEngine.getRegisteredServices().keySet();
+        final List<Instance> instanceReports = new ArrayList<>(0);
 
         //  loop on all service type which exist on server
         for (String serviceType : serviceTypes) {
@@ -191,12 +204,12 @@ public class OGCServiceConfiguration {
         LOGGER.info("stopping an instance");
         AcknowlegementType response;
         try {
-            ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopServiceDescriptor.NAME);
-            ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopServiceDescriptor.NAME);
+            final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
             inputs.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue(id);
             inputs.parameter(StopServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
 
-            org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+            final org.geotoolkit.process.Process proc = desc.createProcess(inputs);
             proc.call();
             response = new AcknowlegementType("Success", "instance succesfully stopped");
         } catch (NoSuchIdentifierException | ProcessException ex) {
@@ -217,13 +230,13 @@ public class OGCServiceConfiguration {
         LOGGER.info("starting an instance");
         AcknowlegementType response;
         try {
-            ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
-            ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
+            final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
             inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
             inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(id);
             inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory(serviceType));
 
-            org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+            final org.geotoolkit.process.Process proc = desc.createProcess(inputs);
             proc.call();
             response = new AcknowlegementType("Success", "new instance succefully started");
         } catch (NoSuchIdentifierException | ProcessException ex) {
@@ -243,14 +256,14 @@ public class OGCServiceConfiguration {
         LOGGER.info("refreshing the workers");
         AcknowlegementType response;
         try {
-            ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
-            ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
+            final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
             inputs.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
             inputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(id);
             inputs.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(isclosedFirst);
             inputs.parameter(RestartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory(serviceType));
 
-            org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+            final org.geotoolkit.process.Process proc = desc.createProcess(inputs);
             proc.call();
             response = new AcknowlegementType("Success", "instances succefully restarted");
         } catch (NoSuchIdentifierException | ProcessException ex) {
@@ -271,13 +284,13 @@ public class OGCServiceConfiguration {
         AcknowlegementType response;
 
         try {
-            ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteServiceDescriptor.NAME);
-            ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteServiceDescriptor.NAME);
+            final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
             inputs.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
             inputs.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue(id);
             inputs.parameter(DeleteServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory(serviceType));
 
-            org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+            final org.geotoolkit.process.Process proc = desc.createProcess(inputs);
             proc.call();
             response = new AcknowlegementType("Success", "instance succesfully deleted");
         } catch (NoSuchIdentifierException | ProcessException ex) {
@@ -295,7 +308,25 @@ public class OGCServiceConfiguration {
      * @return {@link AcknowlegementType} : to know on client side server state after operation call
      */
     public AcknowlegementType rename(final String serviceType, final String id, final String newName) throws CstlServiceException {
-        final AcknowlegementType response;
+        AcknowlegementType response;
+
+        try {
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RenameServiceDescriptor.NAME);
+            final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+            inputs.parameter(RenameServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
+            inputs.parameter(RenameServiceDescriptor.IDENTIFIER_NAME).setValue(id);
+            inputs.parameter(RenameServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory(serviceType));
+            inputs.parameter(RenameServiceDescriptor.NEW_NAME_NAME).setValue(newName);
+
+            final org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+            proc.call();
+            response = new AcknowlegementType("Success", "instance succesfully deleted");
+        } catch (NoSuchIdentifierException | ProcessException ex) {
+            response = new AcknowlegementType("Error", "unable to rename the instance : " + ex.getMessage());
+        }
+
+        return response;
+
         // we stop the current worker
         WSEngine.shutdownInstance(serviceType, id);
         final File serviceDirectory = getServiceDirectory(serviceType);
@@ -508,13 +539,8 @@ public class OGCServiceConfiguration {
         File currentServiceDirectory = new File(serviceTypeDirectory, identifier);
         if(currentServiceDirectory.exists() && currentServiceDirectory.isDirectory()){
             try{
-                //unmarshall serviceMetadata.xml File to create Service object
-                JAXBContext context = JAXBContext.newInstance(Service.class, Contact.class, AccessConstraint.class);
-                final Unmarshaller unmarshaller = context.createUnmarshaller();
-                final File wMSServiceMetadata = new File(currentServiceDirectory, "serviceMetadata.xml");
-                final Service service = (Service) unmarshaller.unmarshal(wMSServiceMetadata);
-                return service;
-            }catch (JAXBException e){
+                return MetadataUtilities.readMetadata(currentServiceDirectory);
+            } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "error on serviceMetadataParsing", e);
             }
         }

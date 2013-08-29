@@ -46,6 +46,7 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.util.DataReference;
+import org.constellation.ws.rs.MapUtilities;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.feature.DefaultName;
 import org.opengis.feature.type.Name;
@@ -198,50 +199,7 @@ public abstract class LayerWorker extends AbstractWorker {
      * layer context.
      */
     public List<Layer> getConfigurationLayers(final String login) {
-        if (layerContext == null) {
-            return new ArrayList<>();
-        }
-        final LayerProviderProxy namedProxy  = LayerProviderProxy.getInstance();
-        final List<Layer> layers = new ArrayList<>();
-        /*
-         * For each source declared in the layer context we search for layers informations.
-         */
-        for (final Source source : layerContext.getLayers()) {
-            final String sourceID = source.getId();
-            final Set<Name> layerNames = namedProxy.getKeys(sourceID);
-                for(final Name layerName : layerNames) {
-                final QName qn = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
-                /*
-                 * first case : source is in load-all mode
-                 */
-                if (source.getLoadAll()) {
-                    // we look if the layer is excluded
-                    if (source.isExcludedLayer(qn)) {
-                        continue;
-                    // we look for detailled informations in the include sections
-                    } else {
-                        if (securityFilter.allowed(login, layerName)) {
-                            Layer layer = source.isIncludedLayer(qn);
-                            if (layer == null) {
-                                layer = new Layer(qn);
-                            } 
-                            layer.setProviderID(sourceID);
-                            layers.add(layer);
-                        }
-                    }
-                /*
-                 * second case : we include only the layer in the balise include
-                 */
-                } else {
-                    Layer layer = source.isIncludedLayer(qn);
-                    if (layer != null && securityFilter.allowed(login, layerName)) {
-                        layer.setProviderID(sourceID);
-                        layers.add(layer);
-                    }
-                }
-            }
-        }
-        return layers;
+        return MapUtilities.getConfigurationLayers(layerContext, securityFilter, login);
     }
 
     

@@ -41,7 +41,7 @@ public final class StartService extends AbstractCstlProcess {
     @Override
     protected void execute() throws ProcessException {
         final String identifier = value(IDENTIFIER, inputParameters);
-        final String serviceName = value(SERVICE_TYPE, inputParameters);
+        final String serviceType = value(SERVICE_TYPE, inputParameters);
         File serviceDir = value(SERVICE_DIRECTORY, inputParameters);
 
         if (identifier == null || identifier.isEmpty()) {
@@ -54,14 +54,14 @@ public final class StartService extends AbstractCstlProcess {
 
             if (configDirectory != null && configDirectory.isDirectory()) {
 
-                serviceDir = new File(configDirectory, serviceName);
+                serviceDir = new File(configDirectory, serviceType);
 
             } else {
                 throw new ProcessException("Configuration directory can't be found.", this, null);
             }
         }
 
-        if (serviceDir.exists() && serviceDir.isDirectory()) {
+        if (serviceDir.isDirectory()) {
 
             //create service instance directory
             final File instanceDirectory = new File(serviceDir, identifier);
@@ -69,11 +69,11 @@ public final class StartService extends AbstractCstlProcess {
             if (instanceDirectory.isDirectory()) {
                 if (!instanceDirectory.getName().startsWith(".")) {
                     try {
-                        final Class clazz   = WSEngine.getServiceWorkerClass(serviceName);
+                        final Class clazz   = WSEngine.getServiceWorkerClass(serviceType);
                         final Worker worker = (Worker) ReflectionUtilities.newInstance(clazz, instanceDirectory.getName(), instanceDirectory);
 
                         if (worker != null) {
-                            WSEngine.addServiceInstance(serviceName, identifier, worker);
+                            WSEngine.addServiceInstance(serviceType, identifier, worker);
                             if (!worker.isStarted()) {
                                 throw new ProcessException("Unable to start the instance " + identifier + ".", this, null);
                             }
@@ -88,7 +88,7 @@ public final class StartService extends AbstractCstlProcess {
                 throw new ProcessException("Service instance directory can't be created. Check permissions.", this, null);
             }
         } else {
-            throw new ProcessException("Service directory can' be found for service name : " + serviceName, this, null);
+            throw new ProcessException("Service directory can' be found for service name : " + serviceType, this, null);
         }
     }
 }

@@ -57,7 +57,7 @@ public class CreateService extends AbstractProcess {
     @Override
     protected void execute() throws ProcessException {
 
-        String serviceName = value(SERVICE_TYPE, inputParameters);
+        String serviceType = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         Object configuration = value(CONFIGURATION, inputParameters);
         File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
@@ -65,12 +65,12 @@ public class CreateService extends AbstractProcess {
         final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
         final String configFileName    = value(FILENAME, inputParameters);
 
-        if (serviceName != null && !serviceName.isEmpty()
-        && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName) ||
-            "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName)  ||
-            "WPS".equalsIgnoreCase(serviceName) || "SOS".equalsIgnoreCase(serviceName)  ||
-            "CSW".equalsIgnoreCase(serviceName))) {
-            serviceName = serviceName.toUpperCase();
+        if (serviceType != null && !serviceType.isEmpty()
+        && ("WMS".equalsIgnoreCase(serviceType) || "WMTS".equalsIgnoreCase(serviceType) ||
+            "WFS".equalsIgnoreCase(serviceType) || "WCS".equalsIgnoreCase(serviceType)  ||
+            "WPS".equalsIgnoreCase(serviceType) || "SOS".equalsIgnoreCase(serviceType)  ||
+            "CSW".equalsIgnoreCase(serviceType))) {
+            serviceType = serviceType.toUpperCase();
         } else {
             throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\", \"WPS\", \"CSW\", \"SOS\").", this, null);
         }
@@ -91,14 +91,14 @@ public class CreateService extends AbstractProcess {
             if (configDirectory != null && configDirectory.isDirectory()) {
 
                 //get service directory ("WMS", "WMTS", "WFS", "WCS")
-                final File serviceDir = new File(configDirectory, serviceName);
+                final File serviceDir = new File(configDirectory, serviceType);
                 if (serviceDir.exists() && serviceDir.isDirectory()) {
 
                     //create service instance directory
                     instanceDirectory = new File(serviceDir, identifier);
 
                 } else {
-                    throw new ProcessException("Service directory can't be found for service name : " + serviceName, this, null);
+                    throw new ProcessException("Service directory can't be found for service name : " + serviceType, this, null);
                 }
             } else {
                 throw new ProcessException("Configuration directory can't be found.", this, null);

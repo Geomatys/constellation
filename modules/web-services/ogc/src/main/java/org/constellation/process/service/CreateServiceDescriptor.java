@@ -43,7 +43,7 @@ public class CreateServiceDescriptor extends AbstractProcessDescriptor {
 
 
     public static final String NAME = "service.create";
-    public static final InternationalString ABSTRACT = new SimpleInternationalString("Get an existing or create a new map service (WMS, WMTS, WFS, WCS) in constellation.");
+    public static final InternationalString ABSTRACT = new SimpleInternationalString("Get an existing or create a new ogc service in constellation.");
 
 
     public static final String SERVICE_TYPE_NAME = "service_type";
@@ -94,7 +94,7 @@ public class CreateServiceDescriptor extends AbstractProcessDescriptor {
 
 
     public static final String OUT_CONFIG_NAME = "out_configuration";
-    private static final String OUT_CONFIG_REMARKS = "The LayerContext configuration for the new instance.";
+    private static final String OUT_CONFIG_REMARKS = "The configuration object for the new instance.";
     public static final ParameterDescriptor<LayerContext> OUT_CONFIGURATION =
             new DefaultParameterDescriptor(OUT_CONFIG_NAME, OUT_CONFIG_REMARKS, Object.class, null, false);
     /**Output parameters */

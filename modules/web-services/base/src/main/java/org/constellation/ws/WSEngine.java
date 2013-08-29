@@ -34,13 +34,13 @@ public final class WSEngine {
     /**
      * A map of service worker.
      */
-    private static final Map<String, Map<String, Worker>> WORKERS_MAP = new HashMap<String, Map<String, Worker>>();
+    private static final Map<String, Map<String, Worker>> WORKERS_MAP = new HashMap<>();
 
-    private static final Map<String, List<String>> REGISTERED_SERVICE = new HashMap<String, List<String>>();
+    private static final Map<String, List<String>> REGISTERED_SERVICE = new HashMap<>();
 
-    private static final Map<String, Class> SERVICE_WORKER_CLASS = new HashMap<String, Class>();
+    private static final Map<String, Class> SERVICE_WORKER_CLASS = new HashMap<>();
 
-    private static final List<String> TO_RESTART = new ArrayList<String>();
+    private static final List<String> TO_RESTART = new ArrayList<>();
 
     public static Map<String, Worker> getWorkersMap(final String specification) {
         return WORKERS_MAP.get(specification);
@@ -71,7 +71,7 @@ public final class WSEngine {
         if (workersMap != null) {
             return workersMap.keySet();
         }
-        return new HashSet<String>();
+        return new HashSet<>();
     }
 
     public static Worker getInstance(final String specification, final String serviceID) {
@@ -118,7 +118,7 @@ public final class WSEngine {
     public static void addServiceInstance(final String specification, final String serviceID, final Worker instance) {
         Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap == null) {
-            workersMap = new HashMap<String, Worker>();
+            workersMap = new HashMap<>();
             WORKERS_MAP.put(specification, workersMap);
         }
         final Worker oldWorker = workersMap.put(serviceID, instance);
@@ -129,11 +129,11 @@ public final class WSEngine {
     }
 
     public static Set<Entry<String, Boolean>> getEntriesStatus(final String specification) {
-        final Set<Map.Entry<String, Boolean>> response = new HashSet<Entry<String, Boolean>>();
+        final Set<Map.Entry<String, Boolean>> response = new HashSet<>();
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap != null) {
             for (Entry<String, Worker> entry : workersMap.entrySet()) {
-                response.add(new AbstractMap.SimpleEntry<String, Boolean>(entry.getKey(), entry.getValue().isStarted()));
+                response.add(new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().isStarted()));
             }
         }
         return response;
@@ -165,7 +165,7 @@ public final class WSEngine {
             }
             REGISTERED_SERVICE.put(serviceName, protocols);
         } else {
-            final List<String> protocols = new ArrayList<String>();
+            final List<String> protocols = new ArrayList<>();
             protocols.add(protocol);
             REGISTERED_SERVICE.put(serviceName, protocols);
         }
