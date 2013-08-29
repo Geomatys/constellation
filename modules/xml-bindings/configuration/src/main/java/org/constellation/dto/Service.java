@@ -56,6 +56,18 @@ public class Service {
     public Service() {
     }
 
+    public Service(final String name, final String identifier, final List<String> keywords,
+            final String description, final List<String> versions, final Contact serviceContact,
+            final AccessConstraint serviceConstraints) {
+        this.description = description;
+        this.identifier  = identifier;
+        this.keywords    = keywords;
+        this.name        = name;
+        this.serviceConstraints = serviceConstraints;
+        this.serviceContact = serviceContact;
+        this.versions = versions;
+    }
+
     public String getName() {
         return name;
     }

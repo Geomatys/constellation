@@ -20,17 +20,17 @@ package org.constellation.utils;
 import org.apache.sis.util.Static;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.dto.AccessConstraint;
-import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 /**
  * Utility class for map services management/configuration.
@@ -40,18 +40,6 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @since 0.9
  */
 public final class MetadataUtilities extends Static {
-
-    /**
-     * Service metadata JAXB context.
-     */
-    private static JAXBContext METADATA_CONTEXT;
-    static {
-        try {
-            METADATA_CONTEXT = JAXBContext.newInstance(Service.class, Contact.class, AccessConstraint.class);
-        } catch (JAXBException ex) {
-            throw new IllegalStateException("Unable to create JAXB context for service metadata marshalling/unmarshalling.");
-        }
-    }
 
     /**
      * The service metadata file name.
@@ -104,8 +92,10 @@ public final class MetadataUtilities extends Static {
         ensureNonNull("metadata", metadata);
 
         try {
+            final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             final File metadataFile = new File(directory, METADATA_FILE_NAME);
-            METADATA_CONTEXT.createMarshaller().marshal(metadata, metadataFile);
+            m.marshal(metadata, metadataFile);
+            GenericDatabaseMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
             throw new IOException("Metadata marshalling has failed.", ex);
         }
@@ -140,7 +130,9 @@ public final class MetadataUtilities extends Static {
         final File metadataFile = new File(directory, METADATA_FILE_NAME);
         if (metadataFile.exists() && !metadataFile.isDirectory()) {
             try {
-                final Object metadata = METADATA_CONTEXT.createUnmarshaller().unmarshal(metadataFile);
+                final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                final Object metadata = um.unmarshal(metadataFile);
+                GenericDatabaseMarshallerPool.getInstance().recycle(um);
                 if (metadata instanceof Service) {
                     return (Service) metadata;
                 }

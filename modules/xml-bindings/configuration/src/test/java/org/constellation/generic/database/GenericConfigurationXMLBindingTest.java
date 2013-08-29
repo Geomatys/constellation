@@ -33,6 +33,9 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.SOSConfiguration;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
+import org.constellation.dto.Service;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -73,7 +76,7 @@ public class GenericConfigurationXMLBindingTest {
 
         BDD bdd = new BDD("org.driver.test", "http://somehost/blablabla", "bobby", "juanito");
 
-        HashMap<String, String> parameters = new HashMap<String, String>();
+        HashMap<String, String> parameters = new HashMap<>();
         parameters.put("staticVar01", "something");
         parameters.put("staticVar02", "blavl, bloub");
 
@@ -303,9 +306,9 @@ public class GenericConfigurationXMLBindingTest {
 
         BDD bdd = new BDD("org.driver.test", "http://somehost/blablabla", "bobby", "juanito");
 
-        HashMap<String, String> parameters = new HashMap<String, String>();
+        HashMap<String, String> parameters = new HashMap<>();
         parameters.put("staticVar01", "something");
-        ArrayList<String> sp2 = new ArrayList<String>();
+        ArrayList<String> sp2 = new ArrayList<>();
         sp2.add("value1");
         sp2.add("value2");
         parameters.put("staticVar02", "blavl, bloub");
@@ -399,7 +402,7 @@ public class GenericConfigurationXMLBindingTest {
         expResult.addWhere(where);
         expResult.addOrderby(order);
 
-        HashMap<String, String> parameters = new HashMap<String, String>();
+        HashMap<String, String> parameters = new HashMap<>();
 
         parameters.put("st1", "plouf");
 
@@ -486,7 +489,7 @@ public class GenericConfigurationXMLBindingTest {
         query.addWhere(where);
         query.addOrderby(order);
 
-        HashMap<String, String> parameters = new HashMap<String, String>();
+        HashMap<String, String> parameters = new HashMap<>();
 
         parameters.put("st1", "plouf");
 
@@ -538,5 +541,52 @@ public class GenericConfigurationXMLBindingTest {
         System.out.println(obj);
 
         assertTrue(obj instanceof Node);
+    }
+
+    @Test
+    public void serviceMarshalingTest() throws Exception {
+
+        final Contact ctc = new Contact("fname1", "org1", "pos1", "0600", "0800", "test@jj.com", "adr1", "city1", "state1", "34000", "france");
+        final AccessConstraint cstr = new AccessConstraint("fees1", "constraint1", 5, 200, 300);
+        final Service service = new Service("name1", "id1", Arrays.asList("kw1", "kw2"), "desc1", Arrays.asList("1.0.0", "2.0.0"), ctc, cstr);
+
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(service, sw);
+
+        String result =  StringUtilities.removeXmlns(sw.toString());
+        String expResult =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<ns2:service>\n" +
+        "  <ns2:description>desc1</ns2:description>\n" +
+        "  <ns2:identifier>id1</ns2:identifier>\n" +
+        "  <ns2:keywords>kw1</ns2:keywords>\n" +
+        "  <ns2:keywords>kw2</ns2:keywords>\n" +
+        "  <ns2:name>name1</ns2:name>\n" +
+        "  <ns2:serviceConstraints>\n" +
+        "    <ns2:accessConstraint>constraint1</ns2:accessConstraint>\n" +
+        "    <ns2:fees>fees1</ns2:fees>\n" +
+        "    <ns2:layerLimit>5</ns2:layerLimit>\n" +
+        "    <ns2:maxHeight>300</ns2:maxHeight>\n" +
+        "    <ns2:maxWidth>200</ns2:maxWidth>\n" +
+        "  </ns2:serviceConstraints>\n" +
+        "  <ns2:serviceContact>\n" +
+        "    <ns2:address>adr1</ns2:address>\n" +
+        "    <ns2:city>city1</ns2:city>\n" +
+        "    <ns2:country>france</ns2:country>\n" +
+        "    <ns2:email>test@jj.com</ns2:email>\n" +
+        "    <ns2:fax>0800</ns2:fax>\n" +
+        "    <ns2:fullname>fname1</ns2:fullname>\n" +
+        "    <ns2:organisation>org1</ns2:organisation>\n" +
+        "    <ns2:phone>0600</ns2:phone>\n" +
+        "    <ns2:position>pos1</ns2:position>\n" +
+        "    <ns2:state>state1</ns2:state>\n" +
+        "    <ns2:zipCode>34000</ns2:zipCode>\n" +
+        "  </ns2:serviceContact>\n" +
+        "  <ns2:versions>1.0.0</ns2:versions>\n" +
+        "  <ns2:versions>2.0.0</ns2:versions>\n" +
+        "</ns2:service>" + '\n';
+
+        final XMLComparator comparator = new XMLComparator(expResult, result);
+        comparator.compare();
     }
 }

@@ -1,7 +1,6 @@
 package org.constellation.dto;
 
 import juzu.Mapped;
-import org.constellation.utils.CoverageMetadataBean;
 import org.constellation.utils.SimplyMetadataTreeNode;
 
 import javax.xml.bind.annotation.XmlRootElement;

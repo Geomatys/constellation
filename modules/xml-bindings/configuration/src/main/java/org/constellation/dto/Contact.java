@@ -56,6 +56,22 @@ public class Contact {
     public Contact() {
     }
 
+    public Contact(final String fullname, final String organisation, final String position,
+            final String phone, final String fax, final String email, final String address,
+            final String city, final String state, final String zipCode, final String country) {
+        this.address = address;
+        this.city = city;
+        this.country = country;
+        this.email = email;
+        this.fax = fax;
+        this.fullname = fullname;
+        this.organisation = organisation;
+        this.phone = phone;
+        this.position = position;
+        this.state = state;
+        this.zipCode = zipCode;
+    }
+
     public String getFullname() {
         return fullname;
     }

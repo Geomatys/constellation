@@ -1,7 +1,8 @@
-package org.constellation.utils;
+package org.constellation.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
+import org.constellation.utils.SimplyMetadataTreeNode;
 
 /**
  * Container used to pass a list on JAXB

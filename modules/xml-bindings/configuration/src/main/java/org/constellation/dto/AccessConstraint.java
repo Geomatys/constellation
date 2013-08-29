@@ -44,6 +44,15 @@ public class AccessConstraint {
     public AccessConstraint() {
     }
 
+    public AccessConstraint(final String fees, final String accessConstraint,
+            final int layerLimit, final int maxWidth, final int maxHeight) {
+        this.accessConstraint = accessConstraint;
+        this.fees = fees;
+        this.layerLimit = layerLimit;
+        this.maxHeight = maxHeight;
+        this.maxWidth = maxWidth;
+    }
+
     public String getFees() {
         return fees;
     }
