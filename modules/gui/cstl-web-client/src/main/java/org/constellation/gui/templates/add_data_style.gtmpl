@@ -42,23 +42,8 @@
         function loadStyle(startElement, counter, orderBy, filter, direction){
             $('#styleList [data-name=datalist]').jzLoad("Controller.getStyleList()",
                     {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction},
-                    setPaginationDataPage);
+                    setPaginationStylePage);
         }
         var firstTime = 0;
-
-        function setPaginationDataPage(){
-            if(firstTime==0){
-                var nbPage = totalProvider/10;
-                generatePagination("#styleList", "loadStyle", nbPage);
-                addLayerSelectAction("#styleList", "loadStyle", totalProvider);
-                addOrderByAction("#styleList", "loadStyle");
-                addFilterAction("#styleList", "loadStyle");
-                addResetFilterAction("#styleList", "loadStyle");
-
-                $("#dataList [data-name=previous]").addClass("active");
-                $("#dataList [data-name=nbLayersselect]").val("10");
-                firstTime=1;
-            }
-        }
     </script>
 </div>

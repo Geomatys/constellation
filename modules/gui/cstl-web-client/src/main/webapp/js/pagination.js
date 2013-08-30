@@ -144,3 +144,37 @@ function generatePagination(root, method, nbPage){
         });
     }
 }
+
+/*********************** Data pagination ***********************/
+function setPaginationDataPage(){
+    if(firstTime==0){
+        var nbPage = totalProvider/10;
+        generatePagination("#dataList", "loadData", nbPage);
+        addLayerSelectAction("#dataList", "loadData", totalProvider);
+        addOrderByAction("#dataList", "loadData");
+        addFilterAction("#dataList", "loadData");
+        addResetFilterAction("#dataList", "loadData");
+
+        $("#dataList [data-name=previous]").addClass("active");
+        $("#dataList [data-name=nbLayersselect]").val("10");
+        firstTime=1;
+    }
+
+}
+
+
+/*********************** STYLE pagination ***********************/
+function setPaginationStylePage(){
+    if(firstTime==0){
+        var nbPage = totalProvider/10;
+        generatePagination("#styleList", "loadStyle", nbPage);
+        addLayerSelectAction("#styleList", "loadStyle", totalProvider);
+        addOrderByAction("#styleList", "loadStyle");
+        addFilterAction("#styleList", "loadStyle");
+        addResetFilterAction("#styleList", "loadStyle");
+
+        $("#dataList [data-name=previous]").addClass("active");
+        $("#dataList [data-name=nbLayersselect]").val("10");
+        firstTime=1;
+    }
+}
