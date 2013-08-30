@@ -92,6 +92,7 @@ import org.geotoolkit.wcs.xml.v111.FieldType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
 import org.geotoolkit.wcs.xml.v111.RangeType;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.dto.Service;
 import org.geotoolkit.wcs.xml.v100.InterpolationMethod;
 import org.geotoolkit.gml.xml.v311.RectifiedGridType;
 import org.geotoolkit.gml.xml.v311.GridType;
@@ -181,7 +182,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     MISSING_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
         }
         
-        final List<CoverageInfo> coverageOfferings = new ArrayList<CoverageInfo>();
+        final List<CoverageInfo> coverageOfferings = new ArrayList<>();
         for (String coverage : request.getIdentifier()) {
             
             final Name tmpName = parseCoverageName(coverage);
@@ -441,15 +442,20 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         }
         
         // We unmarshall the static capabilities document.
-        final GetCapabilitiesResponse staticCapabilities = (GetCapabilitiesResponse) getStaticCapabilitiesObject(version, "WCS");
-
+        final GetCapabilitiesResponse staticCapabilities;
+        final Object skeleton = getStaticCapabilitiesObject(version, "WCS", null);
+        if (skeleton instanceof Service) {
+            staticCapabilities = WCSConstant.createCapabilities(version, (Service) skeleton);
+        } else {
+            staticCapabilities = (GetCapabilitiesResponse) skeleton;
+        }
         final AbstractServiceIdentification si  = staticCapabilities.getServiceIdentification();
         final AbstractServiceProvider sp        = staticCapabilities.getServiceProvider();
         final AbstractOperationsMetadata om     = getOperationMetadata(version);
         om.updateURL(getServiceUrl());
         
         
-        final List<CoverageInfo> offBrief = new ArrayList<CoverageInfo>();
+        final List<CoverageInfo> offBrief = new ArrayList<>();
         final List<Layer> layers = getConfigurationLayers(userLogin);
         try {
             for (Layer configLayer : layers) {
@@ -764,9 +770,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             try {
                 final GridCoverage2D gridCov = layerRef.getCoverage(refEnvel, size, elevation, date);
                 image = gridCov.getRenderedImage();
-            } catch (IOException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            } catch (DataStoreException ex) {
+            } catch (IOException | DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
 
@@ -783,9 +787,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 final SpatialMetadata metadata = layerRef.getSpatialMetadata();
                 final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, elevation, date);
                 return new SimpleEntry(coverage, metadata);
-            } catch (IOException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            } catch (DataStoreException ex) {
+            } catch (IOException | DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
 
@@ -794,7 +796,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             //NOTE: ADRIAN HACKED HERE
 
             // SCENE
-            final Map<String, Object> renderParameters = new HashMap<String, Object>();
+            final Map<String, Object> renderParameters = new HashMap<>();
 
             renderParameters.put(KEY_TIME, date);
             renderParameters.put("ELEVATION", elevation);

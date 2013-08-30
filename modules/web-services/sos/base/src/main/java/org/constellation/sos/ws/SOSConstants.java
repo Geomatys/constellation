@@ -215,7 +215,7 @@ public final class SOSConstants {
         constraints.add(new org.geotoolkit.ows.xml.v110.DomainType("ImplementsExtendedOperators", new NoValues(), new ValueType("false")));
         final org.geotoolkit.ogc.xml.v200.ConformanceType conformance = new ConformanceType(constraints);
         
-        final org.geotoolkit.ogc.xml.v200.FilterCapabilities capa = new org.geotoolkit.ogc.xml.v200.FilterCapabilities(scalarCapabilities, spatial, temporal, conformance);
+        final org.geotoolkit.ogc.xml.v200.FilterCapabilities capa = new org.geotoolkit.ogc.xml.v200.FilterCapabilities(scalarCapabilities, spatial, temporal, null, conformance);
         SOS_FILTER_CAPABILITIES_V200.setFilterCapabilities(capa);
     }
     
