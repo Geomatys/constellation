@@ -82,7 +82,14 @@ public interface ServiceConfiguration {
      * @param instanceDirectory instance folder which contain metadata file
      * @return service abstract information
      */
-    String getAbstract(final File instanceDirectory);
+    public String getAbstract(final File instanceDirectory);
+
+    /**
+     * give instance version
+     * @param instanceDirectory instance folder which contain metadata file
+     * @return
+     */
+    public List<String> getVersion(final File instanceDirectory);
 
     /**
      * Give instance layer number

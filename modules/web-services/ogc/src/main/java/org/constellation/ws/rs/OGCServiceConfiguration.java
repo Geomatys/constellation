@@ -161,6 +161,8 @@ public class OGCServiceConfiguration {
                     //get service abstract
                     final String _abstract = configuration.getAbstract(instanceDirectory);
 
+                    final List<String> versions = configuration.getVersion(instanceDirectory);
+
                     final boolean serviceExist = WSEngine.serviceInstanceExist(serviceType, name);
                     ServiceStatus status;
                     Instance currentInstance;
@@ -179,6 +181,7 @@ public class OGCServiceConfiguration {
 
                         //add abstract & layer number on instance
                         currentInstance.set_abstract(_abstract);
+                        currentInstance.setVersions(versions);
                         currentInstance.setLayersNumber(layersNumber);
 
                         //add instance on list

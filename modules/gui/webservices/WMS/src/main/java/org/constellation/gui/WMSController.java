@@ -91,12 +91,6 @@ public class WMSController {
         final Instance instance  = servicesManager.getInstance(serviceId, Specification.WMS);
         final LayerList layers   = wmsManager.getLayers(serviceId);
 
-        // Build service capabilities URL.
-        String capabilitiesUrl = cstl.getUrl() + "WS/wms/" + serviceId +"?REQUEST=GetCapabilities&SERVICE=WMS";
-        if (metadata.getVersions().size() == 1) {
-            capabilitiesUrl += "&VERSION=" + metadata.getVersions().get(0);
-        }
-
         //use parameter map (not type safe technique) because we aren't on juzu project => gtmpl aren't build.
         final Map<String, Object> parameters = new HashMap<>(0);
         parameters.put("service", metadata);

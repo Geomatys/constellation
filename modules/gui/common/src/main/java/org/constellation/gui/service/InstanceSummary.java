@@ -38,6 +38,10 @@ public class InstanceSummary {
      */
     private int layersNumber;
 
+
+    private String capabilitiesUrl;
+
+
     public String getName() {
         return name;
     }
@@ -76,5 +80,13 @@ public class InstanceSummary {
 
     public void setLayersNumber(int layersNumber) {
         this.layersNumber = layersNumber;
+    }
+
+    public String getCapabilitiesUrl() {
+        return capabilitiesUrl;
+    }
+
+    public void setCapabilitiesUrl(final String capabilitiesUrl) {
+        this.capabilitiesUrl = capabilitiesUrl;
     }
 }

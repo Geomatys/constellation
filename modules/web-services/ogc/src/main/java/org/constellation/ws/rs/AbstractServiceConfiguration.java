@@ -168,9 +168,26 @@ public abstract class AbstractServiceConfiguration implements ServiceConfigurati
     }
 
     @Override
+    public List<String> getVersion(final File instanceDirectory) {
+        try{
+            //unmarshall serviceMetadata.xml File to create Service object
+            final JAXBContext context = JAXBContext.newInstance(Service.class, Contact.class, AccessConstraint.class);
+            final Unmarshaller unmarshaller = context.createUnmarshaller();
+            final File serviceMetadata = new File(instanceDirectory, "serviceMetadata.xml");
+            final Service service = (Service) unmarshaller.unmarshal(serviceMetadata);
+            return service.getVersions();
+        } catch (JAXBException ex){
+            LOGGER.log(Level.FINEST, "no serviceMetadata.xml");
+        }
+        return new ArrayList<>(0);
+    }
+
+
+    @Override
     public List<Layer> getlayersNumber(final Worker worker) {
         return new ArrayList<>(0);
     }
+
 
     /**
      * Add layer on service

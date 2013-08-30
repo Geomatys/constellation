@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -45,6 +46,9 @@ public class Instance {
 
     @XmlAttribute
     private Integer layersNumber;
+
+    @XmlAttribute
+    private List<String> versions;
 
     public Instance() {
 
@@ -139,5 +143,13 @@ public class Instance {
             sb.append("status:").append(status).append('\n');
         }
         return sb.toString();
+    }
+
+    public void setVersions(final List<String> versions) {
+        this.versions = versions;
+    }
+
+    public List<String> getVersions() {
+        return versions;
     }
 }

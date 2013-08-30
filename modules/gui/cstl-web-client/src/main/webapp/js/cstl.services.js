@@ -173,4 +173,13 @@ $(function() {
         window.open($(this).data('capabilities'));
         return false;
     });
+    $('[data-action="open-service-url"]').click(function() {
+        var capabilities = $(this).data('capabilities');
+        var beginQuery = capabilities.indexOf('?');
+        var url = capabilities.substring(0, beginQuery);
+        $("#url-modal-pre").empty();
+        $("#url-modal-pre").append(url);
+        $("#url-modal").modal();
+        return false;
+    });
 });

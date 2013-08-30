@@ -157,6 +157,27 @@ public class  ServicesManager {
             instanceSum.setName(instance.getName());
             instanceSum.setStatus(instance.getStatus().toString());
             instanceSum.setType(instance.getType().toLowerCase());
+
+            // Build service capabilities URL.
+            String capabilitiesUrl = cstl.getUrl() + "WS/"+instance.getType().toLowerCase()+"/" + instance.getName() +"?REQUEST=GetCapabilities&SERVICE="+instance.getType().toUpperCase();
+
+
+            if (instance.getVersions().size()>0) {
+                double version=0;
+                String selectedVersion = "";
+
+                for (String currentVersion : instance.getVersions()) {
+                    double testedVersion = Double.parseDouble(currentVersion.replace(".", ""));
+
+                    if(testedVersion>version){
+                        version= testedVersion;
+                        selectedVersion = currentVersion;
+                    }
+                }
+                capabilitiesUrl += "&VERSION=" + selectedVersion;
+            }
+            instanceSum.setCapabilitiesUrl(capabilitiesUrl);
+
             instancesSummary.add(instanceSum);
         }
 
