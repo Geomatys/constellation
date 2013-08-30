@@ -33,11 +33,13 @@ import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
+import org.geotoolkit.index.tree.Tree;
 
 // Geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.lucene.tree.NamedEnvelope;
 
 /**
  * Factory used to load various implementation of metadata reader/writer, and Lucene indexer/searcher.
@@ -101,7 +103,7 @@ public interface AbstractCSWFactory {
      * @return  a Lucene index searcher for the specified dataSource type.
      * @throws IndexingException
      */
-    LuceneIndexSearcher getIndexSearcher(final File configDir, final String serviceID) throws IndexingException;
+    LuceneIndexSearcher getIndexSearcher(final File configDir, final String serviceID, final Tree<NamedEnvelope> rTree) throws IndexingException;
 
     /**
      * Return a catalog harvester in the specified implementation type.

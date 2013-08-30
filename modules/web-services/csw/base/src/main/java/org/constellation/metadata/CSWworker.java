@@ -169,14 +169,14 @@ public class CSWworker extends AbstractWorker {
     /**
      * A map of QName - xsd schema object
      */
-    private final Map<QName, Object> schemas = new HashMap<QName, Object>();
+    private final Map<QName, Object> schemas = new HashMap<>();
 
     /**
      * A list of supported MIME type.
      */
     private static final List<String> ACCEPTED_OUTPUT_FORMATS;
     static {
-        ACCEPTED_OUTPUT_FORMATS = new ArrayList<String>();
+        ACCEPTED_OUTPUT_FORMATS = new ArrayList<>();
         ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_XML);
         ACCEPTED_OUTPUT_FORMATS.add(MimeType.APPLICATION_XML);
         ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_HTML);
@@ -314,7 +314,7 @@ public class CSWworker extends AbstractWorker {
         mdReader                      = cswfactory.getMetadataReader(configuration);
         profile                       = configuration.getProfile();
         final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID, mdReader.getAdditionalQueryablePathMap());
-        indexSearcher                 = cswfactory.getIndexSearcher(configDir, serviceID);
+        indexSearcher                 = cswfactory.getIndexSearcher(configDir, serviceID, indexer.getRtree());
         luceneFilterParser            = cswfactory.getLuceneFilterParser();
         sqlFilterParser               = cswfactory.getSQLFilterParser();
         securityFilter                = cswfactory.getSecurityFilter();
@@ -375,7 +375,7 @@ public class CSWworker extends AbstractWorker {
      * Initialize the supported outputSchema in function of the reader capacity.
      */
     private void initializeAcceptedResourceType() {
-        acceptedResourceType = new ArrayList<String>();
+        acceptedResourceType = new ArrayList<>();
         final List<Integer> supportedDataTypes = mdReader.getSupportedDataTypes();
         if (supportedDataTypes.contains(ISO_19115)) {
             acceptedResourceType.add(Namespaces.GMD);
@@ -394,7 +394,7 @@ public class CSWworker extends AbstractWorker {
      * Initialize the supported outputSchema in function of the reader capacity.
      */
     private void initializeSupportedSchemaLanguage() {
-        supportedSchemaLanguage = new ArrayList<String>();
+        supportedSchemaLanguage = new ArrayList<>();
         supportedSchemaLanguage.add("http://www.w3.org/XML/Schema");
         supportedSchemaLanguage.add("XMLSCHEMA");
         supportedSchemaLanguage.add("http://www.w3.org/TR/xmlschema-1/");
@@ -444,7 +444,7 @@ public class CSWworker extends AbstractWorker {
      * Load the federated CSW server from a properties file.
      */
     private void loadCascadedService(final File configDirectory) {
-        cascadedCSWservers = new ArrayList<String>();
+        cascadedCSWservers = new ArrayList<>();
         try {
             // we get the cascading configuration file
             final File f = new File(configDirectory, "CSWCascading.properties");
@@ -592,7 +592,7 @@ public class CSWworker extends AbstractWorker {
             }
             final AbstractDomain tn = gr.getParameter(TYPENAMES);
             if (tn != null) {
-                final List<String> values = new ArrayList<String>();
+                final List<String> values = new ArrayList<>();
                 for (QName qn : supportedTypeNames) {
                     values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
                 }
@@ -602,7 +602,7 @@ public class CSWworker extends AbstractWorker {
             //we update the ISO queryable elements :
             final AbstractDomain isoQueryable = gr.getConstraint("SupportedISOQueryables");
             if (isoQueryable != null) {
-                final List<String> values = new ArrayList<String>();
+                final List<String> values = new ArrayList<>();
                 for (String name : ISO_QUERYABLE.keySet() ) {
                     values.add("apiso:" + name);
                 }
@@ -611,7 +611,7 @@ public class CSWworker extends AbstractWorker {
             //we update the DC queryable elements :
             final AbstractDomain dcQueryable = gr.getConstraint("SupportedDublinCoreQueryables");
             if (dcQueryable != null) {
-                final List<String> values = new ArrayList<String>();
+                final List<String> values = new ArrayList<>();
                 for (String name : DUBLIN_CORE_QUERYABLE.keySet() ) {
                     values.add("dc:" + name);
                 }
@@ -732,8 +732,8 @@ public class CSWworker extends AbstractWorker {
         //We initialize (and verify) the principal attribute of the query
         Query query;
         List<QName> typeNames;
-        final Map<String, QName> variables = new HashMap<String, QName>();
-        final Map<String, String> prefixs  = new HashMap<String, String>();
+        final Map<String, QName> variables = new HashMap<>();
+        final Map<String, String> prefixs  = new HashMap<>();
         if (request.getAbstractQuery() != null) {
             query = (Query)request.getAbstractQuery();
             typeNames =  query.getTypeNames();
