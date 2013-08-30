@@ -17,8 +17,6 @@
 
 package org.constellation.configuration;
 
-import org.apache.sis.internal.jdk7.Objects;
-
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -26,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
+import java.util.Objects;
 
 /**
  *
