@@ -16,7 +16,6 @@
  */
 package org.constellation.process.service;
 
-import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
