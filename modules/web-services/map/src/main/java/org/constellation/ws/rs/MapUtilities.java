@@ -56,7 +56,6 @@ public class MapUtilities {
             final Set<Name> layerNames = namedProxy.getKeys(sourceID);
             for (final Name layerName : layerNames) {
                 final QName qn = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
-                Layer layer = null;
 
                 /*
                  * first case : source is in load-all mode
@@ -68,40 +67,62 @@ public class MapUtilities {
                         // we look for detailled informations in the include sections
                     } else {
                         if (securityFilter.allowed(login, layerName)) {
-                            layer = source.isIncludedLayer(qn);
+                            Layer layer = source.isIncludedLayer(qn);
                             if (layer == null) {
                                 layer = new Layer(qn);
                             }
                             layer.setProviderID(sourceID);
+                            buildDataAndType(layers, sourceID, layerName, layer);
                         }
                     }
                     /*
                      * second case : we include only the layer in the balise include
                      */
                 } else {
-                    layer = source.isIncludedLayer(qn);
-                    if (layer != null && securityFilter.allowed(login, layerName)) {
-                        layer.setProviderID(sourceID);
-                    }
-                }
 
-                //set layer type
-                if (layer != null) {
-                    try {
-                        final DataType dt = LayerProviders.getDataType(sourceID, layerName.getLocalPart());
-                        layer.setType(dt.toString());
-                    } catch (CstlServiceException e) {
-                        LOGGER.log(Level.WARNING, "", e);
+                    /*
+                     * Get all layer with layer name
+                     * NOTE : This case is for get all layer with same name and same source provider
+                     * but differente data version.
+                     */
+                    List<Layer> allLayer = source.allIncludedLayer(qn);
+                    if (!allLayer.isEmpty()) {
+                        for (Layer layer : allLayer) {
+                            layer.setProviderID(sourceID);
+                            layers.add(layer);
+                            buildDataAndType(layers, sourceID, layerName, layer);
+                        }
                     }
-
-                    //set layer date
-                    final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(sourceID);
-                    final String date = (String) provider.getSource().parameter("date").getValue();
-                    layer.setDate(date);
-                    layers.add(layer);
                 }
             }
         }
         return layers;
+    }
+
+    /**
+     * Define layer date and layer type (vector or raster) using layer provider.
+     * And add layer to input list.
+     *
+     * @param layers input {@link List}
+     * @param sourceID provider id
+     * @param layerName name of layer
+     * @param layer layer configuration
+     */
+    private static void buildDataAndType(final List<Layer> layers, final String sourceID, final Name layerName, final Layer layer) {
+        //set layer type
+        if (layer != null) {
+            try {
+                final DataType dt = LayerProviders.getDataType(sourceID, layerName.getLocalPart());
+                layer.setType(dt.toString());
+            } catch (CstlServiceException e) {
+                LOGGER.log(Level.WARNING, e.getMessage(), e);
+            }
+
+            //set layer date
+            final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(sourceID);
+            final String date = (String) provider.getSource().parameter("date").getValue();
+            layer.setDate(date);
+            layers.add(layer);
+        }
     }
 }
