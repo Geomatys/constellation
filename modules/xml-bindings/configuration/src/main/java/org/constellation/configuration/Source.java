@@ -17,14 +17,15 @@
 
 package org.constellation.configuration;
 
-import java.util.Date;
+import org.apache.sis.internal.jdk7.Objects;
+
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
-import java.util.Objects;
 
 /**
  *
@@ -189,6 +190,35 @@ public class Source {
             }
         }
         return null;
+    }
+    
+    /**
+     * Return all layer objects if the specified layer name is included from the source.
+     * or {@code null} else;
+     *
+     * @param name
+     * @return
+     */
+    public List<Layer> allIncludedLayer(final QName name) {
+        final List<Layer> layers = new ArrayList<Layer>();
+        for (Layer layer : getInclude()) {
+            final QName layerName = layer.getName();
+            /*
+             * fix an xml bug with QName
+             * when xmlns is set to "http://www.constellation.org/config" in the layer context,
+             * the layer take this as a namespace
+             */
+            if (layerName != null) {
+                if (layerName.getNamespaceURI() != null && layerName.getNamespaceURI().equals("http://www.constellation.org/config")) {
+                    if (layerName.getLocalPart().equals(name.getLocalPart())) {
+                        layers.add(layer);
+                    }
+                } else if (layerName.equals(name)) {
+                    layers.add(layer);
+                }
+            }
+        }
+        return layers;
     }
 
     /**
