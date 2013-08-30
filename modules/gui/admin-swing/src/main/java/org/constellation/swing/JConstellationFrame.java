@@ -18,8 +18,10 @@ package org.constellation.swing;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.admin.service.ConstellationServerFactory;
 import org.constellation.security.RoleController;
@@ -93,7 +95,9 @@ public final class JConstellationFrame extends JFrame{
     }
     
     public static void main(String[] args) throws MalformedURLException {
-        JConstellationFrame.show("admin", "admin", "http://localhost:8084/constellation/WS/", true);
+    	String url = args.length==1?args[0]:"http://localhost:8084/constellation/WS/";
+        
+		JConstellationFrame.show("admin", "admin", url, true);
     }
     
 }
