@@ -2,12 +2,10 @@ package org.constellation.gui.Mock;
 
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
-import org.constellation.dto.Service;
-import org.constellation.gui.service.WMSManager;
+import org.constellation.gui.service.MapManager;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
-import org.constellation.ServiceDef.Specification;
 
 /**
  * Just WMS Mock
@@ -17,9 +15,10 @@ import org.constellation.ServiceDef.Specification;
  * @since 0.9
  *
  */
-public class WMSManagerMock extends WMSManager{
+public class MapManagerMock extends MapManager {
 
-    private static final Logger LOGGER = Logger.getLogger(WMSManagerMock.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MapManagerMock.class.getName());
+
 
     /**
      * @param serviceName

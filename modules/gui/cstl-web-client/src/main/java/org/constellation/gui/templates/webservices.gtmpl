@@ -16,6 +16,7 @@
             </a>
             <ul class="dropdown-menu">
                 <li><a href="create/wms" id="wmschoice">&{webservicepage.button.dropdown.wms.label}</a></li>
+                <li><a href="create/wcs" id="wcschoice">&{webservicepage.button.dropdown.wcs.label}Coverage</a></li>
             </ul>
         </div>
     </div>

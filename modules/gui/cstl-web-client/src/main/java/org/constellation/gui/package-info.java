@@ -19,35 +19,35 @@
  * Juzu application declaration. List all alias need to run cstl-web-client
  */
 @juzu.Application(defaultController = Controller.class, resourceAliases = {
-        @Alias(of = "/org/constellation/gui/templates/menu.gtmpl",                  as = "menu.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/menu.gtmpl",                      as = "menu.gtmpl"),
 
-        //WMS
-        @Alias(of = "/org/constellation/gui/templates/layer.gtmpl",                 as = "layer.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/layer_listings.gtmpl",        as = "layer_listings.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wms_description.gtmpl",       as = "wms_description.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wms_metadata.gtmpl",          as = "wms_metadata.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wms.gtmpl",                   as = "wms.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wms_create_description.gtmpl",as = "wms_create_description.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wms_create_metadata.gtmpl",   as = "wms_create_metadata.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/wms_create.gtmpl",            as = "wms_create.gtmpl"),
+        //MAP
+        @Alias(of = "/org/constellation/gui/templates/layer.gtmpl",                     as = "layer.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/layer_listings.gtmpl",            as = "layer_listings.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/description.gtmpl",               as = "description.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/metadata.gtmpl",                  as = "metadata.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/map_service.gtmpl",               as = "map_service.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/create_service_description.gtmpl",as = "create_service_description.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/create_service_metadata.gtmpl",   as = "create_service_metadata.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/create_map_service.gtmpl",        as = "create_map_service.gtmpl"),
 
         //Raster
-        @Alias(of = "/org/constellation/gui/templates/raster_description.gtmpl",    as = "raster_description.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/raster_bands.gtmpl",          as = "raster_bands.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/raster_description.gtmpl",        as = "raster_description.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/raster_bands.gtmpl",              as = "raster_bands.gtmpl"),
 
         // Style
-        @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",       as = "style_dashboard.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_overview.gtmpl",        as = "style_overview.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_edition.gtmpl",         as = "style_edition.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_fts.gtmpl",             as = "style_fts.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_rule_manual.gtmpl",     as = "style_rule_manual.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_rule_ai.gtmpl",         as = "style_rule_ai.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_rule_auv.gtmpl",        as = "style_rule_auv.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_symbol_point.gtmpl",    as = "style_symbol_point.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_symbol_line.gtmpl",     as = "style_symbol_line.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_symbol_polygon.gtmpl",  as = "style_symbol_polygon.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_symbol_text.gtmpl",     as = "style_symbol_text.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_symbol_raster.gtmpl",   as = "style_symbol_raster.gtmpl")})
+        @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",           as = "style_dashboard.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_overview.gtmpl",            as = "style_overview.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_edition.gtmpl",             as = "style_edition.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_fts.gtmpl",                 as = "style_fts.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_rule_manual.gtmpl",         as = "style_rule_manual.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_rule_ai.gtmpl",             as = "style_rule_ai.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_rule_auv.gtmpl",            as = "style_rule_auv.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_point.gtmpl",        as = "style_symbol_point.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_line.gtmpl",         as = "style_symbol_line.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_polygon.gtmpl",      as = "style_symbol_polygon.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_text.gtmpl",         as = "style_symbol_text.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_raster.gtmpl",       as = "style_symbol_raster.gtmpl")})
 
 
 

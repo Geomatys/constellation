@@ -19,8 +19,8 @@
                     <div class="btn-group">
                         <button type="button" class="btn btn-small" data-action="open-capabilities" data-capabilities="${capabilitiesUrl}">&{service.description.getcapabilities.button}</button>
                         <button type="button" class="btn btn-small" data-action="open-logs">&{service.description.logs.button}</button>
-                        <button type="button" class="btn btn-small btn-info" data-action="restart-service" data-service-type="WMS" data-service-id="${service.identifier}">&{service.description.reload.button}</button>
-                        <button type="button" class="btn btn-small <%if(instance.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-action="toggle-service" data-service-type="WMS" data-service-id="${service.identifier}">
+                        <button type="button" class="btn btn-small btn-info" data-action="restart-service" data-service-type="${instance.type}" data-service-id="${service.identifier}">&{service.description.reload.button}</button>
+                        <button type="button" class="btn btn-small <%if(instance.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-action="toggle-service" data-service-type="${instance.type}" data-service-id="${service.identifier}">
                             <span class="label-start">&{service.description.start.button}</span>
                             <span class="label-stop">&{service.description.stop.button}</span>
                         </button>
@@ -41,10 +41,10 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane" id="description">
-                    #{include path=wms_description.gtmpl/}
+                    #{include path=description.gtmpl/}
                 </div>
                 <div class="tab-pane" id="metadata">
-                    #{include path=wms_metadata.gtmpl/}
+                    #{include path=metadata.gtmpl/}
                 </div>
                 <div class="tab-pane active" id="data">
                     #{include path=layer_listings.gtmpl/}

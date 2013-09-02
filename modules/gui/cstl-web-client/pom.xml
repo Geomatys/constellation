@@ -34,7 +34,7 @@
         <!-- GUI parts -->
         <dependency>
             <groupId>org.constellation.gui</groupId>
-            <artifactId>WMS</artifactId>
+            <artifactId>MAP</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

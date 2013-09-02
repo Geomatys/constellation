@@ -22,7 +22,7 @@
         <property name="password" ref="constellationPassword"/>
     </bean>
 
-    <bean class="org.constellation.gui.mock.WMSManagerMock" id="wmsManager" scope="session">
+    <bean class="org.constellation.gui.mock.MapManagerMock" id="mapManager" scope="session">
         <property name="constellationUrl" ref="constellationURL"/>
         <property name="login" ref="constellationlogin"/>
         <property name="password" ref="constellationPassword"/>

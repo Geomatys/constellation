@@ -18,7 +18,6 @@
 package org.constellation.gui;
 
 import juzu.Path;
-import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
@@ -28,8 +27,8 @@ import org.constellation.configuration.Instance;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.ConstellationService;
+import org.constellation.gui.service.MapManager;
 import org.constellation.gui.service.ServicesManager;
-import org.constellation.gui.service.WMSManager;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -43,7 +42,7 @@ import java.util.Map;
  * @version 0.9
  * @since 0.9
  */
-public class WMSController {
+public class MapController {
 
     @Inject
     private ConstellationService cstl;
@@ -52,47 +51,49 @@ public class WMSController {
     private ServicesManager servicesManager;
 
     @Inject
-    private WMSManager wmsManager;
+    private MapManager mapManager;
 
     /**
      * root wms service page
      */
     @Inject
-    @Path("wms_create.gtmpl")
-    Template index;
+    @Path("create_map_service.gtmpl")
+    Template create;
 
     @Inject
-    @Path("wms.gtmpl")
+    @Path("map_service.gtmpl")
     Template serviceDescription;
 
 
     /**
      * Generate wms service main page.
      *
-     * @return the view {@link Response}
+     * @return the view {@link juzu.Response}
      */
     @View
-    @Route("/create/wms")
-    public Response index() {
-        return index.ok().withMimeType("text/html");
+    @Route("/create/{serviceType}")
+    public Response index(String serviceType) {
+        final Map<String, Object> parameters = new HashMap<>(0);
+        parameters.put("serviceType", serviceType);
+        return create.ok(parameters).withMimeType("text/html");
     }
 
     /**
      * Generate WMS service edition page.
      *
      * @param serviceId the service identifier
-     * @return the view {@link Response}
-     * @throws IOException on communication error with Constellation server
+     * @return the view {@link juzu.Response}
+     * @throws java.io.IOException on communication error with Constellation server
      */
     @View
-    @Route("edit/wms/{serviceId}")
-    public Response editWMS(String serviceId) throws IOException {
-        final Service metadata   = servicesManager.getMetadata(serviceId, Specification.WMS);
-        final Instance instance  = servicesManager.getInstance(serviceId, Specification.WMS);
-        final LayerList layers   = wmsManager.getLayers(serviceId);
+    @Route("edit/{serviceType}/{serviceId}")
+    public Response editMapService(String serviceId, String serviceType) throws IOException {
+        final Service metadata   = servicesManager.getMetadata(serviceId, Specification.fromShortName(serviceType));
+        final Instance instance  = servicesManager.getInstance(serviceId, Specification.fromShortName(serviceType));
+        final LayerList layers   = mapManager.getLayers(serviceId);
 
         // Build service capabilities URL.
-        String capabilitiesUrl = cstl.getUrl() + "WS/wms/" + serviceId +"?REQUEST=GetCapabilities&SERVICE=WMS";
+        String capabilitiesUrl = cstl.getUrl() + "WS/"+serviceType+"/" + serviceId +"?REQUEST=GetCapabilities&SERVICE="+Specification.fromShortName(serviceType).name();
         if (metadata.getVersions().size() == 1) {
             capabilitiesUrl += "&VERSION=" + metadata.getVersions().get(0);
         }

@@ -39,9 +39,9 @@ import org.constellation.dto.DataInformation;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
 import org.constellation.gui.service.InstanceSummary;
+import org.constellation.gui.service.MapManager;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.service.ServicesManager;
-import org.constellation.gui.service.WMSManager;
 import org.constellation.gui.service.bean.LayerData;
 import org.constellation.gui.templates.add_data_listing;
 import org.constellation.gui.templates.webservices;
@@ -88,7 +88,7 @@ public class Controller {
     protected ServicesManager servicesManager;
 
     @Inject
-    protected WMSManager wmsManager;
+    protected MapManager mapManager;
 
     @Inject
     protected ProviderManager providerManager;
@@ -183,9 +183,9 @@ public class Controller {
      * @throws IOException on communication error with Constellation server
      */
     @Action
-    @Route("/wms/success")
-    public Response createWMSService(Service createdService, Contact serviceContact, AccessConstraint serviceConstraint,
-                                     String v111, String v130, String keywords) throws IOException {
+    @Route("/{serviceType}/success")
+    public Response createService(Service createdService, Contact serviceContact, AccessConstraint serviceConstraint,
+                                  String v111, String v130, String keywords, String serviceType) throws IOException {
 
         //create version list to set on createdService
         List<String> versionList = new ArrayList<String>(0);
@@ -207,10 +207,10 @@ public class Controller {
         createdService.setServiceContact(serviceContact);
 
         //call service
-        boolean created = servicesManager.createServices(createdService, Specification.WMS);
+        boolean created = servicesManager.createServices(createdService, Specification.fromShortName(serviceType));
 
         //return generated view
-        return Controller_.succeded(createdService, "WMS", versionList, created + "");
+        return Controller_.succeded(createdService, Specification.fromShortName(serviceType).name(), versionList, created + "");
     }
 
     /**
@@ -243,7 +243,7 @@ public class Controller {
     @Resource
     @Route("/datalist")
     public void generateDataList(String serviceId, String startElement, String counter, String orderBy, String direction, String filter) throws IOException {
-        LayerList layers = wmsManager.getLayers(serviceId);
+        LayerList layers = mapManager.getLayers(serviceId);
         Map<String, Object> parameters = new HashMap<String, Object>(0);
         int nbByPage =  Integer.parseInt(counter);
 
@@ -385,7 +385,7 @@ public class Controller {
     public Response addLayer(final String providerId, final String layerProviderId, final String styleName, final String layerName, final String serviceId){
         AddLayer toAddLayer = new AddLayer(layerName, "WMS", serviceId, providerId, layerProviderId, "sld", styleName);
         providerManager.addLayer(toAddLayer);
-        return WMSController_.editWMS(serviceId);
+        return MapController_.editMapService(serviceId, "wms");
     }
 
     /**

@@ -18,6 +18,6 @@
     </properties>
 
     <modules>
-        <module>WMS</module>
+        <module>MAP</module>
     </modules>
 </project>

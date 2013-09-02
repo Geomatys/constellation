@@ -1,48 +1,48 @@
-<!-- wms creation description part. Its the first form part. -->
+<!-- creation description part. Its the first form part. -->
 <div id="description">
     <div class="row" style="height:30px;">
         <div class="navbar">
             <div class="navbar-inner">
-                <a class="brand" href="#">&{wms.create.title.label}</a>
+                <a class="brand" href="#">&{create.title.label}</a>
             </div>
         </div>
     </div>
     <!-- main part -->
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <div class="span2 well">
-            <p><h4>&{wms.create.description.title.label}</h4></p>
-            <p>&{wms.create.description.text}</p>
+            <p><h4>&{create.description.title.label}</h4></p>
+            <p>&{create.description.text}</p>
         </div>
         <div class="span9">
             <fieldset>
-                <legend>&{wms.create.description.service.legend}</legend>
+                <legend>&{create.description.service.legend}</legend>
                 <div class="control-group">
-                    <label class="control-label" for="name">&{wms.create.description.service.name.label}</label>
+                    <label class="control-label" for="name">&{create.description.service.name.label}</label>
                     <div class="controls">
                         <input type="text" id="name" name="createdService.name">
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label" for="identifier">&{wms.create.description.service.identifier.label}</label>
+                    <label class="control-label" for="identifier">&{create.description.service.identifier.label}</label>
                     <div class="controls">
                         <input type="text" id="identifier" name="createdService.identifier">
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label" for="keywords">&{wms.create.description.service.keywords.label}</label>
+                    <label class="control-label" for="keywords">&{create.description.service.keywords.label}</label>
 
                     <div class="controls">
                         <input type="text" id="keywords" name="keywords"/>
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label" for="inputDescription">&{wms.create.description.service.description.label}</label>
+                    <label class="control-label" for="inputDescription">&{create.description.service.description.label}</label>
                     <div class="controls">
                         <textarea cols="50" id="inputDescription" name="createdService.description" class="input-xxlarge"></textarea>
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label">&{wms.create.description.version.title}</label>
+                    <label class="control-label">&{create.description.version.title}</label>
                     <div class="controls">
                         <label class="checkbox inline" for="v111">
                             <input type="checkbox" value="1.1.1" id="v111" name="v111"> 1.1.1
@@ -59,8 +59,8 @@
         <div class="row">
             <div class="span2 offset10">
             </br>
-                <a href="@{webservices()}">&{wms.create.cancel.label}</a>
-                <a class="btn btn-primary" onclick="goToMetadata();" type="button" id="nextButton">&{wms.create.next.label}</a>
+                <a href="@{webservices()}">&{create.cancel.label}</a>
+                <a class="btn btn-primary" onclick="goToMetadata();" type="button" id="nextButton">&{create.next.label}</a>
             </div>
         </div>
     </div>

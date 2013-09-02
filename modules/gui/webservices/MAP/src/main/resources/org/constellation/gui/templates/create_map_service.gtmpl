@@ -1,5 +1,6 @@
 #{decorate path=menu.gtmpl/}
 
+#{param name=serviceType/}
 <!-- Header -->
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
@@ -7,13 +8,13 @@
     </div>
 </div>
 
-<!-- Form to create WMS service -->
-<form class="form-horizontal" action="@{createWMSService()}" method="post">
-    #{include path=wms_create_description.gtmpl/}
-    #{include path=wms_create_metadata.gtmpl/}
+<!-- Form to create service -->
+<form class="form-horizontal" action="@{createService(serviceType = serviceType)}" method="post">
+    #{include path=create_service_description.gtmpl/}
+    #{include path=create_service_metadata.gtmpl/}
 </form>
 
-<!-- Javascript part to manage pagination and tooltip on wms creation page -->
+<!-- Javascript part to manage pagination and tooltip on creation page -->
 <script type="text/javascript">
     // on load hide metadata part
     jQuery('#metadata').fadeToggle();

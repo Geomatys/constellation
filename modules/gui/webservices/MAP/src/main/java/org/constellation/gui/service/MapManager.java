@@ -30,7 +30,7 @@ import java.io.IOException;
  * @author Bernard Fabien (Geomatys).
  * @since 0.9
  */
-public class WMSManager {
+public class MapManager {
 
     /**
      * Constellation manager used to communicate with the Constellation server.
@@ -42,8 +42,8 @@ public class WMSManager {
      * Loads a service layer list.
      *
      * @param serviceId   the service identifier
-     * @return the {@link LayerList} instance
-     * @throws IOException on communication error with Constellation server
+     * @return the {@link org.constellation.configuration.LayerList} instance
+     * @throws java.io.IOException on communication error with Constellation server
      */
     public LayerList getLayers(final String serviceId) throws IOException {
         return cstl.openClient().services.getLayers(Specification.WMS, serviceId);
