@@ -21,7 +21,6 @@ import java.awt.Rectangle;
 import java.io.File;
 import java.text.ParseException;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import org.apache.sis.storage.DataStoreException;
 
@@ -61,6 +60,7 @@ import org.geotoolkit.wmts.WMTSUtilities;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.*;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.dto.Service;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -167,22 +167,28 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         }
         
         // we load the skeleton capabilities 
-        final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "WMTS");
+        final Capabilities skeletonCapabilities;
+        final Object skeleton = getStaticCapabilitiesObject("1.0.0", "WMTS", null);
+        if (skeleton instanceof Service) {
+            skeletonCapabilities = (Capabilities) WMTSConstant.createCapabilities("1.0.0", (Service) skeleton);
+        } else {
+            skeletonCapabilities = (Capabilities) skeleton;
+        }
         
          //we prepare the response document
         final ServiceIdentification si = skeletonCapabilities.getServiceIdentification();
         final ServiceProvider       sp = skeletonCapabilities.getServiceProvider();
-        final OperationsMetadata    om = WMTSConstant.OPERATIONS_METADATA.clone();
+        final OperationsMetadata    om = (OperationsMetadata) WMTSConstant.OPERATIONS_METADATA.clone();
         // TODO
-        final List<Themes>      themes = new ArrayList<Themes>();
+        final List<Themes>      themes = new ArrayList<>();
         
         //we update the URL
         om.updateURL(getServiceUrl());
 
         // Build the list of layers
-        final List<LayerType> outputLayers = new ArrayList<LayerType>();
+        final List<LayerType> outputLayers = new ArrayList<>();
         // and the list of matrix set
-        final List<TileMatrixSet> tileSets = new ArrayList<TileMatrixSet>();
+        final List<TileMatrixSet> tileSets = new ArrayList<>();
 
         final List<Layer> declaredLayers = getConfigurationLayers(userLogin);
 
@@ -221,7 +227,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                         env.getMaximum(0),
                         env.getMaximum(1));
 
-                final List<Dimension> dims  = new ArrayList<Dimension>();
+                final List<Dimension> dims  = new ArrayList<>();
                 final LayerType outputLayer = new LayerType(
                         name,
                         name,
@@ -235,7 +241,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     tms.setIdentifier(new CodeType(pr.getId()));
                     tms.setSupportedCRS(IdentifiedObjects.getIdentifier(pr.getCoordinateReferenceSystem()));
 
-                    final List<TileMatrix> tm = new ArrayList<TileMatrix>();
+                    final List<TileMatrix> tm = new ArrayList<>();
                     final double[] scales = pr.getScales();
                     for(int i=0; i<scales.length; i++){
                         final GridMosaic mosaic = pr.getMosaics(i).iterator().next();
@@ -259,9 +265,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 }
 
                 outputLayers.add(outputLayer);
-            } catch(DataStoreException ex) {
-                LOGGER.log(Level.WARNING, ex.getMessage(),ex);
-            } catch(TransformException ex) {
+            } catch(DataStoreException | TransformException ex) {
                 LOGGER.log(Level.WARNING, ex.getMessage(),ex);
             }
         }
@@ -314,7 +318,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 }
             }
         }
-        final Map<String, Object> params       = new HashMap<String, Object>();
+        final Map<String, Object> params = new HashMap<>();
         params.put("ELEVATION", elevation);
         params.put("TIME", time);
         final SceneDef sdef = new SceneDef();
@@ -327,9 +331,9 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         }
 
         // 2. VIEW
-        final JTSEnvelope2D refEnv             = new JTSEnvelope2D(c.getEnvelope());
-        final double azimuth                   = 0;//request.getAzimuth();
-        final ViewDef vdef = new ViewDef(refEnv,azimuth);
+        final JTSEnvelope2D refEnv = new JTSEnvelope2D(c.getEnvelope());
+        final double azimuth       = 0;//request.getAzimuth();
+        final ViewDef vdef         = new ViewDef(refEnv,azimuth);
 
 
         // 3. CANVAS
