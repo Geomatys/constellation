@@ -96,6 +96,7 @@ import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
+import org.constellation.dto.Service;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
@@ -354,7 +355,7 @@ public class CSWworker extends AbstractWorker {
      * Initialize the supported type names in function of the reader capacity.
      */
     private void initializeSupportedTypeNames() {
-        supportedTypeNames = new ArrayList<QName>();
+        supportedTypeNames = new ArrayList<>();
         final List<Integer> supportedDataTypes = mdReader.getSupportedDataTypes();
         if (supportedDataTypes.contains(ISO_19115)) {
             supportedTypeNames.addAll(ISO_TYPE_NAMES);
@@ -551,7 +552,13 @@ public class CSWworker extends AbstractWorker {
         */
 
         // we load the skeleton capabilities
-        final AbstractCapabilities skeletonCapabilities = (AbstractCapabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
+        final AbstractCapabilities skeletonCapabilities;
+        final Object skeleton = getStaticCapabilitiesObject("2.0.2", "CSW", null);
+        if (skeleton instanceof Service) {
+            skeletonCapabilities = CSWConstants.createCapabilities("2.0.2", (Service) skeleton);
+        } else {
+            skeletonCapabilities = (AbstractCapabilities) skeleton;
+        }
 
         //we prepare the response document
         final AbstractServiceIdentification si = skeletonCapabilities.getServiceIdentification();
@@ -621,7 +628,7 @@ public class CSWworker extends AbstractWorker {
             //we update the reader's additional queryable elements :
             final AbstractDomain additionalQueryable = gr.getConstraint("AdditionalQueryables");
             if (additionalQueryable != null) {
-                final List<String> values = new ArrayList<String>();
+                final List<String> values = new ArrayList<>();
                 for (QName name : mdReader.getAdditionalQueryableQName()) {
                     // allow to redefine the mapping in reader implementation
                     if (!ISO_QUERYABLE.containsKey(name.getLocalPart()) &&
@@ -647,7 +654,7 @@ public class CSWworker extends AbstractWorker {
         if (dr != null) {
             final AbstractDomain tn = dr.getParameter("TypeName");
             if (tn != null) {
-                final List<String> values = new ArrayList<String>();
+                final List<String> values = new ArrayList<>();
                 for (QName qn : supportedTypeNames) {
                     values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
                 }
@@ -1031,7 +1038,7 @@ public class CSWworker extends AbstractWorker {
      * @return 
      */
     private List<QName> getConvertibleTypeNames(final List<QName> typeNames) {
-        final List<QName> result = new ArrayList<QName>();
+        final List<QName> result = new ArrayList<>();
         for (QName typeName : typeNames) {
             if (typeName.equals(RECORD_QNAME) && !result.contains(METADATA_QNAME)) {
                 result.add(METADATA_QNAME);
@@ -1081,9 +1088,9 @@ public class CSWworker extends AbstractWorker {
 
         //we begin to build the result
         GetRecordByIdResponse response;
-        final List<String> unexistingID    = new ArrayList<String>();
-        final List<AbstractRecord> records = new ArrayList<AbstractRecord>();
-        final List<Object> otherRecords    = new ArrayList<Object>();
+        final List<String> unexistingID    = new ArrayList<>();
+        final List<AbstractRecord> records = new ArrayList<>();
+        final List<Object> otherRecords    = new ArrayList<>();
 
         final Class expectedType;
         final int mode;
@@ -1213,7 +1220,7 @@ public class CSWworker extends AbstractWorker {
                                            "\nsupported ones are:\n" + supportedList,
                                           INVALID_PARAMETER_VALUE, "schemaLanguage");
         }
-        final List<SchemaComponent> components   = new ArrayList<SchemaComponent>();
+        final List<SchemaComponent> components   = new ArrayList<>();
 
         if (typeNames.contains(RECORD_QNAME)) {
             final Object object = schemas.get(RECORD_QNAME);
@@ -1273,7 +1280,7 @@ public class CSWworker extends AbstractWorker {
          * "parameterName" return metadata about the service itself.
          */
         if (parameterName != null) {
-            responseList = new ArrayList<DomainValues>();
+            responseList = new ArrayList<>();
             final StringTokenizer tokens = new StringTokenizer(parameterName, ",");
             while (tokens.hasMoreTokens()) {
                 final String token      = tokens.nextToken().trim();
@@ -1389,7 +1396,7 @@ public class CSWworker extends AbstractWorker {
                         throw new CstlServiceException("A constraint must be specified.",
                                                       MISSING_PARAMETER_VALUE, "constraint");
                     }
-                    final List<QName> typeNames = new ArrayList<QName>();
+                    final List<QName> typeNames = new ArrayList<>();
                     final String dataType = deleteRequest.getTypeName();
                     if (dataType != null && !dataType.isEmpty()) {
                         try {
@@ -1447,7 +1454,7 @@ public class CSWworker extends AbstractWorker {
                                 MISSING_PARAMETER_VALUE, "MD_Metadata");
                     }
                     
-                    final List<QName> typeNames = new ArrayList<QName>();
+                    final List<QName> typeNames = new ArrayList<>();
                     // build the lucene query from the specified filter
                     final SpatialQuery luceneQuery;
                     try {

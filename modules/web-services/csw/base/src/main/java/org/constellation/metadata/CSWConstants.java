@@ -20,6 +20,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import net.jcip.annotations.Immutable;
+
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
+import org.constellation.dto.Service;
+
+import org.geotoolkit.csw.xml.AbstractCapabilities;
+import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorsType;
 import org.geotoolkit.ogc.xml.v110.FilterCapabilities;
@@ -29,17 +36,22 @@ import org.geotoolkit.ogc.xml.v110.ScalarCapabilitiesType;
 import org.geotoolkit.ogc.xml.v110.SpatialCapabilitiesType;
 import org.geotoolkit.ogc.xml.v110.SpatialOperatorType;
 import org.geotoolkit.ogc.xml.v110.SpatialOperatorsType;
-import org.geotoolkit.ows.xml.v100.DCP;
-import org.geotoolkit.ows.xml.v100.DomainType;
-import org.geotoolkit.ows.xml.v100.HTTP;
-import org.geotoolkit.ows.xml.v100.Operation;
-import org.geotoolkit.ows.xml.v100.OperationsMetadata;
-import org.geotoolkit.ows.xml.v100.RequestMethodType;
-import org.opengis.filter.capability.Operator;
-import org.opengis.filter.capability.SpatialOperator;
+import org.geotoolkit.ows.xml.AbstractContact;
+import org.geotoolkit.ows.xml.AbstractDCP;
+import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.ows.xml.AbstractDomain;
+import org.geotoolkit.ows.xml.AbstractOperation;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 
 import static org.geotoolkit.gml.xml.v311.ObjectFactory.*;
 
+import org.opengis.filter.capability.Operator;
+import org.opengis.filter.capability.SpatialOperator;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * CSW constants.
@@ -80,40 +92,40 @@ public abstract class CSWConstants {
 
     public static final String MALFORMED = " is malformed";
 
-    public static final OperationsMetadata OPERATIONS_METADATA;
+    public static final AbstractOperationsMetadata OPERATIONS_METADATA;
     static {
-        final List<DCP> getAndPost = new ArrayList<DCP>();
-        getAndPost.add(new DCP(new HTTP(new RequestMethodType("somURL"), new RequestMethodType("someURL"))));
+        final List<AbstractDCP> getAndPost = new ArrayList<>();
+        getAndPost.add(OWSXmlFactory.buildDCP("1.0.0", "somURL", "someURL"));
 
-        final List<DCP> onlyPost = new ArrayList<DCP>();
-        onlyPost.add(new DCP(new HTTP(null, new RequestMethodType("someURL"))));
+        final List<AbstractDCP> onlyPost = new ArrayList<>();
+        onlyPost.add(OWSXmlFactory.buildDCP("1.0.0", "somURL", "someURL"));
 
-        final List<Operation> operations = new ArrayList<Operation>();
+        final List<AbstractOperation> operations = new ArrayList<>();
 
-        final List<DomainType> gcParameters = new ArrayList<DomainType>();
-        gcParameters.add(new DomainType("sections", Arrays.asList("All", "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities")));
-        gcParameters.add(new DomainType("Version", "2.0.2"));
-        gcParameters.add(new DomainType("Service", "CSW"));
+        final List<AbstractDomain> gcParameters = new ArrayList<>();
+        gcParameters.add(OWSXmlFactory.buildDomain("1.0.0", "sections", Arrays.asList("All", "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities")));
+        gcParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Version",  Arrays.asList("2.0.2")));
+        gcParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Service",  Arrays.asList("CSW")));
         
-        final List<DomainType> gcConstraints = new ArrayList<DomainType>();
-        gcConstraints.add(new DomainType("PostEncoding", "XML"));
+        final List<AbstractDomain> gcConstraints = new ArrayList<>();
+        gcConstraints.add(OWSXmlFactory.buildDomain("1.0.0", "PostEncoding", Arrays.asList("XML")));
         
-        final Operation getCapabilities = new Operation(getAndPost, gcParameters, gcConstraints, null, "GetCapabilities");
+        final AbstractOperation getCapabilities = OWSXmlFactory.buildOperation("1.0.0", getAndPost, gcParameters, gcConstraints, "GetCapabilities");
         operations.add(getCapabilities);
 
-        final List<DomainType> grParameters = new ArrayList<DomainType>();
-        grParameters.add(new DomainType("Version", "2.0.2"));
-        grParameters.add(new DomainType("Service", "CSW"));
-        grParameters.add(new DomainType("TypeNames", Arrays.asList("gmd:MD_Metadata", "csw:Record")));
-        grParameters.add(new DomainType("outputFormat", Arrays.asList("text/xml", "application/xml")));
-        grParameters.add(new DomainType("outputSchema", Arrays.asList("http://www.opengis.net/cat/csw/2.0.2", "http://www.isotc211.org/2005/gmd")));
-        grParameters.add(new DomainType("resultType", Arrays.asList("hits", "results", "validate")));
-        grParameters.add(new DomainType("ElementSetName", Arrays.asList("brief", "summary", "full")));
-        grParameters.add(new DomainType("CONSTRAINTLANGUAGE", Arrays.asList("Filter", "CQL")));
+        final List<AbstractDomain> grParameters = new ArrayList<>();
+        grParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Version", Arrays.asList("2.0.2")));
+        grParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Service", Arrays.asList("CSW")));
+        grParameters.add(OWSXmlFactory.buildDomain("1.0.0", "TypeNames", Arrays.asList("gmd:MD_Metadata", "csw:Record")));
+        grParameters.add(OWSXmlFactory.buildDomain("1.0.0", "outputFormat", Arrays.asList("text/xml", "application/xml")));
+        grParameters.add(OWSXmlFactory.buildDomain("1.0.0", "outputSchema", Arrays.asList("http://www.opengis.net/cat/csw/2.0.2", "http://www.isotc211.org/2005/gmd")));
+        grParameters.add(OWSXmlFactory.buildDomain("1.0.0", "resultType", Arrays.asList("hits", "results", "validate")));
+        grParameters.add(OWSXmlFactory.buildDomain("1.0.0", "ElementSetName", Arrays.asList("brief", "summary", "full")));
+        grParameters.add(OWSXmlFactory.buildDomain("1.0.0", "CONSTRAINTLANGUAGE", Arrays.asList("Filter", "CQL")));
         
-        final List<DomainType> grConstraints = new ArrayList<DomainType>();
+        final List<AbstractDomain> grConstraints = new ArrayList<>();
         
-        final List<String> supportedISOQueryable = new ArrayList<String>();
+        final List<String> supportedISOQueryable = new ArrayList<>();
         supportedISOQueryable.add("RevisionDate");
         supportedISOQueryable.add("AlternateTitle");
         supportedISOQueryable.add("CreationDate");
@@ -140,78 +152,78 @@ public abstract class CSWConstants {
         supportedISOQueryable.add("OperatesOnIdentifier");
         supportedISOQueryable.add("OperatesOnWithOpName");
         
-        grConstraints.add(new DomainType("SupportedISOQueryables", supportedISOQueryable));
-        grConstraints.add(new DomainType("AdditionalQueryables", "HierarchyLevelName"));
-        grConstraints.add(new DomainType("PostEncoding", "XML"));
+        grConstraints.add(OWSXmlFactory.buildDomain("1.0.0", "SupportedISOQueryables", supportedISOQueryable));
+        grConstraints.add(OWSXmlFactory.buildDomain("1.0.0", "AdditionalQueryables", Arrays.asList("HierarchyLevelName")));
+        grConstraints.add(OWSXmlFactory.buildDomain("1.0.0", "PostEncoding", Arrays.asList("XML")));
         
         
-        final Operation getRecords = new Operation(getAndPost, grParameters, grConstraints, null, "GetRecords");
+        final AbstractOperation getRecords = OWSXmlFactory.buildOperation("1.0.0", getAndPost, grParameters, grConstraints, "GetRecords");
         operations.add(getRecords);
         
-        final List<DomainType> grbParameters = new ArrayList<DomainType>();
-        grbParameters.add(new DomainType("Version", "2.0.2"));
-        grbParameters.add(new DomainType("Service", "CSW"));
-        grbParameters.add(new DomainType("ElementSetName", Arrays.asList("brief", "summary", "full")));
-        grbParameters.add(new DomainType("outputSchema", Arrays.asList("http://www.opengis.net/cat/csw/2.0.2", "http://www.isotc211.org/2005/gmd")));
-        grbParameters.add(new DomainType("outputFormat", Arrays.asList("text/xml", "application/xml")));
+        final List<AbstractDomain> grbParameters = new ArrayList<>();
+        grbParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Version", Arrays.asList("2.0.2")));
+        grbParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Service", Arrays.asList("CSW")));
+        grbParameters.add(OWSXmlFactory.buildDomain("1.0.0", "ElementSetName", Arrays.asList("brief", "summary", "full")));
+        grbParameters.add(OWSXmlFactory.buildDomain("1.0.0", "outputSchema", Arrays.asList("http://www.opengis.net/cat/csw/2.0.2", "http://www.isotc211.org/2005/gmd")));
+        grbParameters.add(OWSXmlFactory.buildDomain("1.0.0", "outputFormat", Arrays.asList("text/xml", "application/xml")));
         
-        final List<DomainType> grbConstraints = new ArrayList<DomainType>();
-        grbConstraints.add(new DomainType("PostEncoding", "XML"));
+        final List<AbstractDomain> grbConstraints = new ArrayList<>();
+        grbConstraints.add(OWSXmlFactory.buildDomain("1.0.0", "PostEncoding", Arrays.asList("XML")));
         
-        final Operation getRecordById = new Operation(getAndPost, grbParameters, grbConstraints, null, "GetRecordById");
+        final AbstractOperation getRecordById = OWSXmlFactory.buildOperation("1.0.0", getAndPost, grbParameters, grbConstraints, "GetRecordById");
         operations.add(getRecordById);
         
-        final List<DomainType> drParameters = new ArrayList<DomainType>();
-        drParameters.add(new DomainType("Version", "2.0.2"));
-        drParameters.add(new DomainType("Service", "CSW"));
-        drParameters.add(new DomainType("TypeName", Arrays.asList("gmd:MD_Metadata", "csw:Record")));
-        drParameters.add(new DomainType("SchemaLanguage", Arrays.asList("http://www.w3.org/XML/Schema", "XMLSCHEMA")));
-        drParameters.add(new DomainType("outputFormat", Arrays.asList("text/xml", "application/xml")));
+        final List<AbstractDomain> drParameters = new ArrayList<>();
+        drParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Version", Arrays.asList("2.0.2")));
+        drParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Service", Arrays.asList("CSW")));
+        drParameters.add(OWSXmlFactory.buildDomain("1.0.0", "TypeName", Arrays.asList("gmd:MD_Metadata", "csw:Record")));
+        drParameters.add(OWSXmlFactory.buildDomain("1.0.0", "SchemaLanguage", Arrays.asList("http://www.w3.org/XML/Schema", "XMLSCHEMA")));
+        drParameters.add(OWSXmlFactory.buildDomain("1.0.0", "outputFormat", Arrays.asList("text/xml", "application/xml")));
         
-        final List<DomainType> drConstraints = new ArrayList<DomainType>();
-        drConstraints.add(new DomainType("PostEncoding", "XML"));
+        final List<AbstractDomain> drConstraints = new ArrayList<>();
+        drConstraints.add(OWSXmlFactory.buildDomain("1.0.0", "PostEncoding", Arrays.asList("XML")));
         
-        final Operation describeRecord = new Operation(getAndPost, drParameters, drConstraints, null, "DescribeRecord");
+        final AbstractOperation describeRecord = OWSXmlFactory.buildOperation("1.0.0", getAndPost, drParameters, drConstraints, "DescribeRecord");
         operations.add(describeRecord);
 
         
-        final List<DomainType> gdParameters = new ArrayList<DomainType>();
-        gdParameters.add(new DomainType("Version", "2.0.2"));
-        gdParameters.add(new DomainType("Service", "CSW"));
+        final List<AbstractDomain> gdParameters = new ArrayList<>();
+        gdParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Version", Arrays.asList("2.0.2")));
+        gdParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Service", Arrays.asList("CSW")));
         
-        final List<DomainType> gdConstraints = new ArrayList<DomainType>();
-        gdConstraints.add(new DomainType("PostEncoding", "XML"));
+        final List<AbstractDomain> gdConstraints = new ArrayList<>();
+        gdConstraints.add(OWSXmlFactory.buildDomain("1.0.0", "PostEncoding", Arrays.asList("XML")));
         
-        final Operation getDomain = new Operation(getAndPost, gdParameters, gdConstraints, null, "GetDomain");
+        final AbstractOperation getDomain = OWSXmlFactory.buildOperation("1.0.0", getAndPost, gdParameters, gdConstraints, "GetDomain");
         operations.add(getDomain);
         
-        final List<DomainType> tParameters = new ArrayList<DomainType>();
-        tParameters.add(new DomainType("Version", "2.0.2"));
-        tParameters.add(new DomainType("Service", "CSW"));
-        tParameters.add(new DomainType("ResourceType", "toUpdate"));
+        final List<AbstractDomain> tParameters = new ArrayList<>();
+        tParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Version", Arrays.asList("2.0.2")));
+        tParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Service", Arrays.asList("CSW")));
+        tParameters.add(OWSXmlFactory.buildDomain("1.0.0", "ResourceType", Arrays.asList("toUpdate")));
         
-        final List<DomainType> tConstraints = new ArrayList<DomainType>();
-        tConstraints.add(new DomainType("PostEncoding", "XML"));
+        final List<AbstractDomain> tConstraints = new ArrayList<>();
+        tConstraints.add(OWSXmlFactory.buildDomain("1.0.0", "PostEncoding", Arrays.asList("XML")));
         
-        final Operation transaction = new Operation(onlyPost, tParameters, tConstraints, null, "Transaction");
+        final AbstractOperation transaction = OWSXmlFactory.buildOperation("1.0.0", onlyPost, tParameters, tConstraints, "Transaction");
         operations.add(transaction);
         
-        final List<DomainType> hParameters = new ArrayList<DomainType>();
-        hParameters.add(new DomainType("Version", "2.0.2"));
-        hParameters.add(new DomainType("Service", "CSW"));
-        hParameters.add(new DomainType("ResourceType", "toUpdate"));
+        final List<AbstractDomain> hParameters = new ArrayList<>();
+        hParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Version", Arrays.asList("2.0.2")));
+        hParameters.add(OWSXmlFactory.buildDomain("1.0.0", "Service", Arrays.asList("CSW")));
+        hParameters.add(OWSXmlFactory.buildDomain("1.0.0", "ResourceType", Arrays.asList("toUpdate")));
         
-        final List<DomainType> hConstraints = new ArrayList<DomainType>();
-        hConstraints.add(new DomainType("PostEncoding", "XML"));
+        final List<AbstractDomain> hConstraints = new ArrayList<>();
+        hConstraints.add(OWSXmlFactory.buildDomain("1.0.0", "PostEncoding", Arrays.asList("XML")));
         
-        final Operation harvest = new Operation(onlyPost, hParameters, hConstraints, null, "Harvest");
+        final AbstractOperation harvest = OWSXmlFactory.buildOperation("1.0.0", onlyPost, hParameters, hConstraints, "Harvest");
         operations.add(harvest);
         
-        final List<DomainType> parameters = new ArrayList<DomainType>();
-        parameters.add(new DomainType("service", "http://www.opengis.net/cat/csw/2.0.2"));
-        parameters.add(new DomainType("version", "2.0.2"));
+        final List<AbstractDomain> parameters = new ArrayList<>();
+        parameters.add(OWSXmlFactory.buildDomain("1.0.0", "service", Arrays.asList("http://www.opengis.net/cat/csw/2.0.2")));
+        parameters.add(OWSXmlFactory.buildDomain("1.0.0", "version", Arrays.asList("2.0.2")));
 
-        OPERATIONS_METADATA = new OperationsMetadata(operations, parameters, null, null);
+        OPERATIONS_METADATA = OWSXmlFactory.buildOperationsMetadata("1.0.0", operations, parameters, null, null);
     }
     
     public static final FilterCapabilities CSW_FILTER_CAPABILITIES = new FilterCapabilities();
@@ -253,6 +265,43 @@ public abstract class CSWConstants {
 
         final IdCapabilitiesType id = new IdCapabilitiesType(false, true);
         CSW_FILTER_CAPABILITIES.setIdCapabilities(id);
+    }
+
+    /**
+     * Generates the base capabilities for a WMS from the service metadata.
+     *
+     * @param metadata the service metadata
+     * @return the service base capabilities
+     */
+    public static AbstractCapabilities createCapabilities(final String version, final Service metadata) {
+        ensureNonNull("metadata", metadata);
+        ensureNonNull("version",  version);
+
+        final Contact currentContact = metadata.getServiceContact();
+        final AccessConstraint constraint = metadata.getServiceConstraints();
+
+        final AbstractServiceIdentification servIdent = OWSXmlFactory.buildServiceIdentification("1.0.0",
+                                                                                                 metadata.getName(),
+                                                                                                 metadata.getDescription(),
+                                                                                                 metadata.getKeywords(),
+                                                                                                 "CSW",
+                                                                                                 metadata.getVersions(),
+                                                                                                 constraint.getFees(),
+                                                                                                 Arrays.asList(constraint.getAccessConstraint()));
+
+        // Create provider part.
+        final AbstractContact contact = OWSXmlFactory.buildContact("1.0.0", currentContact.getPhone(), currentContact.getFax(),
+                currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
+                currentContact.getZipCode(), currentContact.getCountry());
+
+        final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.0.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
+
+
+         final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.0.0", currentContact.getOrganisation(), null, responsible);
+
+
+        // Create capabilities base.
+        return CswXmlFactory.createCapabilities(version, servIdent, servProv, null, null, null);
     }
 
     private CSWConstants() {}
