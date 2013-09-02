@@ -68,7 +68,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
      * @param serviceID  The identifier, if there is one, of the index/service.
      */
     public LuceneObservationIndexer(Automatic configuration, String serviceID) throws IndexingException {
-        super(serviceID, configuration.getConfigurationDirectory(), new WhitespaceAnalyzer(Version.LUCENE_36));
+        super(serviceID, configuration.getConfigurationDirectory(), new WhitespaceAnalyzer(Version.LUCENE_40));
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             observationDirectory = new File(dataDirectory, "observations");
@@ -115,7 +115,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
         int nbTemplate    = 0;
         try {
             final Unmarshaller unmarshaller = SOSMarshallerPool.getInstance().acquireUnmarshaller();
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_36, analyzer);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_40, analyzer);
             final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
 
             // getting the objects list and index avery item in the IndexWriter.
@@ -232,7 +232,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
      */
     @Override
     public void destroy() {
-        // do nothing
+        super.destroy();
     }
 
 }

@@ -286,7 +286,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         final String request = currentQuery.buildSQLQuery();
         LOGGER.log(Level.INFO, "request:{0}", request);
         try {
-            final List<ObservationResult> results = new ArrayList<ObservationResult>();
+            final List<ObservationResult> results = new ArrayList<>();
             final Connection connection           = acquireConnection();
             final Statement currentStatement      = connection.createStatement();
             final ResultSet result                = currentStatement.executeQuery(request);
@@ -316,7 +316,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         final String request = currentQuery.buildSQLQuery();
         LOGGER.log(Level.INFO, "request:{0}", request);
         try {
-            final Set<String> results        = new LinkedHashSet<String>();
+            final Set<String> results        = new LinkedHashSet<>();
             final Connection connection      = acquireConnection();
             final Statement currentStatement = connection.createStatement();
             final ResultSet result           = currentStatement.executeQuery(request);
@@ -371,6 +371,11 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     @Override
     public Set<String> filterFeatureOfInterest() throws CstlServiceException {
         throw new CstlServiceException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
+    }
+
+    @Override
+    public void destroy() {
+        // do nothing
     }
 
 }

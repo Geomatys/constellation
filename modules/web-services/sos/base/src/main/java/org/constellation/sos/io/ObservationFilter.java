@@ -203,4 +203,6 @@ public interface ObservationFilter {
      * @param logLevel
      */
     void setLoglevel(Level logLevel);
+
+    void destroy();
 }

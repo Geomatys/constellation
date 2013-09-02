@@ -43,6 +43,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.util.Version;
 import org.constellation.sos.io.ObservationResult;
 import static org.constellation.sos.ws.Utils.*;
+import org.geotoolkit.index.tree.Tree;
 
 // Geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
@@ -50,6 +51,7 @@ import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
+import org.geotoolkit.lucene.tree.NamedEnvelope;
 
 /**
  *  A Lucene searcher for an index connected to an O&M DataSource.
@@ -67,8 +69,8 @@ public class LuceneObservationSearcher extends LuceneIndexSearcher {
      * @param serviceID The identifier of the index/service
      * @throws IndexingException
      */
-    public LuceneObservationSearcher(File configDir, String serviceID) throws IndexingException  {
-        super(configDir, serviceID, new WhitespaceAnalyzer(Version.LUCENE_36));
+    public LuceneObservationSearcher(final File configDir, final String serviceID, final Tree<NamedEnvelope> rTree) throws IndexingException  {
+        super(configDir, serviceID, new WhitespaceAnalyzer(Version.LUCENE_40), false, rTree);
     }
 
     /**
@@ -82,7 +84,7 @@ public class LuceneObservationSearcher extends LuceneIndexSearcher {
         final Query simpleQuery = new TermQuery(new Term("metafile", "doc"));
         try {
             final long start = System.currentTimeMillis();
-            final List<ObservationResult> results = new ArrayList<ObservationResult>();
+            final List<ObservationResult> results = new ArrayList<>();
 
             int maxRecords = (int) searcher.collectionStatistics("id").maxDoc();
             if (maxRecords == 0) {
@@ -91,7 +93,7 @@ public class LuceneObservationSearcher extends LuceneIndexSearcher {
             }
 
             final String field       = "Title";
-            final QueryParser parser = new QueryParser(Version.LUCENE_36, field, analyzer);
+            final QueryParser parser = new QueryParser(Version.LUCENE_40, field, analyzer);
             parser.setDefaultOperator(Operator.AND);
 
             // we enable the leading wildcard mode if the first character of the query is a '*'

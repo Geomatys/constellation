@@ -123,6 +123,7 @@ import org.geotoolkit.swes.xml.InsertSensorResponse;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.util.logging.MonolineFormatter;
+import org.constellation.dto.Service;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -179,12 +180,12 @@ public class SOSworker extends AbstractWorker {
     /**
      * A list of temporary ObservationTemplate
      */
-    private final Map<String, Observation> templates = new HashMap<String, Observation>();
+    private final Map<String, Observation> templates = new HashMap<>();
     
     /**
      * A list of temporary resultTemplate
      */
-    private final Map<String, ResultTemplate> resultTemplates = new HashMap<String, ResultTemplate>();
+    private final Map<String, ResultTemplate> resultTemplates = new HashMap<>();
 
     /**
      * The base for sensor id.
@@ -214,7 +215,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * A list of schreduled Task (used in close method).
      */
-    private final List<Timer> schreduledTask = new ArrayList<Timer>();
+    private final List<Timer> schreduledTask = new ArrayList<>();
 
     /**
      * A list of supported SensorML version
@@ -399,7 +400,7 @@ public class SOSworker extends AbstractWorker {
             }
 
             // we fill a map of properties to sent to the reader/writer/filter
-            final Map<String, Object> properties = new HashMap<String, Object>();
+            final Map<String, Object> properties = new HashMap<>();
             properties.put(OMFactory.OBSERVATION_ID_BASE, observationIdBase);
             properties.put(OMFactory.OBSERVATION_TEMPLATE_ID_BASE, observationTemplateIdBase);
             properties.put(OMFactory.SENSOR_ID_BASE, sensorIdBase);
@@ -437,7 +438,7 @@ public class SOSworker extends AbstractWorker {
                 
                 this.acceptedSensorMLFormats = smlReader.getAcceptedSensorMLFormats();
             } else {
-                this.acceptedSensorMLFormats = new HashMap<String, List<String>>();
+                this.acceptedSensorMLFormats = new HashMap<>();
             }
 
             // we initialize the O&M reader/writer/filter
@@ -449,8 +450,8 @@ public class SOSworker extends AbstractWorker {
                 this.acceptedResponseMode   = omReader.getResponseModes();
                 this.acceptedResponseFormat = omReader.getResponseFormats();
             } else {
-                this.acceptedResponseMode   = new ArrayList<ResponseModeType>();
-                this.acceptedResponseFormat = new ArrayList<String>();
+                this.acceptedResponseMode   = new ArrayList<>();
+                this.acceptedResponseFormat = new ArrayList<>();
             }
             if (!DataSourceType.NONE.equals(omWriterType)) {
                 omFactory = getOMFactory(omWriterType);
@@ -651,7 +652,13 @@ public class SOSworker extends AbstractWorker {
         }
 
         // we load the skeleton capabilities
-        final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject(currentVersion, "SOS");
+        final Capabilities skeletonCapabilities;
+        final Object skeleton = getStaticCapabilitiesObject(currentVersion, "SOS", null);
+        if (skeleton instanceof Service) {
+            skeletonCapabilities = SOSConstants.createCapabilities(currentVersion, (Service) skeleton);
+        } else {
+            skeletonCapabilities = (Capabilities) skeleton;
+        }
 
         final Capabilities localCapabilities;
         if (keepCapabilities) {
@@ -702,16 +709,16 @@ public class SOSworker extends AbstractWorker {
                 offNames  = omReader.getOfferingNames(currentVersion);
                 eventTime = omReader.getEventTime();
             } else {
-                foiNames  = new ArrayList<String>();
-                procNames = new ArrayList<String>();
-                phenNames = new ArrayList<String>();
-                offNames  = new ArrayList<String>();
-                eventTime = new ArrayList<String>();
+                foiNames  = new ArrayList<>();
+                procNames = new ArrayList<>();
+                phenNames = new ArrayList<>();
+                offNames  = new ArrayList<>();
+                eventTime = new ArrayList<>();
             }
             if (omFilter != null) {
                 queryableResultProperties = omFilter.supportedQueryableResultProperties();
             } else {
-                queryableResultProperties = new ArrayList<String>();
+                queryableResultProperties = new ArrayList<>();
             }
             
             // the list of offering names
@@ -736,7 +743,7 @@ public class SOSworker extends AbstractWorker {
             go.updateParameter("featureOfInterest", foiNames);
             
             // the different responseMode available
-            final List<String> arm = new ArrayList<String>();
+            final List<String> arm = new ArrayList<>();
             for (ResponseModeType rm: acceptedResponseMode) {
                 arm.add(rm.value());
             }
@@ -755,7 +762,7 @@ public class SOSworker extends AbstractWorker {
              */
             final AbstractOperation ds = om.getOperation("DescribeSensor");
             if (smlReader != null) {
-                final List<String> sensorNames = new ArrayList<String>(smlReader.getSensorNames());
+                final List<String> sensorNames = new ArrayList<>(smlReader.getSensorNames());
                 Collections.sort(sensorNames);
                 ds.updateParameter(PROCEDURE, sensorNames);
             } else {
@@ -789,7 +796,7 @@ public class SOSworker extends AbstractWorker {
             if (omReader != null) {
                 offerings = omReader.getObservationOfferings(currentVersion);
             } else {
-                offerings = new ArrayList<ObservationOffering>();
+                offerings = new ArrayList<>();
             }
             cont = buildContents(currentVersion, offerings);
         }
@@ -888,7 +895,7 @@ public class SOSworker extends AbstractWorker {
 
         final String currentVersion = request.getVersion().toString();
      
-        final List<Observation> observation = new ArrayList<Observation>();
+        final List<Observation> observation = new ArrayList<>();
         for (String oid : request.getObservation()) {
             if (oid.isEmpty()) {
                 final String locator;
@@ -996,7 +1003,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         //we verify that there is an offering (mandatory in 1.0.0, optional in 2.0.0)
-        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
+        final List<ObservationOffering> offerings = new ArrayList<>();
         final List<String> offeringNames = requestObservation.getOfferings();
         if (currentVersion.equals("1.0.0") && (offeringNames == null || offeringNames.isEmpty())) {
             throw new CstlServiceException("Offering must be specify!", MISSING_PARAMETER_VALUE, OFFERING);
@@ -1081,7 +1088,7 @@ public class SOSworker extends AbstractWorker {
         //TODO verifier que les pheno appartiennent a l'offering
         final List<String> observedProperties = requestObservation.getObservedProperty();
         if (observedProperties != null && !observedProperties.isEmpty()) {
-            final List<String> phenomenons    = new ArrayList<String>();
+            final List<String> phenomenons    = new ArrayList<>();
             for (String phenomenonName : observedProperties) {
 
                 if (!phenomenonName.equals(phenomenonIdBase + "ALL")) {
@@ -1129,7 +1136,7 @@ public class SOSworker extends AbstractWorker {
 
                 if (e != null && e.isCompleteEnvelope2D()) {
                     boolean add = false;
-                    final List<String> matchingFeatureOfInterest = new ArrayList<String>();
+                    final List<String> matchingFeatureOfInterest = new ArrayList<>();
                     if (localOmFilter.isBoundedObservation()) {
                         localOmFilter.setBoundingBox(e);
                     } else {
@@ -1258,7 +1265,7 @@ public class SOSworker extends AbstractWorker {
 
             // case (1)
             if (!(localOmFilter instanceof ObservationFilterReader)) {
-                matchingResult = new ArrayList<Observation>();
+                matchingResult = new ArrayList<>();
                 final Set<String> observationIDs = localOmFilter.filterObservation();
                 for (String observationID : observationIDs) {
                     final Observation obs = OMXmlFactory.cloneObervation(currentVersion, omReader.getObservation(observationID, resultModel, mode, currentVersion));
@@ -1305,7 +1312,7 @@ public class SOSworker extends AbstractWorker {
                 }
             }
 
-            final List<Observation> observations = new ArrayList<Observation>();
+            final List<Observation> observations = new ArrayList<>();
             for (Observation o : matchingResult) {
                 if (template) {
 
@@ -1581,7 +1588,7 @@ public class SOSworker extends AbstractWorker {
                 if (!alwaysFeatureCollection) {
                     return (AbstractFeature) singleResult;
                 } else {
-                    final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
+                    final List<FeatureProperty> features = new ArrayList<>();
                     features.add(buildFeatureProperty(currentVersion, singleResult));
                     final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
                     collection.computeBounds();
@@ -1592,7 +1599,7 @@ public class SOSworker extends AbstractWorker {
 
         // we return a featureCollection
         } else if (request.getFeatureOfInterestId().size() > 1) {
-            final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
+            final List<FeatureProperty> features = new ArrayList<>();
             for (String featureID : request.getFeatureOfInterestId()) {
                 final SamplingFeature feature = omReader.getFeatureOfInterest(featureID, currentVersion);
                 if (feature == null) {
@@ -1630,7 +1637,7 @@ public class SOSworker extends AbstractWorker {
 
                 // we return a feature collection
                 } else if (results.size() > 1) {
-                    final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
+                    final List<FeatureProperty> features = new ArrayList<>();
                     for (SamplingFeature feature : results) {
                         features.add(buildFeatureProperty(currentVersion, feature));
                     }
@@ -1651,7 +1658,7 @@ public class SOSworker extends AbstractWorker {
         
         if (ofilter) {
             if (localOmFilter instanceof ObservationFilterReader) {
-                final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
+                final List<FeatureProperty> features = new ArrayList<>();
                 final List<SamplingFeature> sfeatures = ((ObservationFilterReader)localOmFilter).getFeatureOfInterests(currentVersion);
                 for (SamplingFeature sf : sfeatures) {
                     features.add(buildFeatureProperty(currentVersion, sf));
@@ -1660,7 +1667,7 @@ public class SOSworker extends AbstractWorker {
                 collection.computeBounds();
                 result = collection;
             } else {
-                final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
+                final List<FeatureProperty> features = new ArrayList<>();
                 final Set<String> fid = localOmFilter.filterFeatureOfInterest();
                 for (String foid : fid) {
                     final SamplingFeature feature = omReader.getFeatureOfInterest(foid, currentVersion);
@@ -1672,7 +1679,7 @@ public class SOSworker extends AbstractWorker {
             }
         // request for all foi
         } else if (!filter) {
-            final List<FeatureProperty> features = new ArrayList<FeatureProperty>();
+            final List<FeatureProperty> features = new ArrayList<>();
             for (String foid : omReader.getFeatureOfInterestNames()) {
                 final SamplingFeature feature = omReader.getFeatureOfInterest(foid, currentVersion);
                 features.add(buildFeatureProperty(currentVersion, feature));
@@ -1826,7 +1833,7 @@ public class SOSworker extends AbstractWorker {
         final List<Observation> matchingResult;
         // case (1)
         if (!(localOmFilter instanceof ObservationFilterReader)) {
-            matchingResult = new ArrayList<Observation>();
+            matchingResult = new ArrayList<>();
             final Set<String> observationIDs = localOmFilter.filterObservation();
             for (String observationID : observationIDs) {
                 matchingResult.add(omReader.getObservation(observationID, OBSERVATION_QNAME, RESULT_TEMPLATE, currentVersion));
@@ -1863,7 +1870,7 @@ public class SOSworker extends AbstractWorker {
         final Envelope e = getEnvelopeFromBBOX(currentVersion, bbox);
         if (e != null && e.isCompleteEnvelope2D()) {
 
-            final List<SamplingFeature> matchingFeatureOfInterest = new ArrayList<SamplingFeature>();
+            final List<SamplingFeature> matchingFeatureOfInterest = new ArrayList<>();
             final List<ObservationOffering> offerings             = omReader.getObservationOfferings(currentVersion);
             for (ObservationOffering off : offerings) {
                 // TODO for SOS 2.0 use observed area
@@ -2087,7 +2094,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         //we get the observation and we assign to it the sensor
-        final List<String> ids = new ArrayList<String>();
+        final List<String> ids = new ArrayList<>();
         final List<? extends Observation> observations = request.getObservations();
         for (Observation observation : observations) {
             final AbstractObservation obs = (AbstractObservation) observation;
@@ -2394,7 +2401,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         //we add the phenomenon to the offering
-        List<String> offPheno = new ArrayList<String>();
+        List<String> offPheno = new ArrayList<>();
         if (template.getObservedProperties() != null) {
             for (String observedProperty : template.getObservedProperties()) {
                 if (!offering.getObservedProperties().contains(observedProperty)) {
@@ -2502,6 +2509,7 @@ public class SOSworker extends AbstractWorker {
         if (smlWriter != null) {smlWriter.destroy();}
         if (omReader  != null) {omReader.destroy();}
         if (omWriter  != null) {omWriter.destroy();}
+        if (omFilter  != null) {omFilter.destroy();}
         for (Timer t : schreduledTask) {
             t.cancel();
         }

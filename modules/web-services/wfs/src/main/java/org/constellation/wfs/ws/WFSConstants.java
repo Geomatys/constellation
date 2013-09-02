@@ -373,7 +373,7 @@ public final class WFSConstants {
     }
 
     /**
-     * Generates the base capabilities for a WMS from the service metadata.
+     * Generates the base capabilities for a WFS from the service metadata.
      *
      * @param metadata the service metadata
      * @return the service base capabilities

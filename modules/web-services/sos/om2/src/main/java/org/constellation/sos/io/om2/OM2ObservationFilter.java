@@ -352,7 +352,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      */
     @Override
     public List<String> supportedQueryableResultProperties() {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     /**
@@ -362,7 +362,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     public List<ObservationResult> filterResult() throws CstlServiceException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
-            final List<ObservationResult> results = new ArrayList<ObservationResult>();
+            final List<ObservationResult> results = new ArrayList<>();
             final Connection c                    = source.getConnection();
             final Statement currentStatement      = c.createStatement();
             final ResultSet result                = currentStatement.executeQuery(sqlRequest.toString());
@@ -391,11 +391,11 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     public Set<String> filterObservation() throws CstlServiceException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
-            final Set<String> results        = new LinkedHashSet<String>();
+            final Set<String> results        = new LinkedHashSet<>();
             final Connection c               = source.getConnection();
             final Statement currentStatement = c.createStatement();
             final ResultSet result           = currentStatement.executeQuery(sqlRequest.toString());
-            final List<String> procedures    = new ArrayList<String>();
+            final List<String> procedures    = new ArrayList<>();
             while (result.next()) {
                 final String procedure = result.getString("procedure");
                 if (!template || !procedures.contains(procedure)) {
@@ -421,7 +421,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     public Set<String> filterFeatureOfInterest() throws CstlServiceException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
-            final Set<String> results        = new LinkedHashSet<String>();
+            final Set<String> results        = new LinkedHashSet<>();
             final Connection c               = source.getConnection();
             final Statement currentStatement = c.createStatement();
             final ResultSet result           = currentStatement.executeQuery(sqlRequest.toString());
@@ -497,5 +497,10 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     @Override
     public boolean isDefaultTemplateTime() {
         return true;
+    }
+
+    @Override
+    public void destroy() {
+        //do nothing
     }
 }

@@ -346,7 +346,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public List<String> supportedQueryableResultProperties() {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     /**
@@ -356,7 +356,7 @@ public class DefaultObservationFilter implements ObservationFilter {
     public List<ObservationResult> filterResult() throws CstlServiceException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
-            final List<ObservationResult> results = new ArrayList<ObservationResult>();
+            final List<ObservationResult> results = new ArrayList<>();
             final Statement currentStatement      = connection.createStatement();
             final ResultSet result                = currentStatement.executeQuery(sqlRequest.toString());
             while (result.next()) {
@@ -383,7 +383,7 @@ public class DefaultObservationFilter implements ObservationFilter {
     public Set<String> filterObservation() throws CstlServiceException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
-            final Set<String> results       = new LinkedHashSet<String>();
+            final Set<String> results       = new LinkedHashSet<>();
             final Statement currentStatement = connection.createStatement();
             final ResultSet result           = currentStatement.executeQuery(sqlRequest.toString());
             while (result.next()) {
@@ -463,5 +463,10 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public Set<String> filterFeatureOfInterest() throws CstlServiceException {
         throw new CstlServiceException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
+    }
+
+    @Override
+    public void destroy() {
+        //do nothing
     }
 }
