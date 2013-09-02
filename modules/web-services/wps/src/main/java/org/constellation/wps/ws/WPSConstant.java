@@ -17,14 +17,25 @@
 package org.constellation.wps.ws;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import org.geotoolkit.ows.xml.v110.DCP;
-import org.geotoolkit.ows.xml.v110.DomainType;
-import org.geotoolkit.ows.xml.v110.HTTP;
-import org.geotoolkit.ows.xml.v110.Operation;
-import org.geotoolkit.ows.xml.v110.OperationsMetadata;
-import org.geotoolkit.ows.xml.v110.RequestMethodType;
 
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
+import org.constellation.dto.Service;
+import org.geotoolkit.ows.xml.AbstractContact;
+import org.geotoolkit.ows.xml.AbstractDCP;
+import org.geotoolkit.ows.xml.AbstractDomain;
+import org.geotoolkit.ows.xml.AbstractOperation;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.wps.xml.WPSCapabilities;
+import org.geotoolkit.wps.xml.WPSXmlFactory;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  *  WPS Constants
@@ -75,38 +86,75 @@ public final class WPSConstant {
      */
     public static final String TEMP_FOLDER = "/tmp/wps" ;
     
-    public static final OperationsMetadata OPERATIONS_METADATA;
+    public static final AbstractOperationsMetadata OPERATIONS_METADATA;
     static {
-        final List<DCP> getAndPost = new ArrayList<DCP>();
-        getAndPost.add(new DCP(new HTTP(new RequestMethodType("somURL"), new RequestMethodType("someURL"))));
+        final List<AbstractDCP> getAndPost = new ArrayList<>();
+        getAndPost.add(OWSXmlFactory.buildDCP("1.1.0", "somURL", "someURL"));
 
-        final List<DCP> onlyPost = new ArrayList<DCP>();
-        onlyPost.add(new DCP(new HTTP(null, new RequestMethodType("someURL"))));
+        final List<AbstractDCP> onlyPost = new ArrayList<>();
+        onlyPost.add(OWSXmlFactory.buildDCP("1.1.0", null, "someURL"));
 
-        final List<Operation> operations = new ArrayList<Operation>();
+        final List<AbstractOperation> operations = new ArrayList<>();
 
-        final List<DomainType> gcParameters = new ArrayList<DomainType>();
-        gcParameters.add(new DomainType("service", "WPS"));
-        gcParameters.add(new DomainType("Acceptversions", "1.0.0"));
-        gcParameters.add(new DomainType("AcceptFormats", "text/xml"));
-        final Operation getCapabilities = new Operation(getAndPost, gcParameters, null, null, "GetCapabilities");
+        final List<AbstractDomain> gcParameters = new ArrayList<>();
+        gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "service", Arrays.asList("WPS")));
+        gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "Acceptversions", Arrays.asList("1.0.0")));
+        gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "AcceptFormats", Arrays.asList("text/xml")));
+        final AbstractOperation getCapabilities = OWSXmlFactory.buildOperation("1.1.0", getAndPost, gcParameters, null, "GetCapabilities");
         operations.add(getCapabilities);
 
-        final List<DomainType> dpParameters = new ArrayList<DomainType>();
-        dpParameters.add(new DomainType("service", "WPS"));
-        dpParameters.add(new DomainType("version", "1.0.0"));
-        final Operation describeProcess = new Operation(getAndPost, dpParameters, null, null, "DescribeProcess");
+        final List<AbstractDomain> dpParameters = new ArrayList<>();
+        dpParameters.add(OWSXmlFactory.buildDomain("1.1.0", "service", Arrays.asList("WPS")));
+        dpParameters.add(OWSXmlFactory.buildDomain("1.1.0", "version", Arrays.asList("1.0.0")));
+        final AbstractOperation describeProcess = OWSXmlFactory.buildOperation("1.1.0", getAndPost, dpParameters, null, "DescribeProcess");
         operations.add(describeProcess);
 
-        final List<DomainType> eParameters = new ArrayList<DomainType>();
-        eParameters.add(new DomainType("service", "WPS"));
-        eParameters.add(new DomainType("version", "1.0.0"));
-        final Operation execute = new Operation(onlyPost, eParameters, null, null, "Execute");
+        final List<AbstractDomain> eParameters = new ArrayList<>();
+        eParameters.add(OWSXmlFactory.buildDomain("1.1.0", "service", Arrays.asList("WPS")));
+        eParameters.add(OWSXmlFactory.buildDomain("1.1.0", "version", Arrays.asList("1.0.0")));
+        final AbstractOperation execute = OWSXmlFactory.buildOperation("1.1.0", onlyPost, eParameters, null, "Execute");
         operations.add(execute);
 
-        final List<DomainType> constraints = new ArrayList<DomainType>();
-        constraints.add(new DomainType("PostEncoding", "XML"));
+        final List<AbstractDomain> constraints = new ArrayList<>();
+        constraints.add(OWSXmlFactory.buildDomain("1.1.0", "PostEncoding", Arrays.asList("XML")));
 
-        OPERATIONS_METADATA = new OperationsMetadata(operations, null, constraints, null);
+        OPERATIONS_METADATA = OWSXmlFactory.buildOperationsMetadata("1.1.0", operations, null, constraints, null);
+    }
+
+    /**
+     * Generates the base capabilities for a WMS from the service metadata.
+     *
+     * @param metadata the service metadata
+     * @return the service base capabilities
+     */
+    public static WPSCapabilities createCapabilities(final String version, final Service metadata) {
+        ensureNonNull("metadata", metadata);
+        ensureNonNull("version",  version);
+
+        final Contact currentContact = metadata.getServiceContact();
+        final AccessConstraint constraint = metadata.getServiceConstraints();
+
+        final AbstractServiceIdentification servIdent = OWSXmlFactory.buildServiceIdentification("1.1.0",
+                                                                                                 metadata.getName(),
+                                                                                                 metadata.getDescription(),
+                                                                                                 metadata.getKeywords(),
+                                                                                                 "WFS",
+                                                                                                 metadata.getVersions(),
+                                                                                                 constraint.getFees(),
+                                                                                                 Arrays.asList(constraint.getAccessConstraint()));
+
+        // Create provider part.
+        final AbstractContact contact = OWSXmlFactory.buildContact("1.1.0", currentContact.getPhone(), currentContact.getFax(),
+                currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
+                currentContact.getZipCode(), currentContact.getCountry());
+
+        final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.1.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
+
+
+         final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), null, responsible);
+
+
+        // Create capabilities base.
+        return WPSXmlFactory.buildWPSCapabilities(version, servIdent, servProv, null, null, null, null);
     }
 }

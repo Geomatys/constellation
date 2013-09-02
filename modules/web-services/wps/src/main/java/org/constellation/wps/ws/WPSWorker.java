@@ -85,6 +85,7 @@ import java.util.logging.Level;
 
 import static org.constellation.api.CommonConstants.DEFAULT_CRS;
 import static org.constellation.api.QueryConstants.*;
+import org.constellation.dto.Service;
 import static org.constellation.wps.ws.WPSConstant.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.opengis.parameter.ParameterValue;
@@ -159,7 +160,7 @@ public class WPSWorker extends AbstractWorker {
     /**
      * List of process descriptors available.
      */
-    private final List<ProcessDescriptor> processDescriptorList = new ArrayList<ProcessDescriptor>();
+    private final List<ProcessDescriptor> processDescriptorList = new ArrayList<>();
 
     private ProcessContext configuration;
     /**
@@ -491,11 +492,17 @@ public class WPSWorker extends AbstractWorker {
             }
 
             // We unmarshall the static capabilities document.
-            final WPSCapabilitiesType staticCapabilities = (WPSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WPS_1_0_0.version.toString(), ServiceDef.Specification.WPS.toString());
+            final WPSCapabilitiesType staticCapabilities;
+            final Object skeleton = getStaticCapabilitiesObject("1.0.0", "WPS", null);
+            if (skeleton instanceof Service) {
+                staticCapabilities = (WPSCapabilitiesType) WPSConstant.createCapabilities("1.0.0", (Service) skeleton);
+            } else {
+                staticCapabilities = (WPSCapabilitiesType) skeleton;
+            }
 
             final ServiceIdentification si = staticCapabilities.getServiceIdentification();
             final ServiceProvider sp       = staticCapabilities.getServiceProvider();
-            final OperationsMetadata om    = WPSConstant.OPERATIONS_METADATA.clone();
+            final OperationsMetadata om    = (OperationsMetadata) WPSConstant.OPERATIONS_METADATA.clone();
             om.updateURL(getServiceUrl());
 
             final ProcessOfferings offering = new ProcessOfferings();
@@ -517,7 +524,7 @@ public class WPSWorker extends AbstractWorker {
     public static Map<String, Object> buildParametersMap(final String webdavURL, final String webdavFolderPath, final String wmsInstanceName,
                                                          final String wmsInstanceURL, final String fileCoverageStorePath, final String wmsProviderId,
                                                          final String layerName, final Boolean wmsSupported) {
-        final Map<String, Object> parameters = new HashMap<String, Object>();
+        final Map<String, Object> parameters = new HashMap<>();
         parameters.put(WPSConvertersUtils.OUT_STORAGE_DIR, webdavFolderPath);
         parameters.put(WPSConvertersUtils.OUT_STORAGE_URL, webdavURL);
         parameters.put(WPSConvertersUtils.WMS_INSTANCE_NAME, wmsInstanceName);
@@ -705,7 +712,7 @@ public class WPSWorker extends AbstractWorker {
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
                         final Class clazz = ft.getClass();
-                        HashMap<String, Object> userData = new HashMap<String, Object>(1);
+                        HashMap<String, Object> userData = new HashMap<>(1);
                         userData.put(WPSIO.SCHEMA_KEY, publicAddress);
                         in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX, userData));
                     } catch (JAXBException ex) {
@@ -791,7 +798,7 @@ public class WPSWorker extends AbstractWorker {
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
-                        HashMap<String, Object> userData = new HashMap<String, Object>(1);
+                        HashMap<String, Object> userData = new HashMap<>(1);
                         userData.put(WPSIO.SCHEMA_KEY, publicAddress);
                         out.setComplexOutput(WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX, userData));
                     } catch (JAXBException ex) {
@@ -884,11 +891,11 @@ public class WPSWorker extends AbstractWorker {
          */
         final ResponseFormType responseForm = request.getResponseForm();
         OutputDefinitionType rawData = null;
-        ResponseDocumentType respDoc = null;
+        final ResponseDocumentType respDoc;
 
         if (responseForm == null) {
             //create default response form if not define
-            final List<DocumentOutputDefinitionType> outputs = new ArrayList<DocumentOutputDefinitionType>();
+            final List<DocumentOutputDefinitionType> outputs = new ArrayList<>();
 
             for (GeneralParameterDescriptor gpd : processDesc.getOutputDescriptor().descriptors()) {
                 if (gpd instanceof ParameterDescriptor) {
@@ -947,7 +954,7 @@ public class WPSWorker extends AbstractWorker {
         ///////////////////////
         //   Process INPUT
         //////////////////////
-        List<InputType> requestInputData = new ArrayList<InputType>();
+        List<InputType> requestInputData = new ArrayList<>();
         if (request.getDataInputs() != null && request.getDataInputs().getInput() != null) {
             requestInputData = request.getDataInputs().getInput();
         }
@@ -1208,7 +1215,7 @@ public class WPSWorker extends AbstractWorker {
 
                 if (dataValue instanceof File) {
                     if (files == null) {
-                        files = new ArrayList<File>();
+                        files = new ArrayList<>();
                     }
                     files.add((File) dataValue);
                 }
@@ -1237,7 +1244,7 @@ public class WPSWorker extends AbstractWorker {
                             ex, OPERATION_NOT_SUPPORTED, inputIdentifier);
                 }
 
-                dataValue = GeometryUtils.createCRSEnvelope(crsDecode, lower.get(0), lower.get(1), upper.get(0), upper.get(1));;
+                dataValue = GeometryUtils.createCRSEnvelope(crsDecode, lower.get(0), lower.get(1), upper.get(0), upper.get(1));
             }
 
             /**
@@ -1488,10 +1495,8 @@ public class WPSWorker extends AbstractWorker {
             restartServiceInputs.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue("WMS");
             restartServiceInputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(wmsInstance);
             restartServiceDesc.createProcess(restartServiceInputs).call();
-        } catch (ProcessException e) {
-            LOGGER.log(Level.WARNING, "Error during WMS "+wmsInstance+" restart.", e);
-        } catch (NoSuchIdentifierException e) {
-            LOGGER.log(Level.WARNING, "Error during WMS "+wmsInstance+" restart.", e);
+        } catch (ProcessException | NoSuchIdentifierException e) {
+            LOGGER.log(Level.WARNING, "Error during WMS " + wmsInstance + " restart.", e);
         }
     }
 

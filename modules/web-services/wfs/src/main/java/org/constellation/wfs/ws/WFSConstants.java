@@ -255,11 +255,10 @@ public final class WFSConstants {
     public static final AbstractOperationsMetadata OPERATIONS_METADATA_V200;
     static {
         final List<AbstractDCP> dcps = new ArrayList<>();
-        dcps.add(new org.geotoolkit.ows.xml.v110.DCP(new org.geotoolkit.ows.xml.v110.HTTP(new org.geotoolkit.ows.xml.v110.RequestMethodType("somURL"),
-                                                                                          new org.geotoolkit.ows.xml.v110.RequestMethodType("someURL"))));
+        dcps.add(WFSXmlFactory.buildDCP("2.0.0", "somURL", "someURL"));
 
         final List<AbstractDCP> dcps2 = new ArrayList<>();
-        dcps2.add(new org.geotoolkit.ows.xml.v110.DCP(new org.geotoolkit.ows.xml.v110.HTTP(null, new org.geotoolkit.ows.xml.v110.RequestMethodType("someURL"))));
+        dcps2.add((WFSXmlFactory.buildDCP("2.0.0", null, "someURL")));
 
         final List<AbstractOperation> operations = new ArrayList<>();
 
