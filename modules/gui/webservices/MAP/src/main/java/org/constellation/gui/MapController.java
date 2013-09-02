@@ -94,7 +94,7 @@ public class MapController {
 
         // Build service capabilities URL.
         String capabilitiesUrl = cstl.getUrl() + "WS/"+serviceType+"/" + serviceId +"?REQUEST=GetCapabilities&SERVICE="+Specification.fromShortName(serviceType).name();
-        if (metadata.getVersions().size() == 1) {
+        if (metadata.getVersions()!=null && metadata.getVersions().size() == 1) {
             capabilitiesUrl += "&VERSION=" + metadata.getVersions().get(0);
         }
 

@@ -1,0 +1,30 @@
+#{param name=providers /}
+#{param name=totalProvider/}
+
+<% for (def provider : providers){%>
+        <br/>
+        <div>
+            <% if(provider.type.equals("raster")){%>
+            <div data-provider="${provider.idProvider}" data-layername="${provider.name}" style="background: url(images/raster.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;" onclick="selectElement(this);">
+                <% }else{%>
+                <div data-provider="${provider.idProvider}" style="background: url(images/vecteur.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;" onclick="selectElement(this);">
+                    <%}%>
+                    <div class="row-fluid">
+                        <div class="span3" style="padding-left: 15px;">
+                            <p>${provider.name}</p>
+                        </div>
+                        <div class="span2 pull-right">
+                            <p class="text-center text-info">${provider.type}</p>
+                        </div>
+                    </div>
+                    <div class="row-fluid" >
+                        <div class="span2" style="border: 1px solid #5bc0de; border-top: 1px solid #5bc0de;">
+                            <p class="text-center">${provider.date}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<%}%>
+<script language="JavaScript" type="text/javascript">
+    var totalProvider = ${totalProvider};
+</script>

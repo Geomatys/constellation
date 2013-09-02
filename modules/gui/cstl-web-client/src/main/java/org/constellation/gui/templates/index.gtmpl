@@ -44,7 +44,7 @@
             <div class="span4">
                 <img src="images/data.png" style="display: block; margin: 0 auto;"/>
                 <p><h3 class="text-center">&{homepage.data.title.label}</h3></p>
-                <a href="cstl-client/createdata" class="btn" style="display: block; margin: 0 auto;">&{homepage.data.button.label}</a>
+                <a href="@{dataDashboard()}" class="btn" style="display: block; margin: 0 auto;">&{homepage.data.button.label}</a>
             </div>
             <div class="span7 offset1" style="font-size:14px;vertical-align:middle;display:inline-block;">
                 &{homepage.data.summary}

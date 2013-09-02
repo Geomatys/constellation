@@ -13,7 +13,7 @@
                 <ul class="nav">
                     <li><a href="@{index()}">&{menu.homepage.label}</a></li>
                     <li><a href="@{webservices()}">&{menu.webservices.label}</a></li>
-                    <li><a href="#">&{menu.data.label}</a></li>
+                    <li><a href="@{dataDashboard()}">&{menu.data.label}</a></li>
                     <li><a href="#">&{menu.style.label}</a></li>
                     <li><a href="#">&{menu.mapcontext.label}</a></li>
                     <li><a href="#">&{menu.geoviewer.label}</a></li>

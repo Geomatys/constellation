@@ -167,7 +167,7 @@ public class  ServicesManager {
             String capabilitiesUrl = cstl.getUrl() + "WS/"+instance.getType().toLowerCase()+"/" + instance.getName() +"?REQUEST=GetCapabilities&SERVICE="+instance.getType().toUpperCase();
 
 
-            if (instance.getVersions().size()>0) {
+            if (instance.getVersions()!= null && instance.getVersions().size()>0) {
                 double version=0;
                 String selectedVersion = "";
 

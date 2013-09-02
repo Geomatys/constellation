@@ -1,0 +1,134 @@
+#{decorate path=menu.gtmpl/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="images/constellation.png"/>
+    </div>
+    <!-- Menu to create services -->
+    <div class="span3 offset6 pull-right">
+        <div class="dropdown">
+            <a id="createservice" class="btn btn-info btn-large dropdown-toggle">
+                <span class="icon-plus icon-white" style="margin-top: 0px;"></span>
+                create a new data
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="well" style="padding: 9px 0">
+                <ul class="nav nav-list">
+                    <li class="nav-header">Données Brutes</li>
+                    <li class="active"><a href="#" onclick="CSTL.Data.goTo($(this), 'vector')">Vecteur</a></li>
+                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'raster')">Raster</a></li>
+                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'sensor')">Capteur</a></li>
+                    <li class="nav-header">Données traitées</li>
+                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'pyramid')">Données pyramidées</a></li>
+                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'virtual')">Capteurs virtuels</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="span9" style="background-color:white;">
+            <div class="navbar" style="margin-bottom: 0px;">
+                <div class="navbar-inner">
+                    <a class="brand" href="#" id="dataDashboardTitle">Donnée vecteur</a>
+                </div>
+            </div>
+
+            <div class="row-fluid">
+                <div class="span9" id="dataList">
+                    <div class="row-fluid" style="padding-left: 10px;">
+                        <h4>n données</h4>
+                    </div>
+
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <ul class="nav">
+                                <li><a href="#" data-order-by="title">&{layer.listing.orderby.title}<i
+                                        class="icon-caret" style="display:none;"></i></a></li>
+                                <li class="divider-vertical"></li>
+                                <li><a href="#" data-order-by="date">&{layer.listing.orderby.date}<i class="icon-caret"
+                                                                                                     style="display:none;"></i>
+                                </a></li>
+                                <li class="divider-vertical"></li>
+                                <li><a href="#" data-order-by="owner">&{layer.listing.orderby.owner}<i
+                                        class="icon-caret" style="display:none;"></i></a></li>
+                            </ul>
+
+                            <form class="navbar-form pull-left">
+                                <button type="button" data-name="resetFilters" class="btn btn-small btn-info">
+                                    <i class="icon-remove icon-white"></i></button>
+                            </form>
+
+                            <form class="navbar-form pull-right">
+                                <input type="text" data-name="searchFilter" class="search-query span12 pull-right" placeholder="Filtrer"/>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="row-fluid">
+                        <div class="span3">
+                            <button type="button"
+                                    class="btn btn-info btn-small">sélectionner tout</button></div>
+
+                        <div class="span3">
+                            <div class="pagination" style="margin: 0px;">
+                                <ul data-name="paging">
+
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="pull-right">
+                            <select  data-name="nbLayersselect">
+                                <option value="10"
+                                        selected="selected">10 données</option>
+                                <option value="20">20 données</option>
+                                <option value="100">100 données</option>
+                                <option value="1000">toutes les données</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row-fluid">
+                        <button type="button"
+                                class="btn btn-info btn-block">&{layer.listing.reduce.button.label}</button>
+                    </div>
+
+                    <div data-name="datalistdashboard">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" >
+
+    function loadDataDashboard(startElement, counter, orderBy, filter, direction){
+        $('#dataList [data-name=datalistdashboard]').jzLoad("Controller.getAvailableData()",
+                {"dashboard":"true", "serviceName": "default", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction},
+                setPaginationDataPage);
+    }
+    var firstTime = 0;
+
+    function setPaginationDataPage(){
+        if(firstTime==0){
+            var nbPage = totalProvider/10;
+            generatePagination("#dataList", "loadDataDashboard", nbPage);
+            addLayerSelectAction("#dataList", "loadDataDashboard", totalProvider);
+            addOrderByAction("#dataList", "loadDataDashboard");
+            addFilterAction("#dataList", "loadDataDashboard");
+            addResetFilterAction("#dataList", "loadDataDashboard");
+
+            $("#dataList [data-name=previous]").addClass("active");
+            $("#dataList [data-name=nbLayersselect]").val("10");
+            firstTime=1;
+        }
+
+    }
+
+    loadDataDashboard(0, 10, "", "");
+</script>

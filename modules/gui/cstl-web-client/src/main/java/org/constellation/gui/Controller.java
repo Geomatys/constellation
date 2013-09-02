@@ -110,6 +110,10 @@ public class Controller {
     @Path("webservices.gtmpl")
     webservices webServices;
 
+
+    @Inject
+    @Path("data_dashboard.gtmpl")
+    protected Template dataDashboard;
     /**
      * End service creation page juzu tempate
      */
@@ -136,8 +140,11 @@ public class Controller {
 
     @Inject
     @Path("add_data_listing.gtmpl")
-    add_data_listing  dataListing;
+    add_data_listing addDataListing;
 
+    @Inject
+    @Path("data_listing.gtmpl")
+    protected Template dataListing;
 
     @Inject
     @Path("add_data.gtmpl")
@@ -168,6 +175,12 @@ public class Controller {
     public Response webservices() {
         List<InstanceSummary> services = servicesManager.getServiceList();
         return webServices.with().services(services).ok().withMimeType("text/html");
+    }
+
+    @View
+    @Route("/data")
+    public Response dataDashboard(){
+        return dataDashboard.ok().withMimeType("text/html");
     }
 
     /**
@@ -293,7 +306,7 @@ public class Controller {
     @Ajax
     @Resource
     @Route("/availabledata")
-    public void getAvailableData(String startElement, String counter, String orderBy, String direction, String filter){
+    public void getAvailableData(String dashboard, String startElement, String counter, String orderBy, String direction, String filter){
         Map<String, Object> parameters = new HashMap<>(0);
         Locale userLocale = Request.getCurrent().getUserContext().getLocale();
         List<LayerData> layerDatas = providerManager.getDataListing(userLocale);
@@ -324,7 +337,13 @@ public class Controller {
 
         parameters.put("totalProvider", layerDatas.size());
         parameters.put("providers", layerList);
-        dataListing.with(parameters).render();
+
+        if(dashboard.equalsIgnoreCase("true")){
+            dataListing.with(parameters).render();
+        }
+        else{
+            addDataListing.with(parameters).render();
+        }
     }
 
     /**
