@@ -76,10 +76,26 @@ CSTL.Services = {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
             CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-restart'));
-            $('[data-state="' + id + '"]').removeClass('stopped').addClass('started');
         }).fail(function() {
             CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-restart'));
-            $('[data-state="' + id + '"]').removeClass('started').addClass('stopped');
+        });
+    },
+
+    /**
+     * Delete a constellation web service
+     *
+     * @param type - {string} the service type
+     * @param id   - {string} the service identifier
+     * @returns {jQuery.ajax} the jQuery.ajax instance
+     */
+    delete: function(type, id){
+        return CSTL.jzAjax('Controller.deleteService', {
+            data: {serviceType:type,serviceId:id}
+        }).done(function() {
+            CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-delete'));
+            $("#"+type+id).remove();
+        }).fail(function() {
+            CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-delete'));
         });
     },
 
@@ -180,6 +196,12 @@ $(function() {
         $("#url-modal-pre").empty();
         $("#url-modal-pre").append(url);
         $("#url-modal").modal();
+        return false;
+    });
+    $('[data-action="delete-service"]').click(function() {
+        var serviceType = $(this).data('service-type');
+        var serviceId = $(this).data('service-id');
+        CSTL.Services.delete(serviceType, serviceId);
         return false;
     });
 });

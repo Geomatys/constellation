@@ -416,6 +416,13 @@ public class Controller {
         return servicesManager.stopService(serviceId, Specification.fromShortName(serviceType)) ? Response.status(200) : Response.status(500);
     }
 
+    @Ajax
+    @Resource
+    @Route("service/delete")
+    public  Response deleteService(final String serviceType, final String serviceId) throws IOException {
+        return servicesManager.deleteService(serviceId, serviceType) ? Response.status(200) : Response.status(500);
+    }
+
     /**
      * Stars the WMS service with the specified identifier.
      *

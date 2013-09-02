@@ -16,6 +16,7 @@
  */
 package org.constellation.gui.service;
 
+import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.Instance;
@@ -112,6 +113,10 @@ public class  ServicesManager {
         return "success".equalsIgnoreCase(response.getStatus());
     }
 
+    public boolean deleteService(final String serviceId, final String specification) {
+        return cstl.openServer(true).services.deleteInstance(specification, serviceId);
+    }
+
     /**
      * Stops a service.
      *
@@ -196,4 +201,6 @@ public class  ServicesManager {
         }
         return null;
     }
+
+
 }

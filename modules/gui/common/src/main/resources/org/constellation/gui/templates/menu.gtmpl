@@ -34,6 +34,7 @@
      data-error-service-metadata="&{growl.error.service.metadata}"
      data-error-service-restart="&{growl.error.service.restart}"
      data-error-service-start="&{growl.error.service.start}"
+     data-error-service-delete="&{growl.error.service.delete}"
      data-error-service-stop="&{growl.error.service.stop}"
      data-logical="&{label.logical}"
      data-no-description="&{label.no.description}"
@@ -42,6 +43,7 @@
      data-success-service-metadata="&{growl.success.service.metadata}"
      data-success-service-restart="&{growl.success.service.restart}"
      data-success-service-start="&{growl.success.service.start}"
+     data-success-service-delete="&{growl.success.service.delete}"
      data-success-service-stop="&{growl.success.service.stop}"></div>
 
 <!-- main page part -->
