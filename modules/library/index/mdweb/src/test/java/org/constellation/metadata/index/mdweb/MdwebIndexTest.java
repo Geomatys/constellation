@@ -122,7 +122,7 @@ public class MdwebIndexTest {
         Automatic configuration = new Automatic("mdweb", bdd);
         configuration.setConfigurationDirectory(configDirectory);
         indexer                 = new MDWebIndexer(configuration, "");
-        indexSearcher           = new LuceneIndexSearcher(configDirectory, "", null, true);
+        indexSearcher           = new LuceneIndexSearcher(configDirectory, "", null, true, null);
         indexer.setLogLevel(Level.FINER);
         indexSearcher.setLogLevel(Level.FINER);
 

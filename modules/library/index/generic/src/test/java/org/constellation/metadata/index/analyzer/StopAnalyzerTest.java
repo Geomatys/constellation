@@ -61,7 +61,7 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         List<Object> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StopAnalyzer(Version.LUCENE_40), Level.FINER);
         indexer.destroy();
-        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_40), true);
+        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_40), true, null);
         indexSearcher.setLogLevel(Level.FINER);
     }
 

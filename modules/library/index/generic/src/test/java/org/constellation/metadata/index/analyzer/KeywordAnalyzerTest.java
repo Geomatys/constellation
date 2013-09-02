@@ -60,7 +60,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new KeywordAnalyzer(), Level.FINER);
         indexer.destroy();
 
-        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new KeywordAnalyzer(), true);
+        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new KeywordAnalyzer(), true, null);
         indexSearcher.setLogLevel(Level.FINER);
     }
 

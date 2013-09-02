@@ -128,7 +128,7 @@ public class MdwebRecordIndexTest {
 
         final MDWebIndexer indexer    = new MDWebIndexer(configuration, "");
         indexer.destroy();
-        indexSearcher                   = new LuceneIndexSearcher(configDirectory, "", null, true);
+        indexSearcher                   = new LuceneIndexSearcher(configDirectory, "", null, true, null);
         indexSearcher.setLogLevel(LOG_LEVEL);
     }
 
