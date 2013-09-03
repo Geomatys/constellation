@@ -21,6 +21,7 @@ import org.opengis.parameter.ParameterValue;
 import java.util.*;
 
 import org.opengis.parameter.ParameterValueGroup;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -28,15 +29,14 @@ import java.util.logging.Level;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.ProviderType;
 import org.geotoolkit.coverage.io.CoverageIO;
-
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.apache.sis.util.logging.Logging;
-
 import org.opengis.feature.type.Name;
 
 import static org.constellation.provider.coveragefile.CoverageMosaicProviderService.*;
@@ -215,5 +215,10 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
 
         return null;
     }
+
+	@Override
+	public ProviderType getType() {
+		return ProviderType.RASTER;
+	}
 
 }

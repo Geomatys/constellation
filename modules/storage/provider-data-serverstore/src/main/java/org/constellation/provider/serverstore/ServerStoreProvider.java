@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
+
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.provider.*;
 import org.geotoolkit.client.Server;
@@ -155,5 +156,29 @@ public class ServerStoreProvider extends AbstractLayerProvider{
 
         return null;
     }
+
+	@Override
+	public ProviderType getType() {
+		ProviderType typeReturned = null;
+		
+		if(server instanceof FeatureStore){
+			typeReturned = ProviderType.VECTOR;
+			
+		}else if (server instanceof CoverageStore) {
+			CoverageStore store = (CoverageStore) server;
+			
+			switch (store.getType()) {
+				case PYRAMID:
+					typeReturned = ProviderType.PYRAMID_DATA;
+					break;
+				default:
+					typeReturned = ProviderType.RASTER;
+			}
+		}
+		
+		return typeReturned;
+	}
+    
+    
 
 }

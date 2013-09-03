@@ -17,9 +17,13 @@
 package org.constellation.provider.om2;
 
 import java.util.logging.Level;
+
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.provider.AbstractDataStoreProvider;
+import org.constellation.provider.ProviderType;
+
 import static org.constellation.provider.AbstractProvider.getLogger;
+
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
@@ -75,4 +79,10 @@ public class OM2StoreProvider extends AbstractDataStoreProvider{
     public void removeAll() {
         super.removeAll();
     }
+
+	@Override
+	public ProviderType getType() {
+		return ProviderType.SENSOR;
+	}
+    
 }

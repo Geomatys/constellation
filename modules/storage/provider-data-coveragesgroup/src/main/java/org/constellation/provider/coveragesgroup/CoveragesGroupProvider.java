@@ -21,13 +21,18 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderType;
+
 import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.*;
+
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.FeatureMapLayer;
@@ -287,4 +292,9 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
             index.put(new DefaultName(name), candidate);
         }
     }
+
+	@Override
+	public ProviderType getType() {
+		return ProviderType.RASTER;
+	}
 }

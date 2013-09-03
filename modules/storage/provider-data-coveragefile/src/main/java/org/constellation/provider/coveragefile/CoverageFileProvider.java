@@ -23,11 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
+
 import javax.imageio.ImageReader;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-
+import org.constellation.provider.ProviderType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.io.ImageCoverageReader;
@@ -36,7 +37,6 @@ import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.apache.sis.util.collection.Cache;
-
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -290,4 +290,10 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         return null;
     }
 
+	@Override
+	public ProviderType getType() {
+		return ProviderType.RASTER;
+	}
+
+    
 }

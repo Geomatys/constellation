@@ -130,4 +130,9 @@ public interface Provider<K,V> {
      */
     void removePropertyListener(PropertyChangeListener listener);
 
+    /**
+     * Define provider type
+     * @return an {@link ProviderType} define in implementations 
+     */
+    ProviderType getType(); 
 }

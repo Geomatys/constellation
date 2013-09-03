@@ -113,4 +113,9 @@ public final class StyleProviderProxy extends AbstractProviderProxy
         throw new UnsupportedOperationException("Not supported yet. Proxy class is immutable.");
     }
 
+	@Override
+	public ProviderType getType() {
+		return ProviderType.STYLE;
+	}
+    
 }

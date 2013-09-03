@@ -153,4 +153,10 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
         return INSTANCE;
     }
 
+	@Override
+	public ProviderType getType() {
+		return null;
+	}
+
+    
 }

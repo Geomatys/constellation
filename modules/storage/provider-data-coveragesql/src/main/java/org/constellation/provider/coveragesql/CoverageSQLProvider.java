@@ -26,15 +26,14 @@ import java.util.logging.Level;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.ProviderType;
 import org.constellation.provider.configuration.ProviderParameters;
-
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.sql.CoverageDatabase;
 import org.geotoolkit.coverage.sql.LayerCoverageReader;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
-
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -222,4 +221,10 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         return null;
     }
 
+	@Override
+	public ProviderType getType() {
+		return ProviderType.RASTER;
+	}
+
+    
 }

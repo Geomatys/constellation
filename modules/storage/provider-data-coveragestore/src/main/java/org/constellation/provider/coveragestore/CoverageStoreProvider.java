@@ -20,11 +20,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
+
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.DefaultCoverageStoreLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderType;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
@@ -175,4 +177,19 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
             getLogger().log(Level.WARNING, e.getMessage(), e);
         }
     }
+
+	@Override
+	public ProviderType getType() {
+		ProviderType typeReturned;
+		
+		switch (store.getType()) {
+			case PYRAMID:
+				typeReturned = ProviderType.PYRAMID_DATA;
+				break;
+			default:
+				typeReturned = ProviderType.RASTER;
+		}
+		
+		return typeReturned;
+	}
 }

@@ -129,5 +129,11 @@ public class MockLayerProviderService extends AbstractProviderService
             }
         }
 
+		@Override
+		public ProviderType getType() {
+			return ProviderType.VECTOR;
+		}
+
+        
     }
 }
