@@ -532,6 +532,17 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-db-core</artifactId>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+               <groupId>org.geotoolkit.pending</groupId>
+               <artifactId>geotk-featurestore-core</artifactId>
+               <type>test-jar</type>
+               <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-db-postgres</artifactId>
                 <version>${geotoolkit.version}</version>
             </dependency>

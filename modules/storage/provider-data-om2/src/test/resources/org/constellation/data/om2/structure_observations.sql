@@ -1,9 +1,8 @@
-CREATE TABLE "public"."version" (
+CREATE TABLE "version" (
     "number"   character varying(10) NOT NULL
 );
 
-INSERT INTO "public"."version" VALUES ('1.0.0');
-
+INSERT INTO "version" VALUES ('1.0.0');
 CREATE SCHEMA "om";
 
 
@@ -51,8 +50,8 @@ CREATE TABLE "om"."observed_properties" (
 );
 
 CREATE TABLE "om"."procedures" (
-    "id"     character varying(100) NOT NULL,
-    "shape"  bit varying(200),
+    "id"     character varying(200) NOT NULL,
+    "shape"  varchar (200) for bit data,
     "crs"    integer
 );
 
@@ -61,7 +60,7 @@ CREATE TABLE "om"."sampling_features" (
     "name"             character varying(200),
     "description"      character varying(200),
     "sampledfeature"   character varying(200),
-    "shape"            postgis.geometry,
+    "shape"            varchar (200) for bit data,
     "crs"              integer
 );
 
@@ -72,7 +71,6 @@ CREATE TABLE "om"."components" (
     "phenomenon" character varying(200) NOT NULL,
     "component"  character varying(200) NOT NULL
 );
-
 
 ALTER TABLE "version" ADD CONSTRAINT version_pk PRIMARY KEY ("number");
 

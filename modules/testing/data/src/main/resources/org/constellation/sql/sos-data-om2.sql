@@ -8,16 +8,16 @@ INSERT INTO "om"."components" ("phenomenon", "component") VALUES ('urn:ogc:def:p
 
 ---------
 
-INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:1', NULL);
-INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:2', NULL);
-INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:3', NULL);
-INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:4', NULL);
-INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:5', NULL);
-INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:6', NULL);
-INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:7', NULL);
-INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:8', NULL);
-INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:9', NULL);
-INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:10', NULL);
+INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:1',  x'000000000140efef0000000000413a6b2800000000', 27582);
+INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:2',  x'000000000140efef0000000000413a6b2800000000', 27582);
+INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:3',  x'000000000140efef0000000000413a6b2800000000', 27582);
+INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:4',  x'000000000140efef0000000000413a6b2800000000', 27582);
+INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:5',  x'000000000140efef0000000000413a6b2800000000', 27582);
+INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:6',  x'000000000140efef0000000000413a6b2800000000', 27582);
+INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:7',  x'000000000140efef0000000000413a6b2800000000', 27582);
+INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:8',  x'000000000140efef0000000000413a6b2800000000', 27582);
+INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:9',  x'000000000140efef0000000000413a6b2800000000', 27582);
+INSERT INTO "om"."procedures" VALUES ('urn:ogc:object:sensor:GEOM:10', x'000000000140efef0000000000413a6b2800000000', 27582);
 
 INSERT INTO "om"."sampling_features" VALUES ('station-001', '10972X0137-PONT' , 'Point d''eau BSSS', 'urn:-sandre:object:bdrhf:123X', x'000000000140efef0000000000413a6b2800000000', 27582);
 INSERT INTO "om"."sampling_features" VALUES ('station-002', '10972X0137-PLOUF', 'Point d''eau BSSS', 'urn:-sandre:object:bdrhf:123X', x'000000000140efef0000000000413a6b2800000000', 27582);

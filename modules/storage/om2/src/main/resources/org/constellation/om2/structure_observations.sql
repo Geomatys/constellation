@@ -51,7 +51,8 @@ CREATE TABLE "om"."observed_properties" (
 
 CREATE TABLE "om"."procedures" (
     "id"     character varying(200) NOT NULL,
-    "shape"  varchar (200) for bit data
+    "shape"  varchar (200) for bit data,
+    "crs"              integer
 );
 
 CREATE TABLE "om"."sampling_features" (
