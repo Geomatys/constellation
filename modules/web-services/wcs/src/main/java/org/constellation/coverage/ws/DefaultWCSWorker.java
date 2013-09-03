@@ -442,13 +442,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         }
         
         // We unmarshall the static capabilities document.
-        final GetCapabilitiesResponse staticCapabilities;
-        final Object skeleton = getStaticCapabilitiesObject(version, "WCS", null);
-        if (skeleton instanceof Service) {
-            staticCapabilities = WCSConstant.createCapabilities(version, (Service) skeleton);
-        } else {
-            staticCapabilities = (GetCapabilitiesResponse) skeleton;
-        }
+        final Service skeleton = getStaticCapabilitiesObject("WCS", null);
+        final GetCapabilitiesResponse staticCapabilities = WCSConstant.createCapabilities(version, skeleton);
         final AbstractServiceIdentification si  = staticCapabilities.getServiceIdentification();
         final AbstractServiceProvider sp        = staticCapabilities.getServiceProvider();
         final AbstractOperationsMetadata om     = getOperationMetadata(version);

@@ -552,13 +552,8 @@ public class CSWworker extends AbstractWorker {
         */
 
         // we load the skeleton capabilities
-        final AbstractCapabilities skeletonCapabilities;
-        final Object skeleton = getStaticCapabilitiesObject("2.0.2", "CSW", null);
-        if (skeleton instanceof Service) {
-            skeletonCapabilities = CSWConstants.createCapabilities("2.0.2", (Service) skeleton);
-        } else {
-            skeletonCapabilities = (AbstractCapabilities) skeleton;
-        }
+        final Service skeleton = getStaticCapabilitiesObject("CSW", null);
+        final AbstractCapabilities skeletonCapabilities = CSWConstants.createCapabilities("2.0.2", skeleton);
 
         //we prepare the response document
         final AbstractServiceIdentification si = skeletonCapabilities.getServiceIdentification();
@@ -931,8 +926,8 @@ public class CSWworker extends AbstractWorker {
         // we return a list of Record
         } else if (resultType.equals(ResultType.RESULTS)) {
 
-            final List<AbstractRecord> abstractRecords = new ArrayList<AbstractRecord>();
-            final List<Object> records                 = new ArrayList<Object>();
+            final List<AbstractRecord> abstractRecords = new ArrayList<>();
+            final List<Object> records                 = new ArrayList<>();
             try {
                 for (int i = startPos -1; i < max; i++) {
                     final Object obj = mdReader.getMetadata(results[i], mode, set, elementName);

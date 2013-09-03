@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<service xmlns="http://www.constellation.org/config">
+    <description>Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.</description>
+    <identifier>default</identifier>
+    <keywords>WMS</keywords>
+    <keywords>???</keywords>
+    <keywords>????</keywords>
+    <name>Ceci est le document capabilities français</name>
+    <serviceConstraints>
+        <accessConstraint>NONE</accessConstraint>
+        <fees>NONE</fees>
+        <layerLimit>20</layerLimit>
+        <maxHeight>1024</maxHeight>
+        <maxWidth>1024</maxWidth>
+    </serviceConstraints>
+    <serviceContact>
+        <address>24 rue Pierre Renaudel</address>
+        <city>Arles</city>
+        <country>France</country>
+        <email>vincent.heurteaux@geomatys.com</email>
+        <fax>04 67 54 87 00</fax>
+        <fullname>Vincent Heurteaux</fullname>
+        <organisation>Geomatys</organisation>
+        <phone>04 67 54 87 30</phone>
+        <position>dev</position>
+        <state>PACA</state>
+        <zipCode>13200</zipCode>
+    </serviceContact>
+    <versions>1.1.1</versions>
+    <versions>1.3.0</versions>
+</service>

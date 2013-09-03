@@ -273,13 +273,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return (AbstractWMSCapabilities) cachedCapabilities;
         }
 
-        final AbstractWMSCapabilities inCapabilities;
-        final Object skeleton = getStaticCapabilitiesObject(queryVersion, "WMS", requestedLanguage);
-        if (skeleton instanceof Service) {
-            inCapabilities = WMSConstant.createCapabilities(queryVersion, (Service) skeleton);
-        } else {
-            inCapabilities = (AbstractWMSCapabilities) skeleton;
-        }
+        final Service skeleton = getStaticCapabilitiesObject("WMS", requestedLanguage);
+        final AbstractWMSCapabilities inCapabilities = WMSConstant.createCapabilities(queryVersion, skeleton);
 
         final AbstractRequest request;
         final List<String> exceptionFormats;
@@ -626,8 +621,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
          */
         if (queryVersion.equals(ServiceDef.WMS_1_3_0.version.toString()) || queryVersion.equals(ServiceDef.WMS_1_3_0_SLD.version.toString()) ) {
 
-            Capability capa = (Capability) inCapabilities.getCapability();
-            ExtendedCapabilitiesType inspireExtension =  capa.getInspireExtendedCapabilities();
+            final Capability capa = (Capability) inCapabilities.getCapability();
+            final ExtendedCapabilitiesType inspireExtension =  capa.getInspireExtendedCapabilities();
 
             if (inspireExtension != null) {
                 inspireExtension.setMetadataDate(new Date(System.currentTimeMillis()));

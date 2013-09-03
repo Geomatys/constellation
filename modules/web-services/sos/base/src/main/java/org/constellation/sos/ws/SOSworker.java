@@ -652,13 +652,9 @@ public class SOSworker extends AbstractWorker {
         }
 
         // we load the skeleton capabilities
-        final Capabilities skeletonCapabilities;
-        final Object skeleton = getStaticCapabilitiesObject(currentVersion, "SOS", null);
-        if (skeleton instanceof Service) {
-            skeletonCapabilities = SOSConstants.createCapabilities(currentVersion, (Service) skeleton);
-        } else {
-            skeletonCapabilities = (Capabilities) skeleton;
-        }
+        final Service skeleton = getStaticCapabilitiesObject("SOS", null);
+        final Capabilities skeletonCapabilities = SOSConstants.createCapabilities(currentVersion, skeleton);
+        
 
         final Capabilities localCapabilities;
         if (keepCapabilities) {

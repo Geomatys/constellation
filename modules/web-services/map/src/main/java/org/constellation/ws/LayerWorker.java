@@ -19,14 +19,10 @@ package org.constellation.ws;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Language;
-import org.constellation.dto.Service;
-import org.constellation.utils.MetadataUtilities;
 import org.constellation.ws.security.SimplePDP;
 import org.constellation.ServiceDef.Specification;
 
-import java.io.IOException;
 import java.util.*;
 import java.io.File;
 import java.util.logging.Level;
@@ -38,7 +34,6 @@ import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Source;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.map.factory.MapFactory;
 import org.constellation.map.security.LayerSecurityFilter;
@@ -389,19 +384,5 @@ public abstract class LayerWorker extends AbstractWorker {
             this.providerID = providerID;
             this.dataVersion= dataVersion;
         }
-    }
-
-    @Override
-    protected Object getStaticCapabilitiesObject(String version, String service, String language) throws CstlServiceException {
-        Service metadata = null;
-        try {
-            metadata = MetadataUtilities.readMetadata(getId(), service);
-        } catch (IOException | ConfigurationException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred when trying to read the service metadata. Returning default capabilities.", ex);
-        }
-        if (metadata != null) {
-            return metadata;
-        }
-        return super.getStaticCapabilitiesObject(version, service, language);
     }
 }

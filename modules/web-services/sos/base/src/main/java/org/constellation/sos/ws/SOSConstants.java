@@ -474,7 +474,7 @@ public final class SOSConstants {
         final Contact currentContact = metadata.getServiceContact();
         final AccessConstraint constraint = metadata.getServiceConstraints();
 
-        final AbstractServiceIdentification servIdent = OWSXmlFactory.buildServiceIdentification(version,
+        final AbstractServiceIdentification servIdent = OWSXmlFactory.buildServiceIdentification("1.1.0",
                                                                                                  metadata.getName(),
                                                                                                  metadata.getDescription(),
                                                                                                  metadata.getKeywords(),
@@ -484,14 +484,14 @@ public final class SOSConstants {
                                                                                                  Arrays.asList(constraint.getAccessConstraint()));
 
         // Create provider part.
-        final AbstractContact contact = OWSXmlFactory.buildContact(version, currentContact.getPhone(), currentContact.getFax(),
+        final AbstractContact contact = OWSXmlFactory.buildContact("1.1.0", currentContact.getPhone(), currentContact.getFax(),
                 currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
                 currentContact.getZipCode(), currentContact.getCountry());
 
-        final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset(version, currentContact.getFullname(), currentContact.getPosition(), contact, null);
+        final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.1.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
 
-        final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider(version, currentContact.getOrganisation(), null, responsible);
+        final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), null, responsible);
 
 
         // Create capabilities base.

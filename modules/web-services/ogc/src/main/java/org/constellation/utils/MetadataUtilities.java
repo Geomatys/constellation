@@ -49,7 +49,7 @@ public final class MetadataUtilities extends Static {
     /**
      * Error message for invalid directories.
      */
-    private static final MessageFormat INVALID_DIRECTORY = new MessageFormat("The {0} folder does not exist or is not a directory.");
+    private static final String INVALID_DIRECTORY ="The $ folder does not exist or is not a directory.";
 
 
     /**
@@ -67,15 +67,15 @@ public final class MetadataUtilities extends Static {
         serviceType = serviceType.toUpperCase();
         final File cstlDirectory = ConfigDirectory.getConfigDirectory();
         if (!cstlDirectory.exists() || !cstlDirectory.isDirectory()) {
-            throw new ConfigurationException(INVALID_DIRECTORY.format(".constellation"));
+            throw new ConfigurationException(INVALID_DIRECTORY.replace("$",".constellation"));
         }
         final File wmsDirectory = new File(cstlDirectory, serviceType);
         if (!wmsDirectory.exists() || !wmsDirectory.isDirectory()) {
-            throw new ConfigurationException(INVALID_DIRECTORY.format(".constellation/" + serviceType));
+            throw new ConfigurationException(INVALID_DIRECTORY.replace("$",".constellation/" + serviceType));
         }
         final File instanceDirectory = new File(wmsDirectory,  identifier);
         if (!instanceDirectory.exists() || !instanceDirectory.isDirectory()) {
-            throw new ConfigurationException(INVALID_DIRECTORY.format(".constellation/" + serviceType + "/" + identifier));
+            throw new ConfigurationException(INVALID_DIRECTORY.replace("$",".constellation/" + serviceType + "/" + identifier));
         }
         return instanceDirectory;
     }

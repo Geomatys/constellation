@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
@@ -47,6 +46,10 @@ import org.apache.sis.util.Version;
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.dto.Service;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.utils.MetadataUtilities;
 import org.opengis.util.CodeList;
 import org.xml.sax.SAXException;
 
@@ -99,12 +102,12 @@ public abstract class AbstractWorker implements Worker {
     /**
      * A map containing the Capabilities Object already loaded from file.
      */
-    private final Map<String,Object> capabilities = Collections.synchronizedMap(new HashMap<String,Object>());
+    private final Map<String, Service> capabilities = Collections.synchronizedMap(new HashMap<String,Service>());
 
     /**
      * Output responses of a GetCapabilities request.
      */
-    private static final Map<String,AbstractCapabilitiesCore> CAPS_RESPONSE = new HashMap<String, AbstractCapabilitiesCore>();
+    private static final Map<String,AbstractCapabilitiesCore> CAPS_RESPONSE = new HashMap<>();
 
     /**
      * The identifier of the worker.
@@ -308,8 +311,17 @@ public abstract class AbstractWorker implements Worker {
      *
      * @throws JAXBException if an error occurs during the unmarshall of the document.
      */
-    protected Object getStaticCapabilitiesObject(final String version, final String service) throws CstlServiceException {
-        return getStaticCapabilitiesObject(version, service, null);
+    protected Service getStaticCapabilitiesObject(String service, String language) throws CstlServiceException {
+        Service metadata = null;
+        try {
+            metadata = MetadataUtilities.readMetadata(getId(), service);
+        } catch (IOException | ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred when trying to read the service metadata. Returning default capabilities.", ex);
+        }
+        if (metadata != null) {
+            return metadata;
+        }
+        return getOldStaticCapabilitiesObject(service, language);
     }
 
     /**
@@ -325,16 +337,16 @@ public abstract class AbstractWorker implements Worker {
      *
      * @throws JAXBException if an error occurs during the unmarshall of the document.
      */
-    protected Object getStaticCapabilitiesObject(final String version, final String service, final String language) throws CstlServiceException {
+    private Service getOldStaticCapabilitiesObject(final String service, final String language) throws CstlServiceException {
         final String fileName;
         if (language == null) {
-            fileName = service + "Capabilities" + version + ".xml";
+            fileName = service + "Capabilities.xml";
         } else {
-            fileName = service + "Capabilities" + version + '-' + language + ".xml";
+            fileName = service + "Capabilities-" + language + ".xml";
         }
 
         //Look if the template capabilities is already in cache.
-        Object response = capabilities.get(fileName);
+        Service response = capabilities.get(fileName);
         if (response == null) {
             final File f;
             if (configurationDirectory != null && configurationDirectory.exists()) {
@@ -343,24 +355,20 @@ public abstract class AbstractWorker implements Worker {
                 f = null;
             }
             try {
-                final Unmarshaller unmarshaller = getMarshallerPool().acquireUnmarshaller();
+                final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 // If the file is not present in the configuration directory, take the one in resource.
                 if (f == null || !f.exists()) {
                     final InputStream in = getClass().getResourceAsStream(fileName);
                     if (in != null) {
-                        response = unmarshaller.unmarshal(in);
+                        response = (Service) unmarshaller.unmarshal(in);
                         in.close();
                     } else {
                         throw new CstlServiceException("Unable to find the capabilities skeleton from resource:" + fileName, OWSExceptionCode.NO_APPLICABLE_CODE);
                     }
                 } else {
-                    response = unmarshaller.unmarshal(f);
+                    response = (Service) unmarshaller.unmarshal(f);
                 }
-                getMarshallerPool().recycle(unmarshaller);
-
-                if (response instanceof JAXBElement) {
-                    response = ((JAXBElement)response).getValue();
-                }
+                GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
 
                 capabilities.put(fileName, response);
             } catch (IOException ex) {
@@ -446,7 +454,7 @@ public abstract class AbstractWorker implements Worker {
     public List<Schema> getRequestValidationSchema() {
         if (schemas == null) {
             final String value = getProperty("requestValidationSchema");
-            schemas = new ArrayList<Schema>();
+            schemas = new ArrayList<>();
             if (value != null) {
                 final List<String> schemaPaths = StringUtilities.toStringList(value);
                 LOGGER.info("Reading schemas. This may take some times ...");
@@ -539,7 +547,7 @@ public abstract class AbstractWorker implements Worker {
     }
 
     protected void clearCapabilitiesCache() {
-        final List<String> toClear = new ArrayList<String>();
+        final List<String> toClear = new ArrayList<>();
         for (String key: CAPS_RESPONSE.keySet()) {
             if (key.startsWith(specification.name() + '-')) {
                 toClear.add(key);

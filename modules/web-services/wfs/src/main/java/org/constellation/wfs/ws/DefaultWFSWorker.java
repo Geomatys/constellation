@@ -320,14 +320,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             return (WFSCapabilities) cachedCapabilities.applySections(sections);
         }
 
-        final WFSCapabilities inCapabilities;
-        final Object skeleton = getStaticCapabilitiesObject(currentVersion, "WFS", null);
-        if (skeleton instanceof Service) {
-            inCapabilities = WFSConstants.createCapabilities(currentVersion, (Service) skeleton);
-        } else {
-            inCapabilities = (WFSCapabilities) skeleton;
-        }
-
+        final Service skeleton = getStaticCapabilitiesObject("WFS", null);
+        final WFSCapabilities inCapabilities = WFSConstants.createCapabilities(currentVersion, skeleton);
+        
         final FeatureTypeList ftl = buildFeatureTypeList(currentVersion);
         /*
          *  layer providers

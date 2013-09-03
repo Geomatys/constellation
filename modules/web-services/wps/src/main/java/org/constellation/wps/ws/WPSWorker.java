@@ -492,13 +492,8 @@ public class WPSWorker extends AbstractWorker {
             }
 
             // We unmarshall the static capabilities document.
-            final WPSCapabilitiesType staticCapabilities;
-            final Object skeleton = getStaticCapabilitiesObject("1.0.0", "WPS", null);
-            if (skeleton instanceof Service) {
-                staticCapabilities = (WPSCapabilitiesType) WPSConstant.createCapabilities("1.0.0", (Service) skeleton);
-            } else {
-                staticCapabilities = (WPSCapabilitiesType) skeleton;
-            }
+            final Service skeleton = getStaticCapabilitiesObject("WPS", null);
+            final WPSCapabilitiesType staticCapabilities = (WPSCapabilitiesType) WPSConstant.createCapabilities("1.0.0", skeleton);
 
             final ServiceIdentification si = staticCapabilities.getServiceIdentification();
             final ServiceProvider sp       = staticCapabilities.getServiceProvider();

@@ -20,10 +20,14 @@ package org.constellation.map.ws;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
 import net.jcip.annotations.Immutable;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.apache.sis.util.iso.DefaultNameFactory;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
+import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
+import org.geotoolkit.service.ServiceTypeImpl;
 import org.geotoolkit.wms.xml.AbstractCapability;
 import org.geotoolkit.wms.xml.AbstractContactAddress;
 import org.geotoolkit.wms.xml.AbstractContactInformation;
@@ -31,7 +35,6 @@ import org.geotoolkit.wms.xml.AbstractContactPersonPrimary;
 import org.geotoolkit.wms.xml.AbstractKeywordList;
 import org.geotoolkit.wms.xml.AbstractService;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
-import org.geotoolkit.wms.xml.WMSVersion;
 import org.geotoolkit.wms.xml.WmsXmlFactory;
 import org.geotoolkit.wms.xml.v111.DescribeLayer;
 import org.geotoolkit.wms.xml.v111.GetCapabilities;
@@ -46,6 +49,9 @@ import org.geotoolkit.wms.xml.v130.OnlineResource;
 import org.geotoolkit.wms.xml.v130.OperationType;
 import org.geotoolkit.wms.xml.v130.Post;
 import org.geotoolkit.wms.xml.v130.Request;
+import org.opengis.metadata.maintenance.ScopeCode;
+import org.opengis.util.LocalName;
+import org.opengis.util.NameFactory;
 
 /**
  *  WMS Constants
@@ -155,8 +161,14 @@ public final class WMSConstant {
                 metadata.getServiceConstraints().getLayerLimit(), metadata.getServiceConstraints().getMaxWidth(),
                 metadata.getServiceConstraints().getMaxHeight());
 
+        // extension
+        final NameFactory nf = new DefaultNameFactory();
+        final LocalName servType = nf.createLocalName(null, "view");
+        final ExtendedCapabilitiesType ext = new ExtendedCapabilitiesType(ScopeCode.SERVICE, new ServiceTypeImpl(servType));
+        final org.geotoolkit.inspire.xml.vs.ObjectFactory factory = new org.geotoolkit.inspire.xml.vs.ObjectFactory();
+        final JAXBElement<?> extension = factory.createExtendedCapabilities(ext);
         // Create capabilities base.
-        final AbstractCapability capability =  WmsXmlFactory.createCapability(version);
+        final AbstractCapability capability =  WmsXmlFactory.createCapability(version, extension);
         return WmsXmlFactory.createCapabilities(version, newService, capability, null);
     }
 }
