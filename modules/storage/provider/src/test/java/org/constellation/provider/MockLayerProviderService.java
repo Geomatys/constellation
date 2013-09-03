@@ -17,19 +17,21 @@
 
 package org.constellation.provider;
 
-import java.util.*;
-
 import org.constellation.provider.configuration.ProviderParameters;
-
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.Parameters;
-
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -128,12 +130,5 @@ public class MockLayerProviderService extends AbstractProviderService
                 throw new RuntimeException("Some error while dispose.");
             }
         }
-
-		@Override
-		public ProviderType getType() {
-			return ProviderType.VECTOR;
-		}
-
-        
     }
 }

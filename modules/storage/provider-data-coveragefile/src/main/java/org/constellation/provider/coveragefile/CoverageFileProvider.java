@@ -16,19 +16,9 @@
  */
 package org.constellation.provider.coveragefile;
 
-import org.opengis.parameter.ParameterValue;
-
-import java.util.*;
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.logging.Level;
-
-import javax.imageio.ImageReader;
-
+import org.apache.sis.util.collection.Cache;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.ProviderType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.io.ImageCoverageReader;
@@ -36,13 +26,29 @@ import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
-import org.apache.sis.util.collection.Cache;
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.provider.coveragefile.CoverageFileProviderService.*;
-import static org.constellation.provider.configuration.ProviderParameters.*;
-import static org.geotoolkit.parameter.Parameters.*;
+import javax.imageio.ImageReader;
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_IS_ELEVATION_MODEL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.containLayer;
+import static org.constellation.provider.configuration.ProviderParameters.getLayer;
+import static org.constellation.provider.configuration.ProviderParameters.isLoadAll;
+import static org.constellation.provider.coveragefile.CoverageFileProviderService.FOLDER_DESCRIPTOR;
+import static org.constellation.provider.coveragefile.CoverageFileProviderService.NAMESPACE_DESCRIPTOR;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  *
@@ -289,11 +295,5 @@ public class CoverageFileProvider extends AbstractLayerProvider{
 
         return null;
     }
-
-	@Override
-	public ProviderType getType() {
-		return ProviderType.RASTER;
-	}
-
     
 }

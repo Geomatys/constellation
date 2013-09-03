@@ -16,20 +16,16 @@
  */
 package org.constellation.provider.featurestore;
 
-import java.util.logging.Level;
-
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.provider.AbstractDataStoreProvider;
-import org.constellation.provider.ProviderType;
-
-import static org.constellation.provider.AbstractProvider.getLogger;
-
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.db.postgres.PostgresFeatureStore;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+
+import java.util.logging.Level;
 
 /**
  *
@@ -93,10 +89,4 @@ public class FeatureStoreProvider extends AbstractDataStoreProvider{
             }
         }
     }
-
-	@Override
-	public ProviderType getType() {
-		return ProviderType.VECTOR;
-	}
-    
 }

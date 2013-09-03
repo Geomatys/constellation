@@ -16,9 +16,10 @@
  */
 package org.constellation.provider;
 
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.beans.PropertyChangeListener;
 import java.util.Set;
-import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * A data provider is basically a index class
@@ -129,10 +130,4 @@ public interface Provider<K,V> {
      * Remove a property listener.
      */
     void removePropertyListener(PropertyChangeListener listener);
-
-    /**
-     * Define provider type
-     * @return an {@link ProviderType} define in implementations 
-     */
-    ProviderType getType(); 
 }

@@ -16,17 +16,8 @@
  */
 package org.constellation.provider.coveragesql;
 
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.CancellationException;
-import java.util.logging.Level;
-
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.ProviderType;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.sql.CoverageDatabase;
@@ -37,9 +28,22 @@ import org.geotoolkit.map.MapBuilder;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
-import static org.constellation.provider.configuration.ProviderParameters.*;
-import static org.geotoolkit.parameter.Parameters.*;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.logging.Level;
+
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_IS_ELEVATION_MODEL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.containLayer;
+import static org.constellation.provider.configuration.ProviderParameters.getLayer;
+import static org.constellation.provider.configuration.ProviderParameters.isLoadAll;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  *
@@ -220,11 +224,6 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
 
         return null;
     }
-
-	@Override
-	public ProviderType getType() {
-		return ProviderType.RASTER;
-	}
 
     
 }

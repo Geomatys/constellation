@@ -16,32 +16,37 @@
  */
 package org.constellation.provider.coveragefile;
 
-import org.opengis.parameter.ParameterValue;
-
-import java.util.*;
-
-import org.opengis.parameter.ParameterValueGroup;
-
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.logging.Level;
-
+import org.apache.sis.util.logging.Logging;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.ProviderType;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
-import org.apache.sis.util.logging.Logging;
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.provider.coveragefile.CoverageMosaicProviderService.*;
-import static org.constellation.provider.configuration.ProviderParameters.*;
-import static org.geotoolkit.parameter.Parameters.*;
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_IS_ELEVATION_MODEL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_NAME_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getLayer;
+import static org.constellation.provider.configuration.ProviderParameters.getLayers;
+import static org.constellation.provider.coveragefile.CoverageMosaicProviderService.FOLDER_DESCRIPTOR;
+import static org.constellation.provider.coveragefile.CoverageMosaicProviderService.NAMESPACE_DESCRIPTOR;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  *
@@ -215,10 +220,4 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
 
         return null;
     }
-
-	@Override
-	public ProviderType getType() {
-		return ProviderType.RASTER;
-	}
-
 }

@@ -56,9 +56,4 @@ public abstract class AbstractStyleProvider extends AbstractProvider<String,Muta
     public MutableStyle getByIdentifier(String key) {
         return get(key);
     }
-    
-	@Override
-	public ProviderType getType() {
-		return ProviderType.STYLE;
-	}
 }

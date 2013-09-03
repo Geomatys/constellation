@@ -16,33 +16,36 @@
  */
 package org.constellation.provider.coveragesgroup;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.*;
-import java.util.logging.Level;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
-import org.constellation.provider.ProviderType;
-
-import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.*;
-
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.style.MutableStyle;
-import org.apache.sis.xml.MarshallerPool;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+
+import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.FOLDER_DESCRIPTOR;
+import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.MAP_CONTEXT_DESCRIPTOR;
+import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.SOURCE_CONFIG_DESCRIPTOR;
 
 /**
  *
@@ -293,8 +296,4 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
         }
     }
 
-	@Override
-	public ProviderType getType() {
-		return ProviderType.RASTER;
-	}
 }

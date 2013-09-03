@@ -16,24 +16,27 @@
  */
 package org.constellation.provider.serverstore;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.Set;
-import java.util.logging.Level;
-
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.provider.*;
+import org.constellation.provider.AbstractLayerProvider;
+import org.constellation.provider.DefaultCoverageStoreLayerDetails;
+import org.constellation.provider.DefaultDataStoreLayerDetails;
+import org.constellation.provider.LayerDetails;
+import org.constellation.provider.ProviderService;
 import org.geotoolkit.client.Server;
 import org.geotoolkit.client.ServerFinder;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.version.Version;
 import org.geotoolkit.version.VersionControl;
 import org.geotoolkit.version.VersioningException;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
+import java.util.logging.Level;
 
 /**
  *
@@ -156,29 +159,4 @@ public class ServerStoreProvider extends AbstractLayerProvider{
 
         return null;
     }
-
-	@Override
-	public ProviderType getType() {
-		ProviderType typeReturned = null;
-		
-		if(server instanceof FeatureStore){
-			typeReturned = ProviderType.VECTOR;
-			
-		}else if (server instanceof CoverageStore) {
-			CoverageStore store = (CoverageStore) server;
-			
-			switch (store.getType()) {
-				case PYRAMID:
-					typeReturned = ProviderType.PYRAMID_DATA;
-					break;
-				default:
-					typeReturned = ProviderType.RASTER;
-			}
-		}
-		
-		return typeReturned;
-	}
-    
-    
-
 }
