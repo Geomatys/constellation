@@ -53,6 +53,7 @@ import org.geotoolkit.sos.xml.v100.FilterCapabilities;
 
 import static org.geotoolkit.gml.xml.v311.ObjectFactory.*;
 import org.geotoolkit.ows.xml.AbstractContact;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
@@ -491,7 +492,11 @@ public final class SOSConstants {
         final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.1.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
 
-        final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), null, responsible);
+        AbstractOnlineResourceType orgUrl = null;
+        if (currentContact.getUrl() != null) {
+            orgUrl = OWSXmlFactory.buildOnlineResource("1.1.0", currentContact.getUrl());
+        }
+        final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), orgUrl, responsible);
 
 
         // Create capabilities base.

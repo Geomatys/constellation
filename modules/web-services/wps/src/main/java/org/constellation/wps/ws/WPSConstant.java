@@ -36,6 +36,7 @@ import org.geotoolkit.wps.xml.WPSCapabilities;
 import org.geotoolkit.wps.xml.WPSXmlFactory;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 
 /**
  *  WPS Constants
@@ -151,7 +152,11 @@ public final class WPSConstant {
         final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.1.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
 
-         final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), null, responsible);
+        AbstractOnlineResourceType orgUrl = null;
+        if (currentContact.getUrl() != null) {
+            orgUrl = OWSXmlFactory.buildOnlineResource("1.1.0", currentContact.getUrl());
+        }
+        final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), orgUrl, responsible);
 
 
         // Create capabilities base.

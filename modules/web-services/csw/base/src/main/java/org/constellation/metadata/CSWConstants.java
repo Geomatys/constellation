@@ -52,6 +52,7 @@ import org.opengis.filter.capability.Operator;
 import org.opengis.filter.capability.SpatialOperator;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 
 /**
  * CSW constants.
@@ -297,7 +298,11 @@ public abstract class CSWConstants {
         final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.0.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
 
-         final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.0.0", currentContact.getOrganisation(), null, responsible);
+        AbstractOnlineResourceType orgUrl = null;
+        if (currentContact.getUrl() != null) {
+            orgUrl = OWSXmlFactory.buildOnlineResource("1.0.0", currentContact.getUrl());
+        }
+        final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.0.0", currentContact.getOrganisation(), orgUrl, responsible);
 
 
         // Create capabilities base.

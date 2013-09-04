@@ -13,7 +13,7 @@
         </ows:Keywords>
         <ows:ServiceType>WMTS</ows:ServiceType>
         <ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>
-        <ows:Fees>none</ows:Fees>
-        <ows:AccessConstraints>none</ows:AccessConstraints>
+        <ows:Fees>NONE</ows:Fees>
+        <ows:AccessConstraints>NONE</ows:AccessConstraints>
     </ows:ServiceIdentification>
 </Capabilities>

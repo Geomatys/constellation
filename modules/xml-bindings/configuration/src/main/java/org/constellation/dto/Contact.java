@@ -53,12 +53,15 @@ public class Contact {
 
     private String country;
 
+    private String url;
+
     public Contact() {
     }
 
     public Contact(final String fullname, final String organisation, final String position,
             final String phone, final String fax, final String email, final String address,
-            final String city, final String state, final String zipCode, final String country) {
+            final String city, final String state, final String zipCode, final String country,
+            final String url) {
         this.address = address;
         this.city = city;
         this.country = country;
@@ -70,6 +73,7 @@ public class Contact {
         this.position = position;
         this.state = state;
         this.zipCode = zipCode;
+        this.url = url;
     }
 
     public String getFullname() {
@@ -158,5 +162,13 @@ public class Contact {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

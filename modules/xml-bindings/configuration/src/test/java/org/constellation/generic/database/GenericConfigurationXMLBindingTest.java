@@ -546,7 +546,7 @@ public class GenericConfigurationXMLBindingTest {
     @Test
     public void serviceMarshalingTest() throws Exception {
 
-        final Contact ctc = new Contact("fname1", "org1", "pos1", "0600", "0800", "test@jj.com", "adr1", "city1", "state1", "34000", "france");
+        final Contact ctc = new Contact("fname1", "org1", "pos1", "0600", "0800", "test@jj.com", "adr1", "city1", "state1", "34000", "france", "url1");
         final AccessConstraint cstr = new AccessConstraint("fees1", "constraint1", 5, 200, 300);
         final Service service = new Service("name1", "id1", Arrays.asList("kw1", "kw2"), "desc1", Arrays.asList("1.0.0", "2.0.0"), ctc, cstr);
 
@@ -580,6 +580,7 @@ public class GenericConfigurationXMLBindingTest {
         "    <ns2:phone>0600</ns2:phone>\n" +
         "    <ns2:position>pos1</ns2:position>\n" +
         "    <ns2:state>state1</ns2:state>\n" +
+        "    <ns2:url>url1</ns2:url>\n" +
         "    <ns2:zipCode>34000</ns2:zipCode>\n" +
         "  </ns2:serviceContact>\n" +
         "  <ns2:versions>1.0.0</ns2:versions>\n" +

@@ -25,10 +25,10 @@
                 </ows:HTTP>
             </ows:DCP>
         </ows:Operation>
-        <ows:Parameter name="PostEncoding">
+        <ows:Constraint name="PostEncoding">
             <ows:AllowedValues>
                 <ows:Value>XML</ows:Value>
             </ows:AllowedValues>
-        </ows:Parameter>
+        </ows:Constraint>
     </ows:OperationsMetadata>
 </Capabilities>

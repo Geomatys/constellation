@@ -45,6 +45,7 @@ import org.geotoolkit.ows.xml.OWSXmlFactory;
 import org.geotoolkit.wcs.xml.WCSXmlFactory;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 
 /**
  *  WCS Constants
@@ -289,7 +290,12 @@ public final class WCSConstant {
 
         final AbstractResponsiblePartySubset responsible = WCSXmlFactory.buildResponsiblePartySubset(version, currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
-         final AbstractServiceProvider servProv = WCSXmlFactory.buildServiceProvider(version, currentContact.getOrganisation(), null, responsible);
+        // url
+        AbstractOnlineResourceType orgUrl = null;
+        if (currentContact.getUrl() != null) {
+            orgUrl = WCSXmlFactory.buildOnlineResource(version, currentContact.getUrl());
+        }
+        final AbstractServiceProvider servProv = WCSXmlFactory.buildServiceProvider(version, currentContact.getOrganisation(), orgUrl, responsible);
 
 
         // Create capabilities base.

@@ -27,6 +27,7 @@ import org.constellation.dto.Service;
 import org.geotoolkit.ows.xml.AbstractContact;
 import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.AbstractDomain;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
@@ -55,7 +56,7 @@ public final class WMTSConstant {
 
         final List<AbstractOperation> operations = new ArrayList<>();
 
-        final AbstractOperation getCapabilities = OWSXmlFactory.buildOperation("1.1.0", onlyPost, null, null, "GetCapabilities");
+        final AbstractOperation getCapabilities = OWSXmlFactory.buildOperation("1.1.0", getAndPost, null, null, "GetCapabilities");
         operations.add(getCapabilities);
 
         final AbstractOperation getTile = OWSXmlFactory.buildOperation("1.1.0", getAndPost, null, null, "GetTile");
@@ -99,8 +100,11 @@ public final class WMTSConstant {
 
         final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.1.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
-
-         final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), null, responsible);
+        AbstractOnlineResourceType orgUrl = null;
+        if (currentContact.getUrl() != null) {
+            orgUrl = OWSXmlFactory.buildOnlineResource("1.1.0", currentContact.getUrl());
+        }
+        final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), orgUrl, responsible);
 
 
         // Create capabilities base.

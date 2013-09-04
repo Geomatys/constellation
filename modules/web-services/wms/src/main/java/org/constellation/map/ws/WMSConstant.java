@@ -33,6 +33,7 @@ import org.geotoolkit.wms.xml.AbstractContactAddress;
 import org.geotoolkit.wms.xml.AbstractContactInformation;
 import org.geotoolkit.wms.xml.AbstractContactPersonPrimary;
 import org.geotoolkit.wms.xml.AbstractKeywordList;
+import org.geotoolkit.wms.xml.AbstractOnlineResource;
 import org.geotoolkit.wms.xml.AbstractService;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.wms.xml.WmsXmlFactory;
@@ -154,9 +155,15 @@ public final class WMSConstant {
                 personPrimary, currentContact.getPosition(), address, currentContact.getPhone(), currentContact.getFax(),
                 currentContact.getEmail());
 
+        // url
+        AbstractOnlineResource orgUrl = null;
+        if (currentContact.getUrl() != null) {
+            orgUrl = WmsXmlFactory.createOnlineResource(version, currentContact.getUrl());
+        }
+
         // Create service part.
         final AbstractService newService = WmsXmlFactory.createService(version, metadata.getName(),
-                metadata.getIdentifier(), metadata.getDescription(), keywordList, null, contact,
+                metadata.getIdentifier(), metadata.getDescription(), keywordList, orgUrl, contact,
                 metadata.getServiceConstraints().getFees(), metadata.getServiceConstraints().getAccessConstraint(),
                 metadata.getServiceConstraints().getLayerLimit(), metadata.getServiceConstraints().getMaxWidth(),
                 metadata.getServiceConstraints().getMaxHeight());

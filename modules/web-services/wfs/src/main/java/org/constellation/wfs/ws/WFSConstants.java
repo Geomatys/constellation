@@ -56,6 +56,7 @@ import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.WFSXmlFactory;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 
 import org.opengis.filter.capability.ComparisonOperators;
 import org.opengis.filter.capability.FilterCapabilities;
@@ -402,7 +403,12 @@ public final class WFSConstants {
         final AbstractResponsiblePartySubset responsible = WFSXmlFactory.buildResponsiblePartySubset(version, currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
 
-         final AbstractServiceProvider servProv = WFSXmlFactory.buildServiceProvider(version, currentContact.getOrganisation(), null, responsible);
+        AbstractOnlineResourceType orgUrl = null;
+        if (currentContact.getUrl() != null) {
+            orgUrl = WFSXmlFactory.buildOnlineResource(version, currentContact.getUrl());
+        }
+        
+        final AbstractServiceProvider servProv = WFSXmlFactory.buildServiceProvider(version, currentContact.getOrganisation(), orgUrl, responsible);
 
 
         // Create capabilities base.

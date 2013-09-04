@@ -20,8 +20,6 @@ package org.constellation.dto;
 import juzu.Mapped;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
