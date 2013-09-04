@@ -41,9 +41,9 @@
     </div>
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;" id="main">
         <% for (def service : services) {%>
-          <div class="span6" id="${service.type}${service.name}">
+          <div class="span6" id="${service.type}-${service.name}">
             <a href="edit/${service.type}/${service.name}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
-            <div class="well <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${service.name}">
+            <div class="well <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${service.type}-${service.name}">
                 <div class="row">
                     <div class="pull-right">
                         <div class="btn-group">
@@ -63,7 +63,7 @@
                         <a class="btn btn-info" href="#" data-action="restart-service" data-service-type="${service.type}" data-service-id="${service.name}">
                             <i class="icon-refresh"></i>
                         </a>
-                        <a class="btn <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" href="#" data-action="toggle-service" data-service-type="${service.type}" data-service-id="${service.name}">
+                        <a class="btn <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" href="#" data-state="${service.type}-${service.name}" data-action="toggle-service" data-service-type="${service.type}" data-service-id="${service.name}">
                             <i class="icon-play"></i>
                             <i class="icon-stop"></i>
                         </a>

@@ -40,7 +40,7 @@ CSTL.Services = {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
             CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-start'));
-            $('[data-state="' + id + '"]').removeClass('stopped').addClass('started');
+            $('[data-state="' + type + '-' + id + '"]').removeClass('stopped').addClass('started');
         }).fail(function() {
             CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-start'));
         })
@@ -58,7 +58,7 @@ CSTL.Services = {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
             CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-stop'));
-            $('[data-state="' + id + '"]').removeClass('started').addClass('stopped');
+            $('[data-state="' + type + '-' + id + '"]').removeClass('started').addClass('stopped');
         }).fail(function() {
             CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-stop'));
         })
@@ -72,10 +72,11 @@ CSTL.Services = {
      * @returns {jQuery.ajax} the jQuery.ajax instance
      */
     restart: function(type, id) {
-        return CSTL.jzAjax('Controller.reloadService', {
+        return CSTL.jzAjax('Controller.restartService', {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
             CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-restart'));
+            $('[data-state="' + type + '-' + id + '"]').removeClass('stopped').addClass('started');
         }).fail(function() {
             CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-restart'));
         });
@@ -93,7 +94,7 @@ CSTL.Services = {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
             CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-delete'));
-            $("#"+type+id).remove();
+            $('#' + type + '-' + id).remove();
         }).fail(function() {
             CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-delete'));
         });
@@ -108,9 +109,9 @@ CSTL.Services = {
      * @returns {jQuery.ajax} the jQuery.ajax instance
      */
     setDescription: function(type, id, $form) {
-        var data = $form.serialize() || {};
-        data['serviceType'] = type;
-        data['serviceId']   = id;
+        var data = $form.serialize() || '';
+        data += '&serviceType=' + type;
+        data += '&serviceId=' + id;
 
         return CSTL.jzAjax('Controller.setServiceDescription', {
             method: 'POST',
@@ -131,9 +132,9 @@ CSTL.Services = {
      * @returns {jQuery.ajax} the jQuery.ajax instance
      */
     setMetadata: function(type, id, $form) {
-        var data = $form.serialize() || {};
-        data['serviceType'] = type;
-        data['serviceId']   = id;
+        var data = $form.serialize() || '';
+        data += '&serviceType=' + type;
+        data += '&serviceId=' + id;
 
         return CSTL.jzAjax('Controller.setServiceMetadata', {
             method: 'POST',
@@ -161,15 +162,11 @@ $(function() {
     $('[data-action="toggle-service"]').click(function() {
         var $this = $(this).attr('disabled', 'disabled');
         if ($this.hasClass('stopped')) {
-            CSTL.Services.start($this.data('service-type'), $this.data('service-id')).success(function() {
-                $this.removeClass('stopped').addClass('started');
-            }).always(function() {
+            CSTL.Services.start($this.data('service-type'), $this.data('service-id')).always(function() {
                 $this.removeAttr('disabled');
             });
         } else {
-            CSTL.Services.stop($this.data('service-type'), $this.data('service-id')).success(function() {
-                $this.removeClass('started').addClass('stopped');
-            }).always(function() {
+            CSTL.Services.stop($this.data('service-type'), $this.data('service-id')).always(function() {
                 $this.removeAttr('disabled');
             });
         }
