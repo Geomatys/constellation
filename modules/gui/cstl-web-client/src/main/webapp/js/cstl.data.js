@@ -27,9 +27,14 @@
  * @type {object}
  */
 CSTL.Data = {
-    goTo: function($element, title){
+
+    type: ["raster, vector, sensor"],
+
+    goTo: function ($element, title, researchtype){
         $("#dataDashboardTitle").empty();
         $("#dataDashboardTitle").append(title);
+        CSTL.Data.type = researchtype;
+        loadDataDashboard(0, 10, null, null, null);
         this.setActive($element.parent());
     },
 

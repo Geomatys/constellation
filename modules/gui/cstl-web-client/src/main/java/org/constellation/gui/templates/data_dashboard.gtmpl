@@ -21,12 +21,12 @@
             <div class="well" style="padding: 9px 0">
                 <ul class="nav nav-list">
                     <li class="nav-header">Données Brutes</li>
-                    <li class="active"><a href="#" onclick="CSTL.Data.goTo($(this), 'vector')">Vecteur</a></li>
-                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'raster')">Raster</a></li>
-                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'sensor')">Capteur</a></li>
+                    <li class="active"><a href="#" onclick="CSTL.Data.goTo($(this), 'vector', 'vector')">Vecteur</a></li>
+                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'raster', 'raster')">Raster</a></li>
+                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'sensor', 'sensor')">Capteur</a></li>
                     <li class="nav-header">Données traitées</li>
-                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'pyramid')">Données pyramidées</a></li>
-                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'virtual')">Capteurs virtuels</a></li>
+                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'pyramid', 'pyramid')">Données pyramidées</a></li>
+                    <li><a href="#" onclick="CSTL.Data.goTo($(this), 'virtual', 'virtual_sensor')">Capteurs virtuels</a></li>
                 </ul>
             </div>
         </div>
@@ -109,7 +109,7 @@
 
     function loadDataDashboard(startElement, counter, orderBy, filter, direction){
         $('#dataList [data-name=datalistdashboard]').jzLoad("Controller.getAvailableData()",
-                {"dashboard":"true", "serviceName": "default", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction},
+                {"dataTypes":CSTL.Data.type, "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction},
                 setPaginationDataPage);
     }
     var firstTime = 0;

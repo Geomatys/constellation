@@ -93,8 +93,9 @@ public class ProviderManager {
      *
      * @return
      * @param userLocale
+     * @param providerTypes
      */
-    public List<LayerData> getDataListing(final Locale userLocale){
+    public List<LayerData> getDataListing(final Locale userLocale, final List<String> providerTypes){
         final List<LayerData> layerDatas = new ArrayList<>(0);
 
         final ProvidersReport report = cstl.openServer(true).providers.listProviders();
@@ -102,26 +103,29 @@ public class ProviderManager {
         for (ProviderServiceReport providerServiceReport : report.getProviderServices()) {
             for (ProviderReport providerReport : providerServiceReport.getProviders()) {
                 String type = providerReport.getAbstractType();
-                String date = "";
 
-                if (providerReport.getDate() != null) {
-                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy X");
-                    Date createDate = new Date();
-                    try {
-                        createDate = dateFormat.parse(providerReport.getDate());
-                    } catch (ParseException e) {
-                        LOGGER.log(Level.WARNING, "", e);
+                if(providerTypes.contains(type)){
+                    String date = "";
+
+                    if (providerReport.getDate() != null) {
+                        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy X");
+                        Date createDate = new Date();
+                        try {
+                            createDate = dateFormat.parse(providerReport.getDate());
+                        } catch (ParseException e) {
+                            LOGGER.log(Level.WARNING, "", e);
+                        }
+
+                        dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale) ;
+                        date = dateFormat.format(createDate);
                     }
 
-                    dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale) ;
-                    date = dateFormat.format(createDate);
-                }
-
-                for (String name : providerReport.getItems()) {
-                    int rightBracket = name.indexOf('}')+1;
-                    name = name.substring(rightBracket);
-                    LayerData layerData = new LayerData(providerReport.getId(), type, name, date);
-                    layerDatas.add(layerData);
+                    for (String name : providerReport.getItems()) {
+                        int rightBracket = name.indexOf('}')+1;
+                        name = name.substring(rightBracket);
+                        LayerData layerData = new LayerData(providerReport.getId(), type, name, date);
+                        layerDatas.add(layerData);
+                    }
                 }
             }
         }

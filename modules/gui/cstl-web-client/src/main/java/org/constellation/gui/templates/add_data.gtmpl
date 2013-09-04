@@ -57,7 +57,14 @@
     <script type="text/javascript" language="JavaScript">
         function loadData(startElement, counter, orderBy, filter, direction){
                 $('#dataList [data-name=datalist]').jzLoad("Controller.getAvailableData()",
-                        {"serviceName": "${service.name}", "startElement":startElement, "counter":counter, "orderBy":orderBy, "filter":filter, "direction":direction},
+                        {
+                            "dataTypes": ["raster","vector"],
+                            "startElement":startElement,
+                            "counter":counter,
+                            "orderBy":orderBy,
+                            "filter":filter,
+                            "direction":direction
+                        },
                         setPaginationDataPage);
         }
         var firstTime = 0;

@@ -307,10 +307,10 @@ public class Controller {
     @Ajax
     @Resource
     @Route("/availabledata")
-    public void getAvailableData(String dashboard, String startElement, String counter, String orderBy, String direction, String filter){
+    public void getAvailableData(final List<String> dataTypes, final String startElement, final String counter, final String orderBy, final String direction, final String filter){
         Map<String, Object> parameters = new HashMap<>(0);
         Locale userLocale = Request.getCurrent().getUserContext().getLocale();
-        List<LayerData> layerDatas = providerManager.getDataListing(userLocale);
+        List<LayerData> layerDatas = providerManager.getDataListing(userLocale, dataTypes);
 
         int nbByPage = Integer.parseInt(counter);
 
@@ -339,12 +339,12 @@ public class Controller {
         parameters.put("totalProvider", layerDatas.size());
         parameters.put("providers", layerList);
 
-//        if(dashboard.equalsIgnoreCase("true")){
-//            dataListing.with(parameters).render();
-//        }
-//        else{
+        if(dataTypes.size()==1){
+            dataListing.with(parameters).render();
+        }
+        else{
             addDataListing.with(parameters).render();
-//        }
+        }
     }
 
     /**
