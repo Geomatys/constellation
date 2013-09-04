@@ -39,6 +39,12 @@ public class ProviderReport {
     @XmlAttribute
     private String type;
 
+    /**
+     * type define by org.constellation.provider.ProviderType
+     */
+    @XmlAttribute
+    private String abstractType;
+
     @XmlAttribute
     private String date;
 
@@ -48,11 +54,12 @@ public class ProviderReport {
     public ProviderReport() {
     }
 
-    public ProviderReport(final String id, final String type, final List<String> items, final String date) {
+    public ProviderReport(final String id, final String type, final List<String> items, final String date, final String abstractType) {
         this.id = id;
         this.type = type;
         this.items = items;
         this.date = date;
+        this.abstractType = abstractType;
     }
 
     /**
@@ -106,6 +113,14 @@ public class ProviderReport {
 
     public void setDate(final String date) {
         this.date = date;
+    }
+
+    public String getAbstractType() {
+        return abstractType;
+    }
+
+    public void setAbstractType(final String abstractType) {
+        this.abstractType = abstractType;
     }
 
     @Override

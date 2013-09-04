@@ -62,7 +62,7 @@ public class ProviderManager {
      * @param fileIdentifier
      * @param path
      */
-    public void createProvider(final String type, final String fileIdentifier, final String path) {
+    public void createProvider(final String type, final String fileIdentifier, final String path, final String dataType) {
         final ConstellationServer cs = cstl.openServer(true);
 
         final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup) cs.providers.getServiceDescriptor(type);
@@ -71,6 +71,7 @@ public class ProviderManager {
         sources.parameter("id").setValue(fileIdentifier);
 
         final String folderPath = path.substring(0, path.lastIndexOf('/'));
+        sources.parameter("providerType").setValue(dataType);
 
         switch (type) {
             case "coverage-file":
@@ -100,39 +101,27 @@ public class ProviderManager {
 
         for (ProviderServiceReport providerServiceReport : report.getProviderServices()) {
             for (ProviderReport providerReport : providerServiceReport.getProviders()) {
-                String type;
-                switch (providerReport.getType()){
-                    case "feature-store":
-                        type = "vector";
-                        break;
-                    case "coverage-file":
-                        type = "raster";
-                        break;
-                    default:
-                        type = null;
+                String type = providerReport.getAbstractType();
+                String date = "";
 
-                }
-
-                if (type != null) {
+                if (providerReport.getDate() != null) {
                     DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy X");
                     Date createDate = new Date();
-                    if (providerReport.getDate() != null) {
-                        try {
-                            createDate = dateFormat.parse(providerReport.getDate());
-                        } catch (ParseException e) {
-                            LOGGER.log(Level.WARNING, "", e);
-                        }
+                    try {
+                        createDate = dateFormat.parse(providerReport.getDate());
+                    } catch (ParseException e) {
+                        LOGGER.log(Level.WARNING, "", e);
                     }
 
                     dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale) ;
-                    String date = dateFormat.format(createDate);
+                    date = dateFormat.format(createDate);
+                }
 
-                    for (String name : providerReport.getItems()) {
-                        int rightBracket = name.indexOf('}')+1;
-                        name = name.substring(rightBracket);
-                        LayerData layerData = new LayerData(providerReport.getId(), type, name, date);
-                        layerDatas.add(layerData);
-                    }
+                for (String name : providerReport.getItems()) {
+                    int rightBracket = name.indexOf('}')+1;
+                    name = name.substring(rightBracket);
+                    LayerData layerData = new LayerData(providerReport.getId(), type, name, date);
+                    layerDatas.add(layerData);
                 }
             }
         }

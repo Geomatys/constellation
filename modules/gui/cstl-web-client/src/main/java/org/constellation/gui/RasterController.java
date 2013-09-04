@@ -50,7 +50,7 @@ public class RasterController {
     public Response createProvider(final String returnURL){
         DataInformation information = informationContainer.getInformation();
         //create provider
-        providerManager.createProvider("coverage-file", information.getName(), information.getPath());
+        providerManager.createProvider("coverage-file", information.getName(), information.getPath(), information.getDataType());
         return StyleController_.edition(information.getName(), information.getName(), null, null, returnURL);
     }
 }

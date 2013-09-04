@@ -68,6 +68,8 @@ public final class ProviderParameters {
              new DefaultParameterDescriptor<Boolean>("load_all","source load all datas",Boolean.class,true,true);
     public static final ParameterDescriptor<String> SOURCE_DATE_DESCRIPTOR =
              new DefaultParameterDescriptor<String>("date","source creation date",String.class,null,false);
+    public static final ParameterDescriptor<String> SOURCE_TYPE_DESCRIPTOR =
+            new DefaultParameterDescriptor<String>("providerType","provider type",String.class,null,false);
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -121,7 +123,7 @@ public final class ProviderParameters {
     public static ParameterDescriptorGroup createDescriptor(final GeneralParameterDescriptor sourceConfigDescriptor){
         final ParameterDescriptorGroup sourceDescriptor = new DefaultParameterDescriptorGroup(
             Collections.singletonMap("name", SOURCE_DESCRIPTOR_NAME),
-            0, Integer.MAX_VALUE,SOURCE_ID_DESCRIPTOR,SOURCE_LOADALL_DESCRIPTOR,SOURCE_DATE_DESCRIPTOR,
+            0, Integer.MAX_VALUE,SOURCE_ID_DESCRIPTOR,SOURCE_LOADALL_DESCRIPTOR,SOURCE_DATE_DESCRIPTOR,SOURCE_TYPE_DESCRIPTOR,
             sourceConfigDescriptor,LAYER_DESCRIPTOR);
         final ParameterDescriptorGroup configDescriptor =
             new DefaultParameterDescriptorGroup(CONFIG_DESCRIPTOR_NAME,sourceDescriptor);

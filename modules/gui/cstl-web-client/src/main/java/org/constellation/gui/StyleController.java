@@ -184,14 +184,13 @@ public final class StyleController {
             final Style style = readJson(styleJson, Style.class);
 
             String stylePath = ConfigDirectory.getDataDirectory().getAbsolutePath()+"/styles/";
-            provider.createProvider("sld", "sld", stylePath);
+            provider.createProvider("sld", "sld", stylePath, "sld");
 
             // Create the style.
             service.createStyle(DEFAULT_PROVIDER_ID, styleName, style);
 
-            // Return to dashboard.
+            // Return to required Page.
             return Response.redirect(returnURL);
-//            return StyleController_.dashboard();
         } catch (IOException ex) {
             return Response.error(ex);
         }

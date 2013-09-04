@@ -43,6 +43,9 @@ public class Source {
     @XmlAttribute
     private String date;
 
+    @XmlAttribute
+    private String providerType;
+
     @XmlElement
     private LayerList include;
 
@@ -104,6 +107,14 @@ public class Source {
 
     public void setDate(final String date) {
         this.date = date;
+    }
+
+    public String getProviderType() {
+        return providerType;
+    }
+
+    public void setProviderType(final String providerType) {
+        this.providerType = providerType;
     }
 
     /**
