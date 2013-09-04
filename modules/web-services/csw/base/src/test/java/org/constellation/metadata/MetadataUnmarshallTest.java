@@ -23,9 +23,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -42,7 +40,6 @@ import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import org.apache.sis.internal.jaxb.gml.GMLAdapter;
 
 // Junit dependencies
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
@@ -96,6 +93,7 @@ import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.ValueConverter;
 import org.apache.sis.xml.XML;
 import org.constellation.test.utils.MetadataUtilities;
 import org.opengis.metadata.Datatype;
@@ -259,7 +257,7 @@ public class MetadataUnmarshallTest {
          * extension information
          */
         DefaultMetadataExtensionInformation extensionInfo = new DefaultMetadataExtensionInformation();
-        Set<ExtendedElementInformation> elements = new HashSet<ExtendedElementInformation>();
+        Set<ExtendedElementInformation> elements = new HashSet<>();
 
         //EDMO
         ExtendedElementInformation edmo =  createExtensionInfo("SDN:EDMO::");
@@ -314,13 +312,13 @@ public class MetadataUnmarshallTest {
         creationDate.setDateType(DateType.CREATION);
         Date dc = TemporalUtilities.parseDate("1979-08-03T00:00:00+0200");
         creationDate.setDate(dc);
-        List<CitationDate> dates = new ArrayList<CitationDate>();
+        List<CitationDate> dates = new ArrayList<>();
         dates.add(revisionDate);
         dates.add(creationDate);
         citation.setDates(dates);
 
 
-        Set<ResponsibleParty> originators = new HashSet<ResponsibleParty>();
+        Set<ResponsibleParty> originators = new HashSet<>();
         DefaultResponsibleParty originator = new DefaultResponsibleParty(Role.ORIGINATOR);
         originator.setOrganisationName(new SimpleInternationalString("UNIVERSITE DE LA MEDITERRANNEE (U2) / COM - LAB. OCEANOG. BIOGEOCHIMIE - LUMINY"));
         contact = new DefaultContact();
@@ -393,10 +391,10 @@ public class MetadataUnmarshallTest {
         /*
          * keywords
          */
-        Set<Keywords> keywords = new HashSet<Keywords>();
+        Set<Keywords> keywords = new HashSet<>();
 
         //parameter
-        Set<String> keys = new HashSet<String>();
+        Set<String> keys = new HashSet<>();
         keys.add("Transmittance and attenuance of the water column");
         Keywords keyword = createKeyword(keys, "parameter", "BODC Parameter Discovery Vocabulary", "P021", "2008-11-26T01:00:00+0200", "35");
         keywords.add(keyword);
@@ -406,10 +404,8 @@ public class MetadataUnmarshallTest {
         /*
          * resource constraint
          */
-        Set<String> resConsts = new HashSet<String>();
-        resConsts.add("license");
         DefaultLegalConstraints constraint = new DefaultLegalConstraints();
-        Set<Restriction> restrictions  = new HashSet<Restriction>();
+        Set<Restriction> restrictions  = new HashSet<>();
         restrictions.add(Restriction.LICENSE);
 
         constraint.setAccessConstraints(restrictions);
@@ -420,7 +416,7 @@ public class MetadataUnmarshallTest {
         /*
          * Aggregate info
          */
-        Set<DefaultAggregateInformation> aggregateInfos = new HashSet<DefaultAggregateInformation>();
+        Set<DefaultAggregateInformation> aggregateInfos = new HashSet<>();
 
         //cruise
         DefaultAggregateInformation aggregateInfo = new DefaultAggregateInformation();
@@ -485,33 +481,32 @@ public class MetadataUnmarshallTest {
 
         // vertical datum
         ImmutableIdentifier datumID = new ImmutableIdentifier(null, null, "D28");
-        DefaultVerticalCRS vcrs = null;
 
-        Map<String, Object> prop = new HashMap<String, Object>();
+        Map<String, Object> prop = new HashMap<>();
         prop.put(DefaultVerticalDatum.NAME_KEY, datumID);
         prop.put(DefaultVerticalDatum.SCOPE_KEY, null);
         DefaultVerticalDatum datum = new DefaultVerticalDatum(prop, VerticalDatumTypes.ELLIPSOIDAL);
 
 
         // vertical coordinate system  TODO var 32 uom?
-        HashMap<String, Object> propCoo = new HashMap<String, Object>();
+        HashMap<String, Object> propCoo = new HashMap<>();
 
 
         propCoo.put(DefaultCoordinateSystemAxis.NAME_KEY, new ImmutableIdentifier(null, null, "meters"));
 //        propCoo.put(DefaultCoordinateSystemAxis.ALIAS_KEY, "");
         DefaultCoordinateSystemAxis axis = new DefaultCoordinateSystemAxis(propCoo, "meters", AxisDirection.DOWN, Unit.valueOf("m"));
 
-        HashMap<String,Object> csProp = new HashMap<String, Object>();
+        HashMap<String,Object> csProp = new HashMap<>();
         ImmutableIdentifier i = new ImmutableIdentifier(null, null, "meters");
         csProp.put(DefaultVerticalCRS.NAME_KEY, i);
         DefaultVerticalCS cs = new DefaultVerticalCS(csProp, axis);
 
-        prop = new HashMap<String, Object>();
+        prop = new HashMap<>();
         ImmutableIdentifier idVert = new ImmutableIdentifier(null, null, "idvertCRS");
         prop.put(DefaultVerticalCRS.NAME_KEY, idVert);
         prop.put(DefaultVerticalCRS.SCOPE_KEY, null);
         //prop.put(DefaultVerticalCRS.ALIAS_KEY, DefaultCoordinateSystemAxis.UNDEFINED.getAlias());
-        vcrs = new DefaultVerticalCRS(prop, datum, cs);
+        DefaultVerticalCRS vcrs = new DefaultVerticalCRS(prop, datum, cs);
 
 
         // TODO vertical limit? var 35
@@ -578,7 +573,7 @@ public class MetadataUnmarshallTest {
         distributionInfo.setDistributors(set);
 
         //format
-        Set<Format> formats  = new HashSet<Format>();
+        Set<Format> formats  = new HashSet<>();
 
         DefaultFormat format = new DefaultFormat();
         String name = "MEDATLAS ASCII";
@@ -596,9 +591,7 @@ public class MetadataUnmarshallTest {
         DefaultOnlineResource onlines = new DefaultOnlineResource();
 
         String uri = "http://www.ifremer.fr/sismerData/jsp/visualisationMetadata3.jsp?langue=EN&pageOrigine=CS&cle1=42292_1&cle2=CTDF02";
-        if (uri != null) {
-            onlines.setLinkage(new URI(uri));
-        }
+        onlines.setLinkage(new URI(uri));
 
         onlines.setDescription(new SimpleInternationalString("CTDF02"));
         onlines.setFunction(OnLineFunction.DOWNLOAD);
@@ -732,7 +725,7 @@ public class MetadataUnmarshallTest {
     protected Keywords createKeyword(Set<String> values, String keywordType, String title, String altTitle, String date, String version) throws ParseException {
 
         DefaultKeywords keyword = new DefaultKeywords();
-        Set<InternationalString> kws = new HashSet<InternationalString>();
+        Set<InternationalString> kws = new HashSet<>();
         if (values != null) {
             for (String value: values) {
                 if (value != null) {
@@ -769,16 +762,12 @@ public class MetadataUnmarshallTest {
     }
 
      protected Set<GeographicExtent> createGeographicExtent(String westVar, String eastVar, String southVar, String northVar) {
-         Set<GeographicExtent> result = new HashSet<GeographicExtent>();
-         double west = 0;
-         double east = 0;
-         double south = 0;
-         double north = 0;
+         Set<GeographicExtent> result = new HashSet<>();
 
-         west  = Double.parseDouble(westVar);
-         east  = Double.parseDouble(eastVar);
-         south = Double.parseDouble(southVar);
-         north = Double.parseDouble(northVar);
+         double west  = Double.parseDouble(westVar);
+         double east  = Double.parseDouble(eastVar);
+         double south = Double.parseDouble(southVar);
+         double north = Double.parseDouble(northVar);
 
          // for point BBOX we replace the westValue equals to 0 by the eastValue (respectively for  north/south)
          if (east == 0) {
@@ -893,7 +882,7 @@ public class MetadataUnmarshallTest {
          * extension information
          */
         DefaultMetadataExtensionInformation extensionInfo = new DefaultMetadataExtensionInformation();
-        Set<ExtendedElementInformation> elements = new HashSet<ExtendedElementInformation>();
+        Set<ExtendedElementInformation> elements = new HashSet<>();
 
         //we only keep one element for test purpose (unordered list)
         //EDMO
@@ -925,13 +914,13 @@ public class MetadataUnmarshallTest {
         creationDate.setDateType(DateType.CREATION);
         Date dc = TemporalUtilities.parseDate("1979-08-03T00:00:00+0200");
         creationDate.setDate(dc);
-        List<CitationDate> dates = new ArrayList<CitationDate>();
+        List<CitationDate> dates = new ArrayList<>();
         dates.add(revisionDate);
         dates.add(creationDate);
         citation.setDates(dates);
 
 
-        Set<ResponsibleParty> originators = new HashSet<ResponsibleParty>();
+        Set<ResponsibleParty> originators = new HashSet<>();
         DefaultResponsibleParty originator = new DefaultResponsibleParty(Role.ORIGINATOR);
         originator.setOrganisationName(new SimpleInternationalString("UNIVERSITE DE LA MEDITERRANNEE (U2) / COM - LAB. OCEANOG. BIOGEOCHIMIE - LUMINY"));
         contact = new DefaultContact();
@@ -1005,10 +994,10 @@ public class MetadataUnmarshallTest {
         /*
          * keywords
          */
-        Set<Keywords> keywords = new HashSet<Keywords>();
+        Set<Keywords> keywords = new HashSet<>();
 
         //parameter
-        Set<String> keys = new HashSet<String>();
+        Set<String> keys = new HashSet<>();
         keys.add("Transmittance and attenuance of the water column");
         Keywords keyword = createKeyword(keys, "parameter", "BODC Parameter Discovery Vocabulary", "P021", "2008-11-26T00:00:00+0200", "35");
         keywords.add(keyword);
@@ -1019,10 +1008,10 @@ public class MetadataUnmarshallTest {
         /*
          * resource constraint
          */
-        Set<String> resConsts = new HashSet<String>();
+        Set<String> resConsts = new HashSet<>();
         resConsts.add("license");
         DefaultLegalConstraints constraint = new DefaultLegalConstraints();
-        Set<Restriction> restrictions  = new HashSet<Restriction>();
+        Set<Restriction> restrictions  = new HashSet<>();
         restrictions.add(Restriction.LICENSE);
 
         constraint.setAccessConstraints(restrictions);
@@ -1033,7 +1022,7 @@ public class MetadataUnmarshallTest {
         /*
          * Aggregate info
          */
-        Set<DefaultAggregateInformation> aggregateInfos = new HashSet<DefaultAggregateInformation>();
+        Set<DefaultAggregateInformation> aggregateInfos = new HashSet<>();
 
         //cruise
         DefaultAggregateInformation aggregateInfo = new DefaultAggregateInformation();
@@ -1101,9 +1090,8 @@ public class MetadataUnmarshallTest {
 
         // vertical datum
         String datumID = "D28";
-        DefaultVerticalCRS vcrs = null;
 
-        Map<String, String> prop = new HashMap<String, String>();
+        Map<String, String> prop = new HashMap<>();
         prop.put(DefaultVerticalDatum.NAME_KEY, datumID);
         prop.put(DefaultVerticalDatum.SCOPE_KEY, null);
         DefaultVerticalDatum datum = new DefaultVerticalDatum(prop, VerticalDatumType.GEOIDAL);
@@ -1113,10 +1101,10 @@ public class MetadataUnmarshallTest {
         DefaultCoordinateSystemAxis axis = new DefaultCoordinateSystemAxis("meters", AxisDirection.DOWN, Unit.valueOf("m"));
         DefaultVerticalCS cs = new DefaultVerticalCS(axis);
 
-        prop = new HashMap<String, String>();
+        prop = new HashMap<>();
         prop.put(DefaultVerticalCRS.NAME_KEY, "idvertCRS");
         prop.put(DefaultVerticalCRS.SCOPE_KEY, null);
-        vcrs = new DefaultVerticalCRS(prop, datum, cs);
+        DefaultVerticalCRS vcrs = new DefaultVerticalCRS(prop, datum, cs);
 
 
         // TODO vertical limit? var 35
@@ -1182,7 +1170,7 @@ public class MetadataUnmarshallTest {
         distributionInfo.setDistributors(set);
 
         //format
-        Set<Format> formats  = new HashSet<Format>();
+        Set<Format> formats  = new HashSet<>();
 
         DefaultFormat format = new DefaultFormat();
         String name = "MEDATLAS ASCII";
@@ -1200,9 +1188,7 @@ public class MetadataUnmarshallTest {
         DefaultOnlineResource onlines = new DefaultOnlineResource();
 
         String uri = "http://www.ifremer.fr/sismerData/jsp/visualisationMetadata3.jsp?langue=EN&pageOrigine=CS&cle1=42292_1&cle2=CTDF02";
-        if (uri != null) {
-            onlines.setLinkage(new URI(uri));
-        }
+        onlines.setLinkage(new URI(uri));
 
         onlines.setDescription(new SimpleInternationalString("CTDF02"));
         onlines.setFunction(OnLineFunction.DOWNLOAD);
@@ -1239,4 +1225,22 @@ public class MetadataUnmarshallTest {
         comparator.compare();
     }
 
+    @Test
+    public void marshallURLTest() throws Exception {
+
+        final URI u1 = new URI("C:%5Cdossier%20test%5CFichier%5C");
+
+        final StringWriter sw = new StringWriter();
+        marshaller = testPool.acquireMarshaller();
+        final DefaultOnlineResource online = new DefaultOnlineResource();
+        online.setLinkage(u1);
+        marshaller.marshal(online, sw);
+        String result = sw.toString();
+        System.out.println(result);
+
+        unmarshaller = testPool.acquireUnmarshaller();
+        final DefaultOnlineResource expResult = (DefaultOnlineResource) unmarshaller.unmarshal(new StringReader(result));
+
+        assertEquals(expResult, online);
+    }
 }
