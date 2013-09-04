@@ -127,8 +127,8 @@ public class MdwebRecordIndexTest {
         configuration.setConfigurationDirectory(configDirectory);
 
         final MDWebIndexer indexer    = new MDWebIndexer(configuration, "");
-        indexer.destroy();
-        indexSearcher                   = new LuceneIndexSearcher(configDirectory, "", null, true, null);
+        //indexer.destroy();
+        indexSearcher                   = new LuceneIndexSearcher(configDirectory, "", null, true, indexer.getRtree());
         indexSearcher.setLogLevel(LOG_LEVEL);
     }
 
@@ -174,7 +174,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 1:\n{0}", resultReport);
 
-        Set<String> expectedResult = new LinkedHashSet<String>();
+        Set<String> expectedResult = new LinkedHashSet<>();
         expectedResult.add("2345-aa453-ade456");
 
         assertEquals(expectedResult, result);
@@ -191,7 +191,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 2:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
@@ -212,7 +212,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 3:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
@@ -235,7 +235,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 4:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
@@ -258,7 +258,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 5:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
 
@@ -276,7 +276,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 5:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
 
 
@@ -299,7 +299,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 6:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         expectedResult.add("test-5");
@@ -324,7 +324,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 7:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
@@ -351,7 +351,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 8:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
@@ -371,7 +371,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 9:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("test-5");
@@ -389,7 +389,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 10:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         assertEquals(expectedResult, result);
@@ -405,7 +405,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 11:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("test-6");
@@ -422,7 +422,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SimpleSearch 11:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("test-6");
         assertEquals(expectedResult, result);
 
@@ -453,7 +453,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SortedSearch 1:\n{0}", resultReport);
 
-        Set<String> expectedResult = new LinkedHashSet<String>();
+        Set<String> expectedResult = new LinkedHashSet<>();
         expectedResult.add("test-5");
         expectedResult.add("test-6");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
@@ -478,7 +478,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SortedSearch 2:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
@@ -503,7 +503,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SortedSearch 3:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("2345-aa453-ade456");
@@ -528,7 +528,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "SortedSearch 4:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         expectedResult.add("test-6");
         expectedResult.add("test-5");
@@ -562,7 +562,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "spatialSearch 1:\n{0}", resultReport);
 
-        Set<String> expectedResult = new LinkedHashSet<String>();
+        Set<String> expectedResult = new LinkedHashSet<>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
@@ -573,7 +573,7 @@ public class MdwebRecordIndexTest {
          * Test 1 spatial search: NOT BBOX filter
          */
         resultReport = "";
-        List<Filter> lf = new ArrayList<Filter>();
+        List<Filter> lf = new ArrayList<>();
         sf           = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
         lf.add(sf);
         int[] op = {SerialChainFilter.NOT};
@@ -587,7 +587,7 @@ public class MdwebRecordIndexTest {
 
         LOGGER.log(LOG_LEVEL, "spatialSearch 2:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("test-5");
         expectedResult.add("test-6");
