@@ -66,7 +66,7 @@ public class MapUtilities {
                         continue;
                         // we look for detailled informations in the include sections
                     } else {
-                        if (securityFilter.allowed(login, layerName)) {
+                        if (securityFilter == null || securityFilter.allowed(login, layerName)) {
                             Layer layer = source.isIncludedLayer(qn);
                             if (layer == null) {
                                 layer = new Layer(qn);
@@ -89,7 +89,6 @@ public class MapUtilities {
                     if (!allLayer.isEmpty()) {
                         for (Layer layer : allLayer) {
                             layer.setProviderID(sourceID);
-                            layers.add(layer);
                             buildDataAndType(layers, sourceID, layerName, layer);
                         }
                     }
