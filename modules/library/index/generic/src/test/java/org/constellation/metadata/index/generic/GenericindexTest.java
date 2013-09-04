@@ -93,7 +93,7 @@ public class GenericindexTest {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object       = fillTestData();
         indexer                   = new GenericIndexer(object, null, configDirectory, "");
-        indexSearcher             = new LuceneIndexSearcher(configDirectory, "", null, true, null);
+        indexSearcher             = new LuceneIndexSearcher(configDirectory, "", null, true, indexer.getRtree());
         //indexer.setLogLevel(Level.FINER);
         //indexSearcher.setLogLevel(Level.FINER);
 
