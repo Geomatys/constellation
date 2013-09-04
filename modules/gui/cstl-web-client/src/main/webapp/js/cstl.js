@@ -101,6 +101,12 @@ CSTL = {
         }
         return null;
     }
-
-
 };
+
+// Send multivalue parameter without [].
+// Exemple :
+// ---------
+// for dataType:["vector","raster"],
+// send dataType:"vector", dataType:"raster"
+// and not dataType[]:"vector", dataType[]:"raster"
+jQuery.ajaxSettings.traditional = true;

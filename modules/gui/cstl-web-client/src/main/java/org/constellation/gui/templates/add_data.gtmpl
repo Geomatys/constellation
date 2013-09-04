@@ -58,7 +58,7 @@
         function loadData(startElement, counter, orderBy, filter, direction){
                 $('#dataList [data-name=datalist]').jzLoad("Controller.getAvailableData()",
                         {
-                            "dataTypes": ["raster","vector"],
+                            "dataTypes": ['raster','vector'],
                             "startElement":startElement,
                             "counter":counter,
                             "orderBy":orderBy,

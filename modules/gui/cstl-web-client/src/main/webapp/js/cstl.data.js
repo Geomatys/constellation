@@ -28,7 +28,7 @@
  */
 CSTL.Data = {
 
-    type: ["raster, vector, sensor"],
+    type: ["raster","vector","sensor"],
 
     goTo: function ($element, title, researchtype){
         $("#dataDashboardTitle").empty();
