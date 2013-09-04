@@ -37,11 +37,11 @@ public abstract class ServiceProcessTest extends AbstractProcessTest {
 
     public ServiceProcessTest(final String str, final String serviceName, final Class workerClass) {
         super(str);
-        ServiceProcessTest.serviceName = serviceName;
-        ServiceProcessTest.workerClass = workerClass;
+        ServiceProcessTest.serviceName     = serviceName;
+        ServiceProcessTest.workerClass     = workerClass;
 
         configDirectory = ConfigDirectory.getConfigDirectory();
-        WSEngine.registerService(serviceName, "REST", workerClass);
+        WSEngine.registerService(serviceName, "REST", workerClass, null);
     }
 
     @AfterClass

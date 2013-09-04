@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.ServiceConfigurer;
 
 /**
  *
@@ -39,6 +40,8 @@ public final class WSEngine {
     private static final Map<String, List<String>> REGISTERED_SERVICE = new HashMap<>();
 
     private static final Map<String, Class> SERVICE_WORKER_CLASS = new HashMap<>();
+
+    private static final Map<String, Class<? extends ServiceConfigurer>> SERVICE_CONFIGURER_CLASS = new HashMap<>();
 
     private static final List<String> TO_RESTART = new ArrayList<>();
 
@@ -156,8 +159,10 @@ public final class WSEngine {
      * @param serviceName A service type (CSW, SOS, WMS, ...).
      * @param protocol
      * @param workerClass the class binding of the service worker.
+      * @param workerClass the class binding of the service configurer
      */
-    public static void registerService(final String serviceName, final String protocol, final Class workerClass) {
+    public static void registerService(final String serviceName, final String protocol, final Class workerClass,
+        final Class<? extends ServiceConfigurer> configurerClass) {
         if (REGISTERED_SERVICE.containsKey(serviceName)) {
             final List<String> protocols = REGISTERED_SERVICE.get(serviceName);
             if (!protocols.contains(protocol)) {
@@ -170,6 +175,7 @@ public final class WSEngine {
             REGISTERED_SERVICE.put(serviceName, protocols);
         }
         SERVICE_WORKER_CLASS.put(serviceName, workerClass);
+        SERVICE_CONFIGURER_CLASS.put(serviceName, configurerClass);
     }
 
     public static Map<String, List<String>> getRegisteredServices() {
@@ -184,6 +190,20 @@ public final class WSEngine {
     public static Class getServiceWorkerClass(final String serviceName) {
         if (SERVICE_WORKER_CLASS.containsKey(serviceName)) {
             return SERVICE_WORKER_CLASS.get(serviceName);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the {@link ServiceConfigurer} implementation {@link Class} for the
+     * specified service specification.
+     *
+     * @param specification the service specification
+     * @return the {@link ServiceConfigurer} implementation {@link Class} or null if service not registered
+     */
+    public static Class<? extends ServiceConfigurer> getServiceConfigurerClass(final String specification) {
+        if (SERVICE_CONFIGURER_CLASS.containsKey(specification)) {
+            return SERVICE_CONFIGURER_CLASS.get(specification);
         }
         return null;
     }

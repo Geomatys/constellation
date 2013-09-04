@@ -34,6 +34,8 @@ import javax.xml.namespace.QName;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.sos.configuration.SOSConfigurer;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
@@ -94,7 +96,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * Build a new Restfull SOS service.
      */
     public SOService() throws CstlServiceException {
-        super(Specification.SOS, new SOSServiceConfiguration(null));
+        super(Specification.SOS);
         setXMLContext(SOSMarshallerPool.getInstance());
         LOGGER.log(Level.INFO, "SOS REST service running ({0} instances)\n", getWorkerMapSize());
     }
@@ -107,7 +109,13 @@ public class SOService extends OGCWebService<SOSworker> {
         return SOSworker.class;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class<? extends ServiceConfigurer> getConfigurerClass() {
+        return SOSConfigurer.class;
+    }
 
     /**
      * {@inheritDoc}

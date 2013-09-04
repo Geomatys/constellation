@@ -16,13 +16,10 @@
  */
 package org.constellation.gui.service;
 
-import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.dto.DataInformation;
-import org.constellation.dto.Restart;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
 
@@ -56,12 +53,10 @@ public class  ServicesManager {
      *
      * @param metadata    the service metadata
      * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return {@code true} on success, {@code false} on fail
-     * @throws IOException on HTTP communication error or response entity parsing error
+     * @throws IOException if the operation has failed
      */
-    public boolean createServices(final Service metadata, final Specification serviceType) throws IOException {
-        final AcknowlegementType response = cstl.openClient().services.newInstance(serviceType, metadata);
-        return "success".equalsIgnoreCase(response.getStatus());
+    public void createServices(final Service metadata, final Specification serviceType) throws IOException {
+        cstl.openClient().services.newInstance(serviceType, metadata);
     }
 
     /**
@@ -69,10 +64,14 @@ public class  ServicesManager {
      *
      * @param serviceId   the service identifier
      * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return the {@link org.constellation.dto.Service} instance
+     * @return the {@link Service} instance
      */
-    public Service getMetadata(final String serviceId, final Specification serviceType) throws IOException {
-        return cstl.openClient().services.getMetadata(serviceType, serviceId);
+    public Service getMetadata(final String serviceId, final Specification serviceType) {
+        try {
+            return cstl.openClient().services.getMetadata(serviceType, serviceId);
+        } catch (IOException ex) {
+            return new Service();
+        }
     }
 
     /**
@@ -80,11 +79,10 @@ public class  ServicesManager {
      *
      * @param metadata    the service metadata
      * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return {@code true} on success, otherwise {@code false}
+     * @throws IOException if the operation has failed
      */
-    public boolean setMetadata(final Service metadata, final Specification serviceType) throws IOException {
-        final AcknowlegementType response = cstl.openClient().services.setMetadata(serviceType, metadata);
-        return "success".equalsIgnoreCase(response.getStatus());
+    public void setMetadata(final Service metadata, final Specification serviceType) throws IOException {
+        cstl.openClient().services.setMetadata(serviceType, metadata.getIdentifier(), metadata);
     }
 
     /**
@@ -93,6 +91,7 @@ public class  ServicesManager {
      * @param serviceId   the service identifier
      * @param serviceType the service type (WMS, CSW, WPS...)
      * @return an {@link Instance} instance
+     * @throws IOException if the operation has failed
      */
     public Instance getInstance(final String serviceId, final Specification serviceType) throws IOException {
         return cstl.openClient().services.getInstance(serviceType, serviceId);
@@ -103,18 +102,21 @@ public class  ServicesManager {
      *
      * @param serviceId   the service identifier
      * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return {@code true} on success, otherwise {@code false}
+     * @throws IOException if the operation has failed
      */
-    public boolean restartService(final String serviceId, final Specification serviceType) throws IOException {
-        final Restart restart = new Restart();
-        restart.setForced(true);
-        restart.setCloseFirst(true);
-        final AcknowlegementType response = cstl.openClient().services.restart(serviceType, serviceId, restart);
-        return "success".equalsIgnoreCase(response.getStatus());
+    public void restartService(final String serviceId, final Specification serviceType) throws IOException {
+        cstl.openClient().services.restart(serviceType, serviceId, true);
     }
 
-    public boolean deleteService(final String serviceId, final String specification) {
-        return cstl.openServer(true).services.deleteInstance(specification, serviceId);
+    /**
+     * Deletes a service.
+     *
+     * @param serviceId   the service identifier
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @throws IOException if the operation has failed
+     */
+    public void deleteService(final String serviceId, final Specification serviceType) throws IOException {
+        cstl.openClient().services.delete(serviceType, serviceId);
     }
 
     /**
@@ -122,11 +124,10 @@ public class  ServicesManager {
      *
      * @param serviceId   the service identifier
      * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return {@code true} on success, otherwise {@code false}
+     * @throws IOException if the operation has failed
      */
-    public boolean stopService(final String serviceId, final Specification serviceType) throws IOException {
-        final AcknowlegementType response = cstl.openClient().services.stop(serviceType, serviceId);
-        return "success".equalsIgnoreCase(response.getStatus());
+    public void stopService(final String serviceId, final Specification serviceType) throws IOException {
+        cstl.openClient().services.stop(serviceType, serviceId);
     }
 
     /**
@@ -134,11 +135,10 @@ public class  ServicesManager {
      *
      * @param serviceId   the service identifier
      * @param serviceType the service type (WMS, CSW, WPS...)
-     * @return {@code true} on success, otherwise {@code false}
+     * @throws IOException if the operation has failed
      */
-    public boolean startService(final String serviceId, final Specification serviceType) throws IOException {
-        final AcknowlegementType response = cstl.openClient().services.start(serviceType, serviceId);
-        return "success".equalsIgnoreCase(response.getStatus());
+    public void startService(final String serviceId, final Specification serviceType) throws IOException {
+        cstl.openClient().services.start(serviceType, serviceId);
     }
 
     /**
@@ -153,12 +153,12 @@ public class  ServicesManager {
         //map server side object on client side object
         for (Instance instance : report.getInstances()) {
             InstanceSummary instanceSum = new InstanceSummary();
-            if(instance.get_abstract().isEmpty()){
+            if(instance.get_abstract() == null || instance.get_abstract().isEmpty()){
                 instanceSum.set_abstract("-");
             }else{
                 instanceSum.set_abstract(instance.get_abstract());
             }
-            instanceSum.setLayersNumber(instance.getLayersNumber());
+            instanceSum.setLayersNumber(instance.getLayersNumber() != null ? instance.getLayersNumber() : 0);
             instanceSum.setName(instance.getName());
             instanceSum.setStatus(instance.getStatus().toString());
             instanceSum.setType(instance.getType().toLowerCase());
@@ -195,7 +195,7 @@ public class  ServicesManager {
 
     public StyleListBean getStyleList() {
         try {
-            return cstl.openClient().providers.getStyleList();
+            return cstl.openClient().providers.getStyles();
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error on message receive", e);
         }

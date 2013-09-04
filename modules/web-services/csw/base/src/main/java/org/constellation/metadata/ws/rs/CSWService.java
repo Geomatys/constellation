@@ -23,8 +23,10 @@ import com.sun.jersey.spi.resource.Singleton;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.jaxb.CstlXMLSerializer;
 import org.constellation.metadata.CSWworker;
+import org.constellation.metadata.configuration.CSWConfigurer;
 import org.constellation.metadata.utils.SerializerResponse;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -109,7 +111,7 @@ public class CSWService extends OGCWebService<CSWworker> {
      * Build a new Restful CSW service.
      */
     public CSWService() {
-        super(Specification.CSW, new CSWServiceConfiguration(null));
+        super(Specification.CSW);
         setXMLContext(EBRIMMarshallerPool.getInstance());
         LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", getWorkerMapSize());
     }
@@ -120,6 +122,14 @@ public class CSWService extends OGCWebService<CSWworker> {
     @Override
     protected Class getWorkerClass() {
         return CSWworker.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class<? extends ServiceConfigurer> getConfigurerClass() {
+        return CSWConfigurer.class;
     }
 
     /**

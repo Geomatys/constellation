@@ -34,6 +34,8 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingType;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.metadata.configuration.CSWConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 
@@ -108,6 +110,14 @@ public class CSWService extends OGCWebService<CSWworker>{
     @Override
     protected Class getWorkerClass() {
         return CSWworker.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class<? extends ServiceConfigurer> getConfigurerClass() {
+        return CSWConfigurer.class;
     }
 
     /**

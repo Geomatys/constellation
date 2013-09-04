@@ -32,11 +32,10 @@ public class ServicesManagerMock extends ServicesManager{
      * @return <code>true</code> if succeded, <code>false</code> if not succeded
      */
     @Override
-    public boolean createServices(Service createdService, Specification service) {
+    public void createServices(Service createdService, Specification service) {
         LOGGER.log(Level.INFO, createdService.getName());
         LOGGER.log(Level.INFO, createdService.getIdentifier());
         LOGGER.log(Level.INFO, createdService.getDescription());
         LOGGER.log(Level.INFO, createdService.getKeywords().toString());
-        return true;
     }
 }

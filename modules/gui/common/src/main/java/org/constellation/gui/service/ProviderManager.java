@@ -17,6 +17,7 @@
 
 package org.constellation.gui.service;
 
+import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
@@ -140,7 +141,8 @@ public class ProviderManager {
 
     public void addLayer(final AddLayer toAddLayer) {
         try {
-            cstl.openClient().providers.addLayer(toAddLayer);
+            cstl.openClient().services.addLayer(Specification.fromShortName(toAddLayer.getServiceType()),
+                    toAddLayer.getServiceId(), toAddLayer);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when try to add layer on service", e);
         }

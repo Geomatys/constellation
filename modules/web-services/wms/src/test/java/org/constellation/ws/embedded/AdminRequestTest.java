@@ -158,7 +158,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        AcknowlegementType expResult = new AcknowlegementType("Success", "instance succefully created");
+        AcknowlegementType expResult = new AcknowlegementType("Success", "Service instance successfully created.");
         assertEquals(expResult, obj);
 
         /*
@@ -192,7 +192,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        expResult = new AcknowlegementType("Error", "unable to create an instance");
+        expResult = new AcknowlegementType("Error", "Unable to create an instance.");
         assertEquals(expResult, obj);
     }
 
@@ -213,7 +213,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        AcknowlegementType expResult = new AcknowlegementType("Success", "new instance succefully started");
+        AcknowlegementType expResult = new AcknowlegementType("Success", "Service instance successfully started.");
         assertEquals(expResult, obj);
 
          /*
@@ -262,7 +262,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        AcknowlegementType expResult = new AcknowlegementType("Success", "Instance correctly configured");
+        AcknowlegementType expResult = new AcknowlegementType("Success", "Service instance configuration successfully updated.");
         assertEquals(expResult, obj);
 
         /*
@@ -278,7 +278,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        expResult = new AcknowlegementType("Success", "instances succefully restarted");
+        expResult = new AcknowlegementType("Success", "Service instance successfully restarted.");
         assertEquals(expResult, obj);
 
         URL gcDefaultURL = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/default?request=GetCapabilities&service=WMS&version=1.1.1");
@@ -308,7 +308,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        AcknowlegementType expResult = new AcknowlegementType("Success", "instance succesfully stopped");
+        AcknowlegementType expResult = new AcknowlegementType("Success", "Service instance successfully stopped.");
         assertEquals(expResult, obj);
 
          /*
@@ -348,7 +348,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        AcknowlegementType expResult = new AcknowlegementType("Success", "instance succesfully deleted");
+        AcknowlegementType expResult = new AcknowlegementType("Success", "Service instance successfully deleted.");
         assertEquals(expResult, obj);
 
          /*

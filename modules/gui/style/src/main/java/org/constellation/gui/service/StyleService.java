@@ -17,14 +17,12 @@
 
 package org.constellation.gui.service;
 import org.constellation.dto.DataDescription;
-import org.constellation.dto.StyleBean;
 import org.constellation.dto.StyleListBean;
 import org.constellation.gui.binding.Style;
 import org.geotoolkit.style.MutableStyle;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Manager for style provider operations.
@@ -122,6 +120,6 @@ public final class StyleService {
      * @return
      */
     public StyleListBean getStyleList() throws IOException {
-        return cstl.openClient().providers.getStyleList();
+        return cstl.openClient().providers.getStyles();
     }
 }

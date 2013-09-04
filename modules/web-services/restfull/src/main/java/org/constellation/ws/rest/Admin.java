@@ -1,14 +1,18 @@
 package org.constellation.ws.rest;
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.NotRunningServiceException;
+import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.ws.rs.ConfigurationUtilities;
 import org.constellation.dto.Configuration;
+import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
-import org.constellation.ws.rs.OGCServiceConfiguration;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -17,6 +21,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -70,9 +77,17 @@ public class Admin {
 
     @GET
     @Path("instances")
-    public Response listIntances(){
-        OGCServiceConfiguration sc = new OGCServiceConfiguration();
-        InstanceReport report = sc.listInstance();
-        return Response.ok(report).build();
+    public Response listInstances(){
+        final List<Instance> instances = new ArrayList<>();
+        final Set<String> services = WSEngine.getRegisteredServices().keySet();
+        for (final String service : services) {
+            try {
+                final Specification spec = Specification.fromShortName(service);
+                final OGCConfigurer configurer = (OGCConfigurer) ServiceConfigurer.newInstance(spec);
+                instances.addAll(configurer.getInstances());
+            } catch (NotRunningServiceException ignore) {
+            }
+        }
+        return Response.ok(new InstanceReport(instances)).build();
     }
 }

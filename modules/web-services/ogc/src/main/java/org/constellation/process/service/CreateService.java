@@ -128,15 +128,6 @@ public class CreateService extends AbstractProcess {
                 }
             }
 
-            // Write the service metadata.
-            if (serviceMetadata != null) {
-                try {
-                    MetadataUtilities.writeMetadata(instanceDirectory, serviceMetadata);
-                } catch (IOException ex) {
-                    throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
-                }
-            }
-
         } else if (instanceDirectory.mkdir()) {
             configurationFile = new File(instanceDirectory, configFileName);
         } else {
@@ -152,6 +143,15 @@ public class CreateService extends AbstractProcess {
 
             } catch (JAXBException ex) {
                 throw new ProcessException(ex.getMessage(), this, ex);
+            }
+
+            // Write the service metadata.
+            if (serviceMetadata != null) {
+                try {
+                    MetadataUtilities.writeMetadata(instanceDirectory, serviceMetadata);
+                } catch (IOException ex) {
+                    throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
+                }
             }
         }
 

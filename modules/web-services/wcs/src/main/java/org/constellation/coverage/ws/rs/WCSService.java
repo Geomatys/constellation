@@ -34,6 +34,8 @@ import java.util.StringTokenizer;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.map.configuration.MapConfigurer;
+import org.constellation.wcs.configuration.WCSConfigurer;
 import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -128,6 +130,13 @@ public class WCSService extends GridWebService<WCSWorker> {
         return DefaultWCSWorker.class;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class<? extends MapConfigurer> getConfigurerClass() {
+        return WCSConfigurer.class;
+    }
 
     /**
      * {@inheritDoc}

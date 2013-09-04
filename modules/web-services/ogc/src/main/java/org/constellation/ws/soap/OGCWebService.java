@@ -122,7 +122,7 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
     public OGCWebService(final Specification spec) {
         LOGGER.log(Level.INFO, "Starting the SOAP {0} service facade.\n", spec.name());
         this.specification = spec;
-        WSEngine.registerService(specification.name(), "SOAP", getWorkerClass());
+        WSEngine.registerService(specification.name(), "SOAP", getWorkerClass(), getConfigurerClass());
 
         /*
          * build the map of Workers, by scanning the sub-directories of its
@@ -198,6 +198,11 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
      * @return the worker binding class of the current service.
      */
     protected abstract Class getWorkerClass();
+
+    /**
+     * @return the {@link org.constellation.configuration.ServiceConfigurer} class implementation.
+     */
+    protected abstract Class getConfigurerClass();
 
     /**
      * extract the service URL (before serviceName/serviceID?)

@@ -35,6 +35,8 @@ import javax.xml.ws.BindingType;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.wps.configuration.WPSConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.wps.ws.WPSWorker;
 
@@ -77,6 +79,14 @@ public class WPSService extends OGCWebService<WPSWorker> {
     @Override
     protected Class getWorkerClass() {
         return WPSWorker.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class<? extends ServiceConfigurer> getConfigurerClass() {
+        return WPSConfigurer.class;
     }
 
     /**

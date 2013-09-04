@@ -43,10 +43,12 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.StartServiceDescriptor;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.security.SecurityManager;
@@ -103,24 +105,23 @@ import org.opengis.util.NoSuchIdentifierException;
 public abstract class OGCWebService<W extends Worker> extends WebService {
 
     final String serviceName;
-    protected static OGCServiceConfiguration utils;
+    final OGCConfigurer configurer;
 
     /**
      * Initialize the basic attributes of a web serviceType.
      *
      */
-    public OGCWebService(final Specification specification, final ServiceConfiguration servConfig) {
+    public OGCWebService(final Specification specification) {
         super();
         if (specification == null){
             throw new IllegalArgumentException("It is compulsory for a web service to have a specification.");
         }
-        utils = new OGCServiceConfiguration();
-        servConfig.setWorkerClass(getWorkerClass());
-        utils.getServiceUtilities().put(specification, servConfig);
-        
-        serviceName = specification.name();
+
+        this.serviceName = specification.name();
+        this.configurer  = (OGCConfigurer) ReflectionUtilities.newInstance(getConfigurerClass());
+
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
-        WSEngine.registerService(serviceName, "REST", getWorkerClass());
+        WSEngine.registerService(serviceName, "REST", getWorkerClass(), getConfigurerClass());
 
         /*
          * build the map of Workers, by scanning the sub-directories of its
@@ -134,7 +135,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     }
 
     private void startAllInstance() {
-        final File serviceDirectory = utils.getServiceDirectory(serviceName);
+        final File serviceDirectory = configurer.getServiceDirectory();
         if (serviceDirectory != null && serviceDirectory.isDirectory()) {
             for (File instanceDirectory : serviceDirectory.listFiles()) {
                 if (instanceDirectory.isDirectory()) {
@@ -168,6 +169,13 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @return the worker class of the service.
      */
     protected abstract Class getWorkerClass();
+
+    /**
+     * Returns the {@link ServiceConfigurer} class implementation.
+     *
+     * @return the implementation {@link Class}
+     */
+    protected abstract Class<? extends ServiceConfigurer> getConfigurerClass();
 
     /**
      * {@inheritDoc}
@@ -286,81 +294,97 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             final String request = getParameter("request", true);
 
             /*
-             * restart operation
-             * kill all the workers and rebuild each one.
+             * Restart service instance (kill all the workers and rebuild each one).
              */
             if ("restart".equalsIgnoreCase(request)) {
                 LOGGER.info("refreshing the workers");
-                final String identifier      = getParameter("id", false);
-                final String closeFirstValue = getParameter("closeFirst", false);
-                final boolean closeFirst;
-                if (closeFirstValue != null) {
-                    closeFirst = Boolean.parseBoolean(closeFirstValue);
-                } else {
-                    closeFirst = true;
-                }
-                AcknowlegementType response = utils.restart(serviceName, identifier, closeFirst);
-                return Response.ok(response).build();
+                final String identifier = getParameter("id", false);
+                final String closeFirst = getParameter("closeFirst", false);
+                configurer.restartInstance(identifier, closeFirst == null || Boolean.parseBoolean(closeFirst));
+                return Response.ok(new AcknowlegementType("Success", "Service instance successfully restarted.")).build();
 
+            /*
+             * Start service instance.
+             */
             } else if ("start".equalsIgnoreCase(request)) {
                 LOGGER.info("starting an instance");
                 final String identifier = getParameter("id", true);
-                AcknowlegementType response = utils.start(serviceName, identifier);
-                return Response.ok(response).build();
+                configurer.startInstance(identifier);
+                return Response.ok(new AcknowlegementType("Success", "Service instance successfully started.")).build();
 
+            /*
+             * Stop service instance.
+             */
             } else if ("stop".equalsIgnoreCase(request)) {
                 final String identifier = getParameter("id", true);
-                AcknowlegementType response = utils.stop(serviceName, identifier);
-                return Response.ok(response).build();
+                configurer.stopInstance(identifier);
+                return Response.ok(new AcknowlegementType("Success", "Service instance successfully stopped.")).build();
 
+            /*
+             * Delete service instance.
+             */
             } else if ("delete".equalsIgnoreCase(request)) {
                 LOGGER.info("deleting an instance");
                 final String identifier = getParameter("id", true);
-                AcknowlegementType response = utils.delete(serviceName, identifier);
-                return Response.ok(response).build();
+                configurer.deleteInstance(identifier);
+                return Response.ok(new AcknowlegementType("Success", "Service instance successfully deleted.")).build();
 
+            /*
+             * Create service instance.
+             */
             } else if ("newInstance".equalsIgnoreCase(request)) {
-                return newInstance(objectRequest);
+                LOGGER.info("creating an instance");
+                final String identifier = getParameter("id", true);
+                if (!configurer.getConfigurationFile(identifier).exists()) {
+                    configurer.createInstance(identifier, null, objectRequest);
+                    return Response.ok(new AcknowlegementType("Success", "Service instance successfully created.")).build();
+                } else {
+                    return Response.ok(new AcknowlegementType("Error", "Unable to create an instance.")).build();
+                }
 
-
+            /*
+             * Rename service instance.
+             */
             } else if ("renameInstance".equalsIgnoreCase(request)) {
                 LOGGER.info("renaming an instance");
                 final String identifier = getParameter("id", true);
                 final String newName    = getParameter("newName", true);
-                AcknowlegementType response = utils.rename(serviceName, identifier, newName);
-                return Response.ok(response).build();
-
+                configurer.renameInstance(identifier, newName);
+                return Response.ok(new AcknowlegementType("Success", "Service instance successfully renamed.")).build();
 
             /*
-             * Update the configuration file of an instance.
+             * Set service instance configuration.
              */
             } else if ("configure".equalsIgnoreCase(request)) {
                 LOGGER.info("configure an instance");
                 final String identifier = getParameter("id", true);
-                final AcknowlegementType response = utils.configure(serviceName, identifier, (LayerContext) objectRequest);
-                return Response.ok(response).build();
+                configurer.setInstanceConfiguration(identifier, objectRequest);
+                return Response.ok(new AcknowlegementType("Success", "Service instance configuration successfully updated.")).build();
 
             /*
-             * Send the configuration file of an instance.
+             * Get service instance configuration.
              */
             } else if ("getConfiguration".equalsIgnoreCase(request)) {
                 LOGGER.info("sending instance configuration");
                 final String identifier = getParameter("id", true);
-                final Object response = utils.getConfiguration(serviceName, identifier);
+                final Object response = configurer.getInstanceConfiguration(identifier);
                 return Response.ok(response).build();
 
             /*
-             * Return a report about the instances in the service.
+             * Get list of current service instances.
              */
             } else if ("listInstance".equalsIgnoreCase(request)) {
-                InstanceReport report = utils.listInstance(serviceName);
+                final InstanceReport report = new InstanceReport(configurer.getInstances());
                 return Response.ok(report).build();
 
+            /*
+             * Set service instance capabilities.
+             */
             } else if ("updateCapabilities".equalsIgnoreCase(request)) {
                 LOGGER.info("updating instance capabilities");
                 final String identifier = getParameter("id", true);
                 final String fileName   = getParameter("fileName", true);
-                final File serviceDirectory = utils.getServiceDirectory(serviceName);
+                final File serviceDirectory = configurer.getServiceDirectory();
                 final AcknowlegementType response;
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     File instanceDirectory     = new File (serviceDirectory, identifier);
@@ -388,26 +412,17 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 }
                 return Response.ok(response).build();
 
+            /*
+             * Treat other specific administration operations.
+             */
             } else {
                 return treatSpecificAdminRequest(request);
             }
-        } catch (CstlServiceException ex) {
-            LOGGER.log(Level.WARNING, "Sending admin exception:{0}", ex.getMessage());
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Sending admin exception: {0}", ex.getMessage());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getMessage());
             return Response.ok(report).build();
         }
-    }
-
-    /**
-     * create new service intance
-     * @return
-     * @throws CstlServiceException
-     * @param objectRequest
-     */
-    private Response newInstance(Object objectRequest) throws CstlServiceException {
-        final String identifier = getParameter("id", true);
-        final AcknowlegementType response = utils.newInstance(serviceName, identifier, objectRequest);
-        return Response.ok(response).build();
     }
 
     /**

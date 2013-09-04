@@ -17,6 +17,8 @@
  */
 package org.constellation.map.ws.rs;
 
+import org.constellation.map.configuration.MapConfigurer;
+import org.constellation.wms.configuration.WMSConfigurer;
 import org.constellation.map.visitor.GetFeatureInfoVisitor;
 import com.sun.jersey.spi.resource.Singleton;
 
@@ -120,6 +122,14 @@ public class WMSService extends GridWebService<WMSWorker> {
     @Override
     protected Class getWorkerClass() {
         return DefaultWMSWorker.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class<? extends MapConfigurer> getConfigurerClass() {
+        return WMSConfigurer.class;
     }
 
 

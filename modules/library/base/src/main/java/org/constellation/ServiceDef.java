@@ -208,7 +208,7 @@ public enum ServiceDef {
             } else if (THW.name().equalsIgnoreCase(shortName)) {
                 return THW;
             }
-            throw new IllegalArgumentException("Unknown service specification: " + shortName);
+            throw new IllegalArgumentException(shortName + " is not a valid service specification.");
         }
     }
 

@@ -1,0 +1,55 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2013, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+package org.constellation.wps.configuration;
+
+import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.configuration.Processes;
+import org.constellation.dto.Service;
+import org.constellation.ogc.configuration.OGCConfigurer;
+import org.geotoolkit.process.ProcessException;
+
+/**
+ * {@link org.constellation.configuration.ServiceConfigurer} implementation for WPS service.
+ *
+ * TODO: implement specific configuration methods
+ *
+ * @author Fabien Bernard (Geomatys).
+ * @version 0.9
+ * @since 0.9
+ */
+public class WPSConfigurer extends OGCConfigurer {
+
+    /**
+     * Create a new {@link WPSConfigurer} instance.
+     */
+    protected WPSConfigurer() {
+        super(Specification.WPS, ProcessContext.class, "processContext.xml");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ProcessException {
+        if (configuration == null) {
+            configuration = new ProcessContext(new Processes(true));
+        }
+        super.createInstance(identifier, metadata, configuration);
+    }
+}

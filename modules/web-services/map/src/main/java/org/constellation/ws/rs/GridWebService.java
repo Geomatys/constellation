@@ -18,6 +18,7 @@
 package org.constellation.ws.rs;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.map.configuration.MapConfigurer;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.Worker;
@@ -36,7 +37,7 @@ import org.constellation.ws.Worker;
 public abstract class GridWebService<W extends Worker> extends OGCWebService<W> {
 
     public GridWebService(final Specification specification) {
-        super(specification, new GridServiceConfiguration(null));
+        super(specification);
     }
 
     /**
@@ -50,5 +51,6 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
         LayerProviderProxy.getInstance().dispose();
     }
 
-
+    @Override
+    protected abstract Class<? extends MapConfigurer> getConfigurerClass();
 }

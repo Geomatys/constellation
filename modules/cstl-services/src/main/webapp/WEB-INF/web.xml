@@ -18,6 +18,16 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <!-- Filter to allow AJAX cross-origin requests -->
+    <!--filter>
+        <filter-name>CorsFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CorsFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping-->
+
     <!-- REST Servlet for constellation web service -->
     <servlet>
         <servlet-name>ServletAdaptor</servlet-name>
@@ -53,7 +63,8 @@
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.constellation.ws.rest;
+            <param-value>org.constellation.rest.api;
+                         org.constellation.ws.rest;
                          org.constellation.ws.rs.provider</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>

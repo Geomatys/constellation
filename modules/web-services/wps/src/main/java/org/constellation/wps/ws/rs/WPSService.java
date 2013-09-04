@@ -18,6 +18,8 @@ package org.constellation.wps.ws.rs;
 
 import com.sun.jersey.spi.resource.Singleton;
 import org.constellation.ServiceDef;
+import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.wps.configuration.WPSConfigurer;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -69,7 +71,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * Build a new instance of the webService and initialize the JAXB context.
      */
     public WPSService() {
-        super(Specification.WPS, new WPSServiceConfiguration(null));
+        super(Specification.WPS);
 
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
@@ -80,6 +82,14 @@ public class WPSService extends OGCWebService<WPSWorker> {
     @Override
     protected Class getWorkerClass() {
         return WPSWorker.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class<? extends ServiceConfigurer> getConfigurerClass() {
+        return WPSConfigurer.class;
     }
 
     @Override

@@ -193,7 +193,6 @@ public class Controller {
      * @param v130 <code>null</code> if service will not have this version
      * @param keywords service keyword list
      * @return a {@link juzu.Response} to create view
-     * @throws IOException on communication error with Constellation server
      */
     @Action
     @Route("/{serviceType}/success")
@@ -220,10 +219,12 @@ public class Controller {
         createdService.setServiceContact(serviceContact);
 
         //call service
-        boolean created = servicesManager.createServices(createdService, Specification.fromShortName(serviceType));
-
-        //return generated view
-        return Controller_.succeded(createdService, Specification.fromShortName(serviceType).name(), versionList, created + "");
+        try {
+            servicesManager.createServices(createdService, Specification.WMS);
+            return Controller_.succeded(createdService, "WMS", versionList, "true");
+        } catch (IOException ex) {
+            return Controller_.succeded(createdService, "WMS", versionList, "false");
+        }
     }
 
     /**
@@ -338,12 +339,12 @@ public class Controller {
         parameters.put("totalProvider", layerDatas.size());
         parameters.put("providers", layerList);
 
-        if(dashboard.equalsIgnoreCase("true")){
-            dataListing.with(parameters).render();
-        }
-        else{
+//        if(dashboard.equalsIgnoreCase("true")){
+//            dataListing.with(parameters).render();
+//        }
+//        else{
             addDataListing.with(parameters).render();
-        }
+//        }
     }
 
     /**
@@ -412,13 +413,17 @@ public class Controller {
      *
      * @param serviceId the service identifier
      * @return a status {@link Response}
-     * @throws IOException on communication error with Constellation server
      */
     @Ajax
     @Resource
     @Route("service/reload")
-    public Response restartService(final String serviceType, final String serviceId) throws IOException {
-        return servicesManager.restartService(serviceId, Specification.fromShortName(serviceType)) ? Response.status(200) : Response.status(500);
+    public Response restartService(final String serviceType, final String serviceId) {
+        try {
+            servicesManager.restartService(serviceId, Specification.fromShortName(serviceType));
+            return Response.ok();
+        } catch (IOException ex) {
+            return Response.error(ex.getLocalizedMessage());
+        }
     }
 
     /**
@@ -426,20 +431,35 @@ public class Controller {
      *
      * @param serviceId the service identifier
      * @return a status {@link Response}
-     * @throws IOException on communication error with Constellation server
      */
     @Ajax
     @Resource
     @Route("service/stop")
-    public Response stopService(final String serviceType, final String serviceId) throws IOException {
-        return servicesManager.stopService(serviceId, Specification.fromShortName(serviceType)) ? Response.status(200) : Response.status(500);
+    public Response stopService(final String serviceType, final String serviceId) {
+        try {
+            servicesManager.stopService(serviceId, Specification.fromShortName(serviceType));
+            return Response.ok();
+        } catch (IOException ex) {
+            return Response.error(ex.getLocalizedMessage());
+        }
     }
 
+    /**
+     * Deletes the WMS service with the specified identifier.
+     *
+     * @param serviceId the service identifier
+     * @return a status {@link Response}
+     */
     @Ajax
     @Resource
     @Route("service/delete")
-    public  Response deleteService(final String serviceType, final String serviceId) throws IOException {
-        return servicesManager.deleteService(serviceId, serviceType) ? Response.status(200) : Response.status(500);
+    public  Response deleteService(final String serviceType, final String serviceId) {
+        try {
+            servicesManager.deleteService(serviceId, Specification.fromShortName(serviceType));
+            return Response.ok();
+        } catch (IOException ex) {
+            return Response.error(ex.getLocalizedMessage());
+        }
     }
 
     /**
@@ -447,13 +467,17 @@ public class Controller {
      *
      * @param serviceId the service identifier
      * @return a status {@link Response}
-     * @throws IOException on communication error with Constellation server
      */
     @Ajax
     @Resource
     @Route("service/start")
-    public Response startService(final String serviceType, final String serviceId) throws IOException {
-        return servicesManager.startService(serviceId, Specification.fromShortName(serviceType)) ? Response.status(200) : Response.status(500);
+    public Response startService(final String serviceType, final String serviceId) {
+        try {
+            servicesManager.startService(serviceId, Specification.fromShortName(serviceType));
+            return Response.ok();
+        } catch (IOException ex) {
+            return Response.error(ex.getLocalizedMessage());
+        }
     }
 
     /**
@@ -481,7 +505,13 @@ public class Controller {
         metadata.setVersions(new ArrayList<String>());
         if (v111 != null) metadata.getVersions().add(v111);
         if (v130 != null) metadata.getVersions().add(v130);
-        return servicesManager.setMetadata(metadata, Specification.fromShortName(serviceType)) ? Response.status(200) : Response.status(500);
+
+        try {
+            servicesManager.setMetadata(metadata, Specification.fromShortName(serviceType));
+            return Response.ok();
+        } catch (IOException ex) {
+            return Response.error(ex.getLocalizedMessage());
+        }
     }
 
     /**
@@ -501,6 +531,12 @@ public class Controller {
         final Service metadata = servicesManager.getMetadata(identifier, Specification.WMS);
         metadata.setServiceContact(contact);
         metadata.setServiceConstraints(constraint);
-        return servicesManager.setMetadata(metadata, Specification.fromShortName(serviceType)) ? Response.status(200) : Response.status(500);
+
+        try {
+            servicesManager.setMetadata(metadata, Specification.fromShortName(serviceType));
+            return Response.ok();
+        } catch (IOException ex) {
+            return Response.error(ex.getLocalizedMessage());
+        }
     }
 }

@@ -31,6 +31,8 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingType;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.wmts.configuration.WMTSConfigurer;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
 import org.constellation.wmts.ws.WMTSWorker;
 import org.constellation.ws.CstlServiceException;
@@ -82,6 +84,14 @@ public class WMTSService extends OGCWebService<WMTSWorker>{
     @Override
     protected Class getWorkerClass() {
         return DefaultWMTSWorker.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class<? extends ServiceConfigurer> getConfigurerClass() {
+        return WMTSConfigurer.class;
     }
 
     /**
