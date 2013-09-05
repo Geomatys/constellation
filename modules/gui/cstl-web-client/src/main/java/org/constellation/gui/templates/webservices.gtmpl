@@ -97,20 +97,21 @@
 
 <script type="text/javascript" language="JavaScript">
     function filter(type, tabSelected){
-        var services = $("#main [data-servicetype]");
+    var $services = $("#main > .span6");
 
         if(type==''){
-            $(services).show();
+            $services.show();
         }
         else{
-            for (var i = 0; i < services.length; i++) {
-                var currentService = services [i];
-                var currentServiceType = $(currentService).attr("data-servicetype");
+            for (var i = 0; i < $services.length; i++) {
+                var $currentService = $services.eq(i);
+                var currentServiceId = $currentService.attr("id");
+                var currentServiceType = currentServiceId.split("-")[0];
                 if(type != ''){
                     if(currentServiceType != type){
-                        $(currentService).hide();
+                        $currentService.hide();
                     }else{
-                        $(currentService).show();
+                        $currentService.show();
                     }
                 }
             }

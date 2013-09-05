@@ -43,7 +43,6 @@ import org.constellation.gui.service.MapManager;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.service.ServicesManager;
 import org.constellation.gui.service.bean.LayerData;
-import org.constellation.gui.templates.add_data_listing;
 import org.constellation.gui.templates.webservices;
 import org.constellation.gui.util.LayerComparator;
 import org.constellation.gui.util.LayerDataComparator;
@@ -137,10 +136,6 @@ public class Controller {
     @Inject
     @Path("layer.gtmpl")
     Template dataElement;
-
-    @Inject
-    @Path("add_data_listing.gtmpl")
-    add_data_listing addDataListing;
 
     @Inject
     @Path("data_listing.gtmpl")
@@ -271,7 +266,7 @@ public class Controller {
         }
 
         // create layer list
-        List<Layer> layerList = new ArrayList<Layer>(nbByPage);
+        List<Layer> layerList = new ArrayList<>(nbByPage);
         for (int i = start; i < boundary; i++) {
             final Layer layer = layers.getLayer().get(i);
 
@@ -339,12 +334,7 @@ public class Controller {
         parameters.put("totalProvider", layerDatas.size());
         parameters.put("providers", layerList);
 
-        if(dataTypes.size()==1){
-            dataListing.with(parameters).render();
-        }
-        else{
-            addDataListing.with(parameters).render();
-        }
+        dataListing.with(parameters).render();
     }
 
     /**

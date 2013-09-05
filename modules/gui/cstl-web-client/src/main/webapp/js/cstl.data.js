@@ -28,7 +28,7 @@
  */
 CSTL.Data = {
 
-    type: ["raster","vector","sensor"],
+    type: ["vector"],
 
     goTo: function ($element, title, researchtype){
         $("#dataDashboardTitle").empty();
@@ -40,7 +40,7 @@ CSTL.Data = {
 
     setActive : function($parent){
         var $Ul = $parent.parent();
-        $Ul.children().removeClass("active")
+        $Ul.children().removeClass("active");
         $parent.addClass("active")
     }
 }

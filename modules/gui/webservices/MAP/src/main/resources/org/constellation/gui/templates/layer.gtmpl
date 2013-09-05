@@ -1,12 +1,8 @@
 #{param name=layers/}
 <% for (def layer : layers.getLayer()){%>
-<br/>
 <div class="row">
-<% if(layer.providerType.equalsIgnoreCase("RASTER")){%>
-<div class="span9" style="background: url(../../images/raster.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;" onclick="selectElement(this)">
-    <% }else{%>
-    <div class="span9" style="background: url(../../images/vecteur.png) no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;" onclick="selectElement(this)">
-        <%}%>
+    <br/>
+    <div class="span9" data-providertype="${layer.providerType}" style="background: no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;" onclick="selectElement(this)">
         <div class="row">
             <div class="span4" style="padding-left: 15px;">
                 <p>${layer.name}</p>
@@ -23,3 +19,9 @@
     </div>
 </div>
 <%}%>
+<script language="JavaScript" type="text/javascript">
+    $("[data-providertype=raster]").css("background-image", CSTL.URL_RASTER_PICTURE);
+    $("[data-providertype=vector]").css("background-image", CSTL.URL_VECTOR_PICTURE);
+    $("[data-providertype=pyramid]").css("background-image", CSTL.URL_PYRAMID_PICTURE);
+
+</script>

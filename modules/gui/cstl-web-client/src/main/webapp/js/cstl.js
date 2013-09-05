@@ -20,6 +20,7 @@
  * @version 0.9
  * @since 0.9
  */
+var appURL = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split("/")[1];
 
 /**
  * Constellation UI namespace and utility functions.
@@ -34,14 +35,17 @@ CSTL = {
      */
     $dictionary: null,
 
-    URL_VECTEUR_PICTURE:"url(../../images/vecteur.png)",
-    URL_VECTEUR_SELECTED_PICTURE:"url(../../images/vecteur-selected.png)",
-    URL_RASTER_PICTURE:"url(../../images/raster.png)",
-    URL_RASTER_SELECTED_PICTURE:"url(../../images/raster-selected.png)",
-    URL_SENSOR_PICTURE:"url(../../images/raster.png)",
-    URL_SENSOR_SELECTED_PICTURE:"url(../../images/sensor-selected.png)",
-    URL_STYLE_PICTURE:"url(../../images/style.png)",
-    URL_STYLE_SELECTED_PICTURE:"url(../../images/style-selected.png)",
+
+    URL_VECTOR_PICTURE:"url("+appURL+"/images/vector.png)",
+    URL_VECTOR_SELECTED_PICTURE:"url("+appURL+"/images/vector-selected.png)",
+    URL_RASTER_PICTURE:"url("+appURL+"/images/raster.png)",
+    URL_RASTER_SELECTED_PICTURE:"url("+appURL+"/images/raster-selected.png)",
+    URL_SENSOR_PICTURE:"url("+appURL+"/images/sensor.png)",
+    URL_SENSOR_SELECTED_PICTURE:"url("+appURL+"/images/sensor-selected.png)",
+    URL_PYRAMID_PICTURE:"url("+appURL+"/images/pyramid.png)",
+    URL_PYRAMID_SELECTED_PICTURE:"url("+appURL+"/images/pyramid-selected.png)",
+    URL_STYLE_PICTURE:"url("+appURL+"/images/style.png)",
+    URL_STYLE_SELECTED_PICTURE:"url("+appURL+"/images/style-selected.png)",
 
 
     /**
@@ -110,3 +114,4 @@ CSTL = {
 // send dataType:"vector", dataType:"raster"
 // and not dataType[]:"vector", dataType[]:"raster"
 jQuery.ajaxSettings.traditional = true;
+
