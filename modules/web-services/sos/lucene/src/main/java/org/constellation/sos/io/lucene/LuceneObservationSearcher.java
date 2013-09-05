@@ -43,7 +43,6 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.util.Version;
 import org.constellation.sos.io.ObservationResult;
 import static org.constellation.sos.ws.Utils.*;
-import org.geotoolkit.index.tree.Tree;
 
 // Geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
@@ -51,7 +50,6 @@ import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
-import org.geotoolkit.lucene.tree.NamedEnvelope;
 
 /**
  *  A Lucene searcher for an index connected to an O&M DataSource.
@@ -69,8 +67,8 @@ public class LuceneObservationSearcher extends LuceneIndexSearcher {
      * @param serviceID The identifier of the index/service
      * @throws IndexingException
      */
-    public LuceneObservationSearcher(final File configDir, final String serviceID, final Tree<NamedEnvelope> rTree) throws IndexingException  {
-        super(configDir, serviceID, new WhitespaceAnalyzer(Version.LUCENE_40), false, rTree);
+    public LuceneObservationSearcher(final File configDir, final String serviceID) throws IndexingException  {
+        super(configDir, serviceID, new WhitespaceAnalyzer(Version.LUCENE_40), false);
     }
 
     /**
@@ -160,7 +158,7 @@ public class LuceneObservationSearcher extends LuceneIndexSearcher {
                 } else {
                     hits1 = searcher.search(query, filter, maxRecords);
                 }
-                final List<ObservationResult> unWanteds = new ArrayList<ObservationResult>();
+                final List<ObservationResult> unWanteds = new ArrayList<>();
                 for (ScoreDoc doc : hits1.scoreDocs) {
                     final ObservationResult or = getObservationResult(searcher.doc(doc.doc));
                     unWanteds.add(or);

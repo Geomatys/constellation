@@ -315,7 +315,7 @@ public class CSWworker extends AbstractWorker {
         mdReader                      = cswfactory.getMetadataReader(configuration);
         profile                       = configuration.getProfile();
         final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID, mdReader.getAdditionalQueryablePathMap());
-        indexSearcher                 = cswfactory.getIndexSearcher(configDir, serviceID, indexer.getRtree());
+        indexSearcher                 = cswfactory.getIndexSearcher(configDir, serviceID);
         luceneFilterParser            = cswfactory.getLuceneFilterParser();
         sqlFilterParser               = cswfactory.getSQLFilterParser();
         securityFilter                = cswfactory.getSecurityFilter();

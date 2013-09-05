@@ -60,7 +60,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
         List<Object> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new ClassicAnalyzer(Version.LUCENE_40), Level.FINER);
         indexer.destroy();
-        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new ClassicAnalyzer(Version.LUCENE_40), true, null);
+        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new ClassicAnalyzer(Version.LUCENE_40), true);
         indexSearcher.setLogLevel(Level.FINER);
 
     }
@@ -102,7 +102,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
         logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
         // the result we want are this
-        Set<String> expectedResult = new LinkedHashSet<String>();
+        Set<String> expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
@@ -121,7 +121,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
@@ -144,7 +144,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
@@ -162,7 +162,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "simpleSearch 4:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
@@ -182,7 +182,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "simpleSearch 5:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("11325_158_19640418141800");
 
         assertEquals(expectedResult, result);
@@ -201,7 +201,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "simpleSearch 6:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
@@ -223,7 +223,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "simpleSearch 7:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("CTDF02");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
 
@@ -253,7 +253,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
-        Set<String> expectedResult = new LinkedHashSet<String>();
+        Set<String> expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
 
@@ -272,7 +272,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
@@ -311,7 +311,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "wildCharSearch 4:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_5p_19900609195600");
 
         //issues here it found
@@ -330,7 +330,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
@@ -363,7 +363,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, " wildCharUnderscoreSearch 1:\n{0}", resultReport);
 
-        Set<String> expectedResult = new LinkedHashSet<String>();
+        Set<String> expectedResult = new LinkedHashSet<>();
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258"); // error underscore is tokenized
 
 
@@ -392,7 +392,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
-        Set<String> expectedResult = new LinkedHashSet<String>();
+        Set<String> expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
@@ -427,7 +427,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
-        Set<String> expectedResult = new LinkedHashSet<String>();
+        Set<String> expectedResult = new LinkedHashSet<>();
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
@@ -454,7 +454,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("CTDF02");
         expectedResult.add("42292_9s_19900610041000");
@@ -481,7 +481,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("CTDF02");
         expectedResult.add("11325_158_19640418141800");
@@ -508,7 +508,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
@@ -550,7 +550,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
-        Set<String> expectedResult = new LinkedHashSet<String>();
+        Set<String> expectedResult = new LinkedHashSet<>();
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
@@ -561,7 +561,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
          * Test 1 spatial search: NOT BBOX filter
          */
         resultReport = "";
-        List<Filter> lf = new ArrayList<Filter>();
+        List<Filter> lf = new ArrayList<>();
        //sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
         sf           = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
         lf.add(sf);
@@ -577,7 +577,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
-        expectedResult = new LinkedHashSet<String>();
+        expectedResult = new LinkedHashSet<>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");

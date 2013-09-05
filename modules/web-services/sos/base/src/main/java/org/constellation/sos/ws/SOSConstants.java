@@ -74,7 +74,6 @@ public final class SOSConstants {
 
     private SOSConstants() {}
 
-    public static final String KEY_RTREE = "rTree";
     public static final String SOS = "SOS";
     public static final String ALL = "All";
     public static final String OFFERING = "offering";

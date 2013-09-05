@@ -28,17 +28,14 @@ import org.apache.lucene.search.SortField;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
-import org.constellation.sos.ws.SOSConstants;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.*;
 
 import org.geotoolkit.gml.xml.Envelope;
-import org.geotoolkit.index.tree.Tree;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.lucene.tree.NamedEnvelope;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -65,9 +62,8 @@ public class LuceneObservationFilter implements ObservationFilter {
     }
 
     public LuceneObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
-        final Tree<NamedEnvelope> rTree = (Tree<NamedEnvelope>) properties.get(SOSConstants.KEY_RTREE);
         try {
-            this.searcher = new LuceneObservationSearcher(configuration.getConfigurationDirectory(), "", rTree);
+            this.searcher = new LuceneObservationSearcher(configuration.getConfigurationDirectory(), "");
         } catch (IndexingException ex) {
             throw new CstlServiceException("IndexingException in LuceneObservationFilter constructor", ex, NO_APPLICABLE_CODE);
         }

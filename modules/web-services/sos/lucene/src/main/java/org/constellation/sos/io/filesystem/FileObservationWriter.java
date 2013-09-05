@@ -42,7 +42,6 @@ import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.sos.ws.SOSConstants;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.swe.xml.Phenomenon;
@@ -104,7 +103,6 @@ public class FileObservationWriter implements ObservationWriter {
         }
         try {
             indexer        = new LuceneObservationIndexer(configuration, "");
-            properties.put(SOSConstants.KEY_RTREE, indexer.getRtree());
         } catch (IndexingException ex) {
             throw new CstlServiceException("Indexing exception while initializing the file observation reader", ex, NO_APPLICABLE_CODE);
         }

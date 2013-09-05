@@ -99,8 +99,8 @@ public class NetCDFCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public LuceneIndexSearcher getIndexSearcher(final File configDir, final String serviceID, final Tree<NamedEnvelope> rTree) throws IndexingException {
-        return new LuceneIndexSearcher(configDir, serviceID, null, true, rTree);
+    public LuceneIndexSearcher getIndexSearcher(final File configDir, final String serviceID) throws IndexingException {
+        return new LuceneIndexSearcher(configDir, serviceID, null, true);
     }
 
     /**

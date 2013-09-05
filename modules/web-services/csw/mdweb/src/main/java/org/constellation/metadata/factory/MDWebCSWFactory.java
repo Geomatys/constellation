@@ -48,8 +48,6 @@ import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.constellation.generic.database.Automatic.*;
 import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.metadata.security.NoMetadataSecurityFilter;
-import org.geotoolkit.index.tree.Tree;
-import org.geotoolkit.lucene.tree.NamedEnvelope;
 
 /**
  * A default implementation of the CSW factory.
@@ -103,8 +101,8 @@ public class MDWebCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public LuceneIndexSearcher getIndexSearcher(final File configDirectory, final String serviceID, final Tree<NamedEnvelope> rTree) throws IndexingException {
-        return new LuceneIndexSearcher(configDirectory, serviceID, null, true, rTree);
+    public LuceneIndexSearcher getIndexSearcher(final File configDirectory, final String serviceID) throws IndexingException {
+        return new LuceneIndexSearcher(configDirectory, serviceID, null, true);
     }
 
     /**
