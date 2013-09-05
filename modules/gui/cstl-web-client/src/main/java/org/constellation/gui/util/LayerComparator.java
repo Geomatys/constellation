@@ -122,7 +122,6 @@ public class LayerComparator implements Comparator<Layer> {
     }
 
     private int compareDataType(final Layer l1, final Layer l2) {
-        // TODO: implement data type sort
-        return 0;
+        return ObjectUtils.compare(l1.getProviderType(), l2.getProviderType());
     }
 }

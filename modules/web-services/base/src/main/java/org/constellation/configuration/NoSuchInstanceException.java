@@ -30,12 +30,12 @@ public final class NoSuchInstanceException extends ConfigurationException {
     }
 
     public static NoSuchInstanceException noConfigDirectory(final Specification specification, final String identifier) {
-        return new NoSuchInstanceException(specification + " service instance with \"" + identifier +
+        return new NoSuchInstanceException(specification + " service instance with identifier \"" + identifier +
                 "\" not found. The service instance directory does not exist.");
     }
 
     public static NoSuchInstanceException noConfigFile(final Specification specification, final String identifier) {
-        return new NoSuchInstanceException(specification + " service instance with \"" + identifier +
+        return new NoSuchInstanceException(specification + " service instance with identifier \"" + identifier +
                 "\" not found. The service instance directory exists but there is not configuration file inside.");
     }
 }

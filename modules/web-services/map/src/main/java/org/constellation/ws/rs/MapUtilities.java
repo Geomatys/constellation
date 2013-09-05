@@ -19,7 +19,6 @@ package org.constellation.ws.rs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
@@ -27,16 +26,14 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
-import org.constellation.dto.DataType;
 import org.constellation.map.security.LayerSecurityFilter;
-import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.ws.CstlServiceException;
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
- *
- * @author Guilhem Legal (Geomatys)
+ * @author Guilhem Legal (Geomatys).
+ * @author Fabien Bernard (Geomatys).
  */
 public class MapUtilities {
 
@@ -61,35 +58,30 @@ public class MapUtilities {
                  * first case : source is in load-all mode
                  */
                 if (source.getLoadAll()) {
-                    // we look if the layer is excluded
-                    if (source.isExcludedLayer(qn)) {
-                        continue;
-                        // we look for detailled informations in the include sections
-                    } else {
-                        if (securityFilter == null || securityFilter.allowed(login, layerName)) {
-                            Layer layer = source.isIncludedLayer(qn);
-                            if (layer == null) {
-                                layer = new Layer(qn);
-                            }
-                            layer.setProviderID(sourceID);
-                            buildDataAndType(layers, sourceID, layerName, layer);
+                    // we look if the layer is excluded and if is allowed
+                    if (!source.isExcludedLayer(qn) && (securityFilter == null || securityFilter.allowed(login, layerName))) {
+                        Layer layer = source.isIncludedLayer(qn);
+                        if (layer == null) {
+                            layer = new Layer(qn);
                         }
+                        setLayerExtraProperties(layer, sourceID);
+                        layers.add(layer);
                     }
-                    /*
-                     * second case : we include only the layer in the balise include
-                     */
+                /*
+                 * second case : we include only the layer in the balise include
+                 */
                 } else {
 
                     /*
                      * Get all layer with layer name
                      * NOTE : This case is for get all layer with same name and same source provider
-                     * but differente data version.
+                     * but different data version.
                      */
-                    List<Layer> allLayer = source.allIncludedLayer(qn);
+                    final List<Layer> allLayer = source.allIncludedLayer(qn);
                     if (!allLayer.isEmpty()) {
                         for (Layer layer : allLayer) {
-                            layer.setProviderID(sourceID);
-                            buildDataAndType(layers, sourceID, layerName, layer);
+                            setLayerExtraProperties(layer, sourceID);
+                            layers.add(layer);
                         }
                     }
                 }
@@ -99,29 +91,20 @@ public class MapUtilities {
     }
 
     /**
-     * Define layer date and layer type (vector or raster) using layer provider.
-     * And add layer to input list.
+     * Sets some {@link Layer} extra properties.
+     * <ul>
+     *     <li>ProvideID: the layer provider identifier</li>
+     *     <li>Date: the layer provider creation date</li>
+     *     <li>ProviderType: the layer provider type (vector, raster,...)</li>
+     * </ul>
      *
-     * @param layers input {@link List}
-     * @param sourceID provider id
-     * @param layerName name of layer
-     * @param layer layer configuration
+     * @param layer      the layer to be updated
+     * @param providerID the layer provider identifier
      */
-    private static void buildDataAndType(final List<Layer> layers, final String sourceID, final Name layerName, final Layer layer) {
-        //set layer type
-        if (layer != null) {
-            try {
-                final DataType dt = LayerProviders.getDataType(sourceID, layerName.getLocalPart());
-                layer.setType(dt.toString());
-            } catch (CstlServiceException e) {
-                LOGGER.log(Level.WARNING, e.getMessage(), e);
-            }
-
-            //set layer date
-            final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(sourceID);
-            final String date = (String) provider.getSource().parameter("date").getValue();
-            layer.setDate(date);
-            layers.add(layer);
-        }
+    private static void setLayerExtraProperties(final Layer layer, final String providerID) {
+        final ParameterValueGroup source = LayerProviderProxy.getInstance().getProvider(providerID).getSource();
+        layer.setProviderID(providerID);
+        layer.setDate(source.parameter("date").stringValue());
+        layer.setProviderType(source.parameter("providerType").stringValue());
     }
 }

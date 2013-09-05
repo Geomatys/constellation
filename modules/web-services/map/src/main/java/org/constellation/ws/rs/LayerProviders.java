@@ -126,28 +126,6 @@ public final class LayerProviders extends Static {
     }
 
     /**
-     *
-     * @param providerId
-     * @param layerName
-     * @return
-     * @throws CstlServiceException
-     */
-    public static DataType getDataType(final String providerId, final String layerName) throws CstlServiceException {
-        ensureNonNull("providerId", providerId);
-        ensureNonNull("layerName",  layerName);
-
-        // Get the layer.
-        final LayerDetails layer = getLayer(providerId, layerName);
-
-        // Try to extract layer data info.
-        if (layer instanceof FeatureLayerDetails) {
-            return DataType.RASTER;
-        } else {
-            return DataType.VECTOR;
-        }
-    }
-
-    /**
      * Produces a {@link PortrayalResponse} from the specified {@link PortrayalContext}.
      * <p>
      * This method allow to perform data rendering without WMS layer.

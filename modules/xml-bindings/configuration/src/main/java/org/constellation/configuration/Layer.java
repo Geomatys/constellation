@@ -90,8 +90,8 @@ public class Layer {
     @XmlElement(name="Modified-Date")
     private String date;
 
-    @XmlElement(name="Type")
-    private String type;
+    @XmlElement(name="ProviderType")
+    private String providerType;
 
     @XmlTransient
     private String providerID;
@@ -345,12 +345,12 @@ public class Layer {
         this.date = date;
     }
 
-    public String getType() {
-        return type;
+    public String getProviderType() {
+        return providerType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setProviderType(final String providerType) {
+        this.providerType = providerType;
     }
 
     @Override
