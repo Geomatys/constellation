@@ -30,11 +30,18 @@ import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.DateRange;
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
+
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.style.Style;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -262,4 +269,28 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         }
     }
 
+    protected Filter buildCQLFilter(final String cql, final Filter filter) {
+        final FilterFactory2 factory = (FilterFactory2) FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
+        try {
+            final Filter cqlfilter = CQL.parseFilter(cql);
+            if (filter != null) {
+                return factory.and(cqlfilter, filter);
+            } else {
+                return cqlfilter;
+            }
+        } catch (CQLException ex) {
+            LOGGER.log(Level.INFO,  ex.getMessage(),ex);
+        }
+        return filter;
+    }
+
+    protected Filter buildDimFilter(final String dimName, final String dimValue, final Filter filter) {
+        final FilterFactory2 factory = (FilterFactory2) FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
+        final Filter extraDimFilter = factory.equal(factory.property(dimName), factory.literal(dimValue));
+        if (filter != null) {
+            return factory.and(extraDimFilter, filter);
+        } else {
+            return extraDimFilter;
+        }
+    }
 }

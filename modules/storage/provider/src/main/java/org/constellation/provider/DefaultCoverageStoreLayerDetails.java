@@ -24,6 +24,7 @@ import java.util.logging.Level;
 
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.storage.DataStoreException;
+import static org.constellation.provider.AbstractLayerDetails.LOGGER;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -31,8 +32,6 @@ import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.PortrayalException;
-import org.geotoolkit.cql.CQL;
-import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.map.DefaultCoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
@@ -109,25 +108,23 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
         // EXTRA FILTER extra parameter ////////////////////////////////////////
         if (params != null && layer instanceof DefaultCoverageMapLayer) {
             final Map<String,?> extras = (Map<String, ?>) params.get(KEY_EXTRA_PARAMETERS);
-            if(extras != null){
-                for(String key : extras.keySet()){
-                    if(key.equalsIgnoreCase("cql_filter")){
+            if (extras != null) {
+                Filter filter = null;
+                for (String key : extras.keySet()) {
+                    if (key.equalsIgnoreCase("cql_filter")) {
                         final String cqlFilter = ((List)extras.get(key)).get(0).toString();
-                        if(cqlFilter == null){
-                            break;
+                        if (cqlFilter != null){
+                            filter = buildCQLFilter(cqlFilter, filter);
                         }
-                        try {
-                            final Filter filter = CQL.parseFilter(cqlFilter);
-                            if(filter != null){
-                                final DefaultCoverageMapLayer cml = (DefaultCoverageMapLayer) layer;
-                                cml.setQuery(QueryBuilder.filtered(cml.getCoverageName(), filter));
-                            }
-
-                        } catch (CQLException ex) {
-                            LOGGER.log(Level.INFO,  ex.getMessage(),ex);
-                        }
-                        break;
+                    } else if (key.startsWith("dim_") || key.startsWith("DIM_")){
+                        final String dimValue = ((List)extras.get(key)).get(0).toString();
+                        final String dimName  = key.substring(4);
+                        filter = buildDimFilter(dimName, dimValue, filter);
                     }
+                }
+                if (filter != null) {
+                    final DefaultCoverageMapLayer cml = (DefaultCoverageMapLayer) layer;
+                    cml.setQuery(QueryBuilder.filtered(cml.getCoverageName(), filter));
                 }
             }
         }
@@ -148,7 +145,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
      */
     @Override
     public SortedSet<Date> getAvailableTimes() throws DataStoreException {
-        SortedSet<Date> dates = new TreeSet<Date>();
+        SortedSet<Date> dates = new TreeSet<>();
         final Envelope env = getEnvelope();
             
         final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
@@ -193,7 +190,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
      */
     @Override
     public SortedSet<Number> getAvailableElevations() throws DataStoreException {
-        SortedSet<Number> elevations = new TreeSet<Number>();
+        SortedSet<Number> elevations = new TreeSet<>();
         final Envelope env = getEnvelope();
         final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
         final CoordinateSystem cs = crs.getCoordinateSystem();

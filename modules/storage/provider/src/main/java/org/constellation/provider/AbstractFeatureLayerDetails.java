@@ -40,8 +40,6 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.cql.CQL;
-import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
@@ -157,25 +155,23 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
         // EXTRA FILTER extra parameter ////////////////////////////////////////
         if (params != null && layer instanceof FeatureMapLayer) {
             final Map<String,?> extras = (Map<String, ?>) params.get(KEY_EXTRA_PARAMETERS);
-            if(extras != null){
-                for(String key : extras.keySet()){
-                    if(key.equalsIgnoreCase("cql_filter")){
+            if (extras != null){
+                Filter filter = null;
+                for (String key : extras.keySet()) {
+                    if (key.equalsIgnoreCase("cql_filter")) {
                         final String cqlFilter = ((List)extras.get(key)).get(0).toString();
-                        if(cqlFilter == null || cqlFilter.isEmpty()){
-                            break;
+                        if (cqlFilter != null){
+                            filter = buildCQLFilter(cqlFilter, filter);
                         }
-                        try {
-                            final Filter filter = CQL.parseFilter(cqlFilter);
-                            if(filter != null){
-                                final FeatureMapLayer fml = (FeatureMapLayer) layer;
-                                fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filter));
-                            }
-
-                        } catch (CQLException ex) {
-                            LOGGER.log(Level.INFO,  ex.getMessage(),ex);
-                        }
-                        break;
+                    } else if (key.startsWith("dim_") || key.startsWith("DIM_")){
+                        final String dimValue = ((List)extras.get(key)).get(0).toString();
+                        final String dimName  = key.substring(4);
+                        filter = buildDimFilter(dimName, dimValue, filter);
                     }
+                }
+                if (filter != null) {
+                    final FeatureMapLayer fml = (FeatureMapLayer) layer;
+                    fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filter));
                 }
             }
         }
@@ -200,7 +196,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
      */
     @Override
     public SortedSet<Date> getAvailableTimes() throws DataStoreException {
-        final SortedSet<Date> dates = new TreeSet<Date>();
+        final SortedSet<Date> dates = new TreeSet<>();
         FeatureIterator<SimpleFeature> features = null;
         if(dateStartField != null){
             try{
@@ -249,7 +245,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
      */
     @Override
     public SortedSet<Number> getAvailableElevations() throws DataStoreException {
-        final SortedSet<Number> elevations = new TreeSet<Number>();
+        final SortedSet<Number> elevations = new TreeSet<>();
         FeatureIterator<SimpleFeature> features = null;
         if (elevationStartField != null) {
 
