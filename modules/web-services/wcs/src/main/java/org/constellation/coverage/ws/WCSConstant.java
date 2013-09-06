@@ -286,7 +286,7 @@ public final class WCSConstant {
         // Create provider part.
         final AbstractContact contact = WCSXmlFactory.buildContact(version, currentContact.getPhone(), currentContact.getFax(),
                 currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
-                currentContact.getZipCode(), currentContact.getCountry());
+                currentContact.getZipCode(), currentContact.getCountry(), currentContact.getHoursOfService(), currentContact.getContactInstructions());
 
         final AbstractResponsiblePartySubset responsible = WCSXmlFactory.buildResponsiblePartySubset(version, currentContact.getFullname(), currentContact.getPosition(), contact, null);
 

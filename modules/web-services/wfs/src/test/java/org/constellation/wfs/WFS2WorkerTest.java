@@ -134,7 +134,7 @@ public class WFS2WorkerTest {
     private static final ObjectFactory wfsFactory = new ObjectFactory();
     private static final org.geotoolkit.ogc.xml.v200.ObjectFactory ogcFactory = new org.geotoolkit.ogc.xml.v200.ObjectFactory();
 
-    private static final List<QName> alltypes = new ArrayList<QName>();
+    private static final List<QName> alltypes = new ArrayList<>();
     static {
         alltypes.add(new QName("http://www.opengis.net/gml/3.2","BuildingCenters"));
         alltypes.add(new QName("http://www.opengis.net/gml/3.2","BasicPolygons"));
@@ -186,7 +186,7 @@ public class WFS2WorkerTest {
 
             GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
 
-            final List<StoredQueryDescription> descriptions = new ArrayList<StoredQueryDescription>();
+            final List<StoredQueryDescription> descriptions = new ArrayList<>();
             final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
             final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
             final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
@@ -403,7 +403,7 @@ public class WFS2WorkerTest {
         /**
          * Test 1 : query on typeName samplingPoint
          */
-        List<QueryType> queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
         GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 

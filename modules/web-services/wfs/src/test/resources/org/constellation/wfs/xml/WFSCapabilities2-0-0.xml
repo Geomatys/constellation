@@ -6,16 +6,16 @@
         <ns9:Keywords>
             <ns9:Keyword>WFS</ns9:Keyword>
             <ns9:Keyword>Constellation</ns9:Keyword>
-            <ns9:Type>String</ns9:Type>
+            <ns9:Keyword>Geomatys</ns9:Keyword>
         </ns9:Keywords>
         <ns9:ServiceType>WFS</ns9:ServiceType>
-        <ns9:ServiceTypeVersion>2.0.0</ns9:ServiceTypeVersion>
         <ns9:ServiceTypeVersion>1.1.0</ns9:ServiceTypeVersion>
+        <ns9:ServiceTypeVersion>2.0.0</ns9:ServiceTypeVersion>
         <ns9:Fees>NONE</ns9:Fees>
         <ns9:AccessConstraints>NONE</ns9:AccessConstraints>
     </ns9:ServiceIdentification>
     <ns9:ServiceProvider>
-        <ns9:ProviderName>Constellation</ns9:ProviderName>
+        <ns9:ProviderName>Geomatys</ns9:ProviderName>
         <ns9:ProviderSite xlink:href="http://constellation.codehaus.org"/>
         <ns9:ServiceContact>
             <ns9:IndividualName>Vincent Heurteaux</ns9:IndividualName>
@@ -23,20 +23,19 @@
             <ns9:ContactInfo>
                 <ns9:Phone>
                     <ns9:Voice>04 67 54 87 30</ns9:Voice>
+                    <ns9:Facsimile>04 67 54 87 00</ns9:Facsimile>
                 </ns9:Phone>
                 <ns9:Address>
                     <ns9:DeliveryPoint>24 rue Pierre Renaudel</ns9:DeliveryPoint>
-                    <ns9:City>ARLES</ns9:City>
+                    <ns9:City>Arles</ns9:City>
                     <ns9:AdministrativeArea>Bouches du rhone</ns9:AdministrativeArea>
                     <ns9:PostalCode>13200</ns9:PostalCode>
                     <ns9:Country>France</ns9:Country>
-                    <ns9:ElectronicMailAddress>vincent.heurteaux@geomatys.fr</ns9:ElectronicMailAddress>
+                    <ns9:ElectronicMailAddress>vincent.heurteaux@geomatys.com</ns9:ElectronicMailAddress>
                 </ns9:Address>
-                <ns9:OnlineResource xlink:href="http://constellation.codehaus.org"/>
                 <ns9:HoursOfService>9h - 19h</ns9:HoursOfService>
                 <ns9:ContactInstructions>none</ns9:ContactInstructions>
             </ns9:ContactInfo>
-            <ns9:Role>PointOfContact</ns9:Role>
         </ns9:ServiceContact>
     </ns9:ServiceProvider>
     <ns9:OperationsMetadata>

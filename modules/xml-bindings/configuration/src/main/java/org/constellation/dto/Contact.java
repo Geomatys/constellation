@@ -55,13 +55,17 @@ public class Contact {
 
     private String url;
 
+    private String hoursOfService;
+
+    private String contactInstructions;
+
     public Contact() {
     }
 
     public Contact(final String fullname, final String organisation, final String position,
             final String phone, final String fax, final String email, final String address,
             final String city, final String state, final String zipCode, final String country,
-            final String url) {
+            final String url, final String hoursOfService, final String contactInstructions) {
         this.address = address;
         this.city = city;
         this.country = country;
@@ -74,6 +78,8 @@ public class Contact {
         this.state = state;
         this.zipCode = zipCode;
         this.url = url;
+        this.hoursOfService = hoursOfService;
+        this.contactInstructions = contactInstructions;
     }
 
     public String getFullname() {
@@ -170,5 +176,21 @@ public class Contact {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getHoursOfService() {
+        return hoursOfService;
+    }
+
+    public void setHoursOfService(String hoursOfService) {
+        this.hoursOfService = hoursOfService;
+    }
+
+    public String getContactInstructions() {
+        return contactInstructions;
+    }
+
+    public void setContactInstructions(String contactInstructions) {
+        this.contactInstructions = contactInstructions;
     }
 }

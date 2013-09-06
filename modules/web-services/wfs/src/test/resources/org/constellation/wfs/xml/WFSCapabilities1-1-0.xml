@@ -6,14 +6,16 @@
         <ows:Keywords>
             <ows:Keyword>WFS</ows:Keyword>
             <ows:Keyword>Constellation</ows:Keyword>
+            <ows:Keyword>Geomatys</ows:Keyword>
         </ows:Keywords>
         <ows:ServiceType>WFS</ows:ServiceType>
         <ows:ServiceTypeVersion>1.1.0</ows:ServiceTypeVersion>
+        <ows:ServiceTypeVersion>2.0.0</ows:ServiceTypeVersion>
         <ows:Fees>NONE</ows:Fees>
         <ows:AccessConstraints>NONE</ows:AccessConstraints>
     </ows:ServiceIdentification>
     <ows:ServiceProvider>
-        <ows:ProviderName>Constellation</ows:ProviderName>
+        <ows:ProviderName>Geomatys</ows:ProviderName>
         <ows:ProviderSite xlink:href="http://constellation.codehaus.org"/>
         <ows:ServiceContact>
             <ows:IndividualName>Vincent Heurteaux</ows:IndividualName>
@@ -21,21 +23,19 @@
             <ows:ContactInfo>
                 <ows:Phone>
                     <ows:Voice>04 67 54 87 30</ows:Voice>
-                    <ows:Facsimile></ows:Facsimile>
+                    <ows:Facsimile>04 67 54 87 00</ows:Facsimile>
                 </ows:Phone>
                 <ows:Address>
                     <ows:DeliveryPoint>24 rue Pierre Renaudel</ows:DeliveryPoint>
-                    <ows:City>ARLES</ows:City>
+                    <ows:City>Arles</ows:City>
                     <ows:AdministrativeArea>Bouches du rhone</ows:AdministrativeArea>
                     <ows:PostalCode>13200</ows:PostalCode>
                     <ows:Country>France</ows:Country>
-                    <ows:ElectronicMailAddress>vincent.heurteaux@geomatys.fr</ows:ElectronicMailAddress>
+                    <ows:ElectronicMailAddress>vincent.heurteaux@geomatys.com</ows:ElectronicMailAddress>
                 </ows:Address>
-                <ows:OnlineResource xlink:href="http://constellation.codehaus.org"/>
                 <ows:HoursOfService>9h - 19h</ows:HoursOfService>
                 <ows:ContactInstructions>none</ows:ContactInstructions>
             </ows:ContactInfo>
-            <ows:Role></ows:Role>
         </ows:ServiceContact>
     </ows:ServiceProvider>
     <ows:OperationsMetadata>

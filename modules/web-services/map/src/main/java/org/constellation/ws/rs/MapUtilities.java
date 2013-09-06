@@ -104,7 +104,7 @@ public class MapUtilities {
     private static void setLayerExtraProperties(final Layer layer, final String providerID) {
         final ParameterValueGroup source = LayerProviderProxy.getInstance().getProvider(providerID).getSource();
         layer.setProviderID(providerID);
-        layer.setDate(source.parameter("date").stringValue());
-        layer.setProviderType(source.parameter("providerType").stringValue());
+        layer.setDate((String)source.parameter("date").getValue());
+        layer.setProviderType((String)source.parameter("providerType").getValue());
     }
 }

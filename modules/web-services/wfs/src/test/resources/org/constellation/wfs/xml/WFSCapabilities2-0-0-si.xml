@@ -6,11 +6,11 @@
         <ns9:Keywords>
             <ns9:Keyword>WFS</ns9:Keyword>
             <ns9:Keyword>Constellation</ns9:Keyword>
-            <ns9:Type>String</ns9:Type>
+            <ns9:Keyword>Geomatys</ns9:Keyword>
         </ns9:Keywords>
         <ns9:ServiceType>WFS</ns9:ServiceType>
-        <ns9:ServiceTypeVersion>2.0.0</ns9:ServiceTypeVersion>
         <ns9:ServiceTypeVersion>1.1.0</ns9:ServiceTypeVersion>
+        <ns9:ServiceTypeVersion>2.0.0</ns9:ServiceTypeVersion>
         <ns9:Fees>NONE</ns9:Fees>
         <ns9:AccessConstraints>NONE</ns9:AccessConstraints>
     </ns9:ServiceIdentification>

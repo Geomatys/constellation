@@ -293,7 +293,7 @@ public abstract class CSWConstants {
         // Create provider part.
         final AbstractContact contact = OWSXmlFactory.buildContact("1.0.0", currentContact.getPhone(), currentContact.getFax(),
                 currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
-                currentContact.getZipCode(), currentContact.getCountry());
+                currentContact.getZipCode(), currentContact.getCountry(), currentContact.getHoursOfService(), currentContact.getContactInstructions());
 
         final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.0.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
 

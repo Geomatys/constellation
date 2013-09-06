@@ -5,7 +5,7 @@
     <keywords>WFS</keywords>
     <keywords>Constellation</keywords>
     <keywords>Geomatys</keywords>
-    <name>>Web Feature Service (Constellation)</name>
+    <name>Web Feature Service (Constellation)</name>
     <serviceConstraints>
         <accessConstraint>NONE</accessConstraint>
         <fees>NONE</fees>
@@ -19,9 +19,12 @@
         <fullname>Vincent Heurteaux</fullname>
         <organisation>Geomatys</organisation>
         <phone>04 67 54 87 30</phone>
-        <position>dev</position>
-        <state>PACA</state>
+        <position>PDG</position>
+        <state>Bouches du rhone</state>
         <zipCode>13200</zipCode>
+        <url>http://constellation.codehaus.org</url>
+        <hoursOfService>9h - 19h</hoursOfService>
+        <contactInstructions>none</contactInstructions>
     </serviceContact>
     <versions>1.1.0</versions>
     <versions>2.0.0</versions>
