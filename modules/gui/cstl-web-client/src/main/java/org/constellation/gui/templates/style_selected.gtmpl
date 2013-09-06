@@ -1,0 +1,56 @@
+#{param name=selected/}
+
+<%if(selected == null){%>
+    <div class="alert alert-info">
+        <h5>Aucun style selectionné.</h5>
+        <p>Cliquez sur un style ci-contre pour afficher plus d'informations.</p>
+    </div>
+<%} else {%>
+    <div class="selected-item">
+        <div class="block-header">
+            <strong>${selected.name}</strong><i class="icon-chevron-up pull-right"></i>
+        </div>
+        <div class="block-content">
+            <h6>Description</h6>
+            <span>Altera templo insulam et insignis viribus claram viribus Salamis supremos et ipso committat armamentis tamque claram crebra ad indigens externi instructam ut abundat omnibusque onerariam continenti templo rerum a tanta.</span>
+            <div class="separator"></div>
+            <h6>Propriétaire</h6>
+            <span>Admin</span>
+            <div class="separator"></div>
+            <h6>Date</h6>
+            <span>01/06/2013</span>
+            <div class="separator"></div>
+            <h6>Symboles</h6>
+            <span class="symbol-point"></span>
+            <span class="symbol-line"></span>
+            <span class="symbol-polygon"></span>
+            <span class="symbol-text"></span>
+            <span class="symbol-raster"></span>
+        </div>
+        <div class="block-action">
+            <div class="row-fluid">
+                <a href="@{StyleController.edition(styleName = selected.name, styleProvider = selected.providerId)}&returnURL=@{StyleController.dashboard()}" class="btn btn-info span6">
+                    <i class="icon-edit"></i>Editer
+                </a>
+                <button type="button" class="btn btn-danger span6" onclick="if(confirm('Supprimer ce style?')){}">
+                    <i class="icon-trash"></i>Supprimer
+                </button>
+            </div>
+        </div>
+        <div class="block-header">
+            <strong>Couche(s) associée(s)</strong><i class="icon-chevron-up pull-right"></i>
+        </div>
+        <div class="block-content">
+            <span><strong>WMS1</strong> -> lelombrik</span><br />
+            <span><strong>WMS1</strong> -> trololo</span><br />
+            <span><strong>WMS2</strong> -> test</span><br />
+        </div>
+    </div>
+    <script type="text/javascript">
+        $('.block-header').click(function() {
+            var $this = $(this);
+            $this.next().slideToggle(200);
+            $this.find('i').toggleClass('icon-chevron-down icon-chevron-up');
+        });
+    </script>
+<%}%>

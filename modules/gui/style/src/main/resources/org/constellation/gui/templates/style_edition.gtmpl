@@ -62,7 +62,12 @@
 
         <script type="text/javascript">
             CSTL.STYLE.StyleEdition.init();
-            CSTL.STYLE.StyleEdition.start(${styleBody},[${dataDescription.boundingBox[0]},${dataDescription.boundingBox[1]},${dataDescription.boundingBox[2]},${dataDescription.boundingBox[3]}]);
+            CSTL.STYLE.StyleEdition.start(${styleBody},
+            <% if (dataDescription != null) { %>
+                [${dataDescription.boundingBox[0]},${dataDescription.boundingBox[1]},${dataDescription.boundingBox[2]},${dataDescription.boundingBox[3]}]
+            <% } else { %>
+                [-180,-90,180,90]
+            <% } %>);
         </script>
     </div>
 </div>

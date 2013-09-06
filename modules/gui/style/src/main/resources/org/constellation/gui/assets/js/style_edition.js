@@ -261,7 +261,7 @@ CSTL.STYLE.StyleEdition = {
     },
 
     previous: function() {
-
+        window.location = $('#returnURL').val();
     },
 
     validate: function() {

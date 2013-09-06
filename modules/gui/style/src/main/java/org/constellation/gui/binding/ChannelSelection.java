@@ -39,7 +39,7 @@ public final class ChannelSelection implements StyleElement<org.opengis.style.Ch
         if (channelSelection.getGrayChannel() != null) {
             greyChannel = new SelectedChannelType(channelSelection.getGrayChannel());
         }
-        if (channelSelection.getRGBChannels().length > 2) {
+        if (channelSelection.getRGBChannels() != null && channelSelection.getRGBChannels().length > 2) {
             rgbChannels = new SelectedChannelType[3];
             rgbChannels[0] = new SelectedChannelType(channelSelection.getRGBChannels()[0]);
             rgbChannels[1] = new SelectedChannelType(channelSelection.getRGBChannels()[1]);

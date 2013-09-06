@@ -1,0 +1,40 @@
+#{param name=styleList/}
+
+<%if(styleList == null || styleList.getStyles().isEmpty()){%>
+    <div class="alert alert-info">
+        <strong>Aucun style displonible.</strong>
+    </div>
+<%} else {%>
+    <div class="item-list">
+        <% for (def style : styleList.getStyles()){%>
+            <div class="item style" data-style="${style.name}" data-provider="${style.providerId}">
+                <div class="top">
+                    <span class="item-title">${style.name}</span>
+                </div>
+                <div class="bottom">
+                    <div class="block">
+                        <i class="icon-calendar"></i>01/06/2013
+                    </div>
+                    <div class="block">
+                        <i class="icon-user"></i>Admin
+                    </div>
+                    <div class="block">
+                        <i class="icon-folder-close-alt"></i>Vector
+                    </div>
+                </div>
+            </div>
+        <%}%>
+        <script type="text/javascript">
+            $('[data-style]').click(function() {
+                var $this = $(this);
+                $this.addClass('selected');
+                $this.siblings().removeClass('selected');
+                $('#selected').jzLoad('StyleController.selectStyle()', {
+                    name:       $this.data('style'),
+                    providerId: $this.data('provider')
+                });
+            });
+        </script>
+    </div>
+<%}%>
+

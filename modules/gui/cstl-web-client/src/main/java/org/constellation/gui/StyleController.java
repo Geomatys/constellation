@@ -30,6 +30,7 @@ import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
+import org.constellation.dto.StyleBean;
 import org.constellation.gui.binding.ColorMap;
 import org.constellation.gui.binding.Interpolate;
 import org.constellation.gui.binding.InterpolationPoint;
@@ -80,6 +81,14 @@ public final class StyleController {
     @Path("style_edition.gtmpl")
     Template edition;
 
+    @Inject
+    @Path("style_list.gtmpl")
+    Template list;
+
+    @Inject
+    @Path("style_selected.gtmpl")
+    Template selected;
+
 
     /**
      * View for the style dashboard.
@@ -88,8 +97,12 @@ public final class StyleController {
      */
     @View
     @Route("style/dashboard")
-    public Response dashboard() {
-        return dashboard.ok().withMimeType("text/html");
+    public Response dashboard(final String category) throws IOException {
+        final Map<String, Object> parameters = new HashMap<>(0);
+        parameters.put("category", category);
+        parameters.put("selected", null);
+        parameters.put("styleList", service.getStyleList());
+        return dashboard.ok(parameters).withMimeType("text/html");
     }
 
     /**
@@ -163,7 +176,7 @@ public final class StyleController {
             service.updateStyle(styleProvider, styleName, style);
 
             // Return to dashboard.
-            return StyleController_.dashboard();
+            return StyleController_.dashboard(null);
         } catch (IOException ex) {
             return Response.error(ex);
         }
@@ -228,5 +241,27 @@ public final class StyleController {
         } catch (IOException ex) {
             return Response.error(ex);
         }
+    }
+
+    @Ajax
+    @Resource
+    @Route("style/select")
+    public Response selectStyle(final String name, final String providerId) {
+        final StyleBean style = new StyleBean();
+        style.setName(name);
+        style.setProviderId(providerId);
+
+        final Map<String, Object> parameters = new HashMap<>(0);
+        parameters.put("selected", style);
+        return selected.ok(parameters).withMimeType("text/html");
+    }
+
+    @Ajax
+    @Resource
+    @Route("style/filter")
+    public Response styleList() throws IOException {
+        final Map<String, Object> parameters = new HashMap<>(0);
+        parameters.put("styleList", service.getStyleList());
+        return list.ok(parameters).withMimeType("text/html");
     }
 }
