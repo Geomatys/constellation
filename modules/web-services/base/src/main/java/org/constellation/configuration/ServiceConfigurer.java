@@ -76,32 +76,13 @@ public abstract class ServiceConfigurer {
     }
 
     /**
-     * Returns a service implementation configuration directory.
-     *
-     * @return a {@link java.io.File} instance
-     */
-    public File getServiceDirectory() {
-        return new File(ConfigDirectory.getConfigDirectory(), specification.name());
-    }
-
-    /**
-     * Returns a service instance configuration directory.
-     *
-     * @param identifier the service identifier
-     * @return a {@link File} instance
-     */
-    public File getInstanceDirectory(final String identifier) {
-        return new File(getServiceDirectory(), identifier);
-    }
-
-    /**
      * Returns a service instance configuration file.
      *
      * @param identifier the service identifier
      * @return a {@link File} instance
      */
     public File getConfigurationFile(final String identifier) {
-        return new File(getInstanceDirectory(identifier), configFileName);
+        return new File(ConfigDirectory.getInstanceDirectory(specification.name(), identifier), configFileName);
     }
 
     /**
@@ -112,7 +93,7 @@ public abstract class ServiceConfigurer {
      */
     protected void ensureExistingInstance(final String identifier) throws NoSuchInstanceException {
         if (!WSEngine.serviceInstanceExist(specification.name(), identifier)) {
-            final File directory = getInstanceDirectory(identifier);
+            final File directory = ConfigDirectory.getInstanceDirectory(specification.name(), identifier);
             if (!directory.exists() || !directory.isDirectory()) {
                 throw NoSuchInstanceException.noConfigDirectory(specification, identifier);
             }

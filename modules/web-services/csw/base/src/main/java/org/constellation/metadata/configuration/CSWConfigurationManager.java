@@ -32,7 +32,11 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+// APACHE SIS dependencies
 import org.apache.sis.util.logging.Logging;
+
+//cstl dependencies
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
@@ -46,7 +50,8 @@ import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.WSEngine;
+
+// Geotk dependencies
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.IndexingException;
@@ -170,9 +175,9 @@ public class CSWConfigurationManager {
         
         final List<File> cswInstanceDirectories = new ArrayList<>();
         if ("all".equals(id)) {
-            cswInstanceDirectories.addAll(getAllCswInstanceDirectory());
+            cswInstanceDirectories.addAll(ConfigDirectory.getInstanceDirectories("CSW"));
         } else {
-            final File instanceDir = getCswInstanceDirectory(id);
+            final File instanceDir = ConfigDirectory.getInstanceDirectory("CSW", id);
             if (instanceDir != null) {
                 cswInstanceDirectories.add(instanceDir);
             }
@@ -374,8 +379,8 @@ public class CSWConfigurationManager {
      */
     protected void refreshServiceConfiguration() throws ConfigurationException {
         serviceConfiguration    = new HashMap<>();
-        final File cswConfigDir = getConfigurationDirectory();
-        if (cswConfigDir != null && cswConfigDir.exists() && cswConfigDir.isDirectory()) {
+        final File cswConfigDir = ConfigDirectory.getServiceDirectory("CSW");
+        if (cswConfigDir.isDirectory()) {
             try {
                 final Unmarshaller configUnmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
 
@@ -606,36 +611,5 @@ public class CSWConfigurationManager {
             }
             return cswConfigDir;
         }
-    }
-
-    /*
-     * Return the configuration directory for the specified instance identifier.
-     */
-    protected File getCswInstanceDirectory(String instanceId) throws ConfigurationException {
-        final File configDir = getConfigurationDirectory();
-        if (configDir != null && configDir.exists()) {
-            File instanceDir = new File(configDir, instanceId);
-            if (instanceDir.exists() && instanceDir.isDirectory()) {
-                return instanceDir;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Return the configuration directory for all the instances.
-     * @return
-     */
-    protected List<File> getAllCswInstanceDirectory() throws ConfigurationException {
-        final File configDir = getConfigurationDirectory();
-        final List<File> results = new ArrayList<>();
-        if (configDir != null && configDir.exists()) {
-            for (File instanceDir : configDir.listFiles()) {
-                if (instanceDir.isDirectory()) {
-                    results.add(instanceDir);
-                }
-            }
-        }
-        return results;
     }
 }

@@ -25,7 +25,6 @@ import org.constellation.dto.Service;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
@@ -45,40 +44,6 @@ public final class MetadataUtilities extends Static {
      * The service metadata file name.
      */
     private static final String METADATA_FILE_NAME = "serviceMetadata.xml";
-
-    /**
-     * Error message for invalid directories.
-     */
-    private static final String INVALID_DIRECTORY ="The $ folder does not exist or is not a directory.";
-
-
-    /**
-     * Gets the service instance folder from its identifier.
-     *
-     * @param identifier  the service identifier
-     * @param serviceType the service type (WMS, WFS, WPS...)
-     * @return the service instance folder
-     * @throws ConfigurationException if the service instance directory doesn't exists
-     */
-    public static File getInstanceDirectory(final String identifier, String serviceType) throws ConfigurationException {
-        ensureNonNull("identifier",  identifier);
-        ensureNonNull("serviceType", serviceType);
-
-        serviceType = serviceType.toUpperCase();
-        final File cstlDirectory = ConfigDirectory.getConfigDirectory();
-        if (!cstlDirectory.exists() || !cstlDirectory.isDirectory()) {
-            throw new ConfigurationException(INVALID_DIRECTORY.replace("$",".constellation"));
-        }
-        final File wmsDirectory = new File(cstlDirectory, serviceType);
-        if (!wmsDirectory.exists() || !wmsDirectory.isDirectory()) {
-            throw new ConfigurationException(INVALID_DIRECTORY.replace("$",".constellation/" + serviceType));
-        }
-        final File instanceDirectory = new File(wmsDirectory,  identifier);
-        if (!instanceDirectory.exists() || !instanceDirectory.isDirectory()) {
-            throw new ConfigurationException(INVALID_DIRECTORY.replace("$",".constellation/" + serviceType + "/" + identifier));
-        }
-        return instanceDirectory;
-    }
 
     /**
      * Writes the service metadata file into the service instance directory.
@@ -104,27 +69,14 @@ public final class MetadataUtilities extends Static {
     /**
      * Writes the service metadata file into the service instance directory.
      *
-     * @param identifier  the service identifier
-     * @param serviceType the service type (WMS, WFS, WPS...)
-     * @param metadata    the service metadata
-     * @throws ConfigurationException if the service instance directory doesn't exists
-     * @throws IOException if failed to write the service metadata for any reason
-     */
-    public static void writeMetadata(final String identifier, final String serviceType, final Service metadata) throws ConfigurationException, IOException {
-        ensureNonNull("identifier",  identifier);
-        ensureNonNull("serviceType", serviceType);
-        ensureNonNull("metadata",    metadata);
-
-        writeMetadata(getInstanceDirectory(identifier, serviceType), metadata);
-    }
-
-    /**
-     * Writes the service metadata file into the service instance directory.
-     *
      * @param directory the service instance directory
      * @throws IOException if failed to read the service metadata for any reason
      */
-    public static Service readMetadata(final File directory) throws IOException {
+    public static Service readMetadata(final String identifier, final String serviceType) throws IOException {
+        ensureNonNull("identifier",  identifier);
+        ensureNonNull("serviceType", serviceType);
+        
+        final File directory = ConfigDirectory.getInstanceDirectory(identifier, serviceType);
         ensureNonNull("directory", directory);
 
         final File metadataFile = new File(directory, METADATA_FILE_NAME);
@@ -142,21 +94,5 @@ public final class MetadataUtilities extends Static {
             }
         }
         return null;
-    }
-
-    /**
-     * Reads the service metadata file from the service instance directory.
-     *
-     * @param identifier  the service identifier
-     * @param serviceType the service type (WMS, WFS, WPS...)
-     * @return the service metadata
-     * @throws ConfigurationException if the service instance directory doesn't exists
-     * @throws IOException if failed to read the service metadata for any reason
-     */
-    public static Service readMetadata(final String identifier, final String serviceType) throws ConfigurationException, IOException {
-        ensureNonNull("identifier",  identifier);
-        ensureNonNull("serviceType", serviceType);
-
-        return readMetadata(getInstanceDirectory(identifier, serviceType));
     }
 }

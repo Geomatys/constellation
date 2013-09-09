@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.constellation.configuration.ConfigDirectory;
 
 /**
  * Describe methods which need to be specify by an implementation to manage
@@ -102,7 +103,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
+        inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
         desc.createProcess(inputs).call();
     }
 
@@ -137,7 +138,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
         inputs.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(closeFirst);
-        inputs.parameter(RestartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
+        inputs.parameter(RestartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
         desc.createProcess(inputs).call();
     }
 
@@ -155,7 +156,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(RenameServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(RenameServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(RenameServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
+        inputs.parameter(RenameServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
         inputs.parameter(RenameServiceDescriptor.NEW_NAME_NAME).setValue(newIdentifier);
         desc.createProcess(inputs).call();
     }
@@ -173,7 +174,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(DeleteServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
+        inputs.parameter(DeleteServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
         desc.createProcess(inputs).call();
     }
 
@@ -193,7 +194,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
         inputs.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(configuration);
-        inputs.parameter(SetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(getInstanceDirectory(identifier));
+        inputs.parameter(SetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(ConfigDirectory.getInstanceDirectory(specification.name(), identifier));
         inputs.parameter(SetConfigServiceDescriptor.SERVICE_METADATA_NAME).setValue(metadata);
         inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
         inputs.parameter(SetConfigServiceDescriptor.FILENAME_NAME).setValue(configFileName);
@@ -218,7 +219,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(GetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(GetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(GetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(getInstanceDirectory(identifier));
+        inputs.parameter(GetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(ConfigDirectory.getInstanceDirectory(specification.name(), identifier));
         inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
         inputs.parameter(GetConfigServiceDescriptor.FILENAME_NAME).setValue(configFileName);
 
@@ -250,7 +251,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public Service getInstanceMetadata(final String identifier) throws NoSuchInstanceException, IOException {
         this.ensureExistingInstance(identifier);
-        return MetadataUtilities.readMetadata(getInstanceDirectory(identifier));
+        return MetadataUtilities.readMetadata(specification.name(), identifier);
     }
 
     /**
@@ -317,7 +318,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(specification.name())) {
             status.put(entry.getKey(), entry.getValue() ? ServiceStatus.WORKING : ServiceStatus.ERROR);
         }
-        final File[] files = getServiceDirectory().listFiles(new FileFilter() {
+        final File[] files = ConfigDirectory.getServiceDirectory(specification.name()).listFiles(new FileFilter() {
             @Override
             public boolean accept(final File file) {
                 return file.isDirectory() && !file.getName().startsWith(".")

@@ -19,6 +19,9 @@ package org.constellation.configuration;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,8 +87,8 @@ public final class ConfigDirectory {
     static {
         baseClassLoader = Thread.currentThread().getContextClassLoader();
         final File webInfDirectory = getWebInfDiretory();
-        File propertiesFile = new File(webInfDirectory, "constellation.properties");
-        if (propertiesFile != null && propertiesFile.exists()) {
+        final File propertiesFile = new File(webInfDirectory, "constellation.properties");
+        if (propertiesFile.exists()) {
             try {
                 Properties prop = FileUtilities.getPropertiesFromFile(propertiesFile);
                 USER_DIRECTORY = prop.getProperty("configuration_directory");
@@ -117,7 +120,7 @@ public final class ConfigDirectory {
      * @return data directory as {@link java.io.File}
      */
     public static File getDataDirectory() {
-        File constellationDataDirectory = null;
+        File constellationDataDirectory;
 
         if (DATA_DIRECTORY != null && !DATA_DIRECTORY.isEmpty()) {
             constellationDataDirectory = new File(DATA_DIRECTORY);
@@ -152,7 +155,7 @@ public final class ConfigDirectory {
          final File webInfDirectory = getWebInfDiretory();
 
          constellationDirectory = new File(webInfDirectory, "constellation");
-         if (constellationDirectory != null && constellationDirectory.isDirectory()) {
+         if (constellationDirectory.isDirectory()) {
              return constellationDirectory;
          }
 
@@ -185,6 +188,25 @@ public final class ConfigDirectory {
         return constellationDirectory;
     }
 
+    /**
+     * Return the directory for the configuration files of all instance of serviceType?
+     *
+     * @param serviceType the service type (CSW, WMS, WCS, ...)
+     * @return
+     */
+    public static File getServiceDirectory(final String serviceType) {
+        return new File(ConfigDirectory.getConfigDirectory(), serviceType);
+    }
+
+    public static List<File> getInstanceDirectories(final String serviceType) {
+        return Arrays.asList(ConfigDirectory.getServiceDirectory(serviceType).listFiles());
+    }
+    
+    public static File getInstanceDirectory(final String serviceType, final String instance) {
+        return new File(ConfigDirectory.getServiceDirectory(serviceType), instance);
+    }
+
+    
     /**
      * Return the ".constellation" configuration directory in the user home.
      * 

@@ -68,6 +68,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // Apache SIS dependencies
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.util.iso.Types;
+import org.constellation.configuration.ConfigDirectory;
 
 // GeoAPI dependencies
 import org.opengis.parameter.ParameterValueGroup;
@@ -104,8 +105,8 @@ import org.opengis.util.NoSuchIdentifierException;
  */
 public abstract class OGCWebService<W extends Worker> extends WebService {
 
-    final String serviceName;
-    final OGCConfigurer configurer;
+    private final String serviceName;
+    private final OGCConfigurer configurer;
 
     /**
      * Initialize the basic attributes of a web serviceType.
@@ -135,7 +136,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     }
 
     private void startAllInstance() {
-        final File serviceDirectory = configurer.getServiceDirectory();
+        final File serviceDirectory = ConfigDirectory.getServiceDirectory(serviceName);
         if (serviceDirectory != null && serviceDirectory.isDirectory()) {
             for (File instanceDirectory : serviceDirectory.listFiles()) {
                 if (instanceDirectory.isDirectory()) {
@@ -384,7 +385,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 LOGGER.info("updating instance capabilities");
                 final String identifier = getParameter("id", true);
                 final String fileName   = getParameter("fileName", true);
-                final File serviceDirectory = configurer.getServiceDirectory();
+                final File serviceDirectory = ConfigDirectory.getServiceDirectory(serviceName);
                 final AcknowlegementType response;
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     File instanceDirectory     = new File (serviceDirectory, identifier);
