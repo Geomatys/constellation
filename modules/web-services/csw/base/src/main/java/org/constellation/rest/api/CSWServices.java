@@ -46,7 +46,7 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 public class CSWServices {
 
     @POST
-    @Path("{id}/refreshIndex")
+    @Path("{id}/index/refresh")
     public Response refreshIndex(final @PathParam("id") String id, final ParameterValues values) throws Exception {
         final boolean asynchrone = values.getAsBoolean("ASYNCHRONE");
         final boolean forced     = values.getAsBoolean("FORCED");
@@ -59,19 +59,19 @@ public class CSWServices {
     }
 
     @PUT
-    @Path("{id}/AddToIndex/{metaID}")
+    @Path("{id}/index/{metaID}")
     public Response AddToIndex(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().addToIndex(id, metaID));
     }
 
     @DELETE
-    @Path("{id}/removeFromIndex/{metaID}")
+    @Path("{id}/index/{metaID}")
     public Response removeFromIndex(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().removeFromIndex(id, metaID));
     }
 
     @POST
-    @Path("{id}/stop")
+    @Path("{id}/index/stop")
     public Response stopIndexation(final @PathParam("id") String id) throws Exception {
         return ok(getConfigurer().stopIndexation(id));
     }
@@ -80,26 +80,26 @@ public class CSWServices {
      * TODO change fileName into dataType parameter
      */
     @PUT
-    @Path("{id}/importRecords/{fileName}")
+    @Path("{id}/records/{fileName}")
     public Response importRecord(final @PathParam("id") String id, final @PathParam("fileName") String fileName, final File record) throws Exception {
         return ok(getConfigurer().importRecords(id, record, fileName));
     }
 
     @DELETE
-    @Path("{id}/removeMetadata/{metaID}")
+    @Path("{id}/records/{metaID}")
     public Response removeMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().removeRecords(id, metaID));
     }
 
     @GET
-    @Path("{id}/metadataExist/{metaID}")
+    @Path("{id}/records/{metaID}")
     public Response metadataExist(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().metadataExist(id, metaID));
     }
 
     @GET
-    @Path("GetCSWDatasourceType")
-    public Response GetCSWDatasourceType() throws Exception {
+    @Path("types")
+    public Response getCSWDatasourceType() throws Exception {
         return ok(getConfigurer().getAvailableCSWDataSourceType());
     }
 
