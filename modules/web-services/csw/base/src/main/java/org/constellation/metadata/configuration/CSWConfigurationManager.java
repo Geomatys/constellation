@@ -22,10 +22,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.spi.ServiceRegistry;
@@ -78,8 +76,6 @@ public class CSWConfigurationManager {
      */
     private final List<String> SERVICE_INDEXING = new ArrayList<>();
 
-    protected Map<String, Automatic> serviceConfiguration = new HashMap<>();
-
     private static CSWConfigurationManager INSTANCE;
 
     public static CSWConfigurationManager getInstance() {
@@ -91,11 +87,6 @@ public class CSWConfigurationManager {
 
     public CSWConfigurationManager() {
         indexing = false;
-        try {
-            refreshServiceConfiguration();
-        } catch (ConfigurationException ex) {
-            LOGGER.log(Level.WARNING, "Error while starting CSW configuration Manager", ex);
-        }
     }
 
     public AcknowlegementType refreshIndex(final String id, final boolean asynchrone, final boolean forced) throws ConfigurationException {
@@ -171,7 +162,6 @@ public class CSWConfigurationManager {
             suffix = suffix + " id:" + id;
         }
         LOGGER.log(Level.INFO, "refresh index requested{0}", suffix);
-        refreshServiceConfiguration();
         
         final List<File> cswInstanceDirectories = new ArrayList<>();
         if ("all".equals(id)) {
@@ -205,7 +195,7 @@ public class CSWConfigurationManager {
         final List<String> identifiers = StringUtilities.toStringList(identifierList);
         AbstractIndexer indexer  = null;
         try {
-            final CSWMetadataReader reader  = initReader(id);
+            final CSWMetadataReader reader  = getReader(id);
             final List<Object> objectToIndex = new ArrayList<>();
             if (reader != null) {
                 try {
@@ -219,7 +209,7 @@ public class CSWConfigurationManager {
                 throw new ConfigurationException("Unable to create a reader for the id:" + id);
             }
 
-            indexer = initIndexer(id, reader);
+            indexer = getIndexer(id, reader);
             if (indexer != null) {
                 for (Object obj : objectToIndex) {
                     indexer.indexDocument(obj);
@@ -250,8 +240,8 @@ public class CSWConfigurationManager {
         final List<String> identifiers = StringUtilities.toStringList(identifierList);
         AbstractIndexer indexer  = null;
         try {
-            final CSWMetadataReader reader  = initReader(id);
-            indexer = initIndexer(id, reader);
+            final CSWMetadataReader reader  = getReader(id);
+            indexer = getIndexer(id, reader);
             if (indexer != null) {
                 for (String metadataID : identifiers) {
                     indexer.removeDocument(metadataID);
@@ -287,7 +277,7 @@ public class CSWConfigurationManager {
 
     public AcknowlegementType importRecords(final String id, final File f, final String fileName) throws ConfigurationException {
         LOGGER.info("Importing record");
-        final CSWMetadataWriter writer = initWriter(id);
+        final CSWMetadataWriter writer = getWriter(id);
         final List<File> files;
         if (fileName.endsWith("zip")) {
             try  {
@@ -327,7 +317,7 @@ public class CSWConfigurationManager {
     }
 
     public AcknowlegementType metadataExist(final String id, final String metadataName) throws ConfigurationException {
-        final CSWMetadataReader reader = initReader(id);
+        final CSWMetadataReader reader = getReader(id);
         try {
             final boolean exist = reader.existMetadata(metadataName);
             if (exist) {
@@ -343,7 +333,7 @@ public class CSWConfigurationManager {
     }
 
     public AcknowlegementType deleteMetadata(final String id, final String metadataName) throws ConfigurationException {
-        final CSWMetadataWriter writer = initWriter(id);
+        final CSWMetadataWriter writer = getWriter(id);
         try {
             final boolean deleted = writer.deleteMetadata(metadataName);
             if (deleted) {
@@ -377,36 +367,29 @@ public class CSWConfigurationManager {
      *
      * @throws ConfigurationException
      */
-    protected void refreshServiceConfiguration() throws ConfigurationException {
-        serviceConfiguration    = new HashMap<>();
-        final File cswConfigDir = ConfigDirectory.getServiceDirectory("CSW");
-        if (cswConfigDir.isDirectory()) {
+    protected Automatic getServiceConfiguration(final String id) throws ConfigurationException {
+        final File instanceDirectory = ConfigDirectory.getInstanceDirectory("CSW", id);
+        if (instanceDirectory.isDirectory()) {
             try {
                 final Unmarshaller configUnmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-
-                for (File instanceDirectory : cswConfigDir.listFiles()) {
-                    if (instanceDirectory.isDirectory()) {
-                        //we get the csw ID
-                        final String id = instanceDirectory.getName();
-                        final File configFile = new File(instanceDirectory, "config.xml");
-                        if (configFile.exists()) {
-                            // we get the CSW configuration file
-                            final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
-                            config.setConfigurationDirectory(instanceDirectory);
-                            serviceConfiguration.put(id, config);
-                        }
-                    }
+                final File configFile = new File(instanceDirectory, "config.xml");
+                if (configFile.exists()) {
+                    // we get the CSW configuration file
+                    final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
+                    config.setConfigurationDirectory(instanceDirectory);
+                    return config;
                 }
                 GenericDatabaseMarshallerPool.getInstance().recycle(configUnmarshaller);
 
             } catch (JAXBException ex) {
-                throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service", ex.getMessage());
+                throw new ConfigurationException("JAXBexception while getting the CSW configuration for:" + id, ex.getMessage());
             } catch (IllegalArgumentException ex) {
                 throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
             }
         } else {
-            LOGGER.warning("No CSW configuration directory.");
+            LOGGER.log(Level.WARNING, "No CSW configuration directory for instance:{0}", id);
         }
+        return null;
     }
 
     /**
@@ -459,7 +442,7 @@ public class CSWConfigurationManager {
             final File nexIndexDir        = new File(cswInstanceDirectory, "index-" + System.currentTimeMillis());
             AbstractIndexer indexer = null;
             try {
-                indexer = initIndexer(id, null);
+                indexer = getIndexer(id, null);
                 if (indexer != null) {
                     final boolean success = nexIndexDir.mkdir();
                     if (!success) {
@@ -492,10 +475,10 @@ public class CSWConfigurationManager {
      * @return A lucene Indexer
      * @throws org.constellation.ws.CstlServiceException
      */
-    protected AbstractIndexer initIndexer(final String serviceID, CSWMetadataReader currentReader) throws ConfigurationException {
+    protected AbstractIndexer getIndexer(final String serviceID, CSWMetadataReader currentReader) throws ConfigurationException {
 
         // we get the CSW configuration file
-        final Automatic config = serviceConfiguration.get(serviceID);
+        final Automatic config = getServiceConfiguration(serviceID);
         if (config != null) {
             final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
             try {
@@ -520,10 +503,10 @@ public class CSWConfigurationManager {
      * @return A metadata reader.
      * @throws org.constellation.ws.CstlServiceException
      */
-    protected CSWMetadataReader initReader(final String serviceID) throws ConfigurationException {
+    protected CSWMetadataReader getReader(final String serviceID) throws ConfigurationException {
 
         // we get the CSW configuration file
-        final Automatic config = serviceConfiguration.get(serviceID);
+        final Automatic config = getServiceConfiguration(serviceID);
         if (config != null) {
             final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
             try {
@@ -545,10 +528,10 @@ public class CSWConfigurationManager {
      * @return A metadata reader.
      * @throws org.constellation.ws.CstlServiceException
      */
-    protected CSWMetadataWriter initWriter(final String serviceID) throws ConfigurationException {
+    protected CSWMetadataWriter getWriter(final String serviceID) throws ConfigurationException {
 
         // we get the CSW configuration file
-        final Automatic config = serviceConfiguration.get(serviceID);
+        final Automatic config = getServiceConfiguration(serviceID);
         if (config != null) {
             final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
             try {
@@ -577,39 +560,5 @@ public class CSWConfigurationManager {
             }
         }
         throw new FactoryNotFoundException("No CSW factory has been found for type:" + type);
-    }
-
-    /**
-     * Return all the founded CSW service identifiers.
-     *
-     * @return all the founded CSW service identifiers.
-     */
-    public List<String> getAllServiceIDs() {
-        final List<String> result = new ArrayList<>();
-        for (String id : serviceConfiguration.keySet()) {
-            result.add(id);
-        }
-        return result;
-    }
-
-    /**
-     * Return the CSW configuration directory.
-     * example for regular constellation configuration it return the file USER_DIRECTORY/.constellation/CSW
-     *
-     * @return Return the CSW configuration directory.
-     * @throws ConfigurationException
-     */
-    protected File getConfigurationDirectory() throws ConfigurationException {
-        final File configDir = ConfigDirectory.getConfigDirectory();
-        final File cswConfigDir;
-        if (configDir == null || !configDir.isDirectory()) {
-            throw new ConfigurationException("No configuration directory have been found");
-        } else {
-            cswConfigDir = new File(configDir, "CSW");
-            if (!cswConfigDir.isDirectory()) {
-                throw new ConfigurationException("No CSW configuration directory have been found");
-            }
-            return cswConfigDir;
-        }
     }
 }
