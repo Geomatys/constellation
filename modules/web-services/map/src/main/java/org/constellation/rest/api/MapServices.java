@@ -75,8 +75,7 @@ public final class MapServices {
      */
     private static MapConfigurer getConfigurer(final String specification) throws NotRunningServiceException {
         final Specification spec = Specification.fromShortName(specification);
-        if (!spec.equals(Specification.WMTS) && !spec.equals(Specification.WMS)
-                && !spec.equals(Specification.WFS) && !spec.equals(Specification.WCS)) {
+        if (!spec.supportedWXS()) {
             throw new IllegalArgumentException(specification + " is not a valid OGC service.");
         }
         return (MapConfigurer) ServiceConfigurer.newInstance(spec);

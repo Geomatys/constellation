@@ -28,16 +28,28 @@ public class ConfigurationException extends Exception {
     
     private final String cause;
     
-    public ConfigurationException(String message) {
+    public ConfigurationException(final String message) {
         super(message);
         this.message = message;
         this.cause   = "";
     }
     
-    public ConfigurationException(String message, String cause) {
+    public ConfigurationException(final String message, final String cause) {
         super(message);
         this.message = message;
         this.cause   = cause;
+    }
+
+    public ConfigurationException(final String message, final Exception cause) {
+        super(message, cause);
+        this.message = message;
+        this.cause   = cause.getMessage();
+    }
+
+    public ConfigurationException(final Exception cause) {
+        super(cause);
+        this.message = null;
+        this.cause   = cause.getMessage();
     }
     
     @Override

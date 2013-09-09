@@ -252,7 +252,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 throw new CstlServiceException("The geographic bbox for the layer is null !",
                         NO_APPLICABLE_CODE);
             }
-            final List<String> keywords = Arrays.asList(ServiceDef.Specification.WCS.toString(), coverageName);
+            final List<String> keywords = Arrays.asList("WCS", coverageName);
 
             /*
              * Spatial metadata
@@ -360,7 +360,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             //general metadata
             final String title     = coverageName;
             final String abstractt = StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks());
-            final List<String> keywords = Arrays.asList(ServiceDef.Specification.WCS.toString(), coverageName);
+            final List<String> keywords = Arrays.asList("WCS", coverageName);
 
             // temporal metadata
             final List<Object> times = WCSUtils.formatDateList(coverageRef.getAvailableTimes());

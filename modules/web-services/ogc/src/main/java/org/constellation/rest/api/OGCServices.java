@@ -173,10 +173,7 @@ public final class OGCServices {
      */
     private static OGCConfigurer getConfigurer(final String specification) throws NotRunningServiceException {
         final Specification spec = Specification.fromShortName(specification);
-        if (!spec.equals(Specification.WMS) && !spec.equals(Specification.WMTS)
-                && !spec.equals(Specification.WFS) && !spec.equals(Specification.CSW)
-                && !spec.equals(Specification.WCS) && !spec.equals(Specification.SOS)
-                && !spec.equals(Specification.WPS)) {
+        if (!spec.supported()) {
             throw new IllegalArgumentException(specification + " is not a valid OGC service.");
         }
         return (OGCConfigurer) ServiceConfigurer.newInstance(spec);

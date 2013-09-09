@@ -17,7 +17,11 @@
 
 package org.constellation.metadata.configuration;
 
+import java.io.File;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.StringList;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -51,5 +55,37 @@ public class CSWConfigurer extends OGCConfigurer {
             configuration = new Automatic("filesystem", new BDD());
         }
         super.createInstance(identifier, metadata, configuration);
+    }
+
+    public AcknowlegementType refreshIndex(final String id, final boolean asynchrone, final boolean forced) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().refreshIndex(id, asynchrone, forced);
+    }
+
+    public AcknowlegementType addToIndex(final String id, final String identifierList) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().addToIndex(id, identifierList);
+    }
+
+    public AcknowlegementType removeFromIndex(final String id, final String identifierList) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().removeFromIndex(id, identifierList);
+    }
+
+    public AcknowlegementType stopIndexation(final String id) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().stopIndexation(id);
+    }
+
+    public AcknowlegementType importRecords(final String id, final File f, final String fileName) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().importRecords(id, f, fileName);
+    }
+
+    public AcknowlegementType removeRecords(final String id, final String identifierList) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().deleteMetadata(id, identifierList);
+    }
+
+    public AcknowlegementType metadataExist(final String id, final String identifier) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().metadataExist(id, identifier);
+    }
+
+    public StringList getAvailableCSWDataSourceType() {
+        return CSWConfigurationManager.getInstance().getAvailableCSWDataSourceType();
     }
 }

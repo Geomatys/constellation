@@ -210,6 +210,18 @@ public enum ServiceDef {
             }
             throw new IllegalArgumentException(shortName + " is not a valid service specification.");
         }
+
+        public boolean supported() {
+            return this.equals(Specification.WMS)  ||this.equals(Specification.WMTS)
+                 ||this.equals(Specification.WFS)  ||this.equals(Specification.CSW)
+                 ||this.equals(Specification.WCS)  ||this.equals(Specification.SOS)
+                 ||this.equals(Specification.WPS);
+        }
+
+        public boolean supportedWXS() {
+            return this.equals(Specification.WMS)  ||this.equals(Specification.WMTS)
+                 ||this.equals(Specification.WFS)  ||this.equals(Specification.WCS);
+        }
     }
 
     public enum Organization {
