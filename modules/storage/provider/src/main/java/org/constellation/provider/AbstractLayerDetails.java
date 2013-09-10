@@ -286,7 +286,13 @@ public abstract class AbstractLayerDetails implements LayerDetails{
 
     protected Filter buildDimFilter(final String dimName, final String dimValue, final Filter filter) {
         final FilterFactory2 factory = (FilterFactory2) FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
-        final Filter extraDimFilter = factory.equal(factory.property(dimName), factory.literal(dimValue));
+        Object value = dimValue;
+        try {
+            value = Double.parseDouble(dimValue);
+        } catch (NumberFormatException ex) {
+            // not a number
+        }
+        final Filter extraDimFilter = factory.equals(factory.property(dimName), factory.literal(value));
         if (filter != null) {
             return factory.and(extraDimFilter, filter);
         } else {
