@@ -331,7 +331,9 @@ public final class ConstellationClient {
                 final String message;
                 if (MediaType.TEXT_PLAIN_TYPE.equals(response.getType())) {
                     message = response.getEntity(String.class);
-                } else if (MediaType.TEXT_XML_TYPE.equals(response.getType()) || MediaType.TEXT_XML_TYPE.equals(response.getType())) {
+                } else if (MediaType.TEXT_XML_TYPE.equals(response.getType())
+                        || MediaType.APPLICATION_XML_TYPE.equals(response.getType())
+                        || MediaType.APPLICATION_JSON_TYPE.equals(response.getType())) {
                     message = response.getEntity(AcknowlegementType.class).getMessage();
                 } else {
                     message = "No reason message.";
