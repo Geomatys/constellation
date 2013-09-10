@@ -46,7 +46,7 @@ public final class StyleProviderConfig extends Static {
      * @throws TargetNotFoundException if the style provider instance can't be found
      */
     private static void ensureExistingProvider(final String providerId) throws TargetNotFoundException {
-        if (!StyleProviderProxy.getInstance().getKeys().contains(providerId)) {
+        if (StyleProviderProxy.getInstance().getProvider(providerId) == null) {
             throw new TargetNotFoundException("Style provider with identifier \"" + providerId + "\" does not exist.");
         }
     }
