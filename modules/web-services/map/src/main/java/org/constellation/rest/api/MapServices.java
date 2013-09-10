@@ -18,9 +18,11 @@
 package org.constellation.rest.api;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.LayerList;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.map.configuration.MapConfigurer;
 
@@ -42,7 +44,7 @@ import static org.constellation.utils.RESTfulUtilities.ok;
  * @version 0.9
  * @since 0.9
  */
-@Path("/1/map/{spec}")
+@Path("/1/MAP/{spec}")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public final class MapServices {
@@ -63,13 +65,12 @@ public final class MapServices {
     @Path("{id}/layer")
     public Response addLayer(final @PathParam("spec") String spec, final @PathParam("id") String id, final AddLayer layer) throws Exception {
         getConfigurer(spec).addLayer(layer);
-        return ok("Layer (" + layer.getLayerId() + ") successfully added to " + spec + " service (" + id + ").");
+        return ok(AcknowlegementType.success("Layer \"" + layer.getLayerId() + "\" successfully added to " + spec + " service \"" + id + "\"."));
     }
 
     /**
      * Returns the {@link MapConfigurer} instance from its {@link Specification}.
      *
-     * @throws javax.ws.rs.WebApplicationException
      * @throws NotRunningServiceException if the service is not activated or if an error
      * occurred during its startup
      */

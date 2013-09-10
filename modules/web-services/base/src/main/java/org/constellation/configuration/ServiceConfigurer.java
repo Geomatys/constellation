@@ -89,17 +89,19 @@ public abstract class ServiceConfigurer {
      * Ensure that a service instance really exists.
      *
      * @param identifier the service identifier
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
      */
-    protected void ensureExistingInstance(final String identifier) throws NoSuchInstanceException {
+    protected void ensureExistingInstance(final String identifier) throws TargetNotFoundException {
         if (!WSEngine.serviceInstanceExist(specification.name(), identifier)) {
             final File directory = ConfigDirectory.getInstanceDirectory(specification.name(), identifier);
             if (!directory.exists() || !directory.isDirectory()) {
-                throw NoSuchInstanceException.noConfigDirectory(specification, identifier);
+                throw new TargetNotFoundException(specification + " service instance with identifier \"" + identifier +
+                        "\" not found. The service instance directory does not exist.");
             }
             final File configFile = getConfigurationFile(identifier);
             if (!configFile.exists() || configFile.isDirectory()) {
-                throw NoSuchInstanceException.noConfigFile(specification, identifier);
+                throw new TargetNotFoundException(specification + " service instance with identifier \"" + identifier +
+                        "\" not found. The service instance directory exists but there is not configuration file inside.");
             }
         }
     }

@@ -17,19 +17,17 @@
 
 package org.constellation.configuration;
 
-import org.constellation.ServiceDef.Specification;
-
 /**
- * {@link ConfigurationException} to be thrown when trying to configure a non-started
- * service.
+ * {@link ConfigurationException} to be thrown when the target of a configuration action
+ * does not exist or is unreachable.
  *
  * @author Bernard Fabien (Geomatys)
  * @version 0.9
  * @since 0.9
  */
-public class NotRunningServiceException extends TargetNotFoundException {
+public class TargetNotFoundException extends ConfigurationException {
 
-    public NotRunningServiceException(final Specification specification) {
-        super(specification + " services are not activated/running.");
+    public TargetNotFoundException(final String message) {
+        super(message);
     }
 }

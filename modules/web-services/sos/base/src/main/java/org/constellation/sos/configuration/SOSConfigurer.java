@@ -18,13 +18,13 @@
 package org.constellation.sos.configuration;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.ogc.configuration.OGCConfigurer;
-import org.geotoolkit.process.ProcessException;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for SOS service.
@@ -48,7 +48,7 @@ public class SOSConfigurer extends OGCConfigurer {
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ProcessException {
+    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
         if (configuration == null) {
             final SOSConfiguration baseConfig = new SOSConfiguration(new Automatic(null, new BDD()), new Automatic(null, new BDD()));
             baseConfig.setObservationReaderType(DataSourceType.FILESYSTEM);

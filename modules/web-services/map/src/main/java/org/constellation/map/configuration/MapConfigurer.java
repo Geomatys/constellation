@@ -18,9 +18,11 @@
 package org.constellation.map.configuration;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ConfigProcessException;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.NoSuchInstanceException;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
@@ -58,10 +60,10 @@ public class MapConfigurer extends OGCConfigurer {
      * Adds a new layer to a "map" service instance.
      *
      * @param addLayerData the layer to be added
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void addLayer(final AddLayer addLayerData) throws NoSuchInstanceException, ProcessException {
+    public void addLayer(final AddLayer addLayerData) throws ConfigurationException {
         this.ensureExistingInstance(addLayerData.getServiceId());
 
         final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(addLayerData.getProviderId());
@@ -73,8 +75,8 @@ public class MapConfigurer extends OGCConfigurer {
         final DataReference styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, addLayerData.getStyleProviderId(), addLayerData.getStyleId());
 
         // Build descriptor.
-        final ProcessDescriptor descriptor = getProcessDescriptor("service.add_layer");
-        final ParameterValueGroup inputs = descriptor.getInputDescriptor().createValue();
+        final ProcessDescriptor desc = getProcessDescriptor("service.add_layer");
+        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_REF_PARAM_NAME).setValue(layerProviderReference);
         inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_ALIAS_PARAM_NAME).setValue(addLayerData.getLayerAlias());
         inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_STYLE_PARAM_NAME).setValue(styleProviderReference);
@@ -82,7 +84,11 @@ public class MapConfigurer extends OGCConfigurer {
         inputs.parameter(AddLayerToMapServiceDescriptor.SERVICE_INSTANCE_PARAM_NAME).setValue(addLayerData.getServiceId());
 
         // Call process.
-        descriptor.createProcess(inputs).call();
+        try {
+            desc.createProcess(inputs).call();
+        } catch (ProcessException ex) {
+            throw new ConfigProcessException("Process to add a layer has reported an error.", ex);
+        }
     }
 
     /**
@@ -90,10 +96,10 @@ public class MapConfigurer extends OGCConfigurer {
      *
      * @param identifier the service identifier
      * @return the {@link Layer} list
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public List<Layer> getLayers(final String identifier) throws NoSuchInstanceException, ProcessException {
+    public List<Layer> getLayers(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
 
         // Extracts the layer list from service configuration.

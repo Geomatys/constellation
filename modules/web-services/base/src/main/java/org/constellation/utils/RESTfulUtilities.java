@@ -35,24 +35,21 @@ public final class RESTfulUtilities extends Static {
     public static Response ok(final Object entity) {
         return Response.status(200).entity(entity).build();
     }
-    public static Response ok(final String message) {
-        return Response.status(200).entity(message).type(MediaType.TEXT_PLAIN_TYPE).build();
-    }
-    public static Response created(final String message) {
-        return Response.status(201).entity(message).type(MediaType.TEXT_PLAIN_TYPE).build();
+    public static Response created(final Object entity) {
+        return Response.status(201).entity(entity).build();
     }
     public static Response noContent() {
         return Response.status(204).build();
     }
 
-    // Errors.
-    public static Response badRequest(final String message) {
-        return Response.status(400).entity(message).type(MediaType.TEXT_PLAIN_TYPE).build();
+    // Failure.
+    public static Response badRequest(final Object entity) {
+        return Response.status(400).entity(entity).build();
     }
-    public static Response notFound(final String message) {
-        return Response.status(404).entity(message).type(MediaType.TEXT_PLAIN_TYPE).build();
+    public static Response notFound(final Object entity) {
+        return Response.status(404).entity(entity).build();
     }
-    public static Response internalError(final String message) {
-        return Response.status(500).entity(message).type(MediaType.TEXT_PLAIN_TYPE).build();
+    public static Response internalError(final Object entity) {
+        return Response.status(500).entity(entity).build();
     }
 }

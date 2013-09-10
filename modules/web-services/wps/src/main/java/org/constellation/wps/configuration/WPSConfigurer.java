@@ -18,11 +18,11 @@
 package org.constellation.wps.configuration;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.Processes;
 import org.constellation.dto.Service;
 import org.constellation.ogc.configuration.OGCConfigurer;
-import org.geotoolkit.process.ProcessException;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for WPS service.
@@ -46,7 +46,7 @@ public class WPSConfigurer extends OGCConfigurer {
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ProcessException {
+    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
         if (configuration == null) {
             configuration = new ProcessContext(new Processes(true));
         }

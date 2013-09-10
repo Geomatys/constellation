@@ -18,8 +18,10 @@
 package org.constellation.rest.api;
 
 import org.apache.sis.util.NullArgumentException;
-import org.constellation.configuration.NoSuchInstanceException;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.NotRunningServiceException;
+import org.constellation.configuration.TargetNotFoundException;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -46,15 +48,24 @@ public class GenericExceptionMapper implements ExceptionMapper<Exception> {
      */
     @Override
     public Response toResponse(final Exception exception) {
+        /*
+         * Runtime exception that defines the response to be returned.
+         */
         if (exception instanceof WebApplicationException) {
             return ((WebApplicationException) exception).getResponse();
         }
+        /*
+         * Others. Simply return the response message with an appropriate HTTP status code.
+         */
         if (exception instanceof IllegalArgumentException || exception instanceof NullArgumentException) {
-            return badRequest(exception.getLocalizedMessage());
+            return badRequest(AcknowlegementType.failure(exception.getLocalizedMessage()));
         }
-        if (exception instanceof NotRunningServiceException || exception instanceof NoSuchInstanceException) {
-            return notFound(exception.getLocalizedMessage());
+        if (exception instanceof TargetNotFoundException) {
+            return notFound(AcknowlegementType.failure(exception.getLocalizedMessage()));
         }
-        return internalError(exception.getLocalizedMessage());
+        if (exception instanceof ConfigProcessException) {
+            return internalError(AcknowlegementType.failure(exception.toString())); // use toString() to see message + cause
+        }
+        return internalError(AcknowlegementType.failure(exception.getLocalizedMessage()));
     }
 }

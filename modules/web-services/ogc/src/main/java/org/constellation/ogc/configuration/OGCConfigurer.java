@@ -18,10 +18,13 @@
 package org.constellation.ogc.configuration;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigProcessException;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
-import org.constellation.configuration.NoSuchInstanceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.ServiceStatus;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.CreateServiceDescriptor;
@@ -47,7 +50,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.constellation.configuration.ConfigDirectory;
 
 /**
  * Describe methods which need to be specify by an implementation to manage
@@ -76,9 +78,9 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param metadata      the service metadata (can be null)
      * @param configuration the service configuration (can be null)
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void createInstance(final String identifier, final Service metadata, final Object configuration) throws ProcessException {
+    public void createInstance(final String identifier, final Service metadata, final Object configuration) throws ConfigurationException {
         final ProcessDescriptor desc = getProcessDescriptor(CreateServiceDescriptor.NAME);
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
@@ -87,40 +89,52 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(CreateServiceDescriptor.SERVICE_METADATA_NAME).setValue(metadata);
         inputs.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
         inputs.parameter(CreateServiceDescriptor.FILENAME_NAME).setValue(configFileName);
-        desc.createProcess(inputs).call();
+        try {
+            desc.createProcess(inputs).call();
+        } catch (ProcessException ex) {
+            throw new ConfigProcessException("Process to create a service instance has reported an error.", ex);
+        }
     }
 
     /**
      * Starts a service instance.
      *
      * @param identifier the service identifier
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void startInstance(final String identifier) throws NoSuchInstanceException, ProcessException {
+    public void startInstance(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         final ProcessDescriptor desc = getProcessDescriptor(StartServiceDescriptor.NAME);
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
         inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
-        desc.createProcess(inputs).call();
+        try {
+            desc.createProcess(inputs).call();
+        } catch (ProcessException ex) {
+            throw new ConfigProcessException("Process to start a service instance has reported an error.", ex);
+        }
     }
 
     /**
      * Stops a service instance.
      *
      * @param identifier the service identifier
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void stopInstance(final String identifier) throws NoSuchInstanceException, ProcessException {
+    public void stopInstance(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         final ProcessDescriptor desc = getProcessDescriptor(StopServiceDescriptor.NAME);
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(StopServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        desc.createProcess(inputs).call();
+        try {
+            desc.createProcess(inputs).call();
+        } catch (ProcessException ex) {
+            throw new ConfigProcessException("Process to stop a service instance has reported an error.", ex);
+        }
     }
 
     /**
@@ -128,10 +142,10 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param identifier the service identifier
      * @param closeFirst indicates if the service should be closed before trying to restart it
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void restartInstance(final String identifier, final boolean closeFirst) throws NoSuchInstanceException, ProcessException {
+    public void restartInstance(final String identifier, final boolean closeFirst) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         final ProcessDescriptor desc = getProcessDescriptor(RestartServiceDescriptor.NAME);
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
@@ -139,7 +153,11 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
         inputs.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(closeFirst);
         inputs.parameter(RestartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
-        desc.createProcess(inputs).call();
+        try {
+            desc.createProcess(inputs).call();
+        } catch (ProcessException ex) {
+            throw new ConfigProcessException("Process to restart a service instance has reported an error.", ex);
+        }
     }
 
     /**
@@ -147,10 +165,10 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param identifier    the current service identifier
      * @param newIdentifier the new service identifier
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void renameInstance(final String identifier, final String newIdentifier) throws NoSuchInstanceException, ProcessException {
+    public void renameInstance(final String identifier, final String newIdentifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         final ProcessDescriptor desc = getProcessDescriptor(RenameServiceDescriptor.NAME);
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
@@ -158,24 +176,32 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(RenameServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
         inputs.parameter(RenameServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
         inputs.parameter(RenameServiceDescriptor.NEW_NAME_NAME).setValue(newIdentifier);
-        desc.createProcess(inputs).call();
+        try {
+            desc.createProcess(inputs).call();
+        } catch (ProcessException ex) {
+            throw new ConfigProcessException("Process to rename a service instance has reported an error.", ex);
+        }
     }
 
     /**
      * Deletes a service instance.
      *
      * @param identifier the service identifier
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void deleteInstance(final String identifier) throws NoSuchInstanceException, ProcessException {
+    public void deleteInstance(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         final ProcessDescriptor desc = getProcessDescriptor(DeleteServiceDescriptor.NAME);
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
         inputs.parameter(DeleteServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
-        desc.createProcess(inputs).call();
+        try {
+            desc.createProcess(inputs).call();
+        } catch (ProcessException ex) {
+            throw new ConfigProcessException("Process to delete a service instance has reported an error.", ex);
+        }
     }
 
     /**
@@ -184,10 +210,10 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @param identifier    the service identifier
      * @param configuration the service configuration (depending on implementation)
      * @param metadata      the service metadata
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void configureInstance(final String identifier, final Service metadata, final Object configuration) throws NoSuchInstanceException, ProcessException {
+    public void configureInstance(final String identifier, final Service metadata, final Object configuration) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         final ProcessDescriptor desc = getProcessDescriptor(SetConfigServiceDescriptor.NAME);
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
@@ -198,8 +224,11 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(SetConfigServiceDescriptor.SERVICE_METADATA_NAME).setValue(metadata);
         inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
         inputs.parameter(SetConfigServiceDescriptor.FILENAME_NAME).setValue(configFileName);
-        desc.createProcess(inputs).call();
-
+        try {
+            desc.createProcess(inputs).call();
+        } catch (ProcessException ex) {
+            throw new ConfigProcessException("Process to configure a service instance has reported an error.", ex);
+        }
         if (metadata != null && !identifier.equals(metadata.getIdentifier())) { // rename if necessary
             renameInstance(identifier, metadata.getIdentifier());
         }
@@ -210,10 +239,10 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param identifier the service
      * @return a configuration {@link Object} (depending on implementation)
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public Object getInstanceConfiguration(final String identifier) throws NoSuchInstanceException, ProcessException {
+    public Object getInstanceConfiguration(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         final ProcessDescriptor desc = getProcessDescriptor(GetConfigServiceDescriptor.NAME);
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
@@ -222,9 +251,12 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(GetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(ConfigDirectory.getInstanceDirectory(specification.name(), identifier));
         inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
         inputs.parameter(GetConfigServiceDescriptor.FILENAME_NAME).setValue(configFileName);
-
-        final ParameterValueGroup outputs = desc.createProcess(inputs).call();
-        return outputs.parameter(GetConfigServiceDescriptor.CONFIG_NAME).getValue();
+        try {
+            final ParameterValueGroup outputs = desc.createProcess(inputs).call();
+            return outputs.parameter(GetConfigServiceDescriptor.CONFIG_NAME).getValue();
+        } catch (ProcessException ex) {
+            throw new ConfigProcessException("Process to get a service instance configuration has reported an error.", ex);
+        }
     }
 
     /**
@@ -232,10 +264,10 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param identifier    the service identifier
      * @param configuration the service configuration
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void setInstanceConfiguration(final String identifier, final Object configuration) throws NoSuchInstanceException, ProcessException, IOException {
+    public void setInstanceConfiguration(final String identifier, final Object configuration) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         this.configureInstance(identifier, getInstanceMetadata(identifier), configuration);
     }
@@ -246,12 +278,16 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * TODO: use a process and remove IOException
      *
      * @param identifier the service identifier
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws IOException if failed to read the metadata file
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public Service getInstanceMetadata(final String identifier) throws NoSuchInstanceException, IOException {
+    public Service getInstanceMetadata(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
-        return MetadataUtilities.readMetadata(specification.name(), identifier);
+        try {
+            return MetadataUtilities.readMetadata(specification.name(), identifier);
+        } catch (IOException ex) {
+            throw new ConfigurationException("The serviceMetadata.xml file can't be read.", ex);
+        }
     }
 
     /**
@@ -259,10 +295,10 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param identifier the service identifier
      * @param metadata   the service metadata
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
-     * @throws ProcessException if the process used to perform action has failed
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void setInstanceMetadata(final String identifier, final Service metadata) throws NoSuchInstanceException, ProcessException {
+    public void setInstanceMetadata(final String identifier, final Service metadata) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         this.configureInstance(identifier, metadata, getInstanceConfiguration(identifier));
     }
@@ -271,15 +307,16 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * Find and returns a service {@link Instance}.
      *
      * @param identifier the service identifier
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
      * @return an {@link Instance} instance
      */
-    public Instance getInstance(final String identifier) throws NoSuchInstanceException {
+    public Instance getInstance(final String identifier) throws ConfigurationException {
         final Instance instance = new Instance(identifier, specification.name(), getInstanceStatus(identifier));
         Service metadata = null;
         try {
             metadata = getInstanceMetadata(identifier);
-        } catch (IOException ignore) {
+        } catch (ConfigurationException ignore) {
+            // Do nothing.
         }
         if (metadata != null) {
             instance.set_abstract(metadata.getDescription());
@@ -296,9 +333,9 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param identifier the service identifier
      * @return a {@link ServiceStatus} status
-     * @throws NoSuchInstanceException if the service with specified identifier does not exist
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
      */
-    public ServiceStatus getInstanceStatus(final String identifier) throws NoSuchInstanceException {
+    public ServiceStatus getInstanceStatus(final String identifier) throws TargetNotFoundException {
         this.ensureExistingInstance(identifier);
         for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(specification.name())) {
             if (entry.getKey().equals(identifier)) {
@@ -347,7 +384,8 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
             Service metadata = null;
             try {
                 metadata = getInstanceMetadata(entry.getKey());
-            } catch (NoSuchInstanceException | IOException ignore) {
+            } catch (ConfigurationException ignore) {
+                // Do nothing.
             }
             if (metadata != null) {
                 instance.set_abstract(metadata.getDescription());

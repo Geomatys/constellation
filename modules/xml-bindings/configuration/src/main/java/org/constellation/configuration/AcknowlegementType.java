@@ -33,6 +33,14 @@ import java.util.Objects;
 @XmlRootElement(name = "Acknowlegement")
 public class AcknowlegementType {
 
+    public static AcknowlegementType success(final String message) {
+        return new AcknowlegementType("Success", message);
+    }
+
+    public static AcknowlegementType failure(final String message) {
+        return new AcknowlegementType("Failure", message);
+    }
+
     /**
      * An explanation message.
      */

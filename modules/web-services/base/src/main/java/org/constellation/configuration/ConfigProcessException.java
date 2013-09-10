@@ -17,19 +17,19 @@
 
 package org.constellation.configuration;
 
-import org.constellation.ServiceDef.Specification;
+import org.geotoolkit.process.ProcessException;
 
 /**
- * {@link ConfigurationException} to be thrown when trying to configure a non-started
- * service.
+ * {@link ConfigurationException} to be thrown a configuration process has reported
+ * an error.
  *
  * @author Bernard Fabien (Geomatys)
  * @version 0.9
  * @since 0.9
  */
-public class NotRunningServiceException extends TargetNotFoundException {
+public class ConfigProcessException extends ConfigurationException {
 
-    public NotRunningServiceException(final Specification specification) {
-        super(specification + " services are not activated/running.");
+    public ConfigProcessException(final String message, final ProcessException cause) {
+        super(message, cause);
     }
 }

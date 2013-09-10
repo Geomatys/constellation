@@ -18,6 +18,8 @@
 package org.constellation.rest.api;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.dto.Service;
@@ -25,6 +27,7 @@ import org.constellation.dto.SimpleValue;
 import org.constellation.ogc.configuration.OGCConfigurer;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -34,6 +37,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import static org.constellation.utils.RESTfulUtilities.created;
 import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
@@ -63,7 +67,7 @@ public final class OGCServices {
     @GET
     @Path("all")
     public Response getInstances(final @PathParam("spec") String spec) throws Exception {
-        return ok(getConfigurer(spec).getInstances());
+        return ok(new InstanceReport(getConfigurer(spec).getInstances()));
     }
 
     /**
@@ -73,7 +77,7 @@ public final class OGCServices {
     @Path("/")
     public Response addInstance(final @PathParam("spec") String spec, final Service metadata) throws Exception {
         getConfigurer(spec).createInstance(metadata.getIdentifier(), metadata, null);
-        return ok(spec.toUpperCase() + " service (" + metadata.getIdentifier() + ") successfully created.");
+        return created(AcknowlegementType.success(spec.toUpperCase() + " service \"" + metadata.getIdentifier() + "\" successfully created."));
     }
 
     /**
@@ -83,18 +87,17 @@ public final class OGCServices {
     @Path("{id}/start")
     public Response start(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         getConfigurer(spec).startInstance(id);
-        return ok(spec.toUpperCase() + " service (" + id + ") successfully started.");
+        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully started."));
     }
 
     /**
      * @see OGCConfigurer#stopInstance(String)
      */
     @POST
-    @Produces({MediaType.TEXT_PLAIN})
     @Path("{id}/stop")
     public Response stop(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         getConfigurer(spec).stopInstance(id);
-        return ok(spec.toUpperCase() + " service (" + id + ") successfully stopped.");
+        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully stopped."));
     }
 
     /**
@@ -104,7 +107,7 @@ public final class OGCServices {
     @Path("{id}/restart")
     public Response restart(final @PathParam("spec") String spec, final @PathParam("id") String id, final SimpleValue stopFirst) throws Exception {
         getConfigurer(spec).restartInstance(id, stopFirst.getAsBoolean());
-        return ok(spec.toUpperCase() + " service (" + id + ") successfully restarted.");
+        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully restarted."));
     }
 
     /**
@@ -114,17 +117,17 @@ public final class OGCServices {
     @Path("{id}/rename")
     public Response rename(final @PathParam("spec") String spec, final @PathParam("id") String id, final SimpleValue newId) throws Exception {
         getConfigurer(spec).renameInstance(id, newId.getAsString());
-        return ok(spec.toUpperCase() + " service (" + id + ") successfully renamed.");
+        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully renamed."));
     }
 
     /**
      * @see OGCConfigurer#deleteInstance(String)
      */
-    @POST
-    @Path("{id}/delete")
+    @DELETE
+    @Path("/")
     public Response delete(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         getConfigurer(spec).deleteInstance(id);
-        return ok(spec.toUpperCase() + " service (" + id + ") successfully deleted.");
+        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully deleted."));
     }
 
     /**
@@ -143,7 +146,7 @@ public final class OGCServices {
     @Path("{id}/config")
     public Response setConfiguration(final @PathParam("spec") String spec, final @PathParam("id") String id, final Object config) throws Exception {
         getConfigurer(spec).setInstanceConfiguration(id, config);
-        return ok(spec.toUpperCase() + " service (" + id + ") configuration successfully updated.");
+        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" configuration successfully updated."));
     }
 
     /**
@@ -162,7 +165,7 @@ public final class OGCServices {
     @Path("{id}/metadata")
     public Response setMetadata(final @PathParam("spec") String spec, final @PathParam("id") String id, final Service metadata) throws Exception {
         getConfigurer(spec).setInstanceMetadata(id, metadata);
-        return ok(spec.toUpperCase() + " service (" + id + ") metadata successfully updated.");
+        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" metadata successfully updated."));
     }
 
     /**

@@ -26,7 +26,6 @@ import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.ogc.configuration.OGCConfigurer;
-import org.geotoolkit.process.ProcessException;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for CSW service.
@@ -50,7 +49,7 @@ public class CSWConfigurer extends OGCConfigurer {
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ProcessException {
+    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
         if (configuration == null) {
             configuration = new Automatic("filesystem", new BDD());
         }
