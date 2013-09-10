@@ -81,6 +81,7 @@
                 // Constellation commons
                 @Script(id = "cstl",            src = "js/cstl.js",                     depends = "jquery",     location = AssetLocation.SERVER),
                 @Script(id = "cstl.services",   src = "js/cstl.services.js",            depends = "jquery",     location = AssetLocation.SERVER),
+                @Script(id = "cstl.providers",  src = "js/cstl.providers.js",           depends = "jquery",     location = AssetLocation.SERVER),
                 @Script(id = "cstl.data",       src = "js/cstl.data.js",                depends = "jquery",     location = AssetLocation.SERVER),
 
                 // Style

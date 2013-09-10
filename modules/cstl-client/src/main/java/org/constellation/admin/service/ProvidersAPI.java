@@ -22,6 +22,8 @@ import org.constellation.dto.StyleListBean;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
 /**
  * Constellation RESTful API for providers management/configuration.
  *
@@ -51,9 +53,25 @@ public class ProvidersAPI {
      *
      * @return the list of available styles
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-     * @throws java.io.IOException on HTTP communication error or response entity parsing error
+     * @throws IOException on HTTP communication error or response entity parsing error
      */
     public StyleListBean getStyles() throws HttpResponseException, IOException {
         return client.get("style", MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
+    }
+
+    /**
+     * Deletes a style from a style provider.
+     *
+     * @param providerId the style provider identifier
+     * @param styleName  the style name
+     * @throws HttpResponseException if the response does not have a {@code 2xx} status code
+     * @throws IOException on HTTP communication error or response entity parsing error
+     */
+    public void deleteStyle(final String providerId, final String styleName) throws HttpResponseException, IOException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("styleName",  styleName);
+
+        final String path = "SP/" + providerId + "/style/" + styleName;
+        client.delete(path, MediaType.APPLICATION_XML_TYPE, null).ensure2xxStatus();
     }
 }

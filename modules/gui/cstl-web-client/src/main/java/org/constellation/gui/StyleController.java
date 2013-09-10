@@ -26,6 +26,7 @@ import juzu.Route;
 import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
+import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
@@ -263,5 +264,17 @@ public final class StyleController {
         final Map<String, Object> parameters = new HashMap<>(0);
         parameters.put("styleList", service.getStyleList());
         return list.ok(parameters).withMimeType("text/html");
+    }
+
+    @Ajax
+    @Resource
+    @Route("style/delete")
+    public Response deleteStyle(final String providerId, final String styleName) {
+        try {
+            cstl.openClient().providers.deleteStyle(providerId, styleName);
+            return Response.ok();
+        } catch (IOException ex) {
+            return Response.error(ex.getLocalizedMessage());
+        }
     }
 }

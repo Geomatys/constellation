@@ -196,9 +196,8 @@ $(function() {
         return false;
     });
     $('[data-action="delete-service"]').click(function() {
-        var serviceType = $(this).data('service-type');
-        var serviceId = $(this).data('service-id');
-        CSTL.Services.delete(serviceType, serviceId);
+        var $this = $(this);
+        CSTL.Services.delete($this.data('service-type'), $this.data('service-id'));
         return false;
     });
 });

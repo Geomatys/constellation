@@ -216,8 +216,8 @@ public class ServicesAPI {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("identifier",  identifier);
 
-        final String path = "OGC/" + serviceType + "/" + identifier + "/delete";
-        client.post(path, MediaType.APPLICATION_XML_TYPE, null).ensure2xxStatus();
+        final String path = "OGC/" + serviceType + "/" + identifier;
+        client.delete(path, MediaType.APPLICATION_XML_TYPE, null).ensure2xxStatus();
     }
 
     /**
@@ -235,7 +235,7 @@ public class ServicesAPI {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("identifier",  identifier);
 
-        final String path = "map/" + serviceType + "/" + identifier + "/layer/all";
+        final String path = "MAP/" + serviceType + "/" + identifier + "/layer/all";
         return (LayerList) client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(GenericDatabaseMarshallerPool.getInstance());
     }
 
@@ -254,7 +254,7 @@ public class ServicesAPI {
         ensureNonNull("identifier", identifier);
         ensureNonNull("layer", layer);
 
-        final String path = "map/" + serviceType + "/" + identifier + "/layer";
+        final String path = "MAP/" + serviceType + "/" + identifier + "/layer";
         client.put(path, MediaType.APPLICATION_XML_TYPE, layer).ensure2xxStatus();
     }
 }
