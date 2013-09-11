@@ -24,8 +24,6 @@ import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.dto.AddLayer;
 import org.constellation.gui.service.bean.LayerData;
-import org.constellation.utils.ParameterDescriptorConstants;
-import org.geotoolkit.parameter.Parameters;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
