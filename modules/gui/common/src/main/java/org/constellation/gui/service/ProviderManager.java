@@ -23,6 +23,7 @@ import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.dto.AddLayer;
+import org.constellation.dto.FileBean;
 import org.constellation.gui.service.bean.LayerData;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -146,5 +147,20 @@ public class ProviderManager {
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when try to add layer on service", e);
         }
+    }
+
+    /**
+     * ask server to a specific folder
+     *
+     * @param path folder search; if "/", it will be root from data_directory configuration.
+     * @return folder child list name
+     */
+    public List<FileBean> getDataFolder(final String path) {
+        try {
+            return cstl.openClient().providers.getDataFolder(path);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when try to get subfolder list", e);
+        }
+        return new ArrayList<>(0);
     }
 }

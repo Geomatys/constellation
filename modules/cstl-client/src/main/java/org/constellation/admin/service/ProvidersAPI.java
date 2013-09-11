@@ -17,10 +17,13 @@
 
 package org.constellation.admin.service;
 
+import org.constellation.dto.FileBean;
+import org.constellation.dto.FileListBean;
 import org.constellation.dto.StyleListBean;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.List;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
@@ -53,7 +56,7 @@ public class ProvidersAPI {
      *
      * @return the list of available styles
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-     * @throws IOException on HTTP communication error or response entity parsing error
+     * @throws IOException           on HTTP communication error or response entity parsing error
      */
     public StyleListBean getStyles() throws HttpResponseException, IOException {
         return client.get("style", MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
@@ -65,13 +68,24 @@ public class ProvidersAPI {
      * @param providerId the style provider identifier
      * @param styleName  the style name
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-     * @throws IOException on HTTP communication error or response entity parsing error
+     * @throws IOException           on HTTP communication error or response entity parsing error
      */
     public void deleteStyle(final String providerId, final String styleName) throws HttpResponseException, IOException {
         ensureNonNull("providerId", providerId);
-        ensureNonNull("styleName",  styleName);
+        ensureNonNull("styleName", styleName);
 
         final String path = "SP/" + providerId + "/style/" + styleName;
         client.delete(path, MediaType.APPLICATION_XML_TYPE, null).ensure2xxStatus();
+    }
+
+    /**
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    public List<FileBean> getDataFolder(final String path) throws IOException {
+        ensureNonNull("path", path);
+        final FileListBean list = client.get("data/datapath", MediaType.APPLICATION_XML_TYPE).getEntity(FileListBean.class);
+        return list.getList();
     }
 }

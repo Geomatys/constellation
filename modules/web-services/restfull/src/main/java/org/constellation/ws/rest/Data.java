@@ -11,6 +11,8 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
+import org.constellation.dto.FileBean;
+import org.constellation.dto.FileListBean;
 import org.constellation.utils.MetadataMapBuilder;
 import org.constellation.utils.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.io.CoverageIO;
@@ -24,8 +26,10 @@ import org.opengis.util.GenericName;
 import org.w3c.dom.Node;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
@@ -62,7 +66,7 @@ public class Data {
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadFile(MultiPart multi) {
+    public Response uploadFile(final MultiPart multi) {
 
 
         String dataName = "";
@@ -86,7 +90,6 @@ public class Data {
                     dataName = bodyPart.getEntityAs(String.class);
                     break;
                 case "type":
-                    //TODO : using it when generate data provider
                     dataType = bodyPart.getEntityAs(String.class);
                     break;
                 default:
@@ -109,6 +112,32 @@ public class Data {
         }
 
         return Response.status(200).entity(information).build();
+    }
+
+    /**
+     * @return
+     */
+    @GET
+    @Path("datapath")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getDataFolder(final String path) {
+        final FileListBean list = new FileListBean();
+        final List<FileBean> listBean = new ArrayList<>(0);
+
+        if ("".equalsIgnoreCase(path)) {
+            final File root = ConfigDirectory.getDataDirectory();
+            final File[] children = root.listFiles();
+
+            //loop on subfiles/folders to create bean
+            for (int i = 0; i < children.length; i++) {
+                File child = children[i];
+                final FileBean bean = new FileBean(child.getName(), child.isDirectory());
+                listBean.add(bean);
+            }
+        }
+        list.setList(listBean);
+        return Response.status(200).entity(list).build();
     }
 
     /**
