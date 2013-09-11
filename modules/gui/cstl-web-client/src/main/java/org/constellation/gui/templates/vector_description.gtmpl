@@ -1,0 +1,29 @@
+#{decorate path=menu.gtmpl/}
+
+#{param name=name/}
+#{param name=crs/}
+#{param name=returnURL/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <img src="../images/constellation.png"/>
+    </div>
+</div>
+<div class="row">
+    <div class="row" style="background-color:white;" >
+        <div class="navbar">
+            <div class="navbar-inner">
+                <a class="brand" href="#">&{data.information.page.title}</a>
+                <a class="pull-right" href="#" style="display:block;padding:10px 20px 10px;margin-left:-20px;font-size:20px;font-weight:200;color:#777777;text-shadow:0 1px 0 #ffffff;">${name}</a>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+        <div class="span12">
+            <form action="@{VectorController.createProvider(returnURL = returnURL)}" method="POST">
+                <input type="text" class="span3" name="crsSelected" value="${crs}"/>
+                <button type="submit" class="btn btn-info pull-right"/>Open</button>
+            </form>
+        </div>
+    </div>
+</div>

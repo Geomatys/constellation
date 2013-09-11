@@ -3,18 +3,22 @@ package org.constellation.ws.rest;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.dto.DataInformation;
 import org.constellation.utils.MetadataMapBuilder;
 import org.constellation.utils.SimplyMetadataTreeNode;
-import org.constellation.dto.DataInformation;
-import org.constellation.dto.CoverageMetadataBean;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.util.FileUtilities;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.GenericName;
 import org.w3c.dom.Node;
@@ -25,10 +29,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -145,42 +151,69 @@ public class Data {
      * Generate {@link DataInformation} for require file data
      *
      * @param file     data {@link File}
-     * @param dataType data type (raster, sensor or vector)
+     * @param dataType data type (raster, sensor or vector, ...)
      * @return a {@link DataInformation}
      */
     private DataInformation generateMetadatasInformation(final File file, final String dataType) {
-        try {
-            GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
-            if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
+        switch (dataType) {
+            case "raster":
+                try {
+                    GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
+                    if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
 
-                // get Metadata as a List
-                DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
-                TreeTable.Node rootNode = fileMetadata.asTreeTable().getRoot();
+                        // get Metadata as a List
+                        final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
+                        final TreeTable.Node rootNode = fileMetadata.asTreeTable().getRoot();
 
-                MetadataMapBuilder.setCounter(0);
-                ArrayList<SimplyMetadataTreeNode> metadataList = MetadataMapBuilder.createMetadataList(rootNode, null, 11);
+                        MetadataMapBuilder.setCounter(0);
+                        final ArrayList<SimplyMetadataTreeNode> metadataList = MetadataMapBuilder.createMetadataList(rootNode, null, 11);
 
-                DataInformation information = new DataInformation(file.getPath(), dataType, metadataList);
+                        final DataInformation information = new DataInformation(file.getPath(), dataType, metadataList);
 
-                //coverage data
-                HashMap<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
-                for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
-                    GenericName name = coverageReader.getCoverageNames().get(i);
-                    SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
-                    String rootNodeName = sm.getNativeMetadataFormatName();
-                    Node coverateRootNode = sm.getAsTree(rootNodeName);
+                        //coverage data
+                        final HashMap<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
+                        for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
+                            final GenericName name = coverageReader.getCoverageNames().get(i);
+                            final SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
+                            final String rootNodeName = sm.getNativeMetadataFormatName();
+                            final Node coverateRootNode = sm.getAsTree(rootNodeName);
 
-                    MetadataMapBuilder.setCounter(0);
-                    List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11);
+                            MetadataMapBuilder.setCounter(0);
+                            final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11);
 
-                    CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
-                    nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
+                            final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
+                            nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
+                        }
+                        information.setCoveragesMetadata(nameSpatialMetadataMap);
+                        return information;
+                    }
+                } catch (CoverageStoreException e) {
+                    LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
                 }
-                information.setCoveragesMetadata(nameSpatialMetadataMap);
-                return information;
-            }
-        } catch (CoverageStoreException e) {
-            LOGGER.log(Level.WARNING, "", e);
+                break;
+            case "vector":
+                try {
+                    //unzip file
+                    FileUtilities.unzip(file, file.getParentFile(), null);
+                    final FileFilter shapeFilter = new SuffixFileFilter(".shp");
+                    final File[] files = file.getParentFile().listFiles(shapeFilter);
+                    if (files.length > 0) {
+                        final ShapefileFeatureStore shapeStore = new ShapefileFeatureStore(files[0].toURL());
+                        final String crsName = shapeStore.getFeatureType().getCoordinateReferenceSystem().getName().toString();
+                        final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), file.getParent(),
+                                dataType, crsName);
+                        return information;
+                    }
+
+                    //create feature store
+                } catch (MalformedURLException e) {
+                    LOGGER.log(Level.WARNING, "error on file URL", e);
+                } catch (DataStoreException e) {
+                    LOGGER.log(Level.WARNING, "error on data store creation", e);
+                } catch (IOException e) {
+                    LOGGER.log(Level.WARNING, "error on un zip", e);
+                }
+                break;
         }
         return null;
     }

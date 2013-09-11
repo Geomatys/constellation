@@ -2,6 +2,8 @@ package org.constellation.dto;
 
 import juzu.Mapped;
 import org.constellation.utils.SimplyMetadataTreeNode;
+import org.geotoolkit.referencing.crs.DefaultProjectedCRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
@@ -28,6 +30,8 @@ public class DataInformation {
 
     private ArrayList<SimplyMetadataTreeNode> fileMetadata;
 
+    private String crs;
+
     public DataInformation() {
     }
 
@@ -35,6 +39,13 @@ public class DataInformation {
         this.path = path;
         this.dataType = dataType;
         this.fileMetadata = fileMetadata;
+    }
+
+    public DataInformation(final String name, final String path, final String dataType, final String crs) {
+        this.name = name;
+        this.path = path;
+        this.dataType = dataType;
+        this.crs = crs;
     }
 
     public String getName() {
@@ -75,5 +86,13 @@ public class DataInformation {
 
     public void setFileMetadata(ArrayList<SimplyMetadataTreeNode> fileMetadata) {
         this.fileMetadata = fileMetadata;
+    }
+
+    public String getCrs() {
+        return crs;
+    }
+
+    public void setCrs(final String crs) {
+        this.crs = crs;
     }
 }

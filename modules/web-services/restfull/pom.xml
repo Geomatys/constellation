@@ -75,6 +75,10 @@
             <artifactId>cstl-engine-process-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-shapefile</artifactId>
+        </dependency>
 
 
 

@@ -24,11 +24,15 @@ import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.dto.AddLayer;
 import org.constellation.gui.service.bean.LayerData;
+import org.constellation.utils.ParameterDescriptorConstants;
+import org.geotoolkit.parameter.Parameters;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -49,7 +53,6 @@ import java.util.logging.Logger;
 public class ProviderManager {
 
     private static final Logger LOGGER = Logger.getLogger(ProviderManager.class.getName());
-
     /**
      * Constellation manager used to communicate with the Constellation server.
      */
@@ -57,7 +60,6 @@ public class ProviderManager {
     private ConstellationService cstl;
 
     /**
-     *
      * @param type
      * @param fileIdentifier
      * @param path
@@ -72,7 +74,6 @@ public class ProviderManager {
 
         final String folderPath = path.substring(0, path.lastIndexOf('/'));
         sources.parameter("providerType").setValue(dataType);
-
         switch (type) {
             case "coverage-file":
                 sources.groups("coveragefile").get(0).parameter("path").setValue(folderPath);
@@ -80,22 +81,30 @@ public class ProviderManager {
             case "sld":
                 sources.groups("sldFolder").get(0).parameter("path").setValue(folderPath);
                 break;
+            case "feature-store":
+                final URL url;
+                try {
+                    url = new URL("file:" + path);
+                    ParameterValueGroup shapeFileParametersFolder = sources.groups("choice").get(0).addGroup("ShapeFileParametersFolder");
+                    shapeFileParametersFolder.parameter("url").setValue(url);
+                } catch (MalformedURLException e) {
+                    LOGGER.log(Level.WARNING, "", e);
+                }
+                break;
             default:
                 if (LOGGER.isLoggable(Level.FINER)) {
                     LOGGER.log(Level.FINER, "Provider type not known");
                 }
         }
-
         cs.providers.createProvider(type, sources);
     }
 
     /**
-     *
-     * @return
      * @param userLocale
      * @param providerTypes
+     * @return
      */
-    public List<LayerData> getDataListing(final Locale userLocale, final List<String> providerTypes){
+    public List<LayerData> getDataListing(final Locale userLocale, final List<String> providerTypes) {
         final List<LayerData> layerDatas = new ArrayList<>(0);
 
         final ProvidersReport report = cstl.openServer(true).providers.listProviders();
@@ -104,7 +113,7 @@ public class ProviderManager {
             for (ProviderReport providerReport : providerServiceReport.getProviders()) {
                 String type = providerReport.getAbstractType();
 
-                if(providerTypes.contains(type)){
+                if (providerTypes.contains(type)) {
                     String date = "";
 
                     if (providerReport.getDate() != null) {
@@ -116,12 +125,12 @@ public class ProviderManager {
                             LOGGER.log(Level.WARNING, "", e);
                         }
 
-                        dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale) ;
+                        dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale);
                         date = dateFormat.format(createDate);
                     }
 
                     for (String name : providerReport.getItems()) {
-                        int rightBracket = name.indexOf('}')+1;
+                        int rightBracket = name.indexOf('}') + 1;
                         name = name.substring(rightBracket);
                         LayerData layerData = new LayerData(providerReport.getId(), type, name, date);
                         layerDatas.add(layerData);
