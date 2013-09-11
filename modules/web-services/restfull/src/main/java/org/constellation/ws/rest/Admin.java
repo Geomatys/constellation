@@ -75,6 +75,10 @@ public class Admin {
         return Response.ok(ConfigurationUtilities.setConfigPath(configuration.getPath())).build();
     }
 
+    /**
+     *
+     * @return
+     */
     @GET
     @Path("instances")
     public Response listInstances(){
