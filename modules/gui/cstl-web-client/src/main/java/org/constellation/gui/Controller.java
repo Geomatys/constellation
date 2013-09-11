@@ -145,6 +145,15 @@ public class Controller {
     @Path("add_data.gtmpl")
     protected Template addData;
 
+
+    @Inject
+    @Path("local_file_modal.gtmpl")
+    protected Template localFileModal;
+
+    @Inject
+    @Path("server_modal.gtmpl")
+    protected Template serverModal;
+
     /**
      * {@link java.util.ResourceBundle} used on this application
      */
@@ -370,10 +379,16 @@ public class Controller {
                 return Response.error("error when saving file on server");
             }
 
-            di.setName(name);
             informationContainer.setInformation(di);
-            return RasterController_.showRaster(returnURL);
-
+            Response aResponse = Response.error("response not initialized");
+            switch(dataType){
+                case "raster":
+                    aResponse =  RasterController_.showRaster(returnURL);
+                    break;
+                case "vector":
+                    aResponse = VectorController_.showVector(returnURL);
+            }
+            return aResponse;
         }else{
             return Response.error("error when saving file on server");
         }

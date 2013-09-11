@@ -31,16 +31,40 @@ CSTL.Data = {
     type: ["vector"],
 
     goTo: function ($element, title, researchtype){
-        $("#dataDashboardTitle").empty();
-        $("#dataDashboardTitle").append(title);
         CSTL.Data.type = researchtype;
         loadDataDashboard(0, 10, null, null, null);
+
+        this.setTitles(title);
         this.setActive($element.parent());
+
     },
 
+    /**
+     * Change selected menu element
+     * @param $parent the parent element
+     */
     setActive : function($parent){
         var $Ul = $parent.parent();
         $Ul.children().removeClass("active");
         $parent.addClass("active")
+    },
+
+    /**
+     * Set title and subtitle.
+     * @param title
+     */
+    setTitles: function(title){
+        //title
+        $("#dataDashboardTitle").empty();
+        $("#dataDashboardTitle").append(title);
+
+        //get subtitle element
+        var $dataSentence = $("[data-sentence]");
+        $dataSentence.empty();
+
+        //get localized subtitle and concatenate with data number
+        var sentence = $dataSentence.data("sentence");
+        sentence = totalProvider+" "+sentence;
+        $dataSentence.append(sentence);
     }
 }

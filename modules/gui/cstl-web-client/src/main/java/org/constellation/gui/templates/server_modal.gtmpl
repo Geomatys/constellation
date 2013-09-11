@@ -1,0 +1,44 @@
+<form action="#" enctype="multipart/form-data" method="post">
+    <div id="urlModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="localFileModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="localFileModalLabel">&{layer.listing.data.upload.title}</h3>
+        </div>
+        <div class="modal-body">
+            <div>
+                <label>&{layer.listing.data.upload.name.label}</label>
+                <input type="text" name="name"/>
+            </div>
+            <div>
+                <label>URL de la donnée</label>
+                <input type="text" name="name"/>
+            </div>
+            <div class="row">
+                <div class="span2">
+                    <label class="radio">
+                        <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="images/icon/vector.png" class="img-rounded"> &{layer.listing.data.upload.vector.label}
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="images/icon/raster.png" class="img-rounded"> &{layer.listing.data.upload.raster.label}
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
+                    </label>
+                </div>
+                <div class="span2">
+                    <label class="radio">
+                        <input type="radio" name="dataType" value="pyramid" style="margin-top:12px;"> <img src="images/icon/pyramid.png" class="img-rounded"> pyramid
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="dataType" value="virtual" style="margin-top:12px;"> <img src="images/icon/virtual-sensor.png" class="img-rounded"> virtual sensor
+                    </label>
+                </div>
+            </div>
+            <input type="hidden" value="@{dataDashboard()}" name="returnURL"/>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>
+            <button class="btn btn-info" type="submit">&{layer.listing.data.upload.button}</button>
+        </div>
+    </div>
+</form>
