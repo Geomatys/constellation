@@ -6,21 +6,18 @@ import juzu.Response;
 import juzu.Route;
 import juzu.View;
 import org.constellation.utils.SimplyMetadataTreeNode;
-import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.templates.raster_description;
+import org.constellation.gui.service.ProviderManager;
 import org.constellation.dto.DataInformation;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author Benjamin Garcia (Geomatys)
  */
 public class RasterController {
-
-    private static final Logger LOGGER = Logger.getLogger(RasterController.class.getName());
 
     /**
      * Manager used to call constellation server side.
@@ -39,11 +36,9 @@ public class RasterController {
     @View
     @Route("/raster/description")
     public Response showRaster(final String returnURL) throws IOException {
-        List<SimplyMetadataTreeNode> metadataList= informationContainer.getInformation().getFileMetadata();
+        final List<SimplyMetadataTreeNode> metadataList= informationContainer.getInformation().getFileMetadata();
         return rasterDescription.with().datainformation(informationContainer.getInformation()).metadataMap(metadataList).returnURL(returnURL).ok().withMimeType("text/html");
     }
-
-
 
     @Action
     @Route("/raster/create")

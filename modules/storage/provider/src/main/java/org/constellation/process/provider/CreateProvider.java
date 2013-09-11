@@ -43,10 +43,10 @@ public final class CreateProvider extends AbstractCstlProcess {
     @Override
     protected void execute() throws ProcessException {
         final String providerType = value(PROVIDER_TYPE, inputParameters);
-        final ParameterValueGroup source = (ParameterValueGroup) value(SOURCE, inputParameters);
+        final ParameterValueGroup source = value(SOURCE, inputParameters);
 
         //initialize list of avaible Povider services
-        final Map<String, ProviderService> services = new HashMap<String, ProviderService>();
+        final Map<String, ProviderService> services = new HashMap<>();
         final Collection<LayerProviderService> availableLayerServices = LayerProviderProxy.getInstance().getServices();
         for (LayerProviderService service: availableLayerServices) {
             services.put(service.getName(), service);
