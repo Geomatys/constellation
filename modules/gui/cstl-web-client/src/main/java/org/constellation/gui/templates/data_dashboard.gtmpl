@@ -121,6 +121,7 @@
     </div>
     <div>
         #{include path=local_file_modal.gtmpl/}
+        #{include path=server_file_modal.gtmpl/}
         #{include path=server_modal.gtmpl/}
 </div>
 </div>

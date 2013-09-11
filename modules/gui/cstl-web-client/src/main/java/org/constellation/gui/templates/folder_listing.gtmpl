@@ -1,0 +1,6 @@
+#{param name=folders /}
+<ul>
+<% for (def folder : folders){%>
+    <li><a href="#" data-next="${folder.folder}">${folder.name}</a></li>
+<%}%>
+</ul>
