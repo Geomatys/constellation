@@ -197,12 +197,6 @@
       <artifactId>geotk-test</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.constellation.gui</groupId>
-      <artifactId>admin-base</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
 
