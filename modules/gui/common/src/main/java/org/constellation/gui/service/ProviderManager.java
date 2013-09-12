@@ -23,6 +23,7 @@ import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.dto.AddLayer;
+import org.constellation.dto.DataInformation;
 import org.constellation.dto.FileBean;
 import org.constellation.gui.service.bean.LayerData;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -162,5 +163,14 @@ public class ProviderManager {
             LOGGER.log(Level.WARNING, "Error when try to get subfolder list", e);
         }
         return new ArrayList<>(0);
+    }
+
+    public DataInformation loadData(final String filePath, final String name, final String dataType) {
+        try {
+            return cstl.openClient().providers.loadData(filePath, name, dataType);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when try to found data on file", e);
+        }
+        return new DataInformation();
     }
 }

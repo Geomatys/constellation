@@ -1,7 +1,6 @@
 #{decorate path=menu.gtmpl/}
 
 #{param name=datainformation/}
-#{param name=metadataMap /}
 #{param name=returnURL /}
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
@@ -65,7 +64,7 @@
         }
 
         //file
-        var metadatasFile = ${metadataMap};
+        var metadatasFile = ${datainformation.fileMetadata};
         createMetadataTree(metadatasFile, '#description');
 
         //coverage

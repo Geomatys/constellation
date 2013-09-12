@@ -17,12 +17,15 @@
 
 package org.constellation.admin.service;
 
+import org.constellation.dto.DataInformation;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
+import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBean;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
@@ -99,9 +102,24 @@ public class ProvidersAPI {
      * @return
      * @throws IOException
      */
-    public List<FileBean> getDataFolder(final String path) throws IOException {
+    public List<FileBean> getDataFolder(String path) throws IOException {
         ensureNonNull("path", path);
-        final FileListBean list = client.get("data/datapath", MediaType.APPLICATION_XML_TYPE).getEntity(FileListBean.class);
+        if(path.isEmpty()){
+            path = "root";
+        }
+        final FileListBean list = client.post("data/datapath", MediaType.APPLICATION_XML_TYPE, path).getEntity(FileListBean.class);
         return list.getList();
+    }
+
+    public DataInformation loadData(final String filePath, final String name, final String dataType) throws IOException {
+        ParameterValues pv = new ParameterValues();
+        HashMap<String, String> parameters = new HashMap<>(0);
+        parameters.put("filePath", filePath);
+        parameters.put("name", name);
+        parameters.put("dataType", dataType);
+        pv.setValues(parameters);
+
+
+        return client.post("data/load", MediaType.APPLICATION_XML_TYPE, pv).getEntity(DataInformation.class);
     }
 }

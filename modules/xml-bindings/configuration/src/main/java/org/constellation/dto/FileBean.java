@@ -1,7 +1,5 @@
 package org.constellation.dto;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * Bean for file information : name and boolean to define folder
  *
@@ -15,12 +13,15 @@ public class FileBean {
 
     private Boolean folder;
 
+    private String subPath;
+
     public FileBean() {
     }
 
-    public FileBean(final String name, final Boolean folder) {
+    public FileBean(final String name, final Boolean folder, final String subPath) {
         this.name = name;
         this.folder = folder;
+        this.subPath = subPath;
     }
 
     public String getName() {
@@ -37,5 +38,13 @@ public class FileBean {
 
     public void setFolder(final Boolean folder) {
         this.folder = folder;
+    }
+
+    public String getSubPath() {
+        return subPath;
+    }
+
+    public void setSubPath(final String subPath) {
+        this.subPath = subPath;
     }
 }

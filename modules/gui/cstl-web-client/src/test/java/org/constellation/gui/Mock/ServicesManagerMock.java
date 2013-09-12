@@ -1,4 +1,4 @@
-package org.constellation.gui.Mock;
+package org.constellation.gui.mock;
 
 import org.constellation.dto.Service;
 import org.constellation.gui.service.ServicesManager;

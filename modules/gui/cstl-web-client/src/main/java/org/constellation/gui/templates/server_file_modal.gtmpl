@@ -1,4 +1,4 @@
-<form action="#" enctype="multipart/form-data" method="post">
+<form action="@{DataController.loadingFileData()}" method="post" id="serverFileModalForm">
     <div id="serverFileModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="serverFileModalLabel" aria-hidden="true">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -35,34 +35,20 @@
             <div class="row" id="folderPart">
                 <div class="span2 well" id="first" data-panel="1" data-depth="1">
                 </div>
-                <div class="span2 well" data-panel="2">
+                <div class="span2 well" data-panel="2" data-depth="">
                 </div>
-                <div class="span2 well" data-panel="3">
+                <div class="span2 well" data-panel="3" data-depth="">
                 </div>
             </div>
+            <input type="hidden" name="filePath" id="filePath"/>
             <input type="hidden" value="@{dataDashboard()}" name="returnURL"/>
         </div>
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>
-            <button class="btn btn-info" type="button" onclick="loadFolder();">next</button>
-            <button class="btn btn-info hide" type="submit">create data</button>
+            <button class="btn btn-info" type="button" onclick="loadFolder();" id="nextbutton">next</button>
         </div>
     </div>
 </form>
 <script type="text/javascript">
-    function hideAll($Element){
-        $Element.parent().children().hide();
-        $Element.show();
-    }
-
     $("#folderPart").hide();
-
-    function loadFolder(){
-        $("#typePart").hide(function(){
-            $("#folderPart").show();
-            var $first = $("[data-panel='1']");
-            hideAll($first);
-            $first.jzLoad("DataController.getDataFolders()",{"path":"/"});
-        })
-    }
 </script>

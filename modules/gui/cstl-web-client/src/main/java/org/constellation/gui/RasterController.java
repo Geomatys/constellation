@@ -36,8 +36,7 @@ public class RasterController {
     @View
     @Route("/raster/description")
     public Response showRaster(final String returnURL) throws IOException {
-        final List<SimplyMetadataTreeNode> metadataList= informationContainer.getInformation().getFileMetadata();
-        return rasterDescription.with().datainformation(informationContainer.getInformation()).metadataMap(metadataList).returnURL(returnURL).ok().withMimeType("text/html");
+        return rasterDescription.with().datainformation(informationContainer.getInformation()).returnURL(returnURL).ok().withMimeType("text/html");
     }
 
     @Action

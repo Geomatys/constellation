@@ -1,4 +1,4 @@
-package org.constellation.gui.Mock;
+package org.constellation.gui.mock;
 
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;

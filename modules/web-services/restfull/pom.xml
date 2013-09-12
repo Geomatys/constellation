@@ -43,7 +43,6 @@
             <timezone>+1</timezone>
         </developer>
     </developers>
-
     <dependencies>
         <dependency>
             <groupId>org.constellation.xml-bindings</groupId>
@@ -98,4 +97,24 @@
             <artifactId>jersey-multipart</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.qmino</groupId>
+                <artifactId>miredot-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>restdoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--insert configuration here-->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

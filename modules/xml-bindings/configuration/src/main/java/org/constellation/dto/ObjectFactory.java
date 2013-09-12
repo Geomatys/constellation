@@ -41,4 +41,8 @@ public class ObjectFactory {
     public Contact getContact(){
         return new Contact();
     }
+
+    public ParameterValues createParameterValues(){
+        return new ParameterValues();
+    }
 }

@@ -13,6 +13,7 @@ import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
+import org.constellation.dto.ParameterValues;
 import org.constellation.utils.MetadataMapBuilder;
 import org.constellation.utils.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.io.CoverageIO;
@@ -29,7 +30,9 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
@@ -117,27 +120,53 @@ public class Data {
     /**
      * @return
      */
-    @GET
-    @Path("datapath")
+    @POST
+    @Path("datapath/")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getDataFolder(final String path) {
+    public Response getDataFolder(String path) {
         final FileListBean list = new FileListBean();
         final List<FileBean> listBean = new ArrayList<>(0);
+        File[] children;
 
-        if ("".equalsIgnoreCase(path)) {
-            final File root = ConfigDirectory.getDataDirectory();
-            final File[] children = root.listFiles();
+        final File root = ConfigDirectory.getDataDirectory();
+        if ("root".equalsIgnoreCase(path)) {
+            path = "";
+            children = root.listFiles();
 
-            //loop on subfiles/folders to create bean
+        }else{
+            final File nextRoot = new File(root, path);
+            children = nextRoot.listFiles();
+        }
+
+        //loop on subfiles/folders to create bean
+        if(children != null){
             for (int i = 0; i < children.length; i++) {
                 File child = children[i];
-                final FileBean bean = new FileBean(child.getName(), child.isDirectory());
+                final FileBean bean = new FileBean(child.getName(), child.isDirectory(), path+"/"+child.getName());
                 listBean.add(bean);
             }
         }
         list.setList(listBean);
         return Response.status(200).entity(list).build();
+    }
+
+
+    @POST
+    @Path("load")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response loadData(final ParameterValues values){
+        String filePath = values.getValues().get("filePath");
+        String dataType = values.getValues().get("dataType");
+
+        final File root = ConfigDirectory.getDataDirectory();
+        final File choosingFile = new File(root, filePath);
+        if(choosingFile.exists()){
+            DataInformation information = generateMetadatasInformation(choosingFile, dataType);
+            return  Response.status(200).entity(information).build();
+        }
+        return Response.status(418).build();
     }
 
     /**
