@@ -1786,7 +1786,7 @@ public class CSWworker extends AbstractWorker {
      */
     @Override
     protected MarshallerPool getMarshallerPool() {
-        return CSWMarshallerPool.getInstanceCswOnly();
+        return CSWMarshallerPool.getInstance();
     }
     
     public void clearCache() throws CstlServiceException {
