@@ -11,6 +11,13 @@ public class StyleListBean {
 
     private List<StyleBean> styles;
 
+    public StyleListBean() {
+    }
+
+    public StyleListBean(final List<StyleBean> styles) {
+        this.styles = styles;
+    }
+
     public List<StyleBean> getStyles() {
         return styles;
     }

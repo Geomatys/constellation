@@ -77,17 +77,19 @@
                 @Script(id = "add-data",        src = "js/add-data.js",                 depends = "jquery",     location = AssetLocation.SERVER),
                 @Script(id = "selection",       src = "js/selection.js",                depends = "jquery",     location = AssetLocation.SERVER),
 
-                // Constellation commons
-                @Script(id = "cstl",            src = "js/cstl.js",                     depends = "jquery",     location = AssetLocation.SERVER),
-                @Script(id = "cstl.services",   src = "js/cstl.services.js",            depends = "jquery",     location = AssetLocation.SERVER),
-                @Script(id = "cstl.providers",  src = "js/cstl.providers.js",           depends = "jquery",     location = AssetLocation.SERVER),
-                @Script(id = "cstl.data",       src = "js/cstl.data.js",                depends = "jquery",     location = AssetLocation.SERVER),
+                // Constellation
+                @Script(id = "cstl",                    src = "js/cstl.js",                 depends = "jquery",         location = AssetLocation.SERVER),
+                @Script(id = "cstl.services",           src = "js/cstl.services.js",        depends = "cstl",           location = AssetLocation.SERVER),
+                @Script(id = "cstl.providers",          src = "js/cstl.providers.js",       depends = "cstl",           location = AssetLocation.SERVER),
+                @Script(id = "cstl.data",               src = "js/cstl.data.js",            depends = "cstl",           location = AssetLocation.SERVER),
+                @Script(id = "cstl.dashboard",          src = "js/cstl.dashboard.js",       depends = "cstl",           location = AssetLocation.SERVER),
+                @Script(id = "cstl.dashboard.style",    src = "js/cstl.dashboard.style.js", depends = "cstl.dashboard", location = AssetLocation.SERVER),
 
                 // Style
-                @Script(id = "style_edition",   src = "js/style_edition.js",            depends = "jquery"),
-                @Script(id = "style_filter",    src = "js/style_filter.js",             depends = "style_edition"),
-                @Script(id = "style_rule",      src = "js/style_rule.js",               depends = "style_edition"),
-                @Script(id = "style_symbol",    src = "js/style_symbol.js",             depends = "style_edition")})
+                @Script(id = "style_edition",   src = "js/style_edition.js",    depends = "jquery"),
+                @Script(id = "style_filter",    src = "js/style_filter.js",     depends = "style_edition"),
+                @Script(id = "style_rule",      src = "js/style_rule.js",       depends = "style_edition"),
+                @Script(id = "style_symbol",    src = "js/style_symbol.js",     depends = "style_edition")})
 
 /**
  * Constellation web client main part.

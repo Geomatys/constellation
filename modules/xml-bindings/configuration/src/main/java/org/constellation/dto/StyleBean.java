@@ -1,5 +1,7 @@
 package org.constellation.dto;
 
+import java.util.Date;
+
 /**
  * Just bean to acces to style information
  *
@@ -10,13 +12,19 @@ package org.constellation.dto;
 public class StyleBean {
 
     /**
-     * style name
+     * Style name.
      */
     private String name;
+
     /**
-     * provider id
+     * Provider id.
      */
     private String providerId;
+
+    /**
+     * Creation date.
+     */
+    private Date date;
 
     public String getName() {
         return name;
@@ -32,5 +40,13 @@ public class StyleBean {
 
     public void setProviderId(final String providerId) {
         this.providerId = providerId;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

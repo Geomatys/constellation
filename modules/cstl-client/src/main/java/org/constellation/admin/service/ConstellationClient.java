@@ -336,7 +336,7 @@ public final class ConstellationClient {
                         || MediaType.APPLICATION_JSON_TYPE.equals(response.getType())) {
                     message = response.getEntity(AcknowlegementType.class).getMessage();
                 } else {
-                    message = "No reason message.";
+                    message = response.toString();
                 }
                 throw new HttpResponseException(response.getStatus(), message);
             }

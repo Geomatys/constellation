@@ -1,19 +1,54 @@
-#{param name=styleList/}
+#{param name=styles/}
+#{param name=nbResults/}
+#{param name=startIndex/}
+#{param name=nbPerPage/}
 
-<%if(styleList == null || styleList.getStyles().isEmpty()){%>
+<div class="pagination-wrapper">
+    <span class="nb-results pull-left"><strong>${nbResults}</strong> &{label.results}</span>
+    <select class="nb-per-page input-small pull-right" data-role="nb-items">
+        <option value="5"<%if(nbPerPage == 5){%> selected<%}%>>5</option>
+        <option value="10"<%if(nbPerPage == 10){%> selected<%}%>>10</option>
+        <option value="20"<%if(nbPerPage == 20){%> selected<%}%>>20</option>
+        <option value="50"<%if(nbPerPage == 50){%> selected<%}%>>50</option>
+        <option value="100"<%if(nbPerPage == 100){%> selected<%}%>>100</option>
+    </select>
+    <%  def nbPage      = (int) Math.ceil(nbResults / nbPerPage);
+        def currentPage = (int) startIndex / nbPerPage + 1;
+        if (nbPage > 1) { %>
+        <div class="pagination pull-right">
+            <ul>
+                <%  if (currentPage > 1) { %>
+                    <li data-page-index="${currentPage - 1}"><a href="#">&laquo;</a></li>
+                <%  } %>
+                <%  def prevCount = currentPage - 1;
+                    def nextCount = nbPage - currentPage;
+                    def minPage   = currentPage - Math.min(4 - Math.min(2, nextCount), prevCount);
+                    def maxPage   = currentPage + Math.min(4 - Math.min(2, prevCount), nextCount);
+                    for (def i = minPage; i <= maxPage; i++) { %>
+                        <li<%if(i != currentPage){%> data-page-index="${i}"<%}%> class="page<%if(i == currentPage){%> active<%}%>"><a href="#">${i}</a></li>
+                <%  } %>
+                <%  if (currentPage < nbPage) { %>
+                    <li data-page-index="${currentPage + 1}"><a href="#">&raquo;</a></li>
+                <%  } %>
+            </ul>
+        </div>
+    <% } %>
+</div>
+
+<%if(styles == null || styles.isEmpty()){%>
     <div class="alert alert-info">
-        <strong>Aucun style displonible.</strong>
+        <strong>&{label.no.style.available}</strong>
     </div>
 <%} else {%>
     <div class="item-list">
-        <% for (def style : styleList.getStyles()){%>
+        <% for (def style : styles){%>
             <div class="item style" data-style="${style.name}" data-provider="${style.providerId}">
                 <div class="top">
                     <span class="item-title">${style.name}</span>
                 </div>
                 <div class="bottom">
                     <div class="block">
-                        <i class="icon-calendar"></i>01/06/2013
+                        <i class="icon-calendar"></i>${style.date}
                     </div>
                     <div class="block">
                         <i class="icon-user"></i>Admin
@@ -24,17 +59,6 @@
                 </div>
             </div>
         <%}%>
-        <script type="text/javascript">
-            $('[data-style]').click(function() {
-                var $this = $(this);
-                $this.addClass('selected');
-                $this.siblings().removeClass('selected');
-                $('#selected').jzLoad('StyleController.selectStyle()', {
-                    name:       $this.data('style'),
-                    providerId: $this.data('provider')
-                });
-            });
-        </script>
     </div>
 <%}%>
 

@@ -18,6 +18,7 @@
 package org.constellation.rest.api;
 
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.dto.StyleListBean;
 import org.constellation.map.configuration.StyleProviderConfig;
 import org.geotoolkit.style.MutableStyle;
 
@@ -63,6 +64,24 @@ public final class StyleProviders {
     @Path("{id}/style/{styleId}")
     public Response getStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId) throws Exception {
         return ok(StyleProviderConfig.getStyle(id, styleId));
+    }
+
+    /**
+     * @see StyleProviderConfig#getAvailableStyles(String)
+     */
+    @GET
+    @Path("{id}/style/available")
+    public Response getAvailableStyles(final @PathParam("id") String id) throws Exception {
+        return ok(new StyleListBean(StyleProviderConfig.getAvailableStyles(id)));
+    }
+
+    /**
+     * @see StyleProviderConfig#getAvailableStyles()
+     */
+    @GET
+    @Path("all/style/available")
+    public Response getAvailableStyles() throws Exception {
+        return ok(new StyleListBean(StyleProviderConfig.getAvailableStyles()));
     }
 
     /**

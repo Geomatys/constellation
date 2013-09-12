@@ -1,44 +1,42 @@
 #{param name=selected/}
-
-<%if(selected == null){%>
-    <div class="alert alert-info">
-        <h5>Aucun style selectionné.</h5>
-        <p>Cliquez sur un style ci-contre pour afficher plus d'informations.</p>
-    </div>
-<%} else {%>
+<div class="alert alert-info<%if(selected != null){%> hide<%}%>">
+    <h5>&{label.no.style.selected}</h5>
+    <p>&{msg.no.selected.style}</p>
+</div>
+<%if(selected != null){%>
     <div class="selected-item" data-style="${selected.name}" data-provider="${selected.providerId}">
         <div class="block-header">
             <strong>${selected.name}</strong><i class="icon-chevron-up pull-right"></i>
         </div>
         <div class="block-content">
-            <h6>Description</h6>
+            <h6>&{label.description}</h6>
             <span>Altera templo insulam et insignis viribus claram viribus Salamis supremos et ipso committat armamentis tamque claram crebra ad indigens externi instructam ut abundat omnibusque onerariam continenti templo rerum a tanta.</span>
             <div class="separator"></div>
-            <h6>Propriétaire</h6>
+            <h6>&{label.owner}</h6>
             <span>Admin</span>
             <div class="separator"></div>
-            <h6>Date</h6>
+            <h6>&{label.date}</h6>
             <span>01/06/2013</span>
             <div class="separator"></div>
-            <h6>Symboles</h6>
-            <span title="Point" class="symbol-point"></span>
-            <span title="Ligne" class="symbol-line"></span>
-            <span title="Polygone" class="symbol-polygon"></span>
-            <span title="Texte" class="symbol-text"></span>
-            <span title="Raster" class="symbol-raster"></span>
+            <h6>&{label.symbols}</h6>
+            <span title="&{edition.style.label.point}" class="symbol-point"></span>
+            <span title="&{edition.style.label.line}" class="symbol-line"></span>
+            <span title="&{edition.style.label.polygon}" class="symbol-polygon"></span>
+            <span title="&{edition.style.label.text}" class="symbol-text"></span>
+            <span title="&{edition.style.label.raster}" class="symbol-raster"></span>
         </div>
         <div class="block-action">
             <div class="row-fluid">
-                <a href="@{StyleController.edition(styleName = selected.name, styleProvider = selected.providerId)}&returnURL=@{StyleController.dashboard()}" title="Editer le style selectionné." class="btn btn-info span6">
+                <a href="@{StyleController.edition(styleName = selected.name, styleProvider = selected.providerId)}&returnURL=@{StyleController.dashboard()}" title="&{msg.edit.style.selected}" class="btn btn-info span6">
                     <i class="icon-edit"></i>Editer
                 </a>
-                <button type="button" title="Supprimer définitivement le style selectionné." class="btn btn-danger span6" onclick="if(confirm('Supprimer ce style?')){CSTL.Providers.deleteStyle('${selected.providerId}','${selected.name}')}">
+                <button type="button" title="&{msg.delete.style.selected}" class="btn btn-danger span6" onclick="CSTL.StyleDashboard.removeStyle('${selected.name}','${selected.providerId}');">
                     <i class="icon-trash"></i>Supprimer
                 </button>
             </div>
         </div>
         <div class="block-header">
-            <strong>Couche(s) associée(s)</strong><i class="icon-chevron-up pull-right"></i>
+            <strong>&{label.related.layers}</strong><i class="icon-chevron-up pull-right"></i>
         </div>
         <div class="block-content">
             <span><strong>WMS1</strong> -> lelombrik</span><br />
@@ -46,13 +44,4 @@
             <span><strong>WMS2</strong> -> test</span><br />
         </div>
     </div>
-    <script type="text/javascript">
-        var $selected = $('.selected-item');
-        $selected.find('.block-header').click(function() {
-            var $this = $(this);
-            $this.next().slideToggle(200);
-            $this.find('i').toggleClass('icon-chevron-down icon-chevron-up');
-        });
-        $selected.find('[title]').tooltip({delay:{show: 200}})
-    </script>
 <%}%>

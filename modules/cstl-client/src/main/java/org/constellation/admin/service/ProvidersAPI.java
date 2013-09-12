@@ -52,14 +52,30 @@ public class ProvidersAPI {
     }
 
     /**
-     * Queries the entire list of styles from the Constellation server.
+     * Queries the entire list of styles.
      *
      * @return the list of available styles
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException           on HTTP communication error or response entity parsing error
      */
     public StyleListBean getStyles() throws HttpResponseException, IOException {
-        return client.get("style", MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
+        final String path = "SP/all/style/available";
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
+    }
+
+    /**
+     * Queries the entire list of styles from the specified provider.
+     *
+     * @param providerId the style provider identifier
+     * @return the list of available styles
+     * @throws HttpResponseException if the response does not have a {@code 2xx} status code
+     * @throws IOException on HTTP communication error or response entity parsing error
+     */
+    public StyleListBean getStyles(final String providerId) throws HttpResponseException, IOException {
+        ensureNonNull("providerId", providerId);
+
+        final String path = "SP/" + providerId + "/style/available";
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
     }
 
     /**

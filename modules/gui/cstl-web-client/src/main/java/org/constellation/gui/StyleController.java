@@ -24,6 +24,7 @@ import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
+import juzu.impl.request.Request;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.constellation.ServiceDef;
@@ -32,6 +33,7 @@ import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.StyleBean;
+import org.constellation.dto.StyleListBean;
 import org.constellation.gui.binding.ColorMap;
 import org.constellation.gui.binding.Interpolate;
 import org.constellation.gui.binding.InterpolationPoint;
@@ -39,16 +41,23 @@ import org.constellation.gui.binding.Style;
 import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.service.StyleService;
+import org.constellation.gui.util.StyleBeanComparator;
 import org.geotoolkit.style.interval.DefaultIntervalPalette;
 import org.geotoolkit.style.interval.IntervalPalette;
 
 import javax.inject.Inject;
 import java.awt.Color;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.constellation.gui.util.StyleUtilities.createDefaultStyle;
+import static org.constellation.gui.util.StyleUtilities.listType;
 import static org.constellation.gui.util.StyleUtilities.readJson;
 import static org.constellation.gui.util.StyleUtilities.toHex;
 import static org.constellation.gui.util.StyleUtilities.writeJson;
@@ -99,10 +108,21 @@ public final class StyleController {
     @View
     @Route("style/dashboard")
     public Response dashboard(final String category) throws IOException {
+        final StyleListBean listBean = service.getStyleList();
+
+        // Truncate the list.
+        final List<StyleBean> styles = new ArrayList<>(10);
+        for (int i = 0; i < 10; i++) {
+            styles.add(listBean.getStyles().get(i));
+        }
+
         final Map<String, Object> parameters = new HashMap<>(0);
-        parameters.put("category", category);
-        parameters.put("selected", null);
-        parameters.put("styleList", service.getStyleList());
+        parameters.put("category",   category);
+        parameters.put("styles",     styles);
+        parameters.put("nbResults",  listBean.getStyles().size());
+        parameters.put("startIndex", 0);
+        parameters.put("nbPerPage",  10);
+        parameters.put("selected",   null);
         return dashboard.ok(parameters).withMimeType("text/html");
     }
 
@@ -260,9 +280,39 @@ public final class StyleController {
     @Ajax
     @Resource
     @Route("style/filter")
-    public Response styleList() throws IOException {
+    public Response styleList(final String start, final String count, final String filter, final String orderBy, final String direction) throws IOException {
+        final StyleListBean listBean = service.getStyleList();
+
+        // Search style by name.
+        if (!isBlank(filter)) {
+            final List<StyleBean> toRemove = new ArrayList<>();
+            for (final StyleBean bean : listBean.getStyles()) {
+                if (!containsIgnoreCase(bean.getName(), filter)) {
+                    toRemove.add(bean);
+                }
+            }
+            listBean.getStyles().removeAll(toRemove);
+        }
+
+        // Sort style by criteria.
+        if (!isBlank(orderBy) && !isBlank(direction)) {
+            Collections.sort(listBean.getStyles(), new StyleBeanComparator(orderBy, direction));
+        }
+
+        // Truncate the list.
+        final int intStart = Integer.parseInt(start);
+        final int intCount = Integer.parseInt(count);
+        final int endIndex = intStart + intCount > listBean.getStyles().size() ? listBean.getStyles().size() : intStart + intCount;
+        final List<StyleBean> styles = new ArrayList<>(intCount);
+        for (int i = intStart; i < endIndex; i++) {
+            styles.add(listBean.getStyles().get(i));
+        }
+
         final Map<String, Object> parameters = new HashMap<>(0);
-        parameters.put("styleList", service.getStyleList());
+        parameters.put("styles",     styles);
+        parameters.put("nbResults",  listBean.getStyles().size());
+        parameters.put("startIndex", intStart);
+        parameters.put("nbPerPage",  intCount);
         return list.ok(parameters).withMimeType("text/html");
     }
 

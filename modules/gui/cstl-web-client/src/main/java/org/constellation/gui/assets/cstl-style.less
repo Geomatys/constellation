@@ -47,26 +47,36 @@
  *                              Dashboard                                 *
  **************************************************************************/
 
-.item-list .item.style {
-  background: transparent url('../../../../../images/style.png') right center no-repeat;
-}
-.item-list .item.selected.style {
-  background: transparent url('../../../../../images/style-selected.png') right center no-repeat;
-}
-.selected-item {
-  .symbol-point,
-  .symbol-line,
-  .symbol-polygon,
-  .symbol-text,
-  .symbol-raster {
-    background-color: white;
-    display: inline-block;
-    .ie7-inline-block();
-    .box-shadow(~"2px 2px 5px rgba(0,0,0,0.2)");
-    height: 30px;
-    width: 30px;
-    margin-right: 5px;
-    border: 1px solid white;
+#styleDashboard {
+  .item-list .item.style {
+    background: transparent url('../../../../../images/style.png') right center no-repeat;
+  }
+  .item-list .item.selected.style {
+    background: transparent url('../../../../../images/style-selected.png') right center no-repeat;
+  }
+  .selected-item {
+    .symbol-point,
+    .symbol-line,
+    .symbol-polygon,
+    .symbol-text,
+    .symbol-raster {
+      background-color: white;
+      display: inline-block;
+      .ie7-inline-block();
+      .box-shadow(~"2px 2px 5px rgba(0,0,0,0.2)");
+      height: 30px;
+      width: 30px;
+      margin-right: 5px;
+      border: 1px solid white;
+    }
+  }
+  #selection {
+    .alert {
+      display: none;
+    }
+    .alert:last-child {
+      display: block;
+    }
   }
 }
 

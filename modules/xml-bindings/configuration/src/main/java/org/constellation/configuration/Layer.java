@@ -93,7 +93,7 @@ public class Layer {
     @XmlElement(name="ProviderType")
     private String providerType;
 
-    @XmlTransient
+    @XmlElement(name="ProviderID")
     private String providerID;
     
     public Layer() {
