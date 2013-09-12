@@ -106,18 +106,18 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean storeMetadata(Object obj) throws MetadataIoException {
-        File f = null;
+    public boolean storeMetadata(final Object obj) throws MetadataIoException {
+        final String identifier = Utils.findIdentifier(obj);
+        final File f;
+        // for windows we avoid to create file with ':'
+        if (System.getProperty("os.name", "").startsWith("Windows")) {
+            final String windowsIdentifier = identifier.replace(':', '-');
+            f = new File(dataDirectory, windowsIdentifier + ".xml");
+        } else {
+            f = new File(dataDirectory, identifier + ".xml");
+        }
         try {
             final Marshaller marshaller = marshallerPool.acquireMarshaller();
-            final String identifier = Utils.findIdentifier(obj);
-            // for windows we avoid to create file with ':'
-            if (System.getProperty("os.name", "").startsWith("Windows")) {
-                final String windowsIdentifier = identifier.replace(':', '-');
-                f = new File(dataDirectory, windowsIdentifier + ".xml");
-            } else {
-                f = new File(dataDirectory, identifier + ".xml");
-            }
             f.createNewFile();
             marshaller.marshal(obj, f);
             marshallerPool.recycle(marshaller);

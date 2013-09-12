@@ -711,7 +711,7 @@ public class CSWworker extends AbstractWorker {
         initializeOutputFormat(request);
 
         //we get the output schema and verify that we handle it
-        String outputSchema = Namespaces.CSW;
+        final String outputSchema;
         if (request.getOutputSchema() != null) {
             outputSchema = request.getOutputSchema();
             if (!acceptedResourceType.contains(outputSchema)) {
@@ -723,6 +723,8 @@ public class CSWworker extends AbstractWorker {
                                               " supported ones are: " + '\n' + supportedOutput,
                                               INVALID_PARAMETER_VALUE, OUTPUT_SCHEMA);
             }
+        } else {
+             outputSchema = Namespaces.CSW;
         }
 
         //We get the resultType
@@ -908,7 +910,7 @@ public class CSWworker extends AbstractWorker {
         }
         LOGGER.log(Level.FINER, "local max = " + max + " distributed max = " + maxDistributed);
 
-        int mode;
+        final int mode;
         if (outputSchema.equals(Namespaces.GMD) || outputSchema.equals(Namespaces.GFC)) {
             mode = ISO_19115;
         } else if (outputSchema.equals(EBRIM_30) || outputSchema.equals(EBRIM_25)) {
@@ -1068,13 +1070,15 @@ public class CSWworker extends AbstractWorker {
         }
 
         //we get the output schema and verify that we handle it
-        String outputSchema = Namespaces.CSW;
+        final String outputSchema;
         if (request.getOutputSchema() != null) {
             outputSchema = request.getOutputSchema();
             if (!acceptedResourceType.contains(outputSchema)) {
                 throw new CstlServiceException("The server does not support this output schema: " + outputSchema,
                                                   INVALID_PARAMETER_VALUE, OUTPUT_SCHEMA);
             }
+        } else {
+            outputSchema = Namespaces.CSW;
         }
 
         if (request.getId().isEmpty()){
@@ -1782,7 +1786,7 @@ public class CSWworker extends AbstractWorker {
      */
     @Override
     protected MarshallerPool getMarshallerPool() {
-        return CSWMarshallerPool.getInstance();
+        return CSWMarshallerPool.getInstanceCswOnly();
     }
     
     public void clearCache() throws CstlServiceException {

@@ -697,7 +697,7 @@ public class CSWworkerTest {
         LOGGER.finer("TEST - 5 begin");
 
         typeNames        = Arrays.asList(RECORD_QNAME);
-        List<QName> cust = new ArrayList<QName>();
+        List<QName> cust = new ArrayList<>();
         cust.add(_Identifier_QNAME);
         cust.add(_Subject_QNAME);
         cust.add(_Date_QNAME);
@@ -751,7 +751,7 @@ public class CSWworkerTest {
          */
 
         typeNames        = Arrays.asList(RECORD_QNAME);
-        cust             = new ArrayList<QName>();
+        cust             = new ArrayList<>();
         cust.add(_BoundingBox_QNAME);
         cust.add(_Modified_QNAME);
         cust.add(_Identifier_QNAME);
@@ -810,7 +810,7 @@ public class CSWworkerTest {
          */
 
         typeNames        = Arrays.asList(RECORD_QNAME);
-        cust             = new ArrayList<QName>();
+        cust             = new ArrayList<>();
         cust.add(_Modified_QNAME);
         cust.add(_Identifier_QNAME);
         cust.add(_BoundingBox_QNAME);
@@ -837,14 +837,19 @@ public class CSWworkerTest {
 
             assertTrue(rec instanceof RecordType);
             RecordType r = (RecordType)rec;
-            if (r.getIdentifier().getContent().get(0).equals("42292_9s_19900610041000")){
-                customResult2 = r;
-            } else if (r.getIdentifier().getContent().get(0).equals("39727_22_19750113062500")) {
-                customResult3 = r;
-            } else if (r.getIdentifier().getContent().get(0).equals("11325_158_19640418141800")) {
-                customResult4 = r;
-            } else {
-                fail("unexpected metadata:" + r.getIdentifier().getContent().get(0));
+            switch (r.getIdentifier().getContent().get(0)) {
+                case "42292_9s_19900610041000":
+                    customResult2 = r;
+                    break;
+                case "39727_22_19750113062500":
+                    customResult3 = r;
+                    break;
+                case "11325_158_19640418141800":
+                    customResult4 = r;
+                    break;
+                default:
+                    fail("unexpected metadata:" + r.getIdentifier().getContent().get(0));
+                    break;
             }
         }
 
@@ -1235,7 +1240,7 @@ public class CSWworkerTest {
 
         assertTrue(result instanceof GetDomainResponseType);
 
-        List<DomainValues> domainValues = new ArrayList<DomainValues>();
+        List<DomainValues> domainValues = new ArrayList<>();
         ListOfValuesType values = new  ListOfValuesType(Arrays.asList("All", "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities"));
         DomainValuesType value  = new DomainValuesType("GetCapabilities.sections", null, values, CAPABILITIES_QNAME);
         domainValues.add(value);
@@ -1253,8 +1258,8 @@ public class CSWworkerTest {
 
         assertTrue(result200 instanceof org.geotoolkit.csw.xml.v200.GetDomainResponseType);
 
-        List<DomainValues> domainValues200 = new ArrayList<DomainValues>();
-        List<String> list = new ArrayList<String>();
+        List<DomainValues> domainValues200 = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         list.add("All");
         list.add("ServiceIdentification");
         list.add("ServiceProvider");
@@ -1276,8 +1281,8 @@ public class CSWworkerTest {
 
         assertTrue(result instanceof GetDomainResponseType);
 
-        domainValues = new ArrayList<DomainValues>();
-        list = new ArrayList<String>();
+        domainValues = new ArrayList<>();
+        list = new ArrayList<>();
         list.add("000068C3-3B49-C671-89CF-10A39BB1B652");
         list.add("11325_158_19640418141800");
         list.add("39727_22_19750113062500");
@@ -1305,8 +1310,8 @@ public class CSWworkerTest {
 
         assertTrue(result instanceof GetDomainResponseType);
 
-        domainValues = new ArrayList<DomainValues>();
-        list = new ArrayList<String>();
+        domainValues = new ArrayList<>();
+        list = new ArrayList<>();
         // no ebrim list.add("000068C3-3B49-C671-89CF-10A39BB1B652");
         list.add("11325_158_19640418141800");
         list.add("39727_22_19750113062500");
@@ -1332,8 +1337,8 @@ public class CSWworkerTest {
 
         assertTrue(result instanceof GetDomainResponseType);
 
-        domainValues = new ArrayList<DomainValues>();
-        list = new ArrayList<String>();
+        domainValues = new ArrayList<>();
+        list = new ArrayList<>();
         list.add("64061411.bot");
         list.add("75000111.ctd");
         list.add("90008411-2.ctd");
@@ -1360,8 +1365,8 @@ public class CSWworkerTest {
 
         assertTrue(result instanceof GetDomainResponseType);
 
-        domainValues = new ArrayList<DomainValues>();
-        list = new ArrayList<String>();
+        domainValues = new ArrayList<>();
+        list = new ArrayList<>();
         list.add("64061411.bot");
         list.add("75000111.ctd");
         list.add("90008411-2.ctd");
@@ -1548,7 +1553,7 @@ public class CSWworkerTest {
         }
 
         // we must receive an exception saying that the metadata is not present.
-        assertTrue(exe != null);
+        assertNotNull(exe);
         assertEquals(exe.getExceptionCode() , INVALID_PARAMETER_VALUE);
         assertEquals(exe.getLocator() , "id");
 
@@ -1643,7 +1648,7 @@ public class CSWworkerTest {
         }
 
         // we must receive an exception saying that the metadata is not present.
-        assertTrue(exe != null);
+        assertNotNull(exe);
         assertEquals(exe.getExceptionCode() , INVALID_PARAMETER_VALUE);
         assertEquals(exe.getLocator() , "id");
 
@@ -1681,13 +1686,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(6, response.getSearchResults().getAny().size());
 
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        List<String> expResult = new ArrayList<String>();
+        List<String> expResult = new ArrayList<>();
         expResult.add("11325_158_19640418141800");
         expResult.add("39727_22_19750113062500");
         expResult.add("40510_145_19930221211500");
@@ -1699,7 +1704,7 @@ public class CSWworkerTest {
 
         // we update the metadata 11325_158_19640418141800 by replacing the language eng by fr
         constraint = new QueryConstraintType("identifier='11325_158_19640418141800'", "1.1.0");
-        List<RecordPropertyType> properties = new ArrayList<RecordPropertyType>();
+        List<RecordPropertyType> properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/language", "fra"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -1714,13 +1719,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(5, response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("39727_22_19750113062500");
         expResult.add("40510_145_19930221211500");
         expResult.add("42292_9s_19900610041000");
@@ -1741,13 +1746,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(2, response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         expResult.add("11325_158_19640418141800");
 
@@ -1769,13 +1774,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertTrue(response.getSearchResults().getAny().size() == 1);
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("39727_22_19750113062500");
 
         assertEquals(expResult, results);
@@ -1783,7 +1788,7 @@ public class CSWworkerTest {
 
         // we update the metadata 11325_158_19640418141800 by replacing the abstract field from "Donnees CTD ANGOLA CAP 7501 78" to "Modified datas by CSW-T".
         constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/abstract", "Modified datas by CSW-T"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -1799,13 +1804,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertTrue(response.getSearchResults().getAny().isEmpty());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
 
         assertEquals(expResult, results);
 
@@ -1820,13 +1825,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertTrue(response.getSearchResults().getAny().size() == 1);
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("39727_22_19750113062500");
 
         assertEquals(expResult, results);
@@ -1838,7 +1843,7 @@ public class CSWworkerTest {
 
         // we update the metadata 39727_22_19750113062500 by replacing the dateStamp field with "2009-03-31T12:00:00.000+01:00".
         constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp", "2009-03-31T12:00:00.000+01:00"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -1857,13 +1862,13 @@ public class CSWworkerTest {
         assertNotNull(response.getSearchResults().getAny());
         assertEquals(2, response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         expResult.add("39727_22_19750113062500");
 
@@ -1876,7 +1881,7 @@ public class CSWworkerTest {
 
         // we update the metadata 11325_158_19640418141800 by replacing the geographicElement.
         constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         DefaultGeographicBoundingBox geographicElement = new DefaultGeographicBoundingBox(1.1, 1.1, 1.1, 1.1);
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/extent/geographicElement", geographicElement));
         update     = new UpdateType(properties, constraint);
@@ -1897,13 +1902,13 @@ public class CSWworkerTest {
         assertNotNull(response.getSearchResults().getAny());
         assertEquals(1, response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("39727_22_19750113062500");
 
         assertEquals(expResult, results);
@@ -1927,13 +1932,13 @@ public class CSWworkerTest {
         assertNotNull(response.getSearchResults().getAny());
         assertEquals(2, response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("11325_158_19640418141800");
         expResult.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
 
@@ -1943,7 +1948,7 @@ public class CSWworkerTest {
         // we update the metadata 11325_158_19640418141800 by replacing the language eng by a responsibleParty
         constraint = new QueryConstraintType("identifier='11325_158_19640418141800'", "1.1.0");
         DefaultResponsibleParty value = new DefaultResponsibleParty(Role.AUTHOR);
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/language",value));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -1965,13 +1970,13 @@ public class CSWworkerTest {
         assertNotNull(response.getSearchResults().getAny());
         assertEquals(2, response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("11325_158_19640418141800");
         expResult.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         assertEquals(expResult, results);
@@ -1984,7 +1989,7 @@ public class CSWworkerTest {
 
         // we update the metadata 39727_22_19750113062500 by replacing the dateStamp field with "hello world".
         constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp", "hello world"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -2009,13 +2014,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertTrue(response.getSearchResults().getAny().size() == 2);
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         expResult.add("39727_22_19750113062500");
 
@@ -2029,7 +2034,7 @@ public class CSWworkerTest {
 
         // we update the metadata 11325_158_19640418141800 by replacing the geographicElement.
         constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         value = new DefaultResponsibleParty(Role.AUTHOR);
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/extent/geographicElement", value));
         update     = new UpdateType(properties, constraint);
@@ -2055,13 +2060,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertTrue(response.getSearchResults().getAny().size() == 1);
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("39727_22_19750113062500");
 
         assertEquals(expResult, results);
@@ -2083,13 +2088,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(3, response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("39727_22_19750113062500");
         expResult.add("40510_145_19930221211500");
         expResult.add("42292_9s_19900610041000");
@@ -2099,7 +2104,7 @@ public class CSWworkerTest {
 
         // we update the metadata 42292_9s_1990061004100 by replacing the third descriptive field from "research vessel" to "Modified datas by CSW-T".
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/descriptiveKeywords[3]/keyword", "Modified datas by CSW-T"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -2115,13 +2120,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(2, response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("39727_22_19750113062500");
         expResult.add("40510_145_19930221211500");
 
@@ -2138,13 +2143,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(1 , response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("42292_9s_19900610041000");
 
         assertEquals(expResult, results);
@@ -2165,13 +2170,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(3, response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("39727_22_19750113062500");
         expResult.add("40510_145_19930221211500");
         expResult.add("42292_9s_19900610041000");
@@ -2181,7 +2186,7 @@ public class CSWworkerTest {
 
         // we update the metadata 42292_9s_1990061004100 by replacing the abstract field from "Salinity of the water column" to "something".
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/descriptiveKeywords[1]/keyword[7]", "something"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -2226,13 +2231,13 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(1 , response.getSearchResults().getAny().size());
 
-        results = new ArrayList<String>();
+        results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
             DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
-        expResult = new ArrayList<String>();
+        expResult = new ArrayList<>();
         expResult.add("42292_9s_19900610041000");
 
         assertEquals(expResult, results);
@@ -2244,7 +2249,7 @@ public class CSWworkerTest {
 
         // we try to update the metadata 42292_9s_1990061004100 by replacing the abstract field with "wathever".
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/abstract[2]", "whatever"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -2268,7 +2273,7 @@ public class CSWworkerTest {
 
         // we try to update the metadata 42292_9s_1990061004100 by replacing the name field with "wathever".
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/distributionInfo[3]/distributionFormat/name", "whatever"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -2290,7 +2295,7 @@ public class CSWworkerTest {
 
         // we update the metadata 42292_9s_1990061004100 by replacing the abstract field from "Salinity of the water column" to "something".
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         DefaultExtendedElementInformation ext = new DefaultExtendedElementInformation("extendedName",
                                                                                 new SimpleInternationalString("some definition"),
                                                                                 new SimpleInternationalString("some condition"),
@@ -2332,7 +2337,7 @@ public class CSWworkerTest {
          // TEST 14 we update the metadata 42292_9s_1990061004100 by adding a property datasetURI.
         // this value is not yet present in the metadata.
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/dataSetURI", "someURI"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -2376,7 +2381,7 @@ public class CSWworkerTest {
 
 
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
-        properties = new ArrayList<RecordPropertyType>();
+        properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp", "2009-01-18T13:00:00+01:00"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -2459,7 +2464,7 @@ public class CSWworkerTest {
         }
 
         // we must receive an exception saying that the metadata is not present.
-        assertTrue(exe != null);
+        assertNotNull(exe);
         assertEquals(exe.getExceptionCode() , INVALID_PARAMETER_VALUE);
         assertEquals(exe.getLocator() , "id");
 

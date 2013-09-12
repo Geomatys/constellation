@@ -93,7 +93,6 @@ import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.xml.ValueConverter;
 import org.apache.sis.xml.XML;
 import org.constellation.test.utils.MetadataUtilities;
 import org.opengis.metadata.Datatype;
@@ -161,7 +160,7 @@ public class MetadataUnmarshallTest {
 
         unmarshaller = testPool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
-
+        
         assertTrue(obj instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) obj;
 

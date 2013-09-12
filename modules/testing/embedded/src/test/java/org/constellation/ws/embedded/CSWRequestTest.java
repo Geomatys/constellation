@@ -57,7 +57,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
      */
     @BeforeClass
     public static void initPool() throws Exception {
-        final Map<String, Object> map = new HashMap<String, Object>();
+        final Map<String, Object> map = new HashMap<>();
         map.put("sos", new SOService());
         initServer(null, map);
         // Get the list of layers
@@ -201,7 +201,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(result instanceof GetDomainResponseType);
 
-        List<DomainValues> values = new ArrayList<DomainValues>();
+        List<DomainValues> values = new ArrayList<>();
         ListOfValuesType list = new ListOfValuesType(Arrays.asList("All", "ServiceIdentification", "ServiceProvider", "OperationsMetadata","Filter_Capabilities"));
         values.add(new DomainValuesType("GetCapabilities.sections", null, list, new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities")));
         GetDomainResponseType expResult = new GetDomainResponseType(values);
@@ -217,7 +217,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
 
         assertTrue(result instanceof GetDomainResponseType);
 
-        values = new ArrayList<DomainValues>();
+        values = new ArrayList<>();
         list = new ListOfValuesType(Arrays.asList("Aliquam fermentum purus quis arcu","Fuscé vitae ligulä","Lorem ipsum","Lorem ipsum dolor sit amet",
                 "Maecenas enim","Mauris sed neque","Ut facilisis justo ut lacus","Vestibulum massa purus","Ñunç elementum"));
         values.add(new DomainValuesType(null, "title", list, new QName("http://www.isotc211.org/2005/gmd", "MD_Metadata")));

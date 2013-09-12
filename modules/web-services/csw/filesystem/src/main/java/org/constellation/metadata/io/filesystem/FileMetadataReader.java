@@ -246,10 +246,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                     addInCache(identifier, metadata);
                 }
                 return metadata;
-            } catch (JAXBException ex) {
-                throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
-                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
-            } catch (IllegalArgumentException ex) {
+            } catch (JAXBException | IllegalArgumentException ex) {
                 throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             }
@@ -285,7 +282,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                         final Method getter = ReflectionUtilities.getGetterFromName(qn.getLocalPart(), RecordType.class);
                         final Object param  = ReflectionUtilities.invokeMethod(record, getter);
 
-                        Method setter = null;
+                        final Method setter;
                         if (param != null) {
                             setter = ReflectionUtilities.getSetterFromName(qn.getLocalPart(), param.getClass(), RecordType.class);
                         } else {
@@ -353,7 +350,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 customRecord.setType(dataType);
             }
 
-            final List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
+            final List<BoundingBoxType> bboxes = new ArrayList<>();
 
             for (Identification identification: metadata.getIdentificationInfo()) {
                 if (identification instanceof DataIdentification) {
@@ -384,7 +381,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             /*
              *  SUMMARY part
              */
-            final List<SimpleLiteral> abstractt = new ArrayList<SimpleLiteral>();
+            final List<SimpleLiteral> abstractt = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 if (identification.getAbstract() != null) {
                     abstractt.add(new SimpleLiteral(identification.getAbstract().toString()));
@@ -394,7 +391,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 customRecord.setAbstract(abstractt);
             }
 
-            final List<SimpleLiteral> subjects = new ArrayList<SimpleLiteral>();
+            final List<SimpleLiteral> subjects = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 for (Keywords kw :identification.getDescriptiveKeywords()) {
                     for (InternationalString str : kw.getKeywords()) {
@@ -413,7 +410,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             }
 
 
-            List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+            List<SimpleLiteral> formats = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 for (Format f :identification.getResourceFormats()) {
                     if (f == null || f.getName() == null) {
@@ -456,7 +453,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             }
             
 
-            List<SimpleLiteral> creator = new ArrayList<SimpleLiteral>();
+            List<SimpleLiteral> creator = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 for (ResponsibleParty rp :identification.getPointOfContacts()) {
                     if (Role.ORIGINATOR.equals(rp.getRole())) {
@@ -470,7 +467,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 customRecord.setCreator(creator);
             }
             
-            List<String> descriptions = new ArrayList<String>();
+            List<String> descriptions = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 for (BrowseGraphic go :identification.getGraphicOverviews()) {
                     if (go.getFileName() != null) {
@@ -532,7 +529,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public List<DomainValues> getFieldDomainofValues(final String propertyNames) throws MetadataIoException {
-        final List<DomainValues> responseList = new ArrayList<DomainValues>();
+        final List<DomainValues> responseList = new ArrayList<>();
         final StringTokenizer tokens          = new StringTokenizer(propertyNames, ",");
 
         while (tokens.hasMoreTokens()) {
@@ -571,7 +568,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * @throws MetadataIoException
      */
     private List<String> getAllValuesFromPaths(final List<String> paths, final File directory) throws MetadataIoException {
-        final List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<>();
         try {
             final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             for (File metadataFile : directory.listFiles()) {
@@ -590,9 +587,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                         }
                         
                      //continue to the next file   
-                    } catch (JAXBException ex) {
-                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\ncause: " + ex.getMessage());
-                    } catch (IllegalArgumentException ex) {
+                    } catch (JAXBException | IllegalArgumentException ex) {
                         LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\ncause: " + ex.getMessage());
                     }
                 } else {
@@ -636,7 +631,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      *
      */
     public List<? extends Object> getAllEntries(final File directory) throws MetadataIoException {
-        final List<Object> results = new ArrayList<Object>();
+        final List<Object> results = new ArrayList<>();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
             if (fileName.endsWith(XML_EXT)) {
@@ -679,7 +674,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * 
      */
     public List<String> getAllIdentifiers(final File directory) throws MetadataIoException {
-        final List<String> results = new ArrayList<String>();
+        final List<String> results = new ArrayList<>();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
             if (fileName.endsWith(XML_EXT)) {
@@ -707,7 +702,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public List<QName> getAdditionalQueryableQName() {
-        return new ArrayList<QName>();
+        return new ArrayList<>();
     }
 
     /**
@@ -715,7 +710,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
-        return new HashMap<String, List<String>>();
+        return new HashMap<>();
     }
 
     /**
@@ -723,7 +718,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public Map<String, URI> getConceptMap() {
-        return new HashMap<String, URI>();
+        return new HashMap<>();
     }
 }
 
