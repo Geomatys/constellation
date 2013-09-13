@@ -111,9 +111,12 @@ public final class StyleController {
         final StyleListBean listBean = service.getStyleList();
 
         // Truncate the list.
-        final List<StyleBean> styles = new ArrayList<>(10);
-        for (int i = 0; i < 10; i++) {
-            styles.add(listBean.getStyles().get(i));
+        final List<StyleBean> styles;
+        if (!listBean.getStyles().isEmpty()) {
+            final int endIndex = Math.min(listBean.getStyles().size() - 1, 9);
+            styles = listBean.getStyles().subList(0, endIndex);
+        } else {
+            styles = new ArrayList<>(0);
         }
 
         final Map<String, Object> parameters = new HashMap<>(0);
@@ -300,12 +303,14 @@ public final class StyleController {
         }
 
         // Truncate the list.
+        final List<StyleBean> styles;
         final int intStart = Integer.parseInt(start);
         final int intCount = Integer.parseInt(count);
-        final int endIndex = intStart + intCount > listBean.getStyles().size() ? listBean.getStyles().size() : intStart + intCount;
-        final List<StyleBean> styles = new ArrayList<>(intCount);
-        for (int i = intStart; i < endIndex; i++) {
-            styles.add(listBean.getStyles().get(i));
+        if (!listBean.getStyles().isEmpty() && intStart < listBean.getStyles().size()) {
+            final int endIndex = Math.min(listBean.getStyles().size() - 1, intStart + intCount);
+            styles = listBean.getStyles().subList(intStart, endIndex);
+        } else {
+            styles = new ArrayList<>(0);
         }
 
         final Map<String, Object> parameters = new HashMap<>(0);
