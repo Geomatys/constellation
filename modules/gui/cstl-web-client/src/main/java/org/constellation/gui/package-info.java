@@ -36,6 +36,8 @@
 
         // Style
         @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",           as = "style_dashboard.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_list.gtmpl",                as = "style_list.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_selected.gtmpl",            as = "style_selected.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_overview.gtmpl",            as = "style_overview.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_edition.gtmpl",             as = "style_edition.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_fts.gtmpl",                 as = "style_fts.gtmpl"),
