@@ -113,7 +113,7 @@ public final class StyleController {
         // Truncate the list.
         final List<StyleBean> styles;
         if (!listBean.getStyles().isEmpty()) {
-            final int endIndex = Math.min(listBean.getStyles().size() - 1, 9);
+            final int endIndex = Math.min(listBean.getStyles().size(), 10);
             styles = listBean.getStyles().subList(0, endIndex);
         } else {
             styles = new ArrayList<>(0);
@@ -307,7 +307,7 @@ public final class StyleController {
         final int intStart = Integer.parseInt(start);
         final int intCount = Integer.parseInt(count);
         if (!listBean.getStyles().isEmpty() && intStart < listBean.getStyles().size()) {
-            final int endIndex = Math.min(listBean.getStyles().size() - 1, intStart + intCount);
+            final int endIndex = Math.min(listBean.getStyles().size(), intStart + intCount);
             styles = listBean.getStyles().subList(intStart, endIndex);
         } else {
             styles = new ArrayList<>(0);
