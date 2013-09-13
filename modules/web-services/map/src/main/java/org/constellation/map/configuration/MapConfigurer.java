@@ -20,6 +20,7 @@ package org.constellation.map.configuration;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.Instance;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.TargetNotFoundException;
@@ -105,5 +106,15 @@ public class MapConfigurer extends OGCConfigurer {
         // Extracts the layer list from service configuration.
         final LayerContext layerContext = (LayerContext) this.getInstanceConfiguration(identifier);
         return MapUtilities.getConfigurationLayers(layerContext, null, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Instance getInstance(String identifier) throws ConfigurationException {
+        final Instance instance = super.getInstance(identifier);
+        instance.setLayersNumber(getLayers(identifier).size());
+        return instance;
     }
 }

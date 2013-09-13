@@ -379,22 +379,12 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
     public List<Instance> getInstances() {
         final List<Instance> instances = new ArrayList<>();
         final Map<String, ServiceStatus> statusMap = getInstancesStatus();
-        for (final Map.Entry<String, ServiceStatus> entry : statusMap.entrySet()) {
-            final Instance instance = new Instance(entry.getKey(), specification.name(), entry.getValue());
-            Service metadata = null;
+        for (final String key : statusMap.keySet()) {
             try {
-                metadata = getInstanceMetadata(entry.getKey());
+                instances.add(getInstance(key));
             } catch (ConfigurationException ignore) {
                 // Do nothing.
             }
-            if (metadata != null) {
-                instance.set_abstract(metadata.getDescription());
-                instance.setVersions(metadata.getVersions());
-            } else {
-                instance.set_abstract("");
-                instance.setVersions(new ArrayList<String>());
-            }
-            instances.add(instance);
         }
         return instances;
     }
