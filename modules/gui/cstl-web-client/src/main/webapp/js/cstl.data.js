@@ -33,10 +33,7 @@ CSTL.Data = {
     goTo: function ($element, title, researchtype){
         CSTL.Data.type = researchtype;
         loadDataDashboard(0, 10, null, null, null);
-
-        this.setTitles(title);
         this.setActive($element.parent());
-
     },
 
     /**

@@ -1,6 +1,27 @@
 #{param name=folders/}
-<ul>
-<% for (def folder : folders){%>
-    <li><a href="#" data-next="${folder.folder}" data-path="${folder.subPath}">${folder.name}</a></li>
+<ul class="unstyled" data-role="folderlisting">
+<% for (def folder : folders){
+    String screenName = folder.name;
+    if(screenName.size()>18){
+        int extensionBegin = screenName.lastIndexOf(".");
+        screenName = screenName.substring(0,11)+"...";
+        screenName = screenName + folder.name.substring(extensionBegin);
+    }
+    if(folder.folder){%>
+        <li><i class="icon-folder-close-alt" style="color: #5bc0de; font-size: larger;"></i>
+            <a href="#" title="${folder.name}" data-toggle="tooltip" data-next="${folder.folder}" data-path="${folder.subPath}">${screenName}</a>
+        </li>
+    <%} else {%>
+        <li><i class="icon-file" style="color: #5bc0de; font-size: larger;"></i>
+            <a href="#"  title="${folder.name}" data-toggle="tooltip" data-next="${folder.folder}" data-path="${folder.subPath}">${screenName}</a>
+        </li>
+    <%}%>
 <%}%>
 </ul>
+<script type="text/javascript">
+    $("[data-role=folderlisting]").find('[title]').
+            tooltip({
+            delay:{show: 200},
+            placement: "right",
+            trigger: "hover"});
+</script>

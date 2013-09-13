@@ -136,6 +136,8 @@
     var firstTime = 0;
 
     function setPaginationDataPage() {
+        CSTL.Data.setTitles(title);
+
         if (firstTime == 0) {
             var nbPage = totalProvider / 10;
             generatePagination("#dataList", "loadDataDashboard", nbPage);

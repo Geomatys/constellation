@@ -262,7 +262,7 @@ public class Controller {
     @Route("/datalist")
     public void generateDataList(String serviceId, String startElement, String counter, String orderBy, String direction, String filter) throws IOException {
         LayerList layers = mapManager.getLayers(serviceId);
-        Map<String, Object> parameters = new HashMap<String, Object>(0);
+        Map<String, Object> parameters = new HashMap<>(0);
         int nbByPage =  Integer.parseInt(counter);
 
         //show filtered element if list is higher than element number by page
@@ -363,7 +363,6 @@ public class Controller {
                 // Create file on temporary folder
                 String tempDir= System.getProperty("java.io.tmpdir");
                 final File newFile = new File(tempDir +"/"+ file.getName());
-
                 // write on file
                 final FileOutputStream fos = new FileOutputStream(newFile);
                 int intVal = stream.read();
