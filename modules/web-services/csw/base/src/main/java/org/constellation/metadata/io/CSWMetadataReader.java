@@ -21,7 +21,6 @@ package org.constellation.metadata.io;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
@@ -53,6 +52,8 @@ public interface CSWMetadataReader extends MetadataReader {
      * @throws MetadataIoException
      */
     Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
+
+    Object getOriginalMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
     /**
      * Return the list of supported data types.

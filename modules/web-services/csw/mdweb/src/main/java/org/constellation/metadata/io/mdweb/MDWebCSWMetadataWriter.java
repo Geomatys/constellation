@@ -33,6 +33,9 @@ import org.geotoolkit.csw.xml.RecordProperty;
 // Geotoolkit dependencies
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import java.util.Objects;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb meta model dependencies
@@ -43,6 +46,7 @@ import org.mdweb.model.schemas.Property;
 import org.mdweb.model.storage.FullRecord;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
+import org.w3c.dom.Node;
 
 /**
  * A CSW Metadata Writer specific for MDweb data source.
@@ -66,6 +70,21 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
         super(configuration);
         this.indexer = index;
     }
+
+    @Override
+    public boolean storeMetadata(Object obj) throws MetadataIoException {
+        if (obj instanceof Node) {
+            try {
+                final Unmarshaller u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
+                obj = u.unmarshal((Node)obj);
+                CSWMarshallerPool.getInstance().recycle(u);
+            } catch (JAXBException ex) {
+                throw new MetadataIoException(ex);
+            }
+        }
+        return super.storeMetadata(obj); 
+    }
+
 
     /**
      * {@inheritDoc}
@@ -131,7 +150,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                     final String parentIdValue = mp.idValue.substring(0, mp.idValue.lastIndexOf(':'));
                     final List<Value> parentValues    = f.getValueFromNumberedPath(mp.path.getParent(), parentIdValue);
                     if (parentValues != null && !parentValues.isEmpty()) {
-                        final Map<Object, Value> alreadyWrite = new HashMap<Object, Value>();
+                        final Map<Object, Value> alreadyWrite = new HashMap<>();
                         for (Value parentValue : parentValues) {
                             final List<Value> toInsert = addValueFromObject(f, value, mp.path, parentValue, alreadyWrite);
                             alreadyWrite.clear();
@@ -145,7 +164,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
 
                 // if the value(s) already exist
                 } else {
-                    final Map<Object, Value> alreadyWrite = new HashMap<Object, Value>();
+                    final Map<Object, Value> alreadyWrite = new HashMap<>();
                     for (Value v : matchingValues) {
                         if (v instanceof TextValue && value instanceof String) {
                             // TODO verify more Type
@@ -184,9 +203,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                         }
                     }
                 }
-            } catch (MD_IOException ex) {
-                throw new MetadataIoException(ex);
-            } catch (IllegalArgumentException ex) {
+            } catch (MD_IOException | IllegalArgumentException ex) {
                 throw new MetadataIoException(ex);
             }
             indexer.removeDocument(metadataID);

@@ -37,11 +37,6 @@ import static org.junit.Assume.*;
  */
 public class WPSSoapRequestTest extends AbstractGrizzlyServer {
 
-    private static final String WPS_DEFAULT = "http://localhost:9191/wps/default?";
-
-    private static final String WPS_TEST = "http://localhost:9191/wps/test?";
-
-
     @BeforeClass
     public static void initLayerList() throws Exception {
         final Map<String, Object> map = new HashMap<String, Object>();
@@ -65,7 +60,7 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL(WPS_DEFAULT);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?");
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -88,7 +83,7 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL(WPS_DEFAULT);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?");
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -112,7 +107,7 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL(WPS_DEFAULT);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?");
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;

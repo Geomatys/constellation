@@ -32,14 +32,9 @@ import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
-
-// constellation dependencies
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.sis.metadata.iso.extent.DefaultGeographicDescription;
-import org.apache.sis.util.iso.DefaultInternationalString;
-import org.apache.sis.xml.IdentifiedObject;
-import org.apache.sis.xml.IdentifierSpace;
+// constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.utils.Utils;
@@ -47,6 +42,12 @@ import org.constellation.util.ReflectionUtilities;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.StringUtilities;
+
+// Apache dependencies
+import org.apache.sis.metadata.iso.extent.DefaultGeographicDescription;
+import org.apache.sis.util.iso.DefaultInternationalString;
+import org.apache.sis.xml.IdentifiedObject;
+import org.apache.sis.xml.IdentifierSpace;
 import org.apache.sis.xml.XLink;
 import org.apache.sis.xml.XLink.Type;
 
@@ -70,6 +71,8 @@ import org.mdweb.io.Writer;
 import org.mdweb.model.schemas.PrimitiveType;
 import org.mdweb.model.storage.RecordInfo;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
+
+// GeoAPI
 import org.opengis.annotation.UML;
 import org.opengis.metadata.Metadata;
 
@@ -102,12 +105,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * A map recording the binding between java Class and MDWeb {@link classe}
      */
-    private Map<String, Classe> classBinding;
+    private final Map<String, Classe> classBinding = new HashMap<>();
 
     /**
      * A List of contact record.
      */
-    private final Map<Object, Value> contacts = new HashMap<Object, Value>();;
+    private final Map<Object, Value> contacts = new HashMap<>();
 
     /**
      * A flag indicating that we don't want to write predefined values.
@@ -119,12 +122,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     protected final boolean noIndexation;
 
-    private final Map<Standard, List<Standard>> standardMapping = new HashMap<Standard, List<Standard>>();
+    private final Map<Standard, List<Standard>> standardMapping = new HashMap<>();
 
     /**
      * Record the date format in the metadata.
      */
-    protected static final List<DateFormat> DATE_FORMAT = new ArrayList<DateFormat>();
+    protected static final List<DateFormat> DATE_FORMAT = new ArrayList<>();
     static {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         df.setTimeZone(TimeZone.getDefault());
@@ -184,8 +187,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             throw new MetadataIoException("SQLException while initializing the MDWeb writer:" +'\n'+
                                            "cause:" + ex.getMessage());
         }
-
-        this.classBinding = new HashMap<String, Classe>();
     }
 
     /**
@@ -205,7 +206,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                            "cause:" + ex.getMessage());
         }
         this.noIndexation = false;
-        this.classBinding = new HashMap<String, Classe>();
     }
 
     public MDWebMetadataWriter(final Writer mdWriter) throws MetadataIoException {
@@ -221,7 +221,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                            "cause:" + ex.getMessage());
         }
         this.noIndexation = false;
-        this.classBinding = new HashMap<String, Classe>();
     }
 
     protected MDWebMetadataWriter() throws MetadataIoException {
@@ -231,7 +230,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     private void initStandardMapping() {
         // ISO 19115 and its sub standard (ISO 19119, 19110)
-        List<Standard> availableStandards = new ArrayList<Standard>();
+        List<Standard> availableStandards = new ArrayList<>();
         availableStandards.add(Standard.ISO_19115_FRA);
         availableStandards.add(Standard.ISO_19115);
         availableStandards.add(Standard.ISO_19115_2);
@@ -244,7 +243,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         standardMapping.put(Standard.ISO_19115, availableStandards);
 
         // CSW standard
-        availableStandards = new ArrayList<Standard>();
+        availableStandards = new ArrayList<>();
         availableStandards.add(Standard.CSW);
         availableStandards.add(Standard.DUBLINCORE);
         availableStandards.add(Standard.DUBLINCORE_TERMS);
@@ -252,7 +251,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         standardMapping.put(Standard.CSW, availableStandards);
 
         // Ebrim v3 standard
-        availableStandards = new ArrayList<Standard>();
+        availableStandards = new ArrayList<>();
         availableStandards.add(Standard.EBRIM_V3);
         availableStandards.add(Standard.CSW);
         availableStandards.add(Standard.OGC_FILTER);
@@ -260,7 +259,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         standardMapping.put(Standard.EBRIM_V3, availableStandards);
 
         // Ebrim v2.5 standard
-        availableStandards = new ArrayList<Standard>();
+        availableStandards = new ArrayList<>();
         availableStandards.add(Standard.EBRIM_V2_5);
         availableStandards.add(Standard.CSW);
         availableStandards.add(Standard.OGC_FILTER);
@@ -275,7 +274,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
         // we add the extra binding extracted from a properties file
         try {
-            final Map<String, List<String>> extraStandard = new HashMap<String, List<String>>();
+            final Map<String, List<String>> extraStandard = new HashMap<>();
             final Iterator<ExtraMappingFactory> ite = ServiceRegistry.lookupProviders(ExtraMappingFactory.class);
             while (ite.hasNext()) {
                 final ExtraMappingFactory currentFactory = ite.next();
@@ -290,7 +289,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     continue;
                 }
                 final List<String> standardList  = entry.getValue();
-                final List<Standard> standards   = new ArrayList<Standard>();
+                final List<Standard> standards   = new ArrayList<>();
                 for (String standardName : standardList) {
                     Standard standard = mdWriter.getStandard(standardName);
                     if (standard == null) {
@@ -434,7 +433,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 * A List of the already see object for the current metadata read
                 * (in order to avoid infinite loop)
                 */
-                final Map<Object, Value> alreadyWrite = new HashMap<Object, Value>();
+                final Map<Object, Value> alreadyWrite = new HashMap<>();
                 final Path rootPath = new Path(rootClasse.getStandard(), rootClasse);
                 final List<Value> collection = addValueFromObject(record, object, rootPath, null, alreadyWrite);
                 collection.clear();
@@ -458,7 +457,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     protected List<Value> addValueFromObject(final FullRecord record, Object object, Path path, final Value parentValue, final Map<Object, Value> alreadyWrite) throws MD_IOException {
 
-        final List<Value> result = new ArrayList<Value>();
+        final List<Value> result = new ArrayList<>();
 
         //if the path is not already in the database we write it
         if (mdWriter.getPath(path.getId()) == null) {
@@ -1043,8 +1042,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
 
         // we create a MDWeb record the object
-        FullRecord record       = null;
-        Profile profile = null;
+        FullRecord record = null;
+        Profile profile   = null;
         try {
             // we try to determine the profile for the Object
             if ("org.geotoolkit.csw.xml.v202.RecordType".equals(obj.getClass().getName())) {

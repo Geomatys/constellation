@@ -19,6 +19,8 @@ package org.constellation.metadata.io.filesystem;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
@@ -36,6 +38,12 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
@@ -48,6 +56,7 @@ import org.constellation.util.ReflectionUtilities;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
 import static org.constellation.metadata.io.AbstractMetadataReader.ISO_19110;
+import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
 
 // geoAPI dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -61,9 +70,10 @@ import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.identification.Keywords;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.ScopeCode;
-import org.opengis.util.InternationalString;
 import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.distribution.Distributor;
+import org.opengis.metadata.identification.BrowseGraphic;
+import org.opengis.util.InternationalString;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
@@ -74,18 +84,21 @@ import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-import org.opengis.metadata.identification.BrowseGraphic;
-import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 
+import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
+
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.xml.MarshallerPool;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  * A CSW Metadata Reader. This reader does not require a database.
@@ -116,7 +129,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     /**
      * A unmarshaller to get java object from metadata files.
      */
-    private final MarshallerPool marshallerPool;
+    private static final MarshallerPool marshallerPool = EBRIMMarshallerPool.getInstance();
 
     /**
      * Build a new CSW File Reader.
@@ -130,7 +143,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     public FileMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(true, false);
-        marshallerPool = EBRIMMarshallerPool.getInstance();
         dataDirectory = configuration.getDataDirectory();
         if (dataDirectory == null) {
             throw new MetadataIoException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
@@ -183,47 +195,60 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     }
 
     @Override
+    public Object getOriginalMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
+        final int metadataMode;
+        try {
+            metadataMode = getMetadataType(metadataFile);
+        } catch (IOException | XMLStreamException ex) {
+            throw new MetadataIoException(ex);
+        }
+        if ((elementName == null || elementName.isEmpty()) && (ElementSetType.FULL.equals(type) || type == null) && metadataMode == mode) {
+            if (metadataFile != null && metadataFile.exists()) {
+                try {
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    dbf.setNamespaceAware(true);
+                    DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+                    Document document = docBuilder.parse(metadataFile);
+                    return document.getDocumentElement();
+                } catch (ParserConfigurationException | SAXException | IOException ex) {
+                    throw new MetadataIoException(METAFILE_MSG + identifier + ".xml can not be read", ex, NO_APPLICABLE_CODE);
+                }
+            }
+            throw new MetadataIoException(METAFILE_MSG + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
+        } else {
+            return getMetadata(identifier, mode, type, elementName);
+        }
+    }
+
+    private int getMetadataType(final File metadataFile) throws IOException, XMLStreamException {
+        final XMLInputFactory xif = XMLInputFactory.newFactory();
+        final String rootName;
+        try (FileInputStream fos = new FileInputStream(metadataFile)) {
+            XMLStreamReader xsr = xif.createXMLStreamReader(fos, "UTF-8");
+            xsr.nextTag();
+            rootName = xsr.getLocalName();
+            xsr.close();
+        }
+        switch (rootName) {
+            case "MD_Metadata":
+            case "MI_Metadata":
+                return ISO_19115;
+            case "Record":
+                return DUBLINCORE;
+            case "SensorML":
+                return SENSORML;
+        }
+        // TODO complete other metadata type
+        return NATIVE;
+    }
+
+    @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
         return metadataFile != null && metadataFile.exists();
     }
     
-    /**
-     * Try to find a file named identifier.xml or identifier recursively
-     * in the specified directory and its sub-directories.
-     *
-     * @param identifier The metadata identifier.
-     * @param directory The current directory to explore.
-     * @return
-     */
-    public static File getFileFromIdentifier(final String identifier, final File directory) {
-        // 1) try to find the file in the current directory
-        File metadataFile = new File (directory,  identifier + XML_EXT);
-        // 2) trying without the extension
-        if (!metadataFile.exists()) {
-            metadataFile = new File (directory,  identifier);
-        }
-        // 3) trying by replacing ':' by '-' (for windows platform who don't accept ':' in file name)
-        if (!metadataFile.exists()) {
-            final String windowsIdentifier = identifier.replace(':', '-');
-            metadataFile = new File (directory,  windowsIdentifier + XML_EXT);
-        }
-
-        if (metadataFile.exists()) {
-            return metadataFile;
-        } else {
-            for (File child : directory.listFiles()) {
-                if (child.isDirectory()) {
-                    final File result = getFileFromIdentifier(identifier, child);
-                    if (result != null && result.exists()) {
-                        return result;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     /**
      * Unmarshall The file designed by the path dataDirectory/identifier.xml
      * If the file is not present or if it is impossible to unmarshall it it return an exception.
@@ -569,36 +594,30 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     private List<String> getAllValuesFromPaths(final List<String> paths, final File directory) throws MetadataIoException {
         final List<String> result = new ArrayList<>();
-        try {
-            final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-            for (File metadataFile : directory.listFiles()) {
-                if (!metadataFile.isDirectory()) {
-                    try {
-                        Object metadata = unmarshaller.unmarshal(metadataFile);
-                        marshallerPool.recycle(unmarshaller);
-                        if (metadata instanceof JAXBElement) {
-                            metadata = ((JAXBElement) metadata).getValue();
-                        }
-                        final List<Object> value = GenericIndexer.extractValues(metadata, paths);
-                        if (value != null && !value.equals(Arrays.asList("null"))) {
-                            for (Object obj : value){
-                                result.add(obj.toString());
-                            }
-                        }
-                        
-                     //continue to the next file   
-                    } catch (JAXBException | IllegalArgumentException ex) {
-                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\ncause: " + ex.getMessage());
+        for (File metadataFile : directory.listFiles()) {
+            if (!metadataFile.isDirectory()) {
+                try {
+                    final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+                    Object metadata = unmarshaller.unmarshal(metadataFile);
+                    marshallerPool.recycle(unmarshaller);
+                    if (metadata instanceof JAXBElement) {
+                        metadata = ((JAXBElement) metadata).getValue();
                     }
-                } else {
-                    result.addAll(getAllValuesFromPaths(paths, metadataFile));
-                }
-            }
-        } catch (JAXBException ex) {
-            throw new MetadataIoException("Error while getting unmarshaller from pool\ncause: " + ex.getMessage(), NO_APPLICABLE_CODE);
+                    final List<Object> value = GenericIndexer.extractValues(metadata, paths);
+                    if (value != null && !value.equals(Arrays.asList("null"))) {
+                        for (Object obj : value){
+                            result.add(obj.toString());
+                        }
+                    }
 
+                 //continue to the next file   
+                } catch (JAXBException | IllegalArgumentException ex) {
+                    LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\ncause: " + ex.getMessage());
+                }
+            } else {
+                result.addAll(getAllValuesFromPaths(paths, metadataFile));
+            }
         }
-        
         Collections.sort(result);
         return result;
     }

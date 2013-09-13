@@ -57,7 +57,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     /**
      * A map containing the metadata already extract from the database.
      */
-    private final Map<String, Object> metadatas = new HashMap<String, Object>();
+    private final Map<String, Object> metadatas = new HashMap<>();
 
     /**
      * The default level for logging non essential informations (ToSee => finer)

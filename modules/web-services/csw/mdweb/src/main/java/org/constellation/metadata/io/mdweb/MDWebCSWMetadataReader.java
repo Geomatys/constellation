@@ -71,11 +71,9 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     /**
      * A map of binding term-path for each standard.
      */
-    protected static final Map<Standard, Map<String, String>> DUBLINCORE_PATH_MAP;
+    protected static final Map<Standard, Map<String, String>> DUBLINCORE_PATH_MAP = new HashMap<>();
     static {
-        DUBLINCORE_PATH_MAP          = new HashMap<Standard, Map<String, String>>();
-
-        final Map<String, String> isoMap = new HashMap<String, String>();
+        final Map<String, String> isoMap = new HashMap<>();
         isoMap.put("identifier",  "ISO 19115:MD_Metadata:fileIdentifier");
         isoMap.put("type",        "ISO 19115:MD_Metadata:hierarchyLevel");
         isoMap.put("date",        "ISO 19115:MD_Metadata:dateStamp");
@@ -92,7 +90,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         isoMap.put("description", "ISO 19115:MD_Metadata:identificationInfo:graphicOverview:fileName");
         DUBLINCORE_PATH_MAP.put(Standard.ISO_19115, isoMap);
 
-        final Map<String, String> iso2Map = new HashMap<String, String>();
+        final Map<String, String> iso2Map = new HashMap<>();
         iso2Map.put("identifier",  "ISO 19115-2:MI_Metadata:fileIdentifier");
         iso2Map.put("type",        "ISO 19115-2:MI_Metadata:hierarchyLevel");
         iso2Map.put("date",        "ISO 19115-2:MI_Metadata:dateStamp");
@@ -109,7 +107,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         iso2Map.put("description", "ISO 19115-2:MI_Metadata:identificationInfo:graphicOverview:fileName");
         DUBLINCORE_PATH_MAP.put(Standard.ISO_19115_2, iso2Map);
 
-        final Map<String, String> ebrimMap = new HashMap<String, String>();
+        final Map<String, String> ebrimMap = new HashMap<>();
         ebrimMap.put("identifier", "Ebrim v3.0:RegistryObject:id");
         ebrimMap.put("type",       "Ebrim v3.0:RegistryObject:objectType");
         ebrimMap.put("abstract",   "Ebrim v3.0:RegistryObject:description:localizedString:value");
@@ -130,14 +128,14 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * A map of label - concept URI loaded from a Thesaurus.
      * They are used to make Anchor mark in the xml export.
      */
-    private final Map<String, URI> conceptMap = new HashMap<String, URI>();
+    private final Map<String, URI> conceptMap = new HashMap<>();
 
 
     public MDWebCSWMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(configuration);
 
         final List<BDD> thesaurusDBs = configuration.getThesaurus();
-        final List<Thesaurus> thesaurusList = new ArrayList<Thesaurus>();
+        final List<Thesaurus> thesaurusList = new ArrayList<>();
         for (BDD thesaurusDB : thesaurusDBs) {
             final DataSource source    =    thesaurusDB.getPooledDataSource();
             final String schema        = thesaurusDB.getSchema();
@@ -163,7 +161,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
     @Override
     public List<DomainValues> getFieldDomainofValues(final String propertyNames) throws MetadataIoException {
-        final List<DomainValues> responseList = new ArrayList<DomainValues>();
+        final List<DomainValues> responseList = new ArrayList<>();
         final StringTokenizer tokens          = new StringTokenizer(propertyNames, ",");
 
         while (tokens.hasMoreTokens()) {
@@ -205,6 +203,11 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         return responseList;
     }
 
+    @Override
+    public Object getOriginalMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+        return getMetadata(identifier, mode, type, elementName);
+    }
+    
     /**
      * Return a metadata object from the specified identifier.
      * if is not already in cache it read it from the MDWeb database.
@@ -225,7 +228,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
             //we look for cached object
             Object result = getFromCache(identifier);
-            if (mode == ISO_19115 || mode == EBRIM || mode == SENSORML) {
+            if (mode == ISO_19115 || mode == EBRIM || mode == SENSORML || mode == ISO_19110) {
 
                 if (result == null) {
                     final FullRecord f = mdReader.getRecord(identifier);
@@ -233,17 +236,6 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 } else {
                     LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
                 }
-
-                /*
-                 if (mode == ISO_19115 && !(result instanceof DefaultMetadata)) {
-                    LOGGER.info("The metadata:" + identifier + " is not a iso type");
-                    return null;
-                }
-
-                if (mode == SENSORML && !(result instanceof AbstractSensorML)) {
-                    LOGGER.info("The metadata:" + identifier + " is not a SML type");
-                    return null;
-                }*/
 
                 result = applyElementSet(result, type, elementName);
 
@@ -407,7 +399,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         // we get the file identifier(s)
         final List<Value>   identifierValues  = record.getValueFromPath(pathMap.get("identifier"));
-        final List<String>  identifiers       = new ArrayList<String>();
+        final List<String>  identifiers       = new ArrayList<>();
         for (Value v: identifierValues) {
             if (v instanceof TextValue) {
                 identifiers.add(((TextValue)v).getValue());
@@ -417,7 +409,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         //we get The boundingBox(es)
         final List<Value>   bboxValues     = record.getValueFromPath(pathMap.get("boundingBox"));
-        final List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
+        final List<BoundingBoxType> bboxes = new ArrayList<>();
         for (Value v: bboxValues) {
             bboxes.add(createBoundingBoxFromValue(v.getIdValue(), record, recordStandard));
         }
@@ -455,7 +447,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         // we get the keywords
         final List<Value> keywordsValues  = record.getValueFromPath(pathMap.get("subject3"));
         keywordsValues.addAll(record.getValueFromPath(pathMap.get("subject")));
-        final List<SimpleLiteral> keywords = new ArrayList<SimpleLiteral>();
+        final List<SimpleLiteral> keywords = new ArrayList<>();
         for (Value v: keywordsValues) {
             if (v instanceof TextValue) {
                 keywords.add(new SimpleLiteral(null, ((TextValue)v).getValue()));
@@ -491,7 +483,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         }
         // and the topicCategeoryy
         final List<Value> formatsValues  = record.getValueFromPath(pathMap.get("format"));
-        final List<String> formats = new ArrayList<String>();
+        final List<String> formats = new ArrayList<>();
         for (Value v: formatsValues) {
             if (v instanceof TextValue) {
                 formats.add(((TextValue)v).getValue());
@@ -505,7 +497,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         }
 
         final List<Value> dateValues  = record.getValueFromPath(pathMap.get("date"));
-        final List<String> dates = new ArrayList<String>();
+        final List<String> dates = new ArrayList<>();
         for (Value v: dateValues) {
             if (v instanceof TextValue) {
                 dates.add(((TextValue)v).getValue());
@@ -518,7 +510,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         // the abstracts
         final List<Value>   abstractValues = record.getValueFromPath(pathMap.get("abstract"));
-        final List<String>  abstracts      = new ArrayList<String>();
+        final List<String>  abstracts      = new ArrayList<>();
         for (Value v: abstractValues) {
             if (v instanceof TextValue) {
                 abstracts.add(((TextValue)v).getValue());
@@ -528,7 +520,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         // the description
         final List<Value>   descriptionValues   = record.getValueFromPath(pathMap.get("description"));
-        final List<SimpleLiteral>  descriptions = new ArrayList<SimpleLiteral>();
+        final List<SimpleLiteral>  descriptions = new ArrayList<>();
         for (Value v: descriptionValues) {
             if (v instanceof TextValue) {
                 descriptions.add(new SimpleLiteral(((TextValue)v).getValue()));
@@ -541,7 +533,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         // the creator of the data
         final List<Value>   creatorValues = record.getValueFromPath(pathMap.get("creator"));
-        final List<String>  creators      = new ArrayList<String>();
+        final List<String>  creators      = new ArrayList<>();
         for (Value v: creatorValues) {
             if (v instanceof TextValue) {
                 creators.add(((TextValue)v).getValue());
@@ -556,7 +548,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         // the publisher of the data
         final List<Value>   publisherValues = record.getValueFromPath(pathMap.get("publisher"));
-        final List<String>  publishers      = new ArrayList<String>();
+        final List<String>  publishers      = new ArrayList<>();
         for (Value v: publisherValues) {
             if (v instanceof TextValue) {
                 publishers.add(((TextValue)v).getValue());
@@ -569,7 +561,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         // The rights
         final List<Value>   rightValues = record.getValueFromPath(pathMap.get("rights"));
-        final List<String>  rights      = new ArrayList<String>();
+        final List<String>  rights      = new ArrayList<>();
         for (Value v: rightValues) {
             if (v instanceof TextValue) {
                 rights.add(((TextValue)v).getValue());
@@ -585,7 +577,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         // the language
         final List<Value>   languageValues = record.getValueFromPath(pathMap.get("language"));
-        final List<String>  languages      = new ArrayList<String>();
+        final List<String>  languages      = new ArrayList<>();
         for (Value v: languageValues) {
             if (v instanceof TextValue) {
                 languages.add(((TextValue)v).getValue());

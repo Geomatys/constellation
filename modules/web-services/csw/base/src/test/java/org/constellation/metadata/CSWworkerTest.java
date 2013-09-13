@@ -28,8 +28,11 @@ import java.util.List;
 // JAXB dependencies
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 // constellation dependencies
 import org.constellation.util.Util;
@@ -44,6 +47,7 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.test.XMLComparator;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
@@ -111,6 +115,8 @@ import org.opengis.metadata.citation.Role;
 // JUnit dependencies
 import org.junit.Ignore;
 import static org.junit.Assert.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * Test the different methods of CSWWorker with a FileSystem reader/writer.
@@ -282,14 +288,21 @@ public class CSWworkerTest {
         assertTrue(result.getAbstractRecord().isEmpty());
         assertTrue(result.getAny().size() == 1);
         Object obj = result.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetadata);
-
-        DefaultMetadata isoResult = (DefaultMetadata) obj;
-
-        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
-
-        metadataEquals(ExpResult1, isoResult, ComparisonMode.BY_CONTRACT);
-
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata isoResult = (DefaultMetadata) obj;
+            DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+            metadataEquals(ExpResult1, isoResult, ComparisonMode.BY_CONTRACT);
+        } else if (obj instanceof Node) {
+            Node resultNode = (Node) obj;
+            Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1.xml");
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns/:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.compare();
+        } else {
+            fail("unexpected record type:" + obj);
+        }
+        
         /*
          *  TEST 2 : getRecordById with the first metadata in DC mode (BRIEF).
          */
@@ -1528,12 +1541,21 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetadata);
 
-        DefaultMetadata isoResult = (DefaultMetadata) obj;
-        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
-        metadataEquals(ExpResult1, isoResult);
-
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata isoResult = (DefaultMetadata) obj;
+            DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+            metadataEquals(ExpResult1, isoResult, ComparisonMode.BY_CONTRACT);
+        } else if (obj instanceof Node) {
+            Node resultNode = (Node) obj;
+            Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1.xml");
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns/:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.compare();
+        } else {
+            fail("unexpected record type:" + obj);
+        }
 
         // we delete the metadata
         QueryConstraintType constraint = new QueryConstraintType("identifier='42292_5p_19900609195600'", "1.1.0");
@@ -1564,9 +1586,10 @@ public class CSWworkerTest {
         /*
          *  TEST 1 : we add the metadata 42292_5p_19900609195600
          */
-        ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+        DefaultMetadata ExpResult1    = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+        Node original =  getOriginalMetadata("org/constellation/xml/metadata/meta1.xml");
 
-        InsertType insert       = new InsertType(ExpResult1);
+        InsertType insert       = new InsertType(original);
         request = new TransactionType("CSW", "2.0.2", insert);
         result  = worker.transaction(request);
 
@@ -1582,17 +1605,27 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetadata);
 
-        isoResult = (DefaultMetadata) obj;
-        metadataEquals(ExpResult1, isoResult);
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata isoResult = (DefaultMetadata) obj;
+            metadataEquals(ExpResult1, isoResult, ComparisonMode.BY_CONTRACT);
+        } else if (obj instanceof Node) {
+            Node resultNode = (Node) obj;
+            XMLComparator comparator = new XMLComparator(original, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns/:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.compare();
+        } else {
+            fail("unexpected record type:" + obj);
+        }
 
         /*
          *  TEST 2 : we add the metadata urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd (DC Record)
          */
         RecordType ExpResult2 = ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
+        Node       oriExpResult2 = getOriginalMetadata("org/constellation/xml/metadata/meta8.xml");
 
-        insert  = new InsertType(ExpResult2);
+        insert  = new InsertType(oriExpResult2);
         request = new TransactionType("CSW", "2.0.2", insert);
         result  = worker.transaction(request);
 
@@ -1605,13 +1638,24 @@ public class CSWworkerTest {
         GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().size() == 1);
-        assertTrue(GRresult.getAny().isEmpty());
-        obj = GRresult.getAbstractRecord().get(0);
-        assertTrue(obj instanceof RecordType);
+        assertTrue(GRresult.getAbstractRecord().size() == 1 || GRresult.getAny().size() == 1);
+        assertTrue(GRresult.getAny().isEmpty() || GRresult.getAbstractRecord().isEmpty());
 
-        RecordType dcResult =  (RecordType) obj;
-        assertEquals(ExpResult2, dcResult);
+        if (!GRresult.getAbstractRecord().isEmpty()) {
+            obj = GRresult.getAbstractRecord().get(0);
+            assertTrue(obj instanceof RecordType);
+
+            RecordType dcResult =  (RecordType) obj;
+            assertEquals(ExpResult2, dcResult);
+        } else {
+            obj = GRresult.getAny().get(0);
+            assertTrue(obj instanceof Node);
+
+            Node resultNode = (Node) obj;
+            XMLComparator comparator = new XMLComparator(oriExpResult2, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns/:*");
+            comparator.compare();
+        }
         pool.recycle(unmarshaller);
     }
 
@@ -1628,9 +1672,10 @@ public class CSWworkerTest {
          *  TEST 1 : we update the metadata 42292_5p_19900609195600 by replacing it by another metadata
          */
 
-        DefaultMetadata replacement        = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta6.xml"));
+        DefaultMetadata replacement     = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta6.xml"));
+        Node replacementOriginal        = getOriginalMetadata("org/constellation/xml/metadata/meta6.xml");
         QueryConstraintType constraint  = new QueryConstraintType("identifier='42292_5p_19900609195600'", "1.1.0");
-        UpdateType update               = new UpdateType(replacement, constraint);
+        UpdateType update               = new UpdateType(replacementOriginal, constraint);
         TransactionType request         = new TransactionType("CSW", "2.0.2", update);
         TransactionResponse result      = worker.transaction(request);
 
@@ -1662,12 +1707,21 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetadata);
 
-        DefaultMetadata isoResult = (DefaultMetadata) obj;
-        metadataEquals(replacement, isoResult);
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata isoResult = (DefaultMetadata) obj;
+            metadataEquals(replacement, isoResult);
+        } else if (obj instanceof Node) {
+            Node resultNode = (Node) obj;
+            XMLComparator comparator = new XMLComparator(replacementOriginal, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns/:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.compare();
+        } else {
+            fail("unexpected record type:" + obj);
+        }
 
-
+        
         /*
          *  TEST 2 : we update the metadata 11325_158_19640418141800 by replacing a single Property
          *  we replace the property MD_Metadata.language from en to fr.
@@ -1688,8 +1742,18 @@ public class CSWworkerTest {
 
         List<String> results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         List<String> expResult = new ArrayList<>();
@@ -1721,8 +1785,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -1748,8 +1822,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -1776,8 +1860,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -1806,8 +1900,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -1827,8 +1931,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -1864,8 +1978,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -1904,8 +2028,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -1934,8 +2068,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -1960,7 +2104,7 @@ public class CSWworkerTest {
             exe = ex;
         }
 
-        assertTrue(exe != null);
+        assertNotNull(exe);
         assertEquals(exe.getExceptionCode(), INVALID_PARAMETER_VALUE);
 
         // we perform again the getRecord request the modified metadata must appears again in the list
@@ -1972,8 +2116,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -2016,8 +2170,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -2062,8 +2226,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -2090,8 +2264,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -2122,8 +2306,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -2145,8 +2339,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -2172,8 +2376,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -2233,8 +2447,18 @@ public class CSWworkerTest {
 
         results = new ArrayList<>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetadata meta = (DefaultMetadata) objRec;
-            results.add(meta.getFileIdentifier());
+            if (objRec instanceof DefaultMetadata) {
+                final DefaultMetadata meta = (DefaultMetadata) objRec;
+                results.add(meta.getFileIdentifier());
+            } else if (objRec instanceof Node) {
+                final Node isoNode = (Node) objRec;
+                final List<Node> idNodes = getNodes("fileIdentifier/CharacterString", isoNode);
+                assertEquals(1, idNodes.size());
+                Node n =  idNodes.get(0);
+                results.add(n.getTextContent());
+            }  else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         expResult = new ArrayList<>();
@@ -2317,20 +2541,47 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetadata);
 
-        isoResult = (DefaultMetadata) obj;
-        DefaultExtendedElementInformation extResult = null;
         boolean removed = true;
-        for (ExtendedElementInformation ex : isoResult.getMetadataExtensionInfo().iterator().next().getExtendedElementInformation()) {
-            if (ex.getName().equals("extendedName")) {
-                extResult = (DefaultExtendedElementInformation) ex;
-            } else if (ex.getName().equals("SDN:L031:2:")) {
-                removed = false;
-            }
-        }
+        if (obj instanceof DefaultMetadata) {
 
-        assertEquals(ext, extResult);
+            DefaultMetadata isoResult = (DefaultMetadata) obj;
+            DefaultExtendedElementInformation extResult = null;
+
+            for (ExtendedElementInformation ex : isoResult.getMetadataExtensionInfo().iterator().next().getExtendedElementInformation()) {
+                switch (ex.getName()) {
+                    case "extendedName":
+                        extResult = (DefaultExtendedElementInformation) ex;
+                        break;
+                    case "SDN:L031:2:":
+                        removed = false;
+                        break;
+                }
+            }
+            assertEquals(ext, extResult);
+        } else if (obj instanceof Node) {
+
+           DefaultExtendedElementInformation extResult = null;
+
+            Node isoResult = (Node) obj;
+            final List<Node> nodes = getNodes("metadataExtensionInfo/MD_MetadataExtensionInformation/extendedElementInformation/MD_ExtendedElementInformation", isoResult);
+            for (Node extNode : nodes) {
+                DefaultExtendedElementInformation ex = (DefaultExtendedElementInformation) unmarshaller.unmarshal(extNode);
+                switch (ex.getName()) {
+                    case "extendedName":
+                        extResult = (DefaultExtendedElementInformation) ex;
+                        break;
+                    case "SDN:L031:2:":
+                        removed = false;
+                        break;
+                }
+            }
+            assertEquals(ext, extResult);
+            
+        } else {
+            fail("unexpected record type:" + obj);
+        }
+        
         // TODO fix this test assertTrue(removed);
 
 
@@ -2356,12 +2607,20 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(1 , response.getSearchResults().getAny().size());
-
-        DefaultMetadata meta = (DefaultMetadata) response.getSearchResults().getAny().get(0);
-
-        assertEquals("someURI", meta.getDataSetUri());
-
-
+        obj = response.getSearchResults().getAny().get(0);
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata meta = (DefaultMetadata) obj;
+            assertEquals("someURI", meta.getDataSetUri());
+        } else if (obj instanceof Node) {
+            Node isoNode = (Node) obj;
+            final List<Node> uriNodes = getNodes("dataSetURI/CharacterString", isoNode);
+            assertEquals(1, uriNodes.size());
+            Node n =  uriNodes.get(0);
+            assertEquals(n.getTextContent(), "someURI");
+        } else {
+            fail("unexpected record type:" + obj);
+        }
+        
         // TEST 15 we update the metadata 42292_9s_1990061004100 by updating the datestamp.
 
 
@@ -2375,11 +2634,20 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(1 , response.getSearchResults().getAny().size());
 
-        meta = (DefaultMetadata) response.getSearchResults().getAny().get(0);
-
-        assertEquals(TemporalUtilities.parseDateSafe("2009-01-26T12:00:00+01:00",true, true), meta.getDateStamp());
-
-
+        obj = response.getSearchResults().getAny().get(0);
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata meta = (DefaultMetadata) obj;
+            assertEquals(TemporalUtilities.parseDateSafe("2009-01-26T12:00:00+01:00",true, true), meta.getDateStamp());
+        } else if (obj instanceof Node) {
+           Node isoNode = (Node) obj;
+            final List<Node> dateNodes = getNodes("dateStamp/DateTime", isoNode);
+            assertEquals(1, dateNodes.size());
+            Node n =  dateNodes.get(0);
+            assertEquals(n.getTextContent(), "2009-01-26T12:00:00+01:00");
+        } else {
+            fail("unexpected record type:" + obj);
+        }
+        
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
         properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp", "2009-01-18T13:00:00+01:00"));
@@ -2397,17 +2665,27 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(1 , response.getSearchResults().getAny().size());
 
-        meta = (DefaultMetadata) response.getSearchResults().getAny().get(0);
-
-        assertEquals(TemporalUtilities.parseDateSafe("2009-01-18T13:00:00+01:00",true, true), meta.getDateStamp());
+        obj = response.getSearchResults().getAny().get(0);
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata meta = (DefaultMetadata) obj;
+            assertEquals(TemporalUtilities.parseDateSafe("2009-01-18T13:00:00+01:00",true, true), meta.getDateStamp());
+        } else if (obj instanceof Node) {
+           Node isoNode = (Node) obj;
+            final List<Node> dateNodes = getNodes("dateStamp/DateTime", isoNode);
+            assertEquals(1, dateNodes.size());
+            Node n =  dateNodes.get(0);
+            assertEquals(n.getTextContent(), "2009-01-18T13:00:00+01:00");
+        } else {
+            fail("unexpected record type:" + obj);
+        }
 
         // TEST 16 we replace totaly the metadata 42292_9s_1990061004100 .
 
-
-        // then we verify that the modified metadata is well modified and indexed
         final DefaultMetadata newMeta = new DefaultMetadata();
         newMeta.setFileIdentifier("42292_9s_19900610041000");
         newMeta.setDateStamp(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true));
+
+        final Node originalnewMeta = writeMetadataInDom(newMeta);
 
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
         update     = new UpdateType(newMeta, constraint);
@@ -2424,31 +2702,58 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults().getAny() != null);
         assertEquals(1 , response.getSearchResults().getAny().size());
 
-        meta = (DefaultMetadata) response.getSearchResults().getAny().get(0);
+        obj = response.getSearchResults().getAny().get(0);
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata meta = (DefaultMetadata) obj;
+            assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true), meta.getDateStamp());
+            assertEquals(newMeta, meta);
 
-        assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true), meta.getDateStamp());
-        assertEquals(newMeta, meta);
+        } else if (obj instanceof Node) {
+           Node isoNode = (Node) obj;
+            final List<Node> dateNodes = getNodes("dateStamp/DateTime", isoNode);
+            assertEquals(1, dateNodes.size());
+            Node n =  dateNodes.get(0);
+            assertEquals(n.getTextContent(), "2012-01-01T14:00:00+01:00");
+
+            XMLComparator comparator = new XMLComparator(originalnewMeta, isoNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns/:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.compare();
+
+        } else {
+            fail("unexpected record type:" + obj);
+        }
 
         final GetRecordByIdType grbi = new GetRecordByIdType("CSW", "2.0.2",  new ElementSetNameType(ElementSetType.FULL), "text/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_9s_19900610041000"));
         final GetRecordByIdResponse resp = worker.getRecordById(grbi);
         assertEquals(1, resp.getAny().size());
-        meta = (DefaultMetadata) resp.getAny().get(0);
+        obj = resp.getAny().get(0);
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata meta = (DefaultMetadata) resp.getAny().get(0);
 
-        assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true), meta.getDateStamp());
-        assertEquals(newMeta, meta);
-
-
+            assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true), meta.getDateStamp());
+            assertEquals(newMeta, meta);
+        } else if (obj instanceof Node) {
+            Node isoNode = (Node) obj;
+            final List<Node> dateNodes = getNodes("dateStamp/DateTime", isoNode);
+            assertEquals(1, dateNodes.size());
+            Node n =  dateNodes.get(0);
+            assertEquals(n.getTextContent(), "2012-01-01T14:00:00+01:00");
+        } else {
+            fail("unexpected record type:" + obj);
+        }
 
         /*
          * restore context by replacing CTD02 by 42292_5p_19900609195600
          */
 
 
-        replacement        = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
-        constraint         = new QueryConstraintType("identifier='CTDF02'", "1.1.0");
-        update             = new UpdateType(replacement, constraint);
-        request            = new TransactionType("CSW", "2.0.2", update);
-        result             = worker.transaction(request);
+        replacement         = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+        replacementOriginal = getOriginalMetadata("org/constellation/xml/metadata/meta1.xml");
+        constraint          = new QueryConstraintType("identifier='CTDF02'", "1.1.0");
+        update              = new UpdateType(replacementOriginal, constraint);
+        request             = new TransactionType("CSW", "2.0.2", update);
+        result              = worker.transaction(request);
 
         assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
 
@@ -2478,12 +2783,66 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetadata);
 
-        isoResult = (DefaultMetadata) obj;
-        metadataEquals(replacement, isoResult);
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata isoResult = (DefaultMetadata) obj;
+            metadataEquals(replacement, isoResult);
+        } else if (obj instanceof Node) {
+            Node resultNode = (Node) obj;
+            XMLComparator comparator = new XMLComparator(replacementOriginal, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns/:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.compare();
+        } else {
+            fail("unexpected record type:" + obj);
+        }
 
         pool.recycle(unmarshaller);
+    }
+
+    private Node getOriginalMetadata(final String fileName) throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+
+        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+        Document document = docBuilder.parse(Util.getResourceAsStream(fileName));
+
+        return document.getDocumentElement();
+    }
+
+    private Node writeMetadataInDom(final DefaultMetadata meta) throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+
+        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+        Marshaller m = pool.acquireMarshaller();
+        m.marshal(meta, document);
+        return document.getDocumentElement();
+    }
+
+    private List<Node> getNodes(String XPath, final Node isoNode) {
+        final String[] parts = XPath.split("/");
+        List<Node> nodes = Arrays.asList(isoNode);
+        for (String part : parts) {
+            nodes = getChildNodes(nodes, part);
+        }
+        return nodes;
+    }
+
+    private List<Node> getChildNodes(final List<Node> nodes, String childName) {
+        final List<Node> result = new ArrayList<>();
+
+        for (Node node : nodes) {
+            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                final Node n = node.getChildNodes().item(i);
+                final String nodeName = n.getLocalName();
+                if (nodeName != null && nodeName.equals(childName)) {
+                    result.add(n);
+                }
+            }
+        }
+        return result;
     }
 
 }

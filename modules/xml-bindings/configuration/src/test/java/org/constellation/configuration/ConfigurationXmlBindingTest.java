@@ -19,12 +19,10 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.DataReference;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
-import org.opengis.filter.FilterVisitor;
 
 /**
  *
@@ -60,11 +58,11 @@ public class ConfigurationXmlBindingTest {
      */
     @Test
     public void serviceReportMarshalingTest() throws Exception {
-        Map<String, List<String>> instances = new HashMap<String, List<String>>();
-        ArrayList<String> prot1 = new ArrayList<String>();
+        Map<String, List<String>> instances = new HashMap<>();
+        ArrayList<String> prot1 = new ArrayList<>();
         prot1.add("REST");
         instances.put("WMS", prot1);
-        ArrayList<String> prot2 = new ArrayList<String>();
+        ArrayList<String> prot2 = new ArrayList<>();
         prot2.add("REST");
         prot2.add("SOAP");
         instances.put("WPS", prot2);
@@ -99,7 +97,7 @@ public class ConfigurationXmlBindingTest {
      */
     @Test
     public void instanceReportMarshalingTest() throws Exception {
-        List<Instance> instances = new ArrayList<Instance>();
+        List<Instance> instances = new ArrayList<>();
         instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
         instances.add(new Instance("test1", "WMS", ServiceStatus.NOT_STARTED));
         InstanceReport report = new InstanceReport(instances);
@@ -121,7 +119,7 @@ public class ConfigurationXmlBindingTest {
 
     @Test
     public void instanceReportUnMarshalingTest() throws Exception {
-        List<Instance> instances = new ArrayList<Instance>();
+        List<Instance> instances = new ArrayList<>();
         instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
         instances.add(new Instance("test1", "WMS", ServiceStatus.NOT_STARTED));
         InstanceReport expResult = new InstanceReport(instances);
@@ -146,7 +144,7 @@ public class ConfigurationXmlBindingTest {
      */
     @Test
     public void layerContextMarshalingTest() throws Exception {
-        List<Source> sources = new ArrayList<Source>();
+        List<Source> sources = new ArrayList<>();
         Source s1 = new Source("source1", true, null, null);
         Source s2 = new Source("source2", true, null, null);
         sources.add(s1);
@@ -175,8 +173,8 @@ public class ConfigurationXmlBindingTest {
         XMLComparator comparator = new XMLComparator(expresult, result);
         comparator.compare();
 
-        sources = new ArrayList<Source>();
-        List<Layer> exclude = new ArrayList<Layer>();
+        sources = new ArrayList<>();
+        List<Layer> exclude = new ArrayList<>();
         Layer l1 = new Layer(new QName("layer1"));
         Layer l2 = new Layer(new QName("layer2"));
         exclude.add(l1);
@@ -207,8 +205,8 @@ public class ConfigurationXmlBindingTest {
         comparator = new XMLComparator(expresult, result);
         comparator.compare();
 
-        sources = new ArrayList<Source>();
-        List<Layer> include = new ArrayList<Layer>();
+        sources = new ArrayList<>();
+        List<Layer> include = new ArrayList<>();
         l1 = new Layer(new QName("layer1"));
         l2 = new Layer(new QName("layer2"));
         include.add(l1);
@@ -239,8 +237,8 @@ public class ConfigurationXmlBindingTest {
         comparator = new XMLComparator(expresult, result);
         comparator.compare();
 
-        sources = new ArrayList<Source>();
-        include = new ArrayList<Layer>();
+        sources = new ArrayList<>();
+        include = new ArrayList<>();
         l1 = new Layer(new QName("layer1"),
                        "some title human readeable",
                        " a resume about the layer",
@@ -317,8 +315,8 @@ public class ConfigurationXmlBindingTest {
         comparator = new XMLComparator(expresult, result);
         comparator.compare();
 
-        sources = new ArrayList<Source>();
-        include = new ArrayList<Layer>();
+        sources = new ArrayList<>();
+        include = new ArrayList<>();
         l1 = new Layer(new QName("layer1"), Collections.singletonList(new DataReference("${providerStyleType|sldProviderId|styleName}")));
         include.add(l1);
         s1 = new Source("source1", false, include, null);
@@ -345,8 +343,8 @@ public class ConfigurationXmlBindingTest {
         comparator = new XMLComparator(expresult, result);
         comparator.compare();
 
-        sources = new ArrayList<Source>();
-        include = new ArrayList<Layer>();
+        sources = new ArrayList<>();
+        include = new ArrayList<>();
         final FilterType filter = new FilterType();
 
         final BBOXType bbox = new BBOXType("property", -180, -90, 180, 90, "CRS:84");
@@ -395,7 +393,7 @@ public class ConfigurationXmlBindingTest {
      */
     @Test
     public void processContextMarshalingTest() throws Exception {
-        List<ProcessFactory> factories = new ArrayList<ProcessFactory>();
+        List<ProcessFactory> factories = new ArrayList<>();
         ProcessFactory s1 = new ProcessFactory();
         s1.setAutorityCode("source1");
         s1.setLoadAll(true);
@@ -421,8 +419,8 @@ public class ConfigurationXmlBindingTest {
         XMLComparator comparator = new XMLComparator(expresult, result);
         comparator.compare();
 
-        factories = new ArrayList<ProcessFactory>();
-        List<Process> exclude = new ArrayList<Process>();
+        factories = new ArrayList<>();
+        List<Process> exclude = new ArrayList<>();
         Process l1 = new Process();
         l1.setId("process1");
         Process l2 = new Process();
@@ -460,8 +458,8 @@ public class ConfigurationXmlBindingTest {
         comparator = new XMLComparator(expresult, result);
         comparator.compare();
 
-        factories = new ArrayList<ProcessFactory>();
-        List<Process> include = new ArrayList<Process>();
+        factories = new ArrayList<>();
+        List<Process> include = new ArrayList<>();
         l1 = new Process();
         l1.setId("process1");
         l2 = new Process();
@@ -538,7 +536,7 @@ public class ConfigurationXmlBindingTest {
                 + "    </ns2:layers>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        List<Source> sources = new ArrayList<Source>();
+        List<Source> sources = new ArrayList<>();
         Source s1 = new Source("source1", true, null, null);
         Source s2 = new Source("source2", true, null, null);
         sources.add(s1);
@@ -564,8 +562,8 @@ public class ConfigurationXmlBindingTest {
                 + "</ns2:LayerContext>\n";
 
 
-        sources = new ArrayList<Source>();
-        List<Layer> exclude = new ArrayList<Layer>();
+        sources = new ArrayList<>();
+        List<Layer> exclude = new ArrayList<>();
         Layer l1 = new Layer(new QName("layer1"));
         Layer l2 = new Layer(new QName("layer2"));
         exclude.add(l1);
@@ -593,8 +591,8 @@ public class ConfigurationXmlBindingTest {
                 + "    </ns2:layers>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        sources = new ArrayList<Source>();
-        List<Layer> include = new ArrayList<Layer>();
+        sources = new ArrayList<>();
+        List<Layer> include = new ArrayList<>();
         l1 = new Layer(new QName("layer1"));
         l2 = new Layer(new QName("layer2"));
         include.add(l1);
@@ -655,8 +653,8 @@ public class ConfigurationXmlBindingTest {
                 + "    </ns2:layers>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-         sources = new ArrayList<Source>();
-        include = new ArrayList<Layer>();
+        sources = new ArrayList<>();
+        include = new ArrayList<>();
         l1 = new Layer(new QName("layer1"),
                        "some title human readeable",
                        " a resume about the layer",
@@ -729,8 +727,8 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        sources = new ArrayList<Source>();
-        include = new ArrayList<Layer>();
+        sources = new ArrayList<>();
+        include = new ArrayList<>();
         l1 = new Layer(new QName("layer1"), Collections.singletonList(new DataReference("${providerStyleType|sldProviderId|styleName}")));
         include.add(l1);
         s1 = new Source("source1", false, include, null);
@@ -764,8 +762,8 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        sources = new ArrayList<Source>();
-        include = new ArrayList<Layer>();
+        sources = new ArrayList<>();
+        include = new ArrayList<>();
         final FilterType filter = new FilterType();
 
         final BBOXType bbox = new BBOXType("property", -180, -90, 180, 90, "CRS:84");
@@ -802,7 +800,7 @@ public class ConfigurationXmlBindingTest {
 
     @Test
     public void stringListMarshalingTest() throws Exception {
-        final List<String> list = new ArrayList<String>();
+        final List<String> list = new ArrayList<>();
         list.add("value1");
         list.add("value2");
         final StringList sl = new StringList(list);
@@ -819,7 +817,7 @@ public class ConfigurationXmlBindingTest {
         XMLComparator comparator = new XMLComparator(result, result);
         comparator.compare();
 
-        final Set<String> set = new HashSet<String>();
+        final Set<String> set = new HashSet<>();
         set.add("value1");
         set.add("value2");
         final StringList slSet = new StringList(set);
@@ -833,7 +831,7 @@ public class ConfigurationXmlBindingTest {
 
     @Test
     public void stringListUnMarshalingTest() throws Exception {
-        final List<String> list = new ArrayList<String>();
+        final List<String> list = new ArrayList<>();
         list.add("value1");
         list.add("value2");
         final StringList expResult = new StringList(list);

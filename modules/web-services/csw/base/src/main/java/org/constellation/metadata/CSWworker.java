@@ -103,11 +103,13 @@ import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
+import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 
 // GeoAPI dependencies
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.capability.FilterCapabilities;
 import org.opengis.util.CodeList;
+import org.w3c.dom.Node;
 
 
 /**
@@ -932,12 +934,12 @@ public class CSWworker extends AbstractWorker {
             final List<Object> records                 = new ArrayList<>();
             try {
                 for (int i = startPos -1; i < max; i++) {
-                    final Object obj = mdReader.getMetadata(results[i], mode, set, elementName);
+                    final Object obj = mdReader.getOriginalMetadata(results[i], mode, set, elementName);
                     if (obj == null && (max + 1) < nbResults) {
                         max++;
 
                     } else if (obj != null) {
-                        if (mode == DUBLINCORE) {
+                        if (obj instanceof AbstractRecordType) {
                             abstractRecords.add((AbstractRecord)obj);
                         } else {
                             records.add(obj);
@@ -962,25 +964,15 @@ public class CSWworker extends AbstractWorker {
                 }
             }
 
-            if (mode == DUBLINCORE) {
-                searchResults = CswXmlFactory.createSearchResults("2.0.2",
-                                                      id,
-                                                      set,
-                                                      totalMatched,
-                                                      abstractRecords,
-                                                      null,
-                                                      abstractRecords.size(),
-                                                      nextRecord);
-            } else {
-                searchResults = CswXmlFactory.createSearchResults("2.0.2",
-                                                      id,
-                                                      set,
-                                                      totalMatched,
-                                                      null,
-                                                      records,
-                                                      records.size(),
-                                                      nextRecord);
-            }
+            final int size = abstractRecords.size() + records.size();
+            searchResults = CswXmlFactory.createSearchResults("2.0.2",
+                                                              id,
+                                                              set,
+                                                              totalMatched,
+                                                              abstractRecords,
+                                                              records,
+                                                              size,
+                                                              nextRecord);
 
             //we return an Acknowledgement if the request is valid.
         } else if (resultType.equals(ResultType.VALIDATE)) {
@@ -1091,22 +1083,16 @@ public class CSWworker extends AbstractWorker {
         final List<AbstractRecord> records = new ArrayList<>();
         final List<Object> otherRecords    = new ArrayList<>();
 
-        final Class expectedType;
         final int mode;
         if (outputSchema.equals(Namespaces.CSW)) {
-            expectedType = AbstractRecordType.class;
             mode         = DUBLINCORE;
         } else if (outputSchema.equals(Namespaces.GMD))  {
-            expectedType = DefaultMetadata.class;
             mode         = ISO_19115;
         } else if (outputSchema.equals(Namespaces.GFC)) {
-            expectedType = null;
-            mode         = ISO_19115;
+            mode         = ISO_19110;
         } else if (outputSchema.equals(EBRIM_30)) {
-             expectedType = IdentifiableType.class;
              mode         = EBRIM;
         } else if (outputSchema.equals(EBRIM_25)) {
-            expectedType = org.geotoolkit.ebrim.xml.v250.RegistryObjectType.class;
             mode         = EBRIM;
         } else {
             throw new CstlServiceException("Unexpected outputSchema");
@@ -1124,13 +1110,13 @@ public class CSWworker extends AbstractWorker {
 
             //we get the metadata object
             try {
-                final Object o = mdReader.getMetadata(id, mode, set, null);
+                final Object o = mdReader.getOriginalMetadata(id, mode, set, null);
                 if (o != null) {
-                    if (expectedType != null && !expectedType.isInstance(o)) {
-                        LOGGER.severe("The record " + id + " is not a " + expectedType.getSimpleName() + "object.");
+                    if (!matchExpectedType(o, outputSchema)) {
+                        LOGGER.log(Level.WARNING, "The record {0} does not correspound to {1} object.", new Object[]{id, outputSchema});
                         continue;
                     }
-                    if (mode == DUBLINCORE) {
+                    if (o instanceof AbstractRecordType) {
                         records.add((AbstractRecordType)o);
                     } else {
                         otherRecords.add(o);
@@ -1154,6 +1140,21 @@ public class CSWworker extends AbstractWorker {
         response = CswXmlFactory.createGetRecordByIdResponse(version, records, otherRecords);
         LOGGER.log(logLevel, "GetRecordById request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
+    }
+
+    private boolean matchExpectedType(final Object obj, final String outputSchema) {
+        if (obj instanceof Node) {
+            return true; // TODO namespace/localname verification
+        } else {
+            switch (outputSchema) {
+                case Namespaces.CSW: return AbstractRecordType.class.isInstance(obj);
+                case Namespaces.GMD: return DefaultMetadata.class.isInstance(obj);
+                case Namespaces.GFC: return FeatureCatalogueImpl.class.isInstance(obj);
+                case EBRIM_30:       return IdentifiableType.class.isInstance(obj);
+                case EBRIM_25:       return org.geotoolkit.ebrim.xml.v250.RegistryObjectType.class.isInstance(obj);
+                default: return false;
+            }
+        }
     }
 
     /**
@@ -1786,7 +1787,7 @@ public class CSWworker extends AbstractWorker {
      */
     @Override
     protected MarshallerPool getMarshallerPool() {
-        return CSWMarshallerPool.getInstance();
+        return CSWMarshallerPool.getInstanceCswOnly();
     }
     
     public void clearCache() throws CstlServiceException {

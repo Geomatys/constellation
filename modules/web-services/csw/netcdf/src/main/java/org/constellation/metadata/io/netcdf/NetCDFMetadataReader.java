@@ -159,6 +159,14 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * {@inheritDoc}
      */
     @Override
+    public Object getOriginalMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+        return getMetadata(identifier, mode, type, elementName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Object getMetadata(final String identifier, final int mode) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }
@@ -296,9 +304,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 final Object obj = reader.getMetadata();
                 Utils.setIdentifier(identifier, obj);
                 return obj;
-            } catch (CoverageStoreException ex) {
-                throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
-            } catch (IllegalArgumentException ex) {
+            } catch (CoverageStoreException | IllegalArgumentException ex) {
                 throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
             } finally {
                 try {
@@ -407,7 +413,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 customRecord.setType(dataType);
             }
 
-            final List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
+            final List<BoundingBoxType> bboxes = new ArrayList<>();
 
             for (Identification identification: metadata.getIdentificationInfo()) {
                 if (identification instanceof DataIdentification) {
@@ -437,7 +443,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             /*
              *  SUMMARY part
              */
-            final List<SimpleLiteral> abstractt = new ArrayList<SimpleLiteral>();
+            final List<SimpleLiteral> abstractt = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 if (identification.getAbstract() != null) {
                     abstractt.add(new SimpleLiteral(identification.getAbstract().toString()));
@@ -447,7 +453,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 customRecord.setAbstract(abstractt);
             }
 
-            final List<SimpleLiteral> subjects = new ArrayList<SimpleLiteral>();
+            final List<SimpleLiteral> subjects = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 for (Keywords kw :identification.getDescriptiveKeywords()) {
                     for (InternationalString str : kw.getKeywords()) {
@@ -508,7 +514,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             }
 
 
-            List<SimpleLiteral> creator = new ArrayList<SimpleLiteral>();
+            List<SimpleLiteral> creator = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 for (ResponsibleParty rp :identification.getPointOfContacts()) {
                     if (Role.ORIGINATOR.equals(rp.getRole())) {
@@ -567,7 +573,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public List<DomainValues> getFieldDomainofValues(final String propertyNames) throws MetadataIoException {
-        final List<DomainValues> responseList = new ArrayList<DomainValues>();
+        final List<DomainValues> responseList = new ArrayList<>();
         final StringTokenizer tokens          = new StringTokenizer(propertyNames, ",");
 
         while (tokens.hasMoreTokens()) {
@@ -607,7 +613,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     private List<String> getAllValuesFromPaths(final List<String> paths, final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
         final String identifierPrefix    = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
-        final List<String> result        = new ArrayList<String>();
+        final List<String> result        = new ArrayList<>();
         final ImageCoverageReader reader = new ImageCoverageReader();
         try {
             for (File metadataFile : directory.listFiles()) {
@@ -627,9 +633,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                             }
                         }
                         //continue to the next file
-                    } catch (CoverageStoreException ex) {
-                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage());
-                    } catch (IllegalArgumentException ex) {
+                    } catch (CoverageStoreException | IllegalArgumentException ex) {
                         LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage());
                     }
 
@@ -682,7 +686,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     private List<? extends Object> getAllEntries(final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
         final String identifierPrefix = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
-        final List<Object> results = new ArrayList<Object>();
+        final List<Object> results = new ArrayList<>();
         final ImageCoverageReader reader = new ImageCoverageReader();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
@@ -735,7 +739,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     private List<String> getAllIdentifiers(final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
         final String identifierPrefix = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
-        final List<String> results = new ArrayList<String>();
+        final List<String> results = new ArrayList<>();
         if (directory != null && directory.exists()) {
             for (File f : directory.listFiles()) {
                 final String fileName = f.getName();
@@ -784,7 +788,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public List<QName> getAdditionalQueryableQName() {
-        return new ArrayList<QName>();
+        return new ArrayList<>();
     }
 
     /**
@@ -792,7 +796,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
-        return new HashMap<String, List<String>>();
+        return new HashMap<>();
     }
 
     /**
@@ -800,6 +804,6 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public Map<String, URI> getConceptMap() {
-        return new HashMap<String, URI>();
+        return new HashMap<>();
     }
 }

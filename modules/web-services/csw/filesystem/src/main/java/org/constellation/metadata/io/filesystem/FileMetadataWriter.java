@@ -18,6 +18,7 @@
 package org.constellation.metadata.io.filesystem;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,14 +35,20 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 //geotoolkit dependencies
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.util.iso.SimpleInternationalString;
-import org.apache.sis.xml.MarshallerPool;
+import org.geotoolkit.csw.xml.RecordProperty;
+import org.geotoolkit.temporal.object.TemporalUtilities;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Constellation dependencies
@@ -50,12 +57,16 @@ import org.constellation.metadata.io.AbstractCSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
-import org.geotoolkit.csw.xml.RecordProperty;
+
+import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
 
 // GeoApi dependencies
-import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.opengis.util.InternationalString;
 
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.apache.sis.xml.MarshallerPool;
+import org.w3c.dom.Node;
 
 /**
  * A CSW Metadata Writer. This writer does not require a database.
@@ -68,7 +79,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     /**
      * A marshaller to store object from harvested resource.
      */
-    private final  MarshallerPool marshallerPool;
+    private final static MarshallerPool marshallerPool = EBRIMMarshallerPool.getInstance();
     
     /**
      * A directory in witch the metadata files are stored.
@@ -99,36 +110,54 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         if (dataDirectory == null || !dataDirectory.isDirectory()) {
             throw new MetadataIoException("Unable to find the data directory", NO_APPLICABLE_CODE);
         }
-        marshallerPool = EBRIMMarshallerPool.getInstance();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean storeMetadata(final Object obj) throws MetadataIoException {
-        final String identifier = Utils.findIdentifier(obj);
-        final File f;
-        // for windows we avoid to create file with ':'
-        if (System.getProperty("os.name", "").startsWith("Windows")) {
-            final String windowsIdentifier = identifier.replace(':', '-');
-            f = new File(dataDirectory, windowsIdentifier + ".xml");
-        } else {
-            f = new File(dataDirectory, identifier + ".xml");
-        }
+    public boolean storeMetadata(final Object original) throws MetadataIoException {
         try {
-            final Marshaller marshaller = marshallerPool.acquireMarshaller();
-            f.createNewFile();
-            marshaller.marshal(obj, f);
-            marshallerPool.recycle(marshaller);
+            Object obj;
+            if (original instanceof Node) {
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+                obj = unmarshaller.unmarshal((Node)original);
+                if (obj instanceof JAXBElement) {
+                    obj = ((JAXBElement)obj).getValue();
+                }
+                marshallerPool.recycle(unmarshaller);
+            } else {
+                obj = original;
+            }
+
+            final String identifier = Utils.findIdentifier(obj);
+            final File f;
+            // for windows we avoid to create file with ':'
+            if (System.getProperty("os.name", "").startsWith("Windows")) {
+                final String windowsIdentifier = identifier.replace(':', '-');
+                f = new File(dataDirectory, windowsIdentifier + ".xml");
+            } else {
+                f = new File(dataDirectory, identifier + ".xml");
+            }
+
+            if (original instanceof Node) {
+                TransformerFactory tf = TransformerFactory.newInstance();
+                Transformer transformer = tf.newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                FileWriter writer = new FileWriter(f);
+                transformer.transform(new DOMSource((Node)original), new StreamResult(writer));
+            } else {
+                final Marshaller marshaller = marshallerPool.acquireMarshaller();
+                marshaller.marshal(obj, f);
+                marshallerPool.recycle(marshaller);
+            }
+            
             if (indexer != null) {
                 indexer.indexDocument(obj);
             }
             
-        } catch (JAXBException ex) {
-            throw new MetadataIoException("Unable to marshall the object: " + obj, ex, NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-            throw new MetadataIoException("Unable to write the file: " + f.getPath(), ex, NO_APPLICABLE_CODE);
+        } catch (JAXBException | IOException | TransformerException ex) {
+            throw new MetadataIoException("Unable to write the file.", ex, NO_APPLICABLE_CODE);
         }
         return true;
     }
@@ -154,7 +183,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      */
     @Override
     public boolean deleteMetadata(final String metadataID) throws MetadataIoException {
-        final File metadataFile = FileMetadataReader.getFileFromIdentifier(metadataID, dataDirectory);
+        final File metadataFile = getFileFromIdentifier(metadataID, dataDirectory);
         if (metadataFile.exists()) {
            final boolean suceed =  metadataFile.delete();
            if (suceed) {
@@ -184,8 +213,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
 
     @Override
     public boolean isAlreadyUsedIdentifier(String metadataID) throws MetadataIoException {
-        final File f = FileMetadataReader.getFileFromIdentifier(metadataID, dataDirectory);
-        return f != null;
+        return getFileFromIdentifier(metadataID, dataDirectory) != null;
     }
     
     /**
@@ -548,7 +576,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * @throws org.constellation.ws.MetadataIoException
      */
     private Object getObjectFromFile(String identifier) throws MetadataIoException {
-        final File metadataFile = FileMetadataReader.getFileFromIdentifier(identifier, dataDirectory);
+        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
         if (metadataFile.exists()) {
             try {
                 final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
