@@ -36,16 +36,16 @@
 
         // Style
         @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",           as = "style_dashboard.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_list.gtmpl",                as = "style_list.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_selected.gtmpl",            as = "style_selected.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_overview.gtmpl",            as = "style_overview.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_edition.gtmpl",             as = "style_edition.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_fts.gtmpl",                 as = "style_fts.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_rule_manual.gtmpl",         as = "style_rule_manual.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_list.gtmpl",                as = "style_list.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_overview.gtmpl",            as = "style_overview.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_rule_ai.gtmpl",             as = "style_rule_ai.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_rule_auv.gtmpl",            as = "style_rule_auv.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_symbol_point.gtmpl",        as = "style_symbol_point.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_rule_manual.gtmpl",         as = "style_rule_manual.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_selected.gtmpl",            as = "style_selected.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_symbol_line.gtmpl",         as = "style_symbol_line.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_point.gtmpl",        as = "style_symbol_point.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_symbol_polygon.gtmpl",      as = "style_symbol_polygon.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_symbol_text.gtmpl",         as = "style_symbol_text.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_symbol_raster.gtmpl",       as = "style_symbol_raster.gtmpl")})
