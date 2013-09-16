@@ -35,6 +35,7 @@ function loadFolder(){
 var $next;
 var $previous;
 var depth;
+var parentPath;
 
 function addChildOperation() {
     $next.data("depth", depth+1);
@@ -44,6 +45,16 @@ function addChildOperation() {
 function addParentOperation(){
     $previous.find("a").on("click", {parent : $previous}, updateChild);
     $previous.data("depth", $previous.data("depth")-1);
+
+    var $parent = $previous.find("[data-path='"+parentPath+"']");
+    $parent.css("color", "#b94a48");
+    var $liParent = $parent.parent()
+    var $icon = $liParent.find('i');
+    $icon.removeClass("icon-folder-close-alt");
+    $icon.addClass("icon-folder-open-alt");
+    $icon.css("color", "#b94a48");
+
+
 }
 
 /**
@@ -89,6 +100,7 @@ function moverRight($clickedElement){
     $first.empty();
     var endParentPathIndex = $clickedElement.data("path").lastIndexOf("/");
     var path = $clickedElement.data("path").substring(0, endParentPathIndex);
+    parentPath = path;
     endParentPathIndex = path.lastIndexOf("/");
     path = path.substring(0, endParentPathIndex);
 
