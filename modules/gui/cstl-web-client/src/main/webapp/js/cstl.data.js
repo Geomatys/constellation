@@ -30,8 +30,11 @@ CSTL.Data = {
 
     type: ["vector"],
 
+    title: "vector",
+
     goTo: function ($element, title, researchtype){
         CSTL.Data.type = researchtype;
+        CSTL.Data.title = title;
         loadDataDashboard(0, 10, null, null, null);
         this.setActive($element.parent());
     },
@@ -50,10 +53,10 @@ CSTL.Data = {
      * Set title and subtitle.
      * @param title
      */
-    setTitles: function(title){
+    setTitles: function(){
         //title
         $("#dataDashboardTitle").empty();
-        $("#dataDashboardTitle").append(title);
+        $("#dataDashboardTitle").append(CSTL.Data.title);
 
         //get subtitle element
         var $dataSentence = $("[data-sentence]");
