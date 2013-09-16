@@ -16,22 +16,18 @@
  */
 package org.constellation.test;
 
-import java.io.IOException;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.sis.test.XMLComparator;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 public class CstlDOMComparator extends XMLComparator {
-
-    public CstlDOMComparator(final Node expected, final Node actual) {
-        super(expected, actual);
-    }
 
     public CstlDOMComparator(final Object expected, final Object actual) throws IOException, ParserConfigurationException, SAXException {
         super(expected, actual);
