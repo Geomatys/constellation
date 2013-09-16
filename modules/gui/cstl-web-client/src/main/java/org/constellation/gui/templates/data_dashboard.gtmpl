@@ -136,7 +136,7 @@
     var firstTime = 0;
 
     function setPaginationDataPage() {
-        CSTL.Data.setTitles(title);
+        CSTL.Data.setTitles();
 
         if (firstTime == 0) {
             var nbPage = totalProvider / 10;
@@ -155,5 +155,5 @@
 
     loadDataDashboard(0, 10, "", "");
     CSTL.Data.type = ["vector"];
-    CSTL.Data.setTitles("vector");
+    CSTL.Data.title = "vector";
 </script>

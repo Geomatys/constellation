@@ -102,6 +102,8 @@ function moverRight($clickedElement){
  * @param event
  */
 function updateChild(event){
+    $(this).tooltip("hide");
+
     var $parent = event.data.parent;
     var $domParent = $parent.parent();
 

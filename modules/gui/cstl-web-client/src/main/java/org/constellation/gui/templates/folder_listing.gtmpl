@@ -21,7 +21,7 @@
 <script type="text/javascript">
     $("[data-role=folderlisting]").find('[title]').
             tooltip({
-            delay:{show: 200},
+            delay:{show: 200, hide:100},
             placement: "right",
             trigger: "hover"});
 </script>
