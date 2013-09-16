@@ -52,13 +52,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -67,6 +63,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
@@ -251,8 +248,8 @@ public class Controller {
     /**
      * Generate datalist to show it in ajax
      * @param serviceId Service where we want to see data
-     * @param startElement First element list counter
-     * @param counter Element number by page
+     * @param start First element list counter
+     * @param count Element number by page
      * @param orderBy String to order by this attribute
      * @param filter String to filter list
      * @throws IOException on communication error with Constellation server
@@ -260,51 +257,41 @@ public class Controller {
     @Ajax
     @Resource
     @Route("/datalist")
-    public void generateDataList(String serviceId, String startElement, String counter, String orderBy, String direction, String filter) throws IOException {
-        LayerList layers = mapManager.getLayers(serviceId);
-        Map<String, Object> parameters = new HashMap<>(0);
-        int nbByPage =  Integer.parseInt(counter);
+    public void generateDataList(String serviceId, String start, String count, String orderBy, String direction, String filter) throws IOException {
+        final LayerList listBean = mapManager.getLayers(serviceId);
 
-        //show filtered element if list is higher than element number by page
-        int start =  Integer.parseInt(startElement);
-        int boundary = start+nbByPage;
-
-        //define higher bound on list
-        if(boundary>layers.getLayer().size()){
-            boundary = layers.getLayer().size();
+        // Search layers by name.
+        if (!isBlank(filter)) {
+            final List<Layer> toRemove = new ArrayList<>();
+            for (final Layer bean : listBean.getLayer()) {
+                if (!containsIgnoreCase(bean.getName().getLocalPart(), filter)) {
+                    toRemove.add(bean);
+                }
+            }
+            listBean.getLayer().removeAll(toRemove);
         }
 
-        // create layer list
-        List<Layer> layerList = new ArrayList<>(nbByPage);
-        for (int i = start; i < boundary; i++) {
-            final Layer layer = layers.getLayer().get(i);
-
-            //set data as user Locale
-            Locale userLocale = Request.getCurrent().getUserContext().getLocale();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy X");
-            Date layerDate = new Date();
-            try {
-                layerDate = dateFormat.parse(layer.getDate());
-            } catch (ParseException e) {
-                LOGGER.log(Level.WARNING, "date parsing error. Pattern : "+dateFormat.toPattern()+" date as String : "+layer.getDate(), e);
-            }
-            DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale);
-            layer.setDate(df.format(layerDate));
-
-            if (isBlank(filter) || StringUtils.containsIgnoreCase(layer.getName().getLocalPart(), filter)) {
-                layerList.add(layer);
-            }
-        }
-
-        // sort layers if necessary
+        // Sort layers by criteria.
         if (!StringUtils.isBlank(orderBy) && !StringUtils.isBlank(direction)) {
-            Collections.sort(layerList, new LayerComparator(orderBy, direction));
+            Collections.sort(listBean.getLayer(), new LayerComparator(orderBy, direction));
         }
 
-        layers.getLayer().clear();
-        layers.getLayer().addAll(layerList);
+        // Truncate the list.
+        final List<Layer> layers;
+        final int intStart = Integer.parseInt(start);
+        final int intCount = Integer.parseInt(count);
+        if (!listBean.getLayer().isEmpty() && intStart < listBean.getLayer().size()) {
+            final int endIndex = Math.min(listBean.getLayer().size(), intStart + intCount);
+            layers = listBean.getLayer().subList(intStart, endIndex);
+        } else {
+            layers = new ArrayList<>(0);
+        }
 
-        parameters.put("layers", layers);
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("layers",     layers);
+        parameters.put("nbResults",  listBean.getLayer().size());
+        parameters.put("startIndex", intStart);
+        parameters.put("nbPerPage",  intCount);
         dataElement.with(parameters).render();
     }
 
@@ -363,6 +350,7 @@ public class Controller {
                 // Create file on temporary folder
                 String tempDir= System.getProperty("java.io.tmpdir");
                 final File newFile = new File(tempDir +"/"+ file.getName());
+
                 // write on file
                 final FileOutputStream fos = new FileOutputStream(newFile);
                 int intVal = stream.read();

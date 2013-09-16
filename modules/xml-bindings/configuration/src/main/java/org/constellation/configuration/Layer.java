@@ -88,7 +88,7 @@ public class Layer {
     private List<DimensionDefinition> dimensions;
 
     @XmlElement(name="Modified-Date")
-    private String date;
+    private Date date;
 
     @XmlElement(name="ProviderType")
     private String providerType;
@@ -337,11 +337,11 @@ public class Layer {
         this.dimensions = dimensions;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(final Date date) {
         this.date = date;
     }
 

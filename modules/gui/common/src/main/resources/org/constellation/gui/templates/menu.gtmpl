@@ -50,6 +50,6 @@
      data-success-service-stop="&{growl.success.service.stop}"></div>
 
 <!-- main page part -->
-<div class="container" style="margin-top: 30px;">
+<div class="container" style="margin-top:40px;">
     #{insert/}
 </div>

@@ -73,5 +73,6 @@ CSTL.StyleDashboard = {
         if (confirm(CSTL.i18n('confirm-delete-style'))) {
             CSTL.Providers.deleteStyle(provider, style);
         }
+        this.instance.goTo(1);
     }
 };

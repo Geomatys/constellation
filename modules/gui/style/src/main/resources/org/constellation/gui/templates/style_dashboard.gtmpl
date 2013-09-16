@@ -2,12 +2,10 @@
 
 #{param name=category/}
 
-<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
-    <div class="span2">
-        <img src="../images/constellation.png">
-    </div>
+<div class="logo-wrapper">
+    <a href="@{index()}"><img src="../images/constellation.png"></a>
     <div class="dropdown pull-right">
-        <a data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle" style="margin-top:10px;padding:15px 19px;">
+        <a data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle" style="margin-top:8px;padding:15px 19px;">
             <span class="icon-plus icon-white" style="margin-right:5px;"></span>
             &{label.add.style}
         </a>
@@ -18,64 +16,62 @@
     </div>
 </div>
 
-<div id="styleDashboard" class="container-fluid" style="padding:0;">
-    <div class="row-fluid">
-        <div class="span3">
-            <div class="well dash-categories">
-                <ul class="nav nav-list">
-                    <li class="nav-header">&{label.categories}</li>
-                    <li class="divider"></li>
-                    <li class="<%if(category == null){%>active<%}%>"><a href="@{StyleController.dashboard()}">&{label.all_fem}</a></li>
-                    <li class="divider"></li>
-                    <li class="<%if("vector".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='vector')}">&{label.vector}</a></li>
-                    <li class="<%if("raster".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='raster')}">&{label.raster}</a></li>
-                    <li class="<%if("sensor".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='sensor')}">&{label.sensor}</a></li>
-                </ul>
+<div id="styleDashboard" class="row-fluid">
+    <div class="span3">
+        <div class="well nav-frame">
+            <ul class="nav nav-list">
+                <li class="nav-header">&{label.categories}</li>
+                <li class="divider"></li>
+                <li class="<%if(category == null){%>active<%}%>"><a href="@{StyleController.dashboard()}">&{label.all_fem}</a></li>
+                <li class="divider"></li>
+                <li class="<%if("vector".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='vector')}">&{label.vector}</a></li>
+                <li class="<%if("raster".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='raster')}">&{label.raster}</a></li>
+                <li class="<%if("sensor".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='sensor')}">&{label.sensor}</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="span9 frame dashboard">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <a class="brand" href="#" id="dataDashboardTitle">&{label.list.style}</a>
             </div>
         </div>
-        <div class="span9 dash-body">
-            <div class="navbar header-navbar">
-                <div class="navbar-inner">
-                    <a class="brand" href="#" id="dataDashboardTitle">&{label.list.style}</a>
+        <div class="navbar sort-navbar">
+            <div class="navbar-inner">
+                <ul class="nav">
+                    <li><a href="#" data-order-by="name">
+                        &{label.name}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                    </a></li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="#" data-order-by="date">
+                        &{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                    </a></li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="#" data-order-by="owner">
+                        &{label.owner}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                    </a></li>
+                    <li class="divider-vertical"></li>
+                    <%if(category == null){%>
+                        <li><a href="#" data-order-by="type">
+                            &{label.type}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                        </a></li>
+                        <li class="divider-vertical"></li>
+                    <%}%>
+                </ul>
+                <button type="button" data-role="reset" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                <input type="text" data-role="search" class="search-query pull-right" placeholder="&{label.search}..." />
+                <div class="ajax-loader pull-right"></div>
+            </div>
+        </div>
+        <div class="row-fluid dash-inner">
+            <div class="pull-left" style="width: 60%;">
+                <div id="list" data-role="list">
+                    #{include path=style_list.gtmpl/}
                 </div>
             </div>
-            <div class="navbar sort-navbar">
-                <div class="navbar-inner">
-                    <ul class="nav">
-                        <li><a href="#" data-order-by="name">
-                            &{label.name}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                        </a></li>
-                        <li class="divider-vertical"></li>
-                        <li><a href="#" data-order-by="date">
-                            &{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                        </a></li>
-                        <li class="divider-vertical"></li>
-                        <li><a href="#" data-order-by="owner">
-                            &{label.owner}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                        </a></li>
-                        <li class="divider-vertical"></li>
-                        <%if(category == null){%>
-                            <li><a href="#" data-order-by="type">
-                                &{label.type}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                            </a></li>
-                            <li class="divider-vertical"></li>
-                        <%}%>
-                    </ul>
-                    <button type="button" data-role="reset" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
-                    <input type="text" data-role="search" class="search-query pull-right" placeholder="&{label.search}..." />
-                    <div class="ajax-loader pull-right"></div>
-                </div>
-            </div>
-            <div class="row-fluid dash-body-inner">
-                <div class="dash-left pull-left">
-                    <div id="list" data-role="list">
-                        #{include path=style_list.gtmpl/}
-                    </div>
-                </div>
-                <div class="dash-right pull-left">
-                    <div id="selection" data-role="selected">
-                        #{include path=style_selected.gtmpl/}
-                    </div>
+            <div class="pull-left" style="width: 40%;">
+                <div id="selection" data-role="selected">
+                    #{include path=style_selected.gtmpl/}
                 </div>
             </div>
         </div>

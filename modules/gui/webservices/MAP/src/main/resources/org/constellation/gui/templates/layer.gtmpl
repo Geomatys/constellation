@@ -1,27 +1,61 @@
 #{param name=layers/}
-<% for (def layer : layers.getLayer()){%>
-<div class="row">
-    <br/>
-    <div class="span9" data-providertype="${layer.providerType}" style="background: no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;" onclick="selectElement(this)">
-        <div class="row">
-            <div class="span4" style="padding-left: 15px;">
-                <p>${layer.name}</p>
-            </div>
-            <div class="span1 pull-right">
-                <p class="text-right text-info">${layer.providerType}</p>
-            </div>
-        </div>
-        <div class="row" style="border-top: 1px solid #5bc0de">
-            <div class="span2" style="border: 1px solid #5bc0de; border-top: none;">
-                <p class="text-center">${layer.date}</p>
-            </div>
-        </div>
-    </div>
-</div>
-<%}%>
-<script language="JavaScript" type="text/javascript">
-    $("[data-providertype=raster]").css("background-image", CSTL.URL_RASTER_PICTURE);
-    $("[data-providertype=vector]").css("background-image", CSTL.URL_VECTOR_PICTURE);
-    $("[data-providertype=pyramid]").css("background-image", CSTL.URL_PYRAMID_PICTURE);
+#{param name=nbResults/}
+#{param name=startIndex/}
+#{param name=nbPerPage/}
 
-</script>
+<div class="pagination-wrapper">
+    <span class="nb-results pull-left"><strong>${nbResults}</strong> &{label.results}</span>
+    <select class="nb-per-page input-small pull-right" data-role="nb-items">
+        <option value="5"<%if(nbPerPage == 5){%> selected<%}%>>5</option>
+        <option value="10"<%if(nbPerPage == 10){%> selected<%}%>>10</option>
+        <option value="20"<%if(nbPerPage == 20){%> selected<%}%>>20</option>
+        <option value="50"<%if(nbPerPage == 50){%> selected<%}%>>50</option>
+        <option value="100"<%if(nbPerPage == 100){%> selected<%}%>>100</option>
+    </select>
+    <%  def nbPage      = (int) Math.ceil(nbResults / nbPerPage);
+    def currentPage = (int) startIndex / nbPerPage + 1;
+    if (nbPage > 1) { %>
+    <div class="pagination pull-right">
+        <ul>
+            <%  if (currentPage > 1) { %>
+            <li data-page-index="${currentPage - 1}"><a href="#">&laquo;</a></li>
+            <%  } %>
+            <%  def prevCount = currentPage - 1;
+                def nextCount = nbPage - currentPage;
+                def minPage   = currentPage - Math.min(4 - Math.min(2, nextCount), prevCount);
+                def maxPage   = currentPage + Math.min(4 - Math.min(2, prevCount), nextCount);
+                for (def i = minPage; i <= maxPage; i++) { %>
+            <li<%if(i != currentPage){%> data-page-index="${i}"<%}%> class="page<%if(i == currentPage){%> active<%}%>"><a href="#">${i}</a></li>
+            <%  } %>
+            <%  if (currentPage < nbPage) { %>
+            <li data-page-index="${currentPage + 1}"><a href="#">&raquo;</a></li>
+            <%  } %>
+        </ul>
+    </div>
+    <% } %>
+</div>
+
+<%if(layers == null || layers.isEmpty()){%>
+    <div class="alert alert-info">
+        <strong>&{label.no.available.layer}</strong>
+    </div>
+<%} else {%>
+    <div class="item-list">
+        <% for (def layer : layers) { %>
+        <div class="item layer ${layer.providerType.toLowerCase()}" data-layer="${layer.name}" data-provider="${layer.providerID}">
+            <div class="top">
+                <span class="item-title">${layer.name}</span>
+                <span class="pull-right text-right">${layer.providerType}</span>
+            </div>
+            <div class="bottom">
+                <div class="block">
+                    <i class="icon-calendar"></i>${layer.date}
+                </div>
+                <div class="block">
+                    <i class="icon-user"></i>Admin
+                </div>
+            </div>
+        </div>
+        <% } %>
+    </div>
+<%}%>

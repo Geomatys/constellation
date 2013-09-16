@@ -28,14 +28,16 @@
  * @param config - {object} the dashboard configuration
  *
  * {
- *     loadFunc: (mandatory) {string} the Juzu function name to call
- *     $root:    (optional)  {jQuery} the dashboard root element
+ *     loadFunc: (mandatory) {string}   the Juzu function name to call
+ *     $root:    (optional)  {jQuery}   the dashboard root element
  *     onLoad:   (optional)  {function} items loading callback function
  *     onSelect: (optional)  {function} item selection callback function
+ *     params:   (optional)  {object}   static parameters for loading request
  * }
  */
 function Dashboard(config) {
     config = config || {};
+    this.params   = config.params || {};                            // static loading request parameters
     this.loadFunc = config.loadFunc;                                // function to be called for items loading
     this.$root    = config.$root || $('body');                      // dashboard list root element
     this.onLoad   = config.onLoad;                                  // items loading complete function
@@ -89,8 +91,6 @@ Dashboard.prototype.reset = function() {
 
 /**
  * Applies a name/title filter on results.
- *
- * @param e - {event} the "click" event
  */
 Dashboard.prototype.filter = function() {
     this.startIndex = 0;
@@ -148,13 +148,13 @@ Dashboard.prototype.loadItems = function() {
     this.$ajaxLoader.show();
 
     // Load new list.
-    this.$itemList.jzLoad(this.loadFunc, {
+    this.$itemList.jzLoad(this.loadFunc, $.extend(this.params, {
         filter:    this.$filterInput.val(),
         orderBy:   this.sortCriteria,
         direction: this.sortDirection,
         count:     this.nbItems,
         start:     this.startIndex
-    }, $.proxy(this.loadEnd, this));
+    }), $.proxy(this.loadEnd, this));
 };
 
 /**

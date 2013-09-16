@@ -37,7 +37,7 @@
 
 <%if(styles == null || styles.isEmpty()){%>
     <div class="alert alert-info">
-        <strong>&{label.no.style.available}</strong>
+        <strong>&{label.no.available.style}</strong>
     </div>
 <%} else {%>
     <div class="item-list">

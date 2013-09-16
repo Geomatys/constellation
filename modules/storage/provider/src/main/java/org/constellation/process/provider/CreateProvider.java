@@ -71,10 +71,7 @@ public final class CreateProvider extends AbstractCstlProcess {
                         throw new ProcessException("Provider ID is already used : " + id, this, null);
                     }
                 }
-
-                final Date date = new Date();
-                final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy X");
-                source.parameter("date").setValue(dateFormat.format(date));
+                source.parameter("date").setValue(new Date());
                 LayerProviderProxy.getInstance().createProvider((LayerProviderService) service, source);
             }
 

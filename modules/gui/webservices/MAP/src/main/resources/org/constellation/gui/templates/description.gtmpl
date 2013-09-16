@@ -1,5 +1,5 @@
-<form id="serviceDescription" class="row">
-    <div class="span6">
+<form id="serviceDescription" class="row-fluid">
+    <div>
         <fieldset style="padding-left:20px;">
             <legend>&{create.description.service.legend}</legend>
             <div class="control-group">
@@ -38,11 +38,9 @@
                 </div>
             </div>
         </fieldset>
-        <div class="row">
-            <div class="span3 offset9">
-            </br>
-                <button class="btn btn-info" type="button" data-action="service-description" data-form="serviceDescription" data-service-type="${instance.type}" data-service-id="${service.identifier}">&{create.save.label}</button>
-            </div>
-        </div>
+    </div>
+
+    <div style="margin-top:20px;">
+        <button class="btn btn-info" style="margin-left:20px;" type="button" data-action="service-description" data-form="serviceDescription" data-service-type="${instance.type}" data-service-id="${service.identifier}">&{create.save.label}</button>
     </div>
 </form>

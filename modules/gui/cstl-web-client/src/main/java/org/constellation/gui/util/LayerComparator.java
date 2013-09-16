@@ -19,7 +19,6 @@ package org.constellation.gui.util;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.constellation.configuration.Layer;
-import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import java.util.Comparator;
 
@@ -110,10 +109,7 @@ public class LayerComparator implements Comparator<Layer> {
     }
 
     private int compareDate(final Layer l1, final Layer l2) {
-        return ObjectUtils.compare(
-                TemporalUtilities.parseDateSafe(l1.getDate(), false),
-                TemporalUtilities.parseDateSafe(l2.getDate(), false),
-                true);
+        return ObjectUtils.compare(l1.getDate(), l2.getDate(), true);
     }
 
     private int compareOwner(final Layer l1, final Layer l2) {

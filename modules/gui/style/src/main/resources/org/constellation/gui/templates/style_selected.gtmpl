@@ -1,6 +1,6 @@
 #{param name=selected/}
-<div class="alert alert-info<%if(selected != null){%> hide<%}%>">
-    <h5>&{label.no.style.selected}</h5>
+<div class="alert alert-info">
+    <h5>&{label.no.selected.style}</h5>
     <p>&{msg.no.selected.style}</p>
 </div>
 <%if(selected != null){%>

@@ -1,96 +1,99 @@
-<form id="serviceMetadata" class="row">
-    <input type="hidden" id="identifier" name="identifier" value="${service.identifier}">
+<form id="serviceMetadata" class="row-fluid">
 
-    <div class="span6">
+    <div class="row-fluid">
         <!-- contact part -->
-        <fieldset style="padding-left:20px;">
-            <legend>&{create.contact.legend}</legend>
+        <div class="span6">
+            <fieldset style="padding-left:20px;">
+                <legend>&{create.contact.legend}</legend>
 
-            <div class="control-group">
-                <label class="control-label" for="contactName">&{create.contact.name.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactName" name="contact.fullname" value="${service.serviceContact.fullname}"/>
+                <div class="control-group">
+                    <label class="control-label" for="contactName">&{create.contact.name.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactName" name="contact.fullname" value="${service.serviceContact.fullname}"/>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="contactOrganisation">&{create.contact.organisation.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactOrganisation" name="contact.organisation" value="${service.serviceContact.organisation}"/>
+                <div class="control-group">
+                    <label class="control-label" for="contactOrganisation">&{create.contact.organisation.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactOrganisation" name="contact.organisation" value="${service.serviceContact.organisation}"/>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="contactPosition">&{create.contact.position.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactPosition" name="contact.position" value="${service.serviceContact.position}"/>
+                <div class="control-group">
+                    <label class="control-label" for="contactPosition">&{create.contact.position.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactPosition" name="contact.position" value="${service.serviceContact.position}"/>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="contactPhone">&{create.contact.phone.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactPhone" name="contact.phone" value="${service.serviceContact.phone}"/>
+                <div class="control-group">
+                    <label class="control-label" for="contactPhone">&{create.contact.phone.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactPhone" name="contact.phone" value="${service.serviceContact.phone}"/>
+                    </div>
                 </div>
-            </div>
-            <div class="control-group" id="faxDiv">
-                <label class="control-label" for="contactFax">&{create.contact.fax.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactFax" name="contact.fax" value="${service.serviceContact.fax}"/>
+                <div class="control-group" id="faxDiv">
+                    <label class="control-label" for="contactFax">&{create.contact.fax.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactFax" name="contact.fax" value="${service.serviceContact.fax}"/>
+                    </div>
                 </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="contactemail">&{create.contact.email.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactEmail" name="contact.email" value="${service.serviceContact.email}"/>
+                <div class="control-group">
+                    <label class="control-label" for="contactemail">&{create.contact.email.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactEmail" name="contact.email" value="${service.serviceContact.email}"/>
+                    </div>
                 </div>
-            </div>
-        </fieldset>
+            </fieldset>
+        </div>
 
         <!-- address part -->
-        <fieldset style="padding-left:20px;">
-            <legend>&{create.contact.address.legend}</legend>
+        <div class="span6">
+            <fieldset style="padding-left:20px;">
+                <legend>&{create.contact.address.legend}</legend>
 
-            <div class="control-group">
-                <label class="control-label" for="contactAddress">&{create.contact.address.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactAddress" name="contact.address" value="${service.serviceContact.address}"/>
+                <div class="control-group">
+                    <label class="control-label" for="contactAddress">&{create.contact.address.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactAddress" name="contact.address" value="${service.serviceContact.address}"/>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="contactCity">&{create.contact.address.city.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactCity" name="contact.city" value="${service.serviceContact.city}"/>
+                <div class="control-group">
+                    <label class="control-label" for="contactCity">&{create.contact.address.city.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactCity" name="contact.city" value="${service.serviceContact.city}"/>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="contactState">&{create.contact.address.state.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactState" name="contact.state" value="${service.serviceContact.state}"/>
+                <div class="control-group">
+                    <label class="control-label" for="contactState">&{create.contact.address.state.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactState" name="contact.state" value="${service.serviceContact.state}"/>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="contactPostcode">&{create.contact.address.postcode.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactPostcode" name="contact.zipCode" value="${service.serviceContact.zipCode}"/>
+                <div class="control-group">
+                    <label class="control-label" for="contactPostcode">&{create.contact.address.postcode.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactPostcode" name="contact.zipCode" value="${service.serviceContact.zipCode}"/>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="contactCountry">&{create.contact.address.country.label}</label>
-                <div class="controls">
-                    <input type="text" id="contactCountry" name="contact.country" value="${service.serviceContact.country}"/>
+                <div class="control-group">
+                    <label class="control-label" for="contactCountry">&{create.contact.address.country.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactCountry" name="contact.country" value="${service.serviceContact.country}"/>
+                    </div>
                 </div>
-            </div>
-        </fieldset>
+            </fieldset>
+        </div>
     </div>
 
-    <div class="span6">
+    <div>
         <!-- access constraints part -->
-        <fieldset style="padding-right:20px;">
+        <fieldset style="padding-left:20px;">
             <legend>&{create.accessconstraint.legend}</legend>
 
             <div class="control-group">
@@ -112,7 +115,6 @@
                 <div class="controls">
                     <input type="text" id="layerLimit" name="constraint.layerLimit" value="${service.serviceConstraints.layerLimit}"/>
                 </div>
-
             </div>
 
             <div class="control-group" data-toggle="tooltip" title="&{create.accessconstraint.maxwidth.tooltip}" id="maxWidthGroup">
@@ -131,10 +133,10 @@
             </div>
         </fieldset>
     </div>
-    <div class="row">
-        <div class="span3 offset9">
-        </br>
-            <button class="btn btn-info" type="button" data-action="service-metadata" data-form="serviceMetadata" data-service-type="${instance.type}" data-service-id="${service.identifier}">&{create.save.label}</button>
-        </div>
+
+    <input type="hidden" id="identifier" name="identifier" value="${service.identifier}">
+
+    <div style="margin-top:20px;">
+        <button class="btn btn-info" style="margin-left:20px;" type="button" data-action="service-metadata" data-form="serviceMetadata" data-service-type="${instance.type}" data-service-id="${service.identifier}">&{create.save.label}</button>
     </div>
 </form>

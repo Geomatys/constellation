@@ -5,52 +5,87 @@
 #{param name=layers/}
 #{param name=capabilitiesUrl/}
 
-<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
-    <div class="span2">
-        <img src="../../images/constellation.png"/>
-    </div>
+<div class="logo-wrapper">
+    <a href="@{index()}"><img src="../../images/constellation.png"></a>
 </div>
-<div class="row">
-    <div class="row" style="background-color:white;">
-        <div class="navbar">
-            <div class="navbar-inner">
-                <a class="brand" href="#">${service.name}</a>
-                <form class="navbar-form pull-right" style="margin-top: 2px;">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-small" data-action="open-capabilities" data-capabilities="${capabilitiesUrl}">&{service.description.getcapabilities.button}</button>
-                        <button type="button" class="btn btn-small" data-action="open-logs">&{service.description.logs.button}</button>
-                        <button type="button" class="btn btn-small btn-info" data-action="restart-service" data-service-type="${instance.type}" data-service-id="${service.identifier}">&{service.description.reload.button}</button>
-                        <button type="button" class="btn btn-small <%if(instance.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${instance.type}-${service.identifier}" data-action="toggle-service" data-service-type="${instance.type}" data-service-id="${service.identifier}">
-                            <span class="label-start">&{service.description.start.button}</span>
-                            <span class="label-stop">&{service.description.stop.button}</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
+
+<div class="frame">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <a class="brand" href="#">${service.name}</a>
+            <form class="navbar-form">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-small" data-action="open-capabilities" data-capabilities="${capabilitiesUrl}">&{service.description.getcapabilities.button}</button>
+                    <button type="button" class="btn btn-small" data-action="open-logs">&{service.description.logs.button}</button>
+                    <button type="button" class="btn btn-small btn-info" data-action="restart-service" data-service-type="${instance.type}" data-service-id="${service.identifier}">&{service.description.reload.button}</button>
+                    <button type="button" class="btn btn-small <%if(instance.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${instance.type}-${service.identifier}" data-action="toggle-service" data-service-type="${instance.type}" data-service-id="${service.identifier}">
+                        <span class="label-start">&{service.description.start.button}</span>
+                        <span class="label-stop">&{service.description.stop.button}</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
-<div class="row">
-    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
-        <div class="span12">
-
-            <ul class="nav nav-tabs">
-                <li><a href="#description" data-toggle="tab">&{service.description.tab.description.title}</a> </li>
-                <li><a href="#metadata" data-toggle="tab">&{service.description.tab.metadata.title}</a> </li>
-                <li class="active"><a href="#data" data-toggle="tab">&{service.description.tab.data.title}</a> </li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane" id="description">
-                    #{include path=description.gtmpl/}
-                </div>
-                <div class="tab-pane" id="metadata">
-                    #{include path=metadata.gtmpl/}
-                </div>
-                <div class="tab-pane active" id="data">
-                    #{include path=layer_listings.gtmpl/}
-                    #{include path=add_data.gtmpl/}
-                </div>
+    <div class="frame-inner">
+        <ul class="nav nav-tabs">
+            <li><a href="#description" data-toggle="tab">&{service.description.tab.description.title}</a> </li>
+            <li><a href="#metadata" data-toggle="tab">&{service.description.tab.metadata.title}</a> </li>
+            <li class="active"><a href="#data" data-toggle="tab">&{service.description.tab.data.title}</a> </li>
+        </ul>
+        <div class="tab-content">
+            <div id="description" class="tab-pane">
+                #{include path=description.gtmpl/}
             </div>
+            <div id="metadata" class="tab-pane">
+                #{include path=metadata.gtmpl/}
+            </div>
+            <div id="data" class="tab-pane active">
+                #{include path=layer_listings.gtmpl/}
+            </div>
+
+            <!-- Modals -->
+            #{include path=add_data.gtmpl/}
+            <form action="@{upload()}" enctype="multipart/form-data" method="post" style="margin:0;">
+                <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3 id="myModalLabel">&{layer.listing.data.upload.title}</h3>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <label>&{layer.listing.data.upload.name.label}</label>
+                            <input type="text" name="name"/>
+                        </div>
+                        <div class="fileupload fileupload-new" data-provides="fileupload">
+                            <div class="input-append">
+                                <div class="uneditable-input span3">
+                                    <i class="icon-file fileupload-exists"></i>
+                                    <span class="fileupload-preview"></span>
+                                </div>
+                                <span class="btn btn-file">
+                                    <span class="fileupload-new">&{layer.listing.data.upload.select.label}</span>
+                                    <span class="fileupload-exists">&{layer.listing.data.upload.change.label}</span>
+                                    <input type="file" name="file" id="file"/>
+                                </span>
+                                <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">&{layer.listing.data.upload.remove.label}</a>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="radio">
+                                <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="../../images/icon/vector.png" class="img-rounded"> &{layer.listing.data.upload.vector.label}
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="../../images/icon/raster.png" class="img-rounded"> &{layer.listing.data.upload.raster.label}
+                            </label>
+                            <input type="hidden" value="@{MapController.editMapService(serviceId = service.identifier, serviceType = 'wms')}" name="returnURL"/>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>
+                        <button class="btn btn-info" type="submit">&{layer.listing.data.upload.button}</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

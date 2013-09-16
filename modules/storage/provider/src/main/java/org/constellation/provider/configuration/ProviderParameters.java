@@ -66,8 +66,8 @@ public final class ProviderParameters {
              new DefaultParameterDescriptor<String>("id","source id",String.class,null,true);
     public static final ParameterDescriptor<Boolean> SOURCE_LOADALL_DESCRIPTOR =
              new DefaultParameterDescriptor<Boolean>("load_all","source load all datas",Boolean.class,true,true);
-    public static final ParameterDescriptor<String> SOURCE_DATE_DESCRIPTOR =
-             new DefaultParameterDescriptor<String>("date","source creation date",String.class,null,false);
+    public static final ParameterDescriptor<Date> SOURCE_DATE_DESCRIPTOR =
+             new DefaultParameterDescriptor<Date>("date","source creation date",Date.class,null,false);
     public static final ParameterDescriptor<String> SOURCE_TYPE_DESCRIPTOR =
             new DefaultParameterDescriptor<String>("providerType","provider type",String.class,null,false);
 
