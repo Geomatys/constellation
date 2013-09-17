@@ -181,7 +181,24 @@ public class Controller {
     @View
     @Route("/data")
     public Response dataDashboard(){
-        return dataDashboard.ok().withMimeType("text/html");
+        final List<LayerData> list = providerManager.getDataListing(Arrays.asList("vector"));
+        final int nbResults = list.size();
+
+        // Truncate the list.
+        final List<LayerData> providers;
+        if (!list.isEmpty()) {
+            final int endIndex = Math.min(list.size(), 10);
+            providers = list.subList(0, endIndex);
+        } else {
+            providers = new ArrayList<>(0);
+        }
+
+        final Map<String, Object> parameters = new HashMap<>(0);
+        parameters.put("providers",  providers);
+        parameters.put("nbResults",  nbResults);
+        parameters.put("startIndex", 0);
+        parameters.put("nbPerPage",  10);
+        return dataDashboard.ok(parameters).withMimeType("text/html");
     }
 
     /**
@@ -256,9 +273,11 @@ public class Controller {
      */
     @Ajax
     @Resource
-    @Route("/datalist")
-    public void generateDataList(String serviceId, String start, String count, String orderBy, String direction, String filter) throws IOException {
+    @Route("/dataList")
+    public void generateDataList(final String serviceId, final String start, final String count, final String orderBy,
+                                 final String direction, final String filter) throws IOException {
         final LayerList listBean = mapManager.getLayers(serviceId);
+        final int nbResults = listBean.getLayer().size();
 
         // Search layers by name.
         if (!isBlank(filter)) {
@@ -289,7 +308,7 @@ public class Controller {
 
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put("layers",     layers);
-        parameters.put("nbResults",  listBean.getLayer().size());
+        parameters.put("nbResults",  nbResults);
         parameters.put("startIndex", intStart);
         parameters.put("nbPerPage",  intCount);
         dataElement.with(parameters).render();
@@ -297,39 +316,44 @@ public class Controller {
 
     @Ajax
     @Resource
-    @Route("/availabledata")
-    public void getAvailableData(final List<String> dataTypes, final String startElement, final String counter, final String orderBy, final String direction, final String filter){
-        Map<String, Object> parameters = new HashMap<>(0);
-        Locale userLocale = Request.getCurrent().getUserContext().getLocale();
-        List<LayerData> layerDatas = providerManager.getDataListing(userLocale, dataTypes);
+    @Route("/providerList")
+    public void getAvailableData(final List<String> dataTypes, final String start, final String count, final String orderBy,
+                                 final String direction, final String filter){
+        final List<LayerData> list = providerManager.getDataListing(dataTypes);
+        final int nbResults = list.size();
 
-        int nbByPage = Integer.parseInt(counter);
-
-        //show filtered element if list is higher than element number by page
-        int start =  Integer.parseInt(startElement);
-        int boundary = start+nbByPage;
-
-        //define higher bound on list
-        if(boundary>layerDatas.size()){
-            boundary = layerDatas.size();
-        }
-        // create layer list
-        List<LayerData> layerList = new ArrayList(nbByPage);
-        for (int i = start; i < boundary; i++) {
-            final LayerData layerData = layerDatas.get(i);
-            if (isBlank(filter) || StringUtils.containsIgnoreCase(layerData.getName(), filter)) {
-                layerList.add(layerData);
+        // Search layers by name.
+        if (!isBlank(filter)) {
+            final List<LayerData> toRemove = new ArrayList<>();
+            for (final LayerData bean : list) {
+                if (!containsIgnoreCase(bean.getName(), filter)) {
+                    toRemove.add(bean);
+                }
             }
+            list.removeAll(toRemove);
         }
 
-        // sort layers if necessary
-        if (!isBlank(orderBy) && !isBlank(direction)) {
-            Collections.sort(layerDatas, new LayerDataComparator(orderBy, direction));
+        // Sort layers by criteria.
+        if (!StringUtils.isBlank(orderBy) && !StringUtils.isBlank(direction)) {
+            Collections.sort(list, new LayerDataComparator(orderBy, direction));
         }
 
-        parameters.put("totalProvider", layerDatas.size());
-        parameters.put("providers", layerList);
+        // Truncate the list.
+        final List<LayerData> providers;
+        final int intStart = Integer.parseInt(start);
+        final int intCount = Integer.parseInt(count);
+        if (!list.isEmpty() && intStart < list.size()) {
+            final int endIndex = Math.min(list.size(), intStart + intCount);
+            providers = list.subList(intStart, endIndex);
+        } else {
+            providers = new ArrayList<>(0);
+        }
 
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("providers",  providers);
+        parameters.put("nbResults",  nbResults);
+        parameters.put("startIndex", intStart);
+        parameters.put("nbPerPage",  intCount);
         dataListing.with(parameters).render();
     }
 

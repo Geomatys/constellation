@@ -100,11 +100,10 @@ public class ProviderManager {
     }
 
     /**
-     * @param userLocale
      * @param providerTypes
      * @return
      */
-    public List<LayerData> getDataListing(final Locale userLocale, final List<String> providerTypes) {
+    public List<LayerData> getDataListing(final List<String> providerTypes) {
         final List<LayerData> layerDatas = new ArrayList<>(0);
 
         final ProvidersReport report = cstl.openServer(true).providers.listProviders();
@@ -114,25 +113,10 @@ public class ProviderManager {
                 String type = providerReport.getAbstractType();
 
                 if (providerTypes.contains(type)) {
-                    String date = "";
-
-                    if (providerReport.getDate() != null) {
-                        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy X");
-                        Date createDate = new Date();
-                        try {
-                            createDate = dateFormat.parse(providerReport.getDate());
-                        } catch (ParseException e) {
-                            LOGGER.log(Level.WARNING, "", e);
-                        }
-
-                        dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, userLocale);
-                        date = dateFormat.format(createDate);
-                    }
-
                     for (String name : providerReport.getItems()) {
                         int rightBracket = name.indexOf('}') + 1;
                         name = name.substring(rightBracket);
-                        LayerData layerData = new LayerData(providerReport.getId(), type, name, date);
+                        LayerData layerData = new LayerData(providerReport.getId(), type, name, providerReport.getDate());
                         layerDatas.add(layerData);
                     }
                 }

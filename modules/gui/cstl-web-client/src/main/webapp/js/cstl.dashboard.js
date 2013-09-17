@@ -78,6 +78,16 @@ Dashboard.prototype.handleSelection = function() {
 };
 
 /**
+ * Display items from specified index.
+ *
+ * @param index - {number} the first item index
+ */
+Dashboard.prototype.fromIndex = function(index) {
+    this.startIndex = index;
+    this.loadItems();
+};
+
+/**
  * Resets all applied filter/sort criteria.
  */
 Dashboard.prototype.reset = function() {
@@ -147,14 +157,24 @@ Dashboard.prototype.loadItems = function() {
     // Display ajax loader.
     this.$ajaxLoader.show();
 
-    // Load new list.
-    this.$itemList.jzLoad(this.loadFunc, $.extend(this.params, {
+    // Prepare parameters.
+    var parameters = {
         filter:    this.$filterInput.val(),
         orderBy:   this.sortCriteria,
         direction: this.sortDirection,
         count:     this.nbItems,
         start:     this.startIndex
-    }), $.proxy(this.loadEnd, this));
+    };
+    for (var key in this.params) {
+        if (typeof this.params[key] === 'function') {
+            parameters[key] = this.params[key].call();
+        } else {
+            parameters[key] = this.params[key];
+        }
+    }
+
+    // Load new list.
+    this.$itemList.jzLoad(this.loadFunc, parameters, $.proxy(this.loadEnd, this));
 };
 
 /**

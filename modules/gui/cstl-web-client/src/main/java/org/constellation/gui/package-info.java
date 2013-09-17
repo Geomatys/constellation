@@ -81,10 +81,11 @@
 
                 // Constellation
                 @Script(id = "cstl",                    src = "js/cstl.js",                 depends = "jquery",         location = AssetLocation.SERVER),
-                @Script(id = "cstl.services",           src = "js/cstl.services.js",        depends = "cstl",           location = AssetLocation.SERVER),
-                @Script(id = "cstl.providers",          src = "js/cstl.providers.js",       depends = "cstl",           location = AssetLocation.SERVER),
                 @Script(id = "cstl.data",               src = "js/cstl.data.js",            depends = "cstl",           location = AssetLocation.SERVER),
+                @Script(id = "cstl.providers",          src = "js/cstl.providers.js",       depends = "cstl",           location = AssetLocation.SERVER),
+                @Script(id = "cstl.services",           src = "js/cstl.services.js",        depends = "cstl",           location = AssetLocation.SERVER),
                 @Script(id = "cstl.dashboard",          src = "js/cstl.dashboard.js",       depends = "cstl",           location = AssetLocation.SERVER),
+                @Script(id = "cstl.dashboard.data",     src = "js/cstl.dashboard.data.js",  depends = "cstl.dashboard", location = AssetLocation.SERVER),
                 @Script(id = "cstl.dashboard.style",    src = "js/cstl.dashboard.style.js", depends = "cstl.dashboard", location = AssetLocation.SERVER),
                 @Script(id = "cstl.filemodal",          src = "js/cstl.filemodal.js",       depends = "jquery",         location = AssetLocation.APPLICATION),
 

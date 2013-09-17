@@ -16,7 +16,7 @@
  */
 
 /*!
- * Style definition for all WMS pages.
+ * Style definition for all data pages.
  *
  * @author Fabien Bernard (Geomatys).
  */
@@ -26,21 +26,20 @@
  *                              Dashboard                                 *
  **************************************************************************/
 
-.item-list .item.layer.raster {
-  background: transparent url('../../../../../images/raster.png') right center no-repeat;
-}
-.item-list .item.layer.raster.selected {
-  background: transparent url('../../../../../images/raster-selected.png') right center no-repeat;
-}
-.item-list .item.layer.vector {
-  background: transparent url('../../../../../images/vecteur.png') right center no-repeat;
-}
-.item-list .item.layer.vector.selected {
-  background: transparent url('../../../../../images/vecteur-selected.png') right center no-repeat;
-}
-.item-list .item.layer.pyramid {
-  background: transparent url('../../../../../images/pyramid.png') right center no-repeat;
-}
-.item-list .item.layer.pyramid.selected {
-  background: transparent url('../../../../../images/pyramid-selected.png') right center no-repeat;
+#dataDashboard {
+  .dash-inner {
+    padding-bottom: 15px;
+    #list,
+    #selection {
+      padding: 0 10px;
+    }
+    #selection {
+      .alert {
+        display: none;
+      }
+      .alert:last-child {
+        display: block;
+      }
+    }
+  }
 }

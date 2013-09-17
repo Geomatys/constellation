@@ -1,31 +1,63 @@
-#{param name=providers /}
-#{param name=totalProvider/}
+#{param name=providers/}
+#{param name=nbResults/}
+#{param name=startIndex/}
+#{param name=nbPerPage/}
 
-<% for (def provider : providers){%>
-        <div>
-            <br/>
-            <div data-provider="${provider.idProvider}" data-layername="${provider.name}" data-providertype="${provider.type}" style="background: no-repeat center center; -webkit-background-size: cover; -moz-background-size:cover; background-size: cover;" onclick="selectElement(this);">
-                <div class="row-fluid">
-                    <div class="span3" style="padding-left: 15px;">
-                        <p>${provider.name}</p>
-                    </div>
-                    <div class="span2 pull-right">
-                        <p class="text-center text-info">${provider.type}</p>
-                    </div>
+<div class="pagination-wrapper">
+    <span class="nb-results pull-left"><strong>${nbResults}</strong> &{label.results}</span>
+    <select class="nb-per-page input-small pull-right" data-role="nb-items">
+        <option value="5"<%if(nbPerPage == 5){%> selected<%}%>>5</option>
+        <option value="10"<%if(nbPerPage == 10){%> selected<%}%>>10</option>
+        <option value="20"<%if(nbPerPage == 20){%> selected<%}%>>20</option>
+        <option value="50"<%if(nbPerPage == 50){%> selected<%}%>>50</option>
+        <option value="100"<%if(nbPerPage == 100){%> selected<%}%>>100</option>
+    </select>
+    <%  def nbPage      = (int) Math.ceil(nbResults / nbPerPage);
+        def currentPage = (int) startIndex / nbPerPage + 1;
+        if (nbPage > 1) { %>
+        <div class="pagination pull-right">
+            <ul>
+                <%  if (currentPage > 1) { %>
+                    <li data-page-index="${currentPage - 1}"><a href="#">&laquo;</a></li>
+                <%  } %>
+                <%  def prevCount = currentPage - 1;
+                    def nextCount = nbPage - currentPage;
+                    def minPage   = currentPage - Math.min(4 - Math.min(2, nextCount), prevCount);
+                    def maxPage   = currentPage + Math.min(4 - Math.min(2, prevCount), nextCount);
+                    for (def i = minPage; i <= maxPage; i++) { %>
+                        <li<%if(i != currentPage){%> data-page-index="${i}"<%}%> class="page<%if(i == currentPage){%> active<%}%>"><a href="#">${i}</a></li>
+                <%  } %>
+                <%  if (currentPage < nbPage) { %>
+                    <li data-page-index="${currentPage + 1}"><a href="#">&raquo;</a></li>
+                <%  } %>
+            </ul>
+        </div>
+    <% } %>
+</div>
+
+<%if(providers == null || providers.isEmpty()){%>
+    <div class="alert alert-info">
+        <strong>&{label.no.available.data}</strong>
+    </div>
+<%} else {%>
+    <div class="item-list">
+        <% for (def provider : providers){%>
+            <div class="item ${provider.type.toLowerCase()}" data-provider="${provider.idProvider}" data-layername="${provider.name}" data-providertype="${provider.type}">
+                <div class="top">
+                    <span class="item-title">${provider.name}</span>
                 </div>
-                <div class="row-fluid" style="border-top: 1px solid #5bc0de">
-                    <div class="span3" style="border: 1px solid #5bc0de; border-top: 1px solid #5bc0de;">
-                        <p class="text-center">${provider.date}</p>
+                <div class="bottom">
+                    <div class="block">
+                        <i class="icon-calendar"></i>${provider.date}
+                    </div>
+                    <div class="block">
+                        <i class="icon-user"></i>Admin
+                    </div>
+                    <div class="block">
+                        <i class="icon-folder-close-alt"></i>${provider.type}
                     </div>
                 </div>
             </div>
-        </div>
+        <%}%>
+    </div>
 <%}%>
-<script language="JavaScript" type="text/javascript">
-    $("[data-providertype=raster]").css("background-image", CSTL.URL_RASTER_PICTURE);
-    $("[data-providertype=vector]").css("background-image", CSTL.URL_VECTOR_PICTURE);
-    $("[data-providertype=pyramid]").css("background-image", CSTL.URL_PYRAMID_PICTURE);
-    $("[data-providertype=sensor]").css("background-image", CSTL.URL_SENSOR_PICTURE);
-
-    var totalProvider = ${totalProvider};
-</script>

@@ -3,6 +3,8 @@ package org.constellation.gui.service.bean;
 
 import juzu.Mapped;
 
+import java.util.Date;
+
 /**
  * @author Benjamin Garcia (Geomatys)
  */
@@ -15,12 +17,12 @@ public class LayerData {
 
     private String name;
 
-    private String date;
+    private Date date;
 
     public LayerData() {
     }
 
-    public LayerData(final String idProvider, final String type, final String name, final String date) {
+    public LayerData(final String idProvider, final String type, final String name, final Date date) {
         this.idProvider = idProvider;
         this.type = type;
         this.name = name;
@@ -51,11 +53,11 @@ public class LayerData {
         this.name = name;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(final String date) {
+    public void setDate(final Date date) {
         this.date = date;
     }
 }

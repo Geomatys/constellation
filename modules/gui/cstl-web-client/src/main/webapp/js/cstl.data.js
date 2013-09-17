@@ -28,71 +28,31 @@
  */
 CSTL.Data = {
 
-    type: ["vector"],
-
-    title: "vector",
-
-    goTo: function ($element, title, researchtype){
-        CSTL.Data.type = researchtype;
-        CSTL.Data.title = title;
-        loadDataDashboard(0, 10, null, null, null);
-        this.setActive($element.parent());
-    },
-
-    /**
-     * Change selected menu element
-     * @param $parent the parent element
-     */
-    setActive : function($parent){
-        var $Ul = $parent.parent();
-        $Ul.children().removeClass("active");
-        $parent.addClass("active")
-    },
-
-    /**
-     * Set title and subtitle.
-     * @param title
-     */
-    setTitles: function(){
-        //title
-        $("#dataDashboardTitle").empty();
-        $("#dataDashboardTitle").append(CSTL.Data.title);
-
-        //get subtitle element
-        var $dataSentence = $("[data-sentence]");
-        $dataSentence.empty();
-
-        //get localized subtitle and concatenate with data number
-        var sentence = $dataSentence.data("sentence");
-        sentence = totalProvider+" "+sentence;
-        $dataSentence.append(sentence);
-    },
-
     createMetadataTree : function(metadatas, parentDivId){
-    for(var i=0; i<metadatas.length; i++){
-        var key = metadatas[i];
-        var name = key.name;
-        var nameWithoutWhiteSpace = key.nameNoWhiteSpace;
-        var value = key.value;
-        var childrenExist = key.childrenExist;
-        var parentNode = key.parentName;
-        var depthSpan = key.depthSpan;
+        for(var i=0; i<metadatas.length; i++){
+            var key = metadatas[i];
+            var name = key.name;
+            var nameWithoutWhiteSpace = key.nameNoWhiteSpace;
+            var value = key.value;
+            var childrenExist = key.childrenExist;
+            var parentNode = key.parentName;
+            var depthSpan = key.depthSpan;
 
-        if(childrenExist){
-            //root node
-            if(parentNode == "null" || parentNode == ""){
-                var htmlElement =   "<a data-toggle='collapse' data-target='#"+nameWithoutWhiteSpace+"Div' class='span"+depthSpan+"'>"+name+"</a>" +
-                    "<div class='collapse span"+depthSpan+"' id='"+nameWithoutWhiteSpace+"Div'><table id='"+nameWithoutWhiteSpace+"' class=     'table table-striped'></table></div>";
-                jQuery(parentDivId).append(htmlElement);
+            if(childrenExist){
+                //root node
+                if(parentNode == "null" || parentNode == ""){
+                    var htmlElement =   "<a data-toggle='collapse' data-target='#"+nameWithoutWhiteSpace+"Div' class='span"+depthSpan+"'>"+name+"</a>" +
+                        "<div class='collapse span"+depthSpan+"' id='"+nameWithoutWhiteSpace+"Div'><table id='"+nameWithoutWhiteSpace+"' class=     'table table-striped'></table></div>";
+                    jQuery(parentDivId).append(htmlElement);
+                }else{
+                    var htmlElement =   "<a data-toggle='collapse' data-target='#"+nameWithoutWhiteSpace+"Div' class='span"+depthSpan+"'>"+name+"</a>" +
+                        "<div class='collapse span"+depthSpan+"' id='"+nameWithoutWhiteSpace+"Div'><table id='"+nameWithoutWhiteSpace+"' class='table table-striped'></table></div>";
+                    jQuery("#"+parentNode+"Div").append(htmlElement);
+                }
             }else{
-                var htmlElement =   "<a data-toggle='collapse' data-target='#"+nameWithoutWhiteSpace+"Div' class='span"+depthSpan+"'>"+name+"</a>" +
-                    "<div class='collapse span"+depthSpan+"' id='"+nameWithoutWhiteSpace+"Div'><table id='"+nameWithoutWhiteSpace+"' class='table table-striped'></table></div>";
-                jQuery("#"+parentNode+"Div").append(htmlElement);
+                var htmlElement = "<tr><td>"+name+"</td><td>"+value+"</td></tr>";
+                jQuery("#"+parentNode).append(htmlElement);
             }
-        }else{
-            var htmlElement = "<tr><td>"+name+"</td><td>"+value+"</td></tr>";
-            jQuery("#"+parentNode).append(htmlElement);
         }
     }
-}
 }

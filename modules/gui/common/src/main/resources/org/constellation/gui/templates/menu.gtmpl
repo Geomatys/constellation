@@ -27,7 +27,11 @@
 <!-- dictionary -->
 <div id="dictionary" class="hide"
      data-comparison="&{label.comparison}"
-     data-delete="&{label.delete}"
+     data-data-pyramid="&{label.data.pyramidal}"
+     data-data-raster="&{label.data.raster}"
+     data-data-sensor="&{label.data.sensor}"
+     data-data-vector="&{label.data.vector}"
+     data-data-virtual="&{label.data.virtual.sensor}"
      data-confirm-delete-style="&{confirm.delete.style}"
      data-edit="&{label.edit}"
      data-error="&{label.error}"

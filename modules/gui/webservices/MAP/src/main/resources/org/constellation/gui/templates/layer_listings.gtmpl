@@ -1,4 +1,4 @@
-<div class="row-fluid dashboard">
+<div id="mapDashboard" class="row-fluid dashboard">
     <div id="layerList" class="pull-left" style="width:65%;">
         <div style="padding: 0 10px;">
             <h4>&{layer.listing.title}</h4>
@@ -39,7 +39,7 @@
 </div>
 <script type="text/javascript">
     new Dashboard({
-        $root:    $('#data'),
+        $root:    $('#mapDashboard'),
         loadFunc: 'Controller.generateDataList()',
         params:   {serviceId:'${service.identifier}'}
     });

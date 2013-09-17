@@ -20,6 +20,7 @@ package org.constellation.map.configuration;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.io.IOException;
 import java.util.Collection;
@@ -891,26 +892,25 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         for (ProviderService service : services.values()) {
 
             final List<ProviderReport> providerReports = new ArrayList<ProviderReport>();
-            for (LayerProvider p : layerProviders) {
+            for (final LayerProvider p : layerProviders) {
                 if (p.getService().equals(service)) {
                     final List<String> keys = new ArrayList<String>();
                     for(Name n : p.getKeys()){
                         keys.add(DefaultName.toJCRExtendedForm(n));
                     }
-
-                    String date = (String) p.getSource().parameter("date").getValue();
-                    String providerType = (String) p.getSource().parameter("providerType").getValue();
+                    final Date date = (Date) p.getSource().parameter("date").getValue();
+                    final String providerType = (String) p.getSource().parameter("providerType").getValue();
                     providerReports.add(new ProviderReport(p.getId(), service.getName(), keys, date, providerType));
                 }
             }
-            for (StyleProvider p : styleProviders) {
+            for (final StyleProvider p : styleProviders) {
                 if (p.getService().equals(service)) {
                     final List<String> keys = new ArrayList<String>();
                     for(String n : p.getKeys()){
                         keys.add(n);
                     }
-                    String date = (String) p.getSource().parameter("date").getValue();
-                    String providerType = (String) p.getSource().parameter("providerType").getValue();
+                    final Date date = (Date) p.getSource().parameter("date").getValue();
+                    final String providerType = (String) p.getSource().parameter("providerType").getValue();
                     providerReports.add(new ProviderReport(p.getId(), service.getName(), keys, date, providerType));
                 }
             }

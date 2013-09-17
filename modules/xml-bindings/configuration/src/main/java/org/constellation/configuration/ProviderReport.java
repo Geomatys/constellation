@@ -17,6 +17,7 @@
 package org.constellation.configuration;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -46,7 +47,7 @@ public class ProviderReport {
     private String abstractType;
 
     @XmlAttribute
-    private String date;
+    private Date date;
 
     @XmlElement(name = "item")
     private List<String> items;
@@ -54,7 +55,7 @@ public class ProviderReport {
     public ProviderReport() {
     }
 
-    public ProviderReport(final String id, final String type, final List<String> items, final String date, final String abstractType) {
+    public ProviderReport(final String id, final String type, final List<String> items, final Date date, final String abstractType) {
         this.id = id;
         this.type = type;
         this.items = items;
@@ -107,11 +108,11 @@ public class ProviderReport {
         this.items = items;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(final String date) {
+    public void setDate(final Date date) {
         this.date = date;
     }
 

@@ -109,6 +109,7 @@ public final class StyleController {
     @Route("style/dashboard")
     public Response dashboard(final String category) throws IOException {
         final StyleListBean listBean = service.getStyleList();
+        final int nbResults = listBean.getStyles().size();
 
         // Truncate the list.
         final List<StyleBean> styles;
@@ -122,7 +123,7 @@ public final class StyleController {
         final Map<String, Object> parameters = new HashMap<>(0);
         parameters.put("category",   category);
         parameters.put("styles",     styles);
-        parameters.put("nbResults",  listBean.getStyles().size());
+        parameters.put("nbResults",  nbResults);
         parameters.put("startIndex", 0);
         parameters.put("nbPerPage",  10);
         parameters.put("selected",   null);
@@ -285,6 +286,7 @@ public final class StyleController {
     @Route("style/filter")
     public Response styleList(final String start, final String count, final String filter, final String orderBy, final String direction) throws IOException {
         final StyleListBean listBean = service.getStyleList();
+        final int nbResults = listBean.getStyles().size();
 
         // Search style by name.
         if (!isBlank(filter)) {
@@ -315,7 +317,7 @@ public final class StyleController {
 
         final Map<String, Object> parameters = new HashMap<>(0);
         parameters.put("styles",     styles);
-        parameters.put("nbResults",  listBean.getStyles().size());
+        parameters.put("nbResults",  nbResults);
         parameters.put("startIndex", intStart);
         parameters.put("nbPerPage",  intCount);
         return list.ok(parameters).withMimeType("text/html");

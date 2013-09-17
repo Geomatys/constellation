@@ -86,6 +86,8 @@
     .navbar-inner {
       .border-radius(0);
       padding-left: 0;
+      background-image: none;
+      background-color: #f8f8f8;
       border-bottom: 1px solid #e3e3e3;
 
       li a {
@@ -99,6 +101,9 @@
         &.descending .icon-caret-down {
           display: inline-block;
         }
+      }
+      li.divider-vertical {
+        border-left: 1px solid #e3e3e3;
       }
       .divider-vertical {
         margin: 0;
@@ -143,6 +148,37 @@
    * Dashboard item list.
    */
   .item-list {
+    .item.raster {
+      background: transparent url('../../../../../images/raster.png') right center no-repeat;
+    }
+    .item.raster.selected {
+      background: transparent url('../../../../../images/raster-selected.png') right center no-repeat;
+    }
+    .item.vector {
+      background: transparent url('../../../../../images/vector.png') right center no-repeat;
+    }
+    .item.vector.selected {
+      background: transparent url('../../../../../images/vector-selected.png') right center no-repeat;
+    }
+    .item.sensor {
+      background: transparent url('../../../../../images/sensor.png') right center no-repeat;
+    }
+    .item.sensor.selected {
+      background: transparent url('../../../../../images/sensor-selected.png') right center no-repeat;
+    }
+    .item.pyramid {
+      background: transparent url('../../../../../images/pyramid.png') right center no-repeat;
+    }
+    .item.pyramid.selected {
+      background: transparent url('../../../../../images/pyramid-selected.png') right center no-repeat;
+    }
+    .item.style {
+      background: transparent url('../../../../../images/style.png') right center no-repeat;
+    }
+    .item.style.selected{
+      background: transparent url('../../../../../images/style-selected.png') right center no-repeat;
+    }
+
     .item {
       border: 1px solid white;
       .box-shadow(~"0 0 1px rgba(0,0,0,0.3)");

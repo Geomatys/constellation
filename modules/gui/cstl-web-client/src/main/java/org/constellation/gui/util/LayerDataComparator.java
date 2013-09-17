@@ -95,10 +95,7 @@ public class LayerDataComparator implements Comparator<LayerData> {
     }
 
     private int compareDate(final LayerData l1, final LayerData l2) {
-        return ObjectUtils.compare(
-                TemporalUtilities.parseDateSafe(l1.getDate(), false),
-                TemporalUtilities.parseDateSafe(l2.getDate(), false),
-                true);
+        return ObjectUtils.compare(l1.getDate(), l2.getDate(), true);
     }
 
     private int compareOwner(final LayerData l1, final LayerData l2) {
@@ -108,6 +105,6 @@ public class LayerDataComparator implements Comparator<LayerData> {
 
     private int compareDataType(final LayerData l1, final LayerData l2) {
         // TODO: implement data type sort
-        return 0;
+        return ObjectUtils.compare(l1.getType(), l2.getType());
     }
 }
