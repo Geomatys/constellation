@@ -36,7 +36,7 @@ public class DataController {
     @Route("/dataFolderList")
     public void getDataFolders(final String path) {
         List<FileBean> folders = providerManager.getDataFolder(path);
-        folderListing.with().folders(folders).render();
+        folderListing.with().folders(folders).ok();
     }
 
     @Action

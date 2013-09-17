@@ -311,7 +311,7 @@ public class Controller {
         parameters.put("nbResults",  nbResults);
         parameters.put("startIndex", intStart);
         parameters.put("nbPerPage",  intCount);
-        dataElement.with(parameters).render();
+        dataElement.with(parameters).ok();
     }
 
     @Ajax
@@ -354,7 +354,7 @@ public class Controller {
         parameters.put("nbResults",  nbResults);
         parameters.put("startIndex", intStart);
         parameters.put("nbPerPage",  intCount);
-        dataListing.with(parameters).render();
+        dataListing.with(parameters).ok();
     }
 
     /**
@@ -412,7 +412,7 @@ public class Controller {
         Map<String, Object> parameters = new HashMap<>(0);
         StyleListBean aList = servicesManager.getStyleList();
         parameters.put("styleList", aList);
-        styleListing.with(parameters).render();
+        styleListing.with(parameters).ok();
     }
 
 
