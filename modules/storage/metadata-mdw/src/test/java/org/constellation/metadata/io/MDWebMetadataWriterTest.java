@@ -430,14 +430,14 @@ public class MDWebMetadataWriterTest {
     @Order(order=6)
     public void writeMetadataDCTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        RecordType absExpResult = (RecordType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
+        RecordType absExpResult = (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"));
         writer.storeMetadata(absExpResult);
 
         Object absResult = reader.getMetadata("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd", AbstractMetadataReader.DUBLINCORE);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof RecordType);
         RecordType result = (RecordType) absResult;
-        RecordType expResult =  (RecordType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
+        RecordType expResult =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"));
 
         pool.recycle(unmarshaller);
         assertEquals(expResult,result);

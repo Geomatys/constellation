@@ -146,7 +146,7 @@ public class MDWebMetadataReaderTest {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object result = reader.getMetadata("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd", AbstractMetadataReader.DUBLINCORE);
 
-        RecordType expResult = (RecordType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
+        RecordType expResult = (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"));
 
         assertTrue(result instanceof RecordType);
         assertEquals(expResult, (RecordType)result);
