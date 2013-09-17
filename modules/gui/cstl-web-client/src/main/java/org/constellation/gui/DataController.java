@@ -12,7 +12,6 @@ import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.templates.folder_listing;
 
 import javax.inject.Inject;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -34,9 +33,9 @@ public class DataController {
     @Ajax
     @Resource
     @Route("/dataFolderList")
-    public void getDataFolders(final String path) {
-        List<FileBean> folders = providerManager.getDataFolder(path);
-        folderListing.with().folders(folders).ok();
+    public Response getDataFolders(final String path) {
+        final List<FileBean> folders = providerManager.getDataFolder(path);
+        return folderListing.with().folders(folders).ok().withMimeType("text/html");
     }
 
     @Action

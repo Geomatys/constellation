@@ -274,7 +274,7 @@ public class Controller {
     @Ajax
     @Resource
     @Route("/dataList")
-    public void generateDataList(final String serviceId, final String start, final String count, final String orderBy,
+    public Response generateDataList(final String serviceId, final String start, final String count, final String orderBy,
                                  final String direction, final String filter) throws IOException {
         final LayerList listBean = mapManager.getLayers(serviceId);
         final int nbResults = listBean.getLayer().size();
@@ -311,13 +311,13 @@ public class Controller {
         parameters.put("nbResults",  nbResults);
         parameters.put("startIndex", intStart);
         parameters.put("nbPerPage",  intCount);
-        dataElement.with(parameters).ok();
+        return dataElement.with(parameters).ok();
     }
 
     @Ajax
     @Resource
     @Route("/providerList")
-    public void getAvailableData(final List<String> dataTypes, final String start, final String count, final String orderBy,
+    public Response getAvailableData(final List<String> dataTypes, final String start, final String count, final String orderBy,
                                  final String direction, final String filter){
         final List<LayerData> list = providerManager.getDataListing(dataTypes);
         final int nbResults = list.size();
@@ -354,7 +354,7 @@ public class Controller {
         parameters.put("nbResults",  nbResults);
         parameters.put("startIndex", intStart);
         parameters.put("nbPerPage",  intCount);
-        dataListing.with(parameters).ok();
+        return dataListing.with(parameters).ok();
     }
 
     /**
@@ -408,11 +408,11 @@ public class Controller {
     @Ajax
     @Resource
     @Route("style/list")
-    public void getStyleList(){
+    public Response getStyleList(){
         Map<String, Object> parameters = new HashMap<>(0);
         StyleListBean aList = servicesManager.getStyleList();
         parameters.put("styleList", aList);
-        styleListing.with(parameters).ok();
+        return styleListing.with(parameters).ok();
     }
 
 
