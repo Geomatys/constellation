@@ -1,5 +1,7 @@
 package org.constellation.utils;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 /**
  * Reprensent more simply as possible a node on metadata tree
  *
@@ -71,9 +73,10 @@ public class SimplyMetadataTreeNode {
      */
     @Override
     public String toString() {
+        final String jsonValue  = StringEscapeUtils.escapeEcmaScript(value);
         return "{" +
                 "\"name\":\"" + name + '\"' +
-                ", \"value\":\"" + value + '\"' +
+                ", \"value\":\"" + jsonValue + '\"' +
                 ", \"childrenExist\":" + childrenExist +
                 ", \"nameNoWhiteSpace\":\"" + nameNoWhiteSpace + '\"' +
                 ", \"depthSpan\":" + depthSpan +

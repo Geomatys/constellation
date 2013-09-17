@@ -66,5 +66,33 @@ CSTL.Data = {
         var sentence = $dataSentence.data("sentence");
         sentence = totalProvider+" "+sentence;
         $dataSentence.append(sentence);
+    },
+
+    createMetadataTree : function(metadatas, parentDivId){
+    for(var i=0; i<metadatas.length; i++){
+        var key = metadatas[i];
+        var name = key.name;
+        var nameWithoutWhiteSpace = key.nameNoWhiteSpace;
+        var value = key.value;
+        var childrenExist = key.childrenExist;
+        var parentNode = key.parentName;
+        var depthSpan = key.depthSpan;
+
+        if(childrenExist){
+            //root node
+            if(parentNode == "null" || parentNode == ""){
+                var htmlElement =   "<a data-toggle='collapse' data-target='#"+nameWithoutWhiteSpace+"Div' class='span"+depthSpan+"'>"+name+"</a>" +
+                    "<div class='collapse span"+depthSpan+"' id='"+nameWithoutWhiteSpace+"Div'><table id='"+nameWithoutWhiteSpace+"' class=     'table table-striped'></table></div>";
+                jQuery(parentDivId).append(htmlElement);
+            }else{
+                var htmlElement =   "<a data-toggle='collapse' data-target='#"+nameWithoutWhiteSpace+"Div' class='span"+depthSpan+"'>"+name+"</a>" +
+                    "<div class='collapse span"+depthSpan+"' id='"+nameWithoutWhiteSpace+"Div'><table id='"+nameWithoutWhiteSpace+"' class='table table-striped'></table></div>";
+                jQuery("#"+parentNode+"Div").append(htmlElement);
+            }
+        }else{
+            var htmlElement = "<tr><td>"+name+"</td><td>"+value+"</td></tr>";
+            jQuery("#"+parentNode).append(htmlElement);
+        }
     }
+}
 }
