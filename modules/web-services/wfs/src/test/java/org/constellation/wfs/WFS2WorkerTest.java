@@ -427,7 +427,7 @@ public class WFS2WorkerTest {
         /**
          * Test 2 : query on typeName samplingPoint whith HITS result type
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         queries.add(query);
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
@@ -440,7 +440,7 @@ public class WFS2WorkerTest {
         /**
          * Test 3 : query on typeName samplingPoint with propertyName = {gml:name}
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("http://www.opengis.net/gml/3.2", "name"))));
 
@@ -468,7 +468,7 @@ public class WFS2WorkerTest {
         /**
          * Test 4 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         ComparisonOpsType pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "name", Boolean.TRUE);
         FilterType filter = new FilterType(pe);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
@@ -495,7 +495,7 @@ public class WFS2WorkerTest {
         /**
          * Test 5 : query on typeName samplingPoint whith a filter xpath //gml:name = 10972X0137-PONT
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "//{http://www.opengis.net/gml}name", Boolean.TRUE);
         filter = new FilterType(pe);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
@@ -522,7 +522,7 @@ public class WFS2WorkerTest {
         /**
          * Test 6 : query on typeName samplingPoint whith a spatial filter BBOX
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         SpatialOpsType bbox = new BBOXType("{http://www.opengis.net/sampling/1.0}position", 65300.0, 1731360.0, 65500.0, 1731400.0, "urn:ogc:def:crs:epsg:7.6:27582");
         filter = new FilterType(bbox);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
@@ -549,7 +549,7 @@ public class WFS2WorkerTest {
         /**
          * Test 7 : query on typeName samplingPoint whith a spatial filter BBOX () with no namespace
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         bbox = new BBOXType("position", 65300.0, 1731360.0, 65500.0, 1731400.0, "urn:ogc:def:crs:epsg:7.6:27582");
         filter = new FilterType(bbox);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
@@ -578,7 +578,7 @@ public class WFS2WorkerTest {
          * Test 8 : query on typeName samplingPoint with sort on gml:name
          */
 
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.ASC)))));
         queries.add(query);
@@ -605,7 +605,7 @@ public class WFS2WorkerTest {
         /**
          * Test 9 : query on typeName samplingPoint with sort on gml:name
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.DESC)))));
         queries.add(query);
@@ -632,7 +632,7 @@ public class WFS2WorkerTest {
         /**
          * Test 10 : query on typeName samplingPoint with sort on gml:name and startIndex and maxFeature
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.DESC)))));
         queries.add(query);
@@ -659,7 +659,7 @@ public class WFS2WorkerTest {
         /**
          * Test 11 : query on typeName samplingPoint whith HITS result type
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         queries.add(query);
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
@@ -673,7 +673,7 @@ public class WFS2WorkerTest {
          * Test 12 : query on typeName samplingPoint whith a filter with unexpected property
          */
 
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         pe = new PropertyIsEqualToType(new LiteralType("whatever"), "wrongProperty", Boolean.TRUE);
         filter = new FilterType(pe);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
@@ -690,7 +690,7 @@ public class WFS2WorkerTest {
          * Test 13 : query on typeName samplingPoint whith a an unexpected property in propertyNames
          */
 
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("wrongProperty"))));
         queries.add(query);
@@ -853,7 +853,7 @@ public class WFS2WorkerTest {
          * Test 1 : query on typeName sml:System
          */
 
-        List<QueryType> queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null));
         GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
@@ -879,7 +879,7 @@ public class WFS2WorkerTest {
          * Test 2 : query on typeName sml:System avec srsName = EPSG:4326
          */
 
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
         query.setSrsName("EPSG:4326");
         queries.add(query);
@@ -906,7 +906,7 @@ public class WFS2WorkerTest {
         /**
          * Test 3 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query   = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("http://www.opengis.net/sml/1.0", "keywords"))));
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("http://www.opengis.net/sml/1.0", "phenomenons"))));
@@ -937,7 +937,7 @@ public class WFS2WorkerTest {
          */
         ComparisonOpsType pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), "name", Boolean.TRUE);
         FilterType filter         = new FilterType(pe1);
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
 
         queries.add(query);
@@ -967,7 +967,7 @@ public class WFS2WorkerTest {
          */
         pe1     = new PropertyIsEqualToType(new LiteralType("Piezometer Test"), "/name", Boolean.TRUE);
         filter         = new FilterType(pe1);
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
 
         queries.add(query);
@@ -997,7 +997,7 @@ public class WFS2WorkerTest {
          */
         pe1     = new PropertyIsEqualToType(new LiteralType("height"), "/inputs/input/name", Boolean.TRUE);
         filter         = new FilterType(pe1);
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
 
         queries.add(query);
@@ -1027,7 +1027,7 @@ public class WFS2WorkerTest {
         
         pe1     = new PropertyIsEqualToType(new LiteralType("height"), "/inputs/inputation/namein", Boolean.TRUE);
         filter         = new FilterType(pe1);
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
 
         queries.add(query);
@@ -1055,7 +1055,7 @@ public class WFS2WorkerTest {
          */
         pe1     = new PropertyIsEqualToType(new LiteralType("height"), "{http://www.opengis.net/sml/1.0}System/inputs/input/name", Boolean.TRUE);
         filter         = new FilterType(pe1);
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
 
         queries.add(query);
@@ -1085,7 +1085,7 @@ public class WFS2WorkerTest {
          */
         pe1     = new PropertyIsEqualToType(new LiteralType("height"), "a/inputs/input/name", Boolean.TRUE);
         filter         = new FilterType(pe1);
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query   = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
         query.setAliases(Arrays.asList("a"));
 
@@ -1131,7 +1131,7 @@ public class WFS2WorkerTest {
         LogicOpsType le           = new AndType(pe1, pe2);
         FilterType filter         = new FilterType(le);
 
-        List<QueryType> queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<>();
         QueryType selfJoinQuery = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System"), new QName("http://www.opengis.net/sml/1.0", "System")), null);
         selfJoinQuery.getAliases().add("a");
         selfJoinQuery.getAliases().add("b");
@@ -1173,7 +1173,7 @@ public class WFS2WorkerTest {
         LogicOpsType le           = new AndType(pe1, pe2);
         FilterType filter         = new FilterType(le);
 
-        List<QueryType> queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<>();
         QueryType selfJoinQuery = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System"), new QName("http://www.opengis.net/sml/1.0", "System")), null);
         selfJoinQuery.getAliases().add("a");
         selfJoinQuery.getAliases().add("b");
@@ -1208,7 +1208,7 @@ public class WFS2WorkerTest {
          * Test 1 : query on typeName bridges
          */
 
-        List<QueryType> queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges")), null));
         GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
@@ -1232,7 +1232,7 @@ public class WFS2WorkerTest {
         /**
          * Test 2 : query on typeName bridges with propertyName = {FID}
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("FID"))));
         queries.add(query);
@@ -1259,7 +1259,7 @@ public class WFS2WorkerTest {
          * Test 3 : query on typeName NamedPlaces
          */
 
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
@@ -1284,7 +1284,7 @@ public class WFS2WorkerTest {
          * Test 4 : query on typeName NamedPlaces with resultType = HITS
          */
 
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
 
@@ -1298,7 +1298,7 @@ public class WFS2WorkerTest {
          * Test 5 : query on typeName NamedPlaces with srsName = EPSG:27582
          */
 
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null);
         query.setSrsName("EPSG:27582");
         queries.add(query);
@@ -1325,7 +1325,7 @@ public class WFS2WorkerTest {
          * Test 6 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
          */
 
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.DESC)))));
         queries.add(query);
@@ -1353,7 +1353,7 @@ public class WFS2WorkerTest {
         /**
          * Test 7 : query on typeName NamedPlaces with ASC sortBy on NAME property (not supported)
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.ASC)))));
         queries.add(query);
@@ -1390,7 +1390,7 @@ public class WFS2WorkerTest {
         /**
          * Test 1 : describe Feature type bridges
          */
-        List<QName> typeNames = new ArrayList<QName>();
+        List<QName> typeNames = new ArrayList<>();
         typeNames.add(new QName("http://www.opengis.net/gml/3.2", "Bridges"));
         DescribeFeatureTypeType request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/xml; subtype=gml/3.2.1");
 
@@ -1403,7 +1403,7 @@ public class WFS2WorkerTest {
         /**
          * Test 2 : describe Feature type Sampling point
          */
-        typeNames = new ArrayList<QName>();
+        typeNames = new ArrayList<>();
         typeNames.add(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
         request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/xml; subtype=gml/3.2.1");
 
@@ -1416,7 +1416,7 @@ public class WFS2WorkerTest {
         /**
          * Test 3 : describe Feature type System
          */
-        typeNames = new ArrayList<QName>();
+        typeNames = new ArrayList<>();
         typeNames.add(new QName("http://www.opengis.net/sml/1.0", "System"));
         request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/xml; subtype=gml/3.2.1");
 
@@ -1454,7 +1454,7 @@ public class WFS2WorkerTest {
          */
 
         QName typeName = new QName("http://www.opengis.net/gml/3.2", "Bridges");
-        List<PropertyType> properties = new ArrayList<PropertyType>();
+        List<PropertyType> properties = new ArrayList<>();
         UpdateType update = new UpdateType(properties, null, typeName, null);
         update.setInputFormat("bad inputFormat");
         TransactionType request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, update);
@@ -1474,7 +1474,7 @@ public class WFS2WorkerTest {
          */
 
         typeName = new QName("http://www.opengis.net/gml/3.2", "Bridges");
-        properties = new ArrayList<PropertyType>();
+        properties = new ArrayList<>();
         properties.add(new PropertyType(new ValueReference("whatever", UpdateActionType.REPLACE), "someValue"));
         request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new UpdateType(properties, null, typeName, null));
 
@@ -1493,7 +1493,7 @@ public class WFS2WorkerTest {
          */
 
         typeName = new QName("http://www.opengis.net/gml/3.2", "Bridges");
-        properties = new ArrayList<PropertyType>();
+        properties = new ArrayList<>();
         properties.add(new PropertyType(new ValueReference("NAME", UpdateActionType.REPLACE), "someValue"));
         ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "bad", Boolean.TRUE);
         FilterType filter        = new FilterType(pe);
@@ -1513,7 +1513,7 @@ public class WFS2WorkerTest {
          */
 
         typeName = new QName("http://www.opengis.net/gml/3.2", "NamedPlaces");
-        properties = new ArrayList<PropertyType>();
+        properties = new ArrayList<>();
         properties.add(new PropertyType(new ValueReference("FID", UpdateActionType.REPLACE), "999"));
         pe     = new PropertyIsEqualToType(new LiteralType("Ashton"), "NAME", Boolean.TRUE);
         filter = new FilterType(pe);
@@ -1530,7 +1530,7 @@ public class WFS2WorkerTest {
         /**
          * we verify that the feature have been updated
          */
-         List<QueryType> queries = new ArrayList<QueryType>();
+         List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
         GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
@@ -1576,7 +1576,7 @@ public class WFS2WorkerTest {
         TransactionResponse result = worker.transaction(request);
 
         TransactionSummaryType sum = new TransactionSummaryType(0, 0, 0, 1);
-        final List<CreatedOrModifiedFeatureType> r = new ArrayList<CreatedOrModifiedFeatureType>();
+        final List<CreatedOrModifiedFeatureType> r = new ArrayList<>();
         r.add(new CreatedOrModifiedFeatureType(new ResourceIdType("NamedPlaces.2"), null));
         ActionResultsType replaced = new ActionResultsType(r);
         TransactionResponse ExpResult = new TransactionResponseType(sum, null, null, replaced, "2.0.0");
@@ -1586,7 +1586,7 @@ public class WFS2WorkerTest {
         /**
          * we verify that the feature have been updated
          */
-        List<QueryType> queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
         GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
@@ -1652,7 +1652,7 @@ public class WFS2WorkerTest {
         /**
          * we verify that the feature have been deleted
          */
-        List<QueryType> queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
         GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
@@ -1713,7 +1713,7 @@ public class WFS2WorkerTest {
         assertTrue(resultI instanceof ListStoredQueriesResponseType);
         final ListStoredQueriesResponseType result = (ListStoredQueriesResponseType) resultI;
 
-        final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
+        final List<StoredQueryListItemType> items = new ArrayList<>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
@@ -1743,7 +1743,7 @@ public class WFS2WorkerTest {
         assertTrue(resultI instanceof DescribeStoredQueriesResponseType);
         final DescribeStoredQueriesResponseType result = (DescribeStoredQueriesResponseType) resultI;
 
-        final List<StoredQueryDescriptionType> descriptions = new ArrayList<StoredQueryDescriptionType>();
+        final List<StoredQueryDescriptionType> descriptions = new ArrayList<>();
         final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
         final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
         final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
@@ -1770,7 +1770,7 @@ public class WFS2WorkerTest {
     @Test
     @Order(order=16)
     public void createStoredQueriesTest() throws Exception {
-        final List<StoredQueryDescriptionType> desc = new ArrayList<StoredQueryDescriptionType>();
+        final List<StoredQueryDescriptionType> desc = new ArrayList<>();
 
         final ParameterExpressionType param = new ParameterExpressionType("name2", "name Parameter 2 ", "A parameter on the geometry \"the_geom\" of the feature", new QName("http://www.opengis.net/gml/3.2", "AbstractGeometryType", "gml"));
         final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges"));
@@ -1815,7 +1815,7 @@ public class WFS2WorkerTest {
         assertTrue(resultlsqI instanceof ListStoredQueriesResponseType);
         ListStoredQueriesResponseType resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
-        final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
+        final List<StoredQueryListItemType> items = new ArrayList<>();
         items.add(new StoredQueryListItemType("nameQuery",     Arrays.asList(new Title("Name query")),     Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
@@ -1874,7 +1874,7 @@ public class WFS2WorkerTest {
         assertTrue(resultlsqI instanceof ListStoredQueriesResponseType);
         ListStoredQueriesResponseType resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
-        final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
+        final List<StoredQueryListItemType> items = new ArrayList<>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
@@ -1950,7 +1950,7 @@ public class WFS2WorkerTest {
          */
         GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         ObjectFactory factory = new ObjectFactory();
-        List<ParameterType> params = new ArrayList<ParameterType>();
+        List<ParameterType> params = new ArrayList<>();
         params.add(new ParameterType("name", "10972X0137-PONT"));
         StoredQueryType query = new StoredQueryType("nameQuery", null, params);
         request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
@@ -1977,7 +1977,7 @@ public class WFS2WorkerTest {
          * Test 2 : query on typeName samplingPoint with id parameter
          */
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
-        params = new ArrayList<ParameterType>();
+        params = new ArrayList<>();
         params.add(new ParameterType("id", "station-001"));
         query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", null, params);
         request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
@@ -2004,7 +2004,7 @@ public class WFS2WorkerTest {
          * Test 3 : query on typeName samplingPoint with a BBOX parameter
          */
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
-        params = new ArrayList<ParameterType>();
+        params = new ArrayList<>();
         DirectPositionType lower = new DirectPositionType( 65300.0, 1731360.0);
         DirectPositionType upper = new DirectPositionType(65500.0, 1731400.0);
         EnvelopeType env = new EnvelopeType(lower, upper, "urn:ogc:def:crs:epsg:7.6:27582");
@@ -2035,7 +2035,7 @@ public class WFS2WorkerTest {
          * Test 4 : query with typeName parameter
          */
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
-        params = new ArrayList<ParameterType>();
+        params = new ArrayList<>();
         params.add(new ParameterType("typeName", new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")));
         query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", null, params);
         request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
@@ -2067,7 +2067,7 @@ public class WFS2WorkerTest {
          */
         GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         ObjectFactory factory = new ObjectFactory();
-        List<ParameterType> params = new ArrayList<ParameterType>();
+        List<ParameterType> params = new ArrayList<>();
         params.add(new ParameterType("id", "station-001"));
         StoredQueryType query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", null, params);
         request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
@@ -2095,7 +2095,7 @@ public class WFS2WorkerTest {
     @Test
     @Order(order=21)
     public void schemaLocationTest() throws Exception {
-        List<QueryType> queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
         GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
@@ -2104,7 +2104,7 @@ public class WFS2WorkerTest {
         assertTrue(resultGF instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
         
-        final Map<String, String> expResult = new HashMap<String, String>();
+        final Map<String, String> expResult = new HashMap<>();
         expResult.put("http://www.opengis.net/gml/3.2", "http://geomatys.com/constellation/WS/wfs/default?request=DescribeFeatureType&version=2.0.0&service=WFS&namespace=xmlns(ns1=http://www.opengis.net/gml/3.2)&typenames=ns1:NamedPlaces");
         assertEquals(wrapper.getSchemaLocations(), expResult);
         
@@ -2275,7 +2275,7 @@ public class WFS2WorkerTest {
     public static void domCompare(final Object actual, final Object expected) throws Exception {
 
         final CstlDOMComparator comparator = new CstlDOMComparator(expected, actual);
-        comparator.ignoredAttributes.add("xmlns:*");
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 

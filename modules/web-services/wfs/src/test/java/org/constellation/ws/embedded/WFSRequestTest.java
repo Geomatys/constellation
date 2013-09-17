@@ -303,7 +303,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         // Creates a valid GetCapabilities url.
         final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?");
 
-        final List<QueryType> queries = new ArrayList<QueryType>();
+        final List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
         final GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, 2, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.1.1");
 
@@ -323,7 +323,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         // Creates a valid GetCapabilities url.
         final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?");
 
-        final List<org.geotoolkit.wfs.xml.v200.QueryType> queries = new ArrayList<org.geotoolkit.wfs.xml.v200.QueryType>();
+        final List<org.geotoolkit.wfs.xml.v200.QueryType> queries = new ArrayList<>();
         queries.add(new org.geotoolkit.wfs.xml.v200.QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
         final org.geotoolkit.wfs.xml.v200.GetFeatureType request = new org.geotoolkit.wfs.xml.v200.GetFeatureType("WFS", "2.0.0", null, 2, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
@@ -408,7 +408,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        assertEquals(xmlExpResult, xmlResult);
+        domCompare(xmlExpResult, xmlResult);
     }
 
     
@@ -469,7 +469,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         TransactionResponseType result = (TransactionResponseType) obj;
 
         TransactionSummaryType sum        = new TransactionSummaryType(2, 0, 0);
-        List<InsertedFeatureType> insertedFeatures = new ArrayList<InsertedFeatureType>();
+        List<InsertedFeatureType> insertedFeatures = new ArrayList<>();
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-006"), null));
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-007"), null));
         InsertResultsType insertResult    = new InsertResultsType(insertedFeatures);
@@ -481,7 +481,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         /**
          * We verify that the 2 new samplingPoint are inserted
          */
-        List<QueryType> queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
         GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.1.1");
 
@@ -495,7 +495,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
         
-        assertEquals(xmlExpResult, xmlResult);
+        domCompare(xmlExpResult, xmlResult);
 
         // for a POST request
         conec = getCapsUrl.openConnection();
@@ -510,7 +510,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         result = (TransactionResponseType) obj;
 
         sum              = new TransactionSummaryType(2, 0, 0);
-        insertedFeatures = new ArrayList<InsertedFeatureType>();
+        insertedFeatures = new ArrayList<>();
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-008"), null));
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-009"), null));
         insertResult    = new InsertResultsType(insertedFeatures);
@@ -521,7 +521,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         /**
          * We verify that the 2 new samplingPoint are inserted
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.1.1");
 
@@ -537,7 +537,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
 
-        assertEquals(xmlExpResult, xmlResult);
+        domCompare(xmlExpResult, xmlResult);
 
 
         // for a POST request
@@ -553,7 +553,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         result = (TransactionResponseType) obj;
 
         sum              = new TransactionSummaryType(2, 0, 0);
-        insertedFeatures = new ArrayList<InsertedFeatureType>();
+        insertedFeatures = new ArrayList<>();
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-010"), null));
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-011"), null));
         insertResult    = new InsertResultsType(insertedFeatures);
@@ -564,7 +564,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         /**
          * We verify that the 2 new samplingPoint are inserted
          */
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.1.1");
 
@@ -579,7 +579,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
 
-        assertEquals(xmlExpResult, xmlResult);
+        domCompare(xmlExpResult, xmlResult);
 
     }
 
@@ -611,7 +611,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         /**
          * We verify that the namedPlaces have been changed
          */
-        List<QueryType> queries = new ArrayList<QueryType>();
+        List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
         GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.1.1");
 
@@ -626,7 +626,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
         
-        assertEquals(xmlExpResult, xmlResult);
+        domCompare(xmlExpResult, xmlResult);
     }
     
     @Test
@@ -719,7 +719,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     public static void domCompare(final Object actual, final Object expected) throws Exception {
 
         final CstlDOMComparator comparator = new CstlDOMComparator(expected, actual);
-        comparator.ignoredAttributes.add("xmlns:*");
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+        comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
         comparator.compare();
     }
 }

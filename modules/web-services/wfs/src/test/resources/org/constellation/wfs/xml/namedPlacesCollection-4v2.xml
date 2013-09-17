@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <wfs:FeatureCollection gml:id="id" numberReturned="2" timeStamp="" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2">
-    <gml:boundedBy>
+    <wfs:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:4326">
             <gml:lowerCorner>0.0014 6.0E-4</gml:lowerCorner>
             <gml:upperCorner>0.5 0.5</gml:upperCorner>
         </gml:Envelope>
-    </gml:boundedBy>
+    </wfs:boundedBy>
     <wfs:member>
         <gml:NamedPlaces gml:id="NamedPlaces.1">
             <gml:the_geom>

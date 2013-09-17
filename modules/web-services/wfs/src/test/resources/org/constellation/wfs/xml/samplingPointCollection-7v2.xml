@@ -1,11 +1,11 @@
 <?xml version='1.0'?>
 <wfs:FeatureCollection gml:id="id" numberReturned="5" timeStamp="" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:sampling="http://www.opengis.net/sampling/1.0">
-    <gml:boundedBy>
+    <wfs:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
             <gml:lowerCorner>41945.0 1625236.0</gml:lowerCorner>
             <gml:upperCorner>70800.0 2567987.0</gml:upperCorner>
         </gml:Envelope>
-    </gml:boundedBy>
+    </wfs:boundedBy>
     <wfs:member>
         <sampling:SamplingPoint gml:id="station-004">
             <gml:description>Puits</gml:description>

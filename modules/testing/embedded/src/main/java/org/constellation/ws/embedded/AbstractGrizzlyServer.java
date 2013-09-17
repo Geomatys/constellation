@@ -174,8 +174,6 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             sw.append(new String(buffer, 0, size));
         }
         String xmlResult = sw.toString();
-        xmlResult = StringUtilities.removeXmlns(xmlResult);
-        xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
         return xmlResult;
     }
 
@@ -194,9 +192,6 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-        xmlExpResult = StringUtilities.removeXmlns(xmlExpResult);
 
         return xmlExpResult;
     }

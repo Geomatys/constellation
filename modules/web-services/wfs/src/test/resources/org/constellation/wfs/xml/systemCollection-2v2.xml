@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <wfs:FeatureCollection gml:id="id" numberReturned="3" timeStamp="" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:sml="http://www.opengis.net/sml/1.0">
-    <gml:boundedBy>
+    <wfs:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326">
             <gml:lowerCorner>42.387988622819975 -4.244083878356522</gml:lowerCorner>
             <gml:upperCorner>43.46788242438395 -4.14498462789604</gml:upperCorner>
         </gml:Envelope>
-    </gml:boundedBy>
+    </wfs:boundedBy>
     <wfs:member>
         <sml:System gml:id="12">
             <gml:name>Piezometer Test</gml:name>

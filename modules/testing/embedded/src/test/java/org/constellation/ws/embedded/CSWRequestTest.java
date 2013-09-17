@@ -247,7 +247,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         assertTrue(result instanceof GetRecordByIdResponseType);
 
         GetRecordByIdResponseType grResult = (GetRecordByIdResponseType) result;
-        assertEquals(1, grResult.getAbstractRecord().size());
+        assertEquals(1, grResult.getAny().size());
 
 
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
@@ -261,7 +261,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         assertTrue(result instanceof GetRecordByIdResponseType);
 
         grResult = (GetRecordByIdResponseType) result;
-        assertEquals(1, grResult.getAbstractRecord().size());
+        assertEquals(1, grResult.getAny().size());
 
     }
 
@@ -286,7 +286,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         assertTrue(result instanceof GetRecordsResponseType);
 
         GetRecordsResponseType grResult = (GetRecordsResponseType) result;
-        assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
+        assertEquals(1, grResult.getSearchResults().getAny().size());
 
         /**
          * get all the records
@@ -304,7 +304,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
 
         grResult = (GetRecordsResponseType) result;
 
-        assertEquals(12, grResult.getSearchResults().getAbstractRecord().size());
+        assertEquals(12, grResult.getSearchResults().getAny().size());
 
     }
 
@@ -331,7 +331,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         assertTrue(result instanceof GetRecordsResponseType);
 
         GetRecordsResponseType grResult = (GetRecordsResponseType) result;
-        assertEquals(13, grResult.getSearchResults().getAbstractRecord().size());
+        assertEquals(13, grResult.getSearchResults().getAny().size());
 
 
 
@@ -349,7 +349,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
 
         grResult = (GetRecordsResponseType) result;
 
-        assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
+        assertEquals(1, grResult.getSearchResults().getAny().size());
 
         // distribution with 0 hopcount
         conec = getCapsUrl.openConnection();
@@ -366,7 +366,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
 
         grResult = (GetRecordsResponseType) result;
 
-        assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
+        assertEquals(1, grResult.getSearchResults().getAny().size());
      }
 
 

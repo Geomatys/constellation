@@ -1,11 +1,11 @@
 <?xml version='1.0'?>
 <wfs:FeatureCollection gml:id="id" numberReturned="1" timeStamp="" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:wfs="http://www.opengis.net/wfs/2.0">
-    <gml:boundedBy>
+    <wfs:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:4326">
             <gml:lowerCorner>2.0E-4 7.0E-4</gml:lowerCorner>
             <gml:upperCorner>2.0E-4 7.0E-4</gml:upperCorner>
         </gml:Envelope>
-    </gml:boundedBy>
+    </wfs:boundedBy>
     <wfs:member>
         <gml:Bridges gml:id="Bridges.1">
             <gml:the_geom>

@@ -85,7 +85,7 @@ public class CstlDomComparatorTest {
             "  </ns2:form>\n" +
             "</ns2:body>");
 
-        cmp.ignoredAttributes.add("xmlns:*");
+        cmp.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         cmp.compare(); // should not fail
 
         cmp = new CstlDOMComparator(
@@ -105,7 +105,7 @@ public class CstlDomComparatorTest {
             "  </ns2:form>\n" +
             "</ns2:body>");
 
-        cmp.ignoredAttributes.add("xmlns:*");
+        cmp.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         cmp.compare(); // should not fail
     }
 
