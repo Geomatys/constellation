@@ -45,7 +45,6 @@ import org.constellation.ws.CstlServiceException;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.GetRecordsRequest;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 
@@ -104,15 +103,14 @@ public class ByIDHarvester extends CatalogueHarvester {
      * @return A list of identifier correspoundong of each line of the identifier file.
      */
     private List<String> parseIdentifierFile(int currentFile) {
-        final List<String> result = new ArrayList<String>();
-        FileInputStream in = null;
+        final List<String> result = new ArrayList<>();
         try {
             final File f = new File(identifierDirectoryPath + "id" + currentFile);
             if (!f.exists()) {
                 LOGGER.log(Level.WARNING, "the file " + identifierDirectoryPath + "id{0} does not exist", currentFile);
                 return result;
             }
-            in = new FileInputStream(f);
+            final FileInputStream in = new FileInputStream(f);
             final InputStreamReader ipsr = new InputStreamReader(in);
             final BufferedReader br = new BufferedReader(ipsr);
             //we skip the character already read
@@ -153,7 +151,7 @@ public class ByIDHarvester extends CatalogueHarvester {
         boolean succeed            = false;
 
         //we prepare to store the distant serviceException and send it later if this is necessary
-        final List<CstlServiceException> distantException = new ArrayList<CstlServiceException>();
+        final List<CstlServiceException> distantException = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
 
@@ -176,29 +174,12 @@ public class ByIDHarvester extends CatalogueHarvester {
                     LOGGER.log(Level.INFO, "Response of distant service received for: {0}", identifier);
                     final GetRecordByIdResponseType serviceResponse = (GetRecordByIdResponseType) harvested;
 
-                    //we looking for CSW record
-                    for (AbstractRecordType record: serviceResponse.getAbstractRecord()) {
-
-                        //Temporary ugly patch TODO handle update in CSW
-                        try {
-                            if (metadataWriter.storeMetadata(record)) {
-                                nbRecordInserted++;
-                            } else {
-                                LOGGER.log(Level.INFO, "The record:{0} has not been recorded", identifier);
-                            }
-                        } catch (IllegalArgumentException ex) {
-                            LOGGER.log(Level.WARNING, "Illegal argument while storing the record:" + identifier, ex);
-                        }  catch (MetadataIoException ex) {
-                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-                        }
-                    }
-
-                    //we looking for any other Record type
+                    //we looking for any record type
                     for (Object otherRecord: serviceResponse.getAny()) {
                         if (otherRecord instanceof JAXBElement)
                             otherRecord = ((JAXBElement)otherRecord).getValue();
 
-                        LOGGER.log(Level.FINER, "other Record Type: {0}", otherRecord.getClass().getSimpleName());
+                        LOGGER.log(Level.FINER, "record Type: {0}", otherRecord.getClass().getSimpleName());
 
                         //Temporary ugly patch TODO handle update in CSW
                         try {
@@ -283,9 +264,7 @@ public class ByIDHarvester extends CatalogueHarvester {
                     harvested = ((JAXBElement) harvested).getValue();
                 }
                 in.close();
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
-            }  catch (IllegalAccessError ex) {
+            } catch (JAXBException | IllegalAccessError ex) {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             }
         } catch (IOException ex) {

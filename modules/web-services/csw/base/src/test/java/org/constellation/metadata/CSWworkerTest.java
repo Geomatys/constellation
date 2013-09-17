@@ -82,7 +82,6 @@ import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.csw.xml.v202.RecordType;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
 import org.geotoolkit.csw.xml.v202.UpdateType;
@@ -285,7 +284,6 @@ public class CSWworkerTest {
         GetRecordByIdResponseType result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().isEmpty());
         assertTrue(result.getAny().size() == 1);
         Object obj = result.getAny().get(0);
         if (obj instanceof DefaultMetadata) {
@@ -311,15 +309,14 @@ public class CSWworkerTest {
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().isEmpty());
+        assertTrue(result.getAny().size() == 1);
 
-        obj = result.getAbstractRecord().get(0);
+        obj = result.getAny().get(0);
         assertTrue(obj instanceof BriefRecordType);
 
         BriefRecordType briefResult =  (BriefRecordType) obj;
 
-        BriefRecordType expBriefResult1 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1BDC.xml"))).getValue();
+        BriefRecordType expBriefResult1 =  (BriefRecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1BDC.xml"));
 
         assertEquals(expBriefResult1, briefResult);
 
@@ -331,15 +328,14 @@ public class CSWworkerTest {
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().isEmpty());
+        assertTrue(result.getAny().size() == 1);
 
-        obj = result.getAbstractRecord().get(0);
+        obj = result.getAny().get(0);
         assertTrue(obj instanceof SummaryRecordType);
 
         SummaryRecordType sumResult =  (SummaryRecordType) obj;
 
-        SummaryRecordType expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1SDC.xml"))).getValue();
+        SummaryRecordType expSumResult1 =  (SummaryRecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1SDC.xml"));
 
         assertEquals(expSumResult1.getFormat(), sumResult.getFormat());
         assertEquals(expSumResult1, sumResult);
@@ -352,15 +348,14 @@ public class CSWworkerTest {
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().isEmpty());
+        assertTrue(result.getAny().size() == 1);
 
-        obj = result.getAbstractRecord().get(0);
+        obj = result.getAny().get(0);
         assertTrue(obj instanceof RecordType);
 
         RecordType recordResult = (RecordType) obj;
 
-        RecordType expRecordResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1FDC.xml"))).getValue();
+        RecordType expRecordResult1 =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1FDC.xml"));
 
         assertEquals(expRecordResult1.getFormat(), recordResult.getFormat());
         assertEquals(expRecordResult1, recordResult);
@@ -373,15 +368,14 @@ public class CSWworkerTest {
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().isEmpty());
+        assertTrue(result.getAny().size() == 1);
 
-        obj = result.getAbstractRecord().get(0);
+        obj = result.getAny().get(0);
         assertTrue(obj instanceof RecordType);
 
         recordResult = (RecordType) obj;
 
-        RecordType expRecordResult3 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta3FDC.xml"))).getValue();
+        RecordType expRecordResult3 =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta3FDC.xml"));
 
         assertEquals(expRecordResult3.getFormat(), recordResult.getFormat());
         assertEquals(expRecordResult3, recordResult);
@@ -395,18 +389,17 @@ public class CSWworkerTest {
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().size() == 2);
-        assertTrue(result.getAny().isEmpty());
+        assertTrue(result.getAny().size() == 2);
 
-        obj = result.getAbstractRecord().get(0);
+        obj = result.getAny().get(0);
         assertTrue(obj instanceof RecordType);
         RecordType recordResult1 = (RecordType) obj;
 
-        obj = result.getAbstractRecord().get(1);
+        obj = result.getAny().get(1);
         assertTrue(obj instanceof RecordType);
         RecordType recordResult2 = (RecordType) obj;
 
-        RecordType expRecordResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2FDC.xml"))).getValue();
+        RecordType expRecordResult2 =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2FDC.xml"));
 
         assertEquals(expRecordResult1, recordResult1);
         assertEquals(expRecordResult2, recordResult2);
@@ -419,15 +412,14 @@ public class CSWworkerTest {
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().isEmpty());
+        assertTrue(result.getAny().size() == 1);
 
-        obj = result.getAbstractRecord().get(0);
+        obj = result.getAny().get(0);
         assertTrue(obj instanceof SummaryRecordType);
 
         sumResult =  (SummaryRecordType) obj;
 
-        expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1SDC.xml"))).getValue();
+        expSumResult1 =  (SummaryRecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1SDC.xml"));
 
         assertEquals(expSumResult1.getFormat(), sumResult.getFormat());
         assertEquals(expSumResult1, sumResult);
@@ -440,15 +432,14 @@ public class CSWworkerTest {
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().isEmpty());
+        assertTrue(result.getAny().size() == 1);
 
-        obj = result.getAbstractRecord().get(0);
+        obj = result.getAny().get(0);
         assertTrue(obj instanceof SummaryRecordType);
 
         sumResult =  (SummaryRecordType) obj;
 
-        expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1SDC.xml"))).getValue();
+        expSumResult1 =  (SummaryRecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1SDC.xml"));
 
         assertEquals(expSumResult1.getFormat(), sumResult.getFormat());
         assertEquals(expSumResult1, sumResult);
@@ -461,7 +452,6 @@ public class CSWworkerTest {
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().isEmpty());
         assertTrue(result.getAny().size() == 1);
 
         obj = result.getAny().get(0);
@@ -481,7 +471,6 @@ public class CSWworkerTest {
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().isEmpty());
         assertTrue(result.getAny().size() == 1);
 
         obj = result.getAny().get(0);
@@ -585,7 +574,6 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
         assertTrue(result.getSearchResults().getAny().isEmpty());
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
@@ -607,21 +595,20 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
-        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getAny().size() == 2);
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        Object obj = result.getSearchResults().getAbstractRecord().get(0);
+        Object obj = result.getSearchResults().getAny().get(0);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
         assertTrue(obj instanceof RecordType);
         RecordType recordResult1 = (RecordType) obj;
 
-        obj = result.getSearchResults().getAbstractRecord().get(1);
+        obj = result.getSearchResults().getAny().get(1);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
@@ -635,8 +622,8 @@ public class CSWworkerTest {
             recordResult2   = temp;
         }
 
-        RecordType expRecordResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1FDC.xml"))).getValue();
-        RecordType expRecordResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2FDC.xml"))).getValue();
+        RecordType expRecordResult1 =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1FDC.xml"));
+        RecordType expRecordResult2 =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2FDC.xml"));
 
         assertEquals(expRecordResult1, recordResult1);
         assertEquals(expRecordResult2, recordResult2);
@@ -669,21 +656,20 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
-        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getAny().size() == 2);
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.BRIEF));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        obj = result.getSearchResults().getAbstractRecord().get(0);
+        obj = result.getSearchResults().getAny().get(0);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
         assertTrue(obj instanceof BriefRecordType);
         BriefRecordType briefResult1 = (BriefRecordType) obj;
 
-        obj = result.getSearchResults().getAbstractRecord().get(1);
+        obj = result.getSearchResults().getAny().get(1);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
@@ -697,8 +683,8 @@ public class CSWworkerTest {
             briefResult2   = temp;
         }
 
-        BriefRecordType expBriefResult1 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1BDC.xml"))).getValue();
-        BriefRecordType expBriefResult2 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2BDC.xml"))).getValue();
+        BriefRecordType expBriefResult1 =  (BriefRecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1BDC.xml"));
+        BriefRecordType expBriefResult2 =  (BriefRecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2BDC.xml"));
 
         assertEquals(expBriefResult1, briefResult1);
         assertEquals(expBriefResult2, briefResult2);
@@ -724,20 +710,19 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
-        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getAny().size() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        obj = result.getSearchResults().getAbstractRecord().get(0);
+        obj = result.getSearchResults().getAny().get(0);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
         assertTrue(obj instanceof RecordType);
         RecordType customResult1 = (RecordType) obj;
 
-        obj = result.getSearchResults().getAbstractRecord().get(1);
+        obj = result.getSearchResults().getAny().get(1);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
@@ -751,8 +736,8 @@ public class CSWworkerTest {
             customResult2   = temp;
         }
 
-        RecordType expCustomResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1CustomDC.xml"))).getValue();
-        RecordType expCustomResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2CustomDC.xml"))).getValue();
+        RecordType expCustomResult1 =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1CustomDC.xml"));
+        RecordType expCustomResult2 =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2CustomDC.xml"));
 
         assertEquals(expCustomResult1, customResult1);
         assertEquals(expCustomResult2, customResult2);
@@ -777,20 +762,19 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
-        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getAny().size() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        obj = result.getSearchResults().getAbstractRecord().get(0);
+        obj = result.getSearchResults().getAny().get(0);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
         assertTrue(obj instanceof RecordType);
         customResult1 = (RecordType) obj;
 
-        obj = result.getSearchResults().getAbstractRecord().get(1);
+        obj = result.getSearchResults().getAny().get(1);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
@@ -835,8 +819,7 @@ public class CSWworkerTest {
         result = (GetRecordsResponseType) worker.getRecords(request);
 
         assertTrue(result.getSearchResults() != null);
-        assertEquals(3, result.getSearchResults().getAbstractRecord().size());
-        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertEquals(3, result.getSearchResults().getAny().size());
         assertEquals(3, result.getSearchResults().getNumberOfRecordsMatched());
         assertEquals(3, result.getSearchResults().getNumberOfRecordsReturned());
         assertTrue(result.getSearchResults().getNextRecord() == 0);
@@ -845,8 +828,8 @@ public class CSWworkerTest {
         RecordType customResult3 = null;
         RecordType customResult4 = null;
 
-        List<? extends AbstractRecordType> records = result.getSearchResults().getAbstractRecord();
-        for (AbstractRecordType rec : records) {
+        List<Object> records = result.getSearchResults().getAny();
+        for (Object rec : records) {
 
             assertTrue(rec instanceof RecordType);
             RecordType r = (RecordType)rec;
@@ -904,7 +887,6 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
         assertTrue(result.getSearchResults().getAny().isEmpty());
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
@@ -926,7 +908,6 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
         assertTrue(result.getSearchResults().getAny().isEmpty());
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
@@ -949,7 +930,6 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
         assertTrue(result.getSearchResults().getAny().isEmpty());
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 0);
@@ -980,14 +960,13 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertEquals(1, result.getSearchResults().getAbstractRecord().size());
-        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertEquals(1, result.getSearchResults().getAny().size());
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 1);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        Object obj = result.getSearchResults().getAbstractRecord().get(0);
+        Object obj = result.getSearchResults().getAny().get(0);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
@@ -1012,14 +991,13 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().size() == 1);
-        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getAny().size() == 1);
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 1);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        obj = result.getSearchResults().getAbstractRecord().get(0);
+        obj = result.getSearchResults().getAny().get(0);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
@@ -1043,14 +1021,13 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().size() == 1);
-        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getAny().size() == 1);
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 1);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
-        obj = result.getSearchResults().getAbstractRecord().get(0);
+        obj = result.getSearchResults().getAny().get(0);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
@@ -1086,7 +1063,6 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
 
-        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
         assertTrue(result.getSearchResults().getAny().size() == 1);
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
@@ -1115,7 +1091,6 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
 
-        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
         assertTrue(result.getSearchResults().getAny().size() == 2);
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
@@ -1538,7 +1513,6 @@ public class CSWworkerTest {
         GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
 
@@ -1602,7 +1576,6 @@ public class CSWworkerTest {
         GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         obj = GRresult.getAny().get(0);
 
@@ -1622,7 +1595,7 @@ public class CSWworkerTest {
         /*
          *  TEST 2 : we add the metadata urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd (DC Record)
          */
-        RecordType ExpResult2 = ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
+        RecordType ExpResult2 = (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"));
         Node       oriExpResult2 = getOriginalMetadata("org/constellation/xml/metadata/meta8.xml");
 
         insert  = new InsertType(oriExpResult2);
@@ -1638,11 +1611,10 @@ public class CSWworkerTest {
         GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().size() == 1 || GRresult.getAny().size() == 1);
-        assertTrue(GRresult.getAny().isEmpty() || GRresult.getAbstractRecord().isEmpty());
+        assertEquals(1, GRresult.getAny().size());
 
-        if (!GRresult.getAbstractRecord().isEmpty()) {
-            obj = GRresult.getAbstractRecord().get(0);
+        if (!(GRresult.getAny().get(0) instanceof Node)) {
+            obj = GRresult.getAny().get(0);
             assertTrue(obj instanceof RecordType);
 
             RecordType dcResult =  (RecordType) obj;
@@ -1704,7 +1676,6 @@ public class CSWworkerTest {
         GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
 
@@ -2538,7 +2509,6 @@ public class CSWworkerTest {
         GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         obj = GRresult.getAny().get(0);
 
@@ -2780,7 +2750,6 @@ public class CSWworkerTest {
         GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         obj = GRresult.getAny().get(0);
 

@@ -930,7 +930,6 @@ public class CSWworker extends AbstractWorker {
         // we return a list of Record
         } else if (resultType.equals(ResultType.RESULTS)) {
 
-            final List<AbstractRecord> abstractRecords = new ArrayList<>();
             final List<Object> records                 = new ArrayList<>();
             try {
                 for (int i = startPos -1; i < max; i++) {
@@ -939,11 +938,7 @@ public class CSWworker extends AbstractWorker {
                         max++;
 
                     } else if (obj != null) {
-                        if (obj instanceof AbstractRecordType) {
-                            abstractRecords.add((AbstractRecord)obj);
-                        } else {
-                            records.add(obj);
-                        }
+                        records.add(obj);
                     }
                 }
             } catch (MetadataIoException ex) {
@@ -957,21 +952,15 @@ public class CSWworker extends AbstractWorker {
             for (int i = 0; i < maxDistributed; i++) {
 
                 final Object additionalResult = distributedResults.additionalResults.get(i);
-                if (mode == DUBLINCORE) {
-                    abstractRecords.add((AbstractRecord) additionalResult);
-                } else {
-                    records.add(additionalResult);
-                }
+                records.add(additionalResult);
             }
 
-            final int size = abstractRecords.size() + records.size();
             searchResults = CswXmlFactory.createSearchResults("2.0.2",
                                                               id,
                                                               set,
                                                               totalMatched,
-                                                              abstractRecords,
                                                               records,
-                                                              size,
+                                                              records.size(),
                                                               nextRecord);
 
             //we return an Acknowledgement if the request is valid.
@@ -1079,23 +1068,28 @@ public class CSWworker extends AbstractWorker {
 
         //we begin to build the result
         GetRecordByIdResponse response;
-        final List<String> unexistingID    = new ArrayList<>();
-        final List<AbstractRecord> records = new ArrayList<>();
-        final List<Object> otherRecords    = new ArrayList<>();
+        final List<String> unexistingID = new ArrayList<>();
+        final List<Object> records      = new ArrayList<>();
 
         final int mode;
-        if (outputSchema.equals(Namespaces.CSW)) {
-            mode         = DUBLINCORE;
-        } else if (outputSchema.equals(Namespaces.GMD))  {
-            mode         = ISO_19115;
-        } else if (outputSchema.equals(Namespaces.GFC)) {
-            mode         = ISO_19110;
-        } else if (outputSchema.equals(EBRIM_30)) {
-             mode         = EBRIM;
-        } else if (outputSchema.equals(EBRIM_25)) {
-            mode         = EBRIM;
-        } else {
-            throw new CstlServiceException("Unexpected outputSchema");
+        switch (outputSchema) {
+            case Namespaces.CSW:
+                mode         = DUBLINCORE;
+                break;
+            case Namespaces.GMD:
+                mode         = ISO_19115;
+                break;
+            case Namespaces.GFC:
+                mode         = ISO_19110;
+                break;
+            case EBRIM_30:
+                mode         = EBRIM;
+                break;
+            case EBRIM_25:
+                mode         = EBRIM;
+                break;
+            default:
+                throw new CstlServiceException("Unexpected outputSchema");
         }
 
         for (String id : request.getId()) {
@@ -1116,11 +1110,7 @@ public class CSWworker extends AbstractWorker {
                         LOGGER.log(Level.WARNING, "The record {0} does not correspound to {1} object.", new Object[]{id, outputSchema});
                         continue;
                     }
-                    if (o instanceof AbstractRecordType) {
-                        records.add((AbstractRecordType)o);
-                    } else {
-                        otherRecords.add(o);
-                    }
+                    records.add(o);
                 } else {
                     LOGGER.log(Level.WARNING, "The record {0} has not be read is null.", id);
                 }
@@ -1133,11 +1123,11 @@ public class CSWworker extends AbstractWorker {
             }
         }
 
-        if (records.isEmpty() && otherRecords.isEmpty()) {
+        if (records.isEmpty()) {
             throwUnexistingIdentifierException(unexistingID);
         }
 
-        response = CswXmlFactory.createGetRecordByIdResponse(version, records, otherRecords);
+        response = CswXmlFactory.createGetRecordByIdResponse(version, records);
         LOGGER.log(logLevel, "GetRecordById request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }

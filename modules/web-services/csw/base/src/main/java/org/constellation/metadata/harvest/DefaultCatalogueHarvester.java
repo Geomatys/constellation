@@ -19,7 +19,6 @@ package org.constellation.metadata.harvest;
 // J2SE dependencies
 import org.apache.sis.xml.Namespaces;
 import org.constellation.metadata.utils.Utils;
-import org.geotoolkit.csw.xml.AbstractRecord;
 import org.geotoolkit.csw.xml.SearchResults;
 import org.geotoolkit.csw.xml.GetRecordsResponse;
 import java.io.BufferedInputStream;
@@ -161,7 +160,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
         /*
          * we build the first filter : < dublinCore:Title IS LIKE '*' >
          */
-        final List<QName> typeNames = new ArrayList<QName>();
+        final List<QName> typeNames = new ArrayList<>();
         PropertyNameType pname      = new PropertyNameType("dc:title");
         PropertyIsLikeType pil      = new PropertyIsLikeType(pname, "something?", "*", "?", "\\");
         NotType n                   = new NotType(pil);
@@ -185,7 +184,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
 
         //we build the base request to harvest another CSW service (2.0.0)
         org.geotoolkit.csw.xml.v200.QueryConstraintType constraint2 = new org.geotoolkit.csw.xml.v200.QueryConstraintType(filter1, "1.1.0");
-        List<QName> typeNames2 = new ArrayList<QName>();
+        List<QName> typeNames2 = new ArrayList<>();
         typeNames2.add(DATASET_QNAME);
         org.geotoolkit.csw.xml.v200.QueryType query2 = new org.geotoolkit.csw.xml.v200.QueryType(typeNames2,
                                                                                          new org.geotoolkit.csw.xml.v200.ElementSetNameType(ElementSetType.FULL),
@@ -195,7 +194,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
 
         //we build the special request to harvest unstandardized CSW service (2.0.0)
         constraint2        = new org.geotoolkit.csw.xml.v200.QueryConstraintType(filter2, "1.0.20");
-        typeNames2         = new ArrayList<QName>();
+        typeNames2         = new ArrayList<>();
         typeNames2.add(DATASET_QNAME);
         query2             = new org.geotoolkit.csw.xml.v200.QueryType(typeNames2,
                                                                    new org.geotoolkit.csw.xml.v200.ElementSetNameType(ElementSetType.FULL),
@@ -255,7 +254,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
         boolean secondTry    = false;
 
         //we prepare to store the distant serviceException and send it later if this is necessary
-        final List<CstlServiceException> distantException = new ArrayList<CstlServiceException>();
+        final List<CstlServiceException> distantException = new ArrayList<>();
 
         //we request all the records for the best outputSchema supported
 
@@ -286,7 +285,6 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                     final GetRecordsResponse serviceResponse = (GetRecordsResponse) harvested;
                     final SearchResults results              = serviceResponse.getSearchResults();
                     final List<Object> records               = results.getAny();
-                    records.addAll(results.getAbstractRecord());
 
                     //we looking for CSW record
                     for (Object record: records) {
@@ -305,10 +303,8 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                                     nbRecordUpdated++;
                                 }
                             }
-                        } catch (IllegalArgumentException e) {
+                        } catch (IllegalArgumentException | MetadataIoException e) {
                             throw new CstlServiceException(e, NO_APPLICABLE_CODE);
-                        }  catch (MetadataIoException ex) {
-                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                         }
                     }
 
@@ -455,7 +451,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                 typeNameDomain = getRecordOp.getParameterIgnoreCase("typenames");
             }
 
-            final List<QName>  typeNamesQname = new ArrayList<QName>();
+            final List<QName>  typeNamesQname = new ArrayList<>();
             if (typeNameDomain != null) {
                 final List<String> typeNames  = typeNameDomain.getValue();
 
@@ -626,7 +622,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
              * but it could be better to use a filter writer
              */
             String encoding = "UTF-8";
-            if (first != null && first.indexOf("encoding=\"") != -1) {
+            if (first.indexOf("encoding=\"") != -1) {
                 final String temp = first.substring(first.indexOf("encoding=\"") + 10);
                 encoding = temp.substring(0, temp.indexOf('"'));
             }
@@ -675,9 +671,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                 if (harvested instanceof JAXBElement) {
                     harvested = ((JAXBElement) harvested).getValue();
                 }
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
-            }  catch (IllegalAccessError ex) {
+            } catch (JAXBException | IllegalAccessError ex) {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             }
         } catch (IOException ex) {
@@ -744,7 +738,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
     @Override
     public DistributedResults transferGetRecordsRequest(GetRecordsRequest request, List<String> distributedServers,
             int startPosition, int maxRecords) {
-        final List<Object> additionalResults = new ArrayList<Object>();
+        final List<Object> additionalResults = new ArrayList<>();
         int matched = 0;
         for (String serverURL : distributedServers) {
             request.setStartPosition(startPosition);
@@ -761,11 +755,6 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                     final SearchResultsType results = serviceResponse.getSearchResults();
 
                     //we looking for CSW record
-                    for (AbstractRecord record : results.getAbstractRecord()) {
-                        additionalResults.add(record);
-                    }
-
-                    //we looking for any other Record type
                     for (Object otherRecord : results.getAny()) {
                         if (otherRecord instanceof JAXBElement) {
                             otherRecord = ((JAXBElement) otherRecord).getValue();

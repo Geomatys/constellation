@@ -35,6 +35,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -66,7 +69,9 @@ import org.opengis.util.InternationalString;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.xml.MarshallerPool;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * A CSW Metadata Writer. This writer does not require a database.
@@ -246,7 +251,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                     throw new MetadataIoException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
                 }
                 LOGGER.log(Level.FINER, "update type:{0}", type);
-                
+
                 // we verify that the metadata to update has the same type that the Xpath type
                 if (!metadata.getClass().equals(type)) {
                     throw new MetadataIoException("The metadata :" + Utils.findIdentifier(metadata) + "is not of the same type that the one describe in Xpath expression", INVALID_PARAMETER_VALUE);
@@ -257,9 +262,9 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
 
                 Object parent = metadata;
                 while (xpath.indexOf('/') != -1) {
-                    
+
                     //Then we get the next Property name
-                    
+
                     String propertyName = xpath.substring(0, xpath.indexOf('/'));
                     final int ordinal         = extractOrdinal(propertyName);
                     if (propertyName.indexOf('[') != -1) {
@@ -319,12 +324,12 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
 
                 // we update the metadata
                 final Object value = property.getValue();
-                
+
                 updateObjects(parent, xpath, value);
 
                 // we finish by updating the metadata.
                 deleteMetadata(metadataID);
-                storeMetadata(metadata);
+            storeMetadata(metadata);
                 return true;
 
             }
@@ -589,6 +594,23 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             } catch (JAXBException ex) {
                 throw new MetadataIoException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+            }
+        } else {
+            throw new MetadataIoException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
+        }
+    }
+
+    private Document getDocumentFromFile(String identifier) throws MetadataIoException {
+        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
+        if (metadataFile.exists()) {
+            try {
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    dbf.setNamespaceAware(true);
+                    DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+                    Document document = docBuilder.parse(metadataFile);
+                    return document;
+            } catch (SAXException | IOException | ParserConfigurationException ex) {
+                throw new MetadataIoException("The metadataFile : " + identifier + ".xml can not be read\ncause: " + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
             }
         } else {
             throw new MetadataIoException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);

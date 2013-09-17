@@ -136,7 +136,6 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         GetRecordByIdResponseType result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().isEmpty());
         assertTrue(result.getAny().size() == 1);
         Object obj = result.getAny().get(0);
         assertTrue(obj instanceof DefaultMetadata);
