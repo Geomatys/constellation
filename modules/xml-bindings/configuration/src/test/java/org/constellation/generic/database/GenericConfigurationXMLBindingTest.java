@@ -31,7 +31,6 @@ import javax.xml.bind.Unmarshaller;
 
 //Junit dependencies
 import org.constellation.configuration.SOSConfiguration;
-import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
@@ -101,7 +100,7 @@ public class GenericConfigurationXMLBindingTest {
         StringWriter sw = new StringWriter();
         marshaller.marshal(config, sw);
 
-        String result =  StringUtilities.removeXmlns(sw.toString());
+        String result =  sw.toString();
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                + '\n' +
         "<automatic format=\"MDWEB\">"                                                 + '\n' +
@@ -168,6 +167,7 @@ public class GenericConfigurationXMLBindingTest {
         "</automatic>" + '\n';
 
         final XMLComparator comparator = new XMLComparator(expResult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 
@@ -187,10 +187,10 @@ public class GenericConfigurationXMLBindingTest {
         StringWriter sw = new StringWriter();
         marshaller.marshal(sosConfig, sw);
 
-        String result =  StringUtilities.removeXmlns(sw.toString());
+        String result =  sw.toString();
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"            + '\n' +
-        "<ns2:SOSConfiguration>"                                                   + '\n' +
+        "<ns2:SOSConfiguration xmlns:ns2=\"http://www.constellation.org/config\">"                                                   + '\n' +
         "    <ns2:SMLConfiguration format=\"MDWEB\">"                              + '\n' +
         "        <bdd>"                                                            + '\n' +
         "            <className>org.driver.test</className>"                       + '\n' +
@@ -229,6 +229,7 @@ public class GenericConfigurationXMLBindingTest {
         "</ns2:SOSConfiguration>" + '\n';
 
         final XMLComparator comparator = new XMLComparator(expResult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 
@@ -506,8 +507,9 @@ public class GenericConfigurationXMLBindingTest {
 
         marshaller.marshal(query, sw);
 
-        final String result =  StringUtilities.removeXmlns(sw.toString());
+        final String result = sw.toString();
         final XMLComparator comparator = new XMLComparator(expResult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 
@@ -553,10 +555,10 @@ public class GenericConfigurationXMLBindingTest {
         StringWriter sw = new StringWriter();
         marshaller.marshal(service, sw);
 
-        String result =  StringUtilities.removeXmlns(sw.toString());
+        String result =  sw.toString();
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-        "<ns2:service>\n" +
+        "<ns2:service xmlns:ns2=\"http://www.constellation.org/config\">\n" +
         "  <ns2:description>desc1</ns2:description>\n" +
         "  <ns2:identifier>id1</ns2:identifier>\n" +
         "  <ns2:keywords>kw1</ns2:keywords>\n" +
@@ -588,6 +590,7 @@ public class GenericConfigurationXMLBindingTest {
         "</ns2:service>" + '\n';
 
         final XMLComparator comparator = new XMLComparator(expResult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 }

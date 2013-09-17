@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2007 - 2009, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 
 package org.constellation.configuration;
@@ -73,7 +85,7 @@ public class ConfigurationXmlBindingTest {
 
         String expresult =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
-                "<ns2:ServiceReport>" + '\n' +
+                "<ns2:ServiceReport xmlns:ns2=\"http://www.constellation.org/config\">" + '\n' +
                 "    <ns2:availableServices>" + '\n' +
                 "        <ns2:name>WPS</ns2:name>" + '\n' +
                 "        <ns2:protocol>REST</ns2:protocol>" + '\n' +
@@ -85,8 +97,9 @@ public class ConfigurationXmlBindingTest {
                 "    </ns2:availableServices>" + '\n' +
                 "</ns2:ServiceReport>\n";
 
-        final String result = StringUtilities.removeXmlns(sw.toString());
+        final String result = sw.toString();
         final XMLComparator comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 
@@ -107,13 +120,14 @@ public class ConfigurationXmlBindingTest {
 
         String expresult =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:InstanceReport>" + '\n'
+                + "<ns2:InstanceReport xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:instance name=\"default\" type=\"WMS\" status=\"WORKING\"/>" + '\n'
                 + "    <ns2:instance name=\"test1\" type=\"WMS\" status=\"NOT_STARTED\"/>" + '\n'
                 + "</ns2:InstanceReport>\n";
 
-        final String result =  StringUtilities.removeXmlns(sw.toString());
+        final String result = sw.toString();
         final XMLComparator comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 
@@ -156,7 +170,7 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(context, sw);
 
         String expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:LayerContext>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:layers>" + '\n'
                 + "        <ns2:Source id=\"source1\" load_all=\"true\"/>" + '\n'
                 + "        <ns2:Source id=\"source2\" load_all=\"true\"/>" + '\n'
@@ -169,8 +183,9 @@ public class ConfigurationXmlBindingTest {
                 + "    </ns2:customParameters>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        String result = StringUtilities.removeXmlns(sw.toString());
+        String result = sw.toString();
         XMLComparator comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         sources = new ArrayList<>();
@@ -188,7 +203,7 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(context, sw);
 
         expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:LayerContext>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:layers>" + '\n'
                 + "        <ns2:Source id=\"source1\" load_all=\"true\">" + '\n'
                 + "            <ns2:exclude>" + '\n'
@@ -201,8 +216,9 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        result = StringUtilities.removeXmlns(sw.toString());
+        result = sw.toString();
         comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         sources = new ArrayList<>();
@@ -220,7 +236,7 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(context, sw);
 
         expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:LayerContext>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:layers>" + '\n'
                 + "        <ns2:Source id=\"source1\">" + '\n'
                 + "            <ns2:include>" + '\n'
@@ -233,8 +249,9 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        result = StringUtilities.removeXmlns(sw.toString());
+        result = sw.toString();
         comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         sources = new ArrayList<>();
@@ -265,7 +282,7 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(context, sw);
 
         expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:LayerContext>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">" + '\n'
                 + "    <ns2:layers>" + '\n'
                 + "        <ns2:MainLayer>" + '\n'
                 + "            <ns2:Title>mainTitle</ns2:Title>" + '\n'
@@ -311,8 +328,9 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        result = StringUtilities.removeXmlns(sw.toString());
+        result = sw.toString();
         comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         sources = new ArrayList<>();
@@ -326,7 +344,7 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(context, sw);
 
         expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:LayerContext>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:layers>" + '\n'
                 + "        <ns2:Source id=\"source1\" load_all=\"false\">" + '\n'
                 + "            <ns2:include>" + '\n'
@@ -339,8 +357,9 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        result = StringUtilities.removeXmlns(sw.toString());
+        result = sw.toString();
         comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         sources = new ArrayList<>();
@@ -359,7 +378,7 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(context, sw);
 
         expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:LayerContext>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n'
                 + "    <ns2:layers>" + '\n'
                 + "        <ns2:Source id=\"source1\" load_all=\"false\">" + '\n'
                 + "            <ns2:include>" + '\n'
@@ -381,8 +400,9 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        result = StringUtilities.removeXmlns(sw.toString());
+        result = sw.toString();
         comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 
@@ -407,7 +427,7 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(context, sw);
 
         String expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:ProcessContext>" + '\n'
+                + "<ns2:ProcessContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:processes>" + '\n'
                 + "        <ns2:ProcessFactory autorityCode=\"source1\" load_all=\"true\"/>" + '\n'
                 + "        <ns2:ProcessFactory autorityCode=\"source2\" load_all=\"true\"/>" + '\n'
@@ -415,8 +435,9 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:ProcessContext>\n";
 
-        String result = StringUtilities.removeXmlns(sw.toString());
+        String result = sw.toString();
         XMLComparator comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         factories = new ArrayList<>();
@@ -441,7 +462,7 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(context, sw);
 
         expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:ProcessContext>" + '\n'
+                + "<ns2:ProcessContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:processes>" + '\n'
                 + "        <ns2:ProcessFactory autorityCode=\"source1\" load_all=\"true\">" + '\n'
                 + "            <ns2:exclude>" + '\n'
@@ -454,8 +475,9 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:ProcessContext>\n";
 
-        result = StringUtilities.removeXmlns(sw.toString());
+        result = sw.toString();
         comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         factories = new ArrayList<>();
@@ -479,7 +501,7 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(context, sw);
 
         expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:ProcessContext>" + '\n'
+                + "<ns2:ProcessContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:processes>" + '\n'
                 + "        <ns2:ProcessFactory autorityCode=\"source1\">" + '\n'
                 + "            <ns2:include>" + '\n'
@@ -492,8 +514,9 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:ProcessContext>\n";
 
-        result = StringUtilities.removeXmlns(sw.toString());
+        result = sw.toString();
         comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 
@@ -509,15 +532,16 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(context, sw);
 
         String expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:WebdavContext>" + '\n'
+                + "<ns2:WebdavContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:rootFile>/home/guilhem</ns2:rootFile>" + '\n'
                 + "    <ns2:digestAllowed>true</ns2:digestAllowed>" + '\n'
                 + "    <ns2:hideDotFile>true</ns2:hideDotFile>" + '\n'
                 + "    <ns2:contextPath>webdav</ns2:contextPath>" + '\n'
                 + "</ns2:WebdavContext>\n";
 
-        final String result = StringUtilities.removeXmlns(sw.toString());
+        final String result = sw.toString();
         final XMLComparator comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 
@@ -808,13 +832,14 @@ public class ConfigurationXmlBindingTest {
         marshaller.marshal(sl, sw);
 
         String expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:StringList>" + '\n'
+                + "<ns2:StringList xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:Entry>value1</ns2:Entry>" + '\n'
                 + "    <ns2:Entry>value2</ns2:Entry>" + '\n'
                 + "</ns2:StringList>\n";
 
-        String result = StringUtilities.removeXmlns(expresult);
+        String result = expresult;
         XMLComparator comparator = new XMLComparator(result, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         final Set<String> set = new HashSet<>();
@@ -824,8 +849,9 @@ public class ConfigurationXmlBindingTest {
         sw = new StringWriter();
         marshaller.marshal(slSet, sw);
 
-        result = StringUtilities.removeXmlns(sw.toString());
+        result = sw.toString();
         comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
     }
 
