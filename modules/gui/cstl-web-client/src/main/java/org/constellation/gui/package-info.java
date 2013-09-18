@@ -65,35 +65,35 @@
 /*
  * javascript and css loaded
  */
-@Assets(stylesheets = @Stylesheet(src = "cstl-web-client.css"),
-        scripts = {@Script(id = "jquery",       src = "js/jquery-2.0.0.js",                                     location = AssetLocation.SERVER),
-                @Script(id = "json",            src = "js/jquery.json-2.4.js",          depends = "jquery",     location = AssetLocation.SERVER),
-                @Script(id = "jquery-growl",    src = "js/jquery.growl.js",             depends = "jquery",     location = AssetLocation.SERVER),
-                @Script(id = "bootstrap",       src = "js/bootstrap.min.js",            depends = "jquery",     location = AssetLocation.SERVER),
-                @Script(id = "colorpicker",     src = "js/bootstrap-colorpicker.js",    depends = "bootstrap",  location = AssetLocation.SERVER),
-                @Script(id = "slider",          src = "js/bootstrap-slider.js",         depends = "bootstrap",  location = AssetLocation.SERVER),
-                @Script(id = "upload",          src = "js/bootstrap-fileupload.js",     depends = "bootstrap",  location = AssetLocation.SERVER),
-                @Script(id = "openlayers",      src = "js/openlayers.js",               depends = "jquery",     location = AssetLocation.SERVER),
-                @Script(id = "openlayers-ext",  src = "js/openlayers-ext.js",           depends = "openlayers", location = AssetLocation.SERVER),
-                @Script(id = "pagination",      src = "js/pagination.js",               depends = "jquery",     location = AssetLocation.SERVER),
-                @Script(id = "add-data",        src = "js/add-data.js",                 depends = "jquery",     location = AssetLocation.SERVER),
-                @Script(id = "selection",       src = "js/selection.js",                depends = "jquery",     location = AssetLocation.SERVER),
+@Assets({@Asset("cstl-web-client.css"),
+        @Asset(id = "jquery",               value = "js/jquery-2.0.0.js",                                       location = AssetLocation.SERVER),
+        @Asset(id = "json",                 value = "js/jquery.json-2.4.js",        depends = "jquery",         location = AssetLocation.SERVER),
+        @Asset(id = "jquery-growl",         value = "js/jquery.growl.js",           depends = "jquery",         location = AssetLocation.SERVER),
+        @Asset(id = "bootstrap",            value = "js/bootstrap.min.js",          depends = "jquery",         location = AssetLocation.SERVER),
+        @Asset(id = "colorpicker",          value = "js/bootstrap-colorpicker.js",  depends = "bootstrap",      location = AssetLocation.SERVER),
+        @Asset(id = "slider",               value = "js/bootstrap-slider.js",       depends = "bootstrap",      location = AssetLocation.SERVER),
+        @Asset(id = "upload",               value = "js/bootstrap-fileupload.js",   depends = "bootstrap",      location = AssetLocation.SERVER),
+        @Asset(id = "openlayers",           value = "js/openlayers.js",             depends = "jquery",         location = AssetLocation.SERVER),
+        @Asset(id = "openlayers-ext",       value = "js/openlayers-ext.js",         depends = "openlayers",     location = AssetLocation.SERVER),
+        @Asset(id = "pagination",           value = "js/pagination.js",             depends = "jquery",         location = AssetLocation.SERVER),
+        @Asset(id = "add-data",             value = "js/add-data.js",               depends = "jquery",         location = AssetLocation.SERVER),
+        @Asset(id = "selection",            value = "js/selection.js",              depends = "jquery",         location = AssetLocation.SERVER),
 
-                // Constellation
-                @Script(id = "cstl",                    src = "js/cstl.js",                 depends = "jquery",         location = AssetLocation.SERVER),
-                @Script(id = "cstl.data",               src = "js/cstl.data.js",            depends = "cstl",           location = AssetLocation.SERVER),
-                @Script(id = "cstl.providers",          src = "js/cstl.providers.js",       depends = "cstl",           location = AssetLocation.SERVER),
-                @Script(id = "cstl.services",           src = "js/cstl.services.js",        depends = "cstl",           location = AssetLocation.SERVER),
-                @Script(id = "cstl.dashboard",          src = "js/cstl.dashboard.js",       depends = "cstl",           location = AssetLocation.SERVER),
-                @Script(id = "cstl.dashboard.data",     src = "js/cstl.dashboard.data.js",  depends = "cstl.dashboard", location = AssetLocation.SERVER),
-                @Script(id = "cstl.dashboard.style",    src = "js/cstl.dashboard.style.js", depends = "cstl.dashboard", location = AssetLocation.SERVER),
-                @Script(id = "cstl.filemodal",          src = "js/cstl.filemodal.js",       depends = "jquery",         location = AssetLocation.APPLICATION),
+        // Constellation
+        @Asset(id = "cstl",                 value = "js/cstl.js",                 depends = "jquery",           location = AssetLocation.SERVER),
+        @Asset(id = "cstl.data",            value = "js/cstl.data.js",            depends = "cstl",             location = AssetLocation.SERVER),
+        @Asset(id = "cstl.providers",       value = "js/cstl.providers.js",       depends = "cstl",             location = AssetLocation.SERVER),
+        @Asset(id = "cstl.services",        value = "js/cstl.services.js",        depends = "cstl",             location = AssetLocation.SERVER),
+        @Asset(id = "cstl.dashboard",       value = "js/cstl.dashboard.js",       depends = "cstl",             location = AssetLocation.SERVER),
+        @Asset(id = "cstl.dashboard.data",  value = "js/cstl.dashboard.data.js",  depends = "cstl.dashboard",   location = AssetLocation.APPLICATION),
+        @Asset(id = "cstl.dashboard.style", value = "js/cstl.dashboard.style.js", depends = "cstl.dashboard",   location = AssetLocation.SERVER),
+        @Asset(id = "cstl.filemodal",       value = "js/cstl.filemodal.js",       depends = "jquery",           location = AssetLocation.APPLICATION),
 
-                // Style
-                @Script(id = "style_edition",   src = "js/style_edition.js",    depends = "jquery"),
-                @Script(id = "style_filter",    src = "js/style_filter.js",     depends = "style_edition"),
-                @Script(id = "style_rule",      src = "js/style_rule.js",       depends = "style_edition"),
-                @Script(id = "style_symbol",    src = "js/style_symbol.js",     depends = "style_edition")})
+        // Style
+        @Asset(id = "style_edition",    value = "js/style_edition.js",  depends = "jquery"),
+        @Asset(id = "style_filter",     value = "js/style_filter.js",   depends = "style_edition"),
+        @Asset(id = "style_rule",       value = "js/style_rule.js",     depends = "style_edition"),
+        @Asset(id = "style_symbol",     value = "js/style_symbol.js",   depends = "style_edition")})
 
 /**
  * Constellation web client main part.
@@ -107,7 +107,6 @@ package org.constellation.gui;
 
 import juzu.Alias;
 import juzu.asset.AssetLocation;
+import juzu.plugin.asset.Asset;
 import juzu.plugin.asset.Assets;
-import juzu.plugin.asset.Script;
-import juzu.plugin.asset.Stylesheet;
 import juzu.plugin.less.Less;

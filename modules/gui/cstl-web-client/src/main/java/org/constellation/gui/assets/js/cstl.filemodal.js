@@ -18,16 +18,12 @@ function showAll($domParent, counter){
 /**
  *
  */
-function loadFolder(){
+function gotoNext(){
     $("#nextbutton").hide();
 
-    $("#typePart").hide(function(){
-        $("#folderPart").show();
-        var $first = $("[data-panel='1']");
-        hideAll($first);
-        $first.jzLoad("DataController.getDataFolders()",{"path":""}, function(){
-            $("#first").find("a").on("click", {parent : $first}, updateChild);
-        });
+    $("#folderPart").hide(function(){
+        $("#typePart").show();
+        $("#endbutton").show();
     });
 }
 
@@ -47,7 +43,7 @@ function addParentOperation(){
     $previous.data("depth", $previous.data("depth")-1);
 
     var $parent = $previous.find("[data-path='"+parentPath+"']");
-    $parent.css("color", "#b94a48");
+    $parent.addClass("text-error");
     var $liParent = $parent.parent()
     var $icon = $liParent.find('i');
     $icon.removeClass("icon-folder-close-alt");
@@ -125,23 +121,24 @@ function updateChild(event){
     var hasNext = $(this).data("next");
     var nextLevel = panel+1;
 
+    //remove color on old selection
+    var $liParent = $(this).parent();
+    var $ulParent = $liParent.parent();
+    var $oldSelect = $ulParent.find("a.text-error");
+    $oldSelect.siblings("i").css("color", "#5bc0de");
+    $oldSelect.removeClass("text-error");
+
+    //set new color
+    var $icon = $liParent.find('i');
+    $icon.css("color", "#b94a48");
+    $(this).addClass("text-error");
+
     if(hasNext==true){
-        //change color and open folder
-        var $liParent = $(this).parent();
-
-        var $ulParent = $liParent.parent();
-        var $oldSelect = $ulParent.find("i.icon-folder-open-alt");
-        $oldSelect.removeClass("icon-folder-open-alt");
-        $oldSelect.addClass("icon-folder-close-alt");
-        $oldSelect.css("color", "#5bc0de");
-        $oldSelect.siblings("a").removeClass("text-error");
-        $oldSelect.removeClass("temp");
-
-        var $icon = $liParent.find('i');
+        //folder icons
+        $oldSelect.siblings("i").removeClass("icon-folder-open-alt");
+        $oldSelect.siblings("i").addClass("icon-folder-close-alt");
         $icon.removeClass("icon-folder-close-alt");
         $icon.addClass("icon-folder-open-alt");
-        $icon.css("color", "#b94a48");
-        $(this).addClass("text-error");
 
 
         if(depth>1 && panel==1){
@@ -163,8 +160,5 @@ function updateChild(event){
         $domParent.children(":nth-child("+nextLevel+")").hide();
         //Update file path to know file to load
         $("#filePath").val($(this).data("path"));
-
-        //Submit form
-        $("#serverFileModalForm").submit();
     }
 }

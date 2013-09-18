@@ -104,9 +104,6 @@ public class ProvidersAPI {
      */
     public List<FileBean> getDataFolder(String path) throws IOException {
         ensureNonNull("path", path);
-        if(path.isEmpty()){
-            path = "root";
-        }
         final FileListBean list = client.post("data/datapath", MediaType.APPLICATION_XML_TYPE, path).getEntity(FileListBean.class);
         return list.getList();
     }

@@ -6,11 +6,11 @@
         </div>
         <div class="modal-body">
             <div id="typePart">
-                <div>
+                <div class="span2">
                     <label>&{layer.listing.data.upload.name.label}</label>
-                    <input type="text" name="name"/>
+                    <input type="text" name="name" class="span2"/>
                 </div>
-                <div class="row">
+                <div class="span5">
                     <div class="span2">
                         <label class="radio">
                             <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="images/icon/vector.png" class="img-rounded"> &{layer.listing.data.upload.vector.label}
@@ -45,10 +45,12 @@
         </div>
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>
-            <button class="btn btn-info" type="button" onclick="loadFolder();" id="nextbutton">next</button>
+            <button class="btn btn-info" type="button" onclick="gotoNext();" id="nextbutton">next</button>
+            <button class="btn btn-info" type="submit" id="endbutton">create</button>
         </div>
     </div>
 </form>
 <script type="text/javascript">
-    $("#folderPart").hide();
+    $("#endbutton").hide();
+    $("#typePart").hide();
 </script>

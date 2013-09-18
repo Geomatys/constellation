@@ -9,7 +9,7 @@
         </a>
         <ul class="dropdown-menu">
             <li><a href="#" id="uploadchoice" data-toggle="modal" data-target="#localFileModal">&{label.file.local}</a></li>
-            <li><a href="#" id="filesystemchoice" data-toggle="modal" data-target="#serverFileModal">&{label.file.server}</a></li>
+            <li><a href="#" id="filesystemchoice" onclick="CSTL.DataDashboard.showServerFileModal();">&{label.file.server}</a></li>
             <li><a href="#" id="urlchoice" data-toggle="modal" data-target="#urlModal">URL</a></li>
             <li><a href="#" id="databasechoice" data-toggle="modal" data-target="#databaseModal">&{label.database}</a></li>
         </ul>

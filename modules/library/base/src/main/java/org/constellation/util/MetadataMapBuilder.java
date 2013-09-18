@@ -1,4 +1,4 @@
-package org.constellation.utils;
+package org.constellation.util;
 
 import org.apache.sis.util.collection.TableColumn;
 import org.apache.sis.util.collection.TreeTable;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility class to create some {@link org.constellation.utils.SimplyMetadataTreeNode} {@link java.util.List} with required metadata.
+ * Utility class to create some {@link org.constellation.util.SimplyMetadataTreeNode} {@link java.util.List} with required metadata.
  * Can work with {@link TreeTable.Node} and {@link Node} with own method.
  *
  * @author Benjamin Garcia (Geomatys)
@@ -25,12 +25,12 @@ public class MetadataMapBuilder {
     private static int counter;
 
     /**
-     * {@link org.constellation.utils.SimplyMetadataTreeNode} {@link ArrayList} generator with a {@link TreeTable.Node}.
+     * {@link org.constellation.util.SimplyMetadataTreeNode} {@link ArrayList} generator with a {@link TreeTable.Node}.
      *
      * @param rootNode           {@link TreeTable.Node} metadata tree root
      * @param parentTreeNodeName parent div id name
      * @param parentDepth        parent div depth
-     * @return a {@link org.constellation.utils.SimplyMetadataTreeNode} {@link ArrayList}
+     * @return a {@link org.constellation.util.SimplyMetadataTreeNode} {@link ArrayList}
      */
     public static ArrayList<SimplyMetadataTreeNode> createMetadataList(final TreeTable.Node rootNode, final String parentTreeNodeName, final int parentDepth) {
         ArrayList<SimplyMetadataTreeNode> metadataList = new ArrayList<>(0);
@@ -74,12 +74,12 @@ public class MetadataMapBuilder {
     }
 
     /**
-     * {@link org.constellation.utils.SimplyMetadataTreeNode} {@link List} generator with a {@link Node}.
+     * {@link org.constellation.util.SimplyMetadataTreeNode} {@link List} generator with a {@link Node}.
      *
      * @param rootNode           {@link Node} metadata tree root
      * @param parentTreeNodeName parent div id name
      * @param parentDepth        parent div depth
-     * @return a {@link org.constellation.utils.SimplyMetadataTreeNode} {@link List}
+     * @return a {@link org.constellation.util.SimplyMetadataTreeNode} {@link List}
      */
     public static List<SimplyMetadataTreeNode> createSpatialMetadataList(final Node rootNode, final String parentTreeNodeName, final int parentDepth) {
         List<SimplyMetadataTreeNode> metadataList = new ArrayList<>(0);

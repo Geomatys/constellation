@@ -14,8 +14,9 @@ import org.constellation.dto.DataInformation;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
 import org.constellation.dto.ParameterValues;
-import org.constellation.utils.MetadataMapBuilder;
-import org.constellation.utils.SimplyMetadataTreeNode;
+import org.constellation.util.MetadataMapBuilder;
+import org.constellation.util.SimplyMetadataTreeNode;
+import org.constellation.utlis.GeotoolkitFileExtensionAvailable;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
@@ -26,13 +27,11 @@ import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.GenericName;
 import org.w3c.dom.Node;
 
+import javax.imageio.ImageIO;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
@@ -128,6 +127,7 @@ public class Data {
         final FileListBean list = new FileListBean();
         final List<FileBean> listBean = new ArrayList<>(0);
         File[] children;
+        final List<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension();
 
         final File root = ConfigDirectory.getDataDirectory();
         if ("root".equalsIgnoreCase(path)) {
@@ -143,8 +143,20 @@ public class Data {
         if(children != null){
             for (int i = 0; i < children.length; i++) {
                 File child = children[i];
-                final FileBean bean = new FileBean(child.getName(), child.isDirectory(), path+"/"+child.getName());
-                listBean.add(bean);
+
+                if(child.isFile()){
+                    int lastIndexPoint = child.getName().lastIndexOf('.');
+                    String extension = child.getName().substring(lastIndexPoint+1);
+
+                    if(extensions.contains(extension.toLowerCase())){
+                        final FileBean bean = new FileBean(child.getName(), child.isDirectory(), path+"/"+child.getName());
+                        listBean.add(bean);
+                    }
+
+                }else{
+                    final FileBean bean = new FileBean(child.getName(), child.isDirectory(), path+"/"+child.getName());
+                    listBean.add(bean);
+                }
             }
         }
         list.setList(listBean);

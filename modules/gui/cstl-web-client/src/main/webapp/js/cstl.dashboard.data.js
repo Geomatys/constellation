@@ -47,5 +47,18 @@ CSTL.DataDashboard = {
         this.instance.fromIndex(0);
         $elt.parent().addClass("active").siblings().removeClass("active");
         $("#dataDashboardTitle").html(CSTL.i18n("data-" + type));
+    },
+
+
+    showServerFileModal: function(){
+        var $first = $("[data-panel='1']");
+        hideAll($first);
+        $first.jzLoad("DataController.getDataFolders()",{"path":"root"}, function(){
+            $("#first").find("a").on("click", {parent : $first}, updateChild);
+        });
+
+        $("#serverFileModal").modal({
+            backdrop:true
+        });
     }
 };

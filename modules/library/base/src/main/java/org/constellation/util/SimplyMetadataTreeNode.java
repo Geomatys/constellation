@@ -1,4 +1,4 @@
-package org.constellation.utils;
+package org.constellation.util;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 

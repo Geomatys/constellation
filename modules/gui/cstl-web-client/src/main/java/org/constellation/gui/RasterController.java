@@ -5,14 +5,12 @@ import juzu.Path;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
-import org.constellation.utils.SimplyMetadataTreeNode;
 import org.constellation.gui.templates.raster_description;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.dto.DataInformation;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author Benjamin Garcia (Geomatys)

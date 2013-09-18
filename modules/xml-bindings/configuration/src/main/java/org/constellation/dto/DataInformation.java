@@ -1,9 +1,7 @@
 package org.constellation.dto;
 
 import juzu.Mapped;
-import org.constellation.utils.SimplyMetadataTreeNode;
-import org.geotoolkit.referencing.crs.DefaultProjectedCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.constellation.util.SimplyMetadataTreeNode;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
