@@ -85,9 +85,9 @@
         @Asset(id = "cstl.providers",       value = "js/cstl.providers.js",       depends = "cstl",             location = AssetLocation.SERVER),
         @Asset(id = "cstl.services",        value = "js/cstl.services.js",        depends = "cstl",             location = AssetLocation.SERVER),
         @Asset(id = "cstl.dashboard",       value = "js/cstl.dashboard.js",       depends = "cstl",             location = AssetLocation.SERVER),
-        @Asset(id = "cstl.dashboard.data",  value = "js/cstl.dashboard.data.js",  depends = "cstl.dashboard",   location = AssetLocation.APPLICATION),
+        @Asset(id = "cstl.dashboard.data",  value = "js/cstl.dashboard.data.js",  depends = "cstl.dashboard",   location = AssetLocation.SERVER),
         @Asset(id = "cstl.dashboard.style", value = "js/cstl.dashboard.style.js", depends = "cstl.dashboard",   location = AssetLocation.SERVER),
-        @Asset(id = "cstl.filemodal",       value = "js/cstl.filemodal.js",       depends = "jquery",           location = AssetLocation.APPLICATION),
+        @Asset(id = "cstl.filemodal",       value = "js/cstl.filemodal.js",       depends = "jquery",           location = AssetLocation.SERVER),
 
         // Style
         @Asset(id = "style_edition",    value = "js/style_edition.js",  depends = "jquery"),

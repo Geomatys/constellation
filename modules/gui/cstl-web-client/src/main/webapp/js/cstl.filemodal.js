@@ -140,6 +140,8 @@ function updateChild(event){
         $icon.removeClass("icon-folder-close-alt");
         $icon.addClass("icon-folder-open-alt");
 
+        //add folder on breadcrumb
+        updateBreadcrumb($(this).data("path"));
 
         if(depth>1 && panel==1){
             moverRight($(this));
@@ -160,5 +162,35 @@ function updateChild(event){
         $domParent.children(":nth-child("+nextLevel+")").hide();
         //Update file path to know file to load
         $("#filePath").val($(this).data("path"));
+    }
+}
+
+/**
+ *
+ */
+function filterFiles($Element){
+    var $ulParent = $Element.parent().parent();
+    var $liaElements = $ulParent.find("a");
+    for (var i = 0; i < $liaElements.length; i++) {
+        var $selectedAnchor = $($liaElements.get(i));
+        var innerHtml = $selectedAnchor.html();
+        if(!innerHtml.contains($Element.val())){
+            $selectedAnchor.parent().hide();
+        }else{
+            $selectedAnchor.parent().show();
+        }
+    }
+}
+
+/**
+ *
+ */
+function updateBreadcrumb(path){
+    $breadcrumb = $(".breadcrumb");
+    $breadcrumb.empty();
+    var pathArray = path.split("/");
+    for (var i = 0; i < pathArray.length; i++) {
+        var pathPart = pathArray[i];
+        $breadcrumb.append("<li class='active'>"+pathPart+"<span class='divider'>/</span></li>");
     }
 }

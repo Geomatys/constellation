@@ -33,11 +33,16 @@
                 </div>
             </div>
             <div class="row" id="folderPart">
-                <div class="span2 well" id="first" data-panel="1" data-depth="1">
-                </div>
-                <div class="span2 well" data-panel="2" data-depth="">
-                </div>
-                <div class="span2 well" data-panel="3" data-depth="">
+                <ul class="breadcrumb span7">
+                    <li class="active"><span class="divider">/</span></li>
+                </ul>
+                <div>
+                    <div class="span2 well" id="first" data-panel="1" data-depth="1">
+                    </div>
+                    <div class="span2 well" data-panel="2" data-depth="">
+                    </div>
+                    <div class="span2 well" data-panel="3" data-depth="">
+                    </div>
                 </div>
             </div>
             <input type="hidden" name="filePath" id="filePath"/>
@@ -53,4 +58,5 @@
 <script type="text/javascript">
     $("#endbutton").hide();
     $("#typePart").hide();
+    updateBreadcrumb("");
 </script>

@@ -1,5 +1,6 @@
 #{param name=folders/}
 <ul class="unstyled" data-role="folderlisting">
+    <li><input type="text" placeholder="filter" class="span2" onkeyup="filterFiles($(this))"/></li>
 <% for (def folder : folders){
     String screenName = folder.name;
     if(screenName.size()>18){
@@ -22,6 +23,6 @@
     $("[data-role=folderlisting]").find('[title]').
             tooltip({
             delay:{show: 200, hide:100},
-            placement: "right",
+            placement: "bottom",
             trigger: "hover"});
 </script>
