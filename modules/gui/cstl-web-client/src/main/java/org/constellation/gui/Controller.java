@@ -27,7 +27,7 @@ import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
@@ -61,8 +61,8 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Constellation web client main Juzu controller. Manage linkage with other controller and homepages

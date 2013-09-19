@@ -54,8 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.constellation.gui.util.StyleUtilities.createDefaultStyle;
 import static org.constellation.gui.util.StyleUtilities.listType;
 import static org.constellation.gui.util.StyleUtilities.readJson;

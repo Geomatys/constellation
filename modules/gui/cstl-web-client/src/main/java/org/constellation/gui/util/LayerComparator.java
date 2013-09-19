@@ -17,7 +17,7 @@
 
 package org.constellation.gui.util;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.constellation.configuration.Layer;
 
 import java.util.Comparator;
