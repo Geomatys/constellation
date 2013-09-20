@@ -28,10 +28,12 @@ import static org.constellation.provider.AbstractLayerDetails.LOGGER;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.map.DefaultCoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
@@ -53,7 +55,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
+public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails implements CoverageLayerDetails {
 
     private static final MutableStyle DEFAULT =
             new DefaultStyleFactory().style(StyleConstants.DEFAULT_RASTER_SYMBOLIZER);
@@ -241,6 +243,34 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
             }
 
             return generalGridGeom.getEnvelope();
+        } catch (CancellationException ex) {
+            throw new DataStoreException(ex);
+        } finally {
+            reader.dispose();
+        }
+    }
+
+    @Override
+    public String getImageFormat() {
+        return "";
+    }
+
+    @Override
+    public String getRemarks() {
+        return "";
+    }
+
+    @Override
+    public String getThematic() {
+        return "";
+    }
+
+    @Override
+    public SpatialMetadata getSpatialMetadata() throws DataStoreException {
+        final GridCoverageReader reader = ref.createReader();
+
+        try {
+            return reader.getCoverageMetadata(0);
         } catch (CancellationException ex) {
             throw new DataStoreException(ex);
         } finally {

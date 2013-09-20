@@ -181,7 +181,7 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
      */
     @Override
     public SortedSet<Date> getAvailableTimes() throws DataStoreException {
-        return new TreeSet<Date>();
+        return new TreeSet<>();
     }
 
     /**
@@ -189,7 +189,7 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
      */
     @Override
     public SortedSet<Number> getAvailableElevations() throws DataStoreException {
-        return new TreeSet<Number>();
+        return new TreeSet<>();
     }
 
     /*

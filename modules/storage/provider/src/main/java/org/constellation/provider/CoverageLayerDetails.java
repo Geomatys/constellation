@@ -37,11 +37,13 @@ public interface CoverageLayerDetails extends LayerDetails {
     /**
      * @see Layer#getRemarks
      */
+    @Deprecated
     String getRemarks();
 
     /**
      * @see Layer#getThematic
      */
+    @Deprecated
     String getThematic();
 
     SpatialMetadata getSpatialMetadata() throws DataStoreException;
