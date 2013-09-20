@@ -482,6 +482,33 @@ public class CSWworkerTest {
 
         ebrimEquals(expRpResult, rpResult);
 
+        /*
+         *  TEST 11 : getRecordById with native DC metadata.
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo"));
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
+
+        assertTrue(result != null);
+        assertTrue(result.getAny().size() == 1);
+
+        obj = result.getAny().get(0);
+
+        if (obj instanceof RecordType) {
+            RecordType dcResult =  (RecordType) obj;
+            RecordType dcexpResult =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta13.xml"));
+            assertEquals(dcexpResult, dcResult);
+        } else if (obj instanceof Node) {
+            Node resultNode = (Node) obj;
+            Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta13.xml");
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns/:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.compare();
+        } else {
+            fail("unexpected record type:" + obj);
+        }
+
         pool.recycle(unmarshaller);
     }
 
@@ -1280,7 +1307,7 @@ public class CSWworkerTest {
         list.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         list.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         list.add("urn:motiive:csw-ebrim");
-//        list.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        list.add("urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
         list.add("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
         values = new ListOfValuesType(list);
         value  = new DomainValuesType(null, "identifier", values, METADATA_QNAME);
