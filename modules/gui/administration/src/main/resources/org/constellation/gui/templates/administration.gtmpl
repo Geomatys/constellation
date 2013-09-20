@@ -1,0 +1,39 @@
+#{decorate path=menu.gtmpl/}
+
+<div class="logo-wrapper">
+    <a href="@{index()}"><img src="images/constellation.png"></a>
+</div>
+<div id="dataDashboard" class="row-fluid">
+    <div class="span3">
+        <div class="well nav-frame">
+            <ul id="dataTypesNav" class="nav nav-list">
+                <li class="nav-header">Système</li>
+                <li class="active"><a href="#">Etat du service</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Classes d'images</a></li>
+                <li><a href="#">Statistiques</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="#">A propos de Constellation</a></li>
+                <li class="nav-header">Processing</li>
+                <li><a href="#">Process</a></li>
+                <li><a href="#">Gestionnaire de tâches</a>
+                <li><a href="#">Plannification</a>
+                <li class="nav-header">Sécurité</li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Gestion des utilisateurs</a>
+                <li><a href="#">Gestion des groupes</a>
+                <li class="nav-header">Base de donnée</li>
+                <li><a href="#">Administration</a>
+                <li><a href="#">Données</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="span9 frame dashboard">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <a id="dataDashboardTitle" class="brand" href="#">Etat du service</a>
+            </div>
+        </div>
+    </div>
+</div>

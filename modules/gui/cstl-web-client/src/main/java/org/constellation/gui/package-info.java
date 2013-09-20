@@ -48,7 +48,10 @@
         @Alias(of = "/org/constellation/gui/templates/style_symbol_point.gtmpl",        as = "style_symbol_point.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_symbol_polygon.gtmpl",      as = "style_symbol_polygon.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_symbol_text.gtmpl",         as = "style_symbol_text.gtmpl"),
-        @Alias(of = "/org/constellation/gui/templates/style_symbol_raster.gtmpl",       as = "style_symbol_raster.gtmpl")})
+        @Alias(of = "/org/constellation/gui/templates/style_symbol_raster.gtmpl",       as = "style_symbol_raster.gtmpl"),
+
+        //Administration
+        @Alias(of = "/org/constellation/gui/templates/administration.gtmpl",            as = "administration.gtmpl")})
 
 
 

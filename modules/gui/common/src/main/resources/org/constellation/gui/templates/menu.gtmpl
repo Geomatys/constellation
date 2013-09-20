@@ -17,7 +17,7 @@
                     <li><a href="@{StyleController.dashboard()}">&{menu.style.label}</a></li>
                     <li><a href="#">&{menu.mapcontext.label}</a></li>
                     <li><a href="#">&{menu.geoviewer.label}</a></li>
-                    <li><a href="#">&{menu.administration.label}</a></li>
+                    <li><a href="@{AdministrationController.getAdministration()}">&{menu.administration.label}</a></li>
                 </ul>
             </div>
         </div>
