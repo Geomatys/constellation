@@ -69,8 +69,10 @@ import org.opengis.util.InternationalString;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.xml.MarshallerPool;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 /**
@@ -267,8 +269,15 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
 
                     String propertyName = xpath.substring(0, xpath.indexOf('/'));
                     final int ordinal         = extractOrdinal(propertyName);
-                    if (propertyName.indexOf('[') != -1) {
-                        propertyName = propertyName.substring(0, propertyName.indexOf('['));
+                    final int braceIndex = propertyName.indexOf('[');
+                    if (braceIndex != -1) {
+                        propertyName = propertyName.substring(0,braceIndex);
+                    }
+
+                    //remove namespace on propertyName
+                    final int separatorIndex = propertyName.indexOf(':');
+                    if (separatorIndex != -1) {
+                        propertyName = propertyName.substring(separatorIndex + 1);
                     }
 
                     LOGGER.finer("propertyName:" + propertyName + " ordinal=" + ordinal);
@@ -323,18 +332,53 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                 }
 
                 // we update the metadata
-                final Object value = property.getValue();
+                final Object value = readValue(property);
 
+                //remove namespace on propertyName
+                final int separatorIndex = xpath.indexOf(':');
+                if (separatorIndex != -1) {
+                    xpath = xpath.substring(separatorIndex + 1);
+                }
+                
                 updateObjects(parent, xpath, value);
 
                 // we finish by updating the metadata.
                 deleteMetadata(metadataID);
-            storeMetadata(metadata);
+                storeMetadata(metadata);
                 return true;
 
             }
         }
         return false;
+    }
+
+    /**
+     * temporary before node transform
+     * 
+     * @param property
+     * @return
+     * @throws MetadataIoException
+     * @deprecated
+     */
+    @Deprecated
+    private Object readValue(final RecordProperty property) throws MetadataIoException {
+        final Object value;
+        if (property.getValue() instanceof Node) {
+            if (property.getValue() instanceof Text) {
+                value = ((Text)property.getValue()).getTextContent();
+            } else {
+                try {
+                    final Unmarshaller u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
+                    value = u.unmarshal((Node)property.getValue());
+                    CSWMarshallerPool.getInstance().recycle(u);
+                } catch (JAXBException ex) {
+                    throw new MetadataIoException(ex);
+                }
+            }
+        } else {
+            value = property.getValue();
+        }
+        return value;
     }
 
     /**

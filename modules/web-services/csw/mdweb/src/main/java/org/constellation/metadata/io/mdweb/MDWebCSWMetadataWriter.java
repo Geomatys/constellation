@@ -47,6 +47,7 @@ import org.mdweb.model.storage.FullRecord;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 /**
  * A CSW Metadata Writer specific for MDweb data source.
@@ -127,7 +128,22 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
         for (RecordProperty property : properties) {
             try {
                 final String xpath = property.getName();
-                final Object value = property.getValue();
+                final Object value;
+                if (property.getValue() instanceof Node) {
+                    if (property.getValue() instanceof Text) {
+                        value = ((Text)property.getValue()).getTextContent();
+                    } else {
+                        try {
+                            final Unmarshaller u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
+                            value = u.unmarshal((Node)property.getValue());
+                            CSWMarshallerPool.getInstance().recycle(u);
+                        } catch (JAXBException ex) {
+                            throw new MetadataIoException(ex);
+                        }
+                    }
+                } else {
+                    value = property.getValue();
+                }
                 final MixedPath mp = getMDWPathFromXPath(xpath);
                 LOGGER.log(Level.FINER, "IDValue: {0}", mp.idValue);
                 final List<Value> matchingValues = f.getValueFromNumberedPath(mp.path, mp.idValue);
@@ -188,7 +204,11 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                             final Classe requestType = getClasseFromObject(value);
                             final Classe valueType   = v.getType();
                             if (!Objects.equals(requestType, valueType)) {
-                                throw new MetadataIoException("The type of the replacement value (" + requestType.getName() +
+                                String typeName = "null";
+                                if (requestType != null) {
+                                    typeName = requestType.getName();
+                                }
+                                throw new MetadataIoException("The type of the replacement value (" + typeName +
                                                                ") does not match with the value type :" + valueType.getName(),
                                         INVALID_PARAMETER_VALUE);
                             } else {
