@@ -51,7 +51,8 @@
         @Alias(of = "/org/constellation/gui/templates/style_symbol_raster.gtmpl",       as = "style_symbol_raster.gtmpl"),
 
         //Administration
-        @Alias(of = "/org/constellation/gui/templates/administration.gtmpl",            as = "administration.gtmpl")})
+        @Alias(of = "/org/constellation/gui/templates/administration.gtmpl",            as = "administration.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/database.gtmpl",                  as = "database.gtmpl")})
 
 
 

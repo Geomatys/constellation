@@ -7,6 +7,8 @@ import juzu.View;
 import juzu.template.Template;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -25,9 +27,22 @@ public class AdministrationController {
     @Path("administration.gtmpl")
     Template administration;
 
+    @Inject
+    @Path("database.gtmpl")
+    Template database;
+
+
     @View
     @Route("/administration")
     public Response getAdministration(){
         return administration.ok().withMimeType("text/html");
+    }
+
+    @View
+    @Route("/database/{type}")
+    public Response getDatabase(final String type){
+        Map<String, Object> parameters = new HashMap<>(0);
+        parameters.put("type", type);
+        return database.with(parameters).ok().withMimeType("text/html");
     }
 }

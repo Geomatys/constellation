@@ -1,5 +1,5 @@
 #{decorate path=menu.gtmpl/}
-
+#{param name=type/}
 <div class="logo-wrapper">
     <a href="@{index()}"><img src="images/constellation.png"></a>
 </div>
@@ -31,8 +31,39 @@
     <div class="span9 frame dashboard">
         <div class="navbar">
             <div class="navbar-inner">
-                <a id="dataDashboardTitle" class="brand" href="#">test</a>
+                <a id="dataDashboardTitle" class="brand" href="#">${type}</a>
             </div>
+        </div>
+        <div class="row-fluid dash-inner">
+            <form action="#" method="post" class="form-horizontal">
+                <fieldset>
+                    <legend>Information de connexion à la base de donnée</legend>
+                    <div class="control-group">
+                        <label class="control-label" for="databaseUrl">URL</label>
+                        <div class="controls">
+                            <input type="text" id="databaseUrl" name="databaseUrl">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="databaseLogin">Identifiant</label>
+                        <div class="controls">
+                            <input type="text" id="databaseLogin" name="databaseLogin">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="databasePassword">Mot de passe</label>
+
+                        <div class="controls">
+                            <input type="password" id="databaseLogin" name="databaseLogin"/>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="row">
+                    <div class="span3 pull-right">
+                        <button type="submit" class="btn btn-info">Enregistrer</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
