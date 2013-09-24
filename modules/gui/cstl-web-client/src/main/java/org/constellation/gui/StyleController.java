@@ -24,10 +24,8 @@ import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
-import juzu.impl.request.Request;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
-import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
@@ -57,7 +55,6 @@ import java.util.Map;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.constellation.gui.util.StyleUtilities.createDefaultStyle;
-import static org.constellation.gui.util.StyleUtilities.listType;
 import static org.constellation.gui.util.StyleUtilities.readJson;
 import static org.constellation.gui.util.StyleUtilities.toHex;
 import static org.constellation.gui.util.StyleUtilities.writeJson;
@@ -222,7 +219,7 @@ public final class StyleController {
             final Style style = readJson(styleJson, Style.class);
 
             String stylePath = ConfigDirectory.getDataDirectory().getAbsolutePath()+"/styles/";
-            provider.createProvider("sld", "sld", stylePath, "sld");
+            provider.createProvider("sld", "sld", stylePath, "sld", null);
 
             // Create the style.
             service.createStyle(DEFAULT_PROVIDER_ID, styleName, style);

@@ -91,7 +91,7 @@ public final class AdminDatabase extends Static {
      *
      * @throws SQLException if an error occurred while connecting to database or executing a SQL statement
      */
-    static synchronized void configure(final String dbUrl, final String username, final String password) throws SQLException {
+    public static synchronized void configure(final String dbUrl, final String username, final String password) throws SQLException {
         ensureNonNull("dbUrl", dbUrl);
 
         // Update connection variables.

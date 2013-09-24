@@ -24,6 +24,7 @@ import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.dto.AddLayer;
 import org.constellation.dto.DataInformation;
+import org.constellation.dto.Database;
 import org.constellation.dto.FileBean;
 import org.constellation.gui.service.bean.LayerData;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -33,18 +34,13 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Juzu service to call constellation services server side
+ * Juzu service to call constellation services server side about providers
  *
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9
@@ -61,35 +57,65 @@ public class ProviderManager {
 
     /**
      * @param type
-     * @param fileIdentifier
+     * @param identifier
      * @param path
+     * @param database
      */
-    public void createProvider(final String type, final String fileIdentifier, final String path, final String dataType) {
+    public void createProvider(final String type, final String identifier, final String path, final String dataType, final Database database) {
         final ConstellationServer cs = cstl.openServer(true);
 
         final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup) cs.providers.getServiceDescriptor(type);
         final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
         final ParameterValueGroup sources = sourceDesc.createValue();
-        sources.parameter("id").setValue(fileIdentifier);
-
-        final String folderPath = path.substring(0, path.lastIndexOf('/'));
+        sources.parameter("id").setValue(identifier);
         sources.parameter("providerType").setValue(dataType);
+        String folderPath;
+
         switch (type) {
             case "coverage-file":
+                folderPath = path.substring(0, path.lastIndexOf('/'));
                 sources.groups("coveragefile").get(0).parameter("path").setValue(folderPath);
                 break;
             case "sld":
+                folderPath = path.substring(0, path.lastIndexOf('/'));
                 sources.groups("sldFolder").get(0).parameter("path").setValue(folderPath);
                 break;
             case "feature-store":
                 final URL url;
-                try {
-                    url = new URL("file:" + path);
-                    ParameterValueGroup shapeFileParametersFolder = sources.groups("choice").get(0).addGroup("ShapeFileParametersFolder");
-                    shapeFileParametersFolder.parameter("url").setValue(url);
-                } catch (MalformedURLException e) {
-                    LOGGER.log(Level.WARNING, "", e);
+
+                if(path!=null){
+                    try {
+                        url = new URL("file:" + path);
+                        ParameterValueGroup shapeFileParametersFolder = sources.groups("choice").get(0).addGroup("ShapeFileParametersFolder");
+                        shapeFileParametersFolder.parameter("url").setValue(url);
+                    } catch (MalformedURLException e) {
+                        LOGGER.log(Level.WARNING, "", e);
+                    }
+                }else{
+                    //database connection
+                    ParameterValueGroup postGresParametersFolder = sources.groups("choice").get(0).addGroup("PostgresParameters");
+                    int port = Integer.parseInt(database.getPort());
+                    postGresParametersFolder.parameter("identifier").setValue("postgresql");
+                    postGresParametersFolder.parameter("host").setValue(database.getHost());
+                    postGresParametersFolder.parameter("port").setValue(port);
+                    postGresParametersFolder.parameter("user").setValue(database.getLogin());
+                    postGresParametersFolder.parameter("password").setValue(database.getPassword());
+                    postGresParametersFolder.parameter("database").setValue(database.getName());
+                    postGresParametersFolder.parameter("simple types").setValue(true);
                 }
+                break;
+            case "coverage-store":
+                //database connection
+                ParameterValueGroup postGresParametersFolder = sources.groups("choice").get(0).addGroup("PGRasterParameters");
+                int port = Integer.parseInt(database.getPort());
+
+                postGresParametersFolder.parameter("identifier").setValue("postgresql");
+                postGresParametersFolder.parameter("host").setValue(database.getHost());
+                postGresParametersFolder.parameter("port").setValue(port);
+                postGresParametersFolder.parameter("user").setValue(database.getLogin());
+                postGresParametersFolder.parameter("password").setValue(database.getPassword());
+                postGresParametersFolder.parameter("database").setValue(database.getName());
+                postGresParametersFolder.parameter("simple types").setValue(true);
                 break;
             default:
                 if (LOGGER.isLoggable(Level.FINER)) {
