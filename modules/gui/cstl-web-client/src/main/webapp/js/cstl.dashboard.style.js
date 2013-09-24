@@ -71,8 +71,9 @@ CSTL.StyleDashboard = {
 
     removeStyle: function(style, provider) {
         if (confirm(CSTL.i18n('confirm-delete-style'))) {
-            CSTL.Providers.deleteStyle(provider, style);
+            CSTL.Providers.deleteStyle(provider, style).complete(function() {
+                CSTL.StyleDashboard.instance.fromIndex(0);
+            });
         }
-        this.instance.fromIndex(0);
     }
 };

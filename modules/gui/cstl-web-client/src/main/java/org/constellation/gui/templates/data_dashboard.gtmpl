@@ -34,7 +34,7 @@
     <div class="span9 frame dashboard">
         <div class="navbar">
             <div class="navbar-inner">
-                <a id="dataDashboardTitle" class="brand" href="#">Vecteur</a>
+                <a id="dataDashboardTitle" class="brand" href="#">&{label.data.vector}</a>
             </div>
         </div>
         <div class="navbar sort-navbar">
