@@ -127,7 +127,7 @@
     <module>process-core</module>
     <module>process</module>
     <module>testing</module>
-    <module>auth</module>
+    <module>admin</module>
   </modules>
 
 </project>

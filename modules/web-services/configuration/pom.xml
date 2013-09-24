@@ -75,9 +75,10 @@
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
-     <dependency>
-      <groupId>org.mdweb.metamodel</groupId>
-      <artifactId>mdweb-metamodel-lib-auth</artifactId>
+    <dependency>
+      <groupId>org.constellation.engine</groupId>
+      <artifactId>cstl-engine-admin</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>

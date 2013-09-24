@@ -241,31 +241,23 @@ public final class ConfigDirectory {
 
         return providerDirectory;
     }
-    
+
     /**
-     * Return a folder named 'auth' at the root in the configuration directory.
+     * Return a folder named 'admin' at the root in the configuration directory.
      */
-     public static File getAuthConfigDirectory() {
+    public static File getAdminConfigDirectory() {
         final File constellationDirectory = getConfigDirectory();
 
-        if(!constellationDirectory.exists()){
+        if (!constellationDirectory.exists()) {
             constellationDirectory.mkdirs();
         }
 
-        final File authDirectory = new File(constellationDirectory, "auth");
-        if (!authDirectory.exists()) {
-            authDirectory.mkdirs();
+        final File adminDirectory = new File(constellationDirectory, "admin");
+        if (!adminDirectory.exists()) {
+            adminDirectory.mkdirs();
         }
 
-        return authDirectory;
-     }
-     
-    /**
-     * Return the properties file at the root in the auth directory.
-     */
-    public static File getAuthConfigFile() {
-        final File authDirectory = getAuthConfigDirectory();
-        return new File(authDirectory, "cstl-auth.properties");
+        return adminDirectory;
     }
 
     /**

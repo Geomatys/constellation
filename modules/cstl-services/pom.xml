@@ -489,7 +489,7 @@
         </dependency>
         <dependency>
             <groupId>org.constellation.engine</groupId>
-            <artifactId>cstl-engine-auth</artifactId>
+            <artifactId>cstl-engine-admin</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

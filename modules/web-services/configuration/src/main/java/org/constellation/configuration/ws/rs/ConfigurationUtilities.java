@@ -1,5 +1,8 @@
 package org.constellation.configuration.ws.rs;
 
+import org.constellation.admin.AdminDatabase;
+import org.constellation.admin.AdminSession;
+import org.constellation.admin.UserRecord;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
@@ -7,18 +10,11 @@ import org.constellation.generic.database.BDD;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.mdweb.io.auth.AuthenticationReader;
-import org.mdweb.io.auth.sql.v24.DataSourceAuthenticationReader;
-import org.mdweb.model.auth.AuthenticationException;
-import org.mdweb.model.auth.UserAuthnInfo;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,57 +26,47 @@ public class ConfigurationUtilities {
     private static final Logger LOGGER = Logger.getLogger(ConfigurationUtilities.class.getName());
 
     public static AcknowlegementType getUserName() {
+        AdminSession session = null;
         try {
-            final AuthenticationReader authReader = getAuthReader();
-            final List<UserAuthnInfo> users =  authReader.listAllUsers();
+            session = AdminDatabase.createSession();
+            final List<UserRecord> users = session.readUsers();
             String userName = null;
             if (users != null && !users.isEmpty()) {
                 userName = users.get(0).getLogin();
             }
-            authReader.destroy();
             return new AcknowlegementType("Success", userName);
-        } catch (AuthenticationException ex) {
-            LOGGER.log(Level.WARNING, "Error while updating user", ex);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "Error while reading users", ex);
+        } finally {
+            if (session != null) session.close();
         }
         return new AcknowlegementType("Failure", "An error occurs");
     }
 
     public static AcknowlegementType deleteUser(final String userName) {
+        AdminSession session = null;
         try {
-            final AuthenticationReader authReader = getAuthReader();
-            authReader.deleteUser(userName);
-            authReader.destroy();
+            session = AdminDatabase.createSession();
+            session.deleteUser(userName);
             return new AcknowlegementType("Success", "The user has been deleted");
-        } catch (AuthenticationException ex) {
+        } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "Error while deleting user", ex);
+        } finally {
+            if (session != null) session.close();
         }
         return new AcknowlegementType("Failure", "An error occurs");
     }
 
-
-    public static AuthenticationReader getAuthReader() {
-        final File authProperties = ConfigDirectory.getAuthConfigFile();
-        final Properties prop = new Properties();
-        try {
-            final FileInputStream fis = new FileInputStream(authProperties);
-            prop.load(fis);
-            final String url = prop.getProperty("cstl_authdb_host");
-            final DefaultDataSource ds = new DefaultDataSource(url.replace('\\', '/') + ";");
-            return new DataSourceAuthenticationReader(ds);
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "IOException while loading cstl auth properties file", ex);
-        }
-        return null;
-    }
-
     public static AcknowlegementType updateUser(final String userName, final String password, final String oldLogin) {
+        AdminSession session = null;
         try {
-            final AuthenticationReader authReader = getAuthReader();
-            authReader.writeUser(userName, password, "Default Constellation Administrator", Arrays.asList("cstl-admin"), oldLogin);
-            authReader.destroy();
+            session = AdminDatabase.createSession();
+            session.updateUser(oldLogin, userName, password, "Default Constellation Administrator", Arrays.asList("cstl-admin"));
             return new AcknowlegementType("Success", "The user has been changed");
-        } catch (AuthenticationException ex) {
-            LOGGER.log(Level.WARNING, "Error while updating user", ex);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "Error while deleting user", ex);
+        } finally {
+            if (session != null) session.close();
         }
         return new AcknowlegementType("Failure", "An error occurs");
     }
