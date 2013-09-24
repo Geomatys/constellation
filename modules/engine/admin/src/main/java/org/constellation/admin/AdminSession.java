@@ -19,6 +19,7 @@ package org.constellation.admin;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.TaskRecord.State;
 import org.geotoolkit.util.StringUtilities;
 
 import java.io.IOException;
@@ -94,6 +95,12 @@ public final class AdminSession {
     private static final String DELETE_STYLE                 = "style.delete";
     private static final String WRITE_STYLED_DATA            = "styled_data.write";
     private static final String DELETE_STYLED_DATA           = "styled_data.delete";
+    private static final String READ_TASK                    = "task.read";
+    private static final String READ_TASK_LIST               = "task.read.list";
+    private static final String READ_TASK_LIST_FROM_STATE    = "task.read.list.from.state";
+    private static final String WRITE_TASK                   = "task.write";
+    private static final String UPDATE_TASK                  = "task.update";
+    private static final String DELETE_TASK                  = "task.delete";
 
 
     /**
@@ -158,7 +165,7 @@ public final class AdminSession {
     }
 
     public void updateUser(final String login, final String newLogin, final String newPwd, final String newName, final List<String> newRoles) throws SQLException {
-        update(UPDATE_USER, new Object[]{newLogin, StringUtilities.MD5encode(newPwd), newName, StringUtils.join(newRoles,','), login});
+        update(UPDATE_USER, new Object[]{newLogin, StringUtilities.MD5encode(newPwd), newName, StringUtils.join(newRoles, ','), login});
     }
 
     public void deleteUser(final String login) throws SQLException {
@@ -242,12 +249,37 @@ public final class AdminSession {
     }
 
 
-    void writeStyledData(final StyleRecord style, final DataRecord data) throws SQLException {
+    public void writeStyledData(final StyleRecord style, final DataRecord data) throws SQLException {
         update(WRITE_STYLED_DATA, new Object[]{style.id, data.id});
     }
 
-    void deleteStyledData(final StyleRecord style, final DataRecord data) throws SQLException {
+    public void deleteStyledData(final StyleRecord style, final DataRecord data) throws SQLException {
         update(DELETE_STYLED_DATA, new Object[]{style.id, data.id});
+    }
+
+
+    public TaskRecord readTask(final String identifier) throws SQLException {
+        return selectOne(READ_TASK, new Object[]{identifier}, TaskRecord.class);
+    }
+
+    public List<TaskRecord> readTasks() throws SQLException {
+        return selectMany(READ_TASK_LIST, TaskRecord.class);
+    }
+
+    public TaskRecord readTasks(final String state) throws SQLException {
+        return selectOne(READ_TASK_LIST_FROM_STATE, new Object[]{state}, TaskRecord.class);
+    }
+
+    public void writeTask(final String identifier, final String type, final String description, final String owner) throws SQLException {
+        update(WRITE_TASK, new Object[]{identifier,State.PENDING,type,description,new java.util.Date().getTime(),owner});
+    }
+
+    public void updateTask(final String identifier, final TaskRecord.State state) throws SQLException {
+        update(UPDATE_TASK, new Object[]{state.name(),new java.util.Date().getTime(),identifier});
+    }
+
+    public void deleteTask(final String identifier) throws SQLException {
+        update(DELETE_TASK, new Object[]{identifier});
     }
 
 
@@ -343,6 +375,8 @@ public final class AdminSession {
                 stmt.setDouble(i + 1, (Double) args[i]);
             } else if (args[i] instanceof Float) {
                 stmt.setFloat(i + 1, (Float) args[i]);
+            } else if (args[i] instanceof Long) {
+                stmt.setLong(i + 1, (Long) args[i]);
             } else if (args[i] instanceof Date) {
                 stmt.setDate(i + 1, (Date) args[i]);
             } else {

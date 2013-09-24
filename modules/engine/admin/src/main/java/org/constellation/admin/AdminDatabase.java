@@ -56,6 +56,8 @@ public final class AdminDatabase extends Static {
 
     /**
      * User cache for improved authentication performance.
+     *
+     * TODO: implement real cache system with a maximum size to reduce memory impact
      */
     private static final Map<String, UserRecord> USER_CACHE = new ConcurrentHashMap<>();
 
@@ -98,6 +100,9 @@ public final class AdminDatabase extends Static {
         DATA_SOURCE = new DefaultDataSource(dbUrl.replace('\\','/') + ";create=true;");
         USERNAME    = username;
         PASSWORD    = password;
+
+        // Clear user cache.
+        USER_CACHE.clear();
 
         // Establish connection and create schema if does not exist.
         AdminSession session = null;
