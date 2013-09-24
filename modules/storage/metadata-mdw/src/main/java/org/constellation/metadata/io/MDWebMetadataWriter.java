@@ -775,9 +775,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             } catch (NoSuchFieldException ex) {
                 LOGGER.log(Level.FINER, "no such Field:" + propName + " in class:" + valueClass.getName());
-            } catch (SecurityException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
-            } catch (IllegalAccessException ex) {
+            } catch (SecurityException | IllegalAccessException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
             valueClass = valueClass.getSuperclass();
@@ -1221,12 +1219,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
         Path p  = new Path(mainStandard, type);
         final StringBuilder idValue = new StringBuilder(mainStandard.getName()).append(':').append(type.getName()).append(".*");
+        int ordinal = -1;
         while (xpath.indexOf('/') != -1) {
             //Then we get the next Property name
             String propertyName = xpath.substring(0, xpath.indexOf('/'));
+            //remove namespace on propertyName
+            final int separatorIndex = propertyName.indexOf(':');
+            if (separatorIndex != -1) {
+                propertyName = propertyName.substring(separatorIndex + 1);
+            }
 
             //we look for an ordinal
-            int ordinal = -1;
+            ordinal = -1;
             if (propertyName.indexOf('[') != -1) {
                 if (propertyName.indexOf(']') != -1) {
                     try {
@@ -1252,32 +1256,46 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             p = new Path(p, property);
             type = property.getType();
             xpath = xpath.substring(xpath.indexOf('/') + 1);
-        }
 
-        //we look for an ordinal
-        int ordinal = -1;
-        if (xpath.indexOf('[') != -1) {
-            if (xpath.indexOf(']') != -1) {
-                try {
-                    final String ordinalValue = xpath.substring(xpath.indexOf('[') + 1, xpath.indexOf(']'));
-                    ordinal = Integer.parseInt(ordinalValue);
-                } catch (NumberFormatException ex) {
-                    throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer");
-                }
-                xpath = xpath.substring(0, xpath.indexOf('['));
+            // remove type node
+            if (xpath.indexOf('/') != -1) {
+                xpath = xpath.substring(xpath.indexOf('/') + 1);
             } else {
-                throw new MetadataIoException("The xpath is malformed, unclosed bracket");
+                xpath = "";
             }
         }
-        idValue.append(':').append(xpath).append('.');
-        if (ordinal == -1) {
-            idValue.append('*');
-        } else {
-            idValue.append(ordinal);
+
+        if (!xpath.isEmpty()) {
+            //we look for an ordinal
+            if (xpath.indexOf('[') != -1) {
+                if (xpath.indexOf(']') != -1) {
+                    try {
+                        final String ordinalValue = xpath.substring(xpath.indexOf('[') + 1, xpath.indexOf(']'));
+                        ordinal = Integer.parseInt(ordinalValue);
+                    } catch (NumberFormatException ex) {
+                        throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer");
+                    }
+                    xpath = xpath.substring(0, xpath.indexOf('['));
+                } else {
+                    throw new MetadataIoException("The xpath is malformed, unclosed bracket");
+                }
+            }
+            //remove namespace on propertyName
+            final int separatorIndex = xpath.indexOf(':');
+            if (separatorIndex != -1) {
+                xpath = xpath.substring(separatorIndex + 1);
+            }
+
+            idValue.append(':').append(xpath).append('.');
+            if (ordinal == -1) {
+                idValue.append('*');
+            } else {
+                idValue.append(ordinal);
+            }
+            LOGGER.finer("last propertyName:" + xpath + " ordinal:" + ordinal);
+            final Property property = getProperty(type, xpath);
+            p = new Path(p, property);
         }
-        LOGGER.finer("last propertyName:" + xpath + " ordinal:" + ordinal);
-        final Property property = getProperty(type, xpath);
-        p = new Path(p, property);
         return new MixedPath(p, idValue.toString(), ordinal);
     }
 

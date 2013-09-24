@@ -225,6 +225,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
     @Override
     @Order(order=11)
     public void transactionUpdateTest() throws Exception {
+        typeCheckUpdate = false;
         super.transactionUpdateTest();
 
     }

@@ -20,6 +20,7 @@ package org.constellation.metadata.io.mdweb;
 import java.util.HashMap;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -127,15 +128,23 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
 
         for (RecordProperty property : properties) {
             try {
-                final String xpath = property.getName();
                 final Object value;
                 if (property.getValue() instanceof Node) {
-                    if (property.getValue() instanceof Text) {
+                    final Node n = (Node) property.getValue();
+                    if (n instanceof Text) {
                         value = ((Text)property.getValue()).getTextContent();
+
+                    // special case for LanguageCode
+                    } else if (n.getLocalName().equals("LanguageCode")) {
+                        final Node langAtt = n.getAttributes().getNamedItem("codeListValue");
+                        if (langAtt == null) {
+                            throw new MetadataIoException("missing codeListValue in languageCode node");
+                        }
+                        value = new Locale(langAtt.getNodeValue());
                     } else {
                         try {
                             final Unmarshaller u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-                            value = u.unmarshal((Node)property.getValue());
+                            value = u.unmarshal(n);
                             CSWMarshallerPool.getInstance().recycle(u);
                         } catch (JAXBException ex) {
                             throw new MetadataIoException(ex);
@@ -144,7 +153,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                 } else {
                     value = property.getValue();
                 }
-                final MixedPath mp = getMDWPathFromXPath(xpath);
+                final MixedPath mp = getMDWPathFromXPath(property.getName());
                 LOGGER.log(Level.FINER, "IDValue: {0}", mp.idValue);
                 final List<Value> matchingValues = f.getValueFromNumberedPath(mp.path, mp.idValue);
 

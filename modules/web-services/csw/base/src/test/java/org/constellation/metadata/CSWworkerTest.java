@@ -131,6 +131,8 @@ public class CSWworkerTest {
 
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.metadata");
 
+    protected boolean typeCheckUpdate = true;
+
     public static void fillPoolAnchor(AnchoredMarshallerPool pool) {
         try {
             pool.addAnchor("Common Data Index record", new URI("SDN:L231:3:CDI"));
@@ -1767,7 +1769,17 @@ public class CSWworkerTest {
         // we update the metadata 11325_158_19640418141800 by replacing the language eng by fr
         constraint = new QueryConstraintType("identifier='11325_158_19640418141800'", "1.1.0");
         List<RecordPropertyType> properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/language", "fra"));
+
+        final Node languageNode = buildNode("http://www.isotc211.org/2005/gmd", "LanguageCode");
+        final Node valueNode = languageNode.getOwnerDocument().createAttribute("codeListValue");
+        valueNode.setNodeValue("fra");
+        final Node clNode = languageNode.getOwnerDocument().createAttribute("codeList");
+        clNode.setNodeValue("http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/ML_gmxCodelists.xml#LanguageCode");
+        languageNode.getAttributes().setNamedItem(valueNode);
+        languageNode.getAttributes().setNamedItem(clNode);
+        languageNode.setTextContent("French");
+
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/language", languageNode));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -1881,7 +1893,7 @@ public class CSWworkerTest {
         // we update the metadata 11325_158_19640418141800 by replacing the abstract field from "Donnees CTD ANGOLA CAP 7501 78" to "Modified datas by CSW-T".
         constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
         properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/abstract", "Modified datas by CSW-T"));
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/MD_DataIdentification/abstract/CharacterString", "Modified datas by CSW-T"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -1956,7 +1968,7 @@ public class CSWworkerTest {
         // we update the metadata 39727_22_19750113062500 by replacing the dateStamp field with "2009-03-31T12:00:00.000+01:00".
         constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
         properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp", "2009-03-31T12:00:00.000+01:00"));
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp/DateTime", "2009-03-31T12:00:00.000+01:00"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -2005,7 +2017,7 @@ public class CSWworkerTest {
         constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
         properties = new ArrayList<>();
         DefaultGeographicBoundingBox geographicElement = new DefaultGeographicBoundingBox(1.1, 1.1, 1.1, 1.1);
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/extent/geographicElement", geographicElement));
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/MD_DataIdentification/extent/EX_Extent/geographicElement", geographicElement));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -2087,23 +2099,25 @@ public class CSWworkerTest {
         assertEquals(expResult, results);
 
 
-        // we update the metadata 11325_158_19640418141800 by replacing the language eng by a responsibleParty
-        constraint = new QueryConstraintType("identifier='11325_158_19640418141800'", "1.1.0");
-        DefaultResponsibleParty value = new DefaultResponsibleParty(Role.AUTHOR);
-        properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/language",value));
-        update     = new UpdateType(properties, constraint);
-        request    = new TransactionType("CSW", "2.0.2", update);
+        if (typeCheckUpdate) {
+            // we update the metadata 11325_158_19640418141800 by replacing the language eng by a responsibleParty
+            constraint = new QueryConstraintType("identifier='11325_158_19640418141800'", "1.1.0");
+            DefaultResponsibleParty value = new DefaultResponsibleParty(Role.AUTHOR);
+            properties = new ArrayList<>();
+            properties.add(new RecordPropertyType("/gmd:MD_Metadata/language",value));
+            update     = new UpdateType(properties, constraint);
+            request    = new TransactionType("CSW", "2.0.2", update);
 
-        exe = null;
-        try {
-            worker.transaction(request);
-        } catch (CstlServiceException ex) {
-            exe = ex;
+            exe = null;
+            try {
+                worker.transaction(request);
+            } catch (CstlServiceException ex) {
+                exe = ex;
+            }
+
+            assertNotNull(exe);
+            assertEquals(exe.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
-
-        assertNotNull(exe);
-        assertEquals(exe.getExceptionCode(), INVALID_PARAMETER_VALUE);
 
         // we perform again the getRecord request the modified metadata must appears again in the list
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -2139,21 +2153,23 @@ public class CSWworkerTest {
          *  we must receive an exception saying that is not the good type.
          */
 
-        // we update the metadata 39727_22_19750113062500 by replacing the dateStamp field with "hello world".
-        constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
-        properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp", "hello world"));
-        update     = new UpdateType(properties, constraint);
-        request    = new TransactionType("CSW", "2.0.2", update);
+        if (typeCheckUpdate) {
+            // we update the metadata 39727_22_19750113062500 by replacing the dateStamp field with "hello world".
+            constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
+            properties = new ArrayList<>();
+            properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp", "hello world"));
+            update     = new UpdateType(properties, constraint);
+            request    = new TransactionType("CSW", "2.0.2", update);
 
-        exe = null;
-        try {
-            worker.transaction(request);
-        } catch (CstlServiceException ex) {
-            exe = ex;
+            exe = null;
+            try {
+                worker.transaction(request);
+            } catch (CstlServiceException ex) {
+                exe = ex;
+            }
+
+            assertTrue(exe != null);
         }
-
-        assertTrue(exe != null);
 
         // then we verify that the metadata is not modified
         constraint = new QueryConstraintType("Modified after 2009-03-30T00:00:00Z", "1.0.0");
@@ -2194,21 +2210,23 @@ public class CSWworkerTest {
          *  we must receive an exception
          */
 
-        // we update the metadata 11325_158_19640418141800 by replacing the geographicElement.
-        constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
-        properties = new ArrayList<>();
-        value = new DefaultResponsibleParty(Role.AUTHOR);
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/extent/geographicElement", value));
-        update     = new UpdateType(properties, constraint);
-        request    = new TransactionType("CSW", "2.0.2", update);
+        if (typeCheckUpdate) {
+            // we update the metadata 11325_158_19640418141800 by replacing the geographicElement.
+            constraint = new QueryConstraintType("identifier='39727_22_19750113062500'", "1.1.0");
+            properties = new ArrayList<>();
+            DefaultResponsibleParty value = new DefaultResponsibleParty(Role.AUTHOR);
+            properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/MD_DataIdentification/extent/EX_Extent/geographicElement", value));
+            update     = new UpdateType(properties, constraint);
+            request    = new TransactionType("CSW", "2.0.2", update);
 
-        exe = null;
-        try {
-            worker.transaction(request);
-        } catch (CstlServiceException ex) {
-            exe = ex;
+            exe = null;
+            try {
+                worker.transaction(request);
+            } catch (CstlServiceException ex) {
+                exe = ex;
+            }
+            assertTrue(exe != null);
         }
-        assertTrue(exe != null);
 
 
         // then we verify that the metadata is not modified
@@ -2287,7 +2305,7 @@ public class CSWworkerTest {
         // we update the metadata 42292_9s_1990061004100 by replacing the third descriptive field from "research vessel" to "Modified datas by CSW-T".
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
         properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/descriptiveKeywords[3]/keyword", "Modified datas by CSW-T"));
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/MD_DataIdentification/descriptiveKeywords[3]/MD_Keywords/keyword/Anchor", "Modified datas by CSW-T"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -2399,7 +2417,7 @@ public class CSWworkerTest {
         // we update the metadata 42292_9s_1990061004100 by replacing the abstract field from "Salinity of the water column" to "something".
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
         properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/descriptiveKeywords[1]/keyword[7]", "something"));
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/MD_DataIdentification/descriptiveKeywords[1]/MD_Keywords/keyword[7]/Anchor", "something"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -2469,45 +2487,48 @@ public class CSWworkerTest {
          *  we try to replace the property MD_Metadata.identificationInfo.abstract[2] but abstract is not a list so we must receive an exception
          */
 
-        // we try to update the metadata 42292_9s_1990061004100 by replacing the abstract field with "wathever".
-        constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
-        properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/abstract[2]", "whatever"));
-        update     = new UpdateType(properties, constraint);
-        request    = new TransactionType("CSW", "2.0.2", update);
+        if (typeCheckUpdate) {
+            // we try to update the metadata 42292_9s_1990061004100 by replacing the abstract field with "wathever".
+            constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
+            properties = new ArrayList<>();
+            properties.add(new RecordPropertyType("/gmd:MD_Metadata/identificationInfo/MD_DataIdentification/abstract[2]/CharacterString", "whatever"));
+            update     = new UpdateType(properties, constraint);
+            request    = new TransactionType("CSW", "2.0.2", update);
 
-        exe = null;
-        try {
-            worker.transaction(request);
-        } catch (CstlServiceException ex) {
-            exe = ex;
-            assertTrue(ex.getMessage(), ex.getMessage().contains("The property: abstract"));
-            assertTrue(ex.getMessage(), ex.getMessage().contains("is not a collection"));
+            exe = null;
+            try {
+                worker.transaction(request);
+            } catch (CstlServiceException ex) {
+                exe = ex;
+                assertTrue(ex.getMessage(), ex.getMessage().contains("The property: abstract"));
+                assertTrue(ex.getMessage(), ex.getMessage().contains("is not a collection"));
+            }
+
+            assertTrue(exe != null);
         }
-
-        assertTrue(exe != null);
-
 
         /*
          *  TEST 12 : we try to update the metadata 42292_9s_1990061004100 by replacing a numeroted single Property
          *  we try to replace the property MD_Metadata.distributionInfo[3]/distributionFormat/name but distributionInfo is not a list so we must receive an exception
          */
 
-        // we try to update the metadata 42292_9s_1990061004100 by replacing the name field with "wathever".
-        constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
-        properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/distributionInfo[3]/distributionFormat/name", "whatever"));
-        update     = new UpdateType(properties, constraint);
-        request    = new TransactionType("CSW", "2.0.2", update);
+        if (typeCheckUpdate) {
+            // we try to update the metadata 42292_9s_1990061004100 by replacing the name field with "wathever".
+            constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
+            properties = new ArrayList<>();
+            properties.add(new RecordPropertyType("/gmd:MD_Metadata/distributionInfo[3]/MD_Distribution/distributionFormat/MD_Format/name/Anchor", "whatever"));
+            update     = new UpdateType(properties, constraint);
+            request    = new TransactionType("CSW", "2.0.2", update);
 
-        exe = null;
-        try {
-            worker.transaction(request);
-        } catch (CstlServiceException ex) {
-            exe = ex;
+            exe = null;
+            try {
+                worker.transaction(request);
+            } catch (CstlServiceException ex) {
+                exe = ex;
+            }
+
+            assertTrue(exe != null);
         }
-
-        assertTrue(exe != null);
 
 
         /*
@@ -2523,7 +2544,7 @@ public class CSWworkerTest {
                                                                                 new SimpleInternationalString("some condition"),
                                                                                 Datatype.ABSTRACT_CLASS, null, null, null);
 
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/metadataExtensionInfo/extendedElementInformation[3]", ext));
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/metadataExtensionInfo/MD_MetadataExtensionInformation/extendedElementInformation[3]", ext));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -2586,7 +2607,7 @@ public class CSWworkerTest {
         // this value is not yet present in the metadata.
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
         properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dataSetURI", "someURI"));
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/gmd:dataSetURI/gco:CharacterString", "someURI"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -2647,7 +2668,7 @@ public class CSWworkerTest {
         
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
         properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp", "2009-01-18T13:00:00+01:00"));
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp/DateTime", "2009-01-18T13:00:00+01:00"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -2815,6 +2836,15 @@ public class CSWworkerTest {
         Marshaller m = pool.acquireMarshaller();
         m.marshal(meta, document);
         return document.getDocumentElement();
+    }
+
+    private Node buildNode(final String ns, String localName) throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+
+        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+        return document.createElementNS(ns, localName);
     }
 
     private List<Node> getNodes(String XPath, final Node isoNode) {

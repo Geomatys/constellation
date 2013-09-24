@@ -20,14 +20,13 @@ package org.constellation.metadata.io.filesystem;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 
 // JAXB dependencies
@@ -46,11 +45,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 //geotoolkit dependencies
-import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.csw.xml.RecordProperty;
-import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -66,12 +63,13 @@ import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
 // GeoApi dependencies
 import org.opengis.util.InternationalString;
 
-import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.xml.MarshallerPool;
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
@@ -228,7 +226,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      */
     @Override
     public boolean updateMetadata(final String metadataID, final List<? extends RecordProperty> properties) throws MetadataIoException {
-        final Object metadata = getObjectFromFile(metadataID);
+        final Document metadataDoc = getDocumentFromFile(metadataID);
         for (RecordProperty property : properties) {
             String xpath = property.getName();
             // we remove the first / before the type declaration
@@ -244,25 +242,17 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                     typeName = typeName.substring(typeName.indexOf(':') + 1);
                 }
 
-                // we look for a know metadata type
-                if ("MD_Metadata".equals(typeName)) {
-                    type = DefaultMetadata.class;
-                } else if ("Record".equals(typeName)) {
-                    type = RecordType.class;
-                } else {
-                    throw new MetadataIoException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
-                }
-                LOGGER.log(Level.FINER, "update type:{0}", type);
+                Element parent = metadataDoc.getDocumentElement();
 
                 // we verify that the metadata to update has the same type that the Xpath type
-                if (!metadata.getClass().equals(type)) {
-                    throw new MetadataIoException("The metadata :" + Utils.findIdentifier(metadata) + "is not of the same type that the one describe in Xpath expression", INVALID_PARAMETER_VALUE);
+                if (!parent.getLocalName().equals(typeName)) {
+                    throw new MetadataIoException("The metadata :" + metadataID + " is not of the same type that the one describe in Xpath expression", INVALID_PARAMETER_VALUE);
                 }
 
                 //we remove the type name from the xpath
                 xpath = xpath.substring(xpath.indexOf('/') + 1);
 
-                Object parent = metadata;
+                List<Element> nodes = Arrays.asList(parent);
                 while (xpath.indexOf('/') != -1) {
 
                     //Then we get the next Property name
@@ -282,57 +272,14 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
 
                     LOGGER.finer("propertyName:" + propertyName + " ordinal=" + ordinal);
 
-                    Class parentClass;
-                    if (parent instanceof Collection) {
-                        final Collection parentCollection = (Collection) parent;
-                        if (parentCollection.size() > 0) {
-                            parentClass = parentCollection.iterator().next().getClass();
-                        } else  {
-                            throw new MetadataIoException("An unresolved programmation issue occurs: TODO find the type of an empty collection", NO_APPLICABLE_CODE);
-                        }
-                    } else {
-                        parentClass = parent.getClass();
-                    }
+                    
+                    nodes = getNodes(propertyName, nodes, ordinal);
 
-                    //we try to find a getter for this property
-                    final Method getter = ReflectionUtilities.getGetterFromName(propertyName, parentClass);
-                    if (getter == null) {
-                        throw new MetadataIoException("There is no getter for the property:" + propertyName + IN_CLASS_MSG + type.getSimpleName(), INVALID_PARAMETER_VALUE);
-                    } else {
-                        // we execute the getter
-                        if (!(parent instanceof Collection)) {
-                            parent = ReflectionUtilities.invokeMethod(parent, getter);
-                        } else {
-                            final Collection tmp = new ArrayList();
-                            for (Object child : (Collection) parent) {
-                                tmp.add(ReflectionUtilities.invokeMethod(child, getter));
-                            }
-                            parent = tmp;
-                        }
-                    }
-
-                    if (ordinal != -1) {
-
-                        if (!(parent instanceof Collection)) {
-                            throw new MetadataIoException("The property:" + propertyName + IN_CLASS_MSG + parentClass + " is not a collection", INVALID_PARAMETER_VALUE);
-                        }
-                        Object tmp = null;
-                        for (Object child : (Collection) parent) {
-                            int i = 1;
-                            for (Object o : (Collection) child) {
-                                if (i == ordinal) {
-                                    tmp = o;
-                                }
-                                i++;
-                            }
-                        }
-                        parent = tmp;
-                    }
                     xpath = xpath.substring(xpath.indexOf('/') + 1);
                 }
 
                 // we update the metadata
-                final Object value = readValue(property);
+                final Node value = (Node) property.getValue();
 
                 //remove namespace on propertyName
                 final int separatorIndex = xpath.indexOf(':');
@@ -340,11 +287,11 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                     xpath = xpath.substring(separatorIndex + 1);
                 }
                 
-                updateObjects(parent, xpath, value);
+                updateObjects(nodes, xpath, value);
 
                 // we finish by updating the metadata.
                 deleteMetadata(metadataID);
-                storeMetadata(metadata);
+                storeMetadata(metadataDoc.getDocumentElement());
                 return true;
 
             }
@@ -352,33 +299,28 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         return false;
     }
 
-    /**
-     * temporary before node transform
-     * 
-     * @param property
-     * @return
-     * @throws MetadataIoException
-     * @deprecated
-     */
-    @Deprecated
-    private Object readValue(final RecordProperty property) throws MetadataIoException {
-        final Object value;
-        if (property.getValue() instanceof Node) {
-            if (property.getValue() instanceof Text) {
-                value = ((Text)property.getValue()).getTextContent();
+    private List<Element> getNodes(final String propertyName, List<Element> nodes, int ordinal) {
+        final List<Element> result = new ArrayList<>();
+        for (Element e : nodes) {
+            final List<Node> nl = getChilds(e, propertyName);
+            // add new node
+            if (nl.isEmpty()) {
+                final Element newNode = e.getOwnerDocument().createElementNS("TODO", propertyName);
+                e.appendChild(newNode);
+                result.add(newNode);
+                
+            // Select the node to update
             } else {
-                try {
-                    final Unmarshaller u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-                    value = u.unmarshal((Node)property.getValue());
-                    CSWMarshallerPool.getInstance().recycle(u);
-                } catch (JAXBException ex) {
-                    throw new MetadataIoException(ex);
+                for (int i = 0 ; i < nl.size(); i++) {
+                    if (ordinal == -1) {
+                        result.add((Element) nl.get(i));
+                    } else if (i == ordinal) {
+                        result.add((Element) nl.get(i));
+                    }
                 }
             }
-        } else {
-            value = property.getValue();
         }
-        return value;
+        return result;
     }
 
     /**
@@ -397,7 +339,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             if (propertyName.indexOf(']') != -1) {
                 try {
                     final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
-                    ordinal = Integer.parseInt(ordinalValue);
+                    ordinal = Integer.parseInt(ordinalValue) - 1;
                 } catch (NumberFormatException ex) {
                     throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
                 }
@@ -417,7 +359,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * 
      * @throws org.constellation.ws.MetadataIoException
      */
-    private void updateObjects(Object parent, String propertyName, Object value) throws MetadataIoException {
+    private void updateObjects(List<Element> nodes, String propertyName, Node value) throws MetadataIoException {
 
         Class parameterType = value.getClass();
         LOGGER.log(Level.FINER, "parameter type:{0}", parameterType);
@@ -428,33 +370,29 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             propertyName = propertyName.substring(0, propertyName.indexOf('['));
         }
 
-        //Special case for language
-        if (propertyName.equalsIgnoreCase("language")) {
-            parameterType = Locale.class;
-            if (value instanceof String) {
-                value = new Locale((String) value);
+        for (Element e : nodes) {
+            final List<Node> toUpdate = getChilds(e, propertyName);
+
+            // ADD
+            if (toUpdate.isEmpty()) {
+                final Node newNode = e.getOwnerDocument().createElementNS("TODO", propertyName);
+                final Node clone   = e.getOwnerDocument().importNode(value, true);
+                newNode.appendChild(clone);
+                e.appendChild(newNode);
+
+            // UPDATE
             } else {
-                throw new MetadataIoException("The value's type of the recordProperty does not match the specified property type language accept only string type",
-                        INVALID_PARAMETER_VALUE);
+                for (int i = 0; i < toUpdate.size(); i++) {
+                    if (ordinal == -1 || i == ordinal) {
+                        Node n = toUpdate.get(i);
+                        final Node firstChild = getFirstChild(n, value instanceof Text);
+                        if (firstChild != null) {
+                            final Node clone = n.getOwnerDocument().importNode(value, true);
+                            n.replaceChild(clone, firstChild);
+                        }
+                    }
+                }
             }
-        }
-
-        //Special case for dateStamp
-        if (propertyName.contains("date") && parameterType.equals(String.class)) {
-            parameterType = Date.class;
-            try {
-                value = TemporalUtilities.parseDate((String) value);
-            } catch (ParseException ex) {
-                throw new MetadataIoException("There service was unable to parse the date:" + value, INVALID_PARAMETER_VALUE);
-            }
-        }
-
-        if (parent instanceof Collection) {
-            for (Object single : (Collection) parent) {
-                updateObjects(single, fullPropertyName, value);
-            }
-        } else {
-            updateObject(propertyName, parent, value, parameterType, ordinal);
         }
     }
 
@@ -649,15 +587,57 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         if (metadataFile.exists()) {
             try {
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                    dbf.setNamespaceAware(true);
-                    DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-                    Document document = docBuilder.parse(metadataFile);
-                    return document;
+                dbf.setNamespaceAware(true);
+                DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+                Document document = docBuilder.parse(metadataFile);
+                return document;
             } catch (SAXException | IOException | ParserConfigurationException ex) {
                 throw new MetadataIoException("The metadataFile : " + identifier + ".xml can not be read\ncause: " + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
             }
         } else {
             throw new MetadataIoException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
         }
+    }
+
+    private Node getFirstChild(final Node n, final boolean isText) {
+        final NodeList nl = n.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            final Node child = nl.item(i);
+            if (isText || (!(child instanceof Text) && !(child instanceof Comment))) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    private List<Node> getChilds(final Node n, final String propertyName) {
+        final List<Node> results = new ArrayList<>();
+        final NodeList nl = n.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            final Node child = nl.item(i);
+            if (propertyName.equals(child.getLocalName())) {
+                results.add(child);
+            } /*else {
+                // we go down for one more level, to escape the typeNode
+                final NodeList nl2 = child.getChildNodes();
+                for (int j = 0; j < nl2.getLength(); j++) {
+                    final Node child2 = nl2.item(j);
+                    if (propertyName.equals(child2.getLocalName())) {
+                        results.add(child2);
+                    }
+                }
+            }*/
+        }
+        return results;
+    }
+
+    private static String getStringFromNode(final Node n) throws Exception {
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(n), new StreamResult(writer));
+        String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
+        return output;
     }
 }
