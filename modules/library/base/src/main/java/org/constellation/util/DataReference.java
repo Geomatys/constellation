@@ -45,7 +45,7 @@ import java.util.Date;
  * @author Johann Sorel (Geomatys)
  * @author Quentin Boileau (Geomatys).
  */
-public class DataReference implements CharSequence{
+public class DataReference implements CharSequence, Comparable<DataReference>{
 
     private static final String SEPARATOR = "|";
     /*
@@ -385,5 +385,10 @@ public class DataReference implements CharSequence{
         sb.append("dataVersion:\n").append(dataVersion).append('\n');
         return sb.toString();
     }
+
+	@Override
+	public int compareTo(DataReference o) {
+		return getReference().compareTo(o.getReference());
+	}
 
 }
