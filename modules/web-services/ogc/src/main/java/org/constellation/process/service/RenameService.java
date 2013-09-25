@@ -69,8 +69,6 @@ public class RenameService extends AbstractProcess {
             }
         }
         
-        // we stop the current worker
-        WSEngine.shutdownInstance(serviceType, identifier);
         if (serviceDirectory.isDirectory()) {
             final File instanceDirectory = new File(serviceDirectory, identifier);
             final File newDirectory = new File(serviceDirectory, newName);
@@ -78,6 +76,10 @@ public class RenameService extends AbstractProcess {
             if (instanceDirectory.isDirectory()) {
                 if (!newDirectory.exists()) {
                     if (instanceDirectory.renameTo(newDirectory)) {
+                        // we stop the current worker
+                        WSEngine.shutdownInstance(serviceType, identifier);
+
+                        // start the new one
                         final Class clazz   = WSEngine.getServiceWorkerClass(serviceType);
                         final Worker newWorker = (Worker) ReflectionUtilities.newInstance(clazz, newName, newDirectory);
 
