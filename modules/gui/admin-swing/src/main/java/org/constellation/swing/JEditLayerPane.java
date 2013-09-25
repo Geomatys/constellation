@@ -19,6 +19,7 @@ package org.constellation.swing;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -112,6 +113,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
         }
         
         guiLayerDataCBox.setModel(new ListComboBoxModel(providerList));
+        Collections.sort(styleList);
         guiLayerStyleCBox.setModel(new ListComboBoxModel(styleList));
         final ListCellRenderer renderer = new CBoxRenderer();
         guiLayerStyleCBox.setRenderer(renderer);
