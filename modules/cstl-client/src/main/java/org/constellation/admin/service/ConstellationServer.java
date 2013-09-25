@@ -20,6 +20,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.util.ArgumentChecks;
@@ -39,6 +40,7 @@ import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringTreeNode;
 import org.constellation.dto.DataDescription;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.dto.DataInformation;
@@ -1078,21 +1080,18 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * @param dataType data type (raster, vector or sensor)
          * @return true if file sent without problem
          */
-        public DataInformation uploadData(final File file, String name, String dataType){
+        public DataInformation uploadData(final File file, final DataMetadata metadata){
             //create form body part
             FormDataBodyPart fileBody = new FormDataBodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
-            FormDataBodyPart dataNameBody = new FormDataBodyPart(name, MediaType.TEXT_PLAIN_TYPE);
-            FormDataBodyPart dataTypeBody = new FormDataBodyPart(dataType, MediaType.TEXT_PLAIN_TYPE);
+            FormDataBodyPart metadataBody = new FormDataBodyPart(metadata, MediaType.APPLICATION_XML_TYPE);
 
 
             try {
                 // create content disposition do give file name on server
                 FormDataContentDisposition cdFile = new FormDataContentDisposition("form-data; name=\"file\"; filename=\""+file.getName()+"\"");
                 fileBody.setContentDisposition(cdFile);
-                FormDataContentDisposition cdDataName = new FormDataContentDisposition("form-data; name=\"name\"");
-                dataNameBody.setContentDisposition(cdDataName);
-                FormDataContentDisposition cdDataType = new FormDataContentDisposition("form-data; name=\"type\"");
-                dataTypeBody.setContentDisposition(cdDataType);
+                FormDataContentDisposition cdDataName = new FormDataContentDisposition("form-data; name=\"metadata\"");
+                metadataBody.setContentDisposition(cdDataName);
             } catch (ParseException e) {
                 LOGGER.log(Level.WARNING, "error on cd building", e);
                 return null;
@@ -1100,8 +1099,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
             MultiPart multi = new MultiPart();
             multi.bodyPart(fileBody);
-            multi.bodyPart(dataNameBody);
-            multi.bodyPart(dataTypeBody);
+            multi.bodyPart(metadataBody);
 
             // generate jersey client to send file
             Client c = Client.create();

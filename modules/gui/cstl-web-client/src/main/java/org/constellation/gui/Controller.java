@@ -35,6 +35,7 @@ import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.AddLayer;
 import org.constellation.dto.Contact;
 import org.constellation.dto.DataInformation;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
 import org.constellation.gui.service.InstanceSummary;
@@ -348,7 +349,7 @@ public class Controller {
      */
     @Resource
     @Route("/upload")
-    public Response upload(final FileItem file, final String name, final String dataType, final String returnURL) {
+    public Response upload(final FileItem file, final DataMetadata metadata, final String returnURL) {
         if (file != null) {
             DataInformation di = null;
             try {
@@ -367,7 +368,7 @@ public class Controller {
                     intVal = stream.read();
                 }
 
-                di = servicesManager.uploadToServer(newFile, name, dataType);
+                di = servicesManager.uploadToServer(newFile, metadata);
 
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "error when saving file on server", e);
@@ -376,7 +377,7 @@ public class Controller {
 
             informationContainer.setInformation(di);
             Response aResponse = Response.error("response not initialized");
-            switch (dataType) {
+            switch (metadata.getDataType()) {
                 case "raster":
                     aResponse = RasterController_.showRaster(returnURL);
                     break;

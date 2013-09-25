@@ -11,6 +11,7 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
 import org.constellation.dto.ParameterValues;
@@ -71,7 +72,7 @@ public class Data {
     public Response uploadFile(final MultiPart multi) {
 
 
-        String dataName = "";
+        DataMetadata metadata = new DataMetadata();
         String dataType = "";
         String extension = "";
         InputStream uploadedInputStream = null;
@@ -88,11 +89,8 @@ public class Data {
                     int extensionPoint = fileName.lastIndexOf('.');
                     extension = fileName.substring(extensionPoint);
                     break;
-                case "name":
-                    dataName = bodyPart.getEntityAs(String.class);
-                    break;
-                case "type":
-                    dataType = bodyPart.getEntityAs(String.class);
+                case "metadata":
+                    metadata = bodyPart.getEntityAs(DataMetadata.class);
                     break;
                 default:
                     LOGGER.log(Level.INFO, "property not use");
@@ -100,15 +98,15 @@ public class Data {
         }
 
 
-        String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath() + "/" + dataName;
-        String uploadedFileName = uploadedFileLocation + "/" + dataName + extension;
+        String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath() + "/" + metadata.getName();
+        String uploadedFileName = uploadedFileLocation + "/" + metadata.getName() + extension;
         DataInformation information;
 
         // save it
         try {
             File file = writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName);
-            information = generateMetadatasInformation(file, dataType);
-            information.setName(dataName);
+            information = generateMetadatasInformation(file, metadata);
+            information.setName(metadata.getName());
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when saving file", e);
             return Response.status(500).entity("upload file " + uploadedFileLocation + " is not saved").build();
@@ -176,7 +174,11 @@ public class Data {
         final File root = ConfigDirectory.getDataDirectory();
         final File choosingFile = new File(root, filePath);
         if(choosingFile.exists()){
-            DataInformation information = generateMetadatasInformation(choosingFile, dataType);
+            //TODO temporary empty DataMetadataobject : just dataType
+            final DataMetadata metadata = new DataMetadata();
+            metadata.setDataType(dataType);
+
+            DataInformation information = generateMetadatasInformation(choosingFile, metadata);
             return  Response.status(200).entity(information).build();
         }
         return Response.status(418).build();
@@ -222,11 +224,11 @@ public class Data {
      * Generate {@link DataInformation} for require file data
      *
      * @param file     data {@link File}
-     * @param dataType data type (raster, sensor or vector, ...)
+     * @param dataMetadata entry user metadata
      * @return a {@link DataInformation}
      */
-    private DataInformation generateMetadatasInformation(final File file, final String dataType) {
-        switch (dataType) {
+    private DataInformation generateMetadatasInformation(final File file, final DataMetadata dataMetadata) {
+        switch (dataMetadata.getDataType()) {
             case "raster":
                 try {
                     GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
@@ -234,12 +236,15 @@ public class Data {
 
                         // get Metadata as a List
                         final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
+
+                        //TODO add user Metadata
+
                         final TreeTable.Node rootNode = fileMetadata.asTreeTable().getRoot();
 
                         MetadataMapBuilder.setCounter(0);
                         final ArrayList<SimplyMetadataTreeNode> metadataList = MetadataMapBuilder.createMetadataList(rootNode, null, 11);
 
-                        final DataInformation information = new DataInformation(file.getPath(), dataType, metadataList);
+                        final DataInformation information = new DataInformation(file.getPath(), dataMetadata.getDataType(), metadataList);
 
                         //coverage data
                         final HashMap<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
@@ -272,7 +277,7 @@ public class Data {
                         final ShapefileFeatureStore shapeStore = new ShapefileFeatureStore(files[0].toURL());
                         final String crsName = shapeStore.getFeatureType().getCoordinateReferenceSystem().getName().toString();
                         final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), file.getParent(),
-                                dataType, crsName);
+                                dataMetadata.getDataType(), crsName);
                         return information;
                     }
 

@@ -20,6 +20,7 @@ import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.dto.DataInformation;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
 
@@ -189,8 +190,8 @@ public class  ServicesManager {
         return instancesSummary;
     }
 
-    public DataInformation uploadToServer(File newFile, String name, String dataType) {
-        return cstl.openServer().providers.uploadData(newFile, name, dataType);
+    public DataInformation uploadToServer(final File newFile, final DataMetadata metadata) {
+        return cstl.openServer().providers.uploadData(newFile, metadata);
     }
 
     public StyleListBean getStyleList() {
