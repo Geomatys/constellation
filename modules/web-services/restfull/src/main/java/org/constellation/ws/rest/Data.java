@@ -108,6 +108,7 @@ public class Data {
         try {
             File file = writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName);
             information = generateMetadatasInformation(file, dataType);
+            information.setName(dataName);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when saving file", e);
             return Response.status(500).entity("upload file " + uploadedFileLocation + " is not saved").build();

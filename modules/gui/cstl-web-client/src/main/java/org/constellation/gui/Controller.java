@@ -322,8 +322,9 @@ public class Controller {
 
         // Truncate the list.
         final List<LayerData> providers;
-        final int intStart = Integer.parseInt(start);
-        final int intCount = Integer.parseInt(count);
+
+        final int intStart = (start == null) ? 0 : Integer.parseInt(start);
+        final int intCount = (count == null) ? 10 : Integer.parseInt(count);
         if (!list.isEmpty() && intStart < list.size()) {
             final int endIndex = Math.min(list.size(), intStart + intCount);
             providers = list.subList(intStart, endIndex);

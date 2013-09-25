@@ -23,7 +23,6 @@ import org.apache.sis.util.Static;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
-import org.constellation.dto.DataType;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PortrayalContext;
 import org.constellation.dto.PropertyDescription;

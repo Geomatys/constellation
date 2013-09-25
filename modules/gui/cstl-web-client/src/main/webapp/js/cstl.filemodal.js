@@ -155,7 +155,8 @@ function updateChild(event){
             hideAll($parent);
             $nextChild.empty();
             $next = $nextChild;
-            $nextChild.jzLoad("DataController.getDataFolders()",{"path":$(this).data("path")}, addChildOperation);
+            var path = $(this).data("path");
+            $nextChild.jzLoad("DataController.getDataFolders()",{"path":path}, addChildOperation);
             showAll($domParent, nextLevel)
         }
     }else{
