@@ -42,7 +42,7 @@
 <%} else {%>
     <div class="item-list">
         <% for (def style : styles){%>
-            <div class="item style" data-style="${style.name}" data-provider="${style.providerId}">
+            <div class="item style" data-name="${style.name}" data-provider="${style.providerId}">
                 <div class="top">
                     <span class="item-title">${style.name}</span>
                 </div>

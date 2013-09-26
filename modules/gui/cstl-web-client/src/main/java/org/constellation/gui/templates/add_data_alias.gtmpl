@@ -1,18 +1,17 @@
-<div data-part="selectedData"></div>
-<br/>
+<div data-part="selectedData" class="item-list"></div>
 <div class="alert alert-info">
     &{adddata.popup.informations.subtitle.label}
 </div>
 <div>
-    <form class="form-horizontal" id="addLayerForm" action="@{addLayer()}" method="post">
-        <input type="hidden" id="providerId" name="providerId"/>
-        <input type="hidden" id="layerProviderId" name="layerProviderId"/>
-        <input type="hidden" id="styleName" name="styleName"/>
-        <input type="hidden" id="serviceId" name="serviceId" value="${service.identifier}"/>
+    <form class="form-horizontal" id="addLayerForm" action="@{addLayer(serviceId = service.identifier)}" method="post">
+        <input type="hidden" id="dataName" name="dataName" />
+        <input type="hidden" id="dataProvider" name="dataProvider" />
+        <input type="hidden" id="styleName" name="styleName" />
+        <input type="hidden" id="styleProvider" name="styleProvider" />
         <div class="control-group">
-            <label class="control-label" for="LayerName">&{adddata.popup.informations.name.label}</label>
+            <label class="control-label" for="layerAlias">&{adddata.popup.informations.name.label}</label>
             <div class="controls">
-                <input type="text" name="layerName" id="layerName" placeholder="Nom de la couche">
+                <input type="text" name="layerAlias" id="layerAlias" placeholder="Nom de la couche">
             </div>
         </div>
     </form>

@@ -15,8 +15,12 @@
                         <li class="divider-vertical"></li>
                     </ul>
                     <button type="button" data-role="reset" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
-                    <input type="text" data-role="search" class="search-query pull-right" placeholder="&{label.search}..." />
-                    <div class="ajax-loader pull-right"></div>
+                    <div class="pull-right">
+                        <div style="position:relative;">
+                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                            <input type="text" data-role="search" class="search-query" placeholder="&{label.search}..." />
+                        </div>
+                    </div>
                 </div>
             </div>
             <div data-role="list">
@@ -27,7 +31,7 @@
     <div class="pull-left" style="width:35%;">
         <div style="padding: 0 10px;">
             <div class="row-fluid">
-                <a href="#addModal" style="margin-bottom:10px;" role="button" class="btn btn-info span6" data-toggle="modal" onmousedown="loadData(0,10,'','');goToDataListing();">&{layer.listing.data.add.button.label}</a>
+                <a href="#addModal" style="margin-bottom:10px;" role="button" class="btn btn-info span6" data-toggle="modal" onmousedown="CSTL.AddLayerWorkflow.start();">&{layer.listing.data.add.button.label}</a>
                 <a href="#myModal" style="margin-bottom:10px;" role="button" class="btn btn-info span6" data-toggle="modal">&{layer.listing.data.create.button.label}</a>
             </div>
             <div class="alert alert-info">
@@ -38,9 +42,5 @@
     </div>
 </div>
 <script type="text/javascript">
-    new Dashboard({
-        $root:    $('#mapDashboard'),
-        loadFunc: 'Controller.generateDataList()',
-        params:   {serviceId:'${service.identifier}'}
-    });
+    CSTL.MapDashboard.init('${service.identifier}');
 </script>

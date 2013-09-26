@@ -59,8 +59,12 @@
                     <%}%>
                 </ul>
                 <button type="button" data-role="reset" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
-                <input type="text" data-role="search" class="search-query pull-right" placeholder="&{label.search}..." />
-                <div class="ajax-loader pull-right"></div>
+                <div class="pull-right">
+                    <div style="position:relative;">
+                        <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                        <input type="text" data-role="search" class="search-query" placeholder="&{label.search}..." />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row-fluid dash-inner">

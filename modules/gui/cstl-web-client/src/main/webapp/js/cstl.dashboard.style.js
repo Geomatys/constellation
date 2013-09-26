@@ -56,7 +56,7 @@ CSTL.StyleDashboard = {
 
     onSelect: function($elt) {
         $('[data-role="selected"]').jzLoad('StyleController.selectStyle()', {
-            name:       $elt.data('style'),
+            name:       $elt.data('name'),
             providerId: $elt.data('provider')
         }, function() {
             var $selected = CSTL.StyleDashboard.instance.$root.find('.selected-item');

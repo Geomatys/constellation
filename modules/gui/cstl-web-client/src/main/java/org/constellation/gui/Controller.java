@@ -260,7 +260,6 @@ public class Controller {
     public Response generateDataList(final String serviceId, final String start, final String count, final String orderBy,
                                      final String direction, final String filter) throws IOException {
         final LayerList listBean = mapManager.getLayers(serviceId);
-        final int nbResults = listBean.getLayer().size();
 
         // Search layers by name.
         if (!isBlank(filter)) {
@@ -272,6 +271,7 @@ public class Controller {
             }
             listBean.getLayer().removeAll(toRemove);
         }
+        final int nbResults = listBean.getLayer().size();
 
         // Sort layers by criteria.
         if (!StringUtils.isBlank(orderBy) && !StringUtils.isBlank(direction)) {
@@ -303,7 +303,6 @@ public class Controller {
     public Response getAvailableData(final List<String> dataTypes, final String start, final String count, final String orderBy,
                                      final String direction, final String filter) {
         final List<LayerData> list = providerManager.getDataListing(dataTypes);
-        final int nbResults = list.size();
 
         // Search layers by name.
         if (!isBlank(filter)) {
@@ -315,6 +314,7 @@ public class Controller {
             }
             list.removeAll(toRemove);
         }
+        final int nbResults = list.size();
 
         // Sort layers by criteria.
         if (!StringUtils.isBlank(orderBy) && !StringUtils.isBlank(direction)) {
@@ -402,8 +402,8 @@ public class Controller {
 
     @Action
     @Route("layer/add")
-    public Response addLayer(final String providerId, final String layerProviderId, final String styleName, final String layerName, final String serviceId) {
-        AddLayer toAddLayer = new AddLayer(layerName, "WMS", serviceId, providerId, layerProviderId, "sld", styleName);
+    public Response addLayer(final String layerAlias, final String dataName, final String dataProvider, final String styleName, final String styleProvider, final String serviceId) {
+        AddLayer toAddLayer = new AddLayer(layerAlias, "WMS", serviceId, dataProvider, dataName, styleProvider, styleName);
         providerManager.addLayer(toAddLayer);
         return MapController_.editMapService(serviceId, "wms");
     }

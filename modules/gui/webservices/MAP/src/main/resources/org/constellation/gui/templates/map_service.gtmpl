@@ -45,6 +45,10 @@
 
             <!-- Modals -->
             #{include path=add_data.gtmpl/}
+            <script type="text/javascript">
+                CSTL.AddLayerWorkflow.init();
+            </script>
+
             <form action="@{upload()}" enctype="multipart/form-data" method="post" style="margin:0;">
                 <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div class="modal-header">

@@ -8,7 +8,7 @@
 
     <!-- Constellation service configuration -->
     <bean class="java.net.URL" id="cstlUrl">
-        <constructor-arg type="java.lang.String" value="http://demo7.geomatys.com/constellation/" />
+        <constructor-arg type="java.lang.String" value="http://localhost:8080/constellation/" />
     </bean>
     <bean class="java.lang.String" id="cstlApiVersion">
         <constructor-arg type="java.lang.String" value="1" />

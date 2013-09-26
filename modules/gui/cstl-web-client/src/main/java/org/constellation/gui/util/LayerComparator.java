@@ -38,7 +38,7 @@ public class LayerComparator implements Comparator<Layer> {
         TITLE,
         DATE,
         OWNER,
-        DATA_TYPE;
+        TYPE;
 
         public static Criteria fromName(final String name) {
             if ("title".equalsIgnoreCase(name)) {
@@ -50,8 +50,8 @@ public class LayerComparator implements Comparator<Layer> {
             if ("owner".equalsIgnoreCase(name)) {
                 return OWNER;
             }
-            if ("dataType".equalsIgnoreCase(name)) {
-                return DATA_TYPE;
+            if ("type".equalsIgnoreCase(name)) {
+                return TYPE;
             }
             throw new IllegalArgumentException("Unknown sort criteria: \"" + name + "\".");
         }
@@ -96,7 +96,7 @@ public class LayerComparator implements Comparator<Layer> {
             case OWNER:
                 result = compareOwner(l1, l2);
                 break;
-            case DATA_TYPE:
+            case TYPE:
                 result = compareDataType(l1, l2);
                 break;
             default: return 0;

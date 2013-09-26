@@ -283,7 +283,6 @@ public final class StyleController {
     @Route("style/filter")
     public Response styleList(final String start, final String count, final String filter, final String orderBy, final String direction) throws IOException {
         final StyleListBean listBean = service.getStyleList();
-        final int nbResults = listBean.getStyles().size();
 
         // Search style by name.
         if (!isBlank(filter)) {
@@ -295,6 +294,7 @@ public final class StyleController {
             }
             listBean.getStyles().removeAll(toRemove);
         }
+        final int nbResults = listBean.getStyles().size();
 
         // Sort style by criteria.
         if (!isBlank(orderBy) && !isBlank(direction)) {

@@ -2,71 +2,44 @@
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="addModalLabel">&{adddata.popup.title}</h3>
-        </div>
-    <div class="modal-body" >
-        <div id="dataList">
+    </div>
+    <div class="modal-body">
+        <div id="dataList" class="dashboard">
             <div class="alert alert-info">
                 &{adddata.popup.datalist.subtitle.label}
             </div>
-            <div class="navbar">
-                <div class="navbar-inner">
+            <div class="navbar sort-navbar">
+                <div class="navbar-inner" style="border:1px solid #e3e3e3;padding-right:5px;">
                     <ul class="nav">
-                        <li><a href="#" data-order-by="title">&{layer.listing.orderby.title}<i class="icon-caret" style="display:none;"></i></a></li>
-                        <li><a href="#" data-order-by="date">&{layer.listing.orderby.date}<i class="icon-caret" style="display:none;"></i></a></li>
-                        <li><a href="#" data-order-by="owner">&{layer.listing.orderby.owner}<i class="icon-caret" style="display:none;"></i></a></li>
-                        <li><a href="#" data-order-by="type">&{layer.listing.orderby.type}<i class="icon-caret" style="display:none;"></i></a></li>
+                        <li><a href="#" data-order-by="title">&{label.title}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="date">&{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i> </a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="owner">&{label.owner}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="type">&{label.type}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
                     </ul>
-                    <form class="navbar-form pull-left">
-                        <button type="button" data-name="resetFilters" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
-                    </form>
-                    <form class="navbar-form pull-right">
-                        <input type="text" data-name="searchFilter" class="search-query span1" placeholder="Filtrer" />
-                    </form>
-                </div>
-            </div>
-            <div class="row">
-                <div class="span3">
-                    <div class="pagination" style="margin: 0px;">
-                        <ul data-name="paging">
-
-                        </ul>
+                    <button type="button" data-role="reset" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                    <div class="pull-right">
+                        <div style="position:relative;">
+                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                            <input type="text" data-role="search" class="search-query input-small" placeholder="&{label.search}..." />
+                        </div>
                     </div>
                 </div>
-                <div class="span2">
-                    <select class="span1 pull-right" data-name="nbLayersselect">
-                        <option value="10" selected="selected">&{layer.listing.numberbypage.10.label}</option>
-                        <option value="20">&{layer.listing.numberbypage.20.label}</option>
-                        <option value="100">&{layer.listing.numberbypage.100.label}</option>
-                    </select>
-                </div>
             </div>
-            <div data-name="datalist">
-            </div>
+            <div data-role="list"></div>
         </div>
-        <div id="dataName">
+        <div id="dataName" class="dashboard" style="display:none;">
             #{include path=add_data_alias.gtmpl/}
         </div>
-        <div id="styleList">
+        <div id="styleList" class="dashboard" style="display:none;">
             #{include path=add_data_style.gtmpl/}
         </div>
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>
-        <button class="btn btn-info" type="submit" id="continue">&{layer.listing.data.upload.continue.button}</button>
+        <button id="continue" class="btn btn-info" type="button" onclick="CSTL.AddLayerWorkflow.next($(this));">&{layer.listing.data.upload.continue.button}</button>
     </div>
-    <script type="text/javascript" language="JavaScript">
-        function loadData(startElement, counter, orderBy, filter, direction){
-                $('#dataList [data-name=datalist]').jzLoad("Controller.getAvailableData()",
-                        {
-                            "dataTypes": ['raster','vector'],
-                            "startElement":startElement,
-                            "counter":counter,
-                            "orderBy":orderBy,
-                            "filter":filter,
-                            "direction":direction
-                        },
-                        setPaginationDataPage);
-        }
-        var firstTime = 0;
-    </script>
 </div>
