@@ -6,6 +6,8 @@
 
     <context:property-placeholder location="classpath:/constellation.properties"/>
 
+    <context:annotation-config  />
+
     <!-- Constellation service configuration -->
     <bean class="java.net.URL" id="cstlUrl">
         <constructor-arg type="java.lang.String" value="http://demo7.geomatys.com/constellation/" />
