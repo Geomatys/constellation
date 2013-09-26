@@ -480,43 +480,43 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final MapItem mi = layer.getMapLayer(null, null);
                     applyLayerFiltersAndDims(mi, userLogin);
 
-                    if(mi instanceof FeatureMapLayer){
-                        final FeatureMapLayer fml = (FeatureMapLayer) mi;
-                        for(FeatureMapLayer.DimensionDef ddef : fml.getExtraDimensions()){
-                            final Collection<Range> collRefs = fml.getDimensionRange(ddef);
-                            // Transform it to a set in order to filter same values
-                            final Set<Range> refs = new HashSet<>();
-                            for (Range ref : collRefs) {
-                                refs.add(ref);
-                            }
-
-                            final StringBuilder values = new StringBuilder();
-                            int index = 0;
-                            for (final Range val : refs) {
-                                values.append(val.getMinValue());
-                                if(val.getMinValue().compareTo(val.getMaxValue()) != 0){
-                                    values.append('-');
-                                    values.append(val.getMaxValue());
+                    if (mi instanceof MapContext) {
+                        final MapContext mc = (MapContext)mi;
+                        final List<AbstractDimension> dimensionsToAdd = new ArrayList<AbstractDimension>();
+                        for (final MapLayer candidateLayer : mc.layers()) {
+                            if (candidateLayer instanceof FeatureMapLayer) {
+                                final FeatureMapLayer fml = (FeatureMapLayer)candidateLayer;
+                                final List<AbstractDimension> extraDimsToAdd = getExtraDimensions(fml, queryVersion);
+                                for (AbstractDimension newExtraDim : extraDimsToAdd) {
+                                    boolean exist = false;
+                                    for (AbstractDimension oldExtraDim : dimensionsToAdd) {
+                                        if (oldExtraDim.getName().equalsIgnoreCase(newExtraDim.getName())) {
+                                            mergeValues(oldExtraDim, newExtraDim);
+                                            exist = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!exist) {
+                                        dimensionsToAdd.add(newExtraDim);
+                                    }
                                 }
-                                if (index++ < refs.size()-1) {
-                                    values.append(",");
-                                }
                             }
+                        }
 
-                            final boolean multipleValues = (refs.size() > 1);
-                            final String unitSymbol = ddef.getCrs().getCoordinateSystem().getAxis(0).getUnit().toString();
-                            final String unit = unitSymbol;
-                            final String axisName = ddef.getCrs().getCoordinateSystem().getAxis(0).getName().getCode();
-                            final String defaut = "";
-
-                            dim = createDimension(queryVersion, values.toString(), axisName, unit,
-                                    unitSymbol, defaut, multipleValues, null, null);
-
-                            dimensions.add(dim);
+                        if (!dimensionsToAdd.isEmpty()) {
+                            dimensions.addAll(dimensionsToAdd);
                         }
                     }
 
-                } catch (PortrayalException | DataStoreException ex) {
+                    if(mi instanceof FeatureMapLayer){
+                        final FeatureMapLayer fml = (FeatureMapLayer) mi;
+                        dimensions.addAll(getExtraDimensions(fml, queryVersion));
+                    }
+
+                } catch (PortrayalException ex) {
+                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
+                    break;
+                } catch (DataStoreException ex) {
                     Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
                     break;
                 }
@@ -637,6 +637,116 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
         putCapabilitiesInCache(queryVersion, currentLanguage, inCapabilities);
         return inCapabilities;
+    }
+
+    /**
+     * Merge old and new values in the old dimension. Try to sort its values.
+     *
+     * @param oldExtraDim
+     * @param newExtraDim
+     */
+    private void mergeValues(final AbstractDimension oldExtraDim, final AbstractDimension newExtraDim) {
+        final Set<String> valsSet = new HashSet<String>();
+        final String oldVals = oldExtraDim.getValue();
+        final String[] oldValsSplit = oldVals.split(",");
+        for (final String o : oldValsSplit) {
+            valsSet.add(o);
+        }
+
+        final String newVals = newExtraDim.getValue();
+        final String[] newValsSplit = newVals.split(",");
+        for (final String n : newValsSplit) {
+            valsSet.add(n);
+        }
+
+        List<String> finalVals = new ArrayList<String>();
+        finalVals.addAll(valsSet);
+
+        if (finalVals.isEmpty()) {
+            return;
+        }
+
+        boolean isDoubleValues = false;
+        List<Double> finalValsDouble = null;
+        try {
+            Double.valueOf(finalVals.get(0));
+            // It is a double!
+            isDoubleValues = true;
+            finalValsDouble = new ArrayList<Double>();
+            for (String s : finalVals) {
+                finalValsDouble.add(Double.valueOf(s));
+            }
+        } catch (NumberFormatException ex) {
+        }
+
+        if (isDoubleValues) {
+            Collections.sort(finalValsDouble);
+            finalVals.clear();
+            for (Double d : finalValsDouble) {
+                finalVals.add(String.valueOf(d));
+            }
+        } else {
+            Collections.sort(finalVals);
+        }
+
+        final StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String val : finalVals) {
+            if (!first) {
+                sb.append(",");
+            }
+            sb.append(val);
+            first = false;
+        }
+        oldExtraDim.setValue(sb.toString());
+    }
+
+    /**
+     * Get extra dimensions from a {@link FeatureMapLayer}.
+     *
+     * @param fml {@link FeatureMapLayer}
+     * @param queryVersion Version of the request.
+     * @return A list of extra dimensions, never {@code null}
+     * @throws DataStoreException
+     */
+    private List<AbstractDimension> getExtraDimensions(final FeatureMapLayer fml, final String queryVersion) throws DataStoreException {
+        final List<AbstractDimension> dimensions = new ArrayList<AbstractDimension>();
+        for(FeatureMapLayer.DimensionDef ddef : fml.getExtraDimensions()){
+            final Collection<Range> collRefs = fml.getDimensionRange(ddef);
+            // Transform it to a set in order to filter same values
+            final Set<Range> refs = new HashSet<Range>();
+            for (Range ref : collRefs) {
+                refs.add(ref);
+            }
+
+            final StringBuilder values = new StringBuilder();
+            int index = 0;
+            for (final Range val : refs) {
+                values.append(val.getMinValue());
+                if(val.getMinValue().compareTo(val.getMaxValue()) != 0){
+                    values.append('-');
+                    values.append(val.getMaxValue());
+                }
+                if (index++ < refs.size()-1) {
+                    values.append(",");
+                }
+            }
+
+            final boolean multipleValues = (refs.size() > 1);
+            final String unitSymbol = ddef.getCrs().getCoordinateSystem().getAxis(0).getUnit().toString();
+            final String unit = unitSymbol;
+            final String axisName = ddef.getCrs().getCoordinateSystem().getAxis(0).getName().getCode();
+            final String defaut = "";
+
+            final AbstractDimension dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+                new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName, unit,
+                    unitSymbol, defaut, multipleValues, null, null) :
+                new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName, unit,
+                    unitSymbol, defaut, multipleValues, null, null);
+
+            dimensions.add(dim);
+        }
+        return dimensions;
     }
 
     /**
