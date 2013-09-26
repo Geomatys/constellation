@@ -1,100 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.constellation</groupId>
-        <artifactId>gui</artifactId>
-        <version>0.9-SNAPSHOT</version>
-    </parent>
-
-    <groupId>org.constellation.gui</groupId>
-    <artifactId>cstl-web-client</artifactId>
+  <parent>
+    <groupId>org.constellation</groupId>
+    <artifactId>gui</artifactId>
     <version>0.9-SNAPSHOT</version>
-    <packaging>jar</packaging>
+  </parent>
 
-    <name>Constellation web client</name>
+  <groupId>org.constellation.gui</groupId>
+  <artifactId>cstl-web-client</artifactId>
+
+  <packaging>jar</packaging>
+
+  <name>Constellation web client</name>
+
+  <properties>
+    <slf4j.version>1.6.4</slf4j.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <!-- <version>${slf4j.version}</version> -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <!-- <version>1.2.17</version> -->
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.constellation.gui</groupId>
+      <artifactId>common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-map</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- GUI parts -->
+    <dependency>
+      <groupId>org.constellation.gui</groupId>
+      <artifactId>administration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.gui</groupId>
+      <artifactId>MAP</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.gui</groupId>
+      <artifactId>style</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
 
 
-    <dependencies>
-        <dependency>
-            <groupId>org.constellation.gui</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.constellation.web-services</groupId>
-            <artifactId>cstl-web-map</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
 
-        <!-- GUI parts -->
-        <dependency>
-            <groupId>org.constellation.gui</groupId>
-            <artifactId>administration</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.constellation.gui</groupId>
-            <artifactId>MAP</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.constellation.gui</groupId>
-            <artifactId>style</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+  </dependencies>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-    </dependencies>
+  <build>
+    <finalName>cstl-web-client</finalName>
 
-    <build>
-        <finalName>cstl-web-client</finalName>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <compilerArguments>
-                        <sourcepath>${project.basedir}/src/main/java</sourcepath>
-                    </compilerArguments>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.3</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.juzu</groupId>
-                        <artifactId>juzu-bom-core</artifactId>
-                        <version>${juzu.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <attach>true</attach>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <finalName>${project.build.finalName}</finalName>
-                            <descriptorRefs>
-                                <descriptorRef>tomcat</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <filters>
+      <filter>src/main/filter/default.properties</filter>
+    </filters>
+
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <!-- <version>2.3.2</version> -->
+        <configuration>
+          <compilerArguments>
+            <sourcepath>${project.basedir}/src/main/java</sourcepath>
+          </compilerArguments>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.3</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.juzu</groupId>
+            <artifactId>juzu-bom-core</artifactId>
+            <version>${juzu.version}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <attach>true</attach>
+          <appendAssemblyId>false</appendAssemblyId>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <finalName>${project.build.finalName}</finalName>
+              <descriptorRefs>
+                <descriptorRef>tomcat</descriptorRef>
+              </descriptorRefs>
+              <filters>
+               <filter>src/main/filter/default.properties</filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
