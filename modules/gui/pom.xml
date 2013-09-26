@@ -41,41 +41,33 @@
         </developer>
     </developers>
 
-    <properties>
-        <juzu.version>0.7.0-beta20-SNAPSHOT</juzu.version>
-    </properties>
+
     <dependencies>
         <!-- Application dependencies-->
         <dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-bom-core</artifactId>
-            <version>${juzu.version}</version>
         </dependency>
         <dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-plugins-servlet</artifactId>
-            <version>${juzu.version}</version>
         </dependency>
         <dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-plugins-less</artifactId>
-            <version>${juzu.version}</version>
         </dependency>
         <dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-plugins-upload</artifactId>
-            <version>${juzu.version}</version>
         </dependency>
         <dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-bom-arquillian</artifactId>
-            <version>${juzu.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-bom-arquillian-tomcat7</artifactId>
-            <version>${juzu.version}</version>
             <scope>test</scope>
         </dependency>
 
