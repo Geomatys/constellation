@@ -317,6 +317,14 @@ public class CSWworker extends AbstractWorker {
         mdReader                      = cswfactory.getMetadataReader(configuration);
         profile                       = configuration.getProfile();
         final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID, mdReader.getAdditionalQueryablePathMap());
+        if (indexer.needCreation()) {
+            try {
+                indexer.createIndex();
+            } catch (Exception ex) {
+                indexer.destroy();
+                throw ex;
+            }
+        }
         indexSearcher                 = cswfactory.getIndexSearcher(configDir, serviceID);
         luceneFilterParser            = cswfactory.getLuceneFilterParser();
         sqlFilterParser               = cswfactory.getSQLFilterParser();
@@ -1193,6 +1201,13 @@ public class CSWworker extends AbstractWorker {
         List<QName> typeNames = (List<QName>)request.getTypeName();
         if (typeNames == null || typeNames.isEmpty()) {
             typeNames = supportedTypeNames;
+        } else {
+            for (QName typeName : typeNames) {
+                if (typeName.getNamespaceURI() == null || typeName.getNamespaceURI().isEmpty()) {
+                    throw new CstlServiceException("The typeName must be qualified: " + typeName,
+                                          INVALID_PARAMETER_VALUE, "typeName");
+                }
+            }
         }
 
         // we initialize the schema language

@@ -82,10 +82,11 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param serviceID The identifier, if there is one, of the index/service.
      * @param additionalQueryable A map of additional queryable element.
      */
-    public GenericIndexer(final MetadataReader reader, final File configurationDirectory, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
+    public GenericIndexer(final MetadataReader reader, final File configurationDirectory, final String serviceID, 
+            final Map<String, List<String>> additionalQueryable, final boolean create) throws IndexingException {
         super(serviceID, configurationDirectory, additionalQueryable);
         this.reader = reader;
-        if (create) {
+        if (create && needCreation()) {
             createIndex();
         }
     }
@@ -96,11 +97,11 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param configDirectory A directory where the index can write indexation file.
      */
     public GenericIndexer(final List<Object> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory,
-            final String serviceID, final Analyzer analyzer, final Level logLevel) throws IndexingException {
+            final String serviceID, final Analyzer analyzer, final Level logLevel, final boolean create) throws IndexingException {
         super(serviceID, configDirectory, analyzer, additionalQueryable);
         this.logLevel            = logLevel;
         this.reader              = null;
-        if (create) {
+        if (create && needCreation()) {
             createIndex(toIndex);
         }
     }
@@ -111,10 +112,10 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param configDirectory A directory where the index can write indexation file.
      */
     public GenericIndexer(final List<Object> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory,
-            final String serviceID) throws IndexingException {
+            final String serviceID, final boolean create) throws IndexingException {
         super(serviceID, configDirectory, additionalQueryable);
         this.reader = null;
-        if (create) {
+        if (create && needCreation()) {
             createIndex(toIndex);
         }
     }
@@ -208,7 +209,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     @Override
     protected void indexQueryableSet(final Document doc, final Object metadata,final  Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
-        final CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
+        final CompletionService<TermValue> cs = new BoundedCompletionService<>(this.pool, 5);
         for (final String term :queryableSet.keySet()) {
             cs.submit(new Callable<TermValue>() {
 
@@ -239,7 +240,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     private TermValue formatStringValue(final TermValue values) {
          if ("date".equals(values.term)) {
-             final List<Object> newValues = new ArrayList<Object>();
+             final List<Object> newValues = new ArrayList<>();
              for (Object value : values.value) {
                  if (value instanceof String) {
                      String stringValue = (String) value;
@@ -302,7 +303,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @return
      */
     public static List<Object> extractValues(final Object metadata, final List<String> paths) {
-        final List<Object> response  = new ArrayList<Object>();
+        final List<Object> response  = new ArrayList<>();
 
         if (paths != null) {
             for (String fullPathID: paths) {
@@ -364,7 +365,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @return
      */
     private static List<Object> getStringValue(final Object obj) {
-        final List<Object> result = new ArrayList<Object>();
+        final List<Object> result = new ArrayList<>();
         if (obj == null) {
             result.add(NULL_VALUE);
         } else if (obj instanceof String) {

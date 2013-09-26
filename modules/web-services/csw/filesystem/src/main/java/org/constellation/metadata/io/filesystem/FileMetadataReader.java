@@ -95,6 +95,7 @@ import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.NullArgumentException;
 import org.apache.sis.xml.MarshallerPool;
 
 import org.w3c.dom.Document;
@@ -271,7 +272,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                     addInCache(identifier, metadata);
                 }
                 return metadata;
-            } catch (JAXBException | IllegalArgumentException ex) {
+            } catch (JAXBException | IllegalArgumentException | NullArgumentException ex) {
                 throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             }

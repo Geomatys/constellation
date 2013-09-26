@@ -67,7 +67,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
      * @param configuration A configuration object containing the database informations.Must not be null.
      * @param serviceID  The identifier, if there is one, of the index/service.
      */
-    public LuceneObservationIndexer(Automatic configuration, String serviceID) throws IndexingException {
+    public LuceneObservationIndexer(final Automatic configuration, final String serviceID, final boolean create) throws IndexingException {
         super(serviceID, configuration.getConfigurationDirectory(), new WhitespaceAnalyzer(Version.LUCENE_40));
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
@@ -82,7 +82,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
         } else {
             throw new IndexingException("The data directory does not exist: ");
         }
-        if (create) {
+        if (create && needCreation()) {
             createIndex();
         }
     }

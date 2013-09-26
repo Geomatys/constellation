@@ -95,7 +95,7 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public AbstractIndexer getIndexer(final Automatic configuration, final MetadataReader reader, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
-        return new GenericIndexer(reader, configuration.getConfigurationDirectory(), serviceID, additionalQueryable);
+        return new GenericIndexer(reader, configuration.getConfigurationDirectory(), serviceID, additionalQueryable, false);
     }
     
     /**

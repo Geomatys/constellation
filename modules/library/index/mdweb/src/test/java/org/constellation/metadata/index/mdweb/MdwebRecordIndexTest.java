@@ -126,7 +126,7 @@ public class MdwebRecordIndexTest {
         final Automatic configuration = new Automatic("mdweb", bdd);
         configuration.setConfigurationDirectory(configDirectory);
 
-        final MDWebIndexer indexer    = new MDWebIndexer(configuration, "");
+        final MDWebIndexer indexer    = new MDWebIndexer(configuration, "", true);
         indexSearcher                   = new LuceneIndexSearcher(configDirectory, "", null, true);
         indexSearcher.setLogLevel(LOG_LEVEL);
     }

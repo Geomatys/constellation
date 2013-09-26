@@ -102,7 +102,7 @@ public class FileObservationWriter implements ObservationWriter {
             throw new CstlServiceException("JAXB exception while initializing the file observation reader", NO_APPLICABLE_CODE);
         }
         try {
-            indexer        = new LuceneObservationIndexer(configuration, "");
+            indexer        = new LuceneObservationIndexer(configuration, "", true);
         } catch (IndexingException ex) {
             throw new CstlServiceException("Indexing exception while initializing the file observation reader", ex, NO_APPLICABLE_CODE);
         }

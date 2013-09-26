@@ -485,8 +485,11 @@ public class CSWConfigurationManager {
                 if (currentReader == null) {
                     currentReader = cswfactory.getMetadataReader(config);
                 }
-                return cswfactory.getIndexer(config, currentReader, "", currentReader.getAdditionalQueryablePathMap());
-
+                final AbstractIndexer indexer = cswfactory.getIndexer(config, currentReader, "", currentReader.getAdditionalQueryablePathMap());
+                if (indexer.needCreation()) {
+                    indexer.createIndex();
+                }
+                return indexer;
             } catch (Exception ex) {
                 throw new ConfigurationException("An exception occurs while initializing the indexer!\ncause:" + ex.getMessage());
             }

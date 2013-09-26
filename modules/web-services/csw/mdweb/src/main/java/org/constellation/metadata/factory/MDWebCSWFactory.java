@@ -94,7 +94,7 @@ public class MDWebCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public AbstractIndexer getIndexer(final Automatic configuration, final MetadataReader reader, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
-        return new MDWebIndexer(configuration, serviceID);
+        return new MDWebIndexer(configuration, serviceID, false);
     }
     
     /**

@@ -58,7 +58,7 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
     public static void setUpClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new ClassicAnalyzer(Version.LUCENE_40), Level.FINER);
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new ClassicAnalyzer(Version.LUCENE_40), Level.FINER, true);
         indexer.destroy();
         indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new ClassicAnalyzer(Version.LUCENE_40), true);
         indexSearcher.setLogLevel(Level.FINER);

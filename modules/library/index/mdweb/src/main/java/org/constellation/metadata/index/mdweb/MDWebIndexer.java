@@ -88,8 +88,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
 
     private final boolean indexExternalRecordset;
 
-    public MDWebIndexer(final Automatic configuration, final String serviceID) throws IndexingException {
-        this(configuration, serviceID, INSPIRE_QUERYABLE);
+    public MDWebIndexer(final Automatic configuration, final String serviceID, final boolean create) throws IndexingException {
+        this(configuration, serviceID, INSPIRE_QUERYABLE, create);
     }
 
     /**
@@ -98,7 +98,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
      * @param configuration A configuration object containing the database informations. Must not be null.
      * @param serviceID The identifier, if there is one, of the index/service.
      */
-    public MDWebIndexer(final Automatic configuration, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
+    public MDWebIndexer(final Automatic configuration, final String serviceID, final Map<String, List<String>> additionalQueryable, final boolean create) throws IndexingException {
         super(serviceID, configuration.getConfigurationDirectory(), additionalQueryable);
 
         this.indexOnlyPusblishedMetadata = configuration.getIndexOnlyPublishedMetadata();
@@ -125,7 +125,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
                 mdWebReader                 = factory.getReaderInstance(dataSource, isPostgres);
                 mdWebReader.setProperty("readProfile", false);
                 initEbrimClasses();
-                if (create) {
+                if (create && needCreation()) {
                     createIndex();
                 }
             } else {
@@ -156,7 +156,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
         try {
             // getting the objects list and index avery item in the IndexWriter.
             final List<RecordSet> cats = mdWebReader.getRecordSets();
-            final List<RecordSet> catToIndex = new ArrayList<RecordSet>();
+            final List<RecordSet> catToIndex = new ArrayList<>();
             for (RecordSet r : cats) {
                 if (indexInternalRecordset) {
                     if (r.getExposure() == EXPOSURE.INTERNAL) {
@@ -314,7 +314,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
     }
 
     protected List<Object> getValuesList(final FullRecord record, final List<String> paths) throws IndexingException {
-        final List<Object> response  = new ArrayList<Object>();
+        final List<Object> response  = new ArrayList<>();
         if (paths != null) {
             for (String fullPathID: paths) {
                 try {
@@ -418,7 +418,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
         if (conditionalPathID == null) {
             values = record.getValueFromPath(pathID);
             if (ordinal != -1) {
-                final List<Value> toRemove = new ArrayList<Value>();
+                final List<Value> toRemove = new ArrayList<>();
                 for (Value v : values) {
                     if (v.getOrdinal() != ordinal) {
                         toRemove.add(v);
@@ -432,7 +432,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
             if (v != null) {
                 values = Collections.singletonList(v);
             } else {
-                values = new ArrayList<Value>();
+                values = new ArrayList<>();
             }
         }
         return values;

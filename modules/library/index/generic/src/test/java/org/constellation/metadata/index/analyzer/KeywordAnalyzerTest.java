@@ -57,7 +57,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
     public static void setUpClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new KeywordAnalyzer(), Level.FINER);
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new KeywordAnalyzer(), Level.FINER, true);
         indexer.destroy();
 
         indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new KeywordAnalyzer(), true);

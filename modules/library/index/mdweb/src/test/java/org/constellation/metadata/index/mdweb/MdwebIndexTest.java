@@ -121,7 +121,7 @@ public class MdwebIndexTest {
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
         Automatic configuration = new Automatic("mdweb", bdd);
         configuration.setConfigurationDirectory(configDirectory);
-        indexer                 = new MDWebIndexer(configuration, "");
+        indexer                 = new MDWebIndexer(configuration, "", true);
         indexSearcher           = new LuceneIndexSearcher(configDirectory, "", null, true);
         indexer.setLogLevel(Level.FINER);
         indexSearcher.setLogLevel(Level.FINER);

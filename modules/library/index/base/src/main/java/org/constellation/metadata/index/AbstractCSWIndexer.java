@@ -71,7 +71,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         if (additionalQueryable != null) {
             this.additionalQueryable = additionalQueryable;
         } else {
-            this.additionalQueryable = new HashMap<String, List<String>>();
+            this.additionalQueryable = new HashMap<>();
         }
     }
 
@@ -88,7 +88,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         if (additionalQueryable != null) {
             this.additionalQueryable = additionalQueryable;
         } else {
-            this.additionalQueryable = new HashMap<String, List<String>>();
+            this.additionalQueryable = new HashMap<>();
         }
     }
 
@@ -165,7 +165,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      * @param queryableSet
      */
     private Map<String, List<String>> removeOverridenField(Map<String, List<String>> queryableSet) {
-        Map<String, List<String>> result = new HashMap<String, List<String>>();
+        Map<String, List<String>> result = new HashMap<>();
         for (Entry<String, List<String>> entry : queryableSet.entrySet()) {
             if (!additionalQueryable.containsKey(entry.getKey())) {
                 result.put(entry.getKey(), entry.getValue());
@@ -323,7 +323,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     private List<Double> extractPositions(A metadata, List<String> paths) throws IndexingException {
         final String coord            = getValues(metadata, paths);
         final StringTokenizer tokens  = new StringTokenizer(coord, ",;");
-        final List<Double> coordinate = new ArrayList<Double>(tokens.countTokens());
+        final List<Double> coordinate = new ArrayList<>(tokens.countTokens());
         try {
             while (tokens.hasMoreTokens()) {
                 coordinate.add(Double.parseDouble(tokens.nextToken()));
