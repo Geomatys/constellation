@@ -46,7 +46,7 @@ CSTL.StyleDashboard = {
 
             // There is a selected item, check if this item exists in the new list.
             var $item = this.instance.$itemList.
-                find('[data-style="' + $selected.data('style') + '"]').
+                find('[data-name="' + $selected.data('name') + '"]').
                 filter('[data-provider="' + $selected.data('provider') + '"]');
 
             // If item exists in new list keep it selected otherwise cancel it.
