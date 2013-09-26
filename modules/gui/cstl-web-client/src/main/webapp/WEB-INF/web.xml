@@ -5,12 +5,25 @@
          version="3.0">
 
     <context-param>
-        <param-name>juzu.run_mode</param-name>
-        <param-value>live</param-value>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/applicationContext.xml</param-value>
     </context-param>
+
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+
+    </listener>
+    <listener>
+        <listener-class>
+            org.springframework.web.context.request.RequestContextListener
+        </listener-class>
+    </listener>
+
     <context-param>
-        <param-name>juzu.src_path</param-name>
-        <param-value>/home/geomatys/projects/geomatys/oss-clone-for-projects/cstl/modules/gui/cstl-web-client/src/main/java/</param-value>
+        <param-name>juzu.run_mode</param-name>
+        <param-value>prod</param-value>
     </context-param>
     <context-param>
         <param-name>juzu.inject</param-name>
