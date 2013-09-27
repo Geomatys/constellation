@@ -31,6 +31,10 @@ import org.constellation.util.ReflectionUtilities;
 import org.apache.sis.util.Classes;
 import org.apache.sis.util.logging.Logging;
 import org.opengis.util.InternationalString;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Utility methods used in CSW object.
@@ -70,7 +74,7 @@ public final class Utils {
         //here we try to get the title
         String title = UNKNOW_TITLE;
 
-        final List<String> paths = new ArrayList<String>();
+        final List<String> paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title");
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
@@ -125,7 +129,7 @@ public final class Utils {
         //here we try to get the title
         String standardName = null;
 
-        final List<String> paths = new ArrayList<String>();
+        final List<String> paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:metadataStandardName");
         paths.add("ISO 19115-2:MI_Metadata:metadataStandardName");
         paths.add("ISO 19115:CI_ResponsibleParty:xLink:href");
@@ -153,9 +157,12 @@ public final class Utils {
      */
     public static String findIdentifier(final Object obj) {
 
+        if (obj instanceof Node) {
+            return findIdentifierNode((Node)obj);
+        }
         String identifier = UNKNOW_IDENTIFIER;
 
-        final List<String> paths = new ArrayList<String>();
+        final List<String> paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
         paths.add("ISO 19115:CI_ResponsibleParty:individualName");
@@ -203,7 +210,7 @@ public final class Utils {
      */
     public static void setIdentifier(final String identifier, final Object object) {
 
-        final List<String> paths = new ArrayList<String>();
+        final List<String> paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
         paths.add("ISO 19115:CI_ResponsibleParty:organisationName");
@@ -327,7 +334,7 @@ public final class Utils {
      */
     public static void setTitle(final String title, final Object object) {
 
-        final List<String> paths = new ArrayList<String>();
+        final List<String> paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo[org.apache.sis.metadata.iso.identification.DefaultDataIdentification]:citation[org.apache.sis.metadata.iso.citation.DefaultCitation]:title");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo[org.apache.sis.metadata.iso.identification.DefaultDataIdentification]:citation[org.apache.sis.metadata.iso.citation.DefaultCitation]:title");
         //paths.add("ISO 19115:CI_ResponsibleParty:individualName");
@@ -451,5 +458,85 @@ public final class Utils {
             }
         }
 
+    }
+
+    /**
+     * This method try to find an identifier for this Document Node.
+     *
+     * @param obj the object for which we want a identifier.
+     *
+     * @return the founded identifier or UNKNOW_IDENTIFIER
+     */
+    private static String findIdentifierNode(final Node node) {
+
+        final List<String> paths = new ArrayList<>();
+        paths.add("MD_Metadata/fileIdentifier/CharacterString");
+        paths.add("MI_Metadata/fileIdentifier/CharacterString");
+        paths.add("CI_ResponsibleParty/individualName/CharacterString");
+        paths.add("CI_ResponsibleParty/organisationName/CharacterString");
+        paths.add("Record/identifier");
+        paths.add("SensorML/member/System/@gml:id");
+        paths.add("SensorML/member/Component/@gml:id");
+        paths.add("*/@id");
+
+        for (String path : paths) {
+            final String[] parts = path.split("/");
+            if (parts[0].equals(node.getLocalName()) || parts[0].equals("*")) {
+                List<Node> nodes = Arrays.asList(node);
+                for (int i = 1; i < parts.length; i++) {
+                    nodes = getNodes(parts[i], nodes, -1, false);
+                    if (nodes.isEmpty()) {
+                        break;
+                    }
+                }
+                if (!nodes.isEmpty()) {
+                    return nodes.get(0).getTextContent();
+                }
+            }
+        }
+        return UNKNOW_IDENTIFIER;
+    }
+
+    public static List<Node> getNodes(final String propertyName, final List<Node> nodes, final int ordinal, final boolean create) {
+        final List<Node> result = new ArrayList<>();
+        for (Node e : nodes) {
+            final List<Node> nl = getChilds(e, propertyName);
+            // add new node
+            if (nl.isEmpty() && create) {
+                final Element newNode = e.getOwnerDocument().createElementNS("TODO", propertyName);
+                e.appendChild(newNode);
+                result.add(newNode);
+
+            // Select the node to update
+            } else {
+                for (int i = 0 ; i < nl.size(); i++) {
+                    if (ordinal == -1) {
+                        result.add(nl.get(i));
+                    } else if (i == ordinal) {
+                        result.add(nl.get(i));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<Node> getChilds(final Node n, final String propertyName) {
+        final List<Node> results = new ArrayList<>();
+        if (propertyName.startsWith("@")) {
+            final Node att = n.getAttributes().getNamedItem(propertyName.substring(1));
+            if (att != null) {
+                results.add(att);
+            }
+        } else {
+            final NodeList nl = n.getChildNodes();
+            for (int i = 0; i < nl.getLength(); i++) {
+                final Node child = nl.item(i);
+                if (propertyName.equals(child.getLocalName())) {
+                    results.add(child);
+                }
+            }
+        }
+        return results;
     }
 }

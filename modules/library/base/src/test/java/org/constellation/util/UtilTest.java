@@ -113,12 +113,12 @@ public class UtilTest {
     @Test
     public void cleanCharSequencesTest() throws Exception {
 
-        List<String> dirtys = new ArrayList<String>();
+        List<String> dirtys = new ArrayList<>();
         dirtys.add("\t blabla              truc machin");
         dirtys.add("  boouu         \n   tc   \n mach");
         dirtys.add("                                 bcbcbcbcbcbcbcbcbc\n");
 
-        List<String> expResults = new ArrayList<String>();
+        List<String> expResults = new ArrayList<>();
         expResults.add("blablatrucmachin");
         expResults.add("boouutcmach");
         expResults.add("bcbcbcbcbcbcbcbcbc");
@@ -133,28 +133,28 @@ public class UtilTest {
      */
     @Test
     public void matchesStringfromListTest() throws Exception {
-        List<String> dirtys = new ArrayList<String>();
+        List<String> dirtys = new ArrayList<>();
         dirtys.add("whatever");
         dirtys.add("SOMeTHING");
         dirtys.add("oTher");
 
         assertTrue(StringUtilities.matchesStringfromList(dirtys, "something"));
 
-        dirtys = new ArrayList<String>();
+        dirtys = new ArrayList<>();
         dirtys.add("whatever");
         dirtys.add("oTher");
         dirtys.add("SOMeTHING and other things");
 
         assertTrue(StringUtilities.matchesStringfromList(dirtys, "something"));
 
-        dirtys = new ArrayList<String>();
+        dirtys = new ArrayList<>();
         dirtys.add("whatever");
         dirtys.add("oTher");
         dirtys.add("SOMeTHING and other things");
 
         assertTrue(StringUtilities.matchesStringfromList(dirtys, "othe"));
 
-        dirtys = new ArrayList<String>();
+        dirtys = new ArrayList<>();
         dirtys.add("whatever");
         dirtys.add("oTher");
         dirtys.add("SOMeTHING and other things");
@@ -225,7 +225,7 @@ public class UtilTest {
         String s3 = "zebre";
         String s4 = "alabama";
         String s5 = "horrible";
-        List<String> toSort = new ArrayList<String>();
+        List<String> toSort = new ArrayList<>();
         toSort.add(s1);
         toSort.add(s2);
         toSort.add(s3);
@@ -234,7 +234,7 @@ public class UtilTest {
 
         Collections.sort(toSort);
 
-        List<String> expResult = new ArrayList<String>();
+        List<String> expResult = new ArrayList<>();
         expResult.add(s4);
         expResult.add(s2);
         expResult.add(s1);
@@ -249,7 +249,7 @@ public class UtilTest {
      */
     @Test
     public void toCommaSeparatedValuesTest() throws Exception {
-        List<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<>();
         l.add("par");
         l.add("le");
         l.add("pouvoir");
@@ -268,7 +268,7 @@ public class UtilTest {
     @Test
     public void toStringListTest() throws Exception {
         List<String> result    = StringUtilities.toStringList("par,le,pouvoir,de,la,lune");
-        List<String> expResult = new ArrayList<String>();
+        List<String> expResult = new ArrayList<>();
         expResult.add("par");
         expResult.add("le");
         expResult.add("pouvoir");
@@ -283,7 +283,7 @@ public class UtilTest {
      */
     @Test
     public void ContainsMatchTest() throws Exception {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("par");
         list.add("le tres grand ");
         list.add("pouvoir magique ");
@@ -303,7 +303,7 @@ public class UtilTest {
      */
     @Test
     public void ContainsIgnoreCaseTest() throws Exception {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("par");
         list.add("le tres grand ");
         list.add("pouvoir magique ");

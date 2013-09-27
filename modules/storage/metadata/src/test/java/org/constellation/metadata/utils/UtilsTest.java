@@ -26,6 +26,9 @@ import org.apache.sis.util.iso.DefaultInternationalString;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.geotoolkit.sml.xml.v100.ComponentType;
 import java.util.Arrays;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.constellation.util.Util;
 
 // geotoolkit dependencies
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
@@ -42,6 +45,8 @@ import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * Test the utilities class org.constellation.metadata.utils.utils from the storage-metadata.
@@ -847,7 +852,7 @@ public class UtilsTest {
 
         Utils.setIdentifier("newidC", smlC);
 
-        assertEquals("newidC", smlC.getMember().get(0).getProcess().getValue().getId());;
+        assertEquals("newidC", smlC.getMember().get(0).getProcess().getValue().getId());
 
 
         /*
@@ -896,7 +901,7 @@ public class UtilsTest {
 
         Utils.setTitle("newidC", smlC);
 
-        assertEquals("newidC", smlC.getMember().get(0).getProcess().getValue().getId());;
+        assertEquals("newidC", smlC.getMember().get(0).getProcess().getValue().getId());
 
 
         /*
@@ -922,5 +927,134 @@ public class UtilsTest {
         Utils.setTitle("newidC-101", smlC1);
 
         assertEquals("newidC-101", smlC1.getMember().get(0).getProcess().getValue().getId());
+    }
+
+    @Test
+    public void findIdentifierDCNodeTest() throws Exception {
+
+        /*
+         * DublinCore Record v202 with identifier
+         */
+        Node n = getOriginalMetadata("org/constellation/xml/metadata/meta8.xml");
+
+        String expResult = "urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd";
+        String result = Utils.findIdentifier(n);
+
+        assertEquals(expResult, result);
+
+        /*
+         * DublinCore Record v202 without identifier
+         */
+        n = getOriginalMetadata("org/constellation/xml/metadata/dcNoIdent.xml");
+
+
+        expResult = "unknow_identifier";
+        result = Utils.findIdentifier(n);
+
+        assertEquals(expResult, result);
+    }
+
+    @Test
+    public void findIdentifierISO19115NodeTest() throws Exception {
+        /*
+         * ISO 19139 Metadata
+         */
+        Node n = getOriginalMetadata("org/constellation/xml/metadata/meta1.xml");
+
+        String expResult = "42292_5p_19900609195600";
+        String result = Utils.findIdentifier(n);
+        assertEquals(expResult, result);
+
+        /*
+         * ISO 19139 Metadata with no identifier
+         */
+        n = getOriginalMetadata("org/constellation/xml/metadata/isoNoIdent.xml");
+
+        expResult = "unknow_identifier";
+        result = Utils.findIdentifier(n);
+        assertEquals(expResult, result);
+
+        /*
+         * Responsible party
+         */
+        n = getOriginalMetadata("org/constellation/xml/metadata/contact1.xml");
+
+        expResult = "IFREMER / IDM/SISMER";
+        result = Utils.findIdentifier(n);
+        assertEquals(expResult, result);
+
+
+        n = getOriginalMetadata("org/constellation/xml/metadata/contact2.xml");
+
+        expResult = "michel";
+        result = Utils.findIdentifier(n);
+        assertEquals(expResult, result);
+    }
+
+
+    @Test
+    public void findIdentifierISO19110NodeTest() throws Exception {
+        Node n = getOriginalMetadata("org/constellation/xml/metadata/featcatalog1.xml");
+
+        String expResult = "cat-1";
+        String result = Utils.findIdentifier(n);
+        assertEquals(expResult, result);
+
+    }
+
+
+    @Test
+    public void findIdentifierEbrimNodeTest() throws Exception {
+        /*
+         * Ebrim v 3.0
+         */
+        Node n = getOriginalMetadata("org/constellation/xml/metadata/ebrim3.xml");
+
+        String expResult = "urn:motiive:csw-ebrim";
+        String result = Utils.findIdentifier(n);
+
+        assertEquals(expResult, result);
+
+
+         /*
+         * Ebrim v 2.5
+         */
+       n = getOriginalMetadata("org/constellation/xml/metadata/ebrim1.xml");
+
+        expResult = "000068C3-3B49-C671-89CF-10A39BB1B652";
+        result = Utils.findIdentifier(n);
+
+        assertEquals(expResult, result);
+    }
+
+    @Test
+    public void findIdentifierSensorMLNodeTest() throws Exception {
+        /*
+         * SensorML 1.0.0
+         */
+        Node n = getOriginalMetadata("org/constellation/xml/sml/system.xml");
+
+        String expResult = "sensor-system";
+        String result = Utils.findIdentifier(n);
+
+        assertEquals(expResult, result);
+
+        n = getOriginalMetadata("org/constellation/xml/sml/component2.xml");
+
+        expResult = "component2";
+        result = Utils.findIdentifier(n);
+
+        assertEquals(expResult, result);
+
+    }
+
+    private Node getOriginalMetadata(final String fileName) throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+
+        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+        Document document = docBuilder.parse(Util.getResourceAsStream(fileName));
+
+        return document.getDocumentElement();
     }
 }

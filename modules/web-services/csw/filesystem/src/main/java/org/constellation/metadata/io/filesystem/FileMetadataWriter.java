@@ -20,14 +20,15 @@ package org.constellation.metadata.io.filesystem;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
+import org.xml.sax.SAXException;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
@@ -56,22 +57,11 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractCSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.utils.Utils;
-import org.constellation.util.ReflectionUtilities;
 
 import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
 
-// GeoApi dependencies
-import org.opengis.util.InternationalString;
-
-import org.apache.sis.util.iso.SimpleInternationalString;
+// SIS dependencies
 import org.apache.sis.xml.MarshallerPool;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-import org.xml.sax.SAXException;
 
 /**
  * A CSW Metadata Writer. This writer does not require a database.
@@ -91,11 +81,6 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      */
     private final File dataDirectory;
 
-    /**
-     * A string constant frequently used in error message.
-     */
-    private static final String IN_CLASS_MSG = " in the class:";
-     
     /**
      * Build a new File metadata writer, with the specified indexer.
      *
@@ -242,7 +227,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                     typeName = typeName.substring(typeName.indexOf(':') + 1);
                 }
 
-                Element parent = metadataDoc.getDocumentElement();
+                Node parent = metadataDoc.getDocumentElement();
 
                 // we verify that the metadata to update has the same type that the Xpath type
                 if (!parent.getLocalName().equals(typeName)) {
@@ -252,7 +237,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                 //we remove the type name from the xpath
                 xpath = xpath.substring(xpath.indexOf('/') + 1);
 
-                List<Element> nodes = Arrays.asList(parent);
+                List<Node> nodes = Arrays.asList(parent);
                 while (xpath.indexOf('/') != -1) {
 
                     //Then we get the next Property name
@@ -270,10 +255,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                         propertyName = propertyName.substring(separatorIndex + 1);
                     }
 
-                    LOGGER.finer("propertyName:" + propertyName + " ordinal=" + ordinal);
-
-                    
-                    nodes = getNodes(propertyName, nodes, ordinal);
+                    nodes = Utils.getNodes(propertyName, nodes, ordinal, true);
 
                     xpath = xpath.substring(xpath.indexOf('/') + 1);
                 }
@@ -299,30 +281,6 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         return false;
     }
 
-    private List<Element> getNodes(final String propertyName, List<Element> nodes, int ordinal) {
-        final List<Element> result = new ArrayList<>();
-        for (Element e : nodes) {
-            final List<Node> nl = getChilds(e, propertyName);
-            // add new node
-            if (nl.isEmpty()) {
-                final Element newNode = e.getOwnerDocument().createElementNS("TODO", propertyName);
-                e.appendChild(newNode);
-                result.add(newNode);
-                
-            // Select the node to update
-            } else {
-                for (int i = 0 ; i < nl.size(); i++) {
-                    if (ordinal == -1) {
-                        result.add((Element) nl.get(i));
-                    } else if (i == ordinal) {
-                        result.add((Element) nl.get(i));
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
     /**
      * Return an ordinal if there is one in the propertyName specified else return -1.
      * example : name[1] return  1
@@ -331,7 +289,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * @return an ordinal if there is one, -1 else.
      * @throws MetadataIoException
      */
-    private int extractOrdinal(String propertyName) throws MetadataIoException {
+    private int extractOrdinal(final String propertyName) throws MetadataIoException {
         int ordinal = -1;
 
         //we extract the ordinal if there is one
@@ -359,7 +317,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * 
      * @throws org.constellation.ws.MetadataIoException
      */
-    private void updateObjects(List<Element> nodes, String propertyName, Node value) throws MetadataIoException {
+    private void updateObjects(List<Node> nodes, String propertyName, Node value) throws MetadataIoException {
 
         Class parameterType = value.getClass();
         LOGGER.log(Level.FINER, "parameter type:{0}", parameterType);
@@ -370,8 +328,8 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             propertyName = propertyName.substring(0, propertyName.indexOf('['));
         }
 
-        for (Element e : nodes) {
-            final List<Node> toUpdate = getChilds(e, propertyName);
+        for (Node e : nodes) {
+            final List<Node> toUpdate = Utils.getChilds(e, propertyName);
 
             // ADD
             if (toUpdate.isEmpty()) {
@@ -393,192 +351,6 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Update a single  object by calling the setter of the specified property with the specified value.
-     *
-     * @param propertyName  The name of the property to update on the parent (can't contain an ordinal).
-     * @param parent The parent object on witch call the setters.
-     * @param value The new value to update.
-     * @param parameterType The class of the parameter
-     * @param ordinal The ordinal of the value in a collection.
-     *
-     * @throws MetadataIoException
-     */
-    private void updateObject(String propertyName, Object parent, Object value, Class parameterType, int ordinal) throws MetadataIoException {
-        Method setter = ReflectionUtilities.getSetterFromName(propertyName, parameterType, parent.getClass());
-
-        // with the geotoolkit implementation we sometimes have to used InternationalString instead of String.
-        if (setter == null && parameterType.equals(String.class)) {
-            setter = ReflectionUtilities.getSetterFromName(propertyName, InternationalString.class, parent.getClass());
-            value = new SimpleInternationalString((String) value);
-        }
-
-        //if there is an ordinal we must get the existant Collection
-        if (ordinal != -1) {
-            final Method getter = ReflectionUtilities.getGetterFromName(propertyName, parent.getClass());
-            if (getter == null) {
-                throw new MetadataIoException("There is no getter for the property:" + propertyName + IN_CLASS_MSG + parent.getClass(), INVALID_PARAMETER_VALUE);
-            }
-            final Object existant = ReflectionUtilities.invokeMethod(parent, getter);
-
-            if (!(existant instanceof Collection)) {
-                throw new MetadataIoException("The property: " + propertyName + IN_CLASS_MSG + parent.getClass() + " is not a collection", INVALID_PARAMETER_VALUE);
-            } 
-
-            final Collection c = (Collection) existant;
-            if (c.size() < ordinal) {
-                throw new MetadataIoException("The property:" + propertyName + IN_CLASS_MSG + parent.getClass() + " got only" + c.size() + " elements", INVALID_PARAMETER_VALUE);
-            }
-
-            if (parameterType.equals(String.class) && c.iterator().hasNext() && c.iterator().next() instanceof InternationalString) {
-                value = new SimpleInternationalString((String) value);
-            }
-
-            // ISSUE how to add in a Collection at a predefined index
-            if (c instanceof List) {
-               final List l = (List) c;
-               l.remove(ordinal);
-               l.add(ordinal, value);
-            } else {
-                int i = 1;
-                Object toDelete = null;
-                for (Object o : c) {
-                    if (i == ordinal) {
-                        toDelete = o;
-                    }
-                    i++;
-                }
-                c.remove(toDelete);
-                c.add(value);
-            }
-            value = existant;
-        }
-
-        if (setter == null) {
-            throw new MetadataIoException("There is no setter for the property:" + propertyName + IN_CLASS_MSG + parent.getClass(), INVALID_PARAMETER_VALUE);
-        } else {
-            final String baseMessage = "Unable to invoke the method " + setter + ": ";
-            try {
-                // we execute the setter
-                if (setter.getParameterTypes().length == 1 && setter.getParameterTypes()[0] == Collection.class) {
-                    if (value instanceof String) {
-                        invokeMethodStrColl(setter, parent, (String) value);
-                    } else {
-                        Collection c;
-                        if (value instanceof Collection) {
-                            c = (Collection) value;
-                        } else {
-                            c = new ArrayList(1);
-                            c.add(value);
-                        }
-                        ReflectionUtilities.invokeMethodEx(setter, parent, c);
-                    }
-                } else {
-                    ReflectionUtilities.invokeMethodEx(setter, parent, value);
-                }
-            } catch (IllegalAccessException ex) {
-                throw new MetadataIoException(baseMessage + "the class is not accessible.", NO_APPLICABLE_CODE);
-
-            } catch (IllegalArgumentException ex) {
-                String param = "null";
-                if (value != null) {
-                    param = value.getClass().getSimpleName();
-                }
-                throw new MetadataIoException(baseMessage + "the given argument does not match that required by the method.( argument type was " + param + ")");
-
-            } catch (InvocationTargetException ex) {
-                String errorMsg = ex.getMessage();
-                if (errorMsg == null && ex.getCause() != null) {
-                    errorMsg = ex.getCause().getMessage();
-                }
-                if (errorMsg == null && ex.getTargetException() != null) {
-                    errorMsg = ex.getTargetException().getMessage();
-                }
-                throw new MetadataIoException(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
-            }
-        }
-    }
-
-    /**
-     * Try to set a collection of String or International string on a parent object.
-     *
-     * @param method A setter.
-     * @param object An object to set.
-     * @param parameter A string value to add to object.
-     *
-     * @throws MetadataIoException
-     */
-    public static Object invokeMethodStrColl(final Method method, final Object object, final String parameter) throws MetadataIoException {
-        final String baseMessage = "Unable to invoke the method " + method + ": ";
-        Object result = null;
-        if (method != null) {
-            int i = 0;
-            while (i < 2) {
-                try {
-                    final Collection c = new ArrayList(1);
-                    if (i == 0) {
-                        c.add(parameter);
-                    } else {
-                        c.add(new SimpleInternationalString(parameter));
-                    }
-                    result = method.invoke(object, c);
-                    return result;
-
-                } catch (IllegalAccessException ex) {
-                    throw new MetadataIoException(baseMessage + "the class is not accessible.", NO_APPLICABLE_CODE);
-
-                } catch (IllegalArgumentException ex) {
-
-                    throw new MetadataIoException(baseMessage + "the given argument does not match that required by the method.( argument type was String)");
-
-                } catch (InvocationTargetException ex) {
-                    String errorMsg = ex.getMessage();
-                    if (errorMsg == null && ex.getCause() != null) {
-                        errorMsg = ex.getCause().getMessage();
-                    }
-                    if (errorMsg == null && ex.getTargetException() != null) {
-                        errorMsg = ex.getTargetException().getMessage();
-                    }
-                    if (i == 1) {
-                        throw new MetadataIoException(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
-                    }
-                    i++;
-                }
-            }
-        } else {
-            LOGGER.severe("Unable to invoke the method reference is null.");
-        }
-        return result;
-    }
-
-    /**
-     * Unmarshall The file designed by the path dataDirectory/identifier.xml
-     * If the file is not present or if it is impossible to unmarshall it it return an exception.
-     *
-     * @param identifier
-     * @return
-     * @throws org.constellation.ws.MetadataIoException
-     */
-    private Object getObjectFromFile(String identifier) throws MetadataIoException {
-        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
-        if (metadataFile.exists()) {
-            try {
-                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-                Object metadata = unmarshaller.unmarshal(metadataFile);
-                marshallerPool.recycle(unmarshaller);
-                if (metadata instanceof JAXBElement) {
-                    metadata = ((JAXBElement) metadata).getValue();
-                }
-                return metadata;
-            } catch (JAXBException ex) {
-                throw new MetadataIoException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
-                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
-            }
-        } else {
-            throw new MetadataIoException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
         }
     }
 
@@ -608,36 +380,5 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             }
         }
         return null;
-    }
-
-    private List<Node> getChilds(final Node n, final String propertyName) {
-        final List<Node> results = new ArrayList<>();
-        final NodeList nl = n.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            final Node child = nl.item(i);
-            if (propertyName.equals(child.getLocalName())) {
-                results.add(child);
-            } /*else {
-                // we go down for one more level, to escape the typeNode
-                final NodeList nl2 = child.getChildNodes();
-                for (int j = 0; j < nl2.getLength(); j++) {
-                    final Node child2 = nl2.item(j);
-                    if (propertyName.equals(child2.getLocalName())) {
-                        results.add(child2);
-                    }
-                }
-            }*/
-        }
-        return results;
-    }
-
-    private static String getStringFromNode(final Node n) throws Exception {
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        StringWriter writer = new StringWriter();
-        transformer.transform(new DOMSource(n), new StreamResult(writer));
-        String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
-        return output;
     }
 }
