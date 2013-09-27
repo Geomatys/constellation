@@ -18,6 +18,7 @@
 package org.constellation.metadata.io;
 
 import java.util.List;
+import java.util.Map;
 import org.geotoolkit.csw.xml.RecordProperty;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
@@ -49,7 +50,7 @@ public abstract class AbstractCSWMetadataWriter extends AbstractMetadataWriter i
      * @param properties A List of property-value to replace in the specified metadata.
      */
     @Override
-    public abstract boolean updateMetadata(final String metadataID, final List<? extends RecordProperty> properties) throws MetadataIoException;
+    public abstract boolean updateMetadata(final String metadataID, final Map<String , Object> properties) throws MetadataIoException;
 
 
     /**

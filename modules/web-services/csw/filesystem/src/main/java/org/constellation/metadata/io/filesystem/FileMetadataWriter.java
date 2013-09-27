@@ -22,6 +22,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -48,7 +50,6 @@ import javax.xml.transform.stream.StreamResult;
 //geotoolkit dependencies
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.csw.xml.RecordProperty;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -210,10 +211,10 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean updateMetadata(final String metadataID, final List<? extends RecordProperty> properties) throws MetadataIoException {
+    public boolean updateMetadata(final String metadataID, final Map<String , Object> properties) throws MetadataIoException {
         final Document metadataDoc = getDocumentFromFile(metadataID);
-        for (RecordProperty property : properties) {
-            String xpath = property.getName();
+        for (Entry<String, Object> property : properties.entrySet()) {
+            String xpath = property.getKey();
             // we remove the first / before the type declaration
             if (xpath.startsWith("/")) {
                 xpath = xpath.substring(1);

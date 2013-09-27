@@ -1476,7 +1476,7 @@ public class CSWworker extends AbstractWorker {
                             if (updateRequest.getAny() != null) {
                                 updated = mdWriter.replaceMetadata(metadataID, updateRequest.getAny());
                             } else {
-                                updated = mdWriter.updateMetadata(metadataID, updateRequest.getRecordProperty());
+                                updated = mdWriter.updateMetadata(metadataID, updateRequest.getRecordPropertyMap());
                             }
                             if (!updated) {
                                 throw new CstlServiceException("The service does not succeed to update the metadata:" + metadataID,

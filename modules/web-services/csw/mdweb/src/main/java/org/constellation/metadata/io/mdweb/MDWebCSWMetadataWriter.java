@@ -22,6 +22,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 // Constellation dependencies
@@ -29,7 +30,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
-import org.geotoolkit.csw.xml.RecordProperty;
 
 // Geotoolkit dependencies
 import org.geotoolkit.lucene.index.AbstractIndexer;
@@ -115,7 +115,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      * {@inheritDoc}
      */
     @Override
-    public boolean updateMetadata(final String metadataID, final List<? extends RecordProperty> properties) throws MetadataIoException {
+    public boolean updateMetadata(final String metadataID, final Map<String, Object> properties) throws MetadataIoException {
         LOGGER.log(logLevel, "metadataID: {0}", metadataID);
 
         FullRecord f = null;
@@ -126,7 +126,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                         NO_APPLICABLE_CODE);
         }
 
-        for (RecordProperty property : properties) {
+        for (Entry<String, Object> property : properties.entrySet()) {
             try {
                 final Object value;
                 if (property.getValue() instanceof Node) {
@@ -153,7 +153,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                 } else {
                     value = property.getValue();
                 }
-                final MixedPath mp = getMDWPathFromXPath(property.getName());
+                final MixedPath mp = getMDWPathFromXPath(property.getKey());
                 LOGGER.log(Level.FINER, "IDValue: {0}", mp.idValue);
                 final List<Value> matchingValues = f.getValueFromNumberedPath(mp.path, mp.idValue);
 
