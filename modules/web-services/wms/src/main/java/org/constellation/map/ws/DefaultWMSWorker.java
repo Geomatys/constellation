@@ -90,7 +90,6 @@ import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
 import org.geotoolkit.inspire.xml.vs.LanguageType;
 import org.geotoolkit.inspire.xml.vs.LanguagesType;
 import org.geotoolkit.map.FeatureMapLayer;
-import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
@@ -1181,25 +1180,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         try {
-            final MapContext context = MapBuilder.createContext();
-
-            for (int i = 0; i < layerRefs.size(); i++) {
-                final LayerDetails layerRef = layerRefs.get(i);
-                final MutableStyle style = styles.get(i);
-
-                assert (null != layerRef);
-                //style can be null
-
-                final MapItem mapLayer = layerRef.getMapLayer(style, params);
-                if (mapLayer == null) {
-                    throw new PortrayalException("Could not create a mapLayer for layer: " + layerRef.getName());
-                }
-                if(mapLayer instanceof MapLayer){
-                    ((MapLayer)mapLayer).setSelectable(true);
-                }
-                mapLayer.setVisible(true);
-                context.items().add(mapLayer);
-            }
+            final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
             //apply layercontext filters
             applyLayerFiltersAndDims(context, userLogin);
 
@@ -1401,7 +1382,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     fml.getExtraDimensions().add(fdef);
 
                 } catch (CQLException ex) {
-                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.WARNING, null, ex);
                 }
             }
 
