@@ -30,11 +30,9 @@ import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.util.ReflectionUtilities;
 import org.apache.sis.util.Classes;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.util.NodeUtilities;
 import org.opengis.util.InternationalString;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Utility methods used in CSW object.
@@ -484,7 +482,7 @@ public final class Utils {
             if (parts[0].equals(node.getLocalName()) || parts[0].equals("*")) {
                 List<Node> nodes = Arrays.asList(node);
                 for (int i = 1; i < parts.length; i++) {
-                    nodes = getNodes(parts[i], nodes, -1, false);
+                    nodes = NodeUtilities.getNodes(parts[i], nodes, -1, false);
                     if (nodes.isEmpty()) {
                         break;
                     }
@@ -495,48 +493,5 @@ public final class Utils {
             }
         }
         return UNKNOW_IDENTIFIER;
-    }
-
-    public static List<Node> getNodes(final String propertyName, final List<Node> nodes, final int ordinal, final boolean create) {
-        final List<Node> result = new ArrayList<>();
-        for (Node e : nodes) {
-            final List<Node> nl = getChilds(e, propertyName);
-            // add new node
-            if (nl.isEmpty() && create) {
-                final Element newNode = e.getOwnerDocument().createElementNS("TODO", propertyName);
-                e.appendChild(newNode);
-                result.add(newNode);
-
-            // Select the node to update
-            } else {
-                for (int i = 0 ; i < nl.size(); i++) {
-                    if (ordinal == -1) {
-                        result.add(nl.get(i));
-                    } else if (i == ordinal) {
-                        result.add(nl.get(i));
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    public static List<Node> getChilds(final Node n, final String propertyName) {
-        final List<Node> results = new ArrayList<>();
-        if (propertyName.startsWith("@")) {
-            final Node att = n.getAttributes().getNamedItem(propertyName.substring(1));
-            if (att != null) {
-                results.add(att);
-            }
-        } else {
-            final NodeList nl = n.getChildNodes();
-            for (int i = 0; i < nl.getLength(); i++) {
-                final Node child = nl.item(i);
-                if (propertyName.equals(child.getLocalName())) {
-                    results.add(child);
-                }
-            }
-        }
-        return results;
     }
 }

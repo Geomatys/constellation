@@ -63,6 +63,7 @@ import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
 
 // SIS dependencies
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.util.NodeUtilities;
 
 /**
  * A CSW Metadata Writer. This writer does not require a database.
@@ -222,7 +223,6 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             if (xpath.indexOf('/') != -1) {
 
                 //we get the type of the metadata (first part of the Xpath
-                Class type;
                 String typeName = xpath.substring(0, xpath.indexOf('/'));
                 if (typeName.contains(":")) {
                     typeName = typeName.substring(typeName.indexOf(':') + 1);
@@ -244,7 +244,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                     //Then we get the next Property name
 
                     String propertyName = xpath.substring(0, xpath.indexOf('/'));
-                    final int ordinal         = extractOrdinal(propertyName);
+                    final int ordinal   = NodeUtilities.extractOrdinal(propertyName);
                     final int braceIndex = propertyName.indexOf('[');
                     if (braceIndex != -1) {
                         propertyName = propertyName.substring(0,braceIndex);
@@ -256,7 +256,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                         propertyName = propertyName.substring(separatorIndex + 1);
                     }
 
-                    nodes = Utils.getNodes(propertyName, nodes, ordinal, true);
+                    nodes = NodeUtilities.getNodes(propertyName, nodes, ordinal, true);
 
                     xpath = xpath.substring(xpath.indexOf('/') + 1);
                 }
@@ -283,33 +283,6 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     }
 
     /**
-     * Return an ordinal if there is one in the propertyName specified else return -1.
-     * example : name[1] return  1
-     *           name    return -1
-     * @param propertyName A property name extract from an Xpath
-     * @return an ordinal if there is one, -1 else.
-     * @throws MetadataIoException
-     */
-    private int extractOrdinal(final String propertyName) throws MetadataIoException {
-        int ordinal = -1;
-
-        //we extract the ordinal if there is one
-        if (propertyName.indexOf('[') != -1) {
-            if (propertyName.indexOf(']') != -1) {
-                try {
-                    final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
-                    ordinal = Integer.parseInt(ordinalValue) - 1;
-                } catch (NumberFormatException ex) {
-                    throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
-                }
-            } else {
-                throw new MetadataIoException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
-            }
-        }
-        return ordinal;
-    }
-    
-    /**
      * Update an object by calling the setter of the specified property with the specified value.
      * 
      * @param parent The parent object on witch call the setters.
@@ -324,13 +297,13 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         LOGGER.log(Level.FINER, "parameter type:{0}", parameterType);
 
         final String fullPropertyName = propertyName;
-        final int ordinal             = extractOrdinal(propertyName);
+        final int ordinal             = NodeUtilities.extractOrdinal(propertyName);
         if (propertyName.indexOf('[') != -1) {
             propertyName = propertyName.substring(0, propertyName.indexOf('['));
         }
 
         for (Node e : nodes) {
-            final List<Node> toUpdate = Utils.getChilds(e, propertyName);
+            final List<Node> toUpdate = NodeUtilities.getChilds(e, propertyName);
 
             // ADD
             if (toUpdate.isEmpty()) {

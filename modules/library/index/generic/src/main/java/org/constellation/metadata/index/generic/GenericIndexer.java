@@ -215,7 +215,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
 
                 @Override
                 public TermValue call() {
-                    return new TermValue(term, getValuesList(metadata, queryableSet.get(term)));
+                    return new TermValue(term, extractValues(metadata, queryableSet.get(term)));
                 }
             });
         }
@@ -289,10 +289,6 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         return sb.toString();
     }
 
-    protected List<Object> getValuesList(final Object metadata, final List<String> paths) {
-        return extractValues(metadata, paths);
-    }
-
     /**
      * Extract the String values denoted by the specified paths
      * and return the values as a String values1,values2,....
@@ -349,9 +345,6 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         }
         if (response.isEmpty()) {
             response.add(NULL_VALUE);
-        } else {
-            // we remove the last ','
-            //response.delete(response.length() - 1, response.length());
         }
         return response;
     }

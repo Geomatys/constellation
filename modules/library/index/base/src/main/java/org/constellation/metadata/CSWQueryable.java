@@ -49,15 +49,14 @@ public final class CSWQueryable {
      /**
      * The queryable element from ISO 19110 and their path id.
      */
-    public static final Map<String, List<String>> ISO_FC_QUERYABLE;
+    public static final Map<String, List<String>> ISO_FC_QUERYABLE = new HashMap<>();
     static {
-        ISO_FC_QUERYABLE = new HashMap<String, List<String>>();
         List<String> paths;
 
         /*
          * The core queryable of ISO 19115
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19110:FC_FeatureCatalogue:featureType:carrierOfCharacteristics:memberName");
         ISO_FC_QUERYABLE.put("attributeName", paths);
     }
@@ -65,15 +64,14 @@ public final class CSWQueryable {
     /**
      * The queryable element from ISO 19115 and their path id.
      */
-    public static final Map<String, List<String>> ISO_QUERYABLE;
+    public static final Map<String, List<String>> ISO_QUERYABLE = new HashMap<>();
     static {
-        ISO_QUERYABLE      = new HashMap<String, List<String>>();
         List<String> paths;
 
         /*
          * The core queryable of ISO 19115
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:descriptiveKeywords:keyword");
@@ -83,14 +81,14 @@ public final class CSWQueryable {
         ISO_QUERYABLE.put("Subject", paths);
 
         //MANDATORY
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title:value");
         ISO_QUERYABLE.put("Title", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:abstract");
@@ -98,10 +96,10 @@ public final class CSWQueryable {
         ISO_QUERYABLE.put("Abstract", paths);
 
         /*MANDATORY
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         ISO_QUERYABLE.put("AnyText", paths);*/
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name");
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name:value");
         paths.add("ISO 19115-2:MI_Metadata:distributionInfo:distributionFormat:name");
@@ -109,17 +107,17 @@ public final class CSWQueryable {
         ISO_QUERYABLE.put("Format", paths);
 
         //MANDATORY
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
         ISO_QUERYABLE.put("Identifier", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:dateStamp");
         paths.add("ISO 19115-2:MI_Metadata:dateStamp");
         ISO_QUERYABLE.put("Modified", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:hierarchyLevel");
         paths.add("ISO 19115-2:MI_Metadata:hierarchyLevel");
         ISO_QUERYABLE.put("Type", paths);
@@ -127,22 +125,22 @@ public final class CSWQueryable {
         /*
          * Bounding box
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude");
         ISO_QUERYABLE.put("WestBoundLongitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude");
         ISO_QUERYABLE.put("EastBoundLongitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude");
         ISO_QUERYABLE.put("NorthBoundLatitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude");
         ISO_QUERYABLE.put("SouthBoundLatitude",     paths);
@@ -150,17 +148,17 @@ public final class CSWQueryable {
         /*
          * CRS
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:referenceSystemInfo:referenceSystemIdentifier:codeSpace");
         paths.add("ISO 19115-2:MI_Metadata:referenceSystemInfo:referenceSystemIdentifier:codeSpace");
         ISO_QUERYABLE.put("Authority",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:referenceSystemInfo:referenceSystemIdentifier:code");
         paths.add("ISO 19115-2:MI_Metadata:referenceSystemInfo:referenceSystemIdentifier:code");
         ISO_QUERYABLE.put("ID",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:referenceSystemInfo:referenceSystemIdentifier:version");
         paths.add("ISO 19115-2:MI_Metadata:referenceSystemInfo:referenceSystemIdentifier:version");
         ISO_QUERYABLE.put("Version",     paths);
@@ -168,29 +166,29 @@ public final class CSWQueryable {
         /*
          * Additional queryable Element
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:alternateTitle");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:alternateTitle:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:alternateTitle");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:alternateTitle:value");
         ISO_QUERYABLE.put("AlternateTitle",   paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=revision:date");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:date#dateType=revision:date");
         ISO_QUERYABLE.put("RevisionDate",  paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:date#dateType=creation:date");
         ISO_QUERYABLE.put("CreationDate",  paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=publication:date");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:date#dateType=publication:date");
         ISO_QUERYABLE.put("PublicationDate",  paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName:value");
         // TODO remove the following path are not normalized
@@ -213,41 +211,41 @@ public final class CSWQueryable {
         ISO_QUERYABLE.put("OrganisationName", paths);
 
         //TODO If an instance of the class MD_SecurityConstraint exists for a resource, the “HasSecurityConstraints” is “true”, otherwise “false”
-        //paths = new ArrayList<String>();
+        //paths = new ArrayList<>();
         //ISO_QUERYABLE.put("HasSecurityConstraints", paths);
 
         //TODO MD_FeatureCatalogueDescription
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:language");
         paths.add("ISO 19115-2:MI_Metadata:language");
         ISO_QUERYABLE.put("Language", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:identifier:code");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:identifier:code");
         ISO_QUERYABLE.put("ResourceIdentifier", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:parentIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:parentIdentifier");
         ISO_QUERYABLE.put("ParentIdentifier", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:Type");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:descriptiveKeywords:Type");
         ISO_QUERYABLE.put("KeywordType", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:topicCategory");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:topicCategory");
         ISO_QUERYABLE.put("TopicCategory", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:language");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:language");
         ISO_QUERYABLE.put("ResourceLanguage", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:code");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:code");
         ISO_QUERYABLE.put("GeographicDescriptionCode", paths);
@@ -256,25 +254,25 @@ public final class CSWQueryable {
          * spatial resolution
          */
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:equivalentScale:denominator");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:spatialResolution:equivalentScale:denominator");
         ISO_QUERYABLE.put("Denominator", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:distance");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:spatialResolution:distance");
         ISO_QUERYABLE.put("DistanceValue", paths);
 
         //TODO not existing path in MDWeb or geotoolkit (Distance is treated as a primitive type)
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         //paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:distance:uom");
         //ISO_QUERYABLE.put("DistanceUOM", paths);
 
         /*
          * Temporal Extent
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition:value");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:position");
@@ -283,7 +281,7 @@ public final class CSWQueryable {
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:position");
         ISO_QUERYABLE.put("TempExtent_begin", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:endPosition:value");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:endPosition");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:position");
@@ -295,7 +293,7 @@ public final class CSWQueryable {
         /*
          *  cloud cover percentage
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:contentInfo:cloudCoverPercentage");
         paths.add("ISO 19115-2:MI_Metadata:contentInfo:cloudCoverPercentage");
         ISO_QUERYABLE.put("CloudCover", paths);
@@ -303,7 +301,7 @@ public final class CSWQueryable {
         /*
          *  illuminationElevationAngle
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:contentInfo:illuminationElevationAngle");
         paths.add("ISO 19115-2:MI_Metadata:contentInfo:illuminationElevationAngle");
         ISO_QUERYABLE.put("IlluminationElevation", paths);
@@ -311,7 +309,7 @@ public final class CSWQueryable {
         /*
          *  processing level
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:contentInfo:processingLevelCode:code");
         paths.add("ISO 19115-2:MI_Metadata:contentInfo:processingLevelCode:code");
         ISO_QUERYABLE.put("ProcessingLevel", paths);
@@ -320,18 +318,18 @@ public final class CSWQueryable {
         /**
          * ISO 19119 specific queryable
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:serviceType");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:serviceType");
         ISO_QUERYABLE.put("ServiceType", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:couplingType");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:couplingType");
         ISO_QUERYABLE.put("CouplingType", paths);
 
         //TODO  the following element are described in Service part of ISO 19139 not yet used.
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         ISO_QUERYABLE.put("ServiceTypeVersion", paths);
         ISO_QUERYABLE.put("Operation", paths);
         ISO_QUERYABLE.put("OperatesOn", paths);
@@ -341,7 +339,7 @@ public final class CSWQueryable {
         /**
          * ISO 19115-2 specific queryable
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:platform:citation:title");
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:instrument:mountedOn:citation:title");
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:platform:citation:title");
@@ -349,7 +347,7 @@ public final class CSWQueryable {
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:childOperation:platform:citation:title");
         ISO_QUERYABLE.put("Platform", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:instrument:citation:title");
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:platform:instrument:citation:title");
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:platform:instrument:citation:title");
@@ -357,7 +355,7 @@ public final class CSWQueryable {
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:childOperation:platform:instrument:citation:title");
         ISO_QUERYABLE.put("Instrument", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:citation:title");
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:childOperation:citation:title");
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:parentOperation:citation:title");
@@ -369,15 +367,14 @@ public final class CSWQueryable {
     /**
      * The queryable element from DublinCore and their path id.
      */
-    public static final Map<String, List<String>> DUBLIN_CORE_QUERYABLE;
+    public static final Map<String, List<String>> DUBLIN_CORE_QUERYABLE = new HashMap<>();
     static {
-        DUBLIN_CORE_QUERYABLE = new HashMap<String, List<String>>();
         List<String> paths;
 
         /*
          * The core queryable of DublinCore
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title");
@@ -387,7 +384,7 @@ public final class CSWQueryable {
         paths.add("Ebrim v2.5:*:name:localizedString:value");
         DUBLIN_CORE_QUERYABLE.put("title", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=originator:organisationName:value");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=originator:organisationName");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=originator:organisationName:value");
@@ -395,7 +392,7 @@ public final class CSWQueryable {
         paths.add("Catalog Web Service:Record:creator:content");
         DUBLIN_CORE_QUERYABLE.put("creator", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword:value");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:topicCategory");
@@ -409,7 +406,7 @@ public final class CSWQueryable {
         DUBLIN_CORE_QUERYABLE.put("description", paths);
         DUBLIN_CORE_QUERYABLE.put("subject", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:abstract");
@@ -419,7 +416,7 @@ public final class CSWQueryable {
         paths.add("Ebrim v2.5:*:description:localizedString:value");
         DUBLIN_CORE_QUERYABLE.put("abstract", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=publisher:organisationName");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=publisher:organisationName:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=publisher:organisationName");
@@ -427,7 +424,7 @@ public final class CSWQueryable {
         paths.add("Catalog Web Service:Record:publisher:content");
         DUBLIN_CORE_QUERYABLE.put("publisher", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=author:organisationName");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=author:organisationName:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=author:organisationName");
@@ -435,13 +432,13 @@ public final class CSWQueryable {
         paths.add("Catalog Web Service:Record:contributor:content");
         DUBLIN_CORE_QUERYABLE.put("contributor", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:dateStamp");
         paths.add("ISO 19115-2:MI_Metadata:dateStamp");
         paths.add("Catalog Web Service:Record:date:content");
         DUBLIN_CORE_QUERYABLE.put("date", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:hierarchyLevel");
         paths.add("ISO 19115-2:MI_Metadata:hierarchyLevel");
         paths.add("Catalog Web Service:Record:type:content");
@@ -449,7 +446,7 @@ public final class CSWQueryable {
         paths.add("Ebrim v2.5:*:objectType");
         DUBLIN_CORE_QUERYABLE.put("type", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name");
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name:value");
         paths.add("ISO 19115-2:MI_Metadata:distributionInfo:distributionFormat:name");
@@ -459,7 +456,7 @@ public final class CSWQueryable {
         paths.add("Ebrim v2.5:*:mimeType");
         DUBLIN_CORE_QUERYABLE.put("format", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
 
@@ -474,17 +471,17 @@ public final class CSWQueryable {
         paths.add("Web Registry Service v0.9:*:id");
         DUBLIN_CORE_QUERYABLE.put("identifier", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("Catalog Web Service:Record:source");
         DUBLIN_CORE_QUERYABLE.put("source", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:language");
         paths.add("ISO 19115-2:MI_Metadata:language");
         paths.add("Catalog Web Service:Record:language:content");
         DUBLIN_CORE_QUERYABLE.put("language", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:title");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:title:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:title");
@@ -492,7 +489,7 @@ public final class CSWQueryable {
         paths.add("Catalog Web Service:Record:relation:content");
         DUBLIN_CORE_QUERYABLE.put("relation", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:accessConstraints");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:accessConstraints");
         paths.add("Catalog Web Service:Record:rights:content");
@@ -501,31 +498,31 @@ public final class CSWQueryable {
         /*
          * Bounding box
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude");
         paths.add("Catalog Web Service:Record:BoundingBox:LowerCorner[0]");
         DUBLIN_CORE_QUERYABLE.put("WestBoundLongitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude");
         paths.add("Catalog Web Service:Record:BoundingBox:UpperCorner[0]");
         DUBLIN_CORE_QUERYABLE.put("EastBoundLongitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude");
         paths.add("Catalog Web Service:Record:BoundingBox:UpperCorner[1]");
         DUBLIN_CORE_QUERYABLE.put("NorthBoundLatitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude");
         paths.add("Catalog Web Service:Record:BoundingBox:LowerCorner[1]");
         DUBLIN_CORE_QUERYABLE.put("SouthBoundLatitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("Catalog Web Service:Record:BoundingBox:crs");
         DUBLIN_CORE_QUERYABLE.put("CRS",     paths);
     }
@@ -535,158 +532,156 @@ public final class CSWQueryable {
      * @deprecated
      */
     @Deprecated
-    public static final Map<String, List<String>> EBRIM_QUERYABLE;
+    public static final Map<String, List<String>> EBRIM_QUERYABLE = new HashMap<>();
     static {
-        EBRIM_QUERYABLE = new HashMap<String, List<String>>();
         List<String> paths;
 
         /*
          * The core queryable of DublinCore
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("Ebrim v3.0:RegistryObject:name:localizedString:value");
         paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
         EBRIM_QUERYABLE.put("name", paths);
 
         //TODO verify codelist=originator
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("creator", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         //TODO @name = “http://purl.org/dc/elements/1.1/subject”
         paths.add("Ebrim v3.0:RegistryObject:slot:valueList:value");
         paths.add("Ebrim v3.0:RegistryPackage:slot:valueList:value");
         EBRIM_QUERYABLE.put("description", paths);
         EBRIM_QUERYABLE.put("subject", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("Ebrim v3.0:RegistryObject:description:localizedString:value");
         paths.add("Ebrim v3.0:RegistryPackage:description:localizedString:value");
         EBRIM_QUERYABLE.put("abstract", paths);
 
         //TODO verify codelist=publisher
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("publisher", paths);
 
         //TODO verify codelist=contributor
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("contributor", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("date", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("Ebrim v3.0:RegistryObject:objectType");
         paths.add("Ebrim v3.0:RegistryPackage:objectType");
         EBRIM_QUERYABLE.put("type", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("Ebrim v3.0:ExtrinsicObject:mimeType");
         EBRIM_QUERYABLE.put("format", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("Ebrim v3.0:RegistryObject:id");
         paths.add("Ebrim v3.0:RegistryPackage:id");
         EBRIM_QUERYABLE.put("identifier", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("source", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("language", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("relation", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("rigths", paths);
 
         /*
          * Bounding box
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("WestBoundLongitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("EastBoundLongitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("NorthBoundLatitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("SouthBoundLatitude",     paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         EBRIM_QUERYABLE.put("CRS",     paths);
     }
 
      /**
      * The queryable element from DublinCore and their path id.
      */
-    public static final Map<String, List<String>> INSPIRE_QUERYABLE;
+    public static final Map<String, List<String>> INSPIRE_QUERYABLE = new HashMap<>();
     static {
-        INSPIRE_QUERYABLE = new HashMap<String, List<String>>();
         List<String> paths;
 
         /*
          * The core queryable of DublinCore
          */
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:pass");
         paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:report:result:pass");
         INSPIRE_QUERYABLE.put("Degree", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:accessConstraints");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:accessConstraints");
         INSPIRE_QUERYABLE.put("AccessConstraints", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:otherConstraints");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:otherConstraints:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:otherConstraints");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:otherConstraints:value");
         INSPIRE_QUERYABLE.put("OtherConstraints", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:classification");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:classification");
         INSPIRE_QUERYABLE.put("Classification", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:useLimitation");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:useLimitation:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:useLimitation");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:useLimitation:value");
         INSPIRE_QUERYABLE.put("ConditionApplyingToAccessAndUse", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:contact:organisationName");
         paths.add("ISO 19115:MD_Metadata:contact:organisationName:value");
         paths.add("ISO 19115-2:MI_Metadata:contact:organisationName");
         paths.add("ISO 19115-2:MI_Metadata:contact:organisationName:value");
         INSPIRE_QUERYABLE.put("MetadataPointOfContact", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:dataQualityInfo:lineage:statement");
         paths.add("ISO 19115:MD_Metadata:dataQualityInfo:lineage:statement:value");
         paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:lineage:statement");
         paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:lineage:statement:value");
         INSPIRE_QUERYABLE.put("Lineage", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:title");
         paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:title:value");
         paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:report:result:specification:title");
         paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:report:result:specification:title:value");
         INSPIRE_QUERYABLE.put("SpecificationTitle", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:date:date");
         paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:report:result:specification:date:date");
         INSPIRE_QUERYABLE.put("SpecificationDate", paths);
 
-        paths = new ArrayList<String>();
+        paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:date:dateType");
         paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:report:result:specification:date:dateType");
         INSPIRE_QUERYABLE.put("SpecificationDateType", paths);
