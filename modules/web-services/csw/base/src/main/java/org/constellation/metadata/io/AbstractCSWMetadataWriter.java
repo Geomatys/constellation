@@ -17,16 +17,14 @@
 
 package org.constellation.metadata.io;
 
-import java.util.List;
 import java.util.Map;
-import org.geotoolkit.csw.xml.RecordProperty;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class AbstractCSWMetadataWriter extends AbstractMetadataWriter implements CSWMetadataWriter{
+public abstract class AbstractCSWMetadataWriter extends AbstractMetadataWriter implements MetadataWriter{
 
     /**
      * An indexer lucene to add object into the index.

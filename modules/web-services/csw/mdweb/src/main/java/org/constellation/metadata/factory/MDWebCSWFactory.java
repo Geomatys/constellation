@@ -31,7 +31,6 @@ import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.mdweb.MDWebIndexer;
 import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.mdweb.MDWebCSWMetadataReader;
 import org.constellation.metadata.io.mdweb.MDWebCSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
@@ -85,7 +84,7 @@ public class MDWebCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public CSWMetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
+    public MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
         return new MDWebCSWMetadataWriter(configuration, indexer);
     }
     

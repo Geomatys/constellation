@@ -27,7 +27,6 @@ import java.util.logging.Level;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 
@@ -56,7 +55,7 @@ import org.w3c.dom.Text;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMetadataWriter {
+public class MDWebCSWMetadataWriter extends MDWebMetadataWriter {
 
     /**
      * An indexer lucene to add object into the index.
@@ -113,6 +112,8 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
 
     /**
      * {@inheritDoc}
+     *
+     * TODO move to {@link MDWebMetadataWriter}
      */
     @Override
     public boolean updateMetadata(final String metadataID, final Map<String, Object> properties) throws MetadataIoException {

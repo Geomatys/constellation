@@ -33,7 +33,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
@@ -45,8 +44,6 @@ import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.constellation.generic.database.Automatic.*;
 import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.metadata.security.NoMetadataSecurityFilter;
-import org.geotoolkit.index.tree.Tree;
-import org.geotoolkit.lucene.tree.NamedEnvelope;
 
 /**
  *
@@ -83,7 +80,7 @@ public class NetCDFCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public CSWMetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
+    public MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
         return null;
     }
 

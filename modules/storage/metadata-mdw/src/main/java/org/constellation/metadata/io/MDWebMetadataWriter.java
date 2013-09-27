@@ -1321,6 +1321,20 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         return property;
     }
 
+
+    /**
+     * Must be overridden by subClasses
+     * 
+     * @param metadataID
+     * @param properties
+     * @return
+     * @throws MetadataIoException
+     */
+    @Override
+    public boolean updateMetadata(final String metadataID, final Map<String, Object> properties) throws MetadataIoException {
+        return false;
+    }
+
     /**
      * @return the noLink
      */

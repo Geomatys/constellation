@@ -45,7 +45,7 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.CSWMetadataWriter;
+import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.ws.CstlServiceException;
 
@@ -277,7 +277,7 @@ public class CSWConfigurationManager {
 
     public AcknowlegementType importRecords(final String id, final File f, final String fileName) throws ConfigurationException {
         LOGGER.info("Importing record");
-        final CSWMetadataWriter writer = getWriter(id);
+        final MetadataWriter writer = getWriter(id);
         final List<File> files;
         if (fileName.endsWith("zip")) {
             try  {
@@ -333,7 +333,7 @@ public class CSWConfigurationManager {
     }
 
     public AcknowlegementType deleteMetadata(final String id, final String metadataName) throws ConfigurationException {
-        final CSWMetadataWriter writer = getWriter(id);
+        final MetadataWriter writer = getWriter(id);
         try {
             final boolean deleted = writer.deleteMetadata(metadataName);
             if (deleted) {
@@ -531,7 +531,7 @@ public class CSWConfigurationManager {
      * @return A metadata reader.
      * @throws org.constellation.ws.CstlServiceException
      */
-    protected CSWMetadataWriter getWriter(final String serviceID) throws ConfigurationException {
+    protected MetadataWriter getWriter(final String serviceID) throws ConfigurationException {
 
         // we get the CSW configuration file
         final Automatic config = getServiceConfiguration(serviceID);

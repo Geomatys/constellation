@@ -53,7 +53,7 @@ import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.CSWMetadataWriter;
+import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.security.MetadataSecurityFilter;
@@ -127,7 +127,7 @@ public class CSWworker extends AbstractWorker {
     /**
      * An Database Writer.
      */
-    private CSWMetadataWriter mdWriter;
+    private MetadataWriter mdWriter;
 
     /**
      * The current MIME type of return

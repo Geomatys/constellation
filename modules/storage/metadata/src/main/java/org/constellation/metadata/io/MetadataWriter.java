@@ -17,6 +17,9 @@
  */
 package org.constellation.metadata.io;
 
+import java.util.Map;
+import java.util.logging.Level;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -65,4 +68,19 @@ public interface MetadataWriter {
      * Destoy all the resource and close connection.
      */
     void destroy();
+
+    /**
+     * Update an object in the metadata database.
+     *
+     * @param metadataID The identifier of the metadata to Replace.
+     * @param properties A List of property-value to replace in the specified metadata.
+     */
+    boolean updateMetadata(String metadataID, Map<String, Object> properties) throws MetadataIoException;
+
+    /**
+     * Set the global level of log.
+     *
+     * @param logLevel
+     */
+    void setLogLevel(Level logLevel);
 }

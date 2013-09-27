@@ -29,7 +29,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
@@ -75,7 +74,7 @@ public interface AbstractCSWFactory {
      * @return a Metadata Writer for the specified dataSource type.
      * @throws org.constellation.metadata.io.MetadataIoException
      */
-    CSWMetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException;
+    MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException;
 
     /**
      * Return a Lucene indexer for the specified dataSource type.

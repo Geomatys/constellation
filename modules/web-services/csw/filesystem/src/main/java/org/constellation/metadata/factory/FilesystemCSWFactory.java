@@ -33,7 +33,6 @@ import org.constellation.filter.SQLFilterParser;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.filesystem.FileMetadataReader;
 import org.constellation.metadata.io.filesystem.FileMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
@@ -86,7 +85,7 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public CSWMetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
+    public MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
         return new FileMetadataWriter(configuration, indexer);
     }
     
