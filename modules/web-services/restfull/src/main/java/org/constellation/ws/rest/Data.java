@@ -4,9 +4,15 @@ import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.citation.DefaultCitation;
+import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
+import org.apache.sis.metadata.iso.identification.AbstractIdentification;
+import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
+import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.CoverageMetadataBean;
@@ -15,26 +21,33 @@ import org.constellation.dto.DataMetadata;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
 import org.constellation.dto.ParameterValues;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
-import org.constellation.utlis.GeotoolkitFileExtensionAvailable;
+import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.util.FileUtilities;
+import org.opengis.metadata.citation.CitationDate;
+import org.opengis.metadata.citation.DateType;
+import org.opengis.metadata.identification.Keywords;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.GenericName;
+import org.opengis.util.InternationalString;
 import org.w3c.dom.Node;
 
-import javax.imageio.ImageIO;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -43,9 +56,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,9 +88,9 @@ public class Data {
     public Response uploadFile(final MultiPart multi) {
 
 
-        DataMetadata metadata = new DataMetadata();
         String dataType = "";
-        String extension = "";
+        String fileName = "";
+        int extensionPoint = 0;
         InputStream uploadedInputStream = null;
 
         for (BodyPart bodyPart : multi.getBodyParts()) {
@@ -85,12 +101,11 @@ public class Data {
                 case "file":
                     BodyPartEntity bpe = (BodyPartEntity) bodyPart.getEntity();
                     uploadedInputStream = bpe.getInputStream();
-                    String fileName = bodyPart.getContentDisposition().getFileName();
-                    int extensionPoint = fileName.lastIndexOf('.');
-                    extension = fileName.substring(extensionPoint);
+                    fileName = bodyPart.getContentDisposition().getFileName();
+                    extensionPoint = fileName.lastIndexOf('.');
                     break;
-                case "metadata":
-                    metadata = bodyPart.getEntityAs(DataMetadata.class);
+                case "type":
+                    dataType = bodyPart.getEntityAs(String.class);
                     break;
                 default:
                     LOGGER.log(Level.INFO, "property not use");
@@ -98,15 +113,16 @@ public class Data {
         }
 
 
-        String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath() + "/" + metadata.getName();
-        String uploadedFileName = uploadedFileLocation + "/" + metadata.getName() + extension;
+        String dataName = fileName.substring(0, extensionPoint);
+        String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath() + "/" + dataName;
+        String uploadedFileName = uploadedFileLocation + "/" + fileName;
         DataInformation information;
 
         // save it
         try {
             File file = writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName);
-            information = generateMetadatasInformation(file, metadata);
-            information.setName(metadata.getName());
+            information = generateMetadatasInformation(file, dataType);
+            information.setName(dataName);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when saving file", e);
             return Response.status(500).entity("upload file " + uploadedFileLocation + " is not saved").build();
@@ -126,34 +142,34 @@ public class Data {
         final FileListBean list = new FileListBean();
         final List<FileBean> listBean = new ArrayList<>(0);
         File[] children;
-        final List<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension();
+        final Set<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension().keySet();
 
         final File root = ConfigDirectory.getDataDirectory();
         if ("root".equalsIgnoreCase(path)) {
             path = "";
             children = root.listFiles();
 
-        }else{
+        } else {
             final File nextRoot = new File(root, path);
             children = nextRoot.listFiles();
         }
 
         //loop on subfiles/folders to create bean
-        if(children != null){
+        if (children != null) {
             for (int i = 0; i < children.length; i++) {
                 File child = children[i];
 
-                if(child.isFile()){
+                if (child.isFile()) {
                     int lastIndexPoint = child.getName().lastIndexOf('.');
-                    String extension = child.getName().substring(lastIndexPoint+1);
+                    String extension = child.getName().substring(lastIndexPoint + 1);
 
-                    if(extensions.contains(extension.toLowerCase())){
-                        final FileBean bean = new FileBean(child.getName(), child.isDirectory(), path+"/"+child.getName());
+                    if (extensions.contains(extension.toLowerCase())) {
+                        final FileBean bean = new FileBean(child.getName(), child.isDirectory(), path + "/" + child.getName());
                         listBean.add(bean);
                     }
 
-                }else{
-                    final FileBean bean = new FileBean(child.getName(), child.isDirectory(), path+"/"+child.getName());
+                } else {
+                    final FileBean bean = new FileBean(child.getName(), child.isDirectory(), path + "/" + child.getName());
                     listBean.add(bean);
                 }
             }
@@ -162,24 +178,19 @@ public class Data {
         return Response.status(200).entity(list).build();
     }
 
-
     @POST
     @Path("load")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response loadData(final ParameterValues values){
+    public Response loadData(final ParameterValues values) {
         String filePath = values.getValues().get("filePath");
         String dataType = values.getValues().get("dataType");
 
         final File root = ConfigDirectory.getDataDirectory();
         final File choosingFile = new File(root, filePath);
-        if(choosingFile.exists()){
-            //TODO temporary empty DataMetadataobject : just dataType
-            final DataMetadata metadata = new DataMetadata();
-            metadata.setDataType(dataType);
-
-            DataInformation information = generateMetadatasInformation(choosingFile, metadata);
-            return  Response.status(200).entity(information).build();
+        if (choosingFile.exists()) {
+            DataInformation information = generateMetadatasInformation(choosingFile, dataType);
+            return Response.status(200).entity(information).build();
         }
         return Response.status(418).build();
     }
@@ -223,46 +234,16 @@ public class Data {
     /**
      * Generate {@link DataInformation} for require file data
      *
-     * @param file     data {@link File}
-     * @param dataMetadata entry user metadata
+     *
+     * @param file         data {@link java.io.File}
+     * @param dataType
      * @return a {@link DataInformation}
      */
-    private DataInformation generateMetadatasInformation(final File file, final DataMetadata dataMetadata) {
-        switch (dataMetadata.getDataType()) {
+    private DataInformation generateMetadatasInformation(final File file, final String dataType) {
+        switch (dataType) {
             case "raster":
                 try {
-                    GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
-                    if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
-
-                        // get Metadata as a List
-                        final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
-
-                        //TODO add user Metadata
-
-                        final TreeTable.Node rootNode = fileMetadata.asTreeTable().getRoot();
-
-                        MetadataMapBuilder.setCounter(0);
-                        final ArrayList<SimplyMetadataTreeNode> metadataList = MetadataMapBuilder.createMetadataList(rootNode, null, 11);
-
-                        final DataInformation information = new DataInformation(file.getPath(), dataMetadata.getDataType(), metadataList);
-
-                        //coverage data
-                        final HashMap<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
-                        for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
-                            final GenericName name = coverageReader.getCoverageNames().get(i);
-                            final SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
-                            final String rootNodeName = sm.getNativeMetadataFormatName();
-                            final Node coverateRootNode = sm.getAsTree(rootNodeName);
-
-                            MetadataMapBuilder.setCounter(0);
-                            final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11);
-
-                            final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
-                            nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
-                        }
-                        information.setCoveragesMetadata(nameSpatialMetadataMap);
-                        return information;
-                    }
+                    return getRasterDataInformation(file, dataType);
                 } catch (CoverageStoreException e) {
                     LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
                 }
@@ -277,7 +258,7 @@ public class Data {
                         final ShapefileFeatureStore shapeStore = new ShapefileFeatureStore(files[0].toURL());
                         final String crsName = shapeStore.getFeatureType().getCoordinateReferenceSystem().getName().toString();
                         final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), file.getParent(),
-                                dataMetadata.getDataType(), crsName);
+                                dataType, crsName);
                         return information;
                     }
 
@@ -293,4 +274,41 @@ public class Data {
         }
         return null;
     }
+
+    private DataInformation getRasterDataInformation(final File file, final String dataType) throws CoverageStoreException {
+        GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
+        if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
+
+            // get Metadata as a List
+            final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
+
+            final TreeTable.Node rootNode = fileMetadata.asTreeTable().getRoot();
+
+            MetadataMapBuilder.setCounter(0);
+            final ArrayList<SimplyMetadataTreeNode> metadataList = MetadataMapBuilder.createMetadataList(rootNode, null, 11);
+
+            final DataInformation information = new DataInformation(file.getPath(), dataType, metadataList);
+
+            //coverage data
+            final HashMap<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
+            for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
+                final GenericName name = coverageReader.getCoverageNames().get(i);
+                final SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
+                final String rootNodeName = sm.getNativeMetadataFormatName();
+                final Node coverateRootNode = sm.getAsTree(rootNodeName);
+
+                MetadataMapBuilder.setCounter(0);
+                final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11);
+
+                final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
+                nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
+            }
+            information.setCoveragesMetadata(nameSpatialMetadataMap);
+            return information;
+        } else {
+            return new DataInformation();
+        }
+    }
+
+
 }

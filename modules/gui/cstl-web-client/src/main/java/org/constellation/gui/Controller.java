@@ -46,6 +46,7 @@ import org.constellation.gui.service.bean.LayerData;
 import org.constellation.gui.templates.webservices;
 import org.constellation.gui.util.LayerComparator;
 import org.constellation.gui.util.LayerDataComparator;
+import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -349,16 +350,17 @@ public class Controller {
      */
     @Resource
     @Route("/upload")
-    public Response upload(final FileItem file, final DataMetadata metadata, final String returnURL) {
+    public Response upload(final FileItem file, final String dataType, final String returnURL) {
         if (file != null) {
-            DataInformation di = null;
+            DataInformation di;
+            // Create file on temporary folder
+            String tempDir = System.getProperty("java.io.tmpdir");
+            final File newFile = new File(tempDir + "/" + file.getName());
+
             try {
                 //open stream on file
                 final InputStream stream = file.getInputStream();
 
-                // Create file on temporary folder
-                String tempDir = System.getProperty("java.io.tmpdir");
-                final File newFile = new File(tempDir + "/" + file.getName());
 
                 // write on file
                 final FileOutputStream fos = new FileOutputStream(newFile);
@@ -367,17 +369,15 @@ public class Controller {
                     fos.write(intVal);
                     intVal = stream.read();
                 }
-
-                di = servicesManager.uploadToServer(newFile, metadata);
-
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "error when saving file on server", e);
                 return Response.error("error when saving file on server");
             }
 
+            di = servicesManager.uploadToServer(newFile, dataType);
             informationContainer.setInformation(di);
             Response aResponse = Response.error("response not initialized");
-            switch (metadata.getDataType()) {
+            switch (dataType) {
                 case "raster":
                     aResponse = RasterController_.showRaster(returnURL);
                     break;
@@ -388,16 +388,6 @@ public class Controller {
         } else {
             return Response.error("error when saving file on server");
         }
-    }
-
-    @Ajax
-    @Resource
-    @Route("style/list")
-    public Response getStyleList() {
-        Map<String, Object> parameters = new HashMap<>(0);
-        StyleListBean aList = servicesManager.getStyleList();
-        parameters.put("styleList", aList);
-        return styleListing.with(parameters).ok();
     }
 
     @Action

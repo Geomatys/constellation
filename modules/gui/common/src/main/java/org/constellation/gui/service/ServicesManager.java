@@ -23,6 +23,7 @@ import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBean;
+import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -190,8 +191,8 @@ public class  ServicesManager {
         return instancesSummary;
     }
 
-    public DataInformation uploadToServer(final File newFile, final DataMetadata metadata) {
-        return cstl.openServer().providers.uploadData(newFile, metadata);
+    public DataInformation uploadToServer(File newFile, String dataType) {
+        return cstl.openServer().providers.uploadData(newFile, dataType);
     }
 
     public StyleListBean getStyleList() {

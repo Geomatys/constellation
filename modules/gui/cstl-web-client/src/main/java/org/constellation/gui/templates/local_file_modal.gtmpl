@@ -6,33 +6,6 @@
         </div>
         <div class="modal-body">
             <div id="part1">
-                <div class="control-group">
-                    <label class="control-label" for="name">&{layer.listing.data.upload.name.label}</label>
-                    <div class="controls">
-                        <input type="text" id="name" name="name" />
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="keywords">mot clefs</label>
-                    <div class="controls">
-                        <input type="text" id="keywords" name="keywords" />
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="abstract">description</label>
-                    <div class="controls">
-                        <textarea type="text" id="abstract" name="abstract"></textarea>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="date">date</label>
-                    <div class="controls">
-                        <input type="text" id="date" name="date" />
-                    </div>
-                </div>
-            </div>
-
-            <div id="part2">
                 <!-- Upload part -->
                 <div class="fileupload fileupload-new" data-provides="fileupload">
                     <div class="input-append">
@@ -48,7 +21,9 @@
                         <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">&{layer.listing.data.upload.remove.label}</a>
                     </div>
                 </div>
+            </div>
 
+            <div id="part2">
                 <!-- Choose data type -->
                 <div class="row">
                     <div class="span2">
@@ -84,6 +59,7 @@
 <script type="text/javascript">
     $("#part2").hide();
     $("#submitButton").hide();
+    $("#nextButton").hide();
 
     $("#nextButton").on("click", function(){
         $("#nextButton").hide();
@@ -91,6 +67,24 @@
             $("#part2").show();
             $("#submitButton").show();
         });
+    });
 
-    })
+    $("#file").on("change", function(){
+        var selectedFile = $("#file").val();
+        if(selectedFile != ""){
+            var lastPointIndex = selectedFile.lastIndexOf(".");
+            var extension = selectedFile.substring(lastPointIndex+1, selectedFile.length);
+            $.post(appURL+"/ajax/testExtension/", {"extension": extension}, function(data){
+                if(data.dataType!=""){
+                    $("#part2 [value="+data.dataType+"]").prop("checked", true);
+                    $("#nextButton").hide();
+                    $("#submitButton").show();
+                } else {
+                    $("#submitButton").hide();
+                    $("#nextButton").show();
+                }
+            })
+        }
+    });
+
 </script>
