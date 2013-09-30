@@ -638,31 +638,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         return inCapabilities;
     }
 
-    /**
-     * Merge old and new values in the old dimension. Try to sort its values.
-     *
-     * @param oldExtraDim
-     * @param newExtraDim
-     */
-    private void mergeValues(final AbstractDimension oldExtraDim, final AbstractDimension newExtraDim) {
-        final Set<String> valsSet = new HashSet<String>();
-        final String oldVals = oldExtraDim.getValue();
-        final String[] oldValsSplit = oldVals.split(",");
-        for (final String o : oldValsSplit) {
-            valsSet.add(o);
-        }
-
-        final String newVals = newExtraDim.getValue();
-        final String[] newValsSplit = newVals.split(",");
-        for (final String n : newValsSplit) {
-            valsSet.add(n);
-        }
-
-        List<String> finalVals = new ArrayList<String>();
-        finalVals.addAll(valsSet);
-
-        if (finalVals.isEmpty()) {
-            return;
+    private String sortValues(final String... vals) {
+        final List<String> finalVals = new ArrayList<String>();
+        for (final String s : vals) {
+            finalVals.add(s);
         }
 
         boolean isDoubleValues = false;
@@ -697,7 +676,39 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             sb.append(val);
             first = false;
         }
-        oldExtraDim.setValue(sb.toString());
+
+        return sb.toString();
+    }
+
+    /**
+     * Merge old and new values in the old dimension. Try to sort its values.
+     *
+     * @param oldExtraDim
+     * @param newExtraDim
+     */
+    private void mergeValues(final AbstractDimension oldExtraDim, final AbstractDimension newExtraDim) {
+        final Set<String> valsSet = new HashSet<String>();
+        final String oldVals = oldExtraDim.getValue();
+        final String[] oldValsSplit = oldVals.split(",");
+        for (final String o : oldValsSplit) {
+            valsSet.add(o);
+        }
+
+        final String newVals = newExtraDim.getValue();
+        final String[] newValsSplit = newVals.split(",");
+        for (final String n : newValsSplit) {
+            valsSet.add(n);
+        }
+
+        final List<String> finalVals = new ArrayList<String>();
+        finalVals.addAll(valsSet);
+
+        if (finalVals.isEmpty()) {
+            return;
+        }
+
+        final String finalValSorted = sortValues(finalVals.toArray(new String[0]));
+        oldExtraDim.setValue(finalValSorted);
     }
 
     /**
@@ -718,6 +729,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 refs.add(ref);
             }
 
+            if (refs.isEmpty()) {
+                // Dimension applied on a layer which has no values: just skip this dimension
+                continue;
+            }
+
             final StringBuilder values = new StringBuilder();
             int index = 0;
             for (final Range val : refs) {
@@ -731,6 +747,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             }
 
+            final String sortedValues = sortValues(values.toString().split(","));
             final boolean multipleValues = (refs.size() > 1);
             final String unitSymbol = ddef.getCrs().getCoordinateSystem().getAxis(0).getUnit().toString();
             final String unit = unitSymbol;
@@ -738,9 +755,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             final String defaut = "";
 
             final AbstractDimension dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-                new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName, unit,
+                new org.geotoolkit.wms.xml.v111.Dimension(sortedValues, axisName, unit,
                     unitSymbol, defaut, multipleValues, null, null) :
-                new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName, unit,
+                new org.geotoolkit.wms.xml.v130.Dimension(sortedValues, axisName, unit,
                     unitSymbol, defaut, multipleValues, null, null);
 
             dimensions.add(dim);
