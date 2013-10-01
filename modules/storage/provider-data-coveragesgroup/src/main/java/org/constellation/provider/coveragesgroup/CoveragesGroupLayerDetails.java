@@ -19,6 +19,7 @@ package org.constellation.provider.coveragesgroup;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -46,7 +47,10 @@ import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.geometry.Envelope;
 
 /**
@@ -170,6 +174,25 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
     private void setFilter(final MapItem item, final Filter filter) {
         if (item instanceof FeatureMapLayer) {
             final FeatureMapLayer fml = (FeatureMapLayer) item;
+            if (filter instanceof PropertyIsEqualTo) {
+                final Collection<PropertyDescriptor> propsDesc = fml.getCollection().getFeatureType().getDescriptors();
+                final String propName = ((PropertyName)((PropertyIsEqualTo)filter).getExpression1()).getPropertyName();
+
+                for (PropertyDescriptor prop : propsDesc) {
+                    // If the feature type for the collection contains the property,
+                    // we can apply this filter to this collection.
+                    if (prop.getName().getLocalPart().equalsIgnoreCase(propName)) {
+                        fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filter));
+                        return;
+                    }
+                }
+
+                // Property not found in the feature type, just filter on feature type name
+                fml.setQuery(QueryBuilder.all(fml.getCollection().getFeatureType().getName()));
+                return;
+            }
+
+            // Just apply the filter
             fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filter));
             return;
         }
