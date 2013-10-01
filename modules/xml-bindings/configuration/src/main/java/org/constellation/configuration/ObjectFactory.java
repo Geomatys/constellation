@@ -154,6 +154,26 @@ public class ObjectFactory {
     public WMSPortrayal createWMSMapPortrayal() {
         return new WMSPortrayal();
     }
+
+    public StyleRecord createStyleRecord() {
+        return new StyleRecord();
+    }
+
+    public UserRecord createUserRecord() {
+        return new UserRecord();
+    }
+
+    public ProviderRecord createProviderRecord() {
+        return new ProviderRecord();
+    }
+
+    public TaskRecord createTaskRecord() {
+        return new TaskRecord();
+    }
+
+    public DataRecord createDataRecord() {
+        return new DataRecord();
+    }
     
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "source")
     public JAXBElement<Object> createSource(Object value) {

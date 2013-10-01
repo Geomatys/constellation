@@ -18,8 +18,14 @@
 package org.constellation.map.configuration;
 
 import org.apache.sis.util.Static;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.AdminDatabase;
+import org.constellation.admin.AdminSession;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataRecord;
+import org.constellation.configuration.StyleRecord;
+import org.constellation.configuration.StyleReport;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.StyleBean;
 import org.constellation.process.ConstellationProcessFactory;
@@ -30,14 +36,28 @@ import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.style.MutableFeatureTypeStyle;
+import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.style.LineSymbolizer;
+import org.opengis.style.PointSymbolizer;
+import org.opengis.style.PolygonSymbolizer;
+import org.opengis.style.RasterSymbolizer;
+import org.opengis.style.Symbolizer;
+import org.opengis.style.TextSymbolizer;
 import org.opengis.util.NoSuchIdentifierException;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -45,6 +65,11 @@ import java.util.List;
  * @since 0.9
  */
 public final class StyleProviderConfig extends Static {
+
+    /**
+     * Logger used for debugging and event notification.
+     */
+    private static final Logger LOGGER = Logging.getLogger(StyleProviderConfig.class);
 
     /**
      * Ensures that a style provider with the specified identifier really exists.
@@ -133,19 +158,6 @@ public final class StyleProviderConfig extends Static {
     }
 
     /**
-     * Returns a style metadata.
-     *
-     * TODO: find a way to attach metadata to created style.
-     *
-     * @throws TargetNotFoundException if the style with the specified identifier can't be found
-     * @return a {@link StyleBean} instance
-     */
-    public static Object getStyleMetadata(final String providerId, final String styleId) throws TargetNotFoundException {
-        ensureExistingStyle(providerId, styleId);
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    /**
      * Gets and returns the {@link MutableStyle} that matches with the specified identifier.
      *
      * @param providerId the style provider identifier
@@ -156,6 +168,70 @@ public final class StyleProviderConfig extends Static {
     public static MutableStyle getStyle(final String providerId, final String styleId) throws TargetNotFoundException {
         ensureExistingStyle(providerId, styleId);
         return StyleProviderProxy.getInstance().getProvider(providerId).get(styleId);
+    }
+
+    /**
+     * Gets and returns a {@link StyleReport} instance that contains several information of an
+     * existing style resource.
+     * <p>
+     * The report contains:
+     * <ul>
+     *     <li>Style record from administration database (name, provider, date, category).</li>
+     *     <li>Style body information (description, symbolizer types).</li>
+     *     <li>A list of data records for which the style has been explicitly declared as "applicable".</li>
+     * </ul>
+     *
+     * @param providerId the style provider identifier
+     * @param styleId    the style identifier
+     * @param locale     the locale for report internationalization
+     * @return a {@link StyleReport} instance
+     * @throws TargetNotFoundException if the style with the specified identifier can't be found
+     * @throws ConfigurationException if the operation has failed for any reason
+     */
+    public static StyleReport getStyleReport(final String providerId, final String styleId, final Locale locale) throws ConfigurationException {
+        final StyleReport report = new StyleReport();
+
+        // Extract information from the style body.
+        final MutableStyle style = getStyle(providerId, styleId);
+        if (style.getDescription() != null && style.getDescription().getAbstract() != null) {
+            report.setDescription(style.getDescription().getAbstract().toString(locale));
+        }
+        for (final MutableFeatureTypeStyle fts : style.featureTypeStyles()) {
+            for (final MutableRule rule : fts.rules()) {
+                for (final Symbolizer symbolizer : rule.symbolizers()) {
+                    if (symbolizer instanceof PointSymbolizer && !report.getSymbolizerTypes().contains("point")) {
+                        report.getSymbolizerTypes().add("point");
+                    } else if (symbolizer instanceof LineSymbolizer && !report.getSymbolizerTypes().contains("line")) {
+                        report.getSymbolizerTypes().add("line");
+                    } else if (symbolizer instanceof PolygonSymbolizer && !report.getSymbolizerTypes().contains("polygon")) {
+                        report.getSymbolizerTypes().add("polygon");
+                    } else if (symbolizer instanceof TextSymbolizer && !report.getSymbolizerTypes().contains("text")) {
+                        report.getSymbolizerTypes().add("text");
+                    } else if (symbolizer instanceof RasterSymbolizer && !report.getSymbolizerTypes().contains("raster")) {
+                        report.getSymbolizerTypes().add("raster");
+                    }
+                }
+            }
+        }
+
+        // Extract additional information from the administration database.
+        AdminSession session = null;
+        try {
+            session = AdminDatabase.createSession();
+            final StyleRecord record = session.readStyle(styleId, providerId);
+            if (record != null) {
+                report.setRecord(record);
+                report.setTargetData(session.readData(record));
+            } else {
+                LOGGER.log(Level.WARNING, "Style named \"" + styleId + "\" from provider with id \"" + providerId + "\" can't be found from database.");
+            }
+        } catch (SQLException ex) {
+            throw new ConfigurationException("An error occurred while reading data list for style named \"" + styleId + "\".", ex);
+        } finally {
+            if (session != null) session.close();
+        }
+
+        return report;
     }
 
     /**
@@ -199,6 +275,74 @@ public final class StyleProviderConfig extends Static {
             desc.createProcess(inputs).call();
         } catch (ProcessException ex) {
             throw new ConfigProcessException("Process to delete a style has reported an error.", ex);
+        }
+    }
+
+    /**
+     * Links a style resource to an existing data resource.
+     *
+     * @param styleProvider the style provider identifier
+     * @param styleId       the style identifier
+     * @param dataProvider  the data provider identifier
+     * @param dataId        the data identifier
+     * @throws TargetNotFoundException if the style with the specified identifier can't be found
+     * @throws ConfigurationException if the operation has failed for any reason
+     */
+    public static void linkToData(final String styleProvider, final String styleId, final String dataProvider, final String dataId) throws ConfigurationException {
+        ensureNonNull("dataProvider", dataProvider);
+        ensureNonNull("dataId",       dataId);
+        ensureExistingStyle(styleProvider, styleId);
+
+        AdminSession session = null;
+        try {
+            session = AdminDatabase.createSession();
+            final StyleRecord style = session.readStyle(styleId, styleProvider);
+            if (style == null) {
+                throw new ConfigurationException("Style named \"" + styleId + "\" from provider with id \"" + styleProvider + "\" can't be found from database.");
+            }
+            final DataRecord data = session.readData(dataId, dataProvider);
+            if (data == null) {
+                throw new ConfigurationException("Data named \"" + dataId + "\" from provider with id \"" + dataProvider + "\" can't be found from database.");
+            }
+            session.writeStyledData(style, data);
+        } catch (SQLException ex) {
+            throw new ConfigurationException("An error occurred while trying to link the style named \"" + styleId + "\" to data named \"" + dataId + "\".", ex);
+        } finally {
+            if (session != null) session.close();
+        }
+    }
+
+    /**
+     * Unlink a style resource from an existing data resource.
+     *
+     * @param styleProvider the style provider identifier
+     * @param styleId       the style identifier
+     * @param dataProvider  the data provider identifier
+     * @param dataId        the data identifier
+     * @throws TargetNotFoundException if the style with the specified identifier can't be found
+     * @throws ConfigurationException if the operation has failed for any reason
+     */
+    public static void unlinkFromData(final String styleProvider, final String styleId, final String dataProvider, final String dataId) throws ConfigurationException {
+        ensureNonNull("dataProvider", dataProvider);
+        ensureNonNull("dataId",       dataId);
+        ensureExistingStyle(styleProvider, styleId);
+
+        AdminSession session = null;
+        try {
+            session = AdminDatabase.createSession();
+            final StyleRecord style = session.readStyle(styleId, styleProvider);
+            if (style == null) {
+                throw new ConfigurationException("Style named \"" + styleId + "\" from provider with id \"" + styleProvider + "\" can't be found from database.");
+            }
+            final DataRecord data = session.readData(dataId, dataProvider);
+            if (data == null) {
+                throw new ConfigurationException("Data named \"" + dataId + "\" from provider with id \"" + dataProvider + "\" can't be found from database.");
+            }
+            session.deleteStyledData(style, data);
+        } catch (SQLException ex) {
+            throw new ConfigurationException("An error occurred while trying to unlink the style named \"" + styleId + "\" from data named \"" + dataId + "\".", ex);
+        } finally {
+            if (session != null) session.close();
         }
     }
 

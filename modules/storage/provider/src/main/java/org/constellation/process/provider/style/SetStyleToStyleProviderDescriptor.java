@@ -16,12 +16,12 @@
  */
 package org.constellation.process.provider.style;
 
+import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
 import org.geotoolkit.style.MutableStyle;
-import org.apache.sis.util.iso.SimpleInternationalString;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -63,11 +63,20 @@ public class SetStyleToStyleProviderDescriptor extends AbstractProcessDescriptor
     public static final ParameterDescriptor<MutableStyle> STYLE =
             new DefaultParameterDescriptor(STYLE_NAME, STYLE_REMARKS, MutableStyle.class, null, true);
 
+
+    /*
+     * Owner
+     */
+    public static final String OWNER_NAME = "owner";
+    private static final String OWNER_REMARKS = "The style owner login. Can be null.";
+    public static final ParameterDescriptor<String> OWNER =
+            new DefaultParameterDescriptor<String>(OWNER_NAME,OWNER_REMARKS, String.class, null, false);
+
     /**
      * Input parameters
      */
     public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters", new GeneralParameterDescriptor[]{PROVIDER_ID, STYLE_ID, STYLE});
+            new DefaultParameterDescriptorGroup("InputParameters", new GeneralParameterDescriptor[]{PROVIDER_ID, STYLE_ID, STYLE, OWNER});
     /**
      * Output parameters
      */

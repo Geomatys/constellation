@@ -2,7 +2,7 @@ package org.constellation.configuration.ws.rs;
 
 import org.constellation.admin.AdminDatabase;
 import org.constellation.admin.AdminSession;
-import org.constellation.admin.UserRecord;
+import org.constellation.configuration.UserRecord;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;

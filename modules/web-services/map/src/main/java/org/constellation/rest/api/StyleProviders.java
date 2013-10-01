@@ -18,10 +18,12 @@
 package org.constellation.rest.api;
 
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBean;
 import org.constellation.map.configuration.StyleProviderConfig;
 import org.geotoolkit.style.MutableStyle;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -30,8 +32,11 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import java.util.Locale;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -54,7 +59,7 @@ public final class StyleProviders {
     @Path("{id}/style")
     public Response createStyle(final @PathParam("id") String id, final MutableStyle style) throws Exception {
         StyleProviderConfig.createStyle(id, style);
-        return ok(AcknowlegementType.success("Style \"" + style.getName() + "\" successfully added to provider (" + id + ")."));
+        return ok(AcknowlegementType.success("Style named \"" + style.getName() + "\" successfully added to provider with id \"" + id + "\"."));
     }
 
     /**
@@ -91,7 +96,7 @@ public final class StyleProviders {
     @Path("{id}/style/{styleId}")
     public Response updateStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final MutableStyle style) throws Exception {
         StyleProviderConfig.setStyle(id, styleId, style);
-        return ok(AcknowlegementType.success("Style \"" + styleId + "\" from provider \"" + id + "\" successfully updated."));
+        return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully updated."));
     }
 
     /**
@@ -101,6 +106,35 @@ public final class StyleProviders {
     @Path("{id}/style/{styleId}")
     public Response deleteStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId) throws Exception {
         StyleProviderConfig.deleteStyle(id, styleId);
-        return ok(AcknowlegementType.success("Style \"" + styleId + "\" successfully removed from provider \"" + id + "\"."));
+        return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully removed from provider with id \"" + id + "\"."));
+    }
+
+    /**
+     * @see StyleProviderConfig#getStyleReport(String, String,Locale)
+     */
+    @GET
+    @Path("{id}/style/{styleId}/report")
+    public Response getStyleReport(final @Context HttpServletRequest request, final @PathParam("id") String id, final @PathParam("styleId") String styleId) throws Exception {
+        return ok(StyleProviderConfig.getStyleReport(id, styleId, request.getLocale()));
+    }
+
+    /**
+     * @see StyleProviderConfig#linkToData(String, String, String, String)
+     */
+    @POST
+    @Path("{id}/style/{styleId}/linkData")
+    public Response linkToData(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final ParameterValues values) throws Exception {
+        StyleProviderConfig.linkToData(id, styleId, values.getValues().get("dataProvider"), values.getValues().get("dataId"));
+        return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully linked to data named \"" + values.getValues().get("dataId") + "\"."));
+    }
+
+    /**
+     * @see StyleProviderConfig#unlinkFromData(String, String, String, String)
+     */
+    @POST
+    @Path("{id}/style/{styleId}/unlinkData")
+    public Response unlinkFromData(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final ParameterValues values) throws Exception {
+        StyleProviderConfig.unlinkFromData(id, styleId, values.getValues().get("dataProvider"), values.getValues().get("dataId"));
+        return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully unlinked from data named \"" + values.getValues().get("dataId") + "\"."));
     }
 }

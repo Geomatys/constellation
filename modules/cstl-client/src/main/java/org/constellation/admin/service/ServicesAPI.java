@@ -39,7 +39,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @version 0.9
  * @since 0.9
  */
-public class ServicesAPI {
+public final class ServicesAPI {
 
     /**
      * Client used to communicate with the Constellation server.

@@ -16,6 +16,9 @@
  */
 package org.constellation.provider.sld;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +29,10 @@ import java.util.Map;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
 
+import org.constellation.admin.AdminDatabase;
+import org.constellation.admin.AdminSession;
+import org.constellation.configuration.ProviderRecord.ProviderType;
+import org.constellation.configuration.StyleRecord;
 import org.constellation.provider.AbstractStyleProvider;
 
 import org.geotoolkit.factory.FactoryFinder;
@@ -196,7 +203,7 @@ public class SLDProvider extends AbstractStyleProvider{
         File f = index.get(key);
         if(f == null){
             //file doesnt exist, create it
-            f = new File(folder, key+".xml");
+            f = new File(folder, key+ ".xml");
         }
 
         final StyleXmlIO util = new StyleXmlIO();
@@ -261,6 +268,41 @@ public class SLDProvider extends AbstractStyleProvider{
             }
 
             visit(folder);
+
+            // Update administration database.
+            AdminSession session = null;
+            try {
+                session = AdminDatabase.createSession();
+                if (session.readProvider(this.getId()) == null) {
+                    session.writeProvider(this.getId(), ProviderType.STYLE, "sld", null);
+                }
+                final List<StyleRecord> styles = session.readStyles(this.getId());
+
+                // Remove no longer existing style.
+                for (final StyleRecord style : styles) {
+                    if (index.get(style.getName()) == null) {
+                        session.deleteStyle(style.getName(), this.getId());
+                    }
+                }
+
+                // Add not registered new data.
+                for (final String key : index.keySet()) {
+                    boolean found = false;
+                    for (final StyleRecord style : styles) {
+                        if (key.equals(style.getName())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        session.writeStyle(this.getId(), key, null, index.get(key).lastModified());
+                    }
+                }
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "An error occurred while updating database on provider startup.", ex);
+            } finally {
+                if (session != null) session.close();
+            }
         }
     }
 

@@ -18,6 +18,7 @@
 package org.constellation.admin;
 
 import org.apache.sis.util.Static;
+import org.constellation.configuration.UserRecord;
 import org.constellation.util.DatabaseUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 
@@ -90,6 +91,8 @@ public final class AdminDatabase extends Static {
      * {@code "CstlAdmin"} exists on the current {@link DataSource}.
      * <p />
      * If the schema is missing create it executing the {@code admin-db.sql} resource file.
+     *
+     * TODO: implement multiple dialects support (only derby is supported actually)
      *
      * @throws SQLException if an error occurred while connecting to database or executing a SQL statement
      */

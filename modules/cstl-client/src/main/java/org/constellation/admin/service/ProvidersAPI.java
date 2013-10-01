@@ -17,6 +17,7 @@
 
 package org.constellation.admin.service;
 
+import org.constellation.configuration.StyleReport;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
@@ -38,7 +39,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @version 0.9
  * @since 0.9
  */
-public class ProvidersAPI {
+public final class ProvidersAPI {
 
     /**
      * Client used to communicate with the Constellation server.
@@ -87,7 +88,7 @@ public class ProvidersAPI {
      * @param providerId the style provider identifier
      * @param styleName  the style name
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-     * @throws IOException           on HTTP communication error or response entity parsing error
+     * @throws IOException on HTTP communication error or response entity parsing error
      */
     public void deleteStyle(final String providerId, final String styleName) throws HttpResponseException, IOException {
         ensureNonNull("providerId", providerId);
@@ -95,6 +96,70 @@ public class ProvidersAPI {
 
         final String path = "SP/" + providerId + "/style/" + styleName;
         client.delete(path, MediaType.APPLICATION_XML_TYPE, null).ensure2xxStatus();
+    }
+
+    /**
+     * Queries a style report that contains several information of a style resource.
+     *
+     * @param providerId the style provider identifier
+     * @param styleName  the style name
+     * @throws HttpResponseException if the response does not have a {@code 2xx} status code
+     * @throws IOException on HTTP communication error or response entity parsing error
+     */
+    public StyleReport getStyleReport(final String providerId, final String styleName) throws HttpResponseException, IOException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("styleName",  styleName);
+
+        final String path = "SP/" + providerId + "/style/" + styleName + "/report";
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(StyleReport.class);
+    }
+
+    /**
+     * Links a style resource to an existing data resource.
+     *
+     * @param styleProvider the style provider identifier
+     * @param styleName     the style name
+     * @param dataProvider  the data provider identifier
+     * @param dataName      the data name
+     * @throws HttpResponseException if the response does not have a {@code 2xx} status code
+     * @throws IOException on HTTP communication error or response entity parsing error
+     */
+    public void linkStyleToData(final String styleProvider, final String styleName, final String dataProvider, final String dataName) throws HttpResponseException, IOException {
+        ensureNonNull("styleProvider", styleProvider);
+        ensureNonNull("styleName",     styleName);
+        ensureNonNull("dataProvider",  dataProvider);
+        ensureNonNull("dataName",      dataName);
+
+        final ParameterValues values = new ParameterValues();
+        values.getValues().put("dataProvider", dataProvider);
+        values.getValues().put("dataId",       dataName);
+
+        final String path = "SP/" + styleProvider + "/style/" + styleName + "/linkData";
+        client.post(path, MediaType.APPLICATION_XML_TYPE, values).ensure2xxStatus();
+    }
+
+    /**
+     * Unlink a style resource to an existing data resource.
+     *
+     * @param styleProvider the style provider identifier
+     * @param styleName     the style name
+     * @param dataProvider  the data provider identifier
+     * @param dataName      the data name
+     * @throws HttpResponseException if the response does not have a {@code 2xx} status code
+     * @throws IOException on HTTP communication error or response entity parsing error
+     */
+    public void unlinkStyleFromData(final String styleProvider, final String styleName, final String dataProvider, final String dataName) throws HttpResponseException, IOException {
+        ensureNonNull("styleProvider", styleProvider);
+        ensureNonNull("styleName",     styleName);
+        ensureNonNull("dataProvider",  dataProvider);
+        ensureNonNull("dataName",      dataName);
+
+        final ParameterValues values = new ParameterValues();
+        values.getValues().put("dataProvider", dataProvider);
+        values.getValues().put("dataId",       dataName);
+
+        final String path = "SP/" + styleProvider + "/style/" + styleName + "/unlinkData";
+        client.post(path, MediaType.APPLICATION_XML_TYPE, values).ensure2xxStatus();
     }
 
     /**

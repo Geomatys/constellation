@@ -104,6 +104,10 @@
   -->
     <dependencies>
         <dependency>
+            <groupId>org.mdweb.metamodel</groupId>
+            <artifactId>mdweb-metamodel-lib-auth</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-utility-pending</artifactId>
         </dependency>

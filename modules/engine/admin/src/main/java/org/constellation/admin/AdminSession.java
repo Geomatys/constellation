@@ -19,7 +19,14 @@ package org.constellation.admin;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.TaskRecord.State;
+import org.constellation.configuration.DataRecord;
+import org.constellation.configuration.DataRecord.DataType;
+import org.constellation.configuration.ProviderRecord;
+import org.constellation.configuration.ProviderRecord.ProviderType;
+import org.constellation.configuration.StyleRecord;
+import org.constellation.configuration.TaskRecord;
+import org.constellation.configuration.TaskRecord.TaskState;
+import org.constellation.configuration.UserRecord;
 import org.geotoolkit.util.StringUtilities;
 
 import java.io.IOException;
@@ -72,7 +79,6 @@ public final class AdminSession {
         }
     }
     private static final String READ_PROVIDER                = "provider.read";
-    private static final String READ_PROVIDER_FOR_ID         = "provider.read.from.id";
     private static final String READ_PROVIDER_LIST           = "provider.read.list";
     private static final String WRITE_PROVIDER               = "provider.write";
     private static final String DELETE_PROVIDER              = "provider.delete";
@@ -174,28 +180,20 @@ public final class AdminSession {
     }
 
 
-    public ProviderRecord readProvider(final DataRecord data) throws SQLException {
-        return selectOne(READ_PROVIDER_FOR_ID, new Object[]{data.provider}, ProviderRecord.class);
-    }
-
-    public ProviderRecord readProvider(final StyleRecord style) throws SQLException {
-        return selectOne(READ_PROVIDER_FOR_ID, new Object[]{style.provider}, ProviderRecord.class);
-    }
-
-    public ProviderRecord readProvider(final String identifier, final String type) throws SQLException {
-        return selectOne(READ_PROVIDER, new Object[]{identifier, type}, ProviderRecord.class);
+    public ProviderRecord readProvider(final String identifier) throws SQLException {
+        return selectOne(READ_PROVIDER, new Object[]{identifier}, ProviderRecord.class);
     }
 
     public List<ProviderRecord> readProvider() throws SQLException {
         return selectMany(READ_PROVIDER_LIST, ProviderRecord.class);
     }
 
-    public void writeProvider(final String identifier, final String type, final String impl, final String owner) throws SQLException {
-        update(WRITE_PROVIDER, new Object[]{identifier, type, impl, owner});
+    public void writeProvider(final String identifier, final ProviderType type, final String impl, final String owner) throws SQLException {
+        update(WRITE_PROVIDER, new Object[]{identifier, type.name(), impl, owner});
     }
 
-    public void deleteProvider(final String identifier, final String type) throws SQLException {
-        update(DELETE_PROVIDER, new Object[]{identifier, type});
+    public void deleteProvider(final String identifier) throws SQLException {
+        update(DELETE_PROVIDER, new Object[]{identifier});
     }
 
 
@@ -208,15 +206,15 @@ public final class AdminSession {
     }
 
     public List<StyleRecord> readStyles(final DataRecord data) throws SQLException {
-        return selectMany(READ_STYLE_LIST_FOR_DATA, new Object[]{data.id}, StyleRecord.class);
+        return selectMany(READ_STYLE_LIST_FOR_DATA, new Object[]{data.getId()}, StyleRecord.class);
     }
 
-    public List<StyleRecord> readStyles(final ProviderRecord provider) throws SQLException {
-        return selectMany(READ_STYLE_LIST_FOR_PROVIDER, new Object[]{provider.id}, StyleRecord.class);
+    public List<StyleRecord> readStyles(final String providerId) throws SQLException {
+        return selectMany(READ_STYLE_LIST_FOR_PROVIDER, new Object[]{providerId}, StyleRecord.class);
     }
 
-    public void writeStyle(final ProviderRecord provider, final String name, final String owner) throws SQLException {
-        update(WRITE_STYLE, new Object[]{name, provider.id, owner});
+    public void writeStyle(final String providerId, final String name, final String owner, final long date) throws SQLException {
+        update(WRITE_STYLE, new Object[]{name, providerId, owner, date});
     }
 
     public void deleteStyle(final String styleName, final String providerId) throws SQLException {
@@ -233,15 +231,15 @@ public final class AdminSession {
     }
 
     public List<DataRecord> readData(final StyleRecord style) throws SQLException {
-        return selectMany(READ_DATA_LIST_FOR_STYLE, new Object[]{style.id}, DataRecord.class);
+        return selectMany(READ_DATA_LIST_FOR_STYLE, new Object[]{style.getId()}, DataRecord.class);
     }
 
-    public List<DataRecord> readData(final ProviderRecord provider) throws SQLException {
-        return selectMany(READ_DATA_LIST_FOR_PROVIDER, new Object[]{provider.id}, DataRecord.class);
+    public List<DataRecord> readData(final String providerId) throws SQLException {
+        return selectMany(READ_DATA_LIST_FOR_PROVIDER, new Object[]{providerId}, DataRecord.class);
     }
 
-    public void writeData(final ProviderRecord provider, final String name, final String type, final String owner) throws SQLException {
-        update(WRITE_DATA, new Object[]{name, provider.id, type, owner});
+    public void writeData(final String providerId, final String name, final DataType type, final String owner, final long date) throws SQLException {
+        update(WRITE_DATA, new Object[]{name, providerId, type.name(), owner, date});
     }
 
     public void deleteData(final String dataName, final String providerId) throws SQLException {
@@ -250,11 +248,11 @@ public final class AdminSession {
 
 
     public void writeStyledData(final StyleRecord style, final DataRecord data) throws SQLException {
-        update(WRITE_STYLED_DATA, new Object[]{style.id, data.id});
+        update(WRITE_STYLED_DATA, new Object[]{style.getId(), data.getId()});
     }
 
     public void deleteStyledData(final StyleRecord style, final DataRecord data) throws SQLException {
-        update(DELETE_STYLED_DATA, new Object[]{style.id, data.id});
+        update(DELETE_STYLED_DATA, new Object[]{style.getId(), data.getId()});
     }
 
 
@@ -271,10 +269,10 @@ public final class AdminSession {
     }
 
     public void writeTask(final String identifier, final String type, final String description, final String owner) throws SQLException {
-        update(WRITE_TASK, new Object[]{identifier,State.PENDING,type,description,new java.util.Date().getTime(),owner});
+        update(WRITE_TASK, new Object[]{identifier, TaskRecord.TaskState.PENDING, type, description, new java.util.Date().getTime(), owner});
     }
 
-    public void updateTask(final String identifier, final TaskRecord.State state) throws SQLException {
+    public void updateTask(final String identifier, final TaskState state) throws SQLException {
         update(UPDATE_TASK, new Object[]{state.name(),new java.util.Date().getTime(),identifier});
     }
 
@@ -282,15 +280,12 @@ public final class AdminSession {
         update(DELETE_TASK, new Object[]{identifier});
     }
 
-
     public void update(final String query, final Object[] args) throws SQLException {
         PreparedStatement stmt = null;
         try {
             stmt = connect.prepareStatement(QUERIES.getProperty(query));
             prepareStatement(stmt, args);
-            synchronized (AdminSession.class) {
-                stmt.executeUpdate();
-            }
+            stmt.executeUpdate();
         } finally {
             if (stmt != null) stmt.close();
         }

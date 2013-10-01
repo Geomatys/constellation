@@ -16,19 +16,26 @@
  */
 package org.constellation.process.provider;
 
-import java.text.SimpleDateFormat;
+import org.constellation.admin.AdminDatabase;
+import org.constellation.admin.AdminSession;
+import org.constellation.configuration.ProviderRecord.ProviderType;
+import org.constellation.process.AbstractCstlProcess;
+import org.constellation.provider.*;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
+import org.opengis.parameter.ParameterValueGroup;
+
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import org.constellation.process.AbstractCstlProcess;
-import org.geotoolkit.process.ProcessException;
-import org.opengis.parameter.ParameterValueGroup;
+import java.util.logging.Level;
 
-import static org.constellation.process.provider.CreateProviderDescriptor.*;
-import org.constellation.provider.*;
-import static org.geotoolkit.parameter.Parameters.*;
-import org.geotoolkit.process.ProcessDescriptor;
+import static org.constellation.process.provider.CreateProviderDescriptor.OWNER;
+import static org.constellation.process.provider.CreateProviderDescriptor.PROVIDER_TYPE;
+import static org.constellation.process.provider.CreateProviderDescriptor.SOURCE;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * Create a new provider in constellation.
@@ -43,6 +50,7 @@ public final class CreateProvider extends AbstractCstlProcess {
     @Override
     protected void execute() throws ProcessException {
         final String providerType = value(PROVIDER_TYPE, inputParameters);
+        final String owner = value(OWNER, inputParameters);
         final ParameterValueGroup source = value(SOURCE, inputParameters);
 
         //initialize list of avaible Povider services
@@ -85,6 +93,21 @@ public final class CreateProvider extends AbstractCstlProcess {
                     }
                 }
                 StyleProviderProxy.getInstance().createProvider((StyleProviderService) service, source);
+            }
+
+            // Register provider into administration database.
+            AdminSession session = null;
+            try {
+                session = AdminDatabase.createSession();
+                if (service instanceof LayerProviderService) {
+                    session.writeProvider(id, ProviderType.LAYER, providerType, owner);
+                } else {
+                    session.writeProvider(id, ProviderType.STYLE, providerType, owner);
+                }
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "An error occurred while updating administration database after creating the provider with id \"" + id + "\".", ex);
+            } finally {
+                if (session != null) session.close();
             }
 
         } else {

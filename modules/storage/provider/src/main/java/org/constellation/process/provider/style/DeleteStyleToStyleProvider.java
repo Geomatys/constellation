@@ -16,20 +16,28 @@
  */
 package org.constellation.process.provider.style;
 
-import java.util.Collection;
+import org.constellation.admin.AdminDatabase;
+import org.constellation.admin.AdminSession;
 import org.constellation.process.AbstractCstlProcess;
+import org.constellation.provider.StyleProvider;
+import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
-import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor.*;
-import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviderProxy;
+
+import java.sql.SQLException;
+import java.util.logging.Level;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor.PROVIDER_ID;
+import static org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor.STYLE_ID;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * Remove a style from an existing style provider.
  *
  * @author Quentin Boileau (Geomatys).
+ * @author Bernard Fabien (Geomatys).
  */
 public class DeleteStyleToStyleProvider extends AbstractCstlProcess {
 
@@ -38,38 +46,35 @@ public class DeleteStyleToStyleProvider extends AbstractCstlProcess {
     }
 
     /**
-     * Remove a style from an existing style provider.
-     * @throws ProcessException if :
-     * - provider identifier is null/empty or not found in LayerProvider list.
-     * - style name is null/empty.
+     * @throws ProcessException if the provider or the style can't be found
      */
     @Override
     protected void execute() throws ProcessException {
+        final String providerID = value(PROVIDER_ID, inputParameters); // required
+        final String styleName  = value(STYLE_ID,    inputParameters); // required
 
-        final String providerId = value(PROVIDER_ID, inputParameters);
-        final String styleName = value(STYLE_ID, inputParameters);
-
-        if (providerId == null || "".equals(providerId.trim())) {
-            throw new ProcessException("Provider identifier can't be null or empty.", this, null);
+        if (isBlank(styleName)) {
+            throw new ProcessException("Unable to delete the style named \"" + styleName + "\". Style name can't be empty/blank.", this, null);
         }
 
-        if (styleName == null || "".equals(styleName.trim())) {
-            throw new ProcessException("Provider identifier can't be null or empty.", this, null);
+        // Retrieve or not the provider instance.
+        final StyleProvider provider = StyleProviderProxy.getInstance().getProvider(providerID);
+        if (provider == null) {
+            throw new ProcessException("Unable to delete the style named \"" + styleName + "\". Provider with id \"" + providerID + "\" not found.", this, null);
         }
 
-        final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
+        // Remove style from provider.
+        provider.remove(styleName);
 
-        boolean found = false;
-        for (final StyleProvider p : providers) {
-            if (p.getId().equals(providerId)) {
-                p.remove(styleName);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            throw new ProcessException("Provider with id "+providerId+" not found.", this, null);
+        // Remove style from administration database.
+        AdminSession session = null;
+        try {
+            session = AdminDatabase.createSession();
+            session.deleteStyle(styleName, providerID);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating administration database after deleting the style named \"" + styleName + "\".", ex);
+        } finally {
+            if (session != null) session.close();
         }
     }
 }

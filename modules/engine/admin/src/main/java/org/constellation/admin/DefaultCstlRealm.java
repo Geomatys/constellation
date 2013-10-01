@@ -28,6 +28,7 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.UserRecord;
 
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -78,7 +79,7 @@ public final class DefaultCstlRealm extends AuthorizingRealm {
         // Acquire user record.
         final UserRecord user = getUser(username);
 
-        // Build and authorization info.
+        // Build and return authorization info.
         final SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         final HashSet<String> roles = new HashSet<>();
         roles.addAll(user.getRoles());

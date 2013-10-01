@@ -20,12 +20,13 @@
     -->
     <dependencies>
         <dependency>
-            <groupId>org.mdweb.metamodel</groupId>
-            <artifactId>mdweb-metamodel-lib-auth</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.constellation.library</groupId>
             <artifactId>cstl-lib-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.xml-bindings</groupId>
+            <artifactId>cstl-xml-configuration</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

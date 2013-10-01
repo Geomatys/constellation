@@ -16,21 +16,32 @@
  */
 package org.constellation.process.provider.style;
 
-import java.util.Collection;
+import org.constellation.admin.AdminDatabase;
+import org.constellation.admin.AdminSession;
 import org.constellation.process.AbstractCstlProcess;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessException;
-import org.opengis.parameter.ParameterValueGroup;
-import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor.*;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.style.MutableStyle;
+import org.opengis.parameter.ParameterValueGroup;
+
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.logging.Level;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor.OWNER;
+import static org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor.PROVIDER_ID;
+import static org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor.STYLE;
+import static org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor.STYLE_ID;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
- * Add a style to an exising StyleProvider. If style name already exist, process will throw a ProcessException.
+ * Add a style to an existing StyleProvider. If the style already exists, update it.
  *
  * @author Quentin Boileau (Geomatys).
+ * @author Bernard Fabien (Geomatys).
  */
 public class SetStyleToStyleProvider extends AbstractCstlProcess {
 
@@ -39,27 +50,19 @@ public class SetStyleToStyleProvider extends AbstractCstlProcess {
     }
 
     /**
-     * Add a style to an existing style provider.
-     * @throws ProcessException if :
-     * - provider identifier is null/empty or not found in LayerProvider list.
-     * - style name is null/empty.
-     * - style is null.
+     * @throws ProcessException if the provider can't be found or if there is no specified style name
      */
     @Override
     protected void execute() throws ProcessException {
+        final String providerID  = value(PROVIDER_ID, inputParameters); // required
+        final MutableStyle style = value(STYLE,       inputParameters); // required
+        final String owner       = value(OWNER,       inputParameters); // optional
+        String styleName         = value(STYLE_ID,    inputParameters); // optional
 
-        final String providerId = value(PROVIDER_ID, inputParameters);
-        String styleName = value(STYLE_ID, inputParameters);
-        final MutableStyle style = value(STYLE, inputParameters);
-
-        if (providerId == null || "".equals(providerId.trim())) {
-            throw new ProcessException("Provider identifier can't be null or empty.", this, null);
-        }
-
-        //use MutableStyle name if style_name parame is null.
-        if ( styleName == null || "".equals(styleName.trim()) ) {
-            if ( style.getName() == null || "".equals(style.getName().trim()) ) {
-                throw new ProcessException("Style name can't be null or empty. Please set a name in style or use style_name input parameter.", this, null);
+        // Proceed style name.
+        if (isBlank(styleName)) {
+            if (isBlank(style.getName())) {
+                throw new ProcessException("Unable to delete the style. No specified style name.", this, null);
             } else {
                 styleName = style.getName();
             }
@@ -67,24 +70,26 @@ public class SetStyleToStyleProvider extends AbstractCstlProcess {
             style.setName(styleName);
         }
 
-        if (style != null) {
-            final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
+        // Retrieve or not the provider instance.
+        final StyleProvider provider = StyleProviderProxy.getInstance().getProvider(providerID);
+        if (provider == null) {
+            throw new ProcessException("Unable to set the style named \"" + styleName + "\". Provider with id \"" + providerID + "\" not found.", this, null);
+        }
 
-            boolean found = false;
-            for (final StyleProvider p : providers) {
-                if (p.getId().equals(providerId)) {
-                    p.set(styleName, style);
-                    found = true;
-                    break;
-                }
+        // Add style into provider.
+        provider.set(styleName, style);
+
+        // Register style into administration database.
+        AdminSession session = null;
+        try {
+            session = AdminDatabase.createSession();
+            if (session.readStyle(styleName, providerID) == null) {
+                session.writeStyle(providerID, styleName, owner, new Date().getTime());
             }
-
-            if (!found) {
-                throw new ProcessException("Provider with id "+providerId+" not found.", this, null);
-            }
-
-        } else {
-            throw new ProcessException("Style can't be null.", this, null);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating administration database after setting the style named \"" + styleName + "\".", ex);
+        } finally {
+            if (session != null) session.close();
         }
     }
 }

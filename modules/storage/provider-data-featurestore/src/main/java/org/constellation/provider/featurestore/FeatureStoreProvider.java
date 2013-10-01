@@ -17,14 +17,24 @@
 package org.constellation.provider.featurestore;
 
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.AdminDatabase;
+import org.constellation.admin.AdminSession;
+import org.constellation.configuration.DataRecord;
+import org.constellation.configuration.DataRecord.DataType;
+import org.constellation.configuration.ProviderRecord.ProviderType;
 import org.constellation.provider.AbstractDataStoreProvider;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.db.postgres.PostgresFeatureStore;
+import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -67,6 +77,59 @@ public class FeatureStoreProvider extends AbstractDataStoreProvider{
         }
         
         return store;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected synchronized void visit() {
+        super.visit();
+
+        // Update administration database.
+        AdminSession session = null;
+        try {
+            session = AdminDatabase.createSession();
+            if (session.readProvider(this.getId()) == null) {
+                session.writeProvider(this.getId(), ProviderType.LAYER, "feature-store", null);
+            }
+            final List<DataRecord> list = session.readData(this.getId());
+            final Set<Name> names = this.getDataStore().getNames();
+
+            // Remove no longer existing data.
+            for (final DataRecord data : list) {
+                boolean found = false;
+                for (final Name key : names) {
+                    if (data.getName().equals(key.getLocalPart())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    session.deleteData(this.getId(), data.getName());
+                }
+            }
+
+            // Add not registered new data.
+            for (final Name key : names) {
+                boolean found = false;
+                for (final DataRecord data : list) {
+                    if (key.getLocalPart().equals(data.getName())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    session.writeData(this.getId(), key.getLocalPart(), DataType.VECTOR, null, new Date().getTime());
+                }
+            }
+        } catch (SQLException ex) {
+            getLogger().log(Level.WARNING, "An error occurred while updating database on provider startup.", ex);
+        } catch (DataStoreException ex) {
+            getLogger().log(Level.WARNING, "An error occurred wile scanning provider FeatureStore entries.", ex);
+        } finally {
+            if (session != null) session.close();
+        }
     }
 
     /**

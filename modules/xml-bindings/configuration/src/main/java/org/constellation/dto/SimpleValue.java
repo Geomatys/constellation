@@ -18,6 +18,7 @@
 package org.constellation.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  * @author Bernard Fabien (Geomatys).
@@ -25,7 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @since 0.9
  */
 @XmlRootElement
-public class SimpleValue {
+public final class SimpleValue implements Serializable {
 
     private String value;
 

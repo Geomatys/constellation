@@ -15,8 +15,11 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.admin;
+package org.constellation.configuration;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,35 +31,58 @@ import java.sql.SQLException;
  * @version 0.9
  * @since 0.9
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class ProviderRecord implements Serializable {
 
-    final int id;
-    final String identifier;
-    final String type;
-    final String impl;
-    final String owner;
+    public static enum ProviderType {
+        LAYER,
+        STYLE
+    }
+
+    private String identifier;
+    private ProviderType type;
+    private String impl;
+    private String owner;
+
+    ProviderRecord() {
+    }
 
     public ProviderRecord(final ResultSet rs) throws SQLException {
-        this.id         = rs.getInt(1);
-        this.identifier = rs.getString(2);
-        this.type       = rs.getString(3);
-        this.impl       = rs.getString(4);
-        this.owner      = rs.getString(5);
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getImpl() {
-        return impl;
+        this.identifier = rs.getString(1);
+        this.type       = ProviderType.valueOf(rs.getString(2));
+        this.impl       = rs.getString(3);
+        this.owner      = rs.getString(4);
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
+    public void setIdentifier(final String identifier) {
+        this.identifier = identifier;
+    }
+
+    public ProviderType getType() {
+        return type;
+    }
+
+    public void setType(final ProviderType type) {
+        this.type = type;
+    }
+
+    public String getImpl() {
+        return impl;
+    }
+
+    public void setImpl(final String impl) {
+        this.impl = impl;
+    }
+
     public String getOwner() {
         return owner;
+    }
+
+    public void setOwner(final String owner) {
+        this.owner = owner;
     }
 }

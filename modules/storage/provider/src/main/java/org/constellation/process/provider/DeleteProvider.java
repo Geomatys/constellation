@@ -16,60 +16,73 @@
  */
 package org.constellation.process.provider;
 
-import java.util.Collection;
+import org.constellation.admin.AdminDatabase;
+import org.constellation.admin.AdminSession;
 import org.constellation.process.AbstractCstlProcess;
+import org.constellation.provider.LayerProvider;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.Provider;
+import org.constellation.provider.StyleProvider;
+import org.constellation.provider.StyleProviderProxy;
+import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.process.provider.DeleteProviderDescriptor.*;
-import org.constellation.provider.*;
-import static org.geotoolkit.parameter.Parameters.*;
-import org.geotoolkit.process.ProcessDescriptor;
+import java.sql.SQLException;
+import java.util.logging.Level;
+
+import static org.constellation.process.provider.DeleteProviderDescriptor.DELETE_DATA;
+import static org.constellation.process.provider.DeleteProviderDescriptor.PROVIDER_ID;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
- * Remove a provider from constellation. Throw an ProcessException if Provider is not found.
+ * Remove a provider from constellation.
  *
  * @author Quentin Boileau (Geomatys).
+ * @author Fabien Bernard (Geomatys).
  */
 public final class DeleteProvider extends AbstractCstlProcess{
 
-    public DeleteProvider( final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public DeleteProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
-
+    /**
+     * @throws ProcessException if the provider can't be found
+     */
     @Override
     protected void execute() throws ProcessException {
-        final String providerID = value(PROVIDER_ID, inputParameters);
-        final Boolean deleteData = value(DELETE_DATA, inputParameters);
+        final String providerID  = value(PROVIDER_ID, inputParameters); // required
+        final Boolean deleteData = value(DELETE_DATA, inputParameters); // optional
 
-        boolean found = false;
-
-        Collection<? extends Provider> providers = LayerProviderProxy.getInstance().getProviders();
-        for (final Provider p : providers) {
-            if (p.getId().equals(providerID)) {
-                if (deleteData != null && deleteData) {
-                    p.removeAll();
-                }
-                LayerProviderProxy.getInstance().removeProvider((LayerProvider) p);
-                found = true;
-                break;
-            }
+        // Retrieve or not the provider instance.
+        Provider provider = LayerProviderProxy.getInstance().getProvider(providerID);
+        if (provider == null) {
+            provider = StyleProviderProxy.getInstance().getProvider(providerID);
+        }
+        if (provider == null) {
+            throw new ProcessException("Unable to delete the provider with id \"" + providerID + "\". Not found.", this, null);
         }
 
-        if (!found) {
-            providers = StyleProviderProxy.getInstance().getProviders();
-            for (final Provider p : providers) {
-                if (p.getId().equals(providerID)) {
-                    StyleProviderProxy.getInstance().removeProvider((StyleProvider) p);
-                    found = true;
-                    break;
-                }
+        // Remove provider from its registry.
+        if (provider instanceof LayerProvider) {
+            if (deleteData != null && deleteData) {
+                provider.removeAll();
             }
+            LayerProviderProxy.getInstance().removeProvider((LayerProvider) provider);
+        } else {
+            StyleProviderProxy.getInstance().removeProvider((StyleProvider) provider);
         }
 
-        if (!found) {
-            throw new ProcessException("Provider to remove not found.", this, null);
+        // Remove provider from administration database.
+        AdminSession session = null;
+        try {
+            session = AdminDatabase.createSession();
+            session.deleteProvider(providerID);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating administration database after deleting the provider with id \"" + providerID + "\".", ex);
+        } finally {
+            if (session != null) session.close();
         }
     }
 
