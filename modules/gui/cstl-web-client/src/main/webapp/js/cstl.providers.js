@@ -29,9 +29,9 @@
 CSTL.Providers = {
 
     /**
-     * Delete a style from a style provider
+     * Delete a style from a style provider.
      *
-     * @param providerId - {string} the provider identifier
+     * @param providerId - {string} the style provider identifier
      * @param styleName  - {string} the style name
      * @returns {jQuery.ajax} the jQuery.ajax instance
      */
@@ -43,6 +43,54 @@ CSTL.Providers = {
             $('[data-provider="' + providerId + '"]').filter('[data-style="' + styleName + '"]').remove();
         }).fail(function() {
             CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-style-delete'));
+        });
+    },
+
+    /**
+     * Links a style to an existing data.
+     *
+     * @param styleProvider - {string} the style provider identifier
+     * @param styleName     - {string} the style name
+     * @param dataProvider  - {string} the data provider identifier
+     * @param dataName      - {string} the data name
+     * @returns {jQuery.ajax} the jQuery.ajax instance
+     */
+    linkStyleToData: function(styleProvider, styleName, dataProvider, dataName) {
+        return CSTL.jzAjax('StyleController.linkStyleToData', {
+            data: {
+                styleProvider: styleProvider,
+                styleName:     styleName,
+                dataProvider:  dataProvider,
+                dataName:      dataName
+            }
+        }).done(function() {
+            CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-style-link-data'));
+        }).fail(function() {
+            CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-style-link-data'));
+        });
+    },
+
+    /**
+     * Links a style to an existing data.
+     *
+     * @param styleProvider - {string} the style provider identifier
+     * @param styleName     - {string} the style name
+     * @param dataProvider  - {string} the data provider identifier
+     * @param dataName      - {string} the data name
+     * @returns {jQuery.ajax} the jQuery.ajax instance
+     */
+    unlinkStyleFromData: function(styleProvider, styleName, dataProvider, dataName) {
+        return CSTL.jzAjax('StyleController.unlinkStyleFromData', {
+            data: {
+                styleProvider: styleProvider,
+                styleName:     styleName,
+                dataProvider:  dataProvider,
+                dataName:      dataName
+            }
+        }).done(function() {
+            CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-style-unlink-data'));
+        }).fail(function() {
+            CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-style-unlink-data'));
         });
     }
 };

@@ -4,44 +4,55 @@
     <p>&{msg.no.selected.style}</p>
 </div>
 <%if(selected != null){%>
-    <div class="selected-item" data-style="${selected.name}" data-provider="${selected.providerId}">
+    <div class="selected-item" data-name="${selected.record.name}" data-provider="${selected.record.provider}">
         <div class="block-header">
-            <strong>${selected.name}</strong><i class="icon-chevron-up pull-right"></i>
+            <strong>${selected.record.name}</strong><i class="icon-chevron-up pull-right"></i>
         </div>
         <div class="block-content">
             <h6>&{label.description}</h6>
-            <span>Altera templo insulam et insignis viribus claram viribus Salamis supremos et ipso committat armamentis tamque claram crebra ad indigens externi instructam ut abundat omnibusque onerariam continenti templo rerum a tanta.</span>
+            <span><%if(selected.description != null && selected.description != ''){%>${selected.description}<%}else{%>&{label.no.description}<%}%></span>
             <div class="separator"></div>
             <h6>&{label.owner}</h6>
-            <span>Admin</span>
+            <span><%if(selected.record.owner != null && selected.record.owner != ''){%>${selected.record.owner}<%}else{%>&{label.unknown}<%}%></span>
             <div class="separator"></div>
             <h6>&{label.date}</h6>
-            <span>01/06/2013</span>
+            <span>${selected.record.date}</span>
             <div class="separator"></div>
             <h6>&{label.symbols}</h6>
-            <span title="&{edition.style.label.point}" class="symbol-point"></span>
-            <span title="&{edition.style.label.line}" class="symbol-line"></span>
-            <span title="&{edition.style.label.polygon}" class="symbol-polygon"></span>
-            <span title="&{edition.style.label.text}" class="symbol-text"></span>
-            <span title="&{edition.style.label.raster}" class="symbol-raster"></span>
+            <%for(def type : selected.symbolizerTypes){%>
+                <%if('point'.equals(type)){%><span title="&{edition.style.label.point}" class="symbol-point"></span><%}%>
+                <%if('line'.equals(type)){%><span title="&{edition.style.label.line}" class="symbol-line"></span><%}%>
+                <%if('polygon'.equals(type)){%><span title="&{edition.style.label.polygon}" class="symbol-polygon"></span><%}%>
+                <%if('text'.equals(type)){%><span title="&{edition.style.label.text}" class="symbol-text"></span><%}%>
+                <%if('raster'.equals(type)){%><span title="&{edition.style.label.raster}" class="symbol-raster"></span><%}%>
+            <%}%>
+            <div class="separator"></div>
+            <h6 style="margin-bottom:12px;">&{label.related.data}<button type="button" onclick="CSTL.LinkDataWorkflow.start();" class="btn btn-small pull-right" title="&{msg.add.style.association}"><i class="icon-plus"></i></button></h6>
+            <div id="linkedList">
+                <%if (selected.targetData == null || selected.targetData.isEmpty()) {%>
+                    &{label.no.association}
+                <%} else {%>
+                    <%for (def data : selected.targetData) {%>
+                        <div class="data" data-name="${data.name}" data-provider="${data.provider}">
+                            <button type="button" onclick="CSTL.LinkDataWorkflow.unlink('${data.name}','${data.provider}');" class="btn btn-small"><i class="icon-minus"></i></button>
+                            ${data.name}
+                        </div>
+                    <%}%>
+                <%}%>
+            </div>
         </div>
         <div class="block-action">
             <div class="row-fluid">
-                <a href="@{StyleController.edition(styleName = selected.name, styleProvider = selected.providerId)}&returnURL=@{StyleController.dashboard()}" title="&{msg.edit.style.selected}" class="btn btn-info span6">
-                    <i class="icon-edit"></i>Editer
+                <a href="@{StyleController.edition(styleName = selected.record.name, styleProvider = selected.record.provider)}&returnURL=@{StyleController.dashboard()}" title="&{msg.edit.style.selected}" class="btn btn-info span6">
+                    <i class="icon-edit"></i> &{label.edit}
                 </a>
-                <button type="button" title="&{msg.delete.style.selected}" class="btn btn-danger span6" onclick="CSTL.StyleDashboard.removeStyle('${selected.name}','${selected.providerId}');">
-                    <i class="icon-trash"></i>Supprimer
+                <button type="button" title="&{msg.delete.style.selected}" class="btn btn-danger span6" onclick="CSTL.StyleDashboard.removeStyle('${selected.record.name}','${selected.record.provider}');">
+                    <i class="icon-trash"></i> &{label.delete}
                 </button>
             </div>
         </div>
-        <div class="block-header">
-            <strong>&{label.related.layers}</strong><i class="icon-chevron-up pull-right"></i>
-        </div>
-        <div class="block-content">
-            <span><strong>WMS1</strong> -> lelombrik</span><br />
-            <span><strong>WMS1</strong> -> trololo</span><br />
-            <span><strong>WMS2</strong> -> test</span><br />
-        </div>
     </div>
+    <script type="text/javascript">
+        CSTL.LinkDataWorkflow.setStyle('${selected.record.name}','${selected.record.provider}');
+    </script>
 <%}%>

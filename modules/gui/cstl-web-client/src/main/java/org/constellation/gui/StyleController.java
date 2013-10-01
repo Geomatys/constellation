@@ -27,6 +27,7 @@ import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.StyleReport;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
@@ -268,13 +269,13 @@ public final class StyleController {
     @Ajax
     @Resource
     @Route("style/select")
-    public Response selectStyle(final String name, final String providerId) {
-        final StyleBean style = new StyleBean();
-        style.setName(name);
-        style.setProviderId(providerId);
+    public Response selectStyle(final String name, final String providerId) throws IOException {
+        // Acquire the style details.
+        final StyleReport report = cstl.openClient().providers.getStyleReport(providerId, name);
 
+        // Go to view with appropriate parameters.
         final Map<String, Object> parameters = new HashMap<>(0);
-        parameters.put("selected", style);
+        parameters.put("selected", report);
         return selected.ok(parameters).withMimeType("text/html");
     }
 
@@ -318,6 +319,30 @@ public final class StyleController {
         parameters.put("startIndex", intStart);
         parameters.put("nbPerPage",  intCount);
         return list.ok(parameters).withMimeType("text/html");
+    }
+
+    @Ajax
+    @Resource
+    @Route("style/linkData")
+    public Response linkStyleToData(final String styleProvider, final String styleName, final String dataProvider, final String dataName) {
+        try {
+            cstl.openClient().providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName);
+            return Response.ok();
+        } catch (IOException ex) {
+            return Response.error(ex.getLocalizedMessage());
+        }
+    }
+
+    @Ajax
+    @Resource
+    @Route("style/unlinkData")
+    public Response unlinkStyleFromData(final String styleProvider, final String styleName, final String dataProvider, final String dataName) {
+        try {
+            cstl.openClient().providers.unlinkStyleFromData(styleProvider, styleName, dataProvider, dataName);
+            return Response.ok();
+        } catch (IOException ex) {
+            return Response.error(ex.getLocalizedMessage());
+        }
     }
 
     @Ajax

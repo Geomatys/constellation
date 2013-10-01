@@ -39,22 +39,14 @@
         <div class="navbar sort-navbar">
             <div class="navbar-inner">
                 <ul class="nav">
-                    <li><a href="#" data-order-by="name">
-                        &{label.name}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                    </a></li>
+                    <li><a href="#" data-order-by="name">&{label.name}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#" data-order-by="date">
-                        &{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                    </a></li>
+                    <li><a href="#" data-order-by="date">&{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
                     <li class="divider-vertical"></li>
-                    <li><a href="#" data-order-by="owner">
-                        &{label.owner}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                    </a></li>
+                    <li><a href="#" data-order-by="owner">&{label.owner}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
                     <li class="divider-vertical"></li>
                     <%if(category == null){%>
-                        <li><a href="#" data-order-by="type">
-                            &{label.type}<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                        </a></li>
+                        <li><a href="#" type="button"  data-order-by="type">&{label.type}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
                         <li class="divider-vertical"></li>
                     <%}%>
                 </ul>
@@ -83,4 +75,44 @@
 </div>
 <script type="text/javascript">
     CSTL.StyleDashboard.init();
+</script>
+
+<div id="dataModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="modalLabel">&{label.data.list}</h3>
+    </div>
+    <div class="modal-body">
+        <div id="dataList" class="dashboard">
+            <div class="navbar sort-navbar">
+                <div class="navbar-inner" style="border:1px solid #e3e3e3;padding-right:5px;">
+                    <ul class="nav">
+                        <li><a href="#" data-order-by="title">&{label.title}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="date">&{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i> </a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="owner">&{label.owner}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="type">&{label.type}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                    </ul>
+                    <button type="button" data-role="reset" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                    <div class="pull-right">
+                        <div style="position:relative;">
+                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                            <input type="text" data-role="search" class="search-query input-small" placeholder="&{label.search}..." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div data-role="list"></div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">&{label.close}</button>
+        <button id="associate" data-dismiss="modal" class="btn btn-info" type="button">&{label.validate}</button>
+    </div>
+</div>
+<script type="text/javascript">
+    CSTL.LinkDataWorkflow.init();
 </script>

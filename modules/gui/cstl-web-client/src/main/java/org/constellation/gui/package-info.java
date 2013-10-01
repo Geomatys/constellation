@@ -92,6 +92,7 @@
         @Asset(id = "cstl.dashboard.data",      value = "js/cstl.dashboard.data.js",    depends = "cstl.dashboard", location = AssetLocation.SERVER),
         @Asset(id = "cstl.dashboard.style",     value = "js/cstl.dashboard.style.js",   depends = "cstl.dashboard", location = AssetLocation.SERVER),
         @Asset(id = "cstl.workflow.addlayer",   value = "js/cstl.workflow.addlayer.js", depends = "cstl.dashboard", location = AssetLocation.SERVER),
+        @Asset(id = "cstl.workflow.linkdata",   value = "js/cstl.workflow.linkdata.js", depends = "cstl.dashboard", location = AssetLocation.SERVER),
         @Asset(id = "cstl.filemodal",           value = "js/cstl.filemodal.js",         depends = "jquery",         location = AssetLocation.SERVER),
 
         // Style

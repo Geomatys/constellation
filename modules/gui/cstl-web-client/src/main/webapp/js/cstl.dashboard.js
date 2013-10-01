@@ -72,6 +72,9 @@ function Dashboard(config) {
 Dashboard.prototype.handleSelection = function() {
     this.$itemList.find(".item").click($.proxy(function(e) {
         var $this = $(e.currentTarget);
+        if ($this.hasClass('disabled')) {
+            return;
+        }
         $this.addClass('selected').siblings().removeClass('selected');
         this.onSelect && this.onSelect.call(this, $this);
     }, this));
@@ -123,6 +126,7 @@ Dashboard.prototype.sort = function(e) {
     this.$sortLinks.removeClass('descending ascending');
     $source.addClass(this.sortDirection);
     this.loadItems();
+    return false;
 };
 
 /**

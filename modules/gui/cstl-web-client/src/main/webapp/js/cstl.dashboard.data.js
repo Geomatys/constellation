@@ -34,7 +34,8 @@ CSTL.DataDashboard = {
     init: function() {
         this.instance = new Dashboard({
             $root:    $('#dataDashboard'),
-            loadFunc: 'Controller.getAvailableData()'
+            loadFunc: 'Controller.getAvailableData()',
+            params:   {'dataTypes':'vector'}
         });
         $('#dataTypesNav').find('a').on('click', $.proxy(this.goTo, this));
     },

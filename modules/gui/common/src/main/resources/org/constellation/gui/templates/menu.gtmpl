@@ -41,8 +41,11 @@
      data-error-service-start="&{growl.error.service.start}"
      data-error-service-delete="&{growl.error.service.delete}"
      data-error-style-delete="&{growl.error.style.delete}"
+     data-error-style-link-data="&{growl.error.style.link.data}"
+     data-error-style-unlink-data="&{growl.error.style.unlink.data}"
      data-error-service-stop="&{growl.error.service.stop}"
      data-logical="&{label.logical}"
+     data-no-association="&{label.no.association}"
      data-no-description="&{label.no.description}"
      data-success="&{label.success}"
      data-success-service-description="&{growl.success.service.description}"
@@ -50,6 +53,8 @@
      data-success-service-restart="&{growl.success.service.restart}"
      data-success-service-start="&{growl.success.service.start}"
      data-success-service-delete="&{growl.success.service.delete}"
+     data-success-style-link-data="&{growl.success.style.link.data}"
+     data-success-style-unlink-data="&{growl.success.style.unlink.data}"
      data-success-style-delete="&{growl.success.style.delete}"
      data-success-service-stop="&{growl.success.service.stop}"></div>
 
