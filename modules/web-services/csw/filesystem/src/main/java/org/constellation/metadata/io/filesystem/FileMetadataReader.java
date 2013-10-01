@@ -97,6 +97,7 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.NullArgumentException;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.metadata.index.XpathUtils;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -560,7 +561,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
 
         while (tokens.hasMoreTokens()) {
             final String token       = tokens.nextToken().trim();
-            final List<String> paths;
+            List<String> paths;
             if (ISO_QUERYABLE.get(token) != null) {
                 paths = ISO_QUERYABLE.get(token);
             } else if (DUBLIN_CORE_QUERYABLE.get(token) != null) {
@@ -571,7 +572,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             }
 
             if (!paths.isEmpty()) {
-
+                paths = XpathUtils.xpathToMDPath(paths);
                 final List<String> values         = getAllValuesFromPaths(paths, dataDirectory);
                 final ListOfValuesType listValues = new ListOfValuesType(values);
                 final DomainValuesType value      = new DomainValuesType(null, token, listValues, METADATA_QNAME);

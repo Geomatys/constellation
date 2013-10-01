@@ -49,7 +49,7 @@ public final class ReflectionUtilities {
     /**
      * A map of getters to avoid to search the same getters many times.
      */
-    private static final Map<String, Method> GETTERS = new HashMap<String, Method>();
+    private static final Map<String, Method> GETTERS = new HashMap<>();
 
     private ReflectionUtilities() {}
 
@@ -711,7 +711,7 @@ public final class ReflectionUtilities {
                 }
 
                 if (metadata instanceof Collection) {
-                    final List<Object> tmp = new ArrayList<Object>();
+                    final List<Object> tmp = new ArrayList<>();
                     for (Object subMeta: (Collection) metadata) {
                         final Object obj = getAttributeValue(subMeta, attributeName);
                         if (obj instanceof Collection) {
@@ -843,7 +843,7 @@ public final class ReflectionUtilities {
 
 
                 if (metadata instanceof Collection) {
-                    final List<Object> tmp = new ArrayList<Object>();
+                    final List<Object> tmp = new ArrayList<>();
                     if (pathID.isEmpty()) {
                         for (Object subMeta: (Collection)metadata) {
                             if (matchCondition(subMeta, conditionalAttribute, conditionalValue)) {

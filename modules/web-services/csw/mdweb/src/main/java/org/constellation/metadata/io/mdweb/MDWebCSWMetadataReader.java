@@ -32,6 +32,7 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
 
 import static org.constellation.metadata.CSWQueryable.*;
+import org.constellation.metadata.index.XpathUtils;
 import static org.constellation.metadata.io.AbstractMetadataReader.ISO_19110;
 
 import org.geotoolkit.csw.xml.DomainValues;
@@ -185,6 +186,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
 
             if (!paths.isEmpty()) {
+                paths = XpathUtils.xpathToMDPath(paths);
                 try {
                     final List<String> values         = mdReader.getDomainOfValuesFromPaths(paths, true);
                     final ListOfValuesType listValues = new ListOfValuesType(values);

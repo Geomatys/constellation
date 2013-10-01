@@ -19,18 +19,12 @@ package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
 import java.io.File;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 // Apache Lucene dependencies
@@ -39,41 +33,31 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
 // constellation dependencies
-import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.metadata.index.AbstractCSWIndexer;
-import org.constellation.metadata.index.XpathUtils;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.utils.Utils;
-import org.constellation.util.ReflectionUtilities;
+import org.constellation.util.NodeUtilities;
 
 // geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 
 // GeoAPI dependencies
-import org.opengis.metadata.Metadata;
-import org.opengis.temporal.Instant;
-import org.opengis.temporal.Position;
-import org.opengis.util.InternationalString;
-import org.opengis.util.LocalName;
+import org.w3c.dom.Node;
 
 
 /**
  * A Lucene Index Handler for a generic Database.
  * @author Guilhem Legal
  */
-public class GenericIndexer extends AbstractCSWIndexer<Object> {
+public class NodeIndexer extends AbstractCSWIndexer<Node> {
 
     /**
      * The Reader of this lucene index (generic DB mode).
      */
     private final MetadataReader reader;
-
-    /**
-     * Shared Thread Pool for parallel execution
-     */
-    private final ExecutorService pool = Executors.newFixedThreadPool(6);
 
     /**
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.
@@ -83,7 +67,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param serviceID The identifier, if there is one, of the index/service.
      * @param additionalQueryable A map of additional queryable element.
      */
-    public GenericIndexer(final MetadataReader reader, final File configurationDirectory, final String serviceID, 
+    public NodeIndexer(final MetadataReader reader, final File configurationDirectory, final String serviceID,
             final Map<String, List<String>> additionalQueryable, final boolean create) throws IndexingException {
         super(serviceID, configurationDirectory, additionalQueryable);
         this.reader = reader;
@@ -97,7 +81,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      *
      * @param configDirectory A directory where the index can write indexation file.
      */
-    public GenericIndexer(final List<Object> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory,
+    public NodeIndexer(final List<Node> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory,
             final String serviceID, final Analyzer analyzer, final Level logLevel, final boolean create) throws IndexingException {
         super(serviceID, configDirectory, analyzer, additionalQueryable);
         this.logLevel            = logLevel;
@@ -112,7 +96,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      *
      * @param configDirectory A directory where the index can write indexation file.
      */
-    public GenericIndexer(final List<Object> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory,
+    public NodeIndexer(final List<Node> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory,
             final String serviceID, final boolean create) throws IndexingException {
         super(serviceID, configDirectory, additionalQueryable);
         this.reader = null;
@@ -137,9 +121,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected Object getEntry(final String identifier) throws IndexingException {
+    protected Node getEntry(final String identifier) throws IndexingException {
         try {
-            return reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115);
+            return (Node) reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115);
         } catch (MetadataIoException ex) {
             throw new IndexingException("Metadata_IOException while reading entry for:" + identifier, ex);
         }
@@ -149,7 +133,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected void indexSpecialField(final Object metadata, final Document doc) throws IndexingException {
+    protected void indexSpecialField(final Node metadata, final Document doc) throws IndexingException {
         final String identifier = getIdentifier(metadata);
         if ("unknow".equals(identifier)) {
             throw new IndexingException("unexpected metadata type.");
@@ -161,77 +145,63 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected String getType(final Object metadata) {
-        return metadata.getClass().getSimpleName();
+    protected String getType(final Node metadata) {
+        return metadata.getLocalName();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean isISO19139(final Object meta) {
-        return meta instanceof Metadata;
+    protected boolean isISO19139(final Node meta) {
+        return "MD_Metadata".equals(meta.getLocalName()) ||
+               "MI_Metadata".equals(meta.getLocalName());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean isDublinCore(final Object meta) {
-        return ReflectionUtilities.instanceOf("org.geotoolkit.csw.xml.v202.RecordType", meta.getClass());
+    protected boolean isDublinCore(final Node meta) {
+        return "Record".equals(meta.getLocalName());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean isEbrim25(final Object meta) {
-        return ReflectionUtilities.instanceOf("org.geotoolkit.ebrim.xml.v250.RegistryObjectType", meta.getClass());
+    protected boolean isEbrim25(final Node meta) {
+        // TODO list rootElement
+        return "RegistryObject".equals(meta.getLocalName());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean isEbrim30(final Object meta) {
-        return ReflectionUtilities.instanceOf("org.geotoolkit.ebrim.xml.v300.IdentifiableType", meta.getClass());
+    protected boolean isEbrim30(final Node meta) {
+        // TODO list rootElement
+        return "Identifiable".equals(meta.getLocalName());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean isFeatureCatalogue(Object meta) {
-        return ReflectionUtilities.instanceOf("org.geotoolkit.feature.catalog.FeatureCatalogueImpl", meta.getClass());
+    protected boolean isFeatureCatalogue(Node meta) {
+        return "FC_FeatureCatalogue".equals(meta.getLocalName());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void indexQueryableSet(final Document doc, final Object metadata,final  Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
-        final CompletionService<TermValue> cs = new BoundedCompletionService<>(this.pool, 5);
-        for (final String term :queryableSet.keySet()) {
-            cs.submit(new Callable<TermValue>() {
+    protected void indexQueryableSet(final Document doc, final Node metadata, final  Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
+        for (final String term : queryableSet.keySet()) {
+            final TermValue tm = new TermValue(term, extractValues(metadata, queryableSet.get(term)));
 
-                @Override
-                public TermValue call() {
-                    final List<String> paths = XpathUtils.xpathToMDPath(queryableSet.get(term));
-                    return new TermValue(term, extractValues(metadata, paths));
-                }
-            });
-        }
-
-        for (int i = 0; i < queryableSet.size(); i++) {
-            try {
-                final TermValue values = formatStringValue(cs.take().get());
-                indexFields(values.value, values.term, anyText, doc);
-
-            } catch (InterruptedException ex) {
-               LOGGER.log(Level.WARNING, "InterruptedException in parralele create document:\n{0}", ex.getMessage());
-            } catch (ExecutionException ex) {
-               LOGGER.log(Level.WARNING, "ExecutionException in parralele create document:\n" + ex.getMessage(), ex);
-            }
+            final NodeIndexer.TermValue values = formatStringValue(tm);
+            indexFields(values.value, values.term, anyText, doc);
         }
     }
 
@@ -269,7 +239,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected String getIdentifier(final Object obj) {
+    protected String getIdentifier(final Node obj) {
         return Utils.findIdentifier(obj);
     }
 
@@ -278,9 +248,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     @Override
     @Deprecated
-    protected String getValues(final Object metadata, final List<String> paths) {
-        final List<String> mdpaths = XpathUtils.xpathToMDPath(paths);
-        final List<Object> values =  extractValues(metadata, mdpaths);
+    protected String getValues(final Node metadata, final List<String> paths) {
+        final List<Object> values =  extractValues(metadata, paths);
         final StringBuilder sb = new StringBuilder();
         for (Object value : values) {
             sb.append(value).append(',');
@@ -301,48 +270,52 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param paths
      * @return
      */
-    public static List<Object> extractValues(final Object metadata, final List<String> paths) {
+    public static List<Object> extractValues(final Node metadata, final List<String> paths) {
         final List<Object> response  = new ArrayList<>();
 
         if (paths != null) {
             for (String fullPathID: paths) {
-               if (!ReflectionUtilities.pathMatchObjectType(metadata, fullPathID)) {
+
+               // remove Standard
+               fullPathID = fullPathID.substring(fullPathID.indexOf(':') + 1);
+               final String pathType =  fullPathID.substring(0, fullPathID.indexOf('/'));
+               if (!pathType.equals(metadata.getLocalName())) {
                    continue;
                }
                 String pathID;
-                String conditionalAttribute = null;
-                String conditionalValue     = null;
+                String conditionalPath  = null;
+                String conditionalValue = null;
 
-                // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
+                // if the path ID contains a # we have a conditional value next to the searched value.
                 final int separator = fullPathID.indexOf('#');
                 if (separator != -1) {
                     pathID               = fullPathID.substring(0, separator);
-                    conditionalAttribute = fullPathID.substring(separator + 1, fullPathID.indexOf('='));
+                    conditionalPath      = pathID + '/' + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
                     conditionalValue     = fullPathID.substring(fullPathID.indexOf('=') + 1);
-                    int nextSeparator    = conditionalValue.indexOf(':');
+                    int nextSeparator    = conditionalValue.indexOf('/');
                     if (nextSeparator == -1) {
-                        throw new IllegalArgumentException("A conditionnal path must be in the form ....:attribute#attibuteconditional=value:otherattribute");
+                        throw new IllegalArgumentException("A conditionnal path must be in the form ...start_path#conditional_path=value/endPath");
                     } else {
                         pathID = pathID + conditionalValue.substring(nextSeparator);
                         conditionalValue = conditionalValue.substring(0, nextSeparator);
                     }
-                    LOGGER.finer("pathID              : " + pathID               + '\n' +
-                                 "conditionalAttribute: " + conditionalAttribute + '\n' +
-                                 "conditionalValue    : " + conditionalValue);
                 } else {
                     pathID = fullPathID;
                 }
 
-                if (conditionalAttribute == null) {
-                    final Object brutValue   = ReflectionUtilities.getValuesFromPath(pathID, metadata);
-                    final List<Object> value = getStringValue(brutValue);
-                    if (value != null && !value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE))) {
+                if (conditionalPath == null) {
+                    List<Node> nodes = NodeUtilities.getNodeFromPath(metadata, pathID);
+                    
+                    final List<Object> value = getStringValue(nodes);
+                    if (!value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE))) {
                         response.addAll(value);
                     }
                 } else {
-                    final Object brutValue   = ReflectionUtilities.getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata);
-                    final List<Object> value = getStringValue(brutValue);
-                    response.addAll(value);
+                    final List<Node> nodes  = NodeUtilities.getNodeFromConditionalPath(pathID, conditionalPath, conditionalValue, metadata);
+                    final List<Object> value = getStringValue(nodes);
+                    if (!value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE))) {
+                        response.addAll(value);
+                    }
                 }
             }
         }
@@ -360,39 +333,45 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param obj
      * @return
      */
-    private static List<Object> getStringValue(final Object obj) {
+    private static List<Object> getStringValue(final List<Node> nodes) {
         final List<Object> result = new ArrayList<>();
-        if (obj == null) {
+        if (nodes != null && !nodes.isEmpty()) {
+            for (Node n : nodes) {
+                final String s = n.getTextContent();
+                final String typeName = n.getLocalName();
+                if (typeName.equals("Real") || typeName.equals("Decimal")) {
+                    try {
+                        result.add(Double.parseDouble(s));
+                    } catch (NumberFormatException ex) {
+                        LOGGER.log(Level.WARNING, "Unable to parse the real value:{0}", s);
+                    }
+                } else if (typeName.equals("Integer")) {
+                    try {
+                        result.add(Integer.parseInt(s));
+                    } catch (NumberFormatException ex) {
+                        LOGGER.log(Level.WARNING, "Unable to parse the integer value:{0}", s);
+                    }
+                } else if (typeName.equals("Date") || typeName.equals("DateTime") ||
+                           typeName.equals("position") || typeName.equals("beginPosition") ||
+                           typeName.equals("endPosition")) {
+                    try {
+                        final Date d = TemporalUtilities.parseDate(s, true);
+                        synchronized (LUCENE_DATE_FORMAT) {
+                            result.add(LUCENE_DATE_FORMAT.format(d));
+                        }
+                    } catch (ParseException ex) {
+                        LOGGER.log(Level.WARNING, "Unable to parse the date value:{0}", s);
+                    }
+                } else if (s != null) {
+                    result.add(s);
+                }
+            }
+        } 
+        if (result.isEmpty()) {
             result.add(NULL_VALUE);
-        } else if (obj instanceof String) {
-            result.add(obj);
-        } else if (obj instanceof Number) {
-            result.add(obj);
-        } else if (obj instanceof InternationalString) {
-            final InternationalString is = (InternationalString) obj;
-            result.add(is.toString());
-        } else if (obj instanceof LocalName) {
-            final LocalName ln = (LocalName) obj;
-            result.add(ln.toString());
-        } else if (obj instanceof Double || obj instanceof Long) {
-            result.add(obj.toString());
-        } else if (obj instanceof java.util.Locale) {
-            try {
-                result.add(((java.util.Locale)obj).getISO3Language());
-            } catch (MissingResourceException ex) {
-                result.add(((java.util.Locale)obj).getLanguage());
-            }
-        } else if (obj instanceof Collection) {
-            for (Object o : (Collection) obj) {
-                result.addAll(getStringValue(o));
-            }
-            if (result.isEmpty()) {
-                result.add(NULL_VALUE);
-            }
-        } else if (obj instanceof org.opengis.util.CodeList) {
-            result.add(((org.opengis.util.CodeList)obj).name());
-
-        } else if (obj instanceof Position) {
+        }
+        
+        /*if (obj instanceof Position) {
             final Position pos = (Position) obj;
             final Date d = pos.getDate();
             if (d != null) {
@@ -419,15 +398,14 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
 
         } else {
             throw new IllegalArgumentException("this type is unexpected: " + obj.getClass().getSimpleName());
-        }
+        }*/
         return result;
     }
 
     @Override
     public void destroy() {
-        LOGGER.info("shutting down generic indexer");
+        LOGGER.info("shutting down Node indexer");
         super.destroy();
-        pool.shutdown();
     }
 
     private static class TermValue {

@@ -427,7 +427,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         assertEquals(result.getSchemaComponent().size(), 1);
         assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), "http://www.isotc211.org/2005/gmd");
 
-        getCapsUrl = new URL(getDefaultURL() + "service=CSW&request=DescribeRecord&version=2.0.2&typename=gmd:MD_Metadata&namespace=xmlns(csw=http://www.isotc211.org/2005/wrong)");
+        getCapsUrl = new URL(getDefaultURL() + "service=CSW&request=DescribeRecord&version=2.0.2&typename=gmd:MD_Metadata&namespace=xmlns(gmd=http://www.isotc211.org/2005/wrong)");
 
         // Try to marshall something from the response returned by the server.
         obj = unmarshallResponse(getCapsUrl);

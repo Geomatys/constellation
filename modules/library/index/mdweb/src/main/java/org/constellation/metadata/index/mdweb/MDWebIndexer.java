@@ -41,6 +41,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.metadata.index.AbstractCSWIndexer;
 
 import static org.constellation.metadata.CSWQueryable.*;
+import org.constellation.metadata.index.XpathUtils;
 
 // geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
@@ -271,7 +272,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
     @Override
     protected void indexQueryableSet(final Document doc, final FullRecord record, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
         for (Entry<String,List<String>> entry :queryableSet.entrySet()) {
-            final List<Object> values = getValuesList(record, entry.getValue());
+            final List<String> paths = XpathUtils.xpathToMDPath(entry.getValue());
+            final List<Object> values = getValuesList(record, paths);
             indexFields(values, entry.getKey(), anyText, doc);
         }
     }
@@ -285,7 +287,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
     protected String getValues(final FullRecord record, final List<String> paths) throws IndexingException {
         final StringBuilder response  = new StringBuilder();
         if (paths != null) {
-            for (String fullPathID: paths) {
+            final List<String> mdPaths = XpathUtils.xpathToMDPath(paths);
+            for (String fullPathID: mdPaths) {
                 try {
                     final List<Value> values = getValuesFromPathID(fullPathID, record);
                     for (final Value v: values) {

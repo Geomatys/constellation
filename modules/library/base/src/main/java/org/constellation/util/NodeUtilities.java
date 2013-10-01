@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2013, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 
 package org.constellation.util;
@@ -8,7 +20,6 @@ package org.constellation.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.constellation.metadata.io.MetadataIoException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -54,7 +65,7 @@ public class NodeUtilities {
             final NodeList nl = n.getChildNodes();
             for (int i = 0; i < nl.getLength(); i++) {
                 final Node child = nl.item(i);
-                if (propertyName.equals(child.getLocalName())) {
+                if (propertyName.equals("*") || propertyName.equals(child.getLocalName())) {
                     results.add(child);
                 }
             }
@@ -62,20 +73,45 @@ public class NodeUtilities {
         return results;
     }
 
-    public static List<Node> getNodeFromConditionalPath(final String pathID, final String conditionalAttribute, final String conditionalValue, final Node metadata) {
-        // TODO
-        return new ArrayList<>();
+    public static List<Node> getNodeFromConditionalPath(final String xpath, final String conditionalPath, final String conditionalValue, final Node metadata) {
+        final List<Node> results = new ArrayList<>();
+        final String[] xpart = xpath.split("/");
+        final String[] cpart = conditionalPath.split("/");
+        final int min = Math.min(xpart.length, cpart.length);
+        int i = 0;
+        String commonPath = "";
+        while (xpart[i].equals(cpart[i]) && i < min) {
+            commonPath += "/" + xpart[i];
+           i++;
+        }
+        commonPath = commonPath.substring(1);
+        final List<Node> nodes = getNodeFromPath(metadata, commonPath);
+
+        for (Node n : nodes) {
+            final List<Node> conditionalNode = getNodeFromPath(n, conditionalPath.substring(commonPath.length()));
+            boolean match = false;
+            for (Node cNode : conditionalNode) {
+                if (conditionalValue.equalsIgnoreCase(cNode.getTextContent())) {
+                    match = true;
+                }
+            }
+            if (match) {
+                final List<Node> matchingNodes = getNodeFromPath(n, xpath.substring(commonPath.length()));
+                results.addAll(matchingNodes);
+            }
+        }
+        return results;
     }
 
     public static List<Node> getNodeFromPath(final Node parent, String xpath) {
         //we remove the type name from the xpath
-        xpath = xpath.substring(xpath.indexOf(':') + 1);
+        xpath = xpath.substring(xpath.indexOf('/') + 1);
 
         List<Node> nodes = Arrays.asList(parent);
         while (!xpath.isEmpty()) {
 
             //Then we get the next Property name
-            int separator = xpath.indexOf(':');
+            int separator = xpath.indexOf('/');
             String propertyName;
             if (separator != -1) {
                 propertyName = xpath.substring(0, separator);
@@ -88,9 +124,15 @@ public class NodeUtilities {
                 propertyName = propertyName.substring(0, braceIndex);
             }
 
+            //remove namespace on propertyName
+            final int separatorIndex = propertyName.indexOf(':');
+            if (separatorIndex != -1) {
+                propertyName = propertyName.substring(separatorIndex + 1);
+            }
+
             nodes = getNodes(propertyName, nodes, ordinal, false);
 
-            separator = xpath.indexOf(':');
+            separator = xpath.indexOf('/');
             if (separator != -1) {
                 xpath = xpath.substring(separator + 1);
             } else {
