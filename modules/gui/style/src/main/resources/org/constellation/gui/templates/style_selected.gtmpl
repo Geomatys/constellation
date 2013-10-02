@@ -51,8 +51,8 @@
                 </button>
             </div>
         </div>
+        <script type="text/javascript">
+            CSTL.LinkDataWorkflow.setStyle('${selected.record.name}','${selected.record.provider}');
+        </script>
     </div>
-    <script type="text/javascript">
-        CSTL.LinkDataWorkflow.setStyle('${selected.record.name}','${selected.record.provider}');
-    </script>
 <%}%>
