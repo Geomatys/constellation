@@ -118,8 +118,8 @@ public final class CSWQueryable {
         ISO_QUERYABLE.put("Modified", paths);
 
         paths = new ArrayList<>();
-        paths.add("/gmd:MD_Metadata/gmd:hierarchyLevel/gmd:MD_ScopeCode");
-        paths.add("/gmi:MI_Metadata/gmd:hierarchyLevel/gmd:MD_ScopeCode");
+        paths.add("/gmd:MD_Metadata/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue");
+        paths.add("/gmi:MI_Metadata/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue");
         ISO_QUERYABLE.put("Type", paths);
 
         /*
@@ -218,8 +218,8 @@ public final class CSWQueryable {
 
         //TODO MD_FeatureCatalogueDescription
         paths = new ArrayList<>();
-        paths.add("/gmd:MD_Metadata/gmd:language/gmd:LanguageCode");
-        paths.add("/gmi:MI_Metadata/gmd:language/gmd:LanguageCode");
+        paths.add("/gmd:MD_Metadata/gmd:language/gmd:LanguageCode/@codeListValue");
+        paths.add("/gmi:MI_Metadata/gmd:language/gmd:LanguageCode/@codeListValue");
         ISO_QUERYABLE.put("Language", paths);
 
         paths = new ArrayList<>();

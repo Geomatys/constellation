@@ -17,13 +17,12 @@
         <dc:subject>CTD profilers</dc:subject>
         <dc:subject>research vessel</dc:subject>
         <dc:subject>oceans</dc:subject>
-        <!--dc:format>MEDATLAS ASCII</dc:format-->
+        <dc:format>MEDATLAS ASCII</dc:format>
         <dc:language>eng</dc:language>
-        <dc:publisher>IFREMER / IDM/SISMER</dc:publisher>
-        <!--dc:creator>UNIVERSITE DE LA MEDITERRANNEE (U2) / COM - LAB. OCEANOG. &amp; BIOGEOCHIMIE - LUMINY</dc:creator-->
         <dct:modified>2009-01-26T13:00:00+02:00</dct:modified>
         <dc:date>2009-01-26T13:00:00+02:00</dc:date>
         <dct:abstract>Donnees CTD MEDIPROD VI 120</dct:abstract>
+        <dc:publisher>IFREMER / IDM/SISMER</dc:publisher>
         <ows:BoundingBox dimensions="2" crs="EPSG:4326">
             <ows:LowerCorner>1.3667 36.6</ows:LowerCorner>
             <ows:UpperCorner>1.3667 36.6</ows:UpperCorner>

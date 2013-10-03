@@ -123,7 +123,7 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
     @Override
     protected Node getEntry(final String identifier) throws IndexingException {
         try {
-            return (Node) reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115);
+            return (Node) reader.getMetadata(identifier, AbstractMetadataReader.NATIVE);
         } catch (MetadataIoException ex) {
             throw new IndexingException("Metadata_IOException while reading entry for:" + identifier, ex);
         }
@@ -339,7 +339,9 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
             for (Node n : nodes) {
                 final String s = n.getTextContent();
                 final String typeName = n.getLocalName();
-                if (typeName.equals("Real") || typeName.equals("Decimal")) {
+                if (typeName == null) {
+                    result.add(s);
+                } else if (typeName.equals("Real") || typeName.equals("Decimal")) {
                     try {
                         result.add(Double.parseDouble(s));
                     } catch (NumberFormatException ex) {

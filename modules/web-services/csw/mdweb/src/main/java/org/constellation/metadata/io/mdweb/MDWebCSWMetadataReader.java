@@ -81,7 +81,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         isoMap.put("subject",     "ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
         isoMap.put("subject2",    "ISO 19115:MD_Metadata:identificationInfo:topicCategory");
         isoMap.put("subject3",    "ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword:value");
-        isoMap.put("format",      "ISO 19115:MD_Metadata:identificationInfo:resourceFormat:name");
+        isoMap.put("format",      "ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name");
+        isoMap.put("format2",     "ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name:value");
         isoMap.put("abstract",    "ISO 19115:MD_Metadata:identificationInfo:abstract");
         isoMap.put("boundingBox", "ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2");
         isoMap.put("creator",     "ISO 19115:MD_Metadata:identificationInfo:credit");
@@ -98,7 +99,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         iso2Map.put("subject",     "ISO 19115-2:MI_Metadata:identificationInfo:descriptiveKeywords:keyword");
         iso2Map.put("subject2",    "ISO 19115-2:MI_Metadata:identificationInfo:topicCategory");
         iso2Map.put("subject3",    "ISO 19115-2:MI_Metadata:identificationInfo:descriptiveKeywords:keyword:value");
-        iso2Map.put("format",      "ISO 19115-2:MI_Metadata:identificationInfo:resourceFormat:name");
+        iso2Map.put("format",      "ISO 19115-2:MI_Metadata:distributionInfo:distributionFormat:name");
+        iso2Map.put("format2",     "ISO 19115-2:MI_Metadata:distributionInfo:distributionFormat:name:value");
         iso2Map.put("abstract",    "ISO 19115-2:MI_Metadata:identificationInfo:abstract");
         iso2Map.put("boundingBox", "ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement2");
         iso2Map.put("creator",     "ISO 19115-2:MI_Metadata:identificationInfo:credit");
@@ -483,8 +485,9 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 }
             }
         }
-        // and the topicCategeoryy
+        
         final List<Value> formatsValues  = record.getValueFromPath(pathMap.get("format"));
+        formatsValues.addAll(record.getValueFromPath(pathMap.get("format2")));
         final List<String> formats = new ArrayList<>();
         for (Value v: formatsValues) {
             if (v instanceof TextValue) {

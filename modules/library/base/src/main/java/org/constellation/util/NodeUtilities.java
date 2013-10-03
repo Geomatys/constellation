@@ -142,6 +142,35 @@ public class NodeUtilities {
         return nodes;
     }
 
+    public static List<String> getValuesFromPath(final Node parent, final String xpath) {
+        return getValuesFromPaths(parent, Arrays.asList(xpath));
+    }
+
+    public static List<String> getValuesFromPaths(final Node parent, final List<String> xpaths) {
+        final List<String> results = new ArrayList<>();
+
+        for (String xpath : xpaths) {
+            // verify type
+            xpath = xpath.substring(xpath.indexOf(':') + 1);
+            final String pathType = xpath.substring(0, xpath.indexOf('/'));
+            if (!pathType.equals(parent.getLocalName())) {
+                continue;
+            }
+            
+            final List<Node> nodes = getNodeFromPath(parent, xpath);
+            for (Node n : nodes) {
+                results.add(n.getTextContent());
+            }
+        }
+        return results;
+    }
+
+    public static void appendChilds(final Node parent, final List<Node> children) {
+        for (Node child : children) {
+            parent.appendChild(child);
+        }
+    }
+
     /**
      * Return an ordinal if there is one in the propertyName specified else return -1.
      * example : name[1] return  1

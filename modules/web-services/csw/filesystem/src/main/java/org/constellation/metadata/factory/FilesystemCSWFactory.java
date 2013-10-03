@@ -44,6 +44,7 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 
 import static org.constellation.generic.database.Automatic.*;
+import org.constellation.metadata.index.generic.NodeIndexer;
 import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.metadata.security.NoMetadataSecurityFilter;
 
@@ -94,7 +95,7 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public AbstractIndexer getIndexer(final Automatic configuration, final MetadataReader reader, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
-        return new GenericIndexer(reader, configuration.getConfigurationDirectory(), serviceID, additionalQueryable, false);
+        return new NodeIndexer(reader, configuration.getConfigurationDirectory(), serviceID, additionalQueryable, false);
     }
     
     /**
@@ -106,10 +107,7 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
     }
 
     /**
-     * {@inheritDoc}@Override
-    public List<DataSourceType> availableType() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+     * {@inheritDoc}
      */
     @Override
     public CatalogueHarvester getCatalogueHarvester(Automatic configuration, MetadataWriter writer) throws MetadataIoException {

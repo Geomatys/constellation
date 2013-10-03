@@ -33,10 +33,6 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,7 +44,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 //geotoolkit dependencies
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -58,12 +53,10 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractCSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.utils.Utils;
+import org.constellation.util.NodeUtilities;
 
 import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
 
-// SIS dependencies
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.util.NodeUtilities;
 
 /**
  * A CSW Metadata Writer. This writer does not require a database.
@@ -73,11 +66,6 @@ import org.constellation.util.NodeUtilities;
  */
 public class FileMetadataWriter extends AbstractCSWMetadataWriter {
 
-    /**
-     * A marshaller to store object from harvested resource.
-     */
-    private final static MarshallerPool marshallerPool = EBRIMMarshallerPool.getInstance();
-    
     /**
      * A directory in witch the metadata files are stored.
      */
@@ -91,7 +79,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      *
      * @throws org.constellation.metadata.io.MetadataIoException
      */
-    public FileMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException {
+    public FileMetadataWriter(final Automatic configuration, final AbstractIndexer index) throws MetadataIoException {
         super(index);
         File dataDir = configuration.getDataDirectory();
         if (!dataDir.exists()) {
@@ -110,19 +98,11 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     @Override
     public boolean storeMetadata(final Object original) throws MetadataIoException {
         try {
-            Object obj;
-            if (original instanceof Node) {
-                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-                obj = unmarshaller.unmarshal((Node)original);
-                if (obj instanceof JAXBElement) {
-                    obj = ((JAXBElement)obj).getValue();
-                }
-                marshallerPool.recycle(unmarshaller);
-            } else {
-                obj = original;
+            if (!(original instanceof Node)) {
+                throw new IllegalArgumentException("filesystem impelmentation wait for Nodes");
             }
 
-            final String identifier = Utils.findIdentifier(obj);
+            final String identifier = Utils.findIdentifier(original);
             final File f;
             // for windows we avoid to create file with ':'
             if (System.getProperty("os.name", "").startsWith("Windows")) {
@@ -132,23 +112,18 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                 f = new File(dataDirectory, identifier + ".xml");
             }
 
-            if (original instanceof Node) {
-                TransformerFactory tf = TransformerFactory.newInstance();
-                Transformer transformer = tf.newTransformer();
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                FileWriter writer = new FileWriter(f);
-                transformer.transform(new DOMSource((Node)original), new StreamResult(writer));
-            } else {
-                final Marshaller marshaller = marshallerPool.acquireMarshaller();
-                marshaller.marshal(obj, f);
-                marshallerPool.recycle(marshaller);
-            }
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            FileWriter writer = new FileWriter(f);
+            transformer.transform(new DOMSource((Node)original), new StreamResult(writer));
+            
             
             if (indexer != null) {
-                indexer.indexDocument(obj);
+                indexer.indexDocument(original);
             }
             
-        } catch (JAXBException | IOException | TransformerException ex) {
+        } catch (IOException | TransformerException ex) {
             throw new MetadataIoException("Unable to write the file.", ex, NO_APPLICABLE_CODE);
         }
         return true;
