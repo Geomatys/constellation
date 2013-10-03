@@ -11,8 +11,9 @@ public class PyramidCoverageHelperTestCase {
 
 	@Test
 	public void testSimple() throws MalformedURLException, DataStoreException {
-		PyramidCoverageHelper helper = PyramidCoverageHelper.builder("name").inputFormat("PNG")
-				.fromImage("/img").toMemoryStore().build();
+		PyramidCoverageHelper helper = PyramidCoverageHelper.builder("name")
+				.inputFormat("PNG").fromImage("path/to/a/geo.tiff")
+				.toMemoryStore().build();
 		Assert.assertNotNull(helper);
 
 	}
