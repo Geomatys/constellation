@@ -587,6 +587,33 @@ public class CSWworkerTest {
             fail("unexpected record type:" + obj);
         }
 
+        /*
+         *  TEST 12 : getRecordById with native DC metadata applying a ElementSet Summary.
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo"));
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
+
+        assertTrue(result != null);
+        assertTrue(result.getAny().size() == 1);
+
+        obj = result.getAny().get(0);
+
+        if (obj instanceof SummaryRecordType) {
+            SummaryRecordType dcResult =  (SummaryRecordType) obj;
+            SummaryRecordType dcexpResult =  (SummaryRecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta13SDC.xml"));
+            assertEquals(dcexpResult, dcResult);
+        } else if (obj instanceof Node) {
+            Node resultNode = (Node) obj;
+            Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta13SDC.xml");
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.compare();
+        } else {
+            fail("unexpected record type:" + obj);
+        }
+
         pool.recycle(unmarshaller);
     }
 

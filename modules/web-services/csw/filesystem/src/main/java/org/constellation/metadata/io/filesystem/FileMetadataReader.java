@@ -100,7 +100,6 @@ import org.apache.sis.util.NullArgumentException;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
 import org.constellation.metadata.index.XpathUtils;
-import static org.constellation.metadata.io.AbstractMetadataReader.ISO_19115;
 import org.constellation.util.NodeUtilities;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
@@ -245,9 +244,18 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 return DUBLINCORE;
             case "SensorML":
                 return SENSORML;
+            case "RegistryObject":
+            case "AdhocQuery":
+            case "Association":
+            case "RegistryPackage":
+            case "Registry":
+            case "ExtrinsicObject":
+            case "RegistryEntry":
+                return EBRIM;
+            default:
+                return NATIVE;
         }
         // TODO complete other metadata type
-        return NATIVE;
     }
 
     @Override
