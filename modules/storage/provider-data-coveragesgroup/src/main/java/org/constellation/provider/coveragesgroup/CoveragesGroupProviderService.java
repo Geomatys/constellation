@@ -45,14 +45,14 @@ import static org.constellation.provider.coveragesgroup.CoveragesGroupProvider.*
 public class CoveragesGroupProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
-    public static final ParameterDescriptor<URL> FOLDER_DESCRIPTOR =
-             new DefaultParameterDescriptor<URL>(KEY_FOLDER_PATH, "Folder path", URL.class, null, true);
+    public static final ParameterDescriptor<URL> URL =
+             new DefaultParameterDescriptor<URL>(KEY_PATH, "Map context path", URL.class, null, true);
 
-    public static final ParameterDescriptor<MapContext> MAP_CONTEXT_DESCRIPTOR =
+    public static final ParameterDescriptor<MapContext> MAP_CONTEXT =
              new DefaultParameterDescriptor<MapContext>(KEY_MAP_CONTEXT, "Map context", MapContext.class, null, false);
 
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup("coveragesgroup", FOLDER_DESCRIPTOR, MAP_CONTEXT_DESCRIPTOR);
+            new DefaultParameterDescriptorGroup("coveragesgroup", URL, MAP_CONTEXT);
 
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
@@ -80,7 +80,7 @@ public class CoveragesGroupProviderService extends AbstractProviderService
         final CoveragesGroupProvider provider = new CoveragesGroupProvider(this, ps);
         ps = getOrCreate(SOURCE_CONFIG_DESCRIPTOR, ps);
         getLogger().log(Level.INFO, "[PROVIDER]> Coverages group provider created : {0}",
-                    value(FOLDER_DESCRIPTOR, ps));
+                    value(URL, ps));
         return provider;
     }
 

@@ -34,6 +34,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
@@ -53,12 +54,12 @@ import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderSe
  */
 public class CoveragesGroupProvider extends AbstractLayerProvider {
 
-    public static final String KEY_FOLDER_PATH = "path";
+    public static final String KEY_PATH = "path";
     public static final String KEY_MAP_CONTEXT = "mapContext";
 
     private final Map<Name,File> index = new HashMap<>();
 
-    private File folder;
+    private File path;
 
     public CoveragesGroupProvider(final ProviderService service, final ParameterValueGroup param) {
         super(service,param);
@@ -115,7 +116,7 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      * @param mapContext A map context to parse.
      * @throws JAXBException
      */
-    public void write(final Name key, final MapContext mapContext) throws JAXBException {
+    public void write(final Name key, final MapContext mapContext) throws JAXBException, IOException {
         final File mapContextFile = index.get(key);
 
         final org.geotoolkit.providers.xml.MapItem finalMapItem = new org.geotoolkit.providers.xml.MapItem(null);
@@ -152,6 +153,9 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
         if (mapContextFile != null) {
             final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance(org.geotoolkit.providers.xml.MapContext.class, org.apache.sis.internal.jaxb.geometry.ObjectFactory.class), null);
             final Marshaller marshaller = pool.acquireMarshaller();
+            if (!mapContextFile.exists()) {
+                mapContextFile.createNewFile();
+            }
             marshaller.marshal(finalMapContext, mapContextFile);
             pool.recycle(marshaller);
         }
@@ -211,48 +215,44 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      */
     @Override
     protected void visit() {
-        final ParameterValue<URL> paramFolder = (ParameterValue<URL>) getSourceConfiguration(getSource()).parameter(FOLDER_DESCRIPTOR.getName().getCode());
+        final ParameterValue<URL> paramUrl = (ParameterValue<URL>) getSourceConfiguration(getSource()).parameter(URL.getName().getCode());
 
-        if(paramFolder == null){
+        if(paramUrl == null || paramUrl.getValue() == null){
             getLogger().log(Level.WARNING,"Provided File path is not defined.");
             return;
         }
 
-        final URL path = paramFolder.getValue();
-
-        if (path == null) {
-            getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");
-            return;
-        }
+        final URL urlPath = paramUrl.getValue();
 
         try {
-            folder = new File(path.toURI());
+            path = new File(urlPath.toURI());
         } catch (URISyntaxException e) {
             getLogger().log(Level.INFO,"Fails to convert path url to file.");
-            folder = new File(path.getPath());
+            path = new File(urlPath.getPath());
         }
 
-        if (folder == null || !folder.exists() || !folder.isDirectory()) {
-            getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");
-            return;
-        }
+        visit(path);
 
-        visit(folder);
-
-        final ParameterValue<MapContext> paramMapContext = (ParameterValue<MapContext>) getSourceConfiguration(getSource()).parameter(MAP_CONTEXT_DESCRIPTOR.getName().getCode());
+        final ParameterValue<MapContext> paramMapContext = (ParameterValue<MapContext>) getSourceConfiguration(getSource()).parameter(MAP_CONTEXT.getName().getCode());
         if (paramMapContext != null) {
             final MapContext mapContext = paramMapContext.getValue();
             if (mapContext != null) {
                 final DefaultName name = new DefaultName(mapContext.getName());
                 File tempFile = index.get(name);
                 if (tempFile == null) {
-                    tempFile = new File(folder, mapContext.getName() + ".xml");
+                    if (path.isDirectory()) {
+                        tempFile = new File(path, mapContext.getName() + ".xml");
+                    } else {
+                        tempFile = path;
+                    }
                     index.put(name, tempFile);
                 }
                 try {
                     write(name, mapContext);
                 } catch (JAXBException e) {
                     getLogger().log(Level.WARNING, "Unable to do the marshalling of the map context object", e);
+                } catch (IOException e) {
+                    getLogger().log(Level.WARNING, "Unable to write the map context in this file!", e);
                 }
             }
         }
