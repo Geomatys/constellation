@@ -27,9 +27,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.spi.ServiceRegistry;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 // APACHE SIS dependencies
 import org.apache.sis.util.logging.Logging;
@@ -50,13 +52,14 @@ import org.constellation.metadata.io.MetadataType;
 import org.constellation.ws.CstlServiceException;
 
 // Geotk dependencies
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.lucene.index.IndexDirectoryFilter;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -293,22 +296,21 @@ public class CSWConfigurationManager {
             throw new ConfigurationException("Unexpected file extension, accepting zip or xml");
         }
         try {
-            final Unmarshaller u = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
+
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
             for (File importedFile: files) {
                 if (importedFile != null) {
-                    Object unmarshalled = u.unmarshal(importedFile);
-                    EBRIMMarshallerPool.getInstance().recycle(u);
-                    if (unmarshalled instanceof JAXBElement) {
-                        unmarshalled = ((JAXBElement)unmarshalled).getValue();
-                    }
-                    writer.storeMetadata(unmarshalled);
+                    Document document = docBuilder.parse(importedFile);
+                    writer.storeMetadata(document.getDocumentElement());
                 } else {
                     throw new ConfigurationException("An imported file is null");
                 }
             }
             final String msg = "The specified record have been imported in the CSW";
             return new AcknowlegementType("Success", msg);
-        } catch (JAXBException ex) {
+        } catch (SAXException | ParserConfigurationException | IOException ex) {
             LOGGER.log(Level.WARNING, "Exception while unmarshalling imported file", ex);
         } catch (MetadataIoException ex) {
             throw new ConfigurationException(ex);
