@@ -21,7 +21,6 @@ import java.text.DateFormat;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -31,11 +30,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-// JAXB dependencies
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.logging.Level;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -53,41 +52,21 @@ import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.util.ReflectionUtilities;
+import org.constellation.metadata.index.XpathUtils;
+import org.constellation.metadata.io.MetadataType;
+import org.constellation.util.NodeUtilities;
 
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
 import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
 
-// geoAPI dependencies
-import org.opengis.metadata.citation.ResponsibleParty;
-import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.distribution.Format;
-import org.opengis.metadata.extent.Extent;
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.metadata.extent.GeographicExtent;
-import org.opengis.metadata.identification.DataIdentification;
-import org.opengis.metadata.identification.Identification;
-import org.opengis.metadata.identification.Keywords;
-import org.opengis.metadata.identification.TopicCategory;
-import org.opengis.metadata.maintenance.ScopeCode;
-import org.opengis.metadata.distribution.Distribution;
-import org.opengis.metadata.distribution.Distributor;
-import org.opengis.metadata.identification.BrowseGraphic;
-import org.opengis.util.InternationalString;
-
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
-import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
-import org.geotoolkit.csw.xml.v202.RecordType;
-import org.geotoolkit.csw.xml.v202.SummaryRecordType;
-import org.geotoolkit.ows.xml.v100.BoundingBoxType;
-import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -95,14 +74,9 @@ import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.util.NullArgumentException;
+// Apache SIS dependencies
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
-import org.constellation.metadata.index.XpathUtils;
-import org.constellation.metadata.io.MetadataType;
-import org.constellation.util.NodeUtilities;
-import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -190,23 +164,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return getOriginalMetadata(identifier, mode, type, elementName);
     }
 
-    public Object getMetadataObj(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        //we look for cached object
-        Object obj = null;
-        if (isCacheEnabled()) {
-            obj = getFromCache(identifier);
-        }
-        if (obj == null) {
-            obj = getObjectFromFile(identifier);
-        }
-        if (obj instanceof DefaultMetadata && mode == MetadataType.DUBLINCORE) {
-            obj = translateISOtoDC((DefaultMetadata)obj, type, elementName);
-        } else if (obj instanceof RecordType && mode == MetadataType.DUBLINCORE) {
-            obj = applyElementSet((RecordType)obj, type, elementName);
-        }
-        return obj;
-    }
-
     @Override
     public Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
@@ -216,15 +173,14 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         } catch (IOException | XMLStreamException ex) {
             throw new MetadataIoException(ex);
         }
-        if ((elementName == null || elementName.isEmpty()) && (ElementSetType.FULL.equals(type) || type == null) && (metadataMode == mode || mode == MetadataType.NATIVE)) {
-            if (metadataFile != null && metadataFile.exists()) {
-                return getNodeFromFile(metadataFile);
-            }
-            throw new MetadataIoException(METAFILE_MSG + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
-        } else if (metadataMode ==  MetadataType.ISO_19115 && mode == MetadataType.DUBLINCORE) {
-            return translateISOtoDCNode(getNodeFromFile(metadataFile), type, elementName);
+        final Node metadataNode = getNodeFromFile(metadataFile);
+            
+        if (metadataMode ==  MetadataType.ISO_19115 && mode == MetadataType.DUBLINCORE) {
+            return translateISOtoDCNode(metadataNode, type, elementName);
+        } else if (mode == MetadataType.DUBLINCORE && metadataMode == MetadataType.DUBLINCORE) {
+            return  applyElementSetNode(metadataNode, type, elementName);
         } else {
-            return getMetadataObj(identifier, mode, type, elementName);
+           return metadataNode;
         }
     }
 
@@ -265,36 +221,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return metadataFile != null && metadataFile.exists();
     }
     
-    /**
-     * Unmarshall The file designed by the path dataDirectory/identifier.xml
-     * If the file is not present or if it is impossible to unmarshall it it return an exception.
-     *
-     * @param identifier the metadata identifier
-     * @return A unmarshalled metadata object.
-     * @throws org.constellation.ws.MetadataIoException
-     */
-    private Object getObjectFromFile(final String identifier) throws MetadataIoException {
-        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
-        if (metadataFile != null && metadataFile.exists()) {
-            try {
-                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-                Object metadata = unmarshaller.unmarshal(metadataFile);
-                marshallerPool.recycle(unmarshaller);
-                if (metadata instanceof JAXBElement) {
-                    metadata = ((JAXBElement) metadata).getValue();
-                }
-                if (isCacheEnabled()) {
-                    addInCache(identifier, metadata);
-                }
-                return metadata;
-            } catch (JAXBException | IllegalArgumentException | NullArgumentException ex) {
-                throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
-                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
-            }
-        } 
-        throw new MetadataIoException(METAFILE_MSG + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
-    }
-
     private Node getNodeFromFile(final File metadataFile) throws MetadataIoException {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -309,7 +235,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
 
     /**
      * Apply the elementSet (Brief, Summary or full) or the custom elementSetName on the specified record.
-     * 
+     *
      * @param record A dublinCore record.
      * @param type The ElementSetType to apply on this record.
      * @param elementName A list of QName corresponding to the requested attribute. this parameter is ignored if type is not null.
@@ -317,265 +243,83 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * @return A record object.
      * @throws MetadataIoException If the type and the element name are null.
      */
-    private AbstractRecordType applyElementSet(final RecordType record, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        
+    private Node applyElementSetNode(final Node record, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+        final DocumentBuilder docBuilder;
+        try {
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            docBuilder = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            throw new MetadataIoException(ex);
+        }
+        final Document document = docBuilder.newDocument();
         if (type != null) {
             if (type.equals(ElementSetType.SUMMARY)) {
-                return record.toSummary();
+                final Element sumRoot = document.createElementNS(Namespaces.CSW, "SummaryRecord");
+                final List<String> identifierValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:identifier");
+                final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues);
+                NodeUtilities.appendChilds(sumRoot, identifiers);
+                final List<String> titleValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:title");
+                final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues);
+                NodeUtilities.appendChilds(sumRoot, titles);
+                final List<String> typeValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:type");
+                final List<Node> types = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", typeValues);
+                NodeUtilities.appendChilds(sumRoot, types);
+                final List<String> subValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:subject");
+                final List<Node> subjects = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "subject", subValues);
+                NodeUtilities.appendChilds(sumRoot, subjects);
+                final List<String> formValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:format");
+                final List<Node> formats = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "format", formValues);
+                NodeUtilities.appendChilds(sumRoot, formats);
+                final List<String> modValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:modified");
+                final List<Node> modifieds = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "modified", modValues);
+                NodeUtilities.appendChilds(sumRoot, modifieds);
+                final List<String> absValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:abstract");
+                final List<Node> abstracts = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "abstract", absValues);
+                NodeUtilities.appendChilds(sumRoot, abstracts);
+                final List<Node> origBboxes = NodeUtilities.getNodeFromPath(record, "/ows:BoundingBox");
+                for (Node origBbox : origBboxes) {
+                    Node n = document.importNode(origBbox, true);
+                    NodeUtilities.appendChilds(sumRoot, Arrays.asList(n));
+                }
+                return sumRoot;
             } else if (type.equals(ElementSetType.BRIEF)) {
-                return record.toBrief();
+                final Element briefRoot = document.createElementNS(Namespaces.CSW, "BriefRecord");
+                final List<String> identifierValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:identifier");
+                final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues);
+                NodeUtilities.appendChilds(briefRoot, identifiers);
+                final List<String> titleValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:title");
+                final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues);
+                NodeUtilities.appendChilds(briefRoot, titles);
+                final List<String> typeValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:type");
+                final List<Node> types = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", typeValues);
+                NodeUtilities.appendChilds(briefRoot, types);
+                final List<Node> origBboxes = NodeUtilities.getNodeFromPath(record, "/csw:Record/ows:BoundingBox");
+                for (Node origBbox : origBboxes) {
+                    Node n = document.importNode(origBbox, true);
+                    NodeUtilities.appendChilds(briefRoot, Arrays.asList(n));
+                }
+                return briefRoot;
             } else {
                 return record;
             }
         } else if (elementName != null) {
-            final RecordType customRecord = new RecordType();
+            final Element recRoot = document.createElementNS(Namespaces.CSW, "Record");
             for (QName qn : elementName) {
                 if (qn != null) {
-                    try {
-                        final Method getter = ReflectionUtilities.getGetterFromName(qn.getLocalPart(), RecordType.class);
-                        final Object param  = ReflectionUtilities.invokeMethod(record, getter);
-
-                        final Method setter;
-                        if (param != null) {
-                            setter = ReflectionUtilities.getSetterFromName(qn.getLocalPart(), param.getClass(), RecordType.class);
-                        } else {
-                            continue;
-                        }
-
-                        if (setter != null) {
-                            ReflectionUtilities.invokeMethod(setter, customRecord, param);
-                        } else {
-                            final String paramDesc = param.getClass().getSimpleName();
-                            LOGGER.warning("No setter have been found for attribute " + qn.getLocalPart() +" of type " + paramDesc + " in the class RecordType");
-                        }
-
-                    } catch (IllegalArgumentException ex) {
-                        LOGGER.log(Level.WARNING, "illegal argument exception while invoking the method for attribute{0} in the classe RecordType", qn.getLocalPart());
+                    final List<Node> origs = NodeUtilities.getNodeFromPath(record, "/csw:Record/dc:" + qn.getLocalPart());
+                    for (Node orig : origs) {
+                        Node n = document.importNode(orig, true);
+                        NodeUtilities.appendChilds(recRoot, Arrays.asList(n));
                     }
                 } else {
                     LOGGER.warning("An elementName was null.");
                 }
             }
-            return customRecord;
+            return recRoot;
         } else {
             throw new MetadataIoException("No ElementSet or Element name specified");
         }
-    }
-
-    /**
-     * Translate A ISO 19139 object into a DublinCore representation.
-     * The elementSet (Brief, Summary or full) or the custom elementSetName is applied.
-     *
-     * @param metadata
-     * @param type
-     * @param elementName
-     * @return
-     */
-    private AbstractRecordType translateISOtoDC(final DefaultMetadata metadata, final ElementSetType type, final List<QName> elementName) {
-        if (metadata != null) {
-
-            final RecordType customRecord = new RecordType();
-
-            /*
-             * BRIEF part
-             */
-            final SimpleLiteral identifier = new SimpleLiteral(metadata.getFileIdentifier());
-            if (elementName != null && elementName.contains(_Identifier_QNAME)) {
-                customRecord.setIdentifier(identifier);
-            }
-
-            SimpleLiteral title = null;
-            //TODO see for multiple identification
-            for (Identification identification: metadata.getIdentificationInfo()) {
-                if (identification.getCitation() != null && identification.getCitation().getTitle() != null) {
-                    title = new SimpleLiteral(identification.getCitation().getTitle().toString());
-                }
-            }
-            if (elementName != null && elementName.contains(_Title_QNAME)) {
-                customRecord.setTitle(title);
-            }
-
-            SimpleLiteral dataType = null;
-            //TODO see for multiple hierarchyLevel
-            for (ScopeCode code: metadata.getHierarchyLevels()) {
-                dataType = new SimpleLiteral(code.identifier());
-            }
-            if (elementName != null && elementName.contains(_Type_QNAME)) {
-                customRecord.setType(dataType);
-            }
-
-            final List<BoundingBoxType> bboxes = new ArrayList<>();
-
-            for (Identification identification: metadata.getIdentificationInfo()) {
-                if (identification instanceof DataIdentification) {
-                    final DataIdentification dataIdentification = (DataIdentification) identification;
-                    for (Extent extent : dataIdentification.getExtents()) {
-                        for (GeographicExtent geoExtent :extent.getGeographicElements()) {
-                            if (geoExtent instanceof GeographicBoundingBox) {
-                                final GeographicBoundingBox bbox = (GeographicBoundingBox) geoExtent;
-                                // TODO find CRS
-                                bboxes.add(new BoundingBoxType("EPSG:4326",
-                                                                bbox.getWestBoundLongitude(),
-                                                                bbox.getSouthBoundLatitude(),
-                                                                bbox.getEastBoundLongitude(),
-                                                                bbox.getNorthBoundLatitude()));
-                            }
-                        }
-                    }
-                }
-            }
-            if (elementName != null && elementName.contains(_BoundingBox_QNAME)) {
-                customRecord.setSimpleBoundingBox(bboxes);
-            }
-
-            if (type != null && type.equals(ElementSetType.BRIEF)) {
-                return new BriefRecordType(identifier, title, dataType, bboxes);
-            }
-
-            /*
-             *  SUMMARY part
-             */
-            final List<SimpleLiteral> abstractt = new ArrayList<>();
-            for (Identification identification: metadata.getIdentificationInfo()) {
-                if (identification.getAbstract() != null) {
-                    abstractt.add(new SimpleLiteral(identification.getAbstract().toString()));
-                }
-            }
-            if (elementName != null && elementName.contains(_Abstract_QNAME)) {
-                customRecord.setAbstract(abstractt);
-            }
-
-            final List<SimpleLiteral> subjects = new ArrayList<>();
-            for (Identification identification: metadata.getIdentificationInfo()) {
-                for (Keywords kw :identification.getDescriptiveKeywords()) {
-                    for (InternationalString str : kw.getKeywords()) {
-                        subjects.add(new SimpleLiteral(str.toString()));
-                    }
-                }
-                if (identification instanceof DataIdentification) {
-                    final DataIdentification dataIdentification = (DataIdentification) identification;
-                    for (TopicCategory tc : dataIdentification.getTopicCategories()) {
-                        subjects.add(new SimpleLiteral(tc.identifier()));
-                    }
-                }
-            }
-            if (elementName != null && elementName.contains(_Subject_QNAME)) {
-                customRecord.setSubject(subjects);
-            }
-
-
-            List<SimpleLiteral> formats = new ArrayList<>();
-            for (Identification identification: metadata.getIdentificationInfo()) {
-                for (Format f :identification.getResourceFormats()) {
-                    if (f == null || f.getName() == null) {
-                        continue;
-                    }
-                    formats.add(new SimpleLiteral(f.getName().toString()));
-                }
-            }
-            if (formats.isEmpty()) {
-                formats = null;
-            }
-            if (elementName != null && elementName.contains(_Format_QNAME)) {
-                customRecord.setFormat(formats);
-            }
-
-            final SimpleLiteral modified;
-            if (metadata.getDateStamp() != null) {
-                String dateValue;
-                synchronized (FORMATTER) {
-                    dateValue = FORMATTER.format(metadata.getDateStamp());
-                }
-                dateValue = dateValue.substring(0, dateValue.length() - 2);
-                dateValue = dateValue + ":00";
-                modified = new SimpleLiteral(dateValue);
-                if (elementName != null && elementName.contains(_Modified_QNAME)) {
-                    customRecord.setModified(modified);
-                }
-            } else {
-                modified = null;
-            }
-
-
-            if (type != null && type.equals(ElementSetType.SUMMARY)) {
-                return new SummaryRecordType(identifier, title, dataType, bboxes, subjects, formats, modified, abstractt);
-            }
-
-            final SimpleLiteral date    = modified;
-            if (elementName != null && elementName.contains(_Date_QNAME)) {
-                customRecord.setDate(date);
-            }
-            
-
-            List<SimpleLiteral> creator = new ArrayList<>();
-            for (Identification identification: metadata.getIdentificationInfo()) {
-                for (ResponsibleParty rp :identification.getPointOfContacts()) {
-                    if (Role.ORIGINATOR.equals(rp.getRole())) {
-                        creator.add(new SimpleLiteral(rp.getOrganisationName().toString()));
-                    }
-                }
-            }
-            if (creator.isEmpty()) {creator = null;}
-            
-            if (elementName != null && elementName.contains(_Creator_QNAME)) {
-                customRecord.setCreator(creator);
-            }
-            
-            List<String> descriptions = new ArrayList<>();
-            for (Identification identification: metadata.getIdentificationInfo()) {
-                for (BrowseGraphic go :identification.getGraphicOverviews()) {
-                    if (go.getFileName() != null) {
-                        descriptions.add(go.getFileName().toString());
-                    }
-                }
-            }
-            
-            if (!descriptions.isEmpty() && elementName != null && elementName.contains(_Description_QNAME)) {
-                customRecord.setDescription(new SimpleLiteral(null, descriptions));
-            }
-
-
-            // TODO multiple
-            SimpleLiteral distributor = null;
-            final Distribution distribution = metadata.getDistributionInfo();
-            if (distribution != null) {
-                for (Distributor dis :distribution.getDistributors()) {
-                    final ResponsibleParty disRP = dis.getDistributorContact();
-                    if (disRP != null) {
-                        if (disRP.getOrganisationName() != null) {
-                            distributor = new SimpleLiteral(disRP.getOrganisationName().toString());
-                        }
-                    }
-                }
-            }
-            if (elementName != null && elementName.contains(_Publisher_QNAME)) {
-                customRecord.setPublisher(distributor);
-            }
-
-            final SimpleLiteral language;
-            if (metadata.getLanguage() != null) {
-                language = new SimpleLiteral(metadata.getLanguage().getISO3Language());
-                if (elementName != null && elementName.contains(_Language_QNAME)) {
-                    customRecord.setLanguage(language);
-                }
-            } else {
-                language = null;
-            }
-
-            // TODO
-            final SimpleLiteral spatial = null;
-            final SimpleLiteral references = null;
-            if (type != null && type.equals(ElementSetType.FULL)) {
-                final RecordType r = new RecordType(identifier, title, dataType, subjects, formats, modified, date, abstractt, bboxes, creator, distributor, language, spatial, references);
-                 if (!descriptions.isEmpty()) {
-                    r.setDescription(new SimpleLiteral(null, descriptions));
-                 }
-                return r;
-            }
-
-            return customRecord;
-        }
-        return null;
     }
 
     private Node translateISOtoDCNode(final Node metadata, final ElementSetType type, final List<QName> elementName) throws MetadataIoException  {
@@ -597,37 +341,22 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
              * BRIEF part
              */
             final List<String> identifierValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Identifier"));
-            final List<Node> identifiers = new ArrayList<>();
-            for (String id : identifierValues) {
-                final Node identifier = document.createElementNS("http://purl.org/dc/elements/1.1/", "identifier");
-                identifier.setTextContent(id);
-                identifiers.add(identifier);
-            }
+            final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues);
             
             if (elementName != null && elementName.contains(_Identifier_QNAME)) {
                 NodeUtilities.appendChilds(root, identifiers);
             }
 
             final List<String> titleValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Title"));
-            final List<Node> titles = new ArrayList<>();
-            for (String titleValue : titleValues) {
-                final Node title = document.createElementNS("http://purl.org/dc/elements/1.1/", "title");
-                title.setTextContent(titleValue);
-                titles.add(title);
-            }
+            final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues);
 
             if (elementName != null && elementName.contains(_Title_QNAME)) {
                 NodeUtilities.appendChilds(root, titles);
             }
             
             final List<String> dataTypeValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Type"));
-            final List<Node> dataTypes = new ArrayList<>();
-            for (String dataTypeValue : dataTypeValues) {
-                final Node dataType = document.createElementNS("http://purl.org/dc/elements/1.1/", "type");
-                dataType.setTextContent(dataTypeValue);
-                dataTypes.add(dataType);
-            }
-
+            final List<Node> dataTypes = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", dataTypeValues);
+                
             if (elementName != null && elementName.contains(_Type_QNAME)) {
                 NodeUtilities.appendChilds(root, dataTypes);
             }
@@ -675,49 +404,32 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
              *  SUMMARY part
              */
             final List<String> abstractValues = NodeUtilities.getValuesFromPath(metadata, "/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:abstract/gco:CharacterString");
-            final List<Node> abstracts = new ArrayList<>();
-            for (String abstractValue : abstractValues) {
-                final Node _abstract = document.createElementNS("http://purl.org/dc/terms/", "abstract");
-                _abstract.setTextContent(abstractValue);
-                abstracts.add(_abstract);
-            }
+            final List<Node> abstracts = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "abstract", abstractValues);
 
             if (elementName != null && elementName.contains(_Abstract_QNAME)) {
                 NodeUtilities.appendChilds(root, abstracts);
             }
 
-            final List<Node> subjects = new ArrayList<>();
             final List<String> kwValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Subject"));
-            for (String kwValue : kwValues) {
-                final Node subject = document.createElementNS("http://purl.org/dc/elements/1.1/", "subject");
-                subject.setTextContent(kwValue);
-                subjects.add(subject);
-            }
+            final List<Node> subjects = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "subject", kwValues);
+
             if (elementName != null && elementName.contains(_Subject_QNAME)) {
                 NodeUtilities.appendChilds(root, subjects);
             }
 
-
-            List<Node> formats = new ArrayList<>();
             final List<String> formValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Format"));
-            for (String formValue : formValues) {
-                final Node format = document.createElementNS("http://purl.org/dc/elements/1.1/", "format");
-                format.setTextContent(formValue);
-                formats.add(format);
-            }
+            final List<Node> formats = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "format", formValues);
 
             if (elementName != null && elementName.contains(_Format_QNAME)) {
                  NodeUtilities.appendChilds(root, formats);
             }
 
-            final List<Node> modifieds = new ArrayList<>();
             final List<String> modValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Modified"));
+            final List<String> dateValues = new ArrayList<>();
             for (String modValue : modValues) {
-                final String dateValue = formatDate(modValue);
-                final Node modified = document.createElementNS("http://purl.org/dc/terms/", "modified");
-                modified.setTextContent(dateValue);
-                modifieds.add(modified);
+                dateValues.add(formatDate(modValue));
             }
+            final List<Node> modifieds = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "modified", dateValues);
 
             if (elementName != null && elementName.contains(_Modified_QNAME)) {
                 NodeUtilities.appendChilds(root, modifieds);
@@ -736,67 +448,40 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 return sumRoot;
             }
 
-            final List<Node> dates = new ArrayList<>();
-            for (String modValue : modValues) {
-                final String dateValue = formatDate(modValue);
-                final Node date = document.createElementNS("http://purl.org/dc/elements/1.1/", "date");
-                date.setTextContent(dateValue);
-                dates.add(date);
-            }
+            final List<Node> dates = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "date", dateValues);
 
             if (elementName != null && elementName.contains(_Date_QNAME)) {
                 NodeUtilities.appendChilds(root, dates);
             }
 
-
-            final List<Node> creators = new ArrayList<>();
             final List<String> creaValues = NodeUtilities.getValuesFromPaths(metadata, DUBLIN_CORE_QUERYABLE.get("creator"));
-            for (String creaValue : creaValues) {
-                final Node creator = document.createElementNS("http://purl.org/dc/elements/1.1/", "creator");
-                creator.setTextContent(creaValue);
-                creators.add(creator);
-            }
+            final List<Node> creators = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "creator", creaValues);
 
             if (elementName != null && elementName.contains(_Creator_QNAME)) {
                 NodeUtilities.appendChilds(root, creators);
             }
 
-            final List<Node> descriptions = new ArrayList<>();
             final List<String> desValues = NodeUtilities.getValuesFromPath(metadata, "/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gmx:FileName/@src");
-            for (String descValue : desValues) {
-                final Node desc = document.createElementNS("http://purl.org/dc/elements/1.1/", "description");
-                desc.setTextContent(descValue);
-                descriptions.add(desc);
-            }
+            final List<Node> descriptions = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "description", desValues);
 
             if (!descriptions.isEmpty() && elementName != null && elementName.contains(_Description_QNAME)) {
                 NodeUtilities.appendChilds(root, descriptions);
             }
 
-            final List<Node> distributors = new ArrayList<>();
             final List<String> paths = new ArrayList<>();
             paths.add("/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
             paths.add("/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact/gmd:CI_ResponsibleParty/gmd:organisationName/gmx:Anchor");
             paths.add("/gmi:MI_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
             paths.add("/gmi:MI_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact/gmd:CI_ResponsibleParty/gmd:organisationName/gmx:Anchor");
             final List<String> distValues = NodeUtilities.getValuesFromPaths(metadata, paths);
-            for (String distValue : distValues) {
-                final Node dist = document.createElementNS("http://purl.org/dc/elements/1.1/", "publisher");
-                dist.setTextContent(distValue);
-                distributors.add(dist);
-            }
+            final List<Node> distributors = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "publisher", distValues);
 
             if (elementName != null && elementName.contains(_Publisher_QNAME)) {
                 NodeUtilities.appendChilds(root, distributors);
             }
 
-            final List<Node> languages = new ArrayList<>();
             final List<String> langValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Language"));
-            for (String langValue : langValues) {
-                final Node lang = document.createElementNS("http://purl.org/dc/elements/1.1/", "language");
-                lang.setTextContent(langValue);
-                languages.add(lang);
-            }
+            final List<Node> languages = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "language", langValues);
            
             if (elementName != null && elementName.contains(_Language_QNAME)) {
                 NodeUtilities.appendChilds(root, languages);
@@ -949,10 +634,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return getAllEntries(dataDirectory);
     }
     
-    /**
-     *
-     */
-    public List<? extends Object> getAllEntries(final File directory) throws MetadataIoException {
+    private List<? extends Object> getAllEntries(final File directory) throws MetadataIoException {
         final List<Object> results = new ArrayList<>();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();

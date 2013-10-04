@@ -20,6 +20,7 @@ package org.constellation.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -196,5 +197,15 @@ public class NodeUtilities {
             }
         }
         return ordinal;
+    }
+
+    public static List<Node> buildNodes(final Document doc, final String namespace, final String localName, final List<String> values) {
+        final List<Node> nodes = new ArrayList<>();
+        for (String value : values) {
+            final Node n = doc.createElementNS(namespace, localName);
+            n.setTextContent(value);
+            nodes.add(n);
+        }
+        return nodes;
     }
 }
