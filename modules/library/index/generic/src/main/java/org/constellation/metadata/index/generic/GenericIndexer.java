@@ -42,9 +42,9 @@ import org.apache.lucene.document.Field;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.metadata.index.AbstractCSWIndexer;
 import org.constellation.metadata.index.XpathUtils;
-import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataType;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
 
@@ -139,7 +139,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     @Override
     protected Object getEntry(final String identifier) throws IndexingException {
         try {
-            return reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115);
+            return reader.getMetadata(identifier, MetadataType.ISO_19115);
         } catch (MetadataIoException ex) {
             throw new IndexingException("Metadata_IOException while reading entry for:" + identifier, ex);
         }

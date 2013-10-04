@@ -43,10 +43,10 @@ import org.constellation.configuration.StringList;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.factory.AbstractCSWFactory;
-import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataType;
 import org.constellation.ws.CstlServiceException;
 
 // Geotk dependencies
@@ -200,7 +200,7 @@ public class CSWConfigurationManager {
             if (reader != null) {
                 try {
                     for (String identifier : identifiers) {
-                        objectToIndex.add(reader.getMetadata(identifier, AbstractMetadataReader.NATIVE));
+                        objectToIndex.add(reader.getMetadata(identifier, MetadataType.NATIVE));
                     }
                 } catch (MetadataIoException ex) {
                     throw new ConfigurationException(ex);

@@ -33,7 +33,7 @@ import org.constellation.util.ReflectionUtilities;
 
 import static org.constellation.metadata.CSWQueryable.*;
 import org.constellation.metadata.index.XpathUtils;
-import static org.constellation.metadata.io.AbstractMetadataReader.ISO_19110;
+import org.constellation.metadata.io.MetadataType;
 
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
@@ -208,7 +208,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     }
 
     @Override
-    public Object getOriginalMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         return getMetadata(identifier, mode, type, elementName);
     }
     
@@ -225,14 +225,14 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * @throws java.sql.MetadataIoException
      */
     @Override
-    public Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
 
         try {
             alreadyRead.clear();
 
             //we look for cached object
             Object result = getFromCache(identifier);
-            if (mode == ISO_19115 || mode == EBRIM || mode == SENSORML || mode == ISO_19110) {
+            if (mode == MetadataType.ISO_19115 || mode == MetadataType.EBRIM || mode == MetadataType.SENSORML || mode == MetadataType.ISO_19110) {
 
                 if (result == null) {
                     final FullRecord f = mdReader.getRecord(identifier);
@@ -243,7 +243,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
                 result = applyElementSet(result, type, elementName);
 
-            } else if (mode == DUBLINCORE) {
+            } else if (mode == MetadataType.DUBLINCORE) {
 
                 final FullRecord record             = mdReader.getRecord(identifier);
                 if (record != null) {
@@ -364,7 +364,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             return transformMDRecordInRecord(record, type, elementName);
 
         } else {
-            final Object obj =  getObjectFromRecord(identifier, record, DUBLINCORE);
+            final Object obj =  getObjectFromRecord(identifier, record, MetadataType.DUBLINCORE);
 
             if (obj instanceof AbstractRecordType) {
                 return (AbstractRecordType) obj;
@@ -727,8 +727,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * {@inheritDoc}
      */
     @Override
-    public List<Integer> getSupportedDataTypes() {
-        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM, SENSORML, ISO_19110);
+    public List<MetadataType> getSupportedDataTypes() {
+        return Arrays.asList(MetadataType.ISO_19115, MetadataType.DUBLINCORE, MetadataType.EBRIM, MetadataType.SENSORML, MetadataType.ISO_19110);
     }
 
     /**

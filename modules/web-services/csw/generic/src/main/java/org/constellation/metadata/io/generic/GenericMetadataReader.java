@@ -33,10 +33,10 @@ import org.constellation.generic.Values;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import static org.constellation.metadata.io.AbstractMetadataReader.*;
 
 // Geotoolkit dependencies
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.metadata.io.MetadataType;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
@@ -62,15 +62,15 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
+    protected Values loadData(String identifier, MetadataType mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
         LOGGER.log(Level.FINER, "loading data for {0}", identifier);
 
         final List<String> variables;
         
-        if (mode == ISO_19115) {
+        if (mode == MetadataType.ISO_19115) {
             variables = getVariablesForISO();
         } else {
-            if (mode == DUBLINCORE) {
+            if (mode == MetadataType.DUBLINCORE) {
                 variables = getVariablesForDublinCore(type, elementName);
             } else {
                 throw new IllegalArgumentException("unknow mode");
@@ -83,7 +83,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(String identifier, int mode) throws MetadataIoException {
+    public Object getMetadata(String identifier, MetadataType mode) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }
 
@@ -99,16 +99,16 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * @throws MetadataIoException
      */
     @Override
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
+    public Object getMetadata(String identifier, MetadataType mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
         
         //TODO we verify that the identifier exists
         final Values values = loadData(identifier, mode, type, elementName);
 
         final Object result;
-        if (mode == ISO_19115 || mode == NATIVE) {
+        if (mode == MetadataType.ISO_19115 || mode == MetadataType.NATIVE) {
             result = getISO(identifier, values);
             
-        } else if (mode == DUBLINCORE) {
+        } else if (mode == MetadataType.DUBLINCORE) {
             result = getDublinCore(identifier, type, elementName, values);
             
         } else {
@@ -163,10 +163,10 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      */
     @Override
     public List<DefaultMetadata> getAllEntries() throws MetadataIoException {
-        final List<DefaultMetadata> result = new ArrayList<DefaultMetadata>();
+        final List<DefaultMetadata> result = new ArrayList<>();
         final List<String> identifiers     = getAllIdentifiers();
         for (String id : identifiers) {
-            result.add((DefaultMetadata) getMetadata(id, ISO_19115, ElementSetType.FULL, null));
+            result.add((DefaultMetadata) getMetadata(id, MetadataType.ISO_19115, ElementSetType.FULL, null));
         }
         return result;
     }
@@ -218,7 +218,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      */
     @Override
     public List<QName> getAdditionalQueryableQName() {
-        return new ArrayList<QName>();
+        return new ArrayList<>();
     }
 
     /**
@@ -226,7 +226,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      */
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
-        return new HashMap<String, List<String>>();
+        return new HashMap<>();
     }
 
     /**
@@ -234,12 +234,12 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      */
     @Override
     public Map<String, URI> getConceptMap() {
-        return new HashMap<String, URI>();
+        return new HashMap<>();
     }
 
     @Override
-    public List<Integer> getSupportedDataTypes() {
-        return Arrays.asList(ISO_19115, DUBLINCORE);
+    public List<MetadataType> getSupportedDataTypes() {
+        return Arrays.asList(MetadataType.ISO_19115, MetadataType.DUBLINCORE);
     }
 
     /**

@@ -337,7 +337,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @throws java.sql.MetadataIoException
      */
     @Override
-    public Object getMetadata(String identifier, final int mode) throws MetadataIoException {
+    public Object getMetadata(String identifier, final MetadataType mode) throws MetadataIoException {
         try {
             alreadyRead.clear();
 
@@ -349,7 +349,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
             if (result == null) {
                 final FullRecord f = mdReader.getRecord(identifier);
-                if (mode == NATIVE) {
+                if (mode == MetadataType.NATIVE) {
                     result = f;
                 } else {
                     result = getObjectFromRecord(identifier, f, mode);
@@ -383,7 +383,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @return a GeotoolKit/constellation object representing the metadata.
      */
-    public Object getObjectFromRecord(final String identifier, final FullRecord record, final int mode) {
+    public Object getObjectFromRecord(final String identifier, final FullRecord record, final MetadataType mode) {
 
         if (record != null && record.getRoot() != null && record.getRoot().getType() != null) {
             final Value topValue = record.getRoot();
@@ -417,7 +417,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @return a GeotoolKit metadata object.
      */
-    private Object getObjectFromValue(final Value value, final int mode) {
+    private Object getObjectFromValue(final Value value, final MetadataType mode) {
         final Class classe;
         // we get the value's class
         if (value.getType() != null) {
@@ -747,7 +747,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 // by searching for the good attribute name
                 String attribName = path.getName();
 
-                if (mode != SENSORML) {
+                if (mode != MetadataType.SENSORML) {
                     //special case due to a bug in mdweb
                     if (attribName.startsWith("geographicElement")) {
                         attribName = "geographicElements";
@@ -778,7 +778,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         ReflectionUtilities.invokeMethod(setter, result, param);
                     } else {
 
-                        if (mode != SENSORML  && attribName.equalsIgnoreCase("identifier")) {
+                        if (mode != MetadataType.SENSORML  && attribName.equalsIgnoreCase("identifier")) {
                             attribName = "name";
                         }
                         // special case for xlink
@@ -941,7 +941,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @param mode
      * @return
      */
-    private List<String> getPackageFromStandard(final String standardName, final String className, final int mode) {
+    private List<String> getPackageFromStandard(final String standardName, final String className, final MetadataType mode) {
         final List<String> packagesName = new ArrayList<>();
 
         if ("Catalog Web Service".equals(standardName) || "DublinCore".equals(standardName) ||
@@ -960,7 +960,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else if ("Sensor Web Enablement".equals(standardName)) {
             packagesName.addAll(swePackage);
 
-        } else if ("ISO 19108".equals(standardName) && (mode == SENSORML || className.startsWith("Time"))) {
+        } else if ("ISO 19108".equals(standardName) && (mode == MetadataType.SENSORML || className.startsWith("Time"))) {
             packagesName.addAll(gmlPackage);
 
         } else if ("ISO 19115-2".equals(standardName)) {
@@ -990,7 +990,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @return a class object corresponding to the specified name.
      */
-    private Class getClassFromName(final Classe type, final int mode) {
+    private Class getClassFromName(final Classe type, final MetadataType mode) {
         String className          = type.getName();
         final String standardName = type.getStandard().getName();
 
@@ -1188,7 +1188,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             final List<RecordSet> recordSets   = mdReader.getRecordSets();
             final Collection<FullRecord> records = mdReader.getAllRecord(recordSets);
             for (FullRecord f: records) {
-                results.add(getObjectFromRecord("no cache", f, -1));
+                results.add(getObjectFromRecord("no cache", f, MetadataType.NATIVE));
             }
         } catch (MD_IOException ex) {
             throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage());

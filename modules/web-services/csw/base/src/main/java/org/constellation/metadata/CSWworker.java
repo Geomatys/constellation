@@ -97,6 +97,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
 import org.constellation.dto.Service;
+import org.constellation.metadata.io.MetadataType;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
@@ -366,18 +367,18 @@ public class CSWworker extends AbstractWorker {
      */
     private void initializeSupportedTypeNames() {
         supportedTypeNames = new ArrayList<>();
-        final List<Integer> supportedDataTypes = mdReader.getSupportedDataTypes();
-        if (supportedDataTypes.contains(ISO_19115)) {
+        final List<MetadataType> supportedDataTypes = mdReader.getSupportedDataTypes();
+        if (supportedDataTypes.contains(MetadataType.ISO_19115)) {
             supportedTypeNames.addAll(ISO_TYPE_NAMES);
         }
-        if (supportedDataTypes.contains(DUBLINCORE)) {
+        if (supportedDataTypes.contains(MetadataType.DUBLINCORE)) {
             supportedTypeNames.addAll(DC_TYPE_NAMES);
         }
-        if (supportedDataTypes.contains(EBRIM)) {
+        if (supportedDataTypes.contains(MetadataType.EBRIM)) {
             supportedTypeNames.addAll(EBRIM30_TYPE_NAMES);
             supportedTypeNames.addAll(EBRIM25_TYPE_NAMES);
         }
-        if (supportedDataTypes.contains(ISO_19110)) {
+        if (supportedDataTypes.contains(MetadataType.ISO_19110)) {
             supportedTypeNames.addAll(FC_TYPE_NAMES);
         }
     }
@@ -387,15 +388,15 @@ public class CSWworker extends AbstractWorker {
      */
     private void initializeAcceptedResourceType() {
         acceptedResourceType = new ArrayList<>();
-        final List<Integer> supportedDataTypes = mdReader.getSupportedDataTypes();
-        if (supportedDataTypes.contains(ISO_19115)) {
+        final List<MetadataType> supportedDataTypes = mdReader.getSupportedDataTypes();
+        if (supportedDataTypes.contains(MetadataType.ISO_19115)) {
             acceptedResourceType.add(Namespaces.GMD);
             acceptedResourceType.add(Namespaces.GFC);
         }
-        if (supportedDataTypes.contains(DUBLINCORE)) {
+        if (supportedDataTypes.contains(MetadataType.DUBLINCORE)) {
             acceptedResourceType.add(Namespaces.CSW);
         }
-        if (supportedDataTypes.contains(EBRIM)) {
+        if (supportedDataTypes.contains(MetadataType.EBRIM)) {
             acceptedResourceType.add(EBRIM_30);
             acceptedResourceType.add(EBRIM_25);
         }
@@ -920,13 +921,13 @@ public class CSWworker extends AbstractWorker {
         }
         LOGGER.log(Level.FINER, "local max = " + max + " distributed max = " + maxDistributed);
 
-        final int mode;
+        final MetadataType mode;
         if (outputSchema.equals(Namespaces.GMD) || outputSchema.equals(Namespaces.GFC)) {
-            mode = ISO_19115;
+            mode = MetadataType.ISO_19115;
         } else if (outputSchema.equals(EBRIM_30) || outputSchema.equals(EBRIM_25)) {
-            mode = EBRIM;
+            mode = MetadataType.EBRIM;
         } else if (outputSchema.equals(Namespaces.CSW)) {
-            mode = DUBLINCORE;
+            mode = MetadataType.DUBLINCORE;
         } else {
             throw new IllegalArgumentException("undefined outputSchema");
         }
@@ -1079,22 +1080,22 @@ public class CSWworker extends AbstractWorker {
         final List<String> unexistingID = new ArrayList<>();
         final List<Object> records      = new ArrayList<>();
 
-        final int mode;
+        final MetadataType mode;
         switch (outputSchema) {
             case Namespaces.CSW:
-                mode         = DUBLINCORE;
+                mode         = MetadataType.DUBLINCORE;
                 break;
             case Namespaces.GMD:
-                mode         = ISO_19115;
+                mode         = MetadataType.ISO_19115;
                 break;
             case Namespaces.GFC:
-                mode         = ISO_19110;
+                mode         = MetadataType.ISO_19110;
                 break;
             case EBRIM_30:
-                mode         = EBRIM;
+                mode         = MetadataType.EBRIM;
                 break;
             case EBRIM_25:
-                mode         = EBRIM;
+                mode         = MetadataType.EBRIM;
                 break;
             default:
                 throw new CstlServiceException("Unexpected outputSchema");

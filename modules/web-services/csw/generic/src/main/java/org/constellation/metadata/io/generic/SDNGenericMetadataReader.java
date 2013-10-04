@@ -31,11 +31,11 @@ import javax.xml.namespace.QName;
 import org.constellation.generic.Values;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
-import static org.constellation.metadata.io.AbstractMetadataReader.*;
 
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.metadata.io.MetadataType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -57,11 +57,6 @@ public abstract class SDNGenericMetadataReader extends GenericMetadataReader {
      * A map of the already retrieved contact from EDMO WS.
      */
     private Map<String, ResponsibleParty> contacts;
-
-    /**
-     * A flag mode indicating we are searching the database for contacts.
-     */
-    private static final int CONTACT = 10;
 
     /**
      * Build a new Generic metadata reader and initialize the statement.
@@ -101,10 +96,10 @@ public abstract class SDNGenericMetadataReader extends GenericMetadataReader {
      * Load a Map of contact from the specified directory
      */
     private Map<String, ResponsibleParty> loadContacts(File contactDirectory) {
-        final Map<String, ResponsibleParty> results = new HashMap<String, ResponsibleParty>();
+        final Map<String, ResponsibleParty> results = new HashMap<>();
         if (contactDirectory.isDirectory()) {
             if (contactDirectory.listFiles().length == 0) {
-                LOGGER.severe("the contacts folder is empty :" + contactDirectory.getPath());
+                LOGGER.log(Level.SEVERE, "the contacts folder is empty :{0}", contactDirectory.getPath());
             }
             for (File f : contactDirectory.listFiles()) {
                 if (f.getName().startsWith("EDMO.") && f.getName().endsWith(".xml")) {
@@ -119,7 +114,7 @@ public abstract class SDNGenericMetadataReader extends GenericMetadataReader {
                             results.put(code, contact);
                         }
                     } catch (JAXBException ex) {
-                        LOGGER.severe("Unable to unmarshall the contact file : " + f.getPath());
+                        LOGGER.log(Level.SEVERE, "Unable to unmarshall the contact file : {0}", f.getPath());
                         LOGGER.log(Level.WARNING, ex.getMessage(), ex);
                     }
                 }
@@ -170,10 +165,10 @@ public abstract class SDNGenericMetadataReader extends GenericMetadataReader {
      * @throws org.constellation.ws.MetadataIoException
      */
     public List<String> getAllContactID(Values values) throws MetadataIoException {
-        final List<String> results = new ArrayList<String>();
+        final List<String> results = new ArrayList<>();
         final List<String> identifiers = getAllIdentifiers();
         for (String id : identifiers) {
-            loadData(id, CONTACT, null, null);
+            loadData(id, MetadataType.CONTACT, null, null);
             for(String var: getVariablesForContact()) {
                 final String contactID = values.getVariable(var);
                 if (contactID == null) {
@@ -198,17 +193,17 @@ public abstract class SDNGenericMetadataReader extends GenericMetadataReader {
      * @param identifier
      */
     @Override
-    protected Values loadData(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
-        LOGGER.finer("loading data for " + identifier);
+    protected Values loadData(String identifier, MetadataType mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
+        LOGGER.log(Level.FINER, "loading data for {0}", identifier);
 
         final List<String> variables;
 
-        if (mode == ISO_19115) {
+        if (mode == MetadataType.ISO_19115) {
             variables = getVariablesForISO();
         } else {
-            if (mode == DUBLINCORE) {
+            if (mode == MetadataType.DUBLINCORE) {
                 variables = getVariablesForDublinCore(type, elementName);
-            } else if (mode == CONTACT) {
+            } else if (mode == MetadataType.CONTACT) {
                 variables = getVariablesForContact();
             } else {
                 throw new IllegalArgumentException("unknow mode");

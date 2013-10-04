@@ -28,9 +28,9 @@ import java.util.logging.Level;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataType;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
 
@@ -53,7 +53,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 public class MDWebSensorReader extends MDWebMetadataReader implements SensorReader {
 
-    private final Map<String, List<String>> acceptedSensorMLFormats = new HashMap<String, List<String>>();
+    private final Map<String, List<String>> acceptedSensorMLFormats = new HashMap<>();
     
     /**
      * Build a new Sensor reader for a MDweb database.
@@ -116,7 +116,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
     @Override
     public AbstractSensorML getSensor(final String sensorId) throws CstlServiceException {
         try {
-            final Object metadata   = getMetadata(sensorId, AbstractMetadataReader.SENSORML);
+            final Object metadata   = getMetadata(sensorId, MetadataType.SENSORML);
             
             if (metadata instanceof AbstractSensorML) {
                return (AbstractSensorML) metadata;
@@ -153,7 +153,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
             if (smlCat != null) {
                 return mdReader.getAllIdentifiers(Arrays.asList(smlCat), false);
             }
-            return new ArrayList<String>();
+            return new ArrayList<>();
         } catch (MD_IOException ex) {
             throw new CstlServiceException(ex);
         }

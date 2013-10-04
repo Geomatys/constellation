@@ -51,14 +51,14 @@ public interface CSWMetadataReader extends MetadataReader {
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
+    Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
-    Object getOriginalMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
+    Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
     /**
      * Return the list of supported data types.
      */
-    List<Integer> getSupportedDataTypes();
+    List<MetadataType> getSupportedDataTypes();
 
     /**
      * Return the list of QName for additional queryable element.

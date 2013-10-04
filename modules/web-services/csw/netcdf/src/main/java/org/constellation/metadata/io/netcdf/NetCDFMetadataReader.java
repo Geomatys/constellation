@@ -56,6 +56,7 @@ import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.ImageCoverageReader;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.metadata.io.MetadataType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 
@@ -159,7 +160,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * {@inheritDoc}
      */
     @Override
-    public Object getOriginalMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         return getMetadata(identifier, mode, type, elementName);
     }
 
@@ -167,7 +168,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final int mode) throws MetadataIoException {
+    public Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }
 
@@ -175,7 +176,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         Object obj = null;
         if (isCacheEnabled()) {
             obj = getFromCache(identifier);
@@ -183,9 +184,9 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         if (obj == null) {
             obj = getObjectFromFile(identifier);
         }
-        if (obj instanceof DefaultMetadata && mode == DUBLINCORE) {
+        if (obj instanceof DefaultMetadata && mode == MetadataType.DUBLINCORE) {
             obj = translateISOtoDC((DefaultMetadata)obj, type, elementName);
-        } else if (obj instanceof RecordType && mode == DUBLINCORE) {
+        } else if (obj instanceof RecordType && mode == MetadataType.DUBLINCORE) {
             obj = applyElementSet((RecordType)obj, type, elementName);
         }
         return obj;
@@ -779,8 +780,9 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * {@inheritDoc}
      */
     @Override
-    public List<Integer> getSupportedDataTypes() {
-        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM, ISO_19110);
+    public List<MetadataType> getSupportedDataTypes() {
+        return Arrays.asList(
+                MetadataType.ISO_19115, MetadataType.DUBLINCORE, MetadataType.EBRIM, MetadataType.ISO_19110);
     }
 
     /**

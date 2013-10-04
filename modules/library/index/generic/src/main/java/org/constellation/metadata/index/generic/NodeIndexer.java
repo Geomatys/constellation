@@ -37,6 +37,7 @@ import org.constellation.metadata.index.AbstractCSWIndexer;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataType;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.NodeUtilities;
 
@@ -123,7 +124,7 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
     @Override
     protected Node getEntry(final String identifier) throws IndexingException {
         try {
-            return (Node) reader.getMetadata(identifier, AbstractMetadataReader.NATIVE);
+            return (Node) reader.getMetadata(identifier, MetadataType.NATIVE);
         } catch (MetadataIoException ex) {
             throw new IndexingException("Metadata_IOException while reading entry for:" + identifier, ex);
         }

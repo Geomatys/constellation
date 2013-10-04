@@ -340,7 +340,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             LOGGER.log(Level.INFO, "initiazing {0} contacts", contactRecords.size());
             final MDWebMetadataReader reader = new MDWebMetadataReader(mdWriter);
             for (FullRecord contactRecord : contactRecords) {
-                Object responsibleParty = reader.getObjectFromRecord(null, contactRecord, AbstractMetadataReader.ISO_19115);
+                Object responsibleParty = reader.getObjectFromRecord(null, contactRecord, MetadataType.ISO_19115);
                 contacts.put(responsibleParty, contactRecord.getRoot());
             }
         }

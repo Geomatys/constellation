@@ -100,6 +100,7 @@ import org.apache.sis.util.NullArgumentException;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
 import org.constellation.metadata.index.XpathUtils;
+import org.constellation.metadata.io.MetadataType;
 import org.constellation.util.NodeUtilities;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
@@ -177,7 +178,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final int mode) throws MetadataIoException {
+    public Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }
 
@@ -185,11 +186,11 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         return getOriginalMetadata(identifier, mode, type, elementName);
     }
 
-    public Object getMetadataObj(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Object getMetadataObj(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         //we look for cached object
         Object obj = null;
         if (isCacheEnabled()) {
@@ -198,36 +199,36 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         if (obj == null) {
             obj = getObjectFromFile(identifier);
         }
-        if (obj instanceof DefaultMetadata && mode == DUBLINCORE) {
+        if (obj instanceof DefaultMetadata && mode == MetadataType.DUBLINCORE) {
             obj = translateISOtoDC((DefaultMetadata)obj, type, elementName);
-        } else if (obj instanceof RecordType && mode == DUBLINCORE) {
+        } else if (obj instanceof RecordType && mode == MetadataType.DUBLINCORE) {
             obj = applyElementSet((RecordType)obj, type, elementName);
         }
         return obj;
     }
 
     @Override
-    public Object getOriginalMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
-        final int metadataMode;
+        final MetadataType metadataMode;
         try {
             metadataMode = getMetadataType(metadataFile);
         } catch (IOException | XMLStreamException ex) {
             throw new MetadataIoException(ex);
         }
-        if ((elementName == null || elementName.isEmpty()) && (ElementSetType.FULL.equals(type) || type == null) && (metadataMode == mode || mode == NATIVE)) {
+        if ((elementName == null || elementName.isEmpty()) && (ElementSetType.FULL.equals(type) || type == null) && (metadataMode == mode || mode == MetadataType.NATIVE)) {
             if (metadataFile != null && metadataFile.exists()) {
                 return getNodeFromFile(metadataFile);
             }
             throw new MetadataIoException(METAFILE_MSG + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
-        } else if (metadataMode ==  ISO_19115 && mode == DUBLINCORE) {
+        } else if (metadataMode ==  MetadataType.ISO_19115 && mode == MetadataType.DUBLINCORE) {
             return translateISOtoDCNode(getNodeFromFile(metadataFile), type, elementName);
         } else {
             return getMetadataObj(identifier, mode, type, elementName);
         }
     }
 
-    private int getMetadataType(final File metadataFile) throws IOException, XMLStreamException {
+    private MetadataType getMetadataType(final File metadataFile) throws IOException, XMLStreamException {
         final XMLInputFactory xif = XMLInputFactory.newFactory();
         final String rootName;
         try (FileInputStream fos = new FileInputStream(metadataFile)) {
@@ -239,11 +240,11 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         switch (rootName) {
             case "MD_Metadata":
             case "MI_Metadata":
-                return ISO_19115;
+                return MetadataType.ISO_19115;
             case "Record":
-                return DUBLINCORE;
+                return MetadataType.DUBLINCORE;
             case "SensorML":
-                return SENSORML;
+                return MetadataType.SENSORML;
             case "RegistryObject":
             case "AdhocQuery":
             case "Association":
@@ -251,9 +252,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             case "Registry":
             case "ExtrinsicObject":
             case "RegistryEntry":
-                return EBRIM;
+                return MetadataType.EBRIM;
             default:
-                return NATIVE;
+                return MetadataType.NATIVE;
         }
         // TODO complete other metadata type
     }
@@ -1014,8 +1015,8 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public List<Integer> getSupportedDataTypes() {
-        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM, ISO_19110);
+    public List<MetadataType> getSupportedDataTypes() {
+        return Arrays.asList(MetadataType.ISO_19115, MetadataType.DUBLINCORE, MetadataType.EBRIM, MetadataType.ISO_19110);
     }
 
     /**

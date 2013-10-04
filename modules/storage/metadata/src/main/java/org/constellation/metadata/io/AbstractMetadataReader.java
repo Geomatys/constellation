@@ -32,13 +32,6 @@ import org.apache.sis.util.logging.Logging;
  */
 public abstract class AbstractMetadataReader implements MetadataReader {
     
-    public static final int DUBLINCORE  = 0;
-    public static final int ISO_19115   = 1;
-    public static final int EBRIM       = 2;
-    public static final int SENSORML    = 3;
-    public static final int NATIVE      = 4;
-    public static final int ISO_19110   = 5;
-    
     /**
      * A debugging logger
      */
@@ -79,7 +72,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * {@inheritDoc}
      */
     @Override
-    public abstract Object getMetadata(final String identifier, final int mode) throws MetadataIoException;
+    public abstract Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException;
     
     /**
      * {@inheritDoc}

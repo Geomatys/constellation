@@ -35,7 +35,7 @@ public interface MetadataReader {
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    Object getMetadata(final String identifier, final int mode) throws MetadataIoException;
+    Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException;
     
     /**
      * Return true if the metadata exist.
