@@ -34,10 +34,7 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.logging.Level;
 
-// JAXB dependencies
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+// XML dependencies
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -48,13 +45,12 @@ import javax.xml.stream.XMLStreamReader;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.index.XpathUtils;
 import org.constellation.metadata.io.MetadataType;
 import org.constellation.util.NodeUtilities;
+import org.constellation.metadata.index.generic.NodeIndexer;
 
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
@@ -65,7 +61,6 @@ import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
@@ -75,7 +70,6 @@ import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // Apache SIS dependencies
-import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
 
 import org.w3c.dom.Document;
@@ -109,11 +103,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     private final File dataDirectory;
     
-    /**
-     * A unmarshaller to get java object from metadata files.
-     */
-    private static final MarshallerPool marshallerPool = EBRIMMarshallerPool.getInstance();
-
     /**
      * Build a new CSW File Reader.
      *
@@ -547,7 +536,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
 
         while (tokens.hasMoreTokens()) {
             final String token       = tokens.nextToken().trim();
-            List<String> paths;
+            final List<String> paths;
             if (ISO_QUERYABLE.get(token) != null) {
                 paths = ISO_QUERYABLE.get(token);
             } else if (DUBLIN_CORE_QUERYABLE.get(token) != null) {
@@ -558,7 +547,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             }
 
             if (!paths.isEmpty()) {
-                paths = XpathUtils.xpathToMDPath(paths);
                 final List<String> values         = getAllValuesFromPaths(paths, dataDirectory);
                 final ListOfValuesType listValues = new ListOfValuesType(values);
                 final DomainValuesType value      = new DomainValuesType(null, token, listValues, METADATA_QNAME);
@@ -584,23 +572,13 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         final List<String> result = new ArrayList<>();
         for (File metadataFile : directory.listFiles()) {
             if (!metadataFile.isDirectory()) {
-                try {
-                    final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-                    Object metadata = unmarshaller.unmarshal(metadataFile);
-                    marshallerPool.recycle(unmarshaller);
-                    if (metadata instanceof JAXBElement) {
-                        metadata = ((JAXBElement) metadata).getValue();
+                
+                final Node metadata = getNodeFromFile(metadataFile);
+                final List<Object> value = NodeIndexer.extractValues(metadata, paths);
+                if (value != null && !value.equals(Arrays.asList("null"))) {
+                    for (Object obj : value){
+                        result.add(obj.toString());
                     }
-                    final List<Object> value = GenericIndexer.extractValues(metadata, paths);
-                    if (value != null && !value.equals(Arrays.asList("null"))) {
-                        for (Object obj : value){
-                            result.add(obj.toString());
-                        }
-                    }
-
-                 //continue to the next file   
-                } catch (JAXBException | IllegalArgumentException ex) {
-                    LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\ncause: " + ex.getMessage());
                 }
             } else {
                 result.addAll(getAllValuesFromPaths(paths, metadataFile));
@@ -630,32 +608,17 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public List<? extends Object> getAllEntries() throws MetadataIoException {
+    public List<Node> getAllEntries() throws MetadataIoException {
         return getAllEntries(dataDirectory);
     }
     
-    private List<? extends Object> getAllEntries(final File directory) throws MetadataIoException {
-        final List<Object> results = new ArrayList<>();
+    private List<Node> getAllEntries(final File directory) throws MetadataIoException {
+        final List<Node> results = new ArrayList<>();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
             if (fileName.endsWith(XML_EXT)) {
-                final String identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
-                try {
-                    final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-                    Object metadata = unmarshaller.unmarshal(f);
-                    marshallerPool.recycle(unmarshaller);
-                    if (metadata instanceof JAXBElement) {
-                        metadata = ((JAXBElement) metadata).getValue();
-                    }
-                    if (isCacheEnabled()) {
-                        addInCache(identifier, metadata);
-                    }
-                    results.add(metadata);
-                } catch (JAXBException ex) {
-                    // throw or continue to the next file?
-                    throw new MetadataIoException(METAFILE_MSG + f.getPath() + " can not be unmarshalled\ncause: "
-                            + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
-                }
+                //final String identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
+                results.add(getNodeFromFile(f));
             } else if (f.isDirectory()) {
                 results.addAll(getAllEntries(f));
             } else {

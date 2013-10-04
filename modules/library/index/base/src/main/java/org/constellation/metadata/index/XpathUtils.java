@@ -123,4 +123,19 @@ public class XpathUtils {
 
         }
     }
+
+    public static String getNamespaceFromPrefix(final String prefix) {
+        switch (prefix) {
+            case "gfc": return "http://www.isotc211.org/2005/gfc";
+            case "gmd": return "http://www.isotc211.org/2005/gmd";
+            case "gmi": return "http://www.isotc211.org/2005/gmi";
+            case "csw": return "http://www.opengis.net/cat/csw/2.0.2";
+            case "eb3": return "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
+            case "eb2": return "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
+            case "wrs": return "http://www.opengis.net/cat/wrs/1.0";
+            case "wr" : return "http://www.opengis.net/cat/wrs";
+            default: throw new IllegalArgumentException("Unexpected prefix: " + prefix);
+
+        }
+    }
 }

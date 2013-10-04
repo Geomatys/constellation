@@ -34,6 +34,7 @@ import org.apache.lucene.document.Field;
 
 // constellation dependencies
 import org.constellation.metadata.index.AbstractCSWIndexer;
+import org.constellation.metadata.index.XpathUtils;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
@@ -262,6 +263,11 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
         return sb.toString();
     }
 
+    private static boolean matchType(final Node n, final String type, final String prefix) {
+        final String namespace = XpathUtils.getNamespaceFromPrefix(prefix);
+        return (type.equals(n.getLocalName()) || type.equals("*")) && namespace.equals(n.getNamespaceURI());
+    }
+
     /**
      * Extract the String values denoted by the specified paths
      * and return the values as a String values1,values2,....
@@ -278,9 +284,10 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
             for (String fullPathID: paths) {
 
                // remove Standard
+               final String pathPrefix = fullPathID.substring(1, fullPathID.indexOf(':'));
                fullPathID = fullPathID.substring(fullPathID.indexOf(':') + 1);
                final String pathType =  fullPathID.substring(0, fullPathID.indexOf('/'));
-               if (!pathType.equals(metadata.getLocalName())) {
+               if (!matchType(metadata, pathType, pathPrefix)) {
                    continue;
                }
                 String pathID;

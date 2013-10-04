@@ -391,8 +391,8 @@ public class XpathTransformationTest {
         expResult.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title");
         expResult.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title:value");
         expResult.add("Catalog Web Service:Record:title:content");
-        expResult.add("Ebrim v3.0:*:name:localizedString:value");
-        expResult.add("Ebrim v2.5:*:name:localizedString:value");
+        expResult.add("Ebrim v3.0:*:Name:LocalizedString:value");
+        expResult.add("Ebrim v2.5:*:Name:LocalizedString:value");
         List<String> result = XpathUtils.xpathToMDPath(DUBLIN_CORE_QUERYABLE.get("title"));
         assertEquals(expResult, result);
 
@@ -427,8 +427,8 @@ public class XpathTransformationTest {
         expResult.add("ISO 19115-2:MI_Metadata:identificationInfo:abstract");
         expResult.add("ISO 19115-2:MI_Metadata:identificationInfo:abstract:value");
         expResult.add("Catalog Web Service:Record:abstract:content");
-        expResult.add("Ebrim v3.0:*:description:localizedString:value");
-        expResult.add("Ebrim v2.5:*:description:localizedString:value");
+        expResult.add("Ebrim v3.0:*:Description:LocalizedString:value");
+        expResult.add("Ebrim v2.5:*:Description:LocalizedString:value");
         result = XpathUtils.xpathToMDPath(DUBLIN_CORE_QUERYABLE.get("abstract"));
         assertEquals(expResult, result);
 
@@ -560,8 +560,8 @@ public class XpathTransformationTest {
          * The core queryable of DublinCore
          */
         List<String> expResult = new ArrayList<>();
-        expResult.add("Ebrim v3.0:RegistryObject:name:localizedString:value");
-        expResult.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
+        expResult.add("Ebrim v3.0:RegistryObject:Name:LocalizedString:value");
+        expResult.add("Ebrim v3.0:RegistryPackage:Name:LocalizedString:value");
         List<String> result = XpathUtils.xpathToMDPath(EBRIM_QUERYABLE.get("name"));
         assertEquals(expResult, result);
         
@@ -580,8 +580,8 @@ public class XpathTransformationTest {
         assertEquals(expResult, result);
 
         expResult = new ArrayList<>();
-        expResult.add("Ebrim v3.0:RegistryObject:description:localizedString:value");
-        expResult.add("Ebrim v3.0:RegistryPackage:description:localizedString:value");
+        expResult.add("Ebrim v3.0:RegistryObject:Description:LocalizedString:value");
+        expResult.add("Ebrim v3.0:RegistryPackage:Description:LocalizedString:value");
         result = XpathUtils.xpathToMDPath(EBRIM_QUERYABLE.get("abstract"));
         assertEquals(expResult, result);
 

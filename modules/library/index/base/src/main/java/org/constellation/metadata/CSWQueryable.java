@@ -382,8 +382,8 @@ public final class CSWQueryable {
         paths.add("/gmi:MI_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
         paths.add("/gmi:MI_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gmx:Anchor");
         paths.add("/csw:Record/dc:title");
-        paths.add("/eb3:*/eb3:name/eb3:localizedString/@value");
-        paths.add("/eb2:*/eb2:name/eb2:localizedString/@value");
+        paths.add("/eb3:*/eb3:Name/eb3:LocalizedString/@value");
+        paths.add("/eb2:*/eb2:Name/eb2:LocalizedString/@value");
         DUBLIN_CORE_QUERYABLE.put("title", paths);
 
         paths = new ArrayList<>();
@@ -414,8 +414,8 @@ public final class CSWQueryable {
         paths.add("/gmi:MI_Metadata/gmd:identificationInfo/*/gmd:abstract/gco:CharacterString");
         paths.add("/gmi:MI_Metadata/gmd:identificationInfo/*/gmd:abstract/gmx:Anchor");
         paths.add("/csw:Record/gmd:abstract");
-        paths.add("/eb3:*/eb3:description/eb3:localizedString/@value");
-        paths.add("/eb2:*/eb2:description/eb2:localizedString/@value");
+        paths.add("/eb3:*/eb3:Description/eb3:LocalizedString/@value");
+        paths.add("/eb2:*/eb2:Description/eb2:LocalizedString/@value");
         DUBLIN_CORE_QUERYABLE.put("abstract", paths);
 
         paths = new ArrayList<>();
@@ -542,8 +542,8 @@ public final class CSWQueryable {
          * The core queryable of DublinCore
          */
         paths = new ArrayList<>();
-        paths.add("/eb3:RegistryObject/eb3:name/eb3:localizedString/@value");
-        paths.add("/eb3:RegistryPackage/eb3:name/eb3:localizedString/@value");
+        paths.add("/eb3:RegistryObject/eb3:Name/eb3:LocalizedString/@value");
+        paths.add("/eb3:RegistryPackage/eb3:Name/eb3:LocalizedString/@value");
         EBRIM_QUERYABLE.put("name", paths);
 
         //TODO verify codelist=originator
@@ -558,8 +558,8 @@ public final class CSWQueryable {
         EBRIM_QUERYABLE.put("subject", paths);
 
         paths = new ArrayList<>();
-        paths.add("/eb3:RegistryObject/eb3:description/eb3:localizedString/@value");
-        paths.add("/eb3:RegistryPackage/eb3:description/eb3:localizedString/@value");
+        paths.add("/eb3:RegistryObject/eb3:Description/eb3:LocalizedString/@value");
+        paths.add("/eb3:RegistryPackage/eb3:Description/eb3:LocalizedString/@value");
         EBRIM_QUERYABLE.put("abstract", paths);
 
         //TODO verify codelist=publisher
