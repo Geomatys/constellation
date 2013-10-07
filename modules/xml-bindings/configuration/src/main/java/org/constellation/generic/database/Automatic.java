@@ -19,6 +19,7 @@ package org.constellation.generic.database;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -178,7 +179,7 @@ public class Automatic {
 
     private String logLevel;
 
-    private HashMap<String, String> customparameters = new HashMap<String, String>();
+    private HashMap<String, String> customparameters = new HashMap<>();
 
     /**
      * In the case of a generic Implementation,
@@ -362,7 +363,7 @@ public class Automatic {
      */
     public List<BDD> getThesaurus() {
         if (thesaurus == null) {
-            thesaurus = new ArrayList<BDD>();
+            thesaurus = new ArrayList<>();
         }
         return thesaurus;
     }
@@ -589,28 +590,41 @@ public class Automatic {
      */
     public HashMap<String, String> getCustomparameters() {
         if (customparameters == null) {
-            customparameters = new HashMap<String, String>();
+            customparameters = new HashMap<>();
         }
         return customparameters;
     }
 
     public void putParameter(final String key, final String value) {
         if (customparameters == null) {
-            customparameters = new HashMap<String, String>();
+            customparameters = new HashMap<>();
         }
         this.customparameters.put(key, value);
     }
 
     public String getParameter(final String key) {
         if (customparameters == null) {
-            customparameters = new HashMap<String, String>();
+            customparameters = new HashMap<>();
         }
         return customparameters.get(key);
     }
 
+    public List<String> getParameterList(final String key) {
+        final List<String> result = new ArrayList<>();
+        if (customparameters == null) {
+            customparameters = new HashMap<>();
+        }
+        final String value = customparameters.get(key);
+        if (value != null) {
+            final String[] parts = value.split(",");
+            result.addAll(Arrays.asList(parts));
+        }
+        return result;
+    }
+
     public void removeParameter(final String key) {
         if (customparameters == null) {
-            customparameters = new HashMap<String, String>();
+            customparameters = new HashMap<>();
         }
         customparameters.remove(key);
     }

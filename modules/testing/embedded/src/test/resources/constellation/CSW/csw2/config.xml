@@ -6,5 +6,9 @@
             <key>shiroAccessible</key>
             <value>false</value>
         </entry>
+        <entry>
+            <key>CSWCascading</key>
+            <value>http://localhost:9090/csw/default</value>
+        </entry>
     </customparameters>
 </automatic>

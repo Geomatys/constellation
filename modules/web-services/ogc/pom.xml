@@ -98,7 +98,11 @@
         <artifactId>cstl-engine-process-core</artifactId>
         <version>${project.version}</version>
     </dependency>
-    
+    <dependency>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-admin</artifactId>
+        <version>${project.version}</version>
+    </dependency>
     <dependency>
         <groupId>com.sun.xml.ws</groupId>
         <artifactId>jaxws-rt</artifactId>

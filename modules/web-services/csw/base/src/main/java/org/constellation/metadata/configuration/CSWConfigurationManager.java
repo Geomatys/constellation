@@ -19,6 +19,7 @@ package org.constellation.metadata.configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -42,8 +42,8 @@ import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.StringList;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
@@ -373,20 +373,17 @@ public class CSWConfigurationManager {
         final File instanceDirectory = ConfigDirectory.getInstanceDirectory("CSW", id);
         if (instanceDirectory.isDirectory()) {
             try {
-                final Unmarshaller configUnmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                final File configFile = new File(instanceDirectory, "config.xml");
-                if (configFile.exists()) {
-                    // we get the CSW configuration file
-                    final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
-                    config.setConfigurationDirectory(instanceDirectory);
-                    return config;
-                }
-                GenericDatabaseMarshallerPool.getInstance().recycle(configUnmarshaller);
-
+                // we get the CSW configuration file
+                final Automatic config = (Automatic) ConfigurationEngine.getConfiguration(instanceDirectory, "config.xml");
+                config.setConfigurationDirectory(instanceDirectory);
+                return config;
+                
             } catch (JAXBException ex) {
                 throw new ConfigurationException("JAXBexception while getting the CSW configuration for:" + id, ex.getMessage());
             } catch (IllegalArgumentException ex) {
                 throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
+            } catch (FileNotFoundException ex) {
+                throw new ConfigurationException("Unable to find the configuration file");
             }
         } else {
             LOGGER.log(Level.WARNING, "No CSW configuration directory for instance:{0}", id);

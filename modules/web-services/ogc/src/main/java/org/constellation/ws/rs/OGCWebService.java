@@ -106,7 +106,7 @@ import org.opengis.util.NoSuchIdentifierException;
 public abstract class OGCWebService<W extends Worker> extends WebService {
 
     private final String serviceName;
-    private final OGCConfigurer configurer;
+    protected final OGCConfigurer configurer;
 
     /**
      * Initialize the basic attributes of a web serviceType.

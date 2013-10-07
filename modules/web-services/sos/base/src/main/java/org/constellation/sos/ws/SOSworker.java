@@ -20,6 +20,7 @@ package org.constellation.sos.ws;
 // JDK dependencies
 import java.util.Iterator;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -40,7 +41,6 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationFilterReader;
@@ -124,6 +124,7 @@ import org.geotoolkit.temporal.object.ISODateParser;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.util.logging.MonolineFormatter;
 import org.constellation.dto.Service;
+import org.constellation.admin.ConfigurationEngine;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -301,19 +302,12 @@ public class SOSworker extends AbstractWorker {
         
         // Database configuration
         try {
-            final File configFile = new File(configurationDirectory, "config.xml");
-            if (configFile.exists()) {
-                final Unmarshaller configUM = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                final Object object = configUM.unmarshal(configFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(configUM);
-                if (object instanceof SOSConfiguration) {
-                    configuration = (SOSConfiguration) object;
-                } else {
-                    startError("The generic configuration file is malformed.", null);
-                    return;
-                }
+                
+            final Object object = ConfigurationEngine.getConfiguration(configurationDirectory, "config.xml");
+            if (object instanceof SOSConfiguration) {
+                configuration = (SOSConfiguration) object;
             } else {
-                startError("The configuration file can't be found.", null);
+                startError("The generic configuration file is malformed.", null);
                 return;
             }
 
@@ -486,6 +480,8 @@ public class SOSworker extends AbstractWorker {
             startError("MetadataIOException while initializing the sensor reader/writer:\n" + ex.getMessage(), ex);
         } catch (CstlServiceException ex) {
             startError(ex.getMessage(), ex);
+        } catch (FileNotFoundException ex) {
+            startError("The configuration file can't be found.", null);
         }
     }
     

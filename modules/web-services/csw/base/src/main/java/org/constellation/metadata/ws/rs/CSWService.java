@@ -18,8 +18,24 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
 
+// jersey dependencies
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import com.sun.jersey.spi.resource.Singleton;
+
+// Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
@@ -35,6 +51,13 @@ import org.constellation.ws.WSEngine;
 import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ws.Worker;
 import org.constellation.ws.rs.OGCWebService;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.generic.database.Automatic;
+
+import static org.constellation.api.QueryConstants.*;
+import static org.constellation.metadata.CSWConstants.*;
+
+// Geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWResponse;
 import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.DescribeRecord;
@@ -64,36 +87,7 @@ import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.Namespaces;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-
-import static org.constellation.api.QueryConstants.ACCEPT_FORMATS_PARAMETER;
-import static org.constellation.api.QueryConstants.ACCEPT_VERSIONS_PARAMETER;
-import static org.constellation.api.QueryConstants.SECTIONS_PARAMETER;
-import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
-import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
-import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
-import static org.constellation.metadata.CSWConstants.MALFORMED;
-import static org.constellation.metadata.CSWConstants.NAMESPACE;
-import static org.constellation.metadata.CSWConstants.NOT_EXIST;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
-
-// jersey dependencies
-//JAXB dependencies
-// Constellation dependencies
-// Geotoolkit dependencies
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * RestFul CSW service.
@@ -228,8 +222,15 @@ public class CSWService extends OGCWebService<CSWworker> {
                     final List<String> servers = StringUtilities.toStringList(getParameter("servers", true));
                     final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", identifier);
                     if (worker != null) {
-                        worker.setCascadedService(servers);
-                        return Response.ok(new AcknowlegementType("Success", "Federated catalogs updated"), "text/xml").build();
+                        try {
+                            worker.setCascadedService(servers);
+                            final Automatic config = (Automatic) configurer.getInstanceConfiguration(identifier);
+                            config.getCustomparameters().put("CSWCascading", StringUtilities.toCommaSeparatedValues(servers));
+                            configurer.setInstanceConfiguration(identifier, config);
+                            return Response.ok(new AcknowlegementType("Success", "Federated catalogs updated"), "text/xml").build();
+                        } catch (ConfigurationException ex)  {
+                            throw new CstlServiceException(ex);
+                        }
                     } else {
                         throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
                                 INVALID_PARAMETER_VALUE, "id");

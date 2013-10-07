@@ -96,7 +96,6 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL(getDefaultURL());
 
-
         // for a POST request
         conec = getCapsUrl.openConnection();
 

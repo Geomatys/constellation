@@ -65,8 +65,8 @@ import javax.measure.converter.UnitConverter;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
@@ -86,6 +86,7 @@ import java.util.logging.Level;
 import static org.constellation.api.CommonConstants.DEFAULT_CRS;
 import static org.constellation.api.QueryConstants.*;
 import org.constellation.dto.Service;
+import org.constellation.admin.ConfigurationEngine;
 import static org.constellation.wps.ws.WPSConstant.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.opengis.parameter.ParameterValue;
@@ -174,30 +175,27 @@ public class WPSWorker extends AbstractWorker {
         setSupportedVersion(ServiceDef.WPS_1_0_0);
         ProcessContext candidate = null;
         if (configurationDirectory != null) {
-            final File lcFile = new File(configurationDirectory, "processContext.xml");
-            if (lcFile.exists()) {
-                try {
-                    final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    Object obj = unmarshaller.unmarshal(lcFile);
-                    GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-                    if (obj instanceof ProcessContext) {
-                        candidate = (ProcessContext) obj;
-                        isStarted = true;
-                    } else {
-                        startError = "The process context File does not contain a ProcessContext object";
-                        isStarted = false;
-                        LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
-                    }
-                } catch (JAXBException ex) {
-                    startError = "JAXBExeception while unmarshalling the process context File";
+            
+            try {
+                Object obj = ConfigurationEngine.getConfiguration(configurationDirectory, "processContext.xml");
+                if (obj instanceof ProcessContext) {
+                    candidate = (ProcessContext) obj;
+                    isStarted = true;
+                } else {
+                    startError = "The process context File does not contain a ProcessContext object";
                     isStarted = false;
-                    LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, ex);
-                } 
-            } else {
+                    LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
+                }
+            } catch (JAXBException ex) {
+                startError = "JAXBExeception while unmarshalling the process context File";
+                isStarted = false;
+                LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, ex);
+            }  catch (FileNotFoundException ex) {
                 startError = "The configuration file processContext.xml has not been found";
                 isStarted = false;
                 LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
             }
+            
         } else {
             startError = "The configuration directory has not been found";
             isStarted = false;

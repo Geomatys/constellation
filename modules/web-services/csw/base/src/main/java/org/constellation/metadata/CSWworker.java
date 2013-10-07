@@ -19,12 +19,8 @@ package org.constellation.metadata;
 
 // J2SE dependencies
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.sql.SQLException;
@@ -51,7 +47,6 @@ import org.constellation.filter.FilterParser;
 import org.constellation.filter.FilterParserException;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
@@ -63,7 +58,6 @@ import org.constellation.ws.MimeType;
 import org.constellation.ws.security.SecurityManager;
 
 import static org.constellation.api.QueryConstants.*;
-import static org.constellation.metadata.io.AbstractMetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
 
@@ -97,6 +91,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
 import org.constellation.dto.Service;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.metadata.io.MetadataType;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
@@ -216,39 +211,23 @@ public class CSWworker extends AbstractWorker {
      *
      */
     public CSWworker(final String serviceID, final File configDir) {
-        this(serviceID, configDir, null);
-    }
-
-    /**
-     * Build a new CSW worker with the specified configuration directory
-     *
-     * @param serviceID The service identifier (used in multiple CSW context). default value is "".
-     *
-     */
-    public CSWworker(final String serviceID, final File configDir, Automatic candidate) {
+    
         super(serviceID, configDir, ServiceDef.Specification.CSW);
         setSupportedVersion(ServiceDef.CSW_2_0_2);
         isStarted = true;
         try {
             //we look if the configuration have been specified
-            if (candidate == null) {
-                final MarshallerPool pool             = GenericDatabaseMarshallerPool.getInstance();
-                final Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
-                final File configFile                 = new File(configDir, "config.xml");
-                if (!configFile.exists()) {
-                    startError = "The configuration file has not been found";
-                    LOGGER.log(Level.WARNING, "\nThe CSW worker( {0}) is not working!\nCause: " + startError, serviceID);
-                    isStarted = false;
-                    return;
-                } else {
-                    candidate = (Automatic) configUnmarshaller.unmarshal(configFile);
-                }
-                pool.recycle(configUnmarshaller);
+            final Object obj = ConfigurationEngine.getConfiguration(configurationDirectory, "config.xml");
+            if (obj instanceof Automatic) {
+                configuration = (Automatic) obj;
+            } else {
+                startError = " Configuration Object is not an Automatic Object";
+                LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}", startError);
+                isStarted = false;
+                return;
             }
-            configuration = candidate;
-
             // we initialize the filterParsers
-            init(configuration, "", configDir);
+            init("", configDir);
             String suffix = "";
             if (profile == TRANSACTIONAL) {
                 suffix = "-T";
@@ -290,6 +269,10 @@ public class CSWworker extends AbstractWorker {
             LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: {0}\n", startError);
             LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
             isStarted = false;
+        } catch (FileNotFoundException ex) {
+            startError = "The configuration file has not been found";
+            LOGGER.log(Level.WARNING, "\nThe CSW worker( {0}) is not working!\nCause: " + startError, serviceID);
+            isStarted = false;
         }
     }
 
@@ -304,7 +287,7 @@ public class CSWworker extends AbstractWorker {
      * @throws MetadataIoException If an error occurs while querying the dataSource.
      * @throws IndexingException If an error occurs while initializing the indexation.
      */
-    private void init(final Automatic configuration,final String serviceID, final File configDir) throws MetadataIoException, IndexingException, JAXBException, CstlServiceException {
+    private void init(final String serviceID, final File configDir) throws MetadataIoException, IndexingException, JAXBException, CstlServiceException {
 
         // we assign the configuration directory
         configuration.setConfigurationDirectory(configDir);
@@ -342,7 +325,7 @@ public class CSWworker extends AbstractWorker {
         initializeAcceptedResourceType();
         initializeRecordSchema();
         initializeAnchorsMap();
-        loadCascadedService(configDir);
+        loadCascadedService();
     }
 
     /**
@@ -351,7 +334,7 @@ public class CSWworker extends AbstractWorker {
      * @param type
      * @return
      */
-    private AbstractCSWFactory getCSWFactory(DataSourceType type) {
+    private AbstractCSWFactory getCSWFactory(final DataSourceType type) {
         final Iterator<AbstractCSWFactory> ite = ServiceRegistry.lookupProviders(AbstractCSWFactory.class);
         while (ite.hasNext()) {
             AbstractCSWFactory currentFactory = ite.next();
@@ -420,12 +403,11 @@ public class CSWworker extends AbstractWorker {
     private void initializeRecordSchema() throws CstlServiceException {
         try {
             final Unmarshaller unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
-
             schemas.put(RECORD_QNAME,              unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/record.xsd")));
             schemas.put(METADATA_QNAME,            unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/metadata.xsd")));
             schemas.put(EXTRINSIC_OBJECT_QNAME,    unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd")));
             schemas.put(EXTRINSIC_OBJECT_25_QNAME, unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd")));
-             XSDMarshallerPool.getInstance().recycle(unmarshaller);
+            XSDMarshallerPool.getInstance().recycle(unmarshaller);
 
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB Exception when trying to parse xsd file", ex, NO_APPLICABLE_CODE);
@@ -455,31 +437,18 @@ public class CSWworker extends AbstractWorker {
     /**
      * Load the federated CSW server from a properties file.
      */
-    private void loadCascadedService(final File configDirectory) {
-        cascadedCSWservers = new ArrayList<>();
-        try {
-            // we get the cascading configuration file
-            final File f = new File(configDirectory, "CSWCascading.properties");
-            final InputStream in = new FileInputStream(f);
-            final Properties cascad = new Properties();
-            cascad.load(in);
-            in.close();
+    private void loadCascadedService() {
+        cascadedCSWservers = configuration.getParameterList("CSWCascading");
+        if (!cascadedCSWservers.isEmpty()) {
             final StringBuilder s = new StringBuilder("Cascaded Services:\n");
-            for (Object server: cascad.keySet()) {
-                final String serverName = (String) server;
-                final String servURL = (String)cascad.getProperty(serverName);
+            for (String servURL : cascadedCSWservers) {
                 s.append(servURL).append('\n');
-                cascadedCSWservers.add(servURL);
             }
             LOGGER.info(s.toString());
-
-        } catch (FileNotFoundException e) {
+        } else  {
             LOGGER.info("no cascaded CSW server found (optionnal)");
-        } catch (IOException e) {
-            LOGGER.info("no cascaded CSW server found (optionnal) (IO Exception)");
         }
     }
-
 
     public void setCascadedService(final List<String> urls) throws CstlServiceException {
         cascadedCSWservers = urls;
@@ -488,18 +457,6 @@ public class CSWworker extends AbstractWorker {
             s.append(servURL).append('\n');
         }
         LOGGER.info(s.toString());
-
-        final File f = new File(configurationDirectory, "CSWCascading.properties");
-        try {
-            final OutputStream out = new FileOutputStream(f);
-            final Properties cascad = new Properties();
-            for (int i = 0; i < urls.size(); i++) {
-                cascad.put("csw" + i, urls.get(i));
-            }
-            cascad.store(out, "updated by admin service");
-        } catch (IOException ex) {
-            throw new CstlServiceException("IO excrption while storing cacadedService", ex, NO_APPLICABLE_CODE);
-        }
     }
 
     /**
