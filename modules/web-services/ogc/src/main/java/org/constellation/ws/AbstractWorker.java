@@ -308,31 +308,22 @@ public abstract class AbstractWorker implements Worker {
      * @throws JAXBException if an error occurs during the unmarshall of the document.
      */
     protected Service getStaticCapabilitiesObject(final String service, final String language) throws CstlServiceException {
-        Service metadata = null;
-        try {
-            metadata = ConfigurationEngine.readMetadata(getId(), service);
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred when trying to read the service metadata. Returning default capabilities.", ex);
-        }
-        if (metadata != null) {
-            return metadata;
-        }
-        final String fileName;
+        final String key;
         if (language == null) {
-            fileName = service + "Capabilities.xml";
+            key = getId() + service;
         } else {
-            fileName = service + "Capabilities-" + language + ".xml";
+            key = getId() + service + "-" + language;
         }
-        Service response = capabilities.get(fileName);
-        if (response == null) {
+        Service metadata = capabilities.get(key);
+        if (metadata == null) {
             try {
-                response = ConfigurationEngine.getOldStaticCapabilitiesObject(configurationDirectory, fileName);
-                capabilities.put(fileName, response);
-            } catch (IOException | JAXBException ex) {
-                throw new CstlServiceException(ex);
+                metadata = ConfigurationEngine.readMetadata(getId(), service, language);
+                capabilities.put(key, metadata);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "An error occurred when trying to read the service metadata. Returning default capabilities.", ex);
             }
         }
-        return response;
+        return metadata;
     }
 
     /**

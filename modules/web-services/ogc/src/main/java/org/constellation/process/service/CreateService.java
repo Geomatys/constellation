@@ -135,7 +135,7 @@ public class CreateService extends AbstractProcess {
             // Write the service metadata.
             if (serviceMetadata != null) {
                 try {
-                    ConfigurationEngine.writeMetadata(instanceDirectory, serviceMetadata);
+                    ConfigurationEngine.writeMetadata(identifier, serviceType, serviceMetadata, null);
                 } catch (IOException ex) {
                     throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
                 }

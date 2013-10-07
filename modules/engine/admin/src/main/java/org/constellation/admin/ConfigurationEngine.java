@@ -36,12 +36,6 @@ import org.constellation.util.Util;
  */
 public class ConfigurationEngine {
 
-    /**
-     * The service metadata file name.
-     */
-    private static final String METADATA_FILE_NAME = "serviceMetadata.xml";
-    
-
     public static Object getConfiguration(final File configurationDirectory, final String fileName) throws JAXBException, FileNotFoundException {
         final File confFile = new File(configurationDirectory, fileName);
         if (confFile.exists()) {
@@ -60,13 +54,21 @@ public class ConfigurationEngine {
         GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
     }
 
-    public static void writeMetadata(final File directory, final Service metadata) throws IOException {
-        ensureNonNull("directory", directory);
+    public static void writeMetadata(final String identifier, final String serviceType, final Service metadata, final String language) throws IOException {
         ensureNonNull("metadata", metadata);
 
+        final File directory = ConfigDirectory.getInstanceDirectory(identifier, serviceType);
+        ensureNonNull("directory", directory);
+        
+        final String fileName;
+        if (language == null) {
+            fileName = serviceType + "Capabilities.xml";
+        } else {
+            fileName = serviceType + "Capabilities-" + language + ".xml";
+        }
         try {
             final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            final File metadataFile = new File(directory, METADATA_FILE_NAME);
+            final File metadataFile = new File(directory, fileName);
             m.marshal(metadata, metadataFile);
             GenericDatabaseMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
@@ -74,59 +76,44 @@ public class ConfigurationEngine {
         }
     }
 
-    /**
-     * Writes the service metadata file into the service instance directory.
-     *
-     * @param directory the service instance directory
-     * @throws IOException if failed to read the service metadata for any reason
-     */
-    public static Service readMetadata(final String identifier, final String serviceType) throws IOException {
+    public static Service readMetadata(final String identifier, final String serviceType, final String language) throws IOException {
         ensureNonNull("identifier",  identifier);
         ensureNonNull("serviceType", serviceType);
 
         final File directory = ConfigDirectory.getInstanceDirectory(identifier, serviceType);
         ensureNonNull("directory", directory);
 
-        final File metadataFile = new File(directory, METADATA_FILE_NAME);
-        if (metadataFile.exists() && !metadataFile.isDirectory()) {
-            try {
-                final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                final Object metadata = um.unmarshal(metadataFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(um);
-                if (metadata instanceof Service) {
-                    return (Service) metadata;
-                }
-                throw new IOException("Unexpected metadata object: " + metadata.getClass());
-            } catch (JAXBException ex) {
-                throw new IOException("Metadata unmarshalling has failed.", ex);
-            }
+        final String fileName;
+        if (language == null) {
+            fileName = serviceType + "Capabilities.xml";
+        } else {
+            fileName = serviceType + "Capabilities-" + language + ".xml";
         }
-        return null;
-    }
 
-    @Deprecated
-    public static Service getOldStaticCapabilitiesObject(final File configDirectory, final String fileName) throws IOException, JAXBException {
-        final Service response;
-        final File f;
-        if (configDirectory != null && configDirectory.exists()) {
-            f = new File(configDirectory, fileName);
-        } else {
-            f = null;
-        }
-        final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-        // If the file is not present in the configuration directory, take the one in resource.
-        if (f == null || !f.exists()) {
-            final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + fileName);
-            if (in != null) {
-                response = (Service) unmarshaller.unmarshal(in);
-                in.close();
+        final File metadataFile = new File(directory, fileName);
+        try {
+            final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+            final Object metadata;
+            if (metadataFile.exists() && !metadataFile.isDirectory()) {
+                metadata = um.unmarshal(metadataFile);
+                GenericDatabaseMarshallerPool.getInstance().recycle(um);
             } else {
-                throw new IOException("Unable to find the capabilities skeleton from resource:" + fileName);
+                final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + fileName);
+                if (in != null) {
+                    metadata = (Service) um.unmarshal(in);
+                    GenericDatabaseMarshallerPool.getInstance().recycle(um);
+                    in.close();
+                } else {
+                    throw new IOException("Unable to find the capabilities skeleton from resource:" + fileName);
+                }
             }
-        } else {
-            response = (Service) unmarshaller.unmarshal(f);
+            if (metadata instanceof Service) {
+                return (Service) metadata;
+            } else {
+                throw new IOException("Unexpected metadata object: " + metadata.getClass());
+            }
+        } catch (JAXBException ex) {
+            throw new IOException("Metadata unmarshalling has failed.", ex);
         }
-        GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-        return response;
     }
 }

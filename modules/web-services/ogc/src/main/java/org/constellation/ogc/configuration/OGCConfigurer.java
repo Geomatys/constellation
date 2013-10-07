@@ -284,7 +284,8 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
     public Service getInstanceMetadata(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         try {
-            return ConfigurationEngine.readMetadata(identifier, specification.name());
+            // todo add language parameter
+            return ConfigurationEngine.readMetadata(identifier, specification.name(), null);
         } catch (IOException ex) {
             throw new ConfigurationException("The serviceMetadata.xml file can't be read.", ex);
         }
