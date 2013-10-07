@@ -20,6 +20,7 @@ package org.constellation.admin;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -27,6 +28,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.util.Util;
 
 /**
  *
@@ -100,5 +102,31 @@ public class ConfigurationEngine {
             }
         }
         return null;
+    }
+
+    @Deprecated
+    public static Service getOldStaticCapabilitiesObject(final File configDirectory, final String fileName) throws IOException, JAXBException {
+        final Service response;
+        final File f;
+        if (configDirectory != null && configDirectory.exists()) {
+            f = new File(configDirectory, fileName);
+        } else {
+            f = null;
+        }
+        final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+        // If the file is not present in the configuration directory, take the one in resource.
+        if (f == null || !f.exists()) {
+            final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + fileName);
+            if (in != null) {
+                response = (Service) unmarshaller.unmarshal(in);
+                in.close();
+            } else {
+                throw new IOException("Unable to find the capabilities skeleton from resource:" + fileName);
+            }
+        } else {
+            response = (Service) unmarshaller.unmarshal(f);
+        }
+        GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
+        return response;
     }
 }

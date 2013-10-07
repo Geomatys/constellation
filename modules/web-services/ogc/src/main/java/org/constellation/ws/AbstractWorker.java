@@ -19,7 +19,6 @@ package org.constellation.ws;
 //J2SE dependencies
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.constellation.ServiceDef;
@@ -48,7 +46,6 @@ import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.dto.Service;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.opengis.util.CodeList;
 import org.xml.sax.SAXException;
 
@@ -310,7 +307,7 @@ public abstract class AbstractWorker implements Worker {
      *
      * @throws JAXBException if an error occurs during the unmarshall of the document.
      */
-    protected Service getStaticCapabilitiesObject(String service, String language) throws CstlServiceException {
+    protected Service getStaticCapabilitiesObject(final String service, final String language) throws CstlServiceException {
         Service metadata = null;
         try {
             metadata = ConfigurationEngine.readMetadata(getId(), service);
@@ -320,60 +317,19 @@ public abstract class AbstractWorker implements Worker {
         if (metadata != null) {
             return metadata;
         }
-        return getOldStaticCapabilitiesObject(service, language);
-    }
-
-    /**
-     * Returns the file where to read the capabilities document for each service.
-     * If no such file is found, then this method returns {@code null}.
-     * This method has a cache system, the object will be read from the file system only one time.
-     *
-     * @param service The service type identifier. example "WMS"
-     * @param version The version of the GetCapabilities.
-     * @param language The language of the capabilities skeleton.
-     *
-     * @return The capabilities Object, or {@code null} if none.
-     *
-     * @throws JAXBException if an error occurs during the unmarshall of the document.
-     */
-    private Service getOldStaticCapabilitiesObject(final String service, final String language) throws CstlServiceException {
         final String fileName;
         if (language == null) {
             fileName = service + "Capabilities.xml";
         } else {
             fileName = service + "Capabilities-" + language + ".xml";
         }
-
-        //Look if the template capabilities is already in cache.
         Service response = capabilities.get(fileName);
         if (response == null) {
-            final File f;
-            if (configurationDirectory != null && configurationDirectory.exists()) {
-                f = new File(configurationDirectory, fileName);
-            } else {
-                f = null;
-            }
             try {
-                final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                // If the file is not present in the configuration directory, take the one in resource.
-                if (f == null || !f.exists()) {
-                    final InputStream in = getClass().getResourceAsStream(fileName);
-                    if (in != null) {
-                        response = (Service) unmarshaller.unmarshal(in);
-                        in.close();
-                    } else {
-                        throw new CstlServiceException("Unable to find the capabilities skeleton from resource:" + fileName, OWSExceptionCode.NO_APPLICABLE_CODE);
-                    }
-                } else {
-                    response = (Service) unmarshaller.unmarshal(f);
-                }
-                GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-
+                response = ConfigurationEngine.getOldStaticCapabilitiesObject(configurationDirectory, fileName);
                 capabilities.put(fileName, response);
-            } catch (IOException ex) {
-                throw new CstlServiceException("Unable to close the skeleton capabilities input stream.", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
-            } catch (JAXBException ex) {
-                throw new CstlServiceException("JAXB exception while unmarshaling static capabilities file", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
+            } catch (IOException | JAXBException ex) {
+                throw new CstlServiceException(ex);
             }
         }
         return response;
