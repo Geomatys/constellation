@@ -17,10 +17,10 @@
 package org.constellation.process.service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -94,22 +94,16 @@ public class GetConfigService extends AbstractProcess {
 
         if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
 
-            //get layerContext.xml file.
-            final File configurationFile = new File(instanceDirectory, configFileName);
-            if (configurationFile.exists()) {
-                try {
-                    final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    final Object obj = unmarshaller.unmarshal(configurationFile);
-                    GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-                    if (obj.getClass().isAssignableFrom(configurationClass)) {
-                        getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
-                    } else {
-                        throw new ProcessException("The " + configFileName + " file does not contain a " + configurationClass.getName() + " object.", this, null);
-                    }
-                } catch (JAXBException ex) {
-                    throw new ProcessException(ex.getMessage(), this, ex);
+            try {
+                final Object obj = ConfigurationEngine.getConfiguration(instanceDirectory, identifier);
+                if (obj.getClass().isAssignableFrom(configurationClass)) {
+                    getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
+                } else {
+                    throw new ProcessException("The " + configFileName + " file does not contain a " + configurationClass.getName() + " object.", this, null);
                 }
-            } else {
+            } catch (JAXBException ex) {
+                throw new ProcessException(ex.getMessage(), this, ex);
+            } catch (FileNotFoundException ex) {
                 throw new ProcessException("Service instance " + identifier + " doesn't have any configuration file.", this, null);
             }
         } else {

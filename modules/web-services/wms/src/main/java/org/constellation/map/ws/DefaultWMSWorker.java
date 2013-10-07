@@ -48,7 +48,6 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 //Constellation dependencies
 import org.constellation.Cstl;
@@ -72,7 +71,6 @@ import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
 import org.constellation.configuration.DimensionDefinition;
 import org.constellation.configuration.WMSPortrayal;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.api.CommonConstants.*;
 import static org.constellation.query.wms.WMSQuery.*;
 import static org.constellation.map.ws.WMSConstant.*;
@@ -130,6 +128,7 @@ import org.geotoolkit.referencing.datum.AbstractDatum;
 import org.apache.sis.measure.Range;
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.ConfigurationEngine;
 
 import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -199,17 +198,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         setSupportedVersion(ServiceDef.WMS_1_3_0_SLD, ServiceDef.WMS_1_1_1_SLD);
 
         mapPortrayal = new WMSPortrayal();
-
-        final File portrayalFile = new File(configurationDirectory, "WMSPortrayal.xml");
-        if (portrayalFile.exists()) {
-            final MarshallerPool marshallerPool = GenericDatabaseMarshallerPool.getInstance();
-            try {
-                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-                mapPortrayal = (WMSPortrayal) unmarshaller.unmarshal(portrayalFile);
-                marshallerPool.recycle(unmarshaller);
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
-            }
+        try {
+            mapPortrayal = (WMSPortrayal) ConfigurationEngine.getConfiguration(configurationDirectory, "WMSPortrayal.xml");
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        } catch (FileNotFoundException ex) {
+            // the file can be absent
         }
 
         if (isStarted) {

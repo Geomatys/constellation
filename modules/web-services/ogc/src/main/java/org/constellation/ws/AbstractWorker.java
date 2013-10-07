@@ -46,9 +46,9 @@ import org.apache.sis.util.Version;
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.utils.MetadataUtilities;
 import org.opengis.util.CodeList;
 import org.xml.sax.SAXException;
 
@@ -313,7 +313,7 @@ public abstract class AbstractWorker implements Worker {
     protected Service getStaticCapabilitiesObject(String service, String language) throws CstlServiceException {
         Service metadata = null;
         try {
-            metadata = MetadataUtilities.readMetadata(getId(), service);
+            metadata = ConfigurationEngine.readMetadata(getId(), service);
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, "An error occurred when trying to read the service metadata. Returning default capabilities.", ex);
         }

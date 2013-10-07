@@ -17,21 +17,20 @@
 package org.constellation.process.service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.Service;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import static org.constellation.process.service.CreateServiceDescriptor.*;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.utils.MetadataUtilities;
-import static org.geotoolkit.parameter.Parameters.*;
-//import org.constellation.ws.rs.MapServices;
+import static org.constellation.process.service.CreateServiceDescriptor.*;
+
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
+import static org.geotoolkit.parameter.Parameters.*;
+
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -105,42 +104,30 @@ public class CreateService extends AbstractProcess {
             }
         }
 
-
-        File configurationFile = null;
         boolean createConfig = true;
         if (instanceDirectory.exists()) {
-            configurationFile = new File(instanceDirectory, configFileName);
-
-            //get configuration if aleady exist.
-            if (configurationFile.exists()) {
-                createConfig = false;
-                try {
-                    final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    final Object obj = unmarshaller.unmarshal(configurationFile);
-                    GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-                    if (obj.getClass().isAssignableFrom(configurationClass)) {
-                        configuration = obj;
-                    } else {
-                        throw new ProcessException("The " + configFileName + " file does not contain a " + configurationClass.getName() + " object", this, null);
-                    }
-                } catch (JAXBException ex) {
-                    throw new ProcessException(ex.getMessage(), this, ex);
+            createConfig = false;
+            try {
+                final Object obj = ConfigurationEngine.getConfiguration(instanceDirectory, configFileName);
+                if (obj.getClass().isAssignableFrom(configurationClass)) {
+                    configuration = obj;
+                } else {
+                    throw new ProcessException("The " + configFileName + " file does not contain a " + configurationClass.getName() + " object", this, null);
                 }
+            } catch (JAXBException ex) {
+                throw new ProcessException(ex.getMessage(), this, ex);
+            } catch (FileNotFoundException ex) {
+                // do nothing
             }
 
-        } else if (instanceDirectory.mkdir()) {
-            configurationFile = new File(instanceDirectory, configFileName);
-        } else {
+        } else if (!instanceDirectory.mkdir()) {
             throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
         }
 
         if (createConfig) {
-            //create layerContext.xml file for the default configuration.
+            //create config file for the default configuration.
             try {
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-
+                ConfigurationEngine.storeConfiguration(instanceDirectory, configFileName, configuration);
             } catch (JAXBException ex) {
                 throw new ProcessException(ex.getMessage(), this, ex);
             }
@@ -148,7 +135,7 @@ public class CreateService extends AbstractProcess {
             // Write the service metadata.
             if (serviceMetadata != null) {
                 try {
-                    MetadataUtilities.writeMetadata(instanceDirectory, serviceMetadata);
+                    ConfigurationEngine.writeMetadata(instanceDirectory, serviceMetadata);
                 } catch (IOException ex) {
                     throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
                 }

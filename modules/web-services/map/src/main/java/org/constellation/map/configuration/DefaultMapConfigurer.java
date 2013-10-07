@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.stream.XMLStreamException;
 
 import org.constellation.provider.*;
@@ -57,6 +56,7 @@ import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 import org.apache.sis.util.Classes;
+import org.constellation.admin.ConfigurationEngine;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 
 import org.opengis.feature.type.Name;
@@ -82,7 +82,6 @@ import org.constellation.ws.WSEngine;
 import org.constellation.api.CommonConstants;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.InvalidParameterValueException;
@@ -94,7 +93,7 @@ import org.opengis.parameter.InvalidParameterValueException;
  */
 public class DefaultMapConfigurer extends AbstractConfigurer {
 
-    private final Map<String, ProviderService> services = new HashMap<String, ProviderService>();
+    private final Map<String, ProviderService> services = new HashMap<>();
 
     private ProviderOperationListener providerListener;
     
@@ -276,14 +275,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 reader.dispose();
                 return new AcknowlegementType("Success", "The source has been added");
 
-            } catch (NoSuchIdentifierException ex) {
+            } catch (NoSuchIdentifierException | XMLStreamException | IOException ex) {
                 throw new CstlServiceException(ex);
             } catch (InvalidParameterValueException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-            } catch (XMLStreamException ex) {
-                throw new CstlServiceException(ex);
-            } catch (IOException ex) {
-                throw new CstlServiceException(ex);
             }
         } else {
             throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
@@ -332,14 +327,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 reader.dispose();
                 return new AcknowlegementType("Success", "The source has been updated");
 
-            } catch (NoSuchIdentifierException ex) {
+            } catch (NoSuchIdentifierException | XMLStreamException | IOException ex) {
                 throw new CstlServiceException(ex);
             } catch (InvalidParameterValueException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-            } catch (XMLStreamException ex) {
-                throw new CstlServiceException(ex);
-            } catch (IOException ex) {
-                throw new CstlServiceException(ex);
             }
         } else {
             throw new CstlServiceException("No descriptor for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
@@ -420,10 +411,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                                         final File configDirectory   = ConfigDirectory.getConfigDirectory();
                                         final File serviceDir        = new File(configDirectory, specification);
                                         final File instanceDirectory = new File(serviceDir, w.getId());
-                                        final File configurationFile =  new File(instanceDirectory, "layerContext.xml");
-                                        final Marshaller marshaller  = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                                        marshaller.marshal(configuration, configurationFile);
-                                        GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
+                                        ConfigurationEngine.storeConfiguration(instanceDirectory, "layerContext.xml", configuration);
                                     } catch (JAXBException ex) {
                                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                                     }
@@ -514,9 +502,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
 
 
-        } catch (XMLStreamException ex) {
-            throw new CstlServiceException(ex);
-        } catch (IOException ex) {
+        } catch (XMLStreamException | IOException ex) {
             throw new CstlServiceException(ex);
         }
 
@@ -648,9 +634,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                     return new AcknowlegementType("Success", "The layer has been modified");
                 }
             }
-        } catch (XMLStreamException ex) {
-            throw new CstlServiceException(ex);
-        } catch (IOException ex) {
+        } catch (XMLStreamException | IOException ex) {
             throw new CstlServiceException(ex);
         }
         return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
@@ -885,16 +869,16 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return A description of the available providers.
      */
     private ProvidersReport listProviderServices(){
-        final List<ProviderServiceReport> providerServ = new ArrayList<ProviderServiceReport>();
+        final List<ProviderServiceReport> providerServ = new ArrayList<>();
 
         final Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
         final Collection<StyleProvider> styleProviders = StyleProviderProxy.getInstance().getProviders();
         for (ProviderService service : services.values()) {
 
-            final List<ProviderReport> providerReports = new ArrayList<ProviderReport>();
+            final List<ProviderReport> providerReports = new ArrayList<>();
             for (final LayerProvider p : layerProviders) {
                 if (p.getService().equals(service)) {
-                    final List<String> keys = new ArrayList<String>();
+                    final List<String> keys = new ArrayList<>();
                     for(Name n : p.getKeys()){
                         keys.add(DefaultName.toJCRExtendedForm(n));
                     }
@@ -905,7 +889,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             }
             for (final StyleProvider p : styleProviders) {
                 if (p.getService().equals(service)) {
-                    final List<String> keys = new ArrayList<String>();
+                    final List<String> keys = new ArrayList<>();
                     for(String n : p.getKeys()){
                         keys.add(n);
                     }
@@ -1039,9 +1023,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             reader.setInput(objectRequest);
             params = (ParameterValueGroup) reader.read();
             reader.dispose();
-        } catch (XMLStreamException ex) {
-            throw new CstlServiceException(ex);
-        } catch (IOException ex) {
+        } catch (XMLStreamException | IOException ex) {
             throw new CstlServiceException(ex);
         }
 
@@ -1094,9 +1076,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             reader.setInput(objectRequest);
             params = (ParameterValueGroup) reader.read();
             reader.dispose();
-        } catch (XMLStreamException ex) {
-            throw new CstlServiceException(ex);
-        } catch (IOException ex) {
+        } catch (XMLStreamException | IOException ex) {
             throw new CstlServiceException(ex);
         }
 

@@ -20,7 +20,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.*;
 import org.constellation.configuration.Process;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.RestartServiceDescriptor;
 import org.constellation.provider.LayerProvider;
@@ -64,7 +63,6 @@ import org.opengis.util.NoSuchIdentifierException;
 import javax.measure.converter.UnitConverter;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
@@ -425,9 +423,7 @@ public class WPSWorker extends AbstractWorker {
         final File webdavConfig = new File(webDavInstanceDir, "WebdavContext.xml");
         if (!webdavConfig.exists()) {
             try {
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(webdavCtx, new File(webDavInstanceDir, "WebdavContext.xml"));
-                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
+                ConfigurationEngine.storeConfiguration(webDavInstanceDir, "WebdavContext.xml", webdavCtx);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;

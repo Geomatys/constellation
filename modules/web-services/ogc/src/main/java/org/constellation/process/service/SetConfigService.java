@@ -19,11 +19,9 @@ package org.constellation.process.service;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.Service;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-//import org.constellation.ws.rs.MapServices;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -31,7 +29,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
 import static org.constellation.process.service.SetConfigServiceDescriptor.*;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.utils.MetadataUtilities;
 
 /**
  *
@@ -106,21 +103,16 @@ public class SetConfigService extends AbstractProcess {
         if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
 
             //write configuration file.
-            final File configurationFile = new File(instanceDirectory, configFileName);
             try {
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(configuration, configurationFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-
+                ConfigurationEngine.storeConfiguration(instanceDirectory, configFileName, configuration);
             } catch (JAXBException ex) {
                 throw new ProcessException(ex.getMessage(), this, ex);
             }
 
-            
             // Override the service metadata.
             if (serviceMetadata != null) {
                 try {
-                    MetadataUtilities.writeMetadata(instanceDirectory, serviceMetadata);
+                    ConfigurationEngine.writeMetadata(instanceDirectory, serviceMetadata);
                 } catch (IOException ex) {
                     throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
                 }

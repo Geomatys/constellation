@@ -94,7 +94,7 @@ public final class ConfigurationService extends WebService  {
     /**
      * The implementation specific configurers.
      */
-    private final List<AbstractConfigurer> configurers = new ArrayList<AbstractConfigurer>();
+    private final List<AbstractConfigurer> configurers = new ArrayList<>();
 
     /**
      * The factory registry allowing to load the correct implementation specific configurer.
@@ -129,7 +129,7 @@ public final class ConfigurationService extends WebService  {
         LOGGER.info("Configuration service runing");
 
         if(INSTANCE == null || INSTANCE.get() == null){
-            INSTANCE = new WeakReference<ConfigurationService>(this);
+            INSTANCE = new WeakReference<>(this);
         }
 
     }
@@ -328,7 +328,7 @@ public final class ConfigurationService extends WebService  {
 
     @Override
     protected List<Schema> getRequestValidationSchema(String workerID) {
-        return new ArrayList<Schema>();
+        return new ArrayList<>();
     }
 
 }

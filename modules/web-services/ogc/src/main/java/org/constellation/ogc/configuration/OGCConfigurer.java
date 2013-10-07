@@ -35,7 +35,6 @@ import org.constellation.process.service.RestartServiceDescriptor;
 import org.constellation.process.service.SetConfigServiceDescriptor;
 import org.constellation.process.service.StartServiceDescriptor;
 import org.constellation.process.service.StopServiceDescriptor;
-import org.constellation.utils.MetadataUtilities;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -50,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.constellation.admin.ConfigurationEngine;
 
 /**
  * Describe methods which need to be specify by an implementation to manage
@@ -284,7 +284,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
     public Service getInstanceMetadata(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
         try {
-            return MetadataUtilities.readMetadata(specification.name(), identifier);
+            return ConfigurationEngine.readMetadata(identifier, specification.name());
         } catch (IOException ex) {
             throw new ConfigurationException("The serviceMetadata.xml file can't be read.", ex);
         }
