@@ -44,6 +44,7 @@ import static org.constellation.test.utils.MetadataUtilities.*;
 
 // JUnit dependencies
 import org.apache.sis.util.ComparisonMode;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import static org.junit.Assert.*;
@@ -71,13 +72,20 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         if (!configDir.exists()) {
             configDir.mkdir();
 
+            ConfigDirectory.setConfigDirectory(configDir);
+            
+            File CSWDirectory  = new File(configDir, "CSW");
+            CSWDirectory.mkdir();
+            final File instDirectory = new File(CSWDirectory, "default");
+            instDirectory.mkdir();
+
             //we write the data files
-            File dataDirectory = new File(configDir, "data");
+            File dataDirectory = new File(instDirectory, "data");
             dataDirectory.mkdir();
             writeDataFile(dataDirectory, "2005092200_sst_21-24.en.nc", "2005092200_sst_21-24.en");
 
             //we write the configuration file
-            File configFile = new File(configDir, "config.xml");
+            File configFile = new File(instDirectory, "config.xml");
             Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
             configuration.putParameter("transactionSecurized", "false");
             configuration.putParameter("shiroAccessible", "false");
@@ -92,7 +100,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         Unmarshaller u = pool.acquireUnmarshaller();
         pool.recycle(u);
 
-        worker = new CSWworker("", configDir);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
     }

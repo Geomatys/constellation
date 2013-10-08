@@ -422,7 +422,7 @@ public abstract class SOSWorkerTest {
          *
          * with unsupported Response mode
          */
-        List<EventTime> times = new ArrayList<EventTime>();
+        List<EventTime> times = new ArrayList<>();
         TimePeriodType period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         TimeEqualsType filter = new TimeEqualsType(null, period);
         EventTime equals = new EventTime(filter);
@@ -454,7 +454,7 @@ public abstract class SOSWorkerTest {
          *
          * with unsupported Response mode
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
@@ -486,7 +486,7 @@ public abstract class SOSWorkerTest {
          *
          * with no offering
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
@@ -518,7 +518,7 @@ public abstract class SOSWorkerTest {
          *
          * with wrong offering
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
@@ -550,7 +550,7 @@ public abstract class SOSWorkerTest {
          *
          * with wrong srsName
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
@@ -583,7 +583,7 @@ public abstract class SOSWorkerTest {
          *
          * with wrong resultModel
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
@@ -614,7 +614,7 @@ public abstract class SOSWorkerTest {
          *          + Time filter TEquals
          *
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         filter = new TimeEqualsType(null, period);
         equals = new EventTime(filter);
@@ -883,7 +883,7 @@ public abstract class SOSWorkerTest {
          *  Test 5: getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *          + Time filter TBefore
          */
-        List<EventTime> times = new ArrayList<EventTime>();
+        List<EventTime> times = new ArrayList<>();
         TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
         TimeBeforeType filter   = new TimeBeforeType(null, instant);
         EventTime before        = new EventTime(filter);
@@ -909,7 +909,7 @@ public abstract class SOSWorkerTest {
          *  Test 6: getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *          + Time filter TAFter
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         TimeAfterType afilter   = new TimeAfterType(null, instant);
         EventTime after         = new EventTime(afilter);
         times.add(after);
@@ -937,7 +937,7 @@ public abstract class SOSWorkerTest {
          *  Test 7: getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *          + Time filter TDuring
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         TimePeriodType period  = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T08:00:00.0"));
         TimeDuringType dfilter = new TimeDuringType(null, period);
         EventTime during       = new EventTime(dfilter);
@@ -966,7 +966,7 @@ public abstract class SOSWorkerTest {
          *  Test 8: getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *          + Time filter TEquals
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         TimeEqualsType efilter = new TimeEqualsType(null, period);
         EventTime equals = new EventTime(efilter);
@@ -1048,7 +1048,7 @@ public abstract class SOSWorkerTest {
          *           with resultTemplate mode
          *           with timeFilter TEquals
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         efilter = new TimeEqualsType(null, period);
         equals = new EventTime(efilter);
@@ -1104,7 +1104,7 @@ public abstract class SOSWorkerTest {
          *           with resultTemplate mode
          *           with timeFilter Tafter
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T17:58:00.0"));
         afilter = new TimeAfterType(null, instant);
         after = new EventTime(afilter);
@@ -1161,7 +1161,7 @@ public abstract class SOSWorkerTest {
          *           with resultTemplate mode
          *           with timeFilter Tbefore
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T17:58:00.0"));
         TimeBeforeType bfilter = new TimeBeforeType(null, instant);
         before = new EventTime(bfilter);
@@ -1782,7 +1782,7 @@ public abstract class SOSWorkerTest {
         String value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" +
                        "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" +
                        "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@";
-        GetResultResponse expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
+        GetResultResponse expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos/default/" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -1793,7 +1793,7 @@ public abstract class SOSWorkerTest {
          *   getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *   with resultTemplate mode and time filter TBefore
          */
-        List<EventTime> times = new ArrayList<EventTime>();
+        List<EventTime> times = new ArrayList<>();
         TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T05:00:00.0"));
         TimeBeforeType bfilter = new TimeBeforeType(null, instant);
         EventTime before = new EventTime(bfilter);
@@ -1858,7 +1858,7 @@ public abstract class SOSWorkerTest {
         result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@";
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos/default/" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -1868,7 +1868,7 @@ public abstract class SOSWorkerTest {
          /**
          * Test 3:  getResult with Tafter
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
         TimeAfterType afilter = new TimeAfterType(null, instant);
         EventTime after = new EventTime(afilter);
@@ -1879,7 +1879,7 @@ public abstract class SOSWorkerTest {
         result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@";
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos/default/" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -1889,7 +1889,7 @@ public abstract class SOSWorkerTest {
         /**
          * Test 4:  getResult with Tbefore
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T04:00:00.0"));
         bfilter = new TimeBeforeType(null, instant);
         EventTime before2 = new EventTime(bfilter);
@@ -1900,7 +1900,7 @@ public abstract class SOSWorkerTest {
         result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@";
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos/default/" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -1910,7 +1910,7 @@ public abstract class SOSWorkerTest {
         /**
          * Test 5:  getResult with TEquals
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T03:59:00.0"));
         TimeEqualsType efilter = new TimeEqualsType(null, instant);
         EventTime equals = new EventTime(efilter);
@@ -1921,7 +1921,7 @@ public abstract class SOSWorkerTest {
         result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.56@@";
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos/default/" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -1931,7 +1931,7 @@ public abstract class SOSWorkerTest {
         /**
          * Test 6:  getResult with TEquals
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T04:00:00.0"));
         TimeDuringType dfilter = new TimeDuringType(null, period);
         EventTime during = new EventTime(dfilter);
@@ -1942,7 +1942,7 @@ public abstract class SOSWorkerTest {
         result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.56@@";
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos/default/" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -1954,7 +1954,7 @@ public abstract class SOSWorkerTest {
          *   getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *   with resultTemplate mode and time filter TAfter
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T19:00:00.0"));
         afilter = new TimeAfterType(null, instant);
         after = new EventTime(afilter);
@@ -2020,7 +2020,7 @@ public abstract class SOSWorkerTest {
         result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@";
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos/default/" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -2031,7 +2031,7 @@ public abstract class SOSWorkerTest {
          *   getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *   with resultTemplate mode and time filter TEquals
          */
-        times = new ArrayList<EventTime>();
+        times = new ArrayList<>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.0"));
         efilter = new TimeEqualsType(null, instant);
         equals = new EventTime(efilter);
@@ -2095,7 +2095,7 @@ public abstract class SOSWorkerTest {
         result = (GetResultResponse) worker.getResult(request);
 
         value = "2007-05-01T20:59:00,6.55@@";
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos/default/" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -2157,7 +2157,7 @@ public abstract class SOSWorkerTest {
                        "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" + 
                        "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@" + 
                        "2007-06-01T01:01:00,6.56@@2007-06-01T02:00:00,6.55@@2007-06-01T03:00:00,6.55@@";
-        GetResultResponse expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
+        GetResultResponse expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos/default/" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());

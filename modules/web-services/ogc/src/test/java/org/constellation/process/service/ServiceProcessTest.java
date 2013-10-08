@@ -73,11 +73,8 @@ public abstract class ServiceProcessTest extends AbstractProcessTest {
     }
 
     protected static void startInstance(String identifier) {
-        final File serviceDir = new File(configDirectory, serviceName);
-        final File instance = new File(serviceDir, identifier);
-
         try {
-            final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier, instance);
+            final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
             if (worker != null) {
                 WSEngine.addServiceInstance(serviceName, identifier, worker);
             }

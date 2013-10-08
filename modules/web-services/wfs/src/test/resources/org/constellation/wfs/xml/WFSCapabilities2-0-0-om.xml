@@ -4,8 +4,8 @@
         <ns9:Operation name="GetCapabilities">
             <ns9:DCP>
                 <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
                 </ns9:HTTP>
             </ns9:DCP>
             <ns9:Parameter name="AcceptVersions">
@@ -28,8 +28,8 @@
         <ns9:Operation name="DescribeFeatureType">
             <ns9:DCP>
                 <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
                 </ns9:HTTP>
             </ns9:DCP>
             <ns9:Parameter name="outputFormat">
@@ -51,8 +51,8 @@
         <ns9:Operation name="GetFeature">
             <ns9:DCP>
                 <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
                 </ns9:HTTP>
             </ns9:DCP>
             <ns9:Parameter name="resultType">
@@ -85,7 +85,7 @@
         <ns9:Operation name="Transaction">
             <ns9:DCP>
                 <ns9:HTTP>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
                 </ns9:HTTP>
             </ns9:DCP>
             <ns9:Parameter name="inputFormat">
@@ -120,8 +120,8 @@
         <ns9:Operation name="ListStoredQueries">
             <ns9:DCP>
                 <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
                 </ns9:HTTP>
             </ns9:DCP>
             <ns9:Parameter name="Service">
@@ -138,8 +138,8 @@
         <ns9:Operation name="DescribeStoredQueries">
             <ns9:DCP>
                 <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
                 </ns9:HTTP>
             </ns9:DCP>
             <ns9:Parameter name="Service">
@@ -156,8 +156,8 @@
         <ns9:Operation name="GetPropertyValue">
             <ns9:DCP>
                 <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
                 </ns9:HTTP>
             </ns9:DCP>
             <ns9:Parameter name="Service">
@@ -174,8 +174,8 @@
         <ns9:Operation name="CreateStoredQuery">
             <ns9:DCP>
                 <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
                 </ns9:HTTP>
             </ns9:DCP>
             <ns9:Parameter name="Service">
@@ -192,8 +192,8 @@
         <ns9:Operation name="DropStoredQuery">
             <ns9:DCP>
                 <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
+                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
                 </ns9:HTTP>
             </ns9:DCP>
             <ns9:Parameter name="Service">

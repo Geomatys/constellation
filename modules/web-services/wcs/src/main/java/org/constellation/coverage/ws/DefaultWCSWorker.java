@@ -19,7 +19,6 @@ package org.constellation.coverage.ws;
 // J2SE dependencies
 import java.util.logging.Level;
 import java.util.Arrays;
-import java.io.File;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -138,8 +137,8 @@ import org.opengis.coverage.grid.RectifiedGrid;
 public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     
 
-    public DefaultWCSWorker(final String id, final File configurationDirectory) {
-        super(id, configurationDirectory, ServiceDef.Specification.WCS);
+    public DefaultWCSWorker(final String id) {
+        super(id, ServiceDef.Specification.WCS);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WCS worker {0} running", id);
         }

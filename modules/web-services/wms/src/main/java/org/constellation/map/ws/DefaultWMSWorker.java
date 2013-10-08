@@ -22,7 +22,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -193,13 +192,13 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     private WMSPortrayal mapPortrayal;
 
-    public DefaultWMSWorker(String id, File configurationDirectory) {
-        super(id, configurationDirectory, ServiceDef.Specification.WMS);
+    public DefaultWMSWorker(final String id) {
+        super(id, ServiceDef.Specification.WMS);
         setSupportedVersion(ServiceDef.WMS_1_3_0_SLD, ServiceDef.WMS_1_1_1_SLD);
 
         mapPortrayal = new WMSPortrayal();
         try {
-            mapPortrayal = (WMSPortrayal) ConfigurationEngine.getConfiguration(configurationDirectory, "WMSPortrayal.xml");
+            mapPortrayal = (WMSPortrayal) ConfigurationEngine.getConfiguration("WMS", id, "WMSPortrayal.xml");
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, null, ex);
         } catch (FileNotFoundException ex) {

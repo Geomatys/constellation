@@ -17,7 +17,6 @@
 package org.constellation.ws;
 
 //J2SE dependencies
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -89,11 +88,6 @@ public abstract class AbstractWorker implements Worker {
     private String serviceUrl = null;
 
     /**
-     * The direcory containing the configuration for this service. TODO make it private => SOSWorker.recordMapping
-     */
-    protected final File configurationDirectory;
-
-    /**
      * The log level off al the informations log.
      */
     protected Level logLevel = Level.INFO;
@@ -144,9 +138,8 @@ public abstract class AbstractWorker implements Worker {
      */
     
 
-    public AbstractWorker(final String id, final File configurationDirectory, final Specification specification) {
+    public AbstractWorker(final String id, final Specification specification) {
         this.id = id;
-        this.configurationDirectory = configurationDirectory;
         this.specification = specification;
     }
 

@@ -24,7 +24,6 @@ import org.constellation.ws.security.SimplePDP;
 import org.constellation.ServiceDef.Specification;
 
 import java.util.*;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
@@ -63,66 +62,62 @@ public abstract class LayerWorker extends AbstractWorker {
 
     private LayerSecurityFilter securityFilter;
 
-    public LayerWorker(final String id, final File configurationDirectory, final Specification specification) {
-        super(id, configurationDirectory, specification);
+    public LayerWorker(final String id, final Specification specification) {
+        super(id, specification);
         isStarted = true;
 
         String defaultLanguageCandidate = null;
         LayerContext candidate          = null;
-        if (configurationDirectory != null) {
-            try {
-                final Object obj = ConfigurationEngine.getConfiguration(configurationDirectory, "layerContext.xml");
-                if (obj instanceof LayerContext) {
-                    candidate = (LayerContext) obj;
-                    final String sec = candidate.getSecurity();
-                    // Instantiaties the PDP only if a rule has been discovered.
-                    if (sec != null && !sec.isEmpty()) {
-                        pdp = new SimplePDP(sec);
-                    }
-                    final Languages languages = candidate.getSupportedLanguages();
-                    if (languages != null) {
-                        for (Language language : languages.getLanguages()) {
-                            supportedLanguages.add(language.getLanguageCode());
-                            if (language.getDefault()) {
-                                defaultLanguageCandidate = language.getLanguageCode();
-                            }
+        
+        try {
+            final Object obj = ConfigurationEngine.getConfiguration(specification.name(), id, "layerContext.xml");
+            if (obj instanceof LayerContext) {
+                candidate = (LayerContext) obj;
+                final String sec = candidate.getSecurity();
+                // Instantiaties the PDP only if a rule has been discovered.
+                if (sec != null && !sec.isEmpty()) {
+                    pdp = new SimplePDP(sec);
+                }
+                final Languages languages = candidate.getSupportedLanguages();
+                if (languages != null) {
+                    for (Language language : languages.getLanguages()) {
+                        supportedLanguages.add(language.getLanguageCode());
+                        if (language.getDefault()) {
+                            defaultLanguageCandidate = language.getLanguageCode();
                         }
                     }
-                    // look for shiro accessibility
-                    final String sa = candidate.getCustomParameters().get("shiroAccessible");
-                    if (sa != null && !sa.isEmpty()) {
-                        shiroAccessible = Boolean.parseBoolean(sa);
-                    }
-                    // look for capabilities cache flag
-                    final String cc = candidate.getCustomParameters().get("cacheCapabilities");
-                    if (cc != null && !cc.isEmpty()) {
-                        cacheCapabilities = Boolean.parseBoolean(cc);
-                    }
-                    final MapFactory mapfactory = getMapFactory(candidate.getImplementation());
-                    securityFilter = mapfactory.getSecurityFilter();
-                } else {
-                    startError = "The layer context File does not contain a layerContext object";
-                    isStarted  = false;
-                    LOGGER.log(Level.WARNING, startError);
                 }
-            } catch (JAXBException ex) {
-                startError = "JAXBExeception while unmarshalling the layer context File";
+                // look for shiro accessibility
+                final String sa = candidate.getCustomParameters().get("shiroAccessible");
+                if (sa != null && !sa.isEmpty()) {
+                    shiroAccessible = Boolean.parseBoolean(sa);
+                }
+                // look for capabilities cache flag
+                final String cc = candidate.getCustomParameters().get("cacheCapabilities");
+                if (cc != null && !cc.isEmpty()) {
+                    cacheCapabilities = Boolean.parseBoolean(cc);
+                }
+                final MapFactory mapfactory = getMapFactory(candidate.getImplementation());
+                securityFilter = mapfactory.getSecurityFilter();
+            } else {
+                startError = "The layer context File does not contain a layerContext object";
                 isStarted  = false;
-                LOGGER.log(Level.WARNING, startError, ex);
-            } catch (FactoryNotFoundException ex) {
-                startError = ex.getMessage();
-                isStarted  = false;
-                LOGGER.log(Level.WARNING, startError, ex);
-            } catch (FileNotFoundException ex) {
-                startError = "The configuration file layerContext.xml has not been found";
-                isStarted = false;
-                LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: ", id);
+                LOGGER.log(Level.WARNING, startError);
             }
-        } else {
-            startError = "The configuration directory has not been found";
+        } catch (JAXBException ex) {
+            startError = "JAXBExeception while unmarshalling the layer context File";
             isStarted  = false;
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
+            LOGGER.log(Level.WARNING, startError, ex);
+        } catch (FactoryNotFoundException ex) {
+            startError = ex.getMessage();
+            isStarted  = false;
+            LOGGER.log(Level.WARNING, startError, ex);
+        } catch (FileNotFoundException ex) {
+            startError = "The configuration file layerContext.xml has not been found";
+            isStarted = false;
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: ", id);
         }
+        
 
         layerContext    = candidate;
         defaultLanguage = defaultLanguageCandidate;

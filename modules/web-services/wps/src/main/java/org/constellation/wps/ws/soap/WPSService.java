@@ -70,7 +70,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      */
     @Override
     protected WPSWorker createWorker(final File instanceDirectory) {
-        return new WPSWorker(instanceDirectory.getName(), instanceDirectory);
+        return new WPSWorker(instanceDirectory.getName());
     }
 
     /**

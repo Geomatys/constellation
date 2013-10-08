@@ -69,8 +69,8 @@ public final class StartService extends AbstractCstlProcess {
             if (instanceDirectory.isDirectory()) {
                 if (!instanceDirectory.getName().startsWith(".")) {
                     try {
-                        final Class clazz   = WSEngine.getServiceWorkerClass(serviceType);
-                        final Worker worker = (Worker) ReflectionUtilities.newInstance(clazz, instanceDirectory.getName(), instanceDirectory);
+                        final Class workerClass   = WSEngine.getServiceWorkerClass(serviceType);
+                        final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
 
                         if (worker != null) {
                             WSEngine.addServiceInstance(serviceType, identifier, worker);

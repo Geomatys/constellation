@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<StoredQueries xmlns:wfs="http://www.opengis.net/wfs" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ows="http://www.opengis.net/ows" xmlns:ins="http://www.inspire.org" xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:ns8="http://www.opengis.net/wfs/2.0" xmlns:ns9="http://www.opengis.net/ows/1.1">
+  <storedQuery>
+    <StoredQueryDescription id="nameQuery">
+      <ns8:Title>Name query</ns8:Title>
+      <ns8:Abstract>filter on name for samplingPoint</ns8:Abstract>
+      <ns8:Parameter xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="name" type="xsd:string">
+        <ns8:Title>name Parameter</ns8:Title>
+        <ns8:Abstract>A parameter on the name of the feature</ns8:Abstract>
+      </ns8:Parameter>
+      <ns8:QueryExpressionText xmlns:sampling="http://www.opengis.net/sampling/1.0" returnFeatureTypes="sampling:SamplingPoint" language="urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression">
+        <ns8:Query featureVersion="2.0.0" typeNames="sampling:SamplingPoint">
+          <fes:Filter>
+            <fes:PropertyIsEqualTo matchCase="true">
+              <fes:ValueReference>name</fes:ValueReference>
+              <fes:Literal>$name</fes:Literal>
+            </fes:PropertyIsEqualTo>
+          </fes:Filter>
+        </ns8:Query>
+      </ns8:QueryExpressionText>
+    </StoredQueryDescription>
+  </storedQuery>
+</StoredQueries>

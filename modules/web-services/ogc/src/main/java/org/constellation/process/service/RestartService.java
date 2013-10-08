@@ -50,7 +50,7 @@ public final class RestartService extends AbstractCstlProcess {
         final String identifier = value(IDENTIFIER, inputParameters);
         final Boolean closeFirst = value(CLOSE, inputParameters);
         File serviceDir = value(SERVICE_DIRECTORY, inputParameters);
-        final Class clazz = WSEngine.getServiceWorkerClass(serviceName);
+        final Class workerClass = WSEngine.getServiceWorkerClass(serviceName);
 
         //get config directory .constellation if null
         if (serviceDir == null) {
@@ -68,10 +68,10 @@ public final class RestartService extends AbstractCstlProcess {
         if (serviceDir.isDirectory()) {
 
             if (identifier == null || "".equals(identifier)) {
-                buildWorkers(serviceDir, serviceName, null, closeFirst, clazz);
+                buildWorkers(serviceDir, serviceName, null, closeFirst, workerClass);
             } else {
                 if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
-                    buildWorkers(serviceDir, serviceName, identifier, closeFirst, clazz);
+                    buildWorkers(serviceDir, serviceName, identifier, closeFirst, workerClass);
                 } else {
                     //try to start service
                     try {
@@ -81,9 +81,7 @@ public final class RestartService extends AbstractCstlProcess {
                         input.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
 
                         startDesc.createProcess(input).call(); // try to start
-                    } catch (NoSuchIdentifierException ex) {
-                        throw new ProcessException("There is no instance of " + identifier, this, null);
-                    } catch (ProcessException ex) {
+                    } catch (NoSuchIdentifierException | ProcessException ex) {
                         throw new ProcessException("There is no instance of " + identifier, this, null);
                     }
                 }
@@ -101,7 +99,7 @@ public final class RestartService extends AbstractCstlProcess {
      * @param identifier
      * @throws ProcessException
      */
-    private void buildWorkers(final File serviceDir, final String serviceName, final String identifier, final boolean closeInstance, final Class clazz) throws ProcessException {
+    private void buildWorkers(final File serviceDir, final String serviceName, final String identifier, final boolean closeInstance, final Class workerClass) throws ProcessException {
 
         /*
          * Single refresh
@@ -116,7 +114,7 @@ public final class RestartService extends AbstractCstlProcess {
             if (instanceDirectory.isDirectory()) {
                 if (!instanceDirectory.getName().startsWith(".")) {
                     try {
-                        final Worker worker = (Worker) ReflectionUtilities.newInstance(clazz, instanceDirectory.getName(), instanceDirectory);
+                        final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
 
                         if (worker != null) {
                             WSEngine.addServiceInstance(serviceName, identifier, worker);
@@ -138,7 +136,7 @@ public final class RestartService extends AbstractCstlProcess {
          */
         } else {
 
-            final Map<String, Worker> workersMap = new HashMap<String, Worker>();
+            final Map<String, Worker> workersMap = new HashMap<>();
             if (closeInstance) {
                 WSEngine.destroyInstances(serviceName);
             }
@@ -148,7 +146,7 @@ public final class RestartService extends AbstractCstlProcess {
                     final String instanceID = instanceDir.getName();
                     if (!instanceID.startsWith(".")) {
                         try {
-                            final Worker worker = (Worker)  ReflectionUtilities.newInstance(clazz, instanceID, instanceDir);
+                            final Worker worker = (Worker)  ReflectionUtilities.newInstance(workerClass, instanceID);
 
                             if (worker != null) {
                                 workersMap.put(instanceID, worker);

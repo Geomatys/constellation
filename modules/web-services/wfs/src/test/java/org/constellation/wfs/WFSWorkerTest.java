@@ -88,6 +88,7 @@ import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.ValueType;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
@@ -123,28 +124,33 @@ public class WFSWorkerTest {
         initFeatureSource();
         File configDir = new File("WFSWorkerTest");
         if (configDir.exists()) {
-            FileUtilities.deleteDirectory(new File("WFSWorkerTest"));
+            FileUtilities.deleteDirectory(configDir);
         }
+        configDir.mkdir();
+        ConfigDirectory.setConfigDirectory(configDir);
+
+        final File WFSDir = new File(configDir, "WFS");
+        WFSDir.mkdir();
+        final File instDir = new File(WFSDir, "test1");
+        instDir.mkdir();
 
 
         pool = WFSMarshallerPool.getInstance();
+       
+        Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
+        Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
+        Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
+        LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
+        lc.getCustomParameters().put("transactionSecurized", "false");
 
-        if (!configDir.exists()) {
-            configDir.mkdir();
-            Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
-            Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
-            Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
-            LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
-            lc.getCustomParameters().put("transactionSecurized", "false");
+        //we write the configuration file
+        File configFile = new File(instDir, "layerContext.xml");
+        final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+        marshaller.marshal(lc, configFile);
+        GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
+       
 
-            //we write the configuration file
-            File configFile = new File(configDir, "layerContext.xml");
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(lc, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-        }
-
-        worker = new DefaultWFSWorker("default", configDir);
+        worker = new DefaultWFSWorker("test1");
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
         worker.setShiroAccessible(false);
@@ -1281,7 +1287,7 @@ public class WFSWorkerTest {
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
         
         final Map<String, String> expResult = new HashMap<>();
-        expResult.put("http://www.opengis.net/gml", "http://geomatys.com/constellation/WS/wfs/default?request=DescribeFeatureType&version=1.1.0&service=WFS&namespace=xmlns(ns1=http://www.opengis.net/gml)&typename=ns1:NamedPlaces");
+        expResult.put("http://www.opengis.net/gml", "http://geomatys.com/constellation/WS/wfs/test1?request=DescribeFeatureType&version=1.1.0&service=WFS&namespace=xmlns(ns1=http://www.opengis.net/gml)&typename=ns1:NamedPlaces");
         assertEquals(wrapper.getSchemaLocations(), expResult);
         
     }

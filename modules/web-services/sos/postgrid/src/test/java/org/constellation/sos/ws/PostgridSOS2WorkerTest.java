@@ -34,6 +34,7 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.ConfigDirectory;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -62,8 +63,15 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
 
         if (!configDir.exists()) {
             configDir.mkdir();
-            
-            final File dbDirectory = new File(configDir, "PGDBSOS");
+
+            ConfigDirectory.setConfigDirectory(configDir);
+
+            File CSWDirectory  = new File(configDir, "SOS");
+            CSWDirectory.mkdir();
+            final File instDirectory = new File(CSWDirectory, "default");
+            instDirectory.mkdir();
+
+            final File dbDirectory = new File(instDirectory, "PGDBSOS");
             final String url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/') + ";create=true";
             //final String url = "jdbc:derby:memory:Test2;create=true";
             ds = new DefaultDataSource(url);
@@ -76,7 +84,7 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
             sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
 
             //we write the configuration file
-            File configFile = new File(configDir, "config.xml");
+            File configFile = new File(instDirectory, "config.xml");
             Automatic SMLConfiguration = new Automatic();
 
             Automatic OMConfiguration  = new Automatic();
@@ -98,7 +106,7 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
         }
         pool.recycle(marshaller);
         init();
-        worker = new SOSworker("", configDir);
+        worker = new SOSworker("default");
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
         workingDirectory = configDir;
@@ -106,7 +114,7 @@ public class PostgridSOS2WorkerTest extends SOS2WorkerTest {
     
     @Override
     public void initWorker() {
-        worker = new SOSworker("", workingDirectory);
+        worker = new SOSworker("default");
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
     }

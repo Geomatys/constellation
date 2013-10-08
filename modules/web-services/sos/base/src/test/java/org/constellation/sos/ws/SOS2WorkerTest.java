@@ -424,7 +424,7 @@ public abstract class SOS2WorkerTest {
          *
          * with wrong offering
          */
-        List<TemporalOpsType> times = new ArrayList<TemporalOpsType>();
+        List<TemporalOpsType> times = new ArrayList<>();
         TimePeriodType period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         TimeEqualsType equals = new TimeEqualsType(null, period);
         times.add(equals);
@@ -450,7 +450,7 @@ public abstract class SOS2WorkerTest {
          *          + Time filter TEquals
          *
          */
-        times = new ArrayList<TemporalOpsType>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         equals = new TimeEqualsType(null, period);
         times.add(equals);
@@ -695,7 +695,7 @@ public abstract class SOS2WorkerTest {
          *  Test 5: getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *          + Time filter TBefore
          */
-        List<TemporalOpsType> times = new ArrayList<TemporalOpsType>();
+        List<TemporalOpsType> times = new ArrayList<>();
         TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
         TimeBeforeType before   = new TimeBeforeType(null, instant);
         times.add(before);
@@ -717,7 +717,7 @@ public abstract class SOS2WorkerTest {
          *  Test 6: getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *          + Time filter TAFter
          */
-        times = new ArrayList<TemporalOpsType>();
+        times = new ArrayList<>();
         TimeAfterType after   = new TimeAfterType(null, instant);
         times.add(after);
         request  = new GetObservationType("2.0.0",
@@ -741,7 +741,7 @@ public abstract class SOS2WorkerTest {
          *  Test 7: getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *          + Time filter TDuring
          */
-        times = new ArrayList<TemporalOpsType>();
+        times = new ArrayList<>();
         TimePeriodType period  = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T08:00:00.0"));
         TimeDuringType during = new TimeDuringType(null, period);
         times.add(during);
@@ -766,7 +766,7 @@ public abstract class SOS2WorkerTest {
          *  Test 8: getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *          + Time filter TEquals
          */
-        times = new ArrayList<TemporalOpsType>();
+        times = new ArrayList<>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
         TimeEqualsType equals = new TimeEqualsType(null, period);
         times.add(equals);
@@ -1492,7 +1492,7 @@ public abstract class SOS2WorkerTest {
          */
         instant = new TimeInstantType(new TimePositionType("2007-05-01T04:00:00.0"));
         TimeBeforeType bfilter = new TimeBeforeType(null, instant);
-        List<TemporalOpsType> filters = new ArrayList<TemporalOpsType>();
+        List<TemporalOpsType> filters = new ArrayList<>();
         filters.add(templatefilter);
         filters.add(bfilter);        
         request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, filters, null, null);
@@ -1509,7 +1509,7 @@ public abstract class SOS2WorkerTest {
          */
         instant = new TimeInstantType(new TimePositionType("2007-05-01T03:59:00.0"));
         TimeEqualsType efilter = new TimeEqualsType(null, instant);
-        filters = new ArrayList<TemporalOpsType>();
+        filters = new ArrayList<>();
         filters.add(templatefilter);
         filters.add(efilter);  
 
@@ -1527,7 +1527,7 @@ public abstract class SOS2WorkerTest {
          */
         TimePeriodType period = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T04:00:00.0"));
         TimeDuringType dfilter = new TimeDuringType(null, period);
-        filters = new ArrayList<TemporalOpsType>();
+        filters = new ArrayList<>();
         filters.add(templatefilter);
         filters.add(dfilter);  
         

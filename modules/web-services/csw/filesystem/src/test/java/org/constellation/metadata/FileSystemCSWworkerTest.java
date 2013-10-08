@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.test.utils.Order;
@@ -54,9 +55,15 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
 
         if (!configDir.exists()) {
             configDir.mkdir();
+            ConfigDirectory.setConfigDirectory(configDir);
+
+            File CSWDirectory  = new File(configDir, "CSW");
+            CSWDirectory.mkdir();
+            final File instDirectory = new File(CSWDirectory, "default");
+            instDirectory.mkdir();
 
             //we write the data files
-            File dataDirectory = new File(configDir, "data");
+            File dataDirectory = new File(instDirectory, "data");
             dataDirectory.mkdir();
             writeDataFile(dataDirectory, "meta1.xml", "42292_5p_19900609195600");
             writeDataFile(dataDirectory, "meta2.xml", "42292_9s_19900610041000");
@@ -72,7 +79,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             writeDataFile(dataDirectory, "meta13.xml", "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
 
             //we write the configuration file
-            File configFile = new File(configDir, "config.xml");
+            File configFile = new File(instDirectory, "config.xml");
             Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
             configuration.putParameter("transactionSecurized", "false");
             configuration.putParameter("shiroAccessible", "false");
@@ -87,7 +94,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         Unmarshaller u = pool.acquireUnmarshaller();
         pool.recycle(u);
 
-        worker = new CSWworker("", configDir);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
     }

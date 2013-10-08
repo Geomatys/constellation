@@ -75,7 +75,7 @@ public class WMTSService extends OGCWebService<WMTSWorker>{
      */
     @Override
     protected WMTSWorker createWorker(File instanceDirectory) {
-        return new DefaultWMTSWorker(instanceDirectory.getName(), instanceDirectory);
+        return new DefaultWMTSWorker(instanceDirectory.getName());
     }
 
     /**

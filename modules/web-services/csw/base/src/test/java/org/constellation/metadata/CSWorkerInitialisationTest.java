@@ -23,7 +23,6 @@ import java.util.logging.Level;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -35,7 +34,9 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.ConfigDirectory;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 import org.junit.*;
@@ -50,60 +51,51 @@ public class CSWorkerInitialisationTest {
 
     private static MarshallerPool pool;
 
-    private static File configurationDirectory = new File("CSWorkerInitialisationTest");
-
+    private static File constellationDirectory = new File("CSWorkerInitialisationTest");
+    private static File instDirectory;
     
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        deleteTemporaryFile();
-        if (!configurationDirectory.exists()) {
-            configurationDirectory.mkdir();
-        }
+        FileUtilities.deleteDirectory(constellationDirectory);
+        constellationDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(constellationDirectory);
+        
+        
         pool = CSWMarshallerPool.getInstance();
-        Unmarshaller u = pool.acquireUnmarshaller();
-
-        pool.recycle(u);
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteTemporaryFile();
+        FileUtilities.deleteDirectory(constellationDirectory);
     }
+    
 
-    private static void deleteTemporaryFile() {
-        if (configurationDirectory.exists()) {
-            emptyConfigurationDirectory();
-        }
-        configurationDirectory.delete();
-    }
+    @Before
+    public void setUp() throws Exception {
+        if (constellationDirectory.exists()) {
 
-    private static void emptyConfigurationDirectory() {
-
-        if (configurationDirectory.exists()) {
-            File dataDirectory = new File(configurationDirectory, "data");
+            File CSWDirectory  = new File(constellationDirectory, "CSW");
+            CSWDirectory.mkdir();
+            instDirectory = new File(CSWDirectory, "default");
+            instDirectory.mkdir();
+            File dataDirectory = new File(instDirectory, "data");
             if (dataDirectory.exists()) {
                 for (File f : dataDirectory.listFiles()) {
                     f.delete();
                 }
                 dataDirectory.delete();
             }
-            File indexDirectory = new File(configurationDirectory, "index");
+            File indexDirectory = new File(instDirectory, "index");
             if (indexDirectory.exists()) {
                 for (File f : indexDirectory.listFiles()) {
                     f.delete();
                 }
                 indexDirectory.delete();
             }
-            File conf = new File(configurationDirectory, "config.xml");
+            File conf = new File(instDirectory, "config.xml");
             conf.delete();
         }
-
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        emptyConfigurationDirectory();
     }
 
     @After
@@ -121,7 +113,7 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
-        CSWworker worker = new CSWworker("", configurationDirectory);
+        CSWworker worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         boolean exceptionLaunched = false;
@@ -141,10 +133,10 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 2: An empty configuration file.
          */
-        File configFile = new File(configurationDirectory, "config.xml");
+        File configFile = new File(instDirectory, "config.xml");
         configFile.createNewFile();
         
-        worker = new CSWworker("",  configurationDirectory);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -163,7 +155,7 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 3: A malformed configuration file (bad recognized type).
          */
-        configFile = new File(configurationDirectory, "config.xml");
+        configFile = new File(instDirectory, "config.xml");
         configFile.createNewFile();
 
         final Marshaller m = pool.acquireMarshaller();
@@ -171,7 +163,7 @@ public class CSWorkerInitialisationTest {
         pool.recycle(m);
 
 
-        worker = new CSWworker("",  configurationDirectory);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -191,13 +183,13 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 4: A malformed configuration file (bad not recognized type).
          */
-        configFile = new File(configurationDirectory, "config.xml");
+        configFile = new File(instDirectory, "config.xml");
         configFile.createNewFile();
 
         Marshaller tempMarshaller = JAXBContext.newInstance(UnknowObject.class, Automatic.class).createMarshaller();
         tempMarshaller.marshal(new UnknowObject(), configFile);
 
-        worker = new CSWworker("",  configurationDirectory);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -216,14 +208,14 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 5: A configuration file with missing part.
          */
-        configFile = new File(configurationDirectory, "config.xml");
+        configFile = new File(instDirectory, "config.xml");
         configFile.createNewFile();
 
         String s = null;
         Automatic configuration = new Automatic(null, s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("",  configurationDirectory);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -242,14 +234,14 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 6: A configuration file with missing part and wrong part.
          */
-        configFile = new File(configurationDirectory, "config.xml");
+        configFile = new File(instDirectory, "config.xml");
         configFile.createNewFile();
 
         s = null;
         configuration = new Automatic("whatever", s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("",  configurationDirectory);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -268,14 +260,14 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 7: A configuration file with mdweb database and wrong database config.
          */
-        configFile = new File(configurationDirectory, "config.xml");
+        configFile = new File(instDirectory, "config.xml");
         configFile.createNewFile();
 
         s = null;
         configuration = new Automatic("mdweb", s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("",  configurationDirectory);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -294,13 +286,13 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 8:  A configuration file with mdweb mode and wrong database config.
          */
-        configFile = new File(configurationDirectory, "config.xml");
+        configFile = new File(instDirectory, "config.xml");
         configFile.createNewFile();
 
         configuration = new Automatic("mdweb", new BDD());
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("",  configurationDirectory);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -319,13 +311,13 @@ public class CSWorkerInitialisationTest {
          /**
          * Test 9:  A configuration file with mdweb mode and wrong database config.
          */
-        configFile = new File(configurationDirectory, "config.xml");
+        configFile = new File(instDirectory, "config.xml");
         configFile.createNewFile();
 
         configuration = new Automatic("mdweb", new BDD(null, null, null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("",  configurationDirectory);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -344,13 +336,13 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 10:  A configuration file with mdweb mode and wrong database config.
          */
-        configFile = new File(configurationDirectory, "config.xml");
+        configFile = new File(instDirectory, "config.xml");
         configFile.createNewFile();
 
         configuration = new Automatic("mdweb", new BDD(null, "whatever", null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("",  configurationDirectory);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -369,13 +361,13 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 11:  A configuration file with mdweb mode and wrong database config.
          */
-        configFile = new File(configurationDirectory, "config.xml");
+        configFile = new File(instDirectory, "config.xml");
         configFile.createNewFile();
 
         configuration = new Automatic("mdweb", new BDD("org.postgresql.Driver", "whatever", null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("",  configurationDirectory);
+        worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;

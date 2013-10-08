@@ -43,7 +43,7 @@ public abstract class GetConfigMapServiceTest extends AbstractMapServiceTest {
      @Test
     public void testGetConfigWMS() throws ProcessException, NoSuchIdentifierException {
 
-        final List<Source> sources = new ArrayList<Source>();
+        final List<Source> sources = new ArrayList<>();
         sources.add(new Source("source1", Boolean.TRUE, null, null));
         final Layers layers = new Layers(sources);
         final LayerContext conf = new LayerContext(layers);

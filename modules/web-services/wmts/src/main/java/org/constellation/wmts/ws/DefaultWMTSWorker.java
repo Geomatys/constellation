@@ -18,7 +18,6 @@ package org.constellation.wmts.ws;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.io.File;
 import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
@@ -96,8 +95,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     /**
      * Instanciates the working class for a SOAP client, that do request on a SOAP PEP service.
      */
-    public DefaultWMTSWorker(String id, File configurationDirectory) {
-        super(id, configurationDirectory, ServiceDef.Specification.WMTS);
+    public DefaultWMTSWorker(final String id) {
+        super(id, ServiceDef.Specification.WMTS);
         setSupportedVersion(ServiceDef.WMTS_1_0_0);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMTS worker {0} running", id);

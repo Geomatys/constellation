@@ -32,7 +32,6 @@ import javax.imageio.spi.ServiceRegistry;
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 
@@ -128,6 +127,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.util.logging.MonolineFormatter;
 import org.constellation.dto.Service;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -301,14 +301,14 @@ public class SOSworker extends AbstractWorker {
     /**
      * Initialize the database connection.
      */
-    public SOSworker(final String id, final File configurationDirectory) {
-        super(id, configurationDirectory, ServiceDef.Specification.SOS);
+    public SOSworker(final String id) {
+        super(id, ServiceDef.Specification.SOS);
         isStarted = true;
         
         // Database configuration
         try {
                 
-            final Object object = ConfigurationEngine.getConfiguration(configurationDirectory, "config.xml");
+            final Object object = ConfigurationEngine.getConfiguration("SOS", id, "config.xml");
             if (object instanceof SOSConfiguration) {
                 configuration = (SOSConfiguration) object;
             } else {
@@ -326,7 +326,7 @@ public class SOSworker extends AbstractWorker {
             this.keepCapabilities      = configuration.isKeepCapabilities();
 
             if (keepCapabilities) {
-                loadCachedCapabilities(configurationDirectory);
+                loadCachedCapabilities();
             }
             
             //we get the O&M filter Type
@@ -341,6 +341,7 @@ public class SOSworker extends AbstractWorker {
             //we get the Sensor reader type
             final DataSourceType smlType = configuration.getSMLType();
 
+            final File configurationDirectory = ConfigDirectory.getInstanceDirectory("SOS", id);
             final Automatic smlConfiguration = configuration.getSMLConfiguration();
             if (smlConfiguration == null) {
                 startError("The configuration file does not contains a SML configuration.", null);
@@ -584,14 +585,12 @@ public class SOSworker extends AbstractWorker {
      * @param configurationDirectory
      * @throws JAXBException
      */
-    private void loadCachedCapabilities(final File configurationDirectory) throws JAXBException {
+    private void loadCachedCapabilities() throws JAXBException {
         //we fill the cachedCapabilities if we have to
         LOGGER.info("adding capabilities document in cache");
-        final File configFile = new File(configurationDirectory, "cached-offerings.xml");
-        if (configFile.exists()) {
-            final Unmarshaller capaUM = SOSMarshallerPool.getInstance().acquireUnmarshaller();
-            Object object = capaUM.unmarshal(configFile);
-            SOSMarshallerPool.getInstance().recycle(capaUM);
+        try {
+            Object object = ConfigurationEngine.getConfiguration("SOS", getId(), "cached-offerings.xml", SOSMarshallerPool.getInstance());
+            
             if (object instanceof JAXBElement) {
                 object = ((JAXBElement)object).getValue();
             }
@@ -600,6 +599,8 @@ public class SOSworker extends AbstractWorker {
             } else {
                 LOGGER.severe("cached capabilities file does not contains Capablities object.");
             }
+        } catch (FileNotFoundException ex) {
+            // file can be missing
         }
     }
 

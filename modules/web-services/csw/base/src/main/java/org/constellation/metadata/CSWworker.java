@@ -97,6 +97,7 @@ import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
 import org.constellation.dto.Service;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.metadata.io.MetadataType;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
@@ -217,14 +218,13 @@ public class CSWworker extends AbstractWorker {
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
      *
      */
-    public CSWworker(final String serviceID, final File configDir) {
-    
-        super(serviceID, configDir, ServiceDef.Specification.CSW);
+    public CSWworker(final String serviceID) {
+        super(serviceID, ServiceDef.Specification.CSW);
         setSupportedVersion(ServiceDef.CSW_2_0_2);
         isStarted = true;
         try {
             //we look if the configuration have been specified
-            final Object obj = ConfigurationEngine.getConfiguration(configurationDirectory, "config.xml");
+            final Object obj = ConfigurationEngine.getConfiguration(CSW, getId(), "config.xml");
             if (obj instanceof Automatic) {
                 configuration = (Automatic) obj;
             } else {
@@ -234,7 +234,7 @@ public class CSWworker extends AbstractWorker {
                 return;
             }
             // we initialize the filterParsers
-            init("", configDir);
+            init("");
             String suffix = "";
             if (profile == TRANSACTIONAL) {
                 suffix = "-T";
@@ -294,9 +294,10 @@ public class CSWworker extends AbstractWorker {
      * @throws MetadataIoException If an error occurs while querying the dataSource.
      * @throws IndexingException If an error occurs while initializing the indexation.
      */
-    private void init(final String serviceID, final File configDir) throws MetadataIoException, IndexingException, JAXBException, CstlServiceException {
+    private void init(final String serviceID) throws MetadataIoException, IndexingException, JAXBException, CstlServiceException {
 
         // we assign the configuration directory
+        final File configDir = ConfigDirectory.getInstanceDirectory("CSW", getId());
         configuration.setConfigurationDirectory(configDir);
         final DataSourceType datasourceType = configuration.getType();
 

@@ -168,34 +168,26 @@ public class WPSWorker extends AbstractWorker {
      * @param id
      * @param configurationDirectory
      */
-    public WPSWorker(final String id, final File configurationDirectory) {
-        super(id, configurationDirectory, ServiceDef.Specification.WPS);
+    public WPSWorker(final String id) {
+        super(id, ServiceDef.Specification.WPS);
         setSupportedVersion(ServiceDef.WPS_1_0_0);
         ProcessContext candidate = null;
-        if (configurationDirectory != null) {
-            
-            try {
-                Object obj = ConfigurationEngine.getConfiguration(configurationDirectory, "processContext.xml");
-                if (obj instanceof ProcessContext) {
-                    candidate = (ProcessContext) obj;
-                    isStarted = true;
-                } else {
-                    startError = "The process context File does not contain a ProcessContext object";
-                    isStarted = false;
-                    LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
-                }
-            } catch (JAXBException ex) {
-                startError = "JAXBExeception while unmarshalling the process context File";
-                isStarted = false;
-                LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, ex);
-            }  catch (FileNotFoundException ex) {
-                startError = "The configuration file processContext.xml has not been found";
+        try {
+            final Object obj = ConfigurationEngine.getConfiguration("WPS", id, "processContext.xml");
+            if (obj instanceof ProcessContext) {
+                candidate = (ProcessContext) obj;
+                isStarted = true;
+            } else {
+                startError = "The process context File does not contain a ProcessContext object";
                 isStarted = false;
                 LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
             }
-            
-        } else {
-            startError = "The configuration directory has not been found";
+        } catch (JAXBException ex) {
+            startError = "JAXBExeception while unmarshalling the process context File";
+            isStarted = false;
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, ex);
+        }  catch (FileNotFoundException ex) {
+            startError = "The configuration file processContext.xml has not been found";
             isStarted = false;
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         }

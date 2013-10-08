@@ -80,8 +80,8 @@ public class RenameService extends AbstractProcess {
                         WSEngine.shutdownInstance(serviceType, identifier);
 
                         // start the new one
-                        final Class clazz   = WSEngine.getServiceWorkerClass(serviceType);
-                        final Worker newWorker = (Worker) ReflectionUtilities.newInstance(clazz, newName, newDirectory);
+                        final Class workerClass   = WSEngine.getServiceWorkerClass(serviceType);
+                        final Worker newWorker = (Worker) ReflectionUtilities.newInstance(workerClass, newName);
 
                         if (newWorker == null) {
                             throw new ProcessException("The instance " + newName + " can be started, maybe there is no configuration directory with this name.", this, null);

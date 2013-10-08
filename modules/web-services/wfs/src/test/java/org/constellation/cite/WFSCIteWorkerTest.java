@@ -39,6 +39,7 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.apache.sis.geometry.GeneralDirectPosition;
+import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
@@ -75,29 +76,31 @@ public class WFSCIteWorkerTest {
         initFeatureSource();
         File configDir = new File("WFSCiteWorkerTest");
         if (configDir.exists()) {
-            FileUtilities.deleteDirectory(new File("WFSCiteWorkerTest"));
+            FileUtilities.deleteDirectory(configDir);
         }
-
+        configDir.mkdir();
+        ConfigDirectory.setConfigDirectory(configDir);
         try {
 
+            final File WFSDir = new File(configDir, "WFS");
+            WFSDir.mkdir();
+            final File instDir = new File(WFSDir, "default");
+            instDir.mkdir();
 
-            if (!configDir.exists()) {
-                configDir.mkdir();
-                Source s1 = new Source("src", Boolean.TRUE, null, null);
-                LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
-                lc.getCustomParameters().put("shiroAccessible", "false");
+            Source s1 = new Source("postgisSrc", Boolean.TRUE, null, null);
+            LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
+            lc.getCustomParameters().put("shiroAccessible", "false");
 
-                //we write the configuration file
-                File configFile = new File(configDir, "layerContext.xml");
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(lc, configFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-            }
+            //we write the configuration file
+            File configFile = new File(instDir, "layerContext.xml");
+            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+            marshaller.marshal(lc, configFile);
+            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        worker = new DefaultWFSWorker("default", configDir);
+        worker = new DefaultWFSWorker("default");
         worker.setLogLevel(Level.FINER);
     }
 
@@ -129,8 +132,8 @@ public class WFSCIteWorkerTest {
          * Test 1 : query on typeName aggragateGeofeature
          */
 
-        List<QueryType> queries = new ArrayList<QueryType>();
-        List<PointPropertyType> points = new ArrayList<PointPropertyType>();
+        List<QueryType> queries = new ArrayList<>();
+        List<PointPropertyType> points = new ArrayList<>();
         points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(29.86, 70.83))));
         points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(31.08, 68.87))));
         points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(32.19, 71.96))));
@@ -204,7 +207,7 @@ public class WFSCIteWorkerTest {
                     // Defines a PostGis data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("src");
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
                     
                     final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);                    
                     final ParameterValueGroup pgconfig = getOrCreate(PostgresFeatureStoreFactory.PARAMETERS_DESCRIPTOR,source);

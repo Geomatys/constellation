@@ -26,11 +26,11 @@ import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.ConfigDirectory;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -54,10 +54,17 @@ public class WMTSWorkerTest {
         
         File configDir = new File("WMTSWorkerTest");
         if (configDir.exists()) {
-            FileUtilities.deleteDirectory(new File("WMTSWorkerTest"));
+            FileUtilities.deleteDirectory(configDir);
         }
+        configDir.mkdir();
+        ConfigDirectory.setConfigDirectory(configDir);
         
-        worker = new DefaultWMTSWorker("default", configDir);
+        final File WMTSDir = new File(configDir, "WMTS");
+        WMTSDir.mkdir();
+        final File instDir = new File(WMTSDir, "default");
+        instDir.mkdir();
+
+        worker = new DefaultWMTSWorker("default");
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
         worker.setShiroAccessible(false);

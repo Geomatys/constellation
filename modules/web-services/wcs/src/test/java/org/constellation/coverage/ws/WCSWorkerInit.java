@@ -19,6 +19,7 @@ package org.constellation.coverage.ws;
 import java.util.Arrays;
 import java.io.File;
 import javax.xml.bind.Marshaller;
+import org.constellation.configuration.ConfigDirectory;
 
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.LayerContext;
@@ -82,7 +83,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
                     srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
                     srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("src");
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
                 }
 
                 return config;
@@ -98,28 +99,33 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
 
         File configDir = new File("WCSWorkerTest");
         if (configDir.exists()) {
-            FileUtilities.deleteDirectory(new File("WCSWorkerTest"));
+            FileUtilities.deleteDirectory(configDir);
         }
-
+        configDir.mkdir();
+        ConfigDirectory.setConfigDirectory(configDir);
         try {
-            if (!configDir.exists()) {
-                configDir.mkdir();
-                Source s1 = new Source("src", Boolean.TRUE, null, null);
+            
+            final File WCSDir = new File(configDir, "WCS");
+            WCSDir.mkdir();
+            final File instDir = new File(WCSDir, "default");
+            instDir.mkdir();
 
-                LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
-                lc.getCustomParameters().put("shiroAccessible", "false");
+            Source s1 = new Source("coverageTestSrc", Boolean.TRUE, null, null);
 
-                //we write the configuration file
-                File configFile = new File(configDir, "layerContext.xml");
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(lc, configFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-            }
+            LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
+            lc.getCustomParameters().put("shiroAccessible", "false");
+
+            //we write the configuration file
+            File configFile = new File(instDir, "layerContext.xml");
+            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+            marshaller.marshal(lc, configFile);
+            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
+            
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        WORKER = new DefaultWCSWorker("default", configDir);
+        WORKER = new DefaultWCSWorker("default");
         // Default instanciation of the worker' servlet context and uri context.
         WORKER.setServiceUrl("http://localhost:9090");
 

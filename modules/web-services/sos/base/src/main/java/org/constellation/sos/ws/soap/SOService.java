@@ -90,7 +90,7 @@ public class SOService extends OGCWebService<SOSworker> {
      */
     @Override
     protected SOSworker createWorker(final File instanceDirectory) {
-        return new SOSworker(instanceDirectory.getName(), instanceDirectory);
+        return new SOSworker(instanceDirectory.getName());
     }
 
      /**
@@ -200,10 +200,7 @@ public class SOService extends OGCWebService<SOSworker> {
                     
             //detail.appendChild(n);
             return response;
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-            throw new RuntimeException(ex.getMessage());
-        } catch (SOAPException ex) {
+        } catch (JAXBException | SOAPException ex) {
             LOGGER.log(Level.WARNING, null, ex);
             throw new RuntimeException(ex.getMessage());
         }

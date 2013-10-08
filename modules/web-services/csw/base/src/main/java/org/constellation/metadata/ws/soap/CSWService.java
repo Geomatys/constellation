@@ -101,7 +101,7 @@ public class CSWService extends OGCWebService<CSWworker>{
      */
     @Override
     protected CSWworker createWorker(File instanceDirectory) {
-        return new CSWworker(instanceDirectory.getName(), instanceDirectory);
+        return new CSWworker(instanceDirectory.getName());
     }
 
     /**

@@ -33,6 +33,7 @@ import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.util.FileUtilities;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.ConfigDirectory;
 
 
 import org.junit.*;
@@ -59,17 +60,22 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         if (!configDir.exists()) {
             configDir.mkdir();
 
+            ConfigDirectory.setConfigDirectory(configDir);
 
+            File CSWDirectory  = new File(configDir, "SOS");
+            CSWDirectory.mkdir();
+            final File instDirectory = new File(CSWDirectory, "default");
+            instDirectory.mkdir();
 
-            File sensorDirectory = new File(configDir, "sensors");
+            File sensorDirectory = new File(instDirectory, "sensors");
             sensorDirectory.mkdir();
             writeCommonDataFile(sensorDirectory, "system.xml",    "urn:ogc:object:sensor:GEOM:1");
             writeCommonDataFile(sensorDirectory, "component.xml", "urn:ogc:object:sensor:GEOM:2");
 
             //we write the configuration file
-            File configFile = new File(configDir, "config.xml");
+            File configFile = new File(instDirectory, "config.xml");
             Automatic SMLConfiguration = new Automatic();
-            SMLConfiguration.setDataDirectory(configDir.getName() + "/sensors");
+            SMLConfiguration.setDataDirectory(instDirectory.getPath() + "/sensors");
 
             Automatic OMConfiguration  = new Automatic();
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
@@ -91,14 +97,14 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         }
         pool.recycle(marshaller);
         init();
-        worker = new SOSworker("", configDir);
+        worker = new SOSworker("default");
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
     }
 
     @Override
     public void initWorker() {
-        worker = new SOSworker("", configDir);
+        worker = new SOSworker("default");
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
     }

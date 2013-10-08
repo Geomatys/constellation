@@ -20,24 +20,19 @@ package org.constellation.wfs.ws;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
-import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import javax.xml.stream.XMLStreamException;
-
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Version;
@@ -45,13 +40,11 @@ import org.constellation.configuration.FormatURL;
 import org.constellation.configuration.Layer;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
-import org.constellation.security.SecurityManagerHolder;;
+import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.QnameLocalComparator;
 import org.constellation.util.QNameComparator;
 import org.constellation.ws.CstlServiceException;
-
 import static org.constellation.wfs.ws.WFSConstants.*;
-
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 
@@ -78,6 +71,7 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.dto.Service;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.visitor.FillCrsVisitor;
@@ -127,7 +121,6 @@ import org.geotoolkit.wfs.xml.v200.PropertyName;
 
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
@@ -178,13 +171,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         DEFAULT_CRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
     }
 
-    
-   
-    
     private List<StoredQueryDescription> storedQueries = new ArrayList<>();
     
-    public DefaultWFSWorker(final String id, final File configurationDirectory) {
-        super(id, configurationDirectory, ServiceDef.Specification.WFS);
+    public DefaultWFSWorker(final String id) {
+        super(id, ServiceDef.Specification.WFS);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WFS worker {0} running", id);
         }
@@ -207,25 +197,20 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     private void loadStoredQueries() {
-        // loading stored queries
-        if (configurationDirectory != null) {
-            final File sqFile = new File(configurationDirectory, "StoredQueries.xml");
-            if (sqFile.exists()) {
-                try {
-                    final Unmarshaller unmarshaller = getMarshallerPool().acquireUnmarshaller();
-                    final Object obj   = unmarshaller.unmarshal(sqFile);
-                    getMarshallerPool().recycle(unmarshaller);
-                    if (obj instanceof StoredQueries) {
-                        StoredQueries candidate = (StoredQueries) obj;
-                        this.storedQueries = candidate.getStoredQuery();
-                    } else {
-                        LOGGER.log(Level.WARNING, "The storedQueries File does not contains proper object");
-                    }
-                } catch (JAXBException ex) {
-                    LOGGER.log(Level.WARNING, "JAXBExeception while unmarshalling the stored queries File", ex);
-                }
+        try {
+            final Object obj = ConfigurationEngine.getConfiguration("WFS", getId(), "StoredQueries.xml", getMarshallerPool());
+            if (obj instanceof StoredQueries) {
+                StoredQueries candidate = (StoredQueries) obj;
+                this.storedQueries = candidate.getStoredQuery();
+            } else {
+                LOGGER.log(Level.WARNING, "The storedQueries File does not contains proper object");
             }
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "Exeception while unmarshalling the stored queries File", ex);
+        } catch (FileNotFoundException e) {
+            // there is no file continue
         }
+            
         // we verify if the identifier query is loaded (if not we load it)
        boolean foundID = false;
        for (StoredQueryDescription squery : storedQueries) {
@@ -267,17 +252,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     private void storedQueries() {
-        // loading stored queries
-        if (configurationDirectory != null) {
-            final File sqFile = new File(configurationDirectory, "StoredQueries.xml");
-            try {
-                final Marshaller marshaller = getMarshallerPool().acquireMarshaller();
-                marshaller.marshal(new StoredQueries(storedQueries), sqFile);
-                getMarshallerPool().recycle(marshaller);
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, "JAXBExeception while marshalling the stored queries File", ex);
-            } 
-        }
+        try {
+            ConfigurationEngine.storeConfiguration("WFS", getId(), "StoredQueries.xml", new StoredQueries(storedQueries), getMarshallerPool());
+        } catch (JAXBException ex) {
+           LOGGER.log(Level.WARNING, "JAXBExeception while marshalling the stored queries File", ex);
+        } 
     }
 
     @Override

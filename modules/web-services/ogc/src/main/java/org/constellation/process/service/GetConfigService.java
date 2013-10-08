@@ -95,7 +95,7 @@ public class GetConfigService extends AbstractProcess {
         if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
 
             try {
-                final Object obj = ConfigurationEngine.getConfiguration(instanceDirectory, identifier);
+                final Object obj = ConfigurationEngine.getConfiguration(instanceDirectory, configFileName);
                 if (obj.getClass().isAssignableFrom(configurationClass)) {
                     getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
                 } else {

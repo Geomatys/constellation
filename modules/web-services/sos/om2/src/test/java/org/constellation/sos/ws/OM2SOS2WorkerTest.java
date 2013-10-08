@@ -34,6 +34,7 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.ConfigDirectory;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -72,8 +73,15 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
         if (!workingDirectory.exists()) {
             workingDirectory.mkdir();
 
+            ConfigDirectory.setConfigDirectory(workingDirectory);
+
+            File CSWDirectory  = new File(workingDirectory, "SOS");
+            CSWDirectory.mkdir();
+            final File instDirectory = new File(CSWDirectory, "default");
+            instDirectory.mkdir();
+
             //we write the configuration file
-            File configFile = new File(workingDirectory, "config.xml");
+            File configFile = new File(instDirectory, "config.xml");
             Automatic SMLConfiguration = new Automatic();
 
             Automatic OMConfiguration  = new Automatic();
@@ -95,14 +103,14 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
         }
         pool.recycle(marshaller);
         init();
-        worker = new SOSworker("", workingDirectory);
+        worker = new SOSworker("default");
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
     }
     
     @Override
     public void initWorker() {
-        worker = new SOSworker("", workingDirectory);
+        worker = new SOSworker("default");
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
     }

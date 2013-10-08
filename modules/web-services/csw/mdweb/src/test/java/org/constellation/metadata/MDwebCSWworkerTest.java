@@ -21,6 +21,7 @@ package org.constellation.metadata;
 import java.io.File;
 import java.sql.Connection;
 import javax.xml.bind.Marshaller;
+import org.constellation.configuration.ConfigDirectory;
 
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -58,6 +59,14 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
         if (!configDir.exists()) {
             configDir.mkdir();
+
+            ConfigDirectory.setConfigDirectory(configDir);
+
+            File CSWDirectory  = new File(configDir, "CSW");
+            CSWDirectory.mkdir();
+            final File instDirectory = new File(CSWDirectory, "default");
+            instDirectory.mkdir();
+            
             final String url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/');
             DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
 
@@ -83,7 +92,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-9.sql"));
 
             //we write the configuration file
-            File configFile = new File(configDir, "config.xml");
+            File configFile = new File(instDirectory, "config.xml");
             BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
             Automatic configuration = new Automatic("mdweb", bdd);
             configuration.putParameter("transactionSecurized", "false");
@@ -95,7 +104,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
-        worker = new CSWworker(configDir.getName(), configDir);
+        worker = new CSWworker("default");
         //worker.setLogLevel(Level.FINER);
     }
 

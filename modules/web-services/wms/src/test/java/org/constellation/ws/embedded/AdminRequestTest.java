@@ -287,7 +287,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
         String expCapabiliites = getStringResponse(gcDefaultURL.openConnection());
         String resCapabiliites = getStringResponse(gcWms2URL.openConnection());
 
-        resCapabiliites = resCapabiliites.replace("http://localhost:" +  grizzly.getCurrentPort() + "/wms/wms2", "http://localhost:" +  grizzly.getCurrentPort() + "/wms/default");
+        resCapabiliites = resCapabiliites.replace("wms2", "default");
 
         assertEquals(expCapabiliites, resCapabiliites);
     }

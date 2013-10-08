@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -36,28 +37,60 @@ import org.constellation.util.Util;
  */
 public class ConfigurationEngine {
 
+    public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName) throws JAXBException, FileNotFoundException {
+        final File dir = ConfigDirectory.getInstanceDirectory(serviceType, serviceID);
+        return getConfiguration(dir, fileName);
+    }
+
+    @Deprecated
     public static Object getConfiguration(final File configurationDirectory, final String fileName) throws JAXBException, FileNotFoundException {
+        return getConfiguration(configurationDirectory, fileName, GenericDatabaseMarshallerPool.getInstance());
+    }
+
+    public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName, final MarshallerPool pool) throws JAXBException, FileNotFoundException {
+        final File dir = ConfigDirectory.getInstanceDirectory(serviceType, serviceID);
+        return getConfiguration(dir, fileName, pool);
+    }
+
+    @Deprecated
+    public static Object getConfiguration(final File configurationDirectory, final String fileName, final MarshallerPool pool) throws JAXBException, FileNotFoundException {
         final File confFile = new File(configurationDirectory, fileName);
         if (confFile.exists()) {
-            final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+            final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
             final Object obj = unmarshaller.unmarshal(confFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
+            pool.recycle(unmarshaller);
             return obj;
         }
         throw new FileNotFoundException("The configuration file " + fileName + " has not been found.");
     }
 
+    public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj) throws JAXBException {
+        final File dir = ConfigDirectory.getInstanceDirectory(serviceType, serviceID);
+        storeConfiguration(dir, fileName, obj);
+    }
+
+    @Deprecated
     public static void storeConfiguration(final File configurationDirectory, final String fileName, final Object obj) throws JAXBException {
+        storeConfiguration(configurationDirectory, fileName, obj, GenericDatabaseMarshallerPool.getInstance());
+    }
+
+    public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj, final MarshallerPool pool) throws JAXBException {
+        final File dir = ConfigDirectory.getInstanceDirectory(serviceType, serviceID);
+        storeConfiguration(dir, fileName, obj, pool);
+    }
+
+    @Deprecated
+    public static void storeConfiguration(final File configurationDirectory, final String fileName, final Object obj, final MarshallerPool pool) throws JAXBException {
         final File confFile = new File(configurationDirectory, fileName);
-        final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+        final Marshaller marshaller = pool.acquireMarshaller();
         marshaller.marshal(obj, confFile);
-        GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
+        pool.recycle(marshaller);
     }
 
     public static void writeMetadata(final String identifier, final String serviceType, final Service metadata, final String language) throws IOException {
         ensureNonNull("metadata", metadata);
 
-        final File directory = ConfigDirectory.getInstanceDirectory(identifier, serviceType);
+        final File directory = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
         ensureNonNull("directory", directory);
         
         final String fileName;
@@ -80,7 +113,7 @@ public class ConfigurationEngine {
         ensureNonNull("identifier",  identifier);
         ensureNonNull("serviceType", serviceType);
 
-        final File directory = ConfigDirectory.getInstanceDirectory(identifier, serviceType);
+        final File directory = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
         ensureNonNull("directory", directory);
 
         final String fileName;
@@ -100,7 +133,7 @@ public class ConfigurationEngine {
             } else {
                 final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + fileName);
                 if (in != null) {
-                    metadata = (Service) um.unmarshal(in);
+                    metadata = um.unmarshal(in);
                     GenericDatabaseMarshallerPool.getInstance().recycle(um);
                     in.close();
                 } else {
@@ -108,7 +141,10 @@ public class ConfigurationEngine {
                 }
             }
             if (metadata instanceof Service) {
-                return (Service) metadata;
+                final Service serv = (Service) metadata;
+                // override identifier
+                serv.setIdentifier(identifier);
+                return serv;
             } else {
                 throw new IOException("Unexpected metadata object: " + metadata.getClass());
             }

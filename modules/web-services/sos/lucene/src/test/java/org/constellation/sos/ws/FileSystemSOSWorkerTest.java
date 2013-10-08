@@ -33,6 +33,7 @@ import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.util.FileUtilities;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.ConfigDirectory;
 
 
 import org.junit.*;
@@ -58,8 +59,15 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         if (!configDir.exists()) {
             configDir.mkdir();
 
+            ConfigDirectory.setConfigDirectory(configDir);
+
+            File SOSDirectory  = new File(configDir, "SOS");
+            SOSDirectory.mkdir();
+            final File instDirectory = new File(SOSDirectory, "default");
+            instDirectory.mkdir();
+
             //we write the data files
-            File offeringDirectory = new File(configDir, "offerings");
+            File offeringDirectory = new File(instDirectory, "offerings");
             offeringDirectory.mkdir();
             
             File offeringV100Directory = new File(offeringDirectory, "1.0.0");
@@ -90,19 +98,19 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             writeDataFile(offeringV200Directory, "v200/offering-10.xml", "offering-10");
             
 
-            File phenomenonDirectory = new File(configDir, "phenomenons");
+            File phenomenonDirectory = new File(instDirectory, "phenomenons");
             phenomenonDirectory.mkdir();
             writeDataFile(phenomenonDirectory, "phenomenon-depth.xml", "depth");
             writeDataFile(phenomenonDirectory, "phenomenon-temp.xml",  "temperature");
             writeDataFile(phenomenonDirectory, "phenomenon-depth-temp.xml",  "aggregatePhenomenon");
 
-            File featureDirectory = new File(configDir, "features");
+            File featureDirectory = new File(instDirectory, "features");
             featureDirectory.mkdir();
             writeDataFile(featureDirectory, "v100/feature1.xml", "station-001");
             writeDataFile(featureDirectory, "v100/feature2.xml", "station-002");
             writeDataFile(featureDirectory, "v100/feature3.xml", "station-006");
 
-            File observationsDirectory = new File(configDir, "observations");
+            File observationsDirectory = new File(instDirectory, "observations");
             observationsDirectory.mkdir();
             writeDataFile(observationsDirectory, "v100/observation1.xml", "urn:ogc:object:observation:GEOM:304");
             writeDataFile(observationsDirectory, "v100/observation2.xml", "urn:ogc:object:observation:GEOM:305");
@@ -111,7 +119,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             writeDataFile(observationsDirectory, "v100/observation5.xml", "urn:ogc:object:observation:GEOM:507");
             writeDataFile(observationsDirectory, "v100/observation6.xml", "urn:ogc:object:observation:GEOM:801");
 
-            File observationTemplatesDirectory = new File(configDir, "observationTemplates");
+            File observationTemplatesDirectory = new File(instDirectory, "observationTemplates");
             observationTemplatesDirectory.mkdir();
             writeDataFile(observationTemplatesDirectory, "v100/observationTemplate-3.xml", "urn:ogc:object:observation:template:GEOM:3");
             writeDataFile(observationTemplatesDirectory, "v100/observationTemplate-4.xml", "urn:ogc:object:observation:template:GEOM:4");
@@ -119,7 +127,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             writeDataFile(observationTemplatesDirectory, "observationTemplate-7.xml", "urn:ogc:object:observation:template:GEOM:7");
             writeDataFile(observationTemplatesDirectory, "observationTemplate-8.xml", "urn:ogc:object:observation:template:GEOM:8");
 
-            File sensorDirectory = new File(configDir, "sensors");
+            File sensorDirectory = new File(instDirectory, "sensors");
             sensorDirectory.mkdir();
             File sensor1         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:1.xml");
             sensor1.createNewFile();
@@ -143,11 +151,11 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             sensor10.createNewFile();
             
             //we write the configuration file
-            File configFile = new File(configDir, "config.xml");
+            File configFile = new File(instDirectory, "config.xml");
             Automatic SMLConfiguration = new Automatic();
 
             Automatic OMConfiguration  = new Automatic();
-            OMConfiguration.setDataDirectory(configDir.getName());
+            OMConfiguration.setDataDirectory(instDirectory.getPath());
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(DataSourceType.FILESYSTEM);
             configuration.setObservationWriterType(DataSourceType.FILESYSTEM);
@@ -164,14 +172,14 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         }
         pool.recycle(marshaller);
         init();
-        worker = new SOSworker("", configDir);
+        worker = new SOSworker("default");
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
     }
 
     @Override
     public void initWorker() {
-        worker = new SOSworker("", configDir);
+        worker = new SOSworker("default");
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
     }
