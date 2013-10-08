@@ -23,10 +23,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Level;
+
 import net.iharder.Base64;
+
+
+
+
+
 
 // Jersey dependencies
 import javax.annotation.PreDestroy;
+import javax.imageio.spi.ServiceRegistry;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
 
@@ -35,8 +42,13 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.validation.Schema;
 
 // Shiro dependencies
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UnknownAccountException;
+//import org.apache.shiro.authc.IncorrectCredentialsException;
+//import org.apache.shiro.authc.UnknownAccountException;
+
+
+
+
+
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
@@ -48,10 +60,12 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.StartServiceDescriptor;
+import org.constellation.security.IncorrectCredentialsException;
+import org.constellation.security.SecurityManagerHolder;
+import org.constellation.security.UnknownAccountException;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
-import org.constellation.ws.security.SecurityManager;
 import org.constellation.ws.Worker;
 import org.constellation.ServiceDef.Specification;
 
@@ -108,6 +122,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     private final String serviceName;
     protected final OGCConfigurer configurer;
 
+    
     /**
      * Initialize the basic attributes of a web serviceType.
      *
@@ -210,11 +225,11 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
               processAuthentication();
         } catch (UnknownAccountException ex) {
             LOGGER.log(Level.FINER, "Unknow acount", ex);
-            SecurityManager.logout();
+            SecurityManagerHolder.getInstance().logout();
             return Response.status(Response.Status.UNAUTHORIZED).build();
         } catch (IncorrectCredentialsException ex) {
             LOGGER.log(Level.FINER, "incorrect password", ex);
-            SecurityManager.logout();
+            SecurityManagerHolder.getInstance().logout();
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
@@ -273,7 +288,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                         if (separatorIndex != -1) {
                             final String login = logPass.substring(0, separatorIndex);
                             final String passw = logPass.substring(separatorIndex + 1);
-                            SecurityManager.login(login, passw);
+                            SecurityManagerHolder.getInstance().login(login, passw);
                         } else {
                             LOGGER.warning("separator missing in authorization header");
                         }

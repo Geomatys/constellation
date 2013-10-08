@@ -26,6 +26,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
+
 import javax.imageio.spi.ServiceRegistry;
 
 // JAXB dependencies
@@ -34,6 +35,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+
+import org.constellation.security.SecurityManagerHolder;
 // Constellation dependencies
 import org.constellation.sos.factory.SMLFactory;
 import org.constellation.sos.factory.OMFactory;
@@ -130,6 +133,7 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+
 import org.geotoolkit.sos.xml.SosInsertionMetadata;
 import org.geotoolkit.swe.xml.DataRecord;
 
@@ -178,6 +182,7 @@ public class SOSworker extends AbstractWorker {
     public static final int DISCOVERY     = 0;
     public static final int TRANSACTIONAL = 1;
 
+    
     /**
      * A list of temporary ObservationTemplate
      */
@@ -1907,7 +1912,7 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The operation registerSensor is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
         }
-        if (isTransactionSecurized() && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
+        if (isTransactionSecurized() && !SecurityManagerHolder.getInstance().isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform an registerSensor request.");
         }
         LOGGER.log(logLevel, "registerSensor request processing\n");
@@ -2045,7 +2050,7 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The operation insertObservation is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
         }
-        if (isTransactionSecurized() && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
+        if (isTransactionSecurized() && !SecurityManagerHolder.getInstance().isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform an insertObservation request.");
         }
 

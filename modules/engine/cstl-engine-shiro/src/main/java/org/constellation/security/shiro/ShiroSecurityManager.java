@@ -14,46 +14,50 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.ws.security;
+package org.constellation.security.shiro;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.constellation.security.SecurityManager;
 
 /**
- *
+ * 
  * @author Guilhem Legal (Geomatys)
+ * @author Olivier NOUGUIER (Geomatys)
  */
-public class SecurityManager {
+public class ShiroSecurityManager implements SecurityManager {
 
-    public static String getCurrentUserLogin() {
+    public String getCurrentUserLogin() {
         final Subject currentUser = SecurityUtils.getSubject();
         return (String) currentUser.getPrincipal();
     }
 
-    public static boolean isAuthenticated() {
+    public boolean isAuthenticated() {
         final Subject currentUser = SecurityUtils.getSubject();
         return currentUser.isAuthenticated();
     }
 
-    public static boolean isAllowed(final String action) {
+    public boolean isAllowed(final String action) {
         final Subject currentUser = SecurityUtils.getSubject();
         return currentUser.isPermitted(action);
     }
 
-    public static boolean hasRole(final String role) {
+    public boolean hasRole(final String role) {
         final Subject currentUser = SecurityUtils.getSubject();
         return currentUser.hasRole(role);
     }
 
-    public static void login(final String login, final String pass) throws UnknownAccountException, IncorrectCredentialsException {
-        final UsernamePasswordToken token = new UsernamePasswordToken(login, pass);
+    public void login(final String login, final String pass)
+            throws UnknownAccountException, IncorrectCredentialsException {
+        final UsernamePasswordToken token = new UsernamePasswordToken(login,
+                pass);
         SecurityUtils.getSubject().login(token);
     }
 
-    public static void logout() {
+    public void logout() {
         SecurityUtils.getSubject().logout();
     }
 }

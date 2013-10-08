@@ -29,11 +29,15 @@ import java.util.Map.Entry;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 
+
+
 // JAXB dependencies
 import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
+
 
 // Apache Lucene dependencies
 import org.apache.lucene.search.Sort;
@@ -52,10 +56,11 @@ import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.security.MetadataSecurityFilter;
+
+import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.security.SecurityManager;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -99,6 +104,7 @@ import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
+
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 
 // GeoAPI dependencies
@@ -115,7 +121,8 @@ import org.w3c.dom.Node;
  */
 public class CSWworker extends AbstractWorker {
 
-    /**
+    
+        /**
      * A Database reader.
      */
     private CSWMetadataReader mdReader;
@@ -1315,7 +1322,7 @@ public class CSWworker extends AbstractWorker {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
         }
-        if (shiroAccessible && isTransactionSecurized() && !SecurityManager.isAuthenticated()) {
+        if (shiroAccessible && isTransactionSecurized() && !SecurityManagerHolder.getInstance().isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform a transaction request.");
         }
         final long startTime = System.currentTimeMillis();
@@ -1492,7 +1499,7 @@ public class CSWworker extends AbstractWorker {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
         }
-        if (isTransactionSecurized() && !SecurityManager.isAuthenticated()) {
+        if (isTransactionSecurized() && !SecurityManagerHolder.getInstance().isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform a harvest request.");
         }
         verifyBaseRequest(request);

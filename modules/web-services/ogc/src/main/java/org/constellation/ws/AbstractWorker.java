@@ -29,15 +29,15 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import org.constellation.ServiceDef;
 
+import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
-
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.util.Version;
@@ -46,6 +46,9 @@ import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.dto.Service;
+
+import org.constellation.security.SecurityManagerHolder;
+
 import org.opengis.util.CodeList;
 import org.xml.sax.SAXException;
 
@@ -135,6 +138,11 @@ public abstract class AbstractWorker implements Worker {
     private List<Schema> schemas = null;
 
     private long currentUpdateSequence = System.currentTimeMillis();
+    
+    /**
+     * Security manager.
+     */
+    
 
     public AbstractWorker(final String id, final File configurationDirectory, final Specification specification) {
         this.id = id;
@@ -145,7 +153,7 @@ public abstract class AbstractWorker implements Worker {
     protected String getUserLogin() {
         final String userLogin;
         if (shiroAccessible) {
-            userLogin = org.constellation.ws.security.SecurityManager.getCurrentUserLogin();
+            userLogin = SecurityManagerHolder.getInstance().getCurrentUserLogin();
         } else {
             userLogin = null;
         }
