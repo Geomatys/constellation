@@ -83,6 +83,10 @@
             <artifactId>geotk-xml-csw</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-processing-metadata</artifactId>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>

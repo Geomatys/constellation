@@ -4,24 +4,18 @@ import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.metadata.iso.citation.DefaultCitation;
-import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
-import org.apache.sis.metadata.iso.identification.AbstractIdentification;
-import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
-import org.apache.sis.util.iso.SimpleInternationalString;
+import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
-import org.constellation.dto.DataMetadata;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
+import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
@@ -31,23 +25,33 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.process.metadata.MetadataProcessingRegistry;
+import org.geotoolkit.process.metadata.merge.MergeDescriptor;
 import org.geotoolkit.util.FileUtilities;
-import org.opengis.metadata.citation.CitationDate;
+import org.opengis.metadata.Metadata;
 import org.opengis.metadata.citation.DateType;
-import org.opengis.metadata.identification.Keywords;
+import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
+import org.opengis.util.NoSuchIdentifierException;
 import org.w3c.dom.Node;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -56,12 +60,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -129,6 +134,56 @@ public class Data {
         }
 
         return Response.status(200).entity(information).build();
+    }
+
+    @GET
+    @Path("/metadataCodeLists/{locale}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getMetadataCodeLists(@PathParam("locale") final String pLocale) {
+
+        final Locale userLocale = new Locale(pLocale);
+        MetadataLists mdList = new MetadataLists();
+
+        HashMap<String, String> roles = new HashMap<>(0);
+        for (int i = 0; i < Role.values().length; i++) {
+            Role role = Role.values()[i];
+            InternationalString is = Types.getCodeTitle(role);
+            roles.put(role.name(), is.toString(userLocale));
+        }
+        mdList.setRoles(roles);
+
+
+        Comparator<String> comparator = new Comparator<String>() {
+            @Override
+            public int compare(final String first, final String second) {
+                return first.compareTo(second);
+            }
+        };
+        TreeMap<String, String> locales = new TreeMap<>(comparator);
+        for (int i = 0; i < Locale.getAvailableLocales().length; i++) {
+            Locale locale = Locale.getAvailableLocales()[i];
+            locales.put(locale.toString(), locale.getDisplayName(userLocale));
+        }
+        mdList.setLocales(locales);
+
+        HashMap<String, String> topics = new HashMap<>(0);
+        for (int i = 0; i < TopicCategory.values().length; i++) {
+            TopicCategory topicCategory = TopicCategory.values()[i];
+            InternationalString is = Types.getCodeTitle(topicCategory);
+            topics.put(topicCategory.name(), is.toString(userLocale));
+        }
+        mdList.setCategories(topics);
+
+        HashMap<String, String> dateTypes = new HashMap<>(0);
+        for (int i = 0; i < DateType.values().length; i++) {
+            DateType dateType = DateType.values()[i];
+            InternationalString is = Types.getCodeTitle(dateType);
+            dateTypes.put(dateType.name(), is.toString(userLocale));
+        }
+        mdList.setDateTypes(dateTypes);
+
+        return Response.status(200).entity(mdList).build();
     }
 
     /**
@@ -234,8 +289,7 @@ public class Data {
     /**
      * Generate {@link DataInformation} for require file data
      *
-     *
-     * @param file         data {@link java.io.File}
+     * @param file     data {@link java.io.File}
      * @param dataType
      * @return a {@link DataInformation}
      */
@@ -281,6 +335,8 @@ public class Data {
 
             // get Metadata as a List
             final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
+            //merge from template
+            //mergeTemplate(fileMetadata);
 
             final TreeTable.Node rootNode = fileMetadata.asTreeTable().getRoot();
 
@@ -298,7 +354,7 @@ public class Data {
                 final Node coverateRootNode = sm.getAsTree(rootNodeName);
 
                 MetadataMapBuilder.setCounter(0);
-                final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11);
+                final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11, i);
 
                 final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
                 nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
@@ -310,5 +366,30 @@ public class Data {
         }
     }
 
+    /**
+     * Merge file metadata with defined template from user
+     *
+     * @param fileMetadata
+     */
+    private Metadata mergeTemplate(final DefaultMetadata fileMetadata) throws JAXBException, NoSuchIdentifierException, ProcessException {
+        // unmarshall metadataFile Template
+        final Unmarshaller xmlReader = CSWMarshallerPool.getInstance().acquireUnmarshaller();
+        final File aFile = new File(ConfigDirectory.getConfigDirectory(), "template.xml");
+        final DefaultMetadata templateMetadata = (DefaultMetadata) xmlReader.unmarshal(aFile);
+
+        // call Merge Process
+        DefaultMetadata resultMetadata = new DefaultMetadata();
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(MetadataProcessingRegistry.NAME, MergeDescriptor.NAME);
+        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+        final ParameterValueGroup output = desc.getOutputDescriptor().createValue();
+        inputs.parameter(MergeDescriptor.FIRST_IN_NAME).setValue(fileMetadata);
+        inputs.parameter(MergeDescriptor.SECOND_IN_NAME).setValue(templateMetadata);
+        output.parameter(MergeDescriptor.RESULT_OUT_NAME).setValue(resultMetadata);
+        final org.geotoolkit.process.Process mergeProcess = desc.createProcess(inputs);
+        mergeProcess.call();
+        return resultMetadata;
+    }
 
 }
+
+

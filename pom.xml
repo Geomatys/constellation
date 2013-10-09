@@ -844,6 +844,11 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-processing-metadata</artifactId>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-groovy</artifactId>
                 <version>${geotoolkit.version}</version>
             </dependency>
