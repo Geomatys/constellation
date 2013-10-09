@@ -65,6 +65,7 @@
       </activation>
       <modules>
         <module>cstl-engine-shiro</module>
+        <module>cstl-engine-spring-security</module>
         <module>server</module>
         <module>xacml</module>
       </modules>
