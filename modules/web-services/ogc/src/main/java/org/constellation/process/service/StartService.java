@@ -17,7 +17,6 @@
 package org.constellation.process.service;
 
 import java.io.File;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -42,53 +41,25 @@ public final class StartService extends AbstractCstlProcess {
     protected void execute() throws ProcessException {
         final String identifier = value(IDENTIFIER, inputParameters);
         final String serviceType = value(SERVICE_TYPE, inputParameters);
-        File serviceDir = value(SERVICE_DIRECTORY, inputParameters);
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
         }
+        
+        try {
+            final Class workerClass   = WSEngine.getServiceWorkerClass(serviceType);
+            final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
 
-        //get config directory .constellation if null
-        if (serviceDir == null) {
-            final File configDirectory = ConfigDirectory.getConfigDirectory();
-
-            if (configDirectory != null && configDirectory.isDirectory()) {
-
-                serviceDir = new File(configDirectory, serviceType);
-
-            } else {
-                throw new ProcessException("Configuration directory can't be found.", this, null);
-            }
-        }
-
-        if (serviceDir.isDirectory()) {
-
-            //create service instance directory
-            final File instanceDirectory = new File(serviceDir, identifier);
-
-            if (instanceDirectory.isDirectory()) {
-                if (!instanceDirectory.getName().startsWith(".")) {
-                    try {
-                        final Class workerClass   = WSEngine.getServiceWorkerClass(serviceType);
-                        final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
-
-                        if (worker != null) {
-                            WSEngine.addServiceInstance(serviceType, identifier, worker);
-                            if (!worker.isStarted()) {
-                                throw new ProcessException("Unable to start the instance " + identifier + ".", this, null);
-                            }
-                        } else {
-                            throw new ProcessException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", this, null);
-                        }
-                    } catch (IllegalArgumentException ex) {
-                        throw new ProcessException(ex.getMessage(), this, ex);
-                    }
+            if (worker != null) {
+                WSEngine.addServiceInstance(serviceType, identifier, worker);
+                if (!worker.isStarted()) {
+                    throw new ProcessException("Unable to start the instance " + identifier + ".", this, null);
                 }
             } else {
-                throw new ProcessException("Service instance directory can't be created. Check permissions.", this, null);
+                throw new ProcessException("The instance " + identifier + " can not be instanciated.", this, null);
             }
-        } else {
-            throw new ProcessException("Service directory can' be found for service name : " + serviceType, this, null);
+        } catch (IllegalArgumentException ex) {
+            throw new ProcessException(ex.getMessage(), this, ex);
         }
     }
 }

@@ -374,7 +374,7 @@ public class CSWConfigurationManager {
         if (instanceDirectory.isDirectory()) {
             try {
                 // we get the CSW configuration file
-                final Automatic config = (Automatic) ConfigurationEngine.getConfiguration(instanceDirectory, "config.xml");
+                final Automatic config = (Automatic) ConfigurationEngine.getConfiguration("CSW", id, "config.xml");
                 config.setConfigurationDirectory(instanceDirectory);
                 return config;
                 

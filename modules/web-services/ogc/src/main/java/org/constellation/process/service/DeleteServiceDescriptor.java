@@ -16,7 +16,6 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.process.ConstellationProcessFactory;
@@ -47,7 +46,7 @@ public class DeleteServiceDescriptor extends AbstractProcessDescriptor {
     private static final Map<String, Object> SERVICE_TYPE_PROPERTIES;
     private static final String[] SERVICE_TYPE_VALID_VALUES = ServiceProcessCommon.servicesAvaible();
     static {
-        SERVICE_TYPE_PROPERTIES = new HashMap<String, Object>();
+        SERVICE_TYPE_PROPERTIES = new HashMap<>();
         SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.NAME_KEY, SERVICE_TYPE_NAME);
         SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.REMARKS_KEY, SERVICE_TYPE_REMARKS);
     }
@@ -60,15 +59,10 @@ public class DeleteServiceDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<String> IDENTIFIER =
             new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, null, true);
 
-    public static final String SERVICE_DIRECTORY_NAME = "serviceDirectory";
-    private static final String SERVICE_DIRECTORY_REMARKS = "Service directory. Use default constellation config directory if not set.";
-    public static final ParameterDescriptor<File> SERVICE_DIRECTORY =
-            new DefaultParameterDescriptor(SERVICE_DIRECTORY_NAME, SERVICE_DIRECTORY_REMARKS, File.class, null, false);
-
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, SERVICE_DIRECTORY});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER});
 
 
     /**Output parameters */

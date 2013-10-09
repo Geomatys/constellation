@@ -16,12 +16,10 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.Service;
 import org.constellation.util.ReflectionUtilities;
 import static org.constellation.process.service.CreateServiceDescriptor.*;
@@ -56,11 +54,10 @@ public class CreateService extends AbstractProcess {
     @Override
     protected void execute() throws ProcessException {
 
-        String serviceType = value(SERVICE_TYPE, inputParameters);
-        final String identifier = value(IDENTIFIER, inputParameters);
-        Object configuration = value(CONFIGURATION, inputParameters);
-        File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
-        Service serviceMetadata = value(SERVICE_METADATA, inputParameters);
+        String serviceType             = value(SERVICE_TYPE, inputParameters);
+        final String identifier        = value(IDENTIFIER, inputParameters);
+        Object configuration           = value(CONFIGURATION, inputParameters);
+        final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
         final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
         final String configFileName    = value(FILENAME, inputParameters);
 
@@ -82,52 +79,24 @@ public class CreateService extends AbstractProcess {
             configuration = ReflectionUtilities.newInstance(configurationClass);
         }
 
-        //get config directory .constellation if null
-        if (instanceDirectory == null) {
-            final File configDirectory = ConfigDirectory.getConfigDirectory();
-
-
-            if (configDirectory != null && configDirectory.isDirectory()) {
-
-                //get service directory ("WMS", "WMTS", "WFS", "WCS")
-                final File serviceDir = new File(configDirectory, serviceType);
-                if (serviceDir.exists() && serviceDir.isDirectory()) {
-
-                    //create service instance directory
-                    instanceDirectory = new File(serviceDir, identifier);
-
-                } else {
-                    throw new ProcessException("Service directory can't be found for service name : " + serviceType, this, null);
-                }
+        boolean createConfig = false;
+        try {
+            final Object obj = ConfigurationEngine.getConfiguration(serviceType, identifier, configFileName);
+            if (obj.getClass().isAssignableFrom(configurationClass)) {
+                configuration = obj;
             } else {
-                throw new ProcessException("Configuration directory can't be found.", this, null);
+                throw new ProcessException("The " + configFileName + " file does not contain a " + configurationClass.getName() + " object", this, null);
             }
-        }
-
-        boolean createConfig = true;
-        if (instanceDirectory.exists()) {
-            createConfig = false;
-            try {
-                final Object obj = ConfigurationEngine.getConfiguration(instanceDirectory, configFileName);
-                if (obj.getClass().isAssignableFrom(configurationClass)) {
-                    configuration = obj;
-                } else {
-                    throw new ProcessException("The " + configFileName + " file does not contain a " + configurationClass.getName() + " object", this, null);
-                }
-            } catch (JAXBException ex) {
-                throw new ProcessException(ex.getMessage(), this, ex);
-            } catch (FileNotFoundException ex) {
-                // do nothing
-            }
-
-        } else if (!instanceDirectory.mkdir()) {
-            throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
+        } catch (JAXBException ex) {
+            throw new ProcessException(ex.getMessage(), this, ex);
+        } catch (FileNotFoundException ex) {
+            createConfig = true;
         }
 
         if (createConfig) {
             //create config file for the default configuration.
             try {
-                ConfigurationEngine.storeConfiguration(instanceDirectory, configFileName, configuration);
+                ConfigurationEngine.createConfiguration(serviceType, identifier, configFileName, configuration);
             } catch (JAXBException ex) {
                 throw new ProcessException(ex.getMessage(), this, ex);
             }

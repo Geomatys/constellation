@@ -16,7 +16,6 @@
  */
 package org.constellation.process.service;
 
-import org.constellation.ServiceDef;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;

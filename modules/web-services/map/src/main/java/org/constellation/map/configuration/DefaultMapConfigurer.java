@@ -17,7 +17,6 @@
 
 package org.constellation.map.configuration;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -80,7 +79,6 @@ import org.constellation.process.provider.style.SetStyleToStyleProviderDescripto
 import org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor;
 import org.constellation.ws.WSEngine;
 import org.constellation.api.CommonConstants;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
@@ -408,10 +406,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                                     // save new Configuration
                                     LOGGER.log(Level.INFO, "Updating service {0}-{1} for deleted provider", new Object[]{specification, w.getId()});
                                     try {
-                                        final File configDirectory   = ConfigDirectory.getConfigDirectory();
-                                        final File serviceDir        = new File(configDirectory, specification);
-                                        final File instanceDirectory = new File(serviceDir, w.getId());
-                                        ConfigurationEngine.storeConfiguration(instanceDirectory, "layerContext.xml", configuration);
+                                        ConfigurationEngine.storeConfiguration(specification, w.getId(), "layerContext.xml", configuration);
                                     } catch (JAXBException ex) {
                                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                                     }

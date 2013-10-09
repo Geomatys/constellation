@@ -415,7 +415,7 @@ public class WPSWorker extends AbstractWorker {
         final File webdavConfig = new File(webDavInstanceDir, "WebdavContext.xml");
         if (!webdavConfig.exists()) {
             try {
-                ConfigurationEngine.storeConfiguration(webDavInstanceDir, "WebdavContext.xml", webdavCtx);
+                ConfigurationEngine.storeConfiguration("webdav", webDavName, "WebdavContext.xml", webdavCtx);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;

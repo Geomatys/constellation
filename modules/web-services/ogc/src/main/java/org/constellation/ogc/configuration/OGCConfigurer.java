@@ -109,7 +109,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
         try {
             desc.createProcess(inputs).call();
         } catch (ProcessException ex) {
@@ -152,7 +151,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
         inputs.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(closeFirst);
-        inputs.parameter(RestartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
         try {
             desc.createProcess(inputs).call();
         } catch (ProcessException ex) {
@@ -174,7 +172,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(RenameServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(RenameServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(RenameServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
         inputs.parameter(RenameServiceDescriptor.NEW_NAME_NAME).setValue(newIdentifier);
         try {
             desc.createProcess(inputs).call();
@@ -196,7 +193,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(DeleteServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(ConfigDirectory.getServiceDirectory(specification.name()));
         try {
             desc.createProcess(inputs).call();
         } catch (ProcessException ex) {
@@ -220,7 +216,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
         inputs.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(configuration);
-        inputs.parameter(SetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(ConfigDirectory.getInstanceDirectory(specification.name(), identifier));
         inputs.parameter(SetConfigServiceDescriptor.SERVICE_METADATA_NAME).setValue(metadata);
         inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
         inputs.parameter(SetConfigServiceDescriptor.FILENAME_NAME).setValue(configFileName);
@@ -248,7 +243,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(GetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(GetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(GetConfigServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(ConfigDirectory.getInstanceDirectory(specification.name(), identifier));
         inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
         inputs.parameter(GetConfigServiceDescriptor.FILENAME_NAME).setValue(configFileName);
         try {

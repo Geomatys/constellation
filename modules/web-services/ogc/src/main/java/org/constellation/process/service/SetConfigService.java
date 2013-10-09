@@ -16,11 +16,9 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.Service;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -54,7 +52,6 @@ public class SetConfigService extends AbstractProcess {
         String serviceType             = value(SERVICE_TYPE, inputParameters);
         final String identifier        = value(IDENTIFIER, inputParameters);
         Object configuration           = value(CONFIGURATION, inputParameters);
-        File instanceDirectory         = value(INSTANCE_DIRECTORY, inputParameters);
         final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
         final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
         final String configFileName    = value(FILENAME, inputParameters);
@@ -77,49 +74,22 @@ public class SetConfigService extends AbstractProcess {
             configuration = ReflectionUtilities.newInstance(configurationClass);
         }
 
-        //get config directory .constellation if null
-        if (instanceDirectory == null) {
-            final File configDirectory = ConfigDirectory.getConfigDirectory();
-
-
-            if (configDirectory != null && configDirectory.isDirectory()) {
-
-                //get service directory ("WMS", "WMTS", "WFS", "WCS", "WPS", "CSW", "SOS")
-                final File serviceDir = new File(configDirectory, serviceType);
-                if (serviceDir.exists() && serviceDir.isDirectory()) {
-
-                    //get service instance directory
-                    instanceDirectory = new File(serviceDir, identifier);
-
-                } else {
-                    throw new ProcessException("Service directory can't be found for service name : " + serviceType, this, null);
-                }
-
-            } else {
-                throw new ProcessException("Configuration directory can't be found.", this, null);
-            }
+        //write configuration file.
+        try {
+            ConfigurationEngine.storeConfiguration(serviceType, identifier, configFileName, configuration);
+        } catch (JAXBException ex) {
+            throw new ProcessException(ex.getMessage(), this, ex);
         }
 
-        if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
-
-            //write configuration file.
+        // Override the service metadata.
+        if (serviceMetadata != null) {
             try {
-                ConfigurationEngine.storeConfiguration(instanceDirectory, configFileName, configuration);
-            } catch (JAXBException ex) {
-                throw new ProcessException(ex.getMessage(), this, ex);
+                ConfigurationEngine.writeMetadata(identifier, serviceType, serviceMetadata, null);
+            } catch (IOException ex) {
+                throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
             }
-
-            // Override the service metadata.
-            if (serviceMetadata != null) {
-                try {
-                    ConfigurationEngine.writeMetadata(identifier, serviceType, serviceMetadata, null);
-                } catch (IOException ex) {
-                    throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
-                }
-            }
-
-        } else {
-            throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);
         }
+
+        //throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);
     }
 }

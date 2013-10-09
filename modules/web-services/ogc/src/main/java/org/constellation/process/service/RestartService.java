@@ -16,10 +16,9 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -34,7 +33,7 @@ import org.geotoolkit.process.ProcessFinder;
 import org.opengis.util.NoSuchIdentifierException;
 
 /**
- * Restart an instance for the specified WMS identifier. Or all WMS instances if identifier is not specified.
+ * Restart an instance for the specified WMS identifier. Or all instances if identifier is not specified.
  *
  * @author Quentin Boileau (Geomatys).
  */
@@ -49,46 +48,26 @@ public final class RestartService extends AbstractCstlProcess {
         final String serviceName = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         final Boolean closeFirst = value(CLOSE, inputParameters);
-        File serviceDir = value(SERVICE_DIRECTORY, inputParameters);
         final Class workerClass = WSEngine.getServiceWorkerClass(serviceName);
 
-        //get config directory .constellation if null
-        if (serviceDir == null) {
-            final File configDirectory = ConfigDirectory.getConfigDirectory();
-
-            if (configDirectory != null && configDirectory.isDirectory()) {
-
-                serviceDir = new File(configDirectory, serviceName);
-
+        if (identifier == null || "".equals(identifier)) {
+            buildWorkers(serviceName, null, closeFirst, workerClass);
+        } else {
+            if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
+                buildWorkers(serviceName, identifier, closeFirst, workerClass);
             } else {
-                throw new ProcessException("Configuration directory can' be found.", this, null);
-            }
-        }
+                //try to start service
+                try {
+                    final ProcessDescriptor startDesc = ProcessFinder.getProcessDescriptor("constellation", StartServiceDescriptor.NAME);
+                    final ParameterValueGroup input = StartServiceDescriptor.INPUT_DESC.createValue();
+                    input.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+                    input.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
 
-        if (serviceDir.isDirectory()) {
-
-            if (identifier == null || "".equals(identifier)) {
-                buildWorkers(serviceDir, serviceName, null, closeFirst, workerClass);
-            } else {
-                if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
-                    buildWorkers(serviceDir, serviceName, identifier, closeFirst, workerClass);
-                } else {
-                    //try to start service
-                    try {
-                        final ProcessDescriptor startDesc = ProcessFinder.getProcessDescriptor("constellation", StartServiceDescriptor.NAME);
-                        final ParameterValueGroup input = StartServiceDescriptor.INPUT_DESC.createValue();
-                        input.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                        input.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-
-                        startDesc.createProcess(input).call(); // try to start
-                    } catch (NoSuchIdentifierException | ProcessException ex) {
-                        throw new ProcessException("There is no instance of " + identifier, this, null);
-                    }
+                    startDesc.createProcess(input).call(); // try to start
+                } catch (NoSuchIdentifierException | ProcessException ex) {
+                    throw new ProcessException("There is no instance of " + identifier, this, null);
                 }
             }
-
-        } else {
-            throw new ProcessException("Service directory can' be found for service name : " + serviceName, this, null);
         }
     }
 
@@ -99,38 +78,29 @@ public final class RestartService extends AbstractCstlProcess {
      * @param identifier
      * @throws ProcessException
      */
-    private void buildWorkers(final File serviceDir, final String serviceName, final String identifier, final boolean closeInstance, final Class workerClass) throws ProcessException {
+    private void buildWorkers(final String serviceType, final String identifier, final boolean closeInstance, final Class workerClass) throws ProcessException {
 
         /*
          * Single refresh
          */
         if (identifier != null) {
             if (closeInstance) {
-                WSEngine.shutdownInstance(serviceName, identifier);
+                WSEngine.shutdownInstance(serviceType, identifier);
             }
-
-            final File instanceDirectory = new File(serviceDir, identifier);
-
-            if (instanceDirectory.isDirectory()) {
-                if (!instanceDirectory.getName().startsWith(".")) {
-                    try {
-                        final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
-
-                        if (worker != null) {
-                            WSEngine.addServiceInstance(serviceName, identifier, worker);
-                            if (!worker.isStarted()) {
-                                throw new ProcessException("Unable to start the instance " + identifier + ".", this, null);
-                            }
-                        } else {
-                            throw new ProcessException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", this, null);
-                        }
-                    } catch (IllegalArgumentException ex) {
-                        throw new ProcessException(ex.getMessage(), this, ex);
+            try {
+                final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
+                if (worker != null) {
+                    WSEngine.addServiceInstance(serviceType, identifier, worker);
+                    if (!worker.isStarted()) {
+                        throw new ProcessException("Unable to start the instance " + identifier + ".", this, null);
                     }
+                } else {
+                    throw new ProcessException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", this, null);
                 }
-            } else {
-                throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
+            } catch (IllegalArgumentException ex) {
+                throw new ProcessException(ex.getMessage(), this, ex);
             }
+            
         /*
          * Multiple refresh
          */
@@ -138,30 +108,23 @@ public final class RestartService extends AbstractCstlProcess {
 
             final Map<String, Worker> workersMap = new HashMap<>();
             if (closeInstance) {
-                WSEngine.destroyInstances(serviceName);
+                WSEngine.destroyInstances(serviceType);
             }
 
-            for (File instanceDir : serviceDir.listFiles()) {
-                if (instanceDir.isDirectory()) {
-                    final String instanceID = instanceDir.getName();
-                    if (!instanceID.startsWith(".")) {
-                        try {
-                            final Worker worker = (Worker)  ReflectionUtilities.newInstance(workerClass, instanceID);
+            for (String instanceID : ConfigurationEngine.getServiceConfigurationIds(serviceType)) {
+                try {
+                    final Worker worker = (Worker)  ReflectionUtilities.newInstance(workerClass, instanceID);
 
-                            if (worker != null) {
-                                workersMap.put(instanceID, worker);
-                            } else {
-                                throw new ProcessException("The instance " + instanceID + " can be started, maybe there is no configuration directory with this name.", this, null);
-                            }
-                        } catch (IllegalArgumentException ex) {
-                            throw new ProcessException(ex.getMessage(), this, ex);
-                        }
+                    if (worker != null) {
+                        workersMap.put(instanceID, worker);
+                    } else {
+                        throw new ProcessException("The instance " + instanceID + " can be started, maybe there is no configuration directory with this name.", this, null);
                     }
-                } else {
-                    throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
+                } catch (IllegalArgumentException ex) {
+                    throw new ProcessException(ex.getMessage(), this, ex);
                 }
             }
-            WSEngine.setServiceInstances(serviceName, workersMap);
+            WSEngine.setServiceInstances(serviceType, workersMap);
         }
     }
 }

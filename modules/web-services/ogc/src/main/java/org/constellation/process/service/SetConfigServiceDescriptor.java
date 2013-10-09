@@ -16,8 +16,6 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
-import org.constellation.configuration.LayerContext;
 import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
@@ -47,7 +45,7 @@ public class SetConfigServiceDescriptor extends AbstractProcessDescriptor {
     private static final String SERVICE_TYPE_REMARKS = "The type of the service WMS, WFS, WMTS, WCS.";
     private static final String[] SERVICE_TYPE_VALID_VALUES = SUPPORTED_SERVICE_TYPE.toArray(new String[SUPPORTED_SERVICE_TYPE.size()]);
     public static final ParameterDescriptor<String> SERVICE_TYPE = 
-            new ExtendedParameterDescriptor<String>(SERVICE_TYPE_NAME, SERVICE_TYPE_REMARKS, String.class, SERVICE_TYPE_VALID_VALUES, null, null, null, null, true, null);
+            new ExtendedParameterDescriptor<>(SERVICE_TYPE_NAME, SERVICE_TYPE_REMARKS, String.class, SERVICE_TYPE_VALID_VALUES, null, null, null, null, true, null);
 
 
     public static final String IDENTIFIER_NAME = "identifier";
@@ -60,11 +58,6 @@ public class SetConfigServiceDescriptor extends AbstractProcessDescriptor {
     private static final String CONFIG_REMARKS = "LayerContext object use to update instance configuration. If not specified the instance will be configured from default LayerContext.";
     public static final ParameterDescriptor<Object> CONFIGURATION =
             new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, Object.class, null, false);
-
-    public static final String INSTANCE_DIRECTORY_NAME = "instanceDirectory";
-    private static final String INSTANCE_DIRECTORY_REMARKS = "Configuration directory. Use default constellation config directory if not set.";
-    public static final ParameterDescriptor<File> INSTANCE_DIRECTORY =
-            new DefaultParameterDescriptor(INSTANCE_DIRECTORY_NAME, INSTANCE_DIRECTORY_REMARKS, File.class, null, false);
 
     public static final String SERVICE_METADATA_NAME = "serviceMetadata";
     private static final String SERVICE_METADATA_REMARKS = "The service metadata to apply.";
@@ -85,7 +78,7 @@ public class SetConfigServiceDescriptor extends AbstractProcessDescriptor {
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY, SERVICE_METADATA, CONFIGURATION_CLASS, FILENAME});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, SERVICE_METADATA, CONFIGURATION_CLASS, FILENAME});
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");

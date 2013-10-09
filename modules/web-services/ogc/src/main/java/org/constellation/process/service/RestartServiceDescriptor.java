@@ -16,11 +16,9 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -48,7 +46,7 @@ public class RestartServiceDescriptor  extends AbstractProcessDescriptor {
     private static final Map<String, Object> SERVICE_TYPE_PROPERTIES;
     private static final String[] SERVICE_TYPE_VALID_VALUES = ServiceProcessCommon.servicesAvaible();
     static {
-        SERVICE_TYPE_PROPERTIES = new HashMap<String, Object>();
+        SERVICE_TYPE_PROPERTIES = new HashMap<>();
         SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.NAME_KEY, SERVICE_TYPE_NAME);
         SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.REMARKS_KEY, SERVICE_TYPE_REMARKS);
     }
@@ -65,15 +63,10 @@ public class RestartServiceDescriptor  extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<Boolean> CLOSE =
             new DefaultParameterDescriptor(CLOSE_NAME, CLOSE_REMARKS, Boolean.class, true, true);
 
-    public static final String SERVICE_DIRECTORY_NAME = "serviceDirectory";
-    private static final String SERVICE_DIRECTORY_REMARKS = "Service directory. Use default constellation config directory if not set.";
-    public static final ParameterDescriptor<File> SERVICE_DIRECTORY =
-            new DefaultParameterDescriptor(SERVICE_DIRECTORY_NAME, SERVICE_DIRECTORY_REMARKS, File.class, null, false);
-
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CLOSE, SERVICE_DIRECTORY});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CLOSE});
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");

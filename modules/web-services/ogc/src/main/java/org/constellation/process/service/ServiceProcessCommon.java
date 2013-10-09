@@ -31,7 +31,7 @@ public final class ServiceProcessCommon {
 
     public static String[] servicesAvaible() {
 
-        final List<String> validValues = new ArrayList <String>();
+        final List<String> validValues = new ArrayList<>();
 
         final ServiceDef.Specification[] spec = ServiceDef.Specification.values();
          for (ServiceDef.Specification specification : spec) {

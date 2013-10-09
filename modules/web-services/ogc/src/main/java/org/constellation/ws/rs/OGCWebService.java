@@ -26,14 +26,8 @@ import java.util.logging.Level;
 
 import net.iharder.Base64;
 
-
-
-
-
-
 // Jersey dependencies
 import javax.annotation.PreDestroy;
-import javax.imageio.spi.ServiceRegistry;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
 
@@ -82,6 +76,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // Apache SIS dependencies
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.util.iso.Types;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 
 // GeoAPI dependencies
@@ -151,35 +146,23 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     }
 
     private void startAllInstance() {
-        final File serviceDirectory = ConfigDirectory.getServiceDirectory(serviceName);
-        if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-            for (File instanceDirectory : serviceDirectory.listFiles()) {
-                if (instanceDirectory.isDirectory()) {
-                    final String instance = instanceDirectory.getName();
-                    try {
-                        ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
-                        ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                        inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(instance);
-                        inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(serviceDirectory);
+        final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(serviceName);
+        for (String serviceID : serviceIDs) {
+            try {
+                ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
+                ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+                inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(serviceID);
 
-                        org.geotoolkit.process.Process proc = desc.createProcess(inputs);
-                        proc.call();
-                    } catch (NoSuchIdentifierException ex) {
-                        LOGGER.log(Level.WARNING, "StartService process is unreachable.");
-                    } catch (ProcessException ex) {
-                        LOGGER.log(Level.WARNING, "Error while starting all instances", ex);
-                    }
-                }
+                org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+                proc.call();
+            } catch (NoSuchIdentifierException ex) {
+                LOGGER.log(Level.WARNING, "StartService process is unreachable.");
+            } catch (ProcessException ex) {
+                LOGGER.log(Level.WARNING, "Error while starting all instances", ex);
             }
-        } else {
-            LOGGER.log(Level.WARNING, "no service directory for :{0}", serviceName);
         }
     }
-
-
-
-
 
     /**
      * @return the worker class of the service.

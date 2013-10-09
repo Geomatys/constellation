@@ -44,7 +44,7 @@ public class StopServiceDescriptor extends AbstractProcessDescriptor {
     private static final Map<String, Object> SERVICE_TYPE_PROPERTIES;
     private static final String[] SERVICE_TYPE_VALID_VALUES = ServiceProcessCommon.servicesAvaible();
     static {
-        SERVICE_TYPE_PROPERTIES = new HashMap<String, Object>();
+        SERVICE_TYPE_PROPERTIES = new HashMap<>();
         SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.NAME_KEY, SERVICE_TYPE_NAME);
         SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.REMARKS_KEY, SERVICE_TYPE_REMARKS);
     }
