@@ -29,9 +29,14 @@
             <artifactId>cstl-xml-configuration</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!--         <dependency> -->
-<!--             <groupId>org.apache.shiro</groupId> -->
-<!--             <artifactId>shiro-core</artifactId> -->
-<!--         </dependency> -->
+        <!-- for provider config -->
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-jaxp-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.stax-utils</groupId>
+            <artifactId>stax-utils</artifactId>
+        </dependency>
     </dependencies>
 </project>

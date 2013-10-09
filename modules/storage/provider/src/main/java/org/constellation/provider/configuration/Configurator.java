@@ -17,14 +17,7 @@
 
 package org.constellation.provider.configuration;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.stream.XMLStreamException;
-
-import org.constellation.configuration.ConfigDirectory;
-import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.ConfigurationEngine;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -42,54 +35,17 @@ public interface Configurator {
 
     static final class DefaultConfigurator implements Configurator{
 
-        private static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
-
         private DefaultConfigurator(){}
 
         @Override
         public ParameterValueGroup getConfiguration(final String serviceName, final ParameterDescriptorGroup desc) {
 
-            final String fileName = serviceName + ".xml";
-            final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
-
-            if(configFile == null || !configFile.exists()){
-                //return an empty configuration
-                return desc.createValue();
-            }
-
-            //parse the configuration
-            ParameterValueGroup config = null;
-            try {
-                config = ProviderParameters.read(configFile, desc);
-            } catch (XMLStreamException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            }
-
-            return config;
+            return ConfigurationEngine.getProviderConfiguration(serviceName, desc);
         }
 
         @Override
         public void saveConfiguration(final String serviceName, final ParameterValueGroup params) {
-            final String fileName = serviceName + ".xml";
-            final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
-
-            if(configFile.exists()){
-                //make a backup
-                configFile.delete();
-            }
-
-            //write the configuration
-            try {
-                ProviderParameters.write(configFile, params);
-            } catch (XMLStreamException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            }
+            ConfigurationEngine.storePoviderConfiguration(serviceName, params);
         }
-
     }
-
 }

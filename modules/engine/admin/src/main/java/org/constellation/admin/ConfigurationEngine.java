@@ -19,26 +19,89 @@ package org.constellation.admin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.apache.sis.xml.MarshallerPool;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Result;
+import javanet.staxutils.IndentingXMLStreamWriter;
+
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
+
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.geotoolkit.xml.parameter.ParameterValueWriter;
+
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 public class ConfigurationEngine {
+
+    private static final Logger LOGGER = Logging.getLogger(ConfigurationEngine.class);
+    
+    
+    public static ParameterValueGroup getProviderConfiguration(final String serviceName, final ParameterDescriptorGroup desc) {
+
+        final String fileName = serviceName + ".xml";
+        final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
+
+        if (configFile == null || !configFile.exists()) {
+            //return an empty configuration
+            return desc.createValue();
+        }
+
+        //parse the configuration
+        ParameterValueGroup config = null;
+        try {
+            final ParameterValueReader reader = new ParameterValueReader(desc);
+            reader.setInput(configFile);
+            config = (ParameterValueGroup) reader.read();
+        } catch (XMLStreamException | IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+        return config;
+    }
+
+    public static void storePoviderConfiguration(final String serviceName, final ParameterValueGroup params) {
+        final String fileName = serviceName + ".xml";
+        final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
+
+        if (configFile.exists()) {
+            //make a backup
+            configFile.delete();
+        }
+
+        //write the configuration
+        try {
+            final ParameterValueWriter writer = new ParameterValueWriter();
+            writer.setOutput(toWriter(configFile));
+            writer.write(params);
+        } catch (XMLStreamException | IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+    }
 
     public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName) throws JAXBException, FileNotFoundException {
         return getConfiguration(serviceType, serviceID, fileName, GenericDatabaseMarshallerPool.getInstance());
@@ -169,5 +232,33 @@ public class ConfigurationEngine {
         final File instanceDirectory = new File(directory, identifier);
         final File newDirectory      = new File(directory, newID);
         return instanceDirectory.renameTo(newDirectory);
+    }
+
+    /**
+     * Create writer with indentation.
+     */
+    private static XMLStreamWriter toWriter(final Object output)
+            throws XMLStreamException{
+        final XMLOutputFactory XMLfactory = XMLOutputFactory.newInstance();
+        XMLfactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+
+        XMLStreamWriter writer;
+        if(output instanceof File){
+            try {
+                writer = XMLfactory.createXMLStreamWriter(new FileOutputStream((File) output));
+            } catch (FileNotFoundException ex) {
+                throw new XMLStreamException(ex.getLocalizedMessage(), ex);
+            }
+        }else if(output instanceof OutputStream){
+            writer = XMLfactory.createXMLStreamWriter((OutputStream)output);
+        }else if(output instanceof Result){
+            writer = XMLfactory.createXMLStreamWriter((Result)output);
+        }else if(output instanceof Writer){
+            writer = XMLfactory.createXMLStreamWriter((Writer)output);
+        }else{
+            throw new XMLStreamException("Output type is not supported : "+ output);
+        }
+
+        return new IndentingXMLStreamWriter(writer);
     }
 }
