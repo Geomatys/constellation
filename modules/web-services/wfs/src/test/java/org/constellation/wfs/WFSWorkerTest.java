@@ -32,10 +32,6 @@ import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
@@ -88,7 +84,6 @@ import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.ValueType;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
@@ -122,34 +117,7 @@ public class WFSWorkerTest {
     public static void setUpClass() throws Exception {
         EPSG_VERSION = CRS.getVersion("EPSG").toString();
         initFeatureSource();
-        File configDir = new File("WFSWorkerTest");
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
-        configDir.mkdir();
-        ConfigDirectory.setConfigDirectory(configDir);
-
-        final File WFSDir = new File(configDir, "WFS");
-        WFSDir.mkdir();
-        final File instDir = new File(WFSDir, "test1");
-        instDir.mkdir();
-
-
         pool = WFSMarshallerPool.getInstance();
-       
-        Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
-        Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
-        Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
-        LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
-        lc.getCustomParameters().put("transactionSecurized", "false");
-
-        //we write the configuration file
-        File configFile = new File(instDir, "layerContext.xml");
-        final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-        marshaller.marshal(lc, configFile);
-        GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-       
-
         worker = new DefaultWFSWorker("test1");
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
@@ -168,7 +136,6 @@ public class WFSWorkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        FileUtilities.deleteDirectory(new File("WFSWorkerTest"));
 
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {

@@ -17,9 +17,6 @@
 
 package org.constellation.wfs;
 
-import org.constellation.configuration.Layers;
-import java.util.Arrays;
-import org.constellation.configuration.Source;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import java.io.IOException;
@@ -32,14 +29,11 @@ import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.io.InputStream;
 import java.net.URL;
-import javax.xml.bind.Marshaller;
 
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.constellation.ws.rs.WebService;
-import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.wfs.ws.rs.WFSService;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
@@ -68,7 +62,6 @@ public class WFSServiceTest {
 
     private static WFSService service;
 
-    private static File configDirectory;
 
     private static DefaultDataSource ds = null;
 
@@ -76,36 +69,12 @@ public class WFSServiceTest {
 
     private static final BasicUriInfo info = new BasicUriInfo(null, null);
 
-    private static final MultivaluedMap<String,String> queryParameters = new BasicMultiValueMap<String, String>();
-    private static final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<String, String>();
+    private static final MultivaluedMap<String,String> queryParameters = new BasicMultiValueMap<>();
+    private static final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<>();
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         initFeatureSource();
-        configDirectory = new File("WFSServiceTest");
-
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-
-        configDirectory.mkdir();
-        File serviceDirectory = new File(configDirectory, "WFS");
-        serviceDirectory.mkdir();
-        File intanceDirectory = new File(serviceDirectory, "default");
-        intanceDirectory.mkdir();
-        File LayerContext = new File(intanceDirectory, "layerContext.xml");
-        Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
-        Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
-        Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
-        LayerContext context = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
-        context.getCustomParameters().put("transactionSecurized", "false");
-        context.getCustomParameters().put("shiroAccessible", "false");
-
-        Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-        m.marshal(context, LayerContext);
-        GenericDatabaseMarshallerPool.getInstance().recycle(m);
-
-        ConfigDirectory.setConfigDirectory(configDirectory);
         service = new WFSService();
 
         Field privateStringField = WebService.class.getDeclaredField("uriContext");
@@ -136,7 +105,6 @@ public class WFSServiceTest {
         if (derbyLog.exists()) {
             derbyLog.delete();
         }
-        FileUtilities.deleteDirectory(configDirectory);
         ConfigDirectory.setConfigDirectory(null);
     }
 
@@ -369,7 +337,7 @@ public class WFSServiceTest {
         }
 
         File styleJar = new File(styleResource);
-        if (styleJar == null || !styleJar.exists()) {
+        if (!styleJar.exists()) {
             throw new IOException("Unable to find the style folder: "+ styleJar);
         }
         if (styleJar.isDirectory()) {

@@ -33,10 +33,6 @@ import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
@@ -84,8 +80,6 @@ import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
 import org.geotoolkit.wfs.xml.DropStoredQueryResponse;
 import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
 import org.geotoolkit.wfs.xml.ResultTypeType;
-import org.geotoolkit.wfs.xml.StoredQueries;
-import org.geotoolkit.wfs.xml.StoredQueryDescription;
 import org.geotoolkit.wfs.xml.TransactionResponse;
 import org.geotoolkit.wfs.xml.ValueCollection;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
@@ -93,7 +87,6 @@ import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v200.*;
 import org.geotoolkit.wfs.xml.v200.Title;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
@@ -130,8 +123,6 @@ public class WFS2WorkerTest {
 
     private static String EPSG_VERSION;
 
-    private static File configDir;
-
     private static final ObjectFactory wfsFactory = new ObjectFactory();
     private static final org.geotoolkit.ogc.xml.v200.ObjectFactory ogcFactory = new org.geotoolkit.ogc.xml.v200.ObjectFactory();
 
@@ -162,52 +153,7 @@ public class WFS2WorkerTest {
     public static void setUpClass() throws Exception {
         EPSG_VERSION = CRS.getVersion("EPSG").toString();
         initFeatureSource();
-        configDir = new File("WFSWorker2Test");
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
-        configDir.mkdir();
-
-        ConfigDirectory.setConfigDirectory(configDir);
-        
-        final File WFSDir = new File(configDir, "WFS");
-        WFSDir.mkdir();
-        final File instDir = new File(WFSDir, "test1");
-        instDir.mkdir();
-
-
         pool = WFSMarshallerPool.getInstance();
-
-        Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
-        Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
-        Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
-        LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
-        lc.getCustomParameters().put("transactionSecurized", "false");
-
-        //we write the configuration file
-        Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-        File configFile = new File(instDir, "layerContext.xml");
-        marshaller.marshal(lc, configFile);
-
-        GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-
-        final List<StoredQueryDescription> descriptions = new ArrayList<>();
-        final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
-        final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
-        final FilterType filter = new FilterType(pis);
-        final QueryType query = new QueryType(filter, types, "2.0.0");
-        final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", query, types);
-        final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
-        descriptions.add(des1);
-        final StoredQueries storesQueries = new StoredQueries(descriptions);
-
-        //we write the configuration file
-        marshaller = WFSMarshallerPool.getInstance().acquireMarshaller();
-        configFile = new File(instDir, "StoredQueries.xml");
-        marshaller.marshal(storesQueries, configFile);
-        WFSMarshallerPool.getInstance().recycle(marshaller);
-
         worker = new DefaultWFSWorker("test1");
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
@@ -226,7 +172,6 @@ public class WFS2WorkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        FileUtilities.deleteDirectory(new File("WFSWorker2Test"));
 
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {

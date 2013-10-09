@@ -16,8 +16,6 @@
  */
 package org.constellation.cite;
 
-import javax.xml.bind.Marshaller;
-import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,21 +23,15 @@ import java.util.List;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
-import org.constellation.configuration.Source;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.LayerContext;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.DefaultWFSWorker;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.apache.sis.geometry.GeneralDirectPosition;
-import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
@@ -74,42 +66,13 @@ public class WFSCIteWorkerTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         initFeatureSource();
-        File configDir = new File("WFSCiteWorkerTest");
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
-        configDir.mkdir();
-        ConfigDirectory.setConfigDirectory(configDir);
-        try {
-
-            final File WFSDir = new File(configDir, "WFS");
-            WFSDir.mkdir();
-            final File instDir = new File(WFSDir, "default");
-            instDir.mkdir();
-
-            Source s1 = new Source("postgisSrc", Boolean.TRUE, null, null);
-            LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
-            lc.getCustomParameters().put("shiroAccessible", "false");
-
-            //we write the configuration file
-            File configFile = new File(instDir, "layerContext.xml");
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(lc, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
         worker = new DefaultWFSWorker("default");
         worker.setLogLevel(Level.FINER);
     }
 
-
-
     @AfterClass
     public static void tearDownClass() throws Exception {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
-        FileUtilities.deleteDirectory(new File("WFSCiteWorkerTest"));
     }
 
     @Before
