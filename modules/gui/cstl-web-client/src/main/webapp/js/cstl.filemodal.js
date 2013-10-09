@@ -161,8 +161,25 @@ function updateChild(event){
         }
     }else{
         $domParent.children(":nth-child("+nextLevel+")").hide();
-        //Update file path to know file to load
-        $("#filePath").val($(this).data("path"));
+        //test file extension
+        var path = $(this).data("path");
+        var length = path.length;
+        var lastPointIndex = path.lastIndexOf(".");
+        var extension = path.substring(lastPointIndex+1, length);
+        $.post(appURL+"/ajax/testExtension/", {"extension": extension}, function(data){
+            if(data.dataType!=""){
+                $("#typePart [value="+data.dataType+"]").prop("checked", true);
+                $("#nextbutton").hide();
+                $("#submitbutton").show();
+            } else {
+                $("#submitbutton").hide();
+                $("#nextbutton").show();
+            }
+
+            //Update file path to know file to load
+            $("#filePath").val($(this).data("path"));
+        });
+
     }
 }
 

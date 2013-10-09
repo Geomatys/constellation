@@ -27,7 +27,8 @@ public class MetadataMapBuilder {
     /**
      * {@link org.constellation.util.SimplyMetadataTreeNode} {@link ArrayList} generator with a {@link TreeTable.Node}.
      *
-     * @param rootNode           {@link TreeTable.Node} metadata tree root
+     *
+     * @param rootNode           {@link org.apache.sis.util.collection.TreeTable.Node} metadata tree root
      * @param parentTreeNodeName parent div id name
      * @param parentDepth        parent div depth
      * @return a {@link org.constellation.util.SimplyMetadataTreeNode} {@link ArrayList}
@@ -76,17 +77,19 @@ public class MetadataMapBuilder {
     /**
      * {@link org.constellation.util.SimplyMetadataTreeNode} {@link List} generator with a {@link Node}.
      *
-     * @param rootNode           {@link Node} metadata tree root
+     *
+     * @param rootNode           {@link org.w3c.dom.Node} metadata tree root
      * @param parentTreeNodeName parent div id name
      * @param parentDepth        parent div depth
+     * @param listCounter
      * @return a {@link org.constellation.util.SimplyMetadataTreeNode} {@link List}
      */
-    public static List<SimplyMetadataTreeNode> createSpatialMetadataList(final Node rootNode, final String parentTreeNodeName, final int parentDepth) {
+    public static List<SimplyMetadataTreeNode> createSpatialMetadataList(final Node rootNode, final String parentTreeNodeName, final int parentDepth, final int listCounter) {
         List<SimplyMetadataTreeNode> metadataList = new ArrayList<>(0);
         SimplyMetadataTreeNode smtn = new SimplyMetadataTreeNode();
 
         //remove all non alphanumeric character from real name for html generation
-        String nameAlphaNumeric = rootNode.getNodeName().replaceAll("[^A-Za-z0-9]", "") + counter;
+        String nameAlphaNumeric = rootNode.getNodeName().replaceAll("[^A-Za-z0-9]", "") + listCounter + MetadataMapBuilder.counter;
 
         //set main attributs
         smtn.setName(rootNode.getNodeName());
@@ -117,16 +120,16 @@ public class MetadataMapBuilder {
         NamedNodeMap attrMap = rootNode.getAttributes();
         for (int i = 0; i < attrMap.getLength(); i++) {
             Node node = attrMap.item(i);
-            counter++;
-            metadataList.addAll(createSpatialMetadataList(node, nameAlphaNumeric, depthSpan));
+            MetadataMapBuilder.counter++;
+            metadataList.addAll(createSpatialMetadataList(node, nameAlphaNumeric, depthSpan, listCounter));
         }
 
         //recursive loop on children
         NodeList nodeList = rootNode.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
-            counter++;
-            metadataList.addAll(createSpatialMetadataList(node, nameAlphaNumeric, depthSpan));
+            MetadataMapBuilder.counter++;
+            metadataList.addAll(createSpatialMetadataList(node, nameAlphaNumeric, depthSpan, listCounter));
         }
         return metadataList;
     }

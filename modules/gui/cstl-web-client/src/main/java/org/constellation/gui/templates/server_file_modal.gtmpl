@@ -6,10 +6,6 @@
         </div>
         <div class="modal-body">
             <div id="typePart">
-                <div class="span2">
-                    <label>&{layer.listing.data.upload.name.label}</label>
-                    <input type="text" name="name" class="span2"/>
-                </div>
                 <div class="span5">
                     <div class="span2">
                         <label class="radio">
@@ -51,12 +47,13 @@
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>
             <button class="btn btn-info" type="button" onclick="gotoNext();" id="nextbutton">next</button>
-            <button class="btn btn-info" type="submit" id="endbutton">create</button>
+            <button class="btn btn-info" type="submit" id="submitbutton">create</button>
         </div>
     </div>
 </form>
 <script type="text/javascript">
     $("#endbutton").hide();
+    $("#submitbutton").hide();
     $("#typePart").hide();
     updateBreadcrumb("");
 </script>

@@ -6,7 +6,9 @@
     if(screenName.size()>18){
         int extensionBegin = screenName.lastIndexOf(".");
         screenName = screenName.substring(0,11)+"...";
-        screenName = screenName + folder.name.substring(extensionBegin);
+        if(extensionBegin>0){
+            screenName = screenName + folder.name.substring(extensionBegin);
+        }
     }
     if(folder.folder){%>
         <li><i class="icon-folder-close-alt" style="color: #5bc0de; font-size: larger;"></i>
