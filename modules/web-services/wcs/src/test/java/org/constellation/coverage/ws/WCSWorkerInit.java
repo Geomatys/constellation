@@ -16,20 +16,10 @@
  */
 package org.constellation.coverage.ws;
 
-import java.util.Arrays;
 import java.io.File;
-import javax.xml.bind.Marshaller;
-import org.constellation.configuration.ConfigDirectory;
-
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Source;
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-
-import org.geotoolkit.util.FileUtilities;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -97,34 +87,6 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
         LayerProviderProxy.getInstance().setConfigurator(config);
 
 
-        File configDir = new File("WCSWorkerTest");
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
-        configDir.mkdir();
-        ConfigDirectory.setConfigDirectory(configDir);
-        try {
-            
-            final File WCSDir = new File(configDir, "WCS");
-            WCSDir.mkdir();
-            final File instDir = new File(WCSDir, "default");
-            instDir.mkdir();
-
-            Source s1 = new Source("coverageTestSrc", Boolean.TRUE, null, null);
-
-            LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
-            lc.getCustomParameters().put("shiroAccessible", "false");
-
-            //we write the configuration file
-            File configFile = new File(instDir, "layerContext.xml");
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(lc, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-            
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
         WORKER = new DefaultWCSWorker("default");
         // Default instanciation of the worker' servlet context and uri context.
         WORKER.setServiceUrl("http://localhost:9090");
@@ -134,7 +96,6 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
     @AfterClass
     public static void tearDownClass() throws Exception {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
-        FileUtilities.deleteDirectory(new File("WCSWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();
