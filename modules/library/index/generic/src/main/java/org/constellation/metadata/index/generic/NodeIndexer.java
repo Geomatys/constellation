@@ -35,7 +35,6 @@ import org.apache.lucene.document.Field;
 // constellation dependencies
 import org.constellation.metadata.index.AbstractCSWIndexer;
 import org.constellation.metadata.index.XpathUtils;
-import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataType;
@@ -311,19 +310,23 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
                     pathID = fullPathID;
                 }
 
+                int ordinal = -1;
+                if (pathID.endsWith("]") && pathID.indexOf('[') != -1) {
+                    try {
+                        ordinal = Integer.parseInt(pathID.substring(pathID.lastIndexOf('[') + 1, pathID.length() - 1));
+                    } catch (NumberFormatException ex) {
+                        LOGGER.warning("Unable to parse last path ordinal");
+                    }
+                }
+                final List<Node> nodes;
                 if (conditionalPath == null) {
-                    List<Node> nodes = NodeUtilities.getNodeFromPath(metadata, pathID);
-                    
-                    final List<Object> value = getStringValue(nodes);
-                    if (!value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE))) {
-                        response.addAll(value);
-                    }
+                    nodes = NodeUtilities.getNodeFromPath(metadata, pathID);
                 } else {
-                    final List<Node> nodes  = NodeUtilities.getNodeFromConditionalPath(pathID, conditionalPath, conditionalValue, metadata);
-                    final List<Object> value = getStringValue(nodes);
-                    if (!value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE))) {
-                        response.addAll(value);
-                    }
+                    nodes  = NodeUtilities.getNodeFromConditionalPath(pathID, conditionalPath, conditionalValue, metadata);
+                }
+                final List<Object> value = getStringValue(nodes, ordinal);
+                if (!value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE))) {
+                    response.addAll(value);
                 }
             }
         }
@@ -341,7 +344,7 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
      * @param obj
      * @return
      */
-    private static List<Object> getStringValue(final List<Node> nodes) {
+    private static List<Object> getStringValue(final List<Node> nodes, final int ordinal) {
         final List<Object> result = new ArrayList<>();
         if (nodes != null && !nodes.isEmpty()) {
             for (Node n : nodes) {
@@ -371,6 +374,15 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
                         }
                     } catch (ParseException ex) {
                         LOGGER.log(Level.WARNING, "Unable to parse the date value:{0}", s);
+                    }
+                } else if (typeName.endsWith("Corner")) {
+                    if (ordinal != -1) {
+                        final String[] parts = s.split(" ");
+                        if (ordinal < parts.length) {
+                            result.add(parts[ordinal]);
+                        }
+                    } else {
+                        result.add(s);
                     }
                 } else if (s != null) {
                     result.add(s);

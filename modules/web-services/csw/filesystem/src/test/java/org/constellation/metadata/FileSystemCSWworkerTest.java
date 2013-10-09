@@ -170,6 +170,13 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
     @Test
     @Override
     @Order(order=5)
+    public void getRecordsSpatialTest() throws Exception {
+        super.getRecordsSpatialTest();
+    }
+
+    @Test
+    @Override
+    @Order(order=6)
     public void getRecords191152Test() throws Exception {
         super.getRecords191152Test();
     }
@@ -182,7 +189,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
-    @Order(order=6)
+    @Order(order=7)
     public void getRecordsErrorTest() throws Exception {
         super.getRecordsErrorTest();
     }
@@ -194,7 +201,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
-    @Order(order=7)
+    @Order(order=8)
     public void getDomainTest() throws Exception {
         super.getDomainTest();
     }
@@ -206,7 +213,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
-    @Order(order=8)
+    @Order(order=9)
     public void DescribeRecordTest() throws Exception {
         super.DescribeRecordTest();
     }
@@ -218,7 +225,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
-    @Order(order=9)
+    @Order(order=10)
     public void transactionDeleteInsertTest() throws Exception {
         super.transactionDeleteInsertTest();
     }

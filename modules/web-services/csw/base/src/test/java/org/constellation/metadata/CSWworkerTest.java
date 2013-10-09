@@ -1157,6 +1157,79 @@ public class CSWworkerTest {
         pool.recycle(unmarshaller);
     }
 
+     /**
+     * Tests the getRecords method
+     *
+     * @throws java.lang.Exception
+     */
+    public void getRecordsSpatialTest() throws Exception {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        /*
+         *  TEST 1 : getRecords with HITS - DC mode (FULL) - CQL text: BBOX
+         */
+
+        List<QName> typeNames             = Arrays.asList(RECORD_QNAME);
+        ElementSetNameType elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        SortByType sortBy                 = null;
+        QueryConstraintType constraint    = new QueryConstraintType("BBOX(ows:BoundingBox, 10,20,30,40)", "1.0.0");
+        QueryType query = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        GetRecordsResponseType result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertEquals(1, result.getSearchResults().getAny().size());
+        assertEquals(1, result.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(1, result.getSearchResults().getNumberOfRecordsReturned());
+        assertEquals(0, result.getSearchResults().getNextRecord());
+
+        Object obj = result.getSearchResults().getAny().get(0);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+
+        if (obj instanceof RecordType) {
+            RecordType recordResult = (RecordType) obj;
+            assertEquals(recordResult.getIdentifier().getContent().get(0), "42292_9s_19900610041000");
+        } else {
+            Node recordResult = (Node) obj;
+            assertEquals(NodeUtilities.getValuesFromPath(recordResult, "/csw:Record/dc:identifier").get(0), "42292_9s_19900610041000");
+        }
+
+        /*
+         *  TEST 1 : getRecords with HITS - DC mode (FULL) - CQL text: BBOX
+         */
+
+        constraint    = new QueryConstraintType("BBOX(ows:BoundingBox, 13, 60, 18,69)", "1.0.0");
+        query = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertEquals(1, result.getSearchResults().getAny().size());
+        assertEquals(1, result.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(1, result.getSearchResults().getNumberOfRecordsReturned());
+        assertEquals(0, result.getSearchResults().getNextRecord());
+
+        obj = result.getSearchResults().getAny().get(0);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+
+        if (obj instanceof RecordType) {
+            RecordType recordResult = (RecordType) obj;
+            assertEquals(recordResult.getIdentifier().getContent().get(0), "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
+        } else {
+            Node recordResult = (Node) obj;
+            assertEquals(NodeUtilities.getValuesFromPath(recordResult, "/csw:Record/dc:identifier").get(0), "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
+        }
+        
+        pool.recycle(unmarshaller);
+    }
+
     /**
      * Tests the getRecords on ISO 19115-2 method
      *

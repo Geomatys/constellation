@@ -984,11 +984,16 @@ public class GenericNodeindexTest {
 
     }
 
-   /* @Test
+   @Test
     @Order(order = 10)
     public void extractValuesTest2() throws Exception {
 
-        DefaultMetadata meta4 = new DefaultMetadata();
+        Node n = getOriginalMetadata("org/constellation/xml/metadata/meta8.xml");
+        List<Object> result = NodeIndexer.extractValues(n, CSWQueryable.DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"));
+        assertEquals(Arrays.asList("60.042"), result);
+
+
+       /* DefaultMetadata meta4 = new DefaultMetadata();
         DefaultDataIdentification ident4 = new DefaultDataIdentification();
 
         TimePeriodType tp1 = new TimePeriodType("id", "2008-11-01", "2008-12-01");
@@ -1002,8 +1007,8 @@ public class GenericNodeindexTest {
 
         meta4.setIdentificationInfo(Arrays.asList(ident4));
         List<Object> result = GenericIndexer.extractValues(meta4, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent#id=[0-9]+-all:beginPosition"));
-        assertEquals(Arrays.asList("20081101000000"), result);
-    }*/
+        assertEquals(Arrays.asList("20081101000000"), result);*/
+    }
 
     public static List<Node> fillTestData() throws Exception {
         List<Node> result = new ArrayList<>();
