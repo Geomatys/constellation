@@ -77,6 +77,8 @@
         @Asset(id = "colorpicker",      value = "js/bootstrap-colorpicker.js",  depends = "bootstrap",  location = AssetLocation.SERVER),
         @Asset(id = "slider",           value = "js/bootstrap-slider.js",       depends = "bootstrap",  location = AssetLocation.SERVER),
         @Asset(id = "upload",           value = "js/bootstrap-fileupload.js",   depends = "bootstrap",  location = AssetLocation.SERVER),
+        @Asset(id = "datepicker",       value = "js/bootstrap-datepicker.js",   depends = "bootstrap",  location = AssetLocation.SERVER),
+        @Asset(id = "validation",       value = "js/bootstrap-validation.js",   depends = "bootstrap",  location = AssetLocation.SERVER),
         @Asset(id = "openlayers",       value = "js/openlayers.js",             depends = "jquery",     location = AssetLocation.SERVER),
         @Asset(id = "openlayers-ext",   value = "js/openlayers-ext.js",         depends = "openlayers", location = AssetLocation.SERVER),
         @Asset(id = "pagination",       value = "js/pagination.js",             depends = "jquery",     location = AssetLocation.SERVER),

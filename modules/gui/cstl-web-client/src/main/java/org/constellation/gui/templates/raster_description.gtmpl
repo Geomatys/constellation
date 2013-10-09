@@ -2,6 +2,10 @@
 
 #{param name=datainformation/}
 #{param name=returnURL /}
+#{param name=locales /}
+#{param name=roles /}
+#{param name=dateTypes /}
+#{param name=topics /}
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
@@ -20,10 +24,14 @@
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <div class="span12">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#description" data-toggle="tab">&{data.information.tab.title}</a> </li>
+                <li class="active"><a href="#requiredISO19115" data-toggle="tab">Missing metadata</a></li>
+                <li><a href="#description" data-toggle="tab">&{data.information.tab.title}</a> </li>
                 <li><a href="#metadata" data-toggle="tab">&{metadata.information.tab.title}</a> </li>
             </ul>
             <div class="tab-content">
+                <div class="tab-pane" id="requiredISO19115">
+                    #{include path=required_iso19115.gtmpl/}
+                </div>
                 <div class="tab-pane" id="description">
                 </div>
                 <div class="tab-pane" id="metadata">

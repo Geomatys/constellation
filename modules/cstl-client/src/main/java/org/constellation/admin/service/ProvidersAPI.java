@@ -21,6 +21,7 @@ import org.constellation.configuration.StyleReport;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
+import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBean;
 
@@ -183,5 +184,9 @@ public final class ProvidersAPI {
 
 
         return client.post("data/load", MediaType.APPLICATION_XML_TYPE, pv).getEntity(DataInformation.class);
+    }
+
+    public MetadataLists getMetadataCodeLists(final String locale) throws IOException {
+        return client.get("data/metadataCodeLists/"+locale, MediaType.APPLICATION_XML_TYPE).getEntity(MetadataLists.class);
     }
 }

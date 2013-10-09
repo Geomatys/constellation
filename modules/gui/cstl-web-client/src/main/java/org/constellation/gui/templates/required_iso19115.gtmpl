@@ -1,0 +1,101 @@
+<form class="form-horizontal">
+    <div class="control-group">
+        <label class="control-label" for="metadataLocale">Locale metadata</label>
+        <div class="controls">
+            <select name="metadataLocale" id="metadataLocale" required>
+                <% for (def locale: locales.keySet()) {%>
+                    <option value="${locale}" />${locales.get(locale)}</option>
+                <%}%>
+            </select>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="individualName">User name</label>
+        <div class="controls">
+            <input type="text" name="individualName" id="individualName" required/>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="organisationName">Organisation name</label>
+        <div class="controls">
+            <input type="text" name="organisationName" id="organisationName required"/>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="roleCode">Role</label>
+        <div class="controls">
+            <select name="roleCode" id="roleCode" required>
+                <% for (def role: roles.keySet()) {%>
+                    <option value="${role}" />${roles.get(role)}</option>
+                <%}%>
+            </select>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="title">Title</label>
+        <div class="controls">
+            <input type="text" name="title" id="title" required/>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="date">Data date</label>
+        <div class="controls">
+            <input type="text" name="date" id="date" required/>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="dateType">Date type</label>
+        <div class="controls">
+            <select name="dateType" id="dateType" required>
+                <% for (def type: dateTypes.keySet()) {%>
+                    <option value="${type}" >${dateTypes.get(type)}</option>
+                <%}%>
+            </select>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="abstract">Abstract</label>
+        <div class="controls">
+            <textarea name="abstrat" id="abstract" required></textarea>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="dataLocale">Locale data</label>
+        <div class="controls">
+            <select name="dataLocale" id="dataLocale" required>
+                <% for (def locale: locales.keySet()) {%>
+                    <option value="${locale}" />${locales.get(locale)}</option>
+                <%}%>
+            </select>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="topicCategory">Locale metadata</label>
+        <div class="controls">
+            <select name="topicCategory" id="topicCategory" required>
+                <% for (def topic: topics.keySet()) {%>
+                    <option value="${topic}" />${topics.get(topic)}</option>
+                <%}%>
+            </select>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="keywords">keywords</label>
+        <div class="controls">
+            <input type="text" name="keywords" id="keywords" required/>
+        </div>
+    </div>
+</form>
+<script>
+    $("#date").datepicker({});
+</script>

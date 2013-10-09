@@ -26,6 +26,7 @@ import org.constellation.dto.AddLayer;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.Database;
 import org.constellation.dto.FileBean;
+import org.constellation.dto.MetadataLists;
 import org.constellation.gui.service.bean.LayerData;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -182,5 +183,14 @@ public class ProviderManager {
             LOGGER.log(Level.WARNING, "Error when try to found data on file", e);
         }
         return new DataInformation();
+    }
+
+    public MetadataLists getMetadataCodeLists(final String locale){
+        try {
+            return cstl.openClient().providers.getMetadataCodeLists(locale);
+        } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "MetadataCodeList service isn't accessible", e);
+        }
+        return null;
     }
 }
