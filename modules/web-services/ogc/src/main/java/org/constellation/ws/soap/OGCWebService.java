@@ -63,6 +63,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // Geotoolkit dependencies
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
 import org.opengis.util.CodeList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -170,18 +171,10 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
      * Scan the configuration directory to instantiate Web service workers.
      */
     private void buildWorkerMap() {
-        final Map<String, Worker> workersMap = new HashMap<String, Worker>();
-        final File serviceDirectory = getServiceDirectory();
-        if (serviceDirectory != null) {
-            for (File instanceDirectory : serviceDirectory.listFiles()) {
-                /*
-                 * For each sub-directory we build a new Worker.
-                 */
-                if (instanceDirectory.isDirectory() && !instanceDirectory.getName().startsWith(".")) {
-                    final W newWorker = createWorker(instanceDirectory);
-                    workersMap.put(instanceDirectory.getName(), newWorker);
-                }
-            }
+        final Map<String, Worker> workersMap = new HashMap<>();
+        for (String serviceID : ConfigurationEngine.getServiceConfigurationIds(specification.name())) {
+            final W newWorker = createWorker(serviceID);
+            workersMap.put(serviceID, newWorker);
         }
         WSEngine.setServiceInstances(specification.name(), workersMap);
     }
@@ -192,7 +185,7 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
      * @param instanceDirectory The configuration directory of the instance.
      * @return
      */
-    protected abstract W createWorker(final File instanceDirectory);
+    protected abstract W createWorker(final String identifier);
 
     /**
      * @return the worker binding class of the current service.
@@ -306,7 +299,7 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
 
     @Override
     public SOAPMessage invoke(final SOAPMessage requestMsg) {
-        final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
+        final Map<String, String> prefixMapping = new LinkedHashMap<>();
         try {
 
             final W worker = getCurrentWorker();

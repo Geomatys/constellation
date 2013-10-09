@@ -18,7 +18,6 @@
 package org.constellation.wps.ws.soap;
 
 // JDK dependencies
-import java.io.File;
 import java.util.logging.Level;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
@@ -69,8 +68,8 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * {@inheritDoc}
      */
     @Override
-    protected WPSWorker createWorker(final File instanceDirectory) {
-        return new WPSWorker(instanceDirectory.getName());
+    protected WPSWorker createWorker(final String id) {
+        return new WPSWorker(id);
     }
 
     /**

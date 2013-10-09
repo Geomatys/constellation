@@ -18,7 +18,6 @@
 package org.constellation.metadata.ws.soap;
 
 // J2SE dependencies
-import java.io.File;
 import java.util.logging.Level;
 
 // JAX-WS dependencies
@@ -100,8 +99,8 @@ public class CSWService extends OGCWebService<CSWworker>{
      * {@inheritDoc}
      */
     @Override
-    protected CSWworker createWorker(File instanceDirectory) {
-        return new CSWworker(instanceDirectory.getName());
+    protected CSWworker createWorker(String id) {
+        return new CSWworker(id);
     }
 
     /**

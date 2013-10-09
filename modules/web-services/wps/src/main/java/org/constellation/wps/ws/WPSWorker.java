@@ -392,36 +392,24 @@ public class WPSWorker extends AbstractWorker {
      * @return false if something went wrong.
      */
     private boolean createWebDav() {
-        final String webDavName = getId();
-        final File configDir = ConfigDirectory.getConfigDirectory();
-        final File webDavDir = new File(configDir, "webdav");
-
-        if (!webDavDir.exists()) {
-            webDavDir.mkdir();
-        }
-
-        final File webDavInstanceDir = new File(webDavDir, webDavName);
-        if (!webDavInstanceDir.exists()) {
-            webDavInstanceDir.mkdir();
-        }
         final File tmpDir = new File(webdavFolderPath);
         if (!tmpDir.exists() || !tmpDir.isDirectory()) {
             tmpDir.mkdirs();
         }
-
-        //configure webdav
-        final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
-        webdavCtx.setId(webDavName);
-        final File webdavConfig = new File(webDavInstanceDir, "WebdavContext.xml");
-        if (!webdavConfig.exists()) {
+        final String webDavName = getId();
+        //configure webdav if not exist
+        try {
+            ConfigurationEngine.getConfiguration("webdav", webDavName, "WebdavContext.xml");
+        } catch (FileNotFoundException | JAXBException e) {
+            final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
+            webdavCtx.setId(webDavName);
             try {
-                ConfigurationEngine.storeConfiguration("webdav", webDavName, "WebdavContext.xml", webdavCtx);
+                ConfigurationEngine.createConfiguration("webdav", webDavName, "WebdavContext.xml", webdavCtx);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;
             }
         }
-
         return true;
     }
     

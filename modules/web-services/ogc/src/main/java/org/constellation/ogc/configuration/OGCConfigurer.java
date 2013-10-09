@@ -350,16 +350,10 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(specification.name())) {
             status.put(entry.getKey(), entry.getValue() ? ServiceStatus.WORKING : ServiceStatus.ERROR);
         }
-        final File[] files = ConfigDirectory.getServiceDirectory(specification.name()).listFiles(new FileFilter() {
-            @Override
-            public boolean accept(final File file) {
-                return file.isDirectory() && !file.getName().startsWith(".")
-                        && !WSEngine.serviceInstanceExist(specification.name(), file.getName());
-            }
-        });
-        if (files != null) {
-            for (final File directory : files) {
-                status.put(directory.getName(), ServiceStatus.NOT_STARTED);
+        final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(specification.name());
+        for (String serviceID : serviceIDs) {
+            if (!WSEngine.serviceInstanceExist(specification.name(), serviceID)) {
+                status.put(serviceID, ServiceStatus.NOT_STARTED);
             }
         }
         return status;

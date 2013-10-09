@@ -16,17 +16,14 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.process.AbstractCstlProcess;
+import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
 import static org.constellation.process.service.DeleteServiceDescriptor.*;
-import org.constellation.ws.WSEngine;
-import org.geotoolkit.util.FileUtilities;
 
 /**
  *

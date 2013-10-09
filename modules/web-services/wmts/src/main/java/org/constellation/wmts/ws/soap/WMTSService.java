@@ -18,7 +18,6 @@ package org.constellation.wmts.ws.soap;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import javax.jws.WebMethod;
@@ -74,8 +73,8 @@ public class WMTSService extends OGCWebService<WMTSWorker>{
      * {@inheritDoc}
      */
     @Override
-    protected WMTSWorker createWorker(File instanceDirectory) {
-        return new DefaultWMTSWorker(instanceDirectory.getName());
+    protected WMTSWorker createWorker(final String id) {
+        return new DefaultWMTSWorker(id);
     }
 
     /**

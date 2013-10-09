@@ -18,7 +18,6 @@
 package org.constellation.sos.ws.soap;
 
 // JDK dependencies
-import java.io.File;
 import java.util.logging.Level;
 
 // JAX-WS dependencies
@@ -89,8 +88,8 @@ public class SOService extends OGCWebService<SOSworker> {
      * {@inheritDoc}
      */
     @Override
-    protected SOSworker createWorker(final File instanceDirectory) {
-        return new SOSworker(instanceDirectory.getName());
+    protected SOSworker createWorker(final String id) {
+        return new SOSworker(id);
     }
 
      /**
