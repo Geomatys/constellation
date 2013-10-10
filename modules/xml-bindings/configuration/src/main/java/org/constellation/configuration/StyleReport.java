@@ -32,10 +32,10 @@ import java.util.List;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class StyleReport implements Serializable {
+public final class StyleReport implements Serializable {
 
-    @XmlElement(name="Record")
-    private StyleRecord record;
+    @XmlElement(name="Brief")
+    private StyleBrief brief;
 
     @XmlElement(name="Description")
     private String description;
@@ -44,15 +44,15 @@ public class StyleReport implements Serializable {
     private List<String> symbolizerTypes = new ArrayList<>();
 
     @XmlElement(name="TargetData")
-    private List<DataRecord> targetData = new ArrayList<>();
+    private List<DataBrief> targetData = new ArrayList<>();
 
 
-    public StyleRecord getRecord() {
-        return record;
+    public StyleBrief getBrief() {
+        return brief;
     }
 
-    public void setRecord(final StyleRecord record) {
-        this.record = record;
+    public void setBrief(final StyleBrief brief) {
+        this.brief = brief;
     }
 
     public String getDescription() {
@@ -71,11 +71,11 @@ public class StyleReport implements Serializable {
         this.symbolizerTypes = symbolizerTypes;
     }
 
-    public List<DataRecord> getTargetData() {
+    public List<DataBrief> getTargetData() {
         return targetData;
     }
 
-    public void setTargetData(final List<DataRecord> targetData) {
+    public void setTargetData(final List<DataBrief> targetData) {
         this.targetData = targetData;
     }
 }

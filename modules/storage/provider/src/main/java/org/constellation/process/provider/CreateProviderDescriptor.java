@@ -44,12 +44,6 @@ public class CreateProviderDescriptor extends AbstractProcessDescriptor {
             new DefaultParameterDescriptor<String>(PROVIDER_TYPE_NAME, PROVIDER_TYPE_REMARKS, String.class, null, true);
 
 
-    public static final String OWNER_NAME = "owner";
-    private static final String OWNER_REMARKS = "The provider owner login. Can be null.";
-    public static final ParameterDescriptor<String> OWNER =
-            new DefaultParameterDescriptor<String>(OWNER_NAME,OWNER_REMARKS, String.class, null, false);
-
-
     public static final String SOURCE_NAME = "parameters";
     private static final String SOURCE_REMARKS = "ParameterValueGroup use to create provider.";
     public static final ParameterDescriptor<ParameterValueGroup> SOURCE =
@@ -58,7 +52,7 @@ public class CreateProviderDescriptor extends AbstractProcessDescriptor {
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{PROVIDER_TYPE, OWNER, SOURCE});
+            new GeneralParameterDescriptor[]{PROVIDER_TYPE, SOURCE});
 
 
     /**Output parameters */

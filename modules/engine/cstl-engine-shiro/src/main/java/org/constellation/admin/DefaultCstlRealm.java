@@ -28,7 +28,8 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.configuration.UserRecord;
+import org.constellation.admin.dao.Session;
+import org.constellation.admin.dao.UserRecord;
 
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -91,7 +92,7 @@ public final class DefaultCstlRealm extends AuthorizingRealm {
     }
 
     /**
-     * Retrieves a {@link UserRecord} instance using {@link AdminDatabase#getCachedUser(String)}
+     * Retrieves a {@link UserRecord} instance using {@link EmbeddedDatabase#getCachedUser(String)}
      * or query it from the administration database.
      *
      * @param login the user login
@@ -99,11 +100,11 @@ public final class DefaultCstlRealm extends AuthorizingRealm {
      * @throws UnknownAccountException if the user does not exist
      */
     private static UserRecord getUser(final String login) throws UnknownAccountException {
-        UserRecord user = AdminDatabase.getCachedUser(login);
+        UserRecord user = EmbeddedDatabase.getCachedUser(login);
         if (user == null) {
-            AdminSession session = null;
+            Session session = null;
             try {
-                session = AdminDatabase.createSession();
+                session = EmbeddedDatabase.createSession();
                 user = session.readUser(login);
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, NO_DB_MSG, ex);

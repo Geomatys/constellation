@@ -19,12 +19,14 @@ package org.constellation.map.configuration;
 
 import org.apache.sis.util.Static;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.AdminDatabase;
-import org.constellation.admin.AdminSession;
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.dao.DataRecord;
+import org.constellation.admin.dao.Session;
+import org.constellation.admin.dao.StyleRecord;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.DataRecord;
-import org.constellation.configuration.StyleRecord;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.StyleBean;
@@ -99,6 +101,25 @@ public final class StyleProviderConfig extends Static {
     }
 
     /**
+     * Builds a {@link StyleBrief} instance from a {@link StyleRecord} instance.
+     *
+     * @param record the record to be converted
+     * @param locale the locale for internationalized text
+     * @return a {@link StyleBrief} instance
+     * @throws SQLException if a database access error occurs
+     */
+    public static StyleBrief getBriefFromRecord(final StyleRecord record, final Locale locale) throws SQLException {
+        final StyleBrief brief = new StyleBrief();
+        brief.setName(record.getName());
+        brief.setProvider(record.getProvider().getIdentifier());
+        brief.setTitle(record.getTitle(locale));
+        brief.setDate(record.getDate());
+        brief.setType(record.getType().name());
+        brief.setOwner(record.getOwnerLogin());
+        return brief;
+    }
+
+    /**
      * Creates a new style into a style provider instance.
      *
      * @param providerId the style provider identifier
@@ -108,7 +129,7 @@ public final class StyleProviderConfig extends Static {
      */
     public static void createStyle(final String providerId, final MutableStyle style) throws ConfigurationException {
         ensureExistingProvider(providerId);
-        setStyle(providerId, style.getName(), style);
+        createOrUpdateStyle(providerId, style.getName(), style);
     }
 
     /**
@@ -191,11 +212,30 @@ public final class StyleProviderConfig extends Static {
     public static StyleReport getStyleReport(final String providerId, final String styleId, final Locale locale) throws ConfigurationException {
         final StyleReport report = new StyleReport();
 
-        // Extract information from the style body.
-        final MutableStyle style = getStyle(providerId, styleId);
-        if (style.getDescription() != null && style.getDescription().getAbstract() != null) {
-            report.setDescription(style.getDescription().getAbstract().toString(locale));
+        // Extract information from the administration database.
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final StyleRecord record = session.readStyle(styleId, providerId);
+            if (record != null) {
+                report.setBrief(getBriefFromRecord(record, locale));
+                report.setDescription(record.getDescription(locale));
+                report.setTargetData(new ArrayList<DataBrief>());
+                final List<DataRecord> data = record.getLinkedData();
+                for (final DataRecord r : data) {
+                    report.getTargetData().add(DataProviderConfig.getBriefFromRecord(r, locale));
+                }
+            } else {
+                LOGGER.log(Level.WARNING, "Style named \"" + styleId + "\" from provider with id \"" + providerId + "\" can't be found from database.");
+            }
+        } catch (SQLException ex) {
+            throw new ConfigurationException("An error occurred while reading data list for style named \"" + styleId + "\".", ex);
+        } finally {
+            if (session != null) session.close();
         }
+
+        // Extract additional information from the style body.
+        final MutableStyle style = getStyle(providerId, styleId);
         for (final MutableFeatureTypeStyle fts : style.featureTypeStyles()) {
             for (final MutableRule rule : fts.rules()) {
                 for (final Symbolizer symbolizer : rule.symbolizers()) {
@@ -214,23 +254,6 @@ public final class StyleProviderConfig extends Static {
             }
         }
 
-        // Extract additional information from the administration database.
-        AdminSession session = null;
-        try {
-            session = AdminDatabase.createSession();
-            final StyleRecord record = session.readStyle(styleId, providerId);
-            if (record != null) {
-                report.setRecord(record);
-                report.setTargetData(session.readData(record));
-            } else {
-                LOGGER.log(Level.WARNING, "Style named \"" + styleId + "\" from provider with id \"" + providerId + "\" can't be found from database.");
-            }
-        } catch (SQLException ex) {
-            throw new ConfigurationException("An error occurred while reading data list for style named \"" + styleId + "\".", ex);
-        } finally {
-            if (session != null) session.close();
-        }
-
         return report;
     }
 
@@ -245,6 +268,19 @@ public final class StyleProviderConfig extends Static {
      */
     public static void setStyle(final String providerId, final String styleId, final MutableStyle style) throws ConfigurationException {
         ensureExistingStyle(providerId, styleId);
+        createOrUpdateStyle(providerId, styleId, style);
+    }
+
+    /**
+     * Creates or updates a style into/from a style provider instance.
+     *
+     * @param providerId the style provider identifier
+     * @param styleId    the style identifier
+     * @param style      the new style body
+     * @throws TargetNotFoundException if the style with the specified identifier can't be found
+     * @throws ConfigurationException if the operation has failed for any reason
+     */
+    private static void createOrUpdateStyle(final String providerId, final String styleId, final MutableStyle style) throws ConfigurationException {
         final ProcessDescriptor desc = getProcessDescriptor(SetStyleToStyleProviderDescriptor.NAME);
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(SetStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(providerId);
@@ -293,9 +329,9 @@ public final class StyleProviderConfig extends Static {
         ensureNonNull("dataId",       dataId);
         ensureExistingStyle(styleProvider, styleId);
 
-        AdminSession session = null;
+        Session session = null;
         try {
-            session = AdminDatabase.createSession();
+            session = EmbeddedDatabase.createSession();
             final StyleRecord style = session.readStyle(styleId, styleProvider);
             if (style == null) {
                 throw new ConfigurationException("Style named \"" + styleId + "\" from provider with id \"" + styleProvider + "\" can't be found from database.");
@@ -327,9 +363,9 @@ public final class StyleProviderConfig extends Static {
         ensureNonNull("dataId",       dataId);
         ensureExistingStyle(styleProvider, styleId);
 
-        AdminSession session = null;
+        Session session = null;
         try {
-            session = AdminDatabase.createSession();
+            session = EmbeddedDatabase.createSession();
             final StyleRecord style = session.readStyle(styleId, styleProvider);
             if (style == null) {
                 throw new ConfigurationException("Style named \"" + styleId + "\" from provider with id \"" + styleProvider + "\" can't be found from database.");

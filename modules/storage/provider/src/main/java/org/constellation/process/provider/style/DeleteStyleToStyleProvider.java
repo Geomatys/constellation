@@ -16,8 +16,8 @@
  */
 package org.constellation.process.provider.style;
 
-import org.constellation.admin.AdminDatabase;
-import org.constellation.admin.AdminSession;
+import org.constellation.admin.dao.Session;
+import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
@@ -67,9 +67,9 @@ public class DeleteStyleToStyleProvider extends AbstractCstlProcess {
         provider.remove(styleName);
 
         // Remove style from administration database.
-        AdminSession session = null;
+        Session session = null;
         try {
-            session = AdminDatabase.createSession();
+            session = EmbeddedDatabase.createSession();
             session.deleteStyle(styleName, providerID);
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating administration database after deleting the style named \"" + styleName + "\".", ex);

@@ -15,15 +15,12 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.configuration;
+package org.constellation.admin.dao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.geotoolkit.util.StringUtilities;
 import org.mdweb.model.auth.MDwebRole;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,77 +28,73 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Administration database record for {@code User} table.
- *
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-public final class UserRecord implements Serializable {
+public final class UserRecord implements Record {
 
-    private String login;
+    private final Session session;
+
+    private final String login;
     private String password;
     private String name;
     private List<String> roles;
-    private List<String> permissions;
+    private final List<String> permissions;
 
-    UserRecord() {
-    }
-
-    public UserRecord(final ResultSet rs) throws SQLException {
-        this.login       = rs.getString(1);
-        this.password    = rs.getString(2);
-        this.name        = rs.getString(3);
-        this.roles       = new ArrayList<>();
+    UserRecord(final Session session, final String login, final String password, final String name, final List<String> roles) {
+        this.session     = session;
+        this.login       = login;
+        this.password    = password;
+        this.name        = name;
+        this.roles       = roles;
         this.permissions = new ArrayList<>();
 
-        final String[] roleArray = StringUtils.split(rs.getString(4), ',');
-        if (roleArray != null) {
-            this.roles.addAll(Arrays.asList(roleArray));
-        }
+        // Set permissions from role list.
         for (final String role : roles) {
-            this.permissions.addAll(MDwebRole.getPermissionListFromRole(role));
+            permissions.addAll(MDwebRole.getPermissionListFromRole(role));
         }
+    }
+
+    public UserRecord(final Session s, final ResultSet rs) throws SQLException {
+        this(s, rs.getString(1),
+                rs.getString(2),
+                rs.getString(3),
+                Arrays.asList(StringUtils.split(rs.getString(4), ',')));
     }
 
     public String getLogin() {
         return login;
     }
 
-    public void setLogin(final String login) {
-        this.login = login;
-    }
-
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(final String password) {
-        this.password = password;
+    public void setPassword(final String password) throws SQLException {
+        this.password = StringUtilities.MD5encode(password);
+        session.updateUser(login, this.password, name, roles);
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(final String name) {
+    public void setName(final String name) throws SQLException {
         this.name = name;
+        session.updateUser(login, password, name, roles);
     }
 
     public List<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(final List<String> roles) {
+    public void setRoles(final List<String> roles) throws SQLException {
         this.roles = roles;
+        session.updateUser(login, password, name, roles);
     }
 
     public List<String> getPermissions() {
         return permissions;
-    }
-
-    public void setPermissions(final List<String> permissions) {
-        this.permissions = permissions;
     }
 }

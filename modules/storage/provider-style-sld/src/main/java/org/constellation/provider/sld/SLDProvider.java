@@ -16,8 +16,8 @@
  */
 package org.constellation.provider.sld;
 
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -29,10 +29,12 @@ import java.util.Map;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
 
-import org.constellation.admin.AdminDatabase;
-import org.constellation.admin.AdminSession;
-import org.constellation.configuration.ProviderRecord.ProviderType;
-import org.constellation.configuration.StyleRecord;
+import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.admin.dao.Session;
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.dao.ProviderRecord.ProviderType;
+import org.constellation.admin.dao.StyleRecord;
+import org.constellation.admin.dao.StyleRecord.StyleType;
 import org.constellation.provider.AbstractStyleProvider;
 
 import org.geotoolkit.factory.FactoryFinder;
@@ -270,13 +272,14 @@ public class SLDProvider extends AbstractStyleProvider{
             visit(folder);
 
             // Update administration database.
-            AdminSession session = null;
+            Session session = null;
             try {
-                session = AdminDatabase.createSession();
-                if (session.readProvider(this.getId()) == null) {
-                    session.writeProvider(this.getId(), ProviderType.STYLE, "sld", null);
+                session = EmbeddedDatabase.createSession();
+                ProviderRecord pr = session.readProvider(this.getId());
+                if (pr == null) {
+                    pr = session.writeProvider(this.getId(), ProviderType.STYLE, "sld", getSource(), null);
                 }
-                final List<StyleRecord> styles = session.readStyles(this.getId());
+                final List<StyleRecord> styles = pr.getStyles();
 
                 // Remove no longer existing style.
                 for (final StyleRecord style : styles) {
@@ -295,10 +298,10 @@ public class SLDProvider extends AbstractStyleProvider{
                         }
                     }
                     if (!found) {
-                        session.writeStyle(this.getId(), key, null, index.get(key).lastModified());
+                        session.writeStyle(key, pr, StyleType.VECTOR, get(key), null);
                     }
                 }
-            } catch (SQLException ex) {
+            } catch (IOException | SQLException ex) {
                 LOGGER.log(Level.WARNING, "An error occurred while updating database on provider startup.", ex);
             } finally {
                 if (session != null) session.close();

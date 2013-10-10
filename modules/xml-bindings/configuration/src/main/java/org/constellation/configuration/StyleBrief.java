@@ -19,46 +19,38 @@ package org.constellation.configuration;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
 
 /**
- * Administration database record for {@code Style} table.
- *
- * @author Fabien Bernard (Geomatys).
+ * @author Bernard Fabien (Geomatys)
  * @version 0.9
  * @since 0.9
  */
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class StyleRecord implements Serializable {
+public final class StyleBrief implements Serializable {
 
-    private int id;
+    @XmlElement(name="Name")
     private String name;
+
+    @XmlElement(name="Provider")
     private String provider;
-    private String owner;
+
+    @XmlElement(name="Title")
+    private String title;
+
+    @XmlElement(name="Date")
     private Date date;
 
-    StyleRecord() {
-    }
+    @XmlElement(name="Type")
+    private String type;
 
-    public StyleRecord(final ResultSet rs) throws SQLException {
-        this.id       = rs.getInt(1);
-        this.name     = rs.getString(2);
-        this.provider = rs.getString(3);
-        this.owner    = rs.getString(4);
-        this.date     = new Date(rs.getLong(5));
-    }
+    @XmlElement(name="Owner")
+    private String owner;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(final int id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -76,12 +68,12 @@ public class StyleRecord implements Serializable {
         this.provider = provider;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getTitle() {
+        return title;
     }
 
-    public void setOwner(final String owner) {
-        this.owner = owner;
+    public void setTitle(final String title) {
+        this.title = title;
     }
 
     public Date getDate() {
@@ -90,5 +82,21 @@ public class StyleRecord implements Serializable {
 
     public void setDate(final Date date) {
         this.date = date;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(final String owner) {
+        this.owner = owner;
     }
 }

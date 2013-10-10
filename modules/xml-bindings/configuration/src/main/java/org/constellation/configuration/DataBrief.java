@@ -19,54 +19,38 @@ package org.constellation.configuration;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
 
 /**
- * Administration database record for {@code Data} table.
- *
- * @author Fabien Bernard (Geomatys).
+ * @author Bernard Fabien (Geomatys)
  * @version 0.9
  * @since 0.9
  */
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class DataRecord implements Serializable {
+public final class DataBrief implements Serializable {
 
-    public static enum DataType {
-        VECTOR,
-        COVERAGE,
-        SENSOR
-    }
-
-    private int id;
+    @XmlElement(name="Name")
     private String name;
+
+    @XmlElement(name="Provider")
     private String provider;
-    private DataType type;
-    private String owner;
+
+    @XmlElement(name="Title")
+    private String title;
+
+    @XmlElement(name="Date")
     private Date date;
 
-    DataRecord() {
-    }
+    @XmlElement(name="Type")
+    private String type;
 
-    public DataRecord(final ResultSet rs) throws SQLException {
-        this.id         = rs.getInt(1);
-        this.name       = rs.getString(2);
-        this.provider   = rs.getString(3);
-        this.type       = DataType.valueOf(rs.getString(4));
-        this.owner      = rs.getString(5);
-        this.date       = new Date(rs.getLong(6));
-    }
+    @XmlElement(name="Owner")
+    private String owner;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(final int id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -84,11 +68,27 @@ public final class DataRecord implements Serializable {
         this.provider = provider;
     }
 
-    public DataType getType() {
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(final String title) {
+        this.title = title;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(final Date date) {
+        this.date = date;
+    }
+
+    public String getType() {
         return type;
     }
 
-    public void setType(final DataType type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -98,13 +98,5 @@ public final class DataRecord implements Serializable {
 
     public void setOwner(final String owner) {
         this.owner = owner;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(final Date date) {
-        this.date = date;
     }
 }

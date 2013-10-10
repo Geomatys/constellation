@@ -16,8 +16,8 @@
  */
 package org.constellation.process.provider;
 
-import org.constellation.admin.AdminDatabase;
-import org.constellation.admin.AdminSession;
+import org.constellation.admin.dao.Session;
+import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
@@ -75,9 +75,9 @@ public final class DeleteProvider extends AbstractCstlProcess{
         }
 
         // Remove provider from administration database.
-        AdminSession session = null;
+        Session session = null;
         try {
-            session = AdminDatabase.createSession();
+            session = EmbeddedDatabase.createSession();
             session.deleteProvider(providerID);
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating administration database after deleting the provider with id \"" + providerID + "\".", ex);

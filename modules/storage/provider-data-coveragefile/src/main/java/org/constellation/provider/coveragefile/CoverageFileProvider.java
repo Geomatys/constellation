@@ -17,11 +17,12 @@
 package org.constellation.provider.coveragefile;
 
 import org.apache.sis.util.collection.Cache;
-import org.constellation.admin.AdminDatabase;
-import org.constellation.admin.AdminSession;
-import org.constellation.configuration.DataRecord.DataType;
-import org.constellation.configuration.ProviderRecord.ProviderType;
-import org.constellation.configuration.DataRecord;
+import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.admin.dao.Session;
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.dao.DataRecord.DataType;
+import org.constellation.admin.dao.ProviderRecord.ProviderType;
+import org.constellation.admin.dao.DataRecord;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -235,13 +236,14 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         super.visit();
 
         // Update administration database.
-        AdminSession session = null;
+        Session session = null;
         try {
-            session = AdminDatabase.createSession();
-            if (session.readProvider(this.getId()) == null) {
-                session.writeProvider(this.getId(), ProviderType.LAYER, "coverage-file", null);
+            session = EmbeddedDatabase.createSession();
+            ProviderRecord pr = session.readProvider(this.getId());
+            if (pr == null) {
+                pr = session.writeProvider(this.getId(), ProviderType.LAYER, "coverage-file", param, null);
             }
-            final List<DataRecord> list = session.readData(this.getId());
+            final List<DataRecord> list = pr.getData();
 
             // Remove no longer existing data.
             for (final DataRecord data : list) {
@@ -267,10 +269,10 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                     }
                 }
                 if (!found) {
-                    session.writeData(this.getId(), key.getLocalPart(), DataType.COVERAGE, null, new Date().getTime());
+                    session.writeData(key.getLocalPart(), pr, DataType.COVERAGE, null);
                 }
             }
-        } catch (SQLException ex) {
+        } catch (IOException | SQLException ex) {
             getLogger().log(Level.WARNING, "An error occurred while updating database on provider startup.", ex);
         } finally {
             if (session != null) session.close();

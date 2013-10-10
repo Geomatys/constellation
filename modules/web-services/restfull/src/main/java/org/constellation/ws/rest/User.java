@@ -37,29 +37,6 @@ public class User {
     }
 
     /**
-     * Update user
-     * @param id Old user login
-     * @param user New user name and password
-     * @return an {@link AcknowlegementType} on {@link Response} to know operation state
-     */
-    @POST
-    @Path("/{id}")
-    public Response user(final @PathParam("id") String id, final org.constellation.dto.User user){
-        return Response.ok(ConfigurationUtilities.updateUser(user.getLogin(), user.getPassword(), id)).build();
-    }
-
-    /**
-     * Delete user
-     * @param id user login
-     * @return an {@link AcknowlegementType} on {@link Response} to know operation state
-     */
-    @DELETE
-    @Path("/{id}")
-    public Response user(final @PathParam("id") String id){
-        return Response.ok(ConfigurationUtilities.deleteUser(id)).build();
-    }
-
-    /**
      * Called on login. To know if login is granted to access to server
      * @return an {@link AcknowlegementType} on {@link Response} to know operation state
      */

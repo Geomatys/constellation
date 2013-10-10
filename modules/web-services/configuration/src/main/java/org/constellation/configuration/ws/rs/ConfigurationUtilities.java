@@ -1,8 +1,8 @@
 package org.constellation.configuration.ws.rs;
 
-import org.constellation.admin.AdminDatabase;
-import org.constellation.admin.AdminSession;
-import org.constellation.configuration.UserRecord;
+import org.constellation.admin.dao.Session;
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.dao.UserRecord;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
@@ -26,9 +26,9 @@ public class ConfigurationUtilities {
     private static final Logger LOGGER = Logger.getLogger(ConfigurationUtilities.class.getName());
 
     public static AcknowlegementType getUserName() {
-        AdminSession session = null;
+        Session session = null;
         try {
-            session = AdminDatabase.createSession();
+            session = EmbeddedDatabase.createSession();
             final List<UserRecord> users = session.readUsers();
             String userName = null;
             if (users != null && !users.isEmpty()) {
@@ -43,32 +43,38 @@ public class ConfigurationUtilities {
         return new AcknowlegementType("Failure", "An error occurs");
     }
 
+    @Deprecated
     public static AcknowlegementType deleteUser(final String userName) {
-        AdminSession session = null;
-        try {
-            session = AdminDatabase.createSession();
-            session.deleteUser(userName);
-            return new AcknowlegementType("Success", "The user has been deleted");
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "Error while deleting user", ex);
-        } finally {
-            if (session != null) session.close();
-        }
-        return new AcknowlegementType("Failure", "An error occurs");
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            session.deleteUser(userName);
+//            return new AcknowlegementType("Success", "The user has been deleted");
+//        } catch (SQLException ex) {
+//            LOGGER.log(Level.WARNING, "Error while deleting user", ex);
+//        } finally {
+//            if (session != null) session.close();
+//        }
+//        return new AcknowlegementType("Failure", "An error occurs");
+
+        return new AcknowlegementType("Failure", "Operation no longer supported");
     }
 
+    @Deprecated
     public static AcknowlegementType updateUser(final String userName, final String password, final String oldLogin) {
-        AdminSession session = null;
-        try {
-            session = AdminDatabase.createSession();
-            session.updateUser(oldLogin, userName, password, "Default Constellation Administrator", Arrays.asList("cstl-admin"));
-            return new AcknowlegementType("Success", "The user has been changed");
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "Error while deleting user", ex);
-        } finally {
-            if (session != null) session.close();
-        }
-        return new AcknowlegementType("Failure", "An error occurs");
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            session.updateUser(oldLogin, userName, password, "Default Constellation Administrator", Arrays.asList("cstl-admin"));
+//            return new AcknowlegementType("Success", "The user has been changed");
+//        } catch (SQLException ex) {
+//            LOGGER.log(Level.WARNING, "Error while deleting user", ex);
+//        } finally {
+//            if (session != null) session.close();
+//        }
+//        return new AcknowlegementType("Failure", "An error occurs");
+
+        return new AcknowlegementType("Failure", "Operation no longer supported");
     }
 
     public static AcknowlegementType setConfigPath(final String path) throws CstlServiceException {

@@ -155,24 +155,16 @@ public class ObjectFactory {
         return new WMSPortrayal();
     }
 
-    public StyleRecord createStyleRecord() {
-        return new StyleRecord();
+    public StyleBrief createStyleBrief() {
+        return new StyleBrief();
     }
 
-    public UserRecord createUserRecord() {
-        return new UserRecord();
+    public StyleReport createStyleReport() {
+        return new StyleReport();
     }
 
-    public ProviderRecord createProviderRecord() {
-        return new ProviderRecord();
-    }
-
-    public TaskRecord createTaskRecord() {
-        return new TaskRecord();
-    }
-
-    public DataRecord createDataRecord() {
-        return new DataRecord();
+    public DataBrief createDataBrief() {
+        return new DataBrief();
     }
     
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "source")

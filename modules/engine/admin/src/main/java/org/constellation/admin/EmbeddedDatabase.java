@@ -19,9 +19,9 @@ package org.constellation.admin;
 
 import org.apache.sis.util.Static;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.dao.Session;
+import org.constellation.admin.dao.UserRecord;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.UserRecord;
-import org.constellation.util.DatabaseUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 
 import javax.sql.DataSource;
@@ -29,6 +29,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
@@ -37,43 +40,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-
 /**
- * Constellation administration database utility class.
+ * Constellation embedded administration database class.
  *
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-public final class AdminDatabase extends Static {
+public final class EmbeddedDatabase extends Static {
 
     /**
      * Logger used for debugging and event notification.
      */
-    private static final Logger LOGGER = Logging.getLogger(AdminDatabase.class);
+    private static final Logger LOGGER = Logging.getLogger(EmbeddedDatabase.class);
 
     /**
      * Administration database configuration keys.
      */
-    private static final String CONFIG_KEY_PASSWORD = "admin-db-password";
-    private static final String CONFIG_KEY_URL      = "admin-db-url";
-    private static final String CONFIG_KEY_USERNAME = "admin-db-username";
+    private static final String CONFIG_KEY_URL = "admin-db-url";
 
     /**
      * Administration database {@link DefaultDataSource} instance.
      */
     private static DefaultDataSource DATA_SOURCE;
-
-    /**
-     * Administration database username.
-     */
-    private static String USERNAME;
-
-    /**
-     * Administration database password.
-     */
-    private static String PASSWORD;
 
     /**
      * User cache for improved authentication performance.
@@ -84,20 +73,20 @@ public final class AdminDatabase extends Static {
 
 
     /**
-     * Obtains a administration database {@link AdminSession} instance.
+     * Obtains a administration database {@link org.constellation.admin.dao.Session} instance.
      *
-     * @return a {@link AdminSession} instance
-     * @throws SQLException if a database access error occurs
+     * @return a {@link org.constellation.admin.dao.Session} instance
+     * @throws  SQLException if a database access error occurs
      */
-    public static AdminSession createSession() throws SQLException {
+    public static Session createSession() throws SQLException {
         if (DATA_SOURCE == null) {
-            synchronized(AdminDatabase.class) {
+            synchronized(EmbeddedDatabase.class) {
                 if (DATA_SOURCE == null) {
                     setup();
                 }
             }
         }
-        return new AdminSession(DATA_SOURCE.getConnection(USERNAME, PASSWORD), USER_CACHE);
+        return new Session(DATA_SOURCE.getConnection(), USER_CACHE);
     }
 
     /**
@@ -115,8 +104,6 @@ public final class AdminDatabase extends Static {
      * {@code "CstlAdmin"} exists on the current {@link DataSource}.
      * <p />
      * If the schema is missing create it executing the {@code admin-db.sql} resource file.
-     *
-     * TODO: implement multiple dialects support (only derby is supported actually)
      *
      * @throws SQLException if an error occurred while connecting to database or executing a SQL statement
      */
@@ -150,24 +137,34 @@ public final class AdminDatabase extends Static {
             LOGGER.log(Level.SEVERE, "Unexpected exception while reading/writing administration database property file.", ex);
         }
 
-        // Set connection variables.
-        DATA_SOURCE = new DefaultDataSource(config.getProperty(CONFIG_KEY_URL).replace('\\','/') + ";create=true;");
-        USERNAME    = config.getProperty(CONFIG_KEY_USERNAME);
-        PASSWORD    = config.getProperty(CONFIG_KEY_PASSWORD);
+        // Initialize data source.
+        final String dbUrl = config.getProperty(CONFIG_KEY_URL);
+        if (dbUrl == null) {
+            throw new IllegalStateException("Embedded database configuration property \"" + CONFIG_KEY_URL + "\" is missing.");
+        }
+        DATA_SOURCE = new DefaultDataSource(dbUrl.replace('\\','/') + ";create=true;");
 
         // Establish connection and create schema if does not exist.
-        AdminSession session = null;
+        Session session = null;
         try {
             session = createSession();
-            if (!DatabaseUtilities.schemaExists(session.getConnection(), "CstlAdmin")) {
+            if (!session.schemaExists("admin")) {
+                // Load database schema SQL stream.
+                final ClassLoader loader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                    public ClassLoader run() {
+                        return Thread.currentThread().getContextClassLoader();
+                    }
+                });
+                final InputStream stream = loader.getResourceAsStream("org/constellation/sql/v1/create-admin-db.sql");
+
                 // Create schema.
-                DatabaseUtilities.runSqlScript(session.getConnection(), "org/constellation/sql/v1/create-admin-db.sql");
+                session.runSql(stream);
 
                 // Create default admin user.
                 session.writeUser("admin", "admin", "Default Constellation Administrator", Arrays.asList("cstl-admin"));
             }
-        } catch (IOException ex) {
-            throw new IllegalStateException("Unexpected error occurred while trying to create admin database schema.", ex);
+        } catch (IOException unexpected) {
+            throw new IllegalStateException("Unexpected error occurred while trying to create admin database schema.", unexpected);
         } finally {
             if (session != null) {
                 session.close();

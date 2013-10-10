@@ -38,5 +38,17 @@
             <groupId>net.java.dev.stax-utils</groupId>
             <artifactId>stax-utils</artifactId>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-jaxp-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-xml-sld</artifactId>
+        </dependency>
     </dependencies>
 </project>
