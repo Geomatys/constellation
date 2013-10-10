@@ -22,21 +22,15 @@ public class AddLayer {
 
     private String layerId;
 
-    private String styleProviderId;
-
-    private String styleId;
-
     public AddLayer() {
     }
 
-    public AddLayer(final String layerAlias, final String serviceType, final String serviceId, final String providerId, final String layerId, final String styleProviderId, final String styleId) {
+    public AddLayer(final String layerAlias, final String serviceType, final String serviceId, final String providerId, final String layerId) {
         this.layerAlias = layerAlias;
         this.serviceType = serviceType;
         this.serviceId = serviceId;
         this.providerId = providerId;
         this.layerId = layerId;
-        this.styleProviderId = styleProviderId;
-        this.styleId = styleId;
     }
 
     public String getLayerAlias() {
@@ -79,22 +73,6 @@ public class AddLayer {
         this.layerId = layerId;
     }
 
-    public String getStyleProviderId() {
-        return styleProviderId;
-    }
-
-    public void setStyleProviderId(final String styleProviderId) {
-        this.styleProviderId = styleProviderId;
-    }
-
-    public String getStyleId() {
-        return styleId;
-    }
-
-    public void setStyleId(final String styleId) {
-        this.styleId = styleId;
-    }
-
     @Override
     public String toString() {
         return "addLayer{" +
@@ -103,8 +81,6 @@ public class AddLayer {
                 ", serviceId='" + serviceId + '\'' +
                 ", providerId='" + providerId + '\'' +
                 ", layerId='" + layerId + '\'' +
-                ", styleProviderId='" + styleProviderId + '\'' +
-                ", styleId='" + styleId + '\'' +
                 '}';
     }
 }

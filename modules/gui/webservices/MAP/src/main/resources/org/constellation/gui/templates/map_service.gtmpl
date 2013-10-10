@@ -81,7 +81,7 @@
                             <label class="radio">
                                 <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="../../images/icon/raster.png" class="img-rounded"> &{layer.listing.data.upload.raster.label}
                             </label>
-                            <input type="hidden" value="@{MapController.editMapService(serviceId = service.identifier, serviceType = 'wms')}" name="returnURL"/>
+                            <input type="hidden" value="@{MapController.dashboard(serviceId = service.identifier, serviceType = 'wms')}" name="returnURL"/>
                         </div>
                     </div>
                     <div class="modal-footer">

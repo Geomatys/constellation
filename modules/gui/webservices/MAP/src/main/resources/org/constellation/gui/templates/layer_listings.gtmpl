@@ -7,7 +7,7 @@
                     <ul class="nav">
                         <li><a href="#" data-order-by="title">&{label.title}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
                         <li class="divider-vertical"></li>
-                        <li><a href="#" data-order-by="date">&{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i> </a></li>
+                        <li><a href="#" data-order-by="date" class="descending">&{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i> </a></li>
                         <li class="divider-vertical"></li>
                         <li><a href="#" data-order-by="owner">&{label.owner}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
                         <li class="divider-vertical"></li>

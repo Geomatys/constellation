@@ -109,7 +109,7 @@ public class LayerComparator implements Comparator<Layer> {
     }
 
     private int compareDate(final Layer l1, final Layer l2) {
-        return ObjectUtils.compare(l1.getDate(), l2.getDate(), true);
+        return -ObjectUtils.compare(l1.getDate(), l2.getDate(), true);
     }
 
     private int compareOwner(final Layer l1, final Layer l2) {

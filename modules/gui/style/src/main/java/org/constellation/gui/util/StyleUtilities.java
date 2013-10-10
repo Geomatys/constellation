@@ -175,7 +175,7 @@ public final class StyleUtilities extends Static {
             final List<BandDescription> bands = ((CoverageDataDescription) dataDescription).getBands();
 
             final Symbolizer symbolizer;
-            if (bands.size() >= 2) {
+            if (bands.size() >= 3) {
                 symbolizer = DEFAULT_RGB_RASTER_SYMBOLIZER;
             } else {
                 symbolizer = DEFAULT_GREY_RASTER_SYMBOLIZER;

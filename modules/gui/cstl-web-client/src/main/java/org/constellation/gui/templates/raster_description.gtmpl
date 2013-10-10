@@ -38,7 +38,7 @@
                 </div>
             </div>
             <form action="@{RasterController.createProvider(returnURL = returnURL)}" method="POST">
-                <button type="submit" class="btn btn-info pull-right"/>Open</button>
+                <button type="submit" class="btn btn-info pull-right"/>&{label.finish}</button>
             </form>
         </div>
     </div>

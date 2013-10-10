@@ -95,7 +95,7 @@ public class LayerDataComparator implements Comparator<LayerData> {
     }
 
     private int compareDate(final LayerData l1, final LayerData l2) {
-        return ObjectUtils.compare(l1.getDate(), l2.getDate(), true);
+        return -ObjectUtils.compare(l1.getDate(), l2.getDate(), true);
     }
 
     private int compareOwner(final LayerData l1, final LayerData l2) {

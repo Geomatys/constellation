@@ -130,12 +130,6 @@ public class Controller {
     @Path("add_data_alias.gtmpl")
     Template addDataAlias;
     @Inject
-    @Path("add_data_style.gtmpl")
-    Template addDataStyle;
-    @Inject
-    @Path("add_data_style_listing.gtmpl")
-    Template styleListing;
-    @Inject
     @Path("layer.gtmpl")
     Template dataElement;
 
@@ -392,10 +386,10 @@ public class Controller {
 
     @Action
     @Route("layer/add")
-    public Response addLayer(final String layerAlias, final String dataName, final String dataProvider, final String styleName, final String styleProvider, final String serviceId) {
-        AddLayer toAddLayer = new AddLayer(layerAlias, "WMS", serviceId, dataProvider, dataName, styleProvider, styleName);
+    public Response addLayer(final String layerAlias, final String dataName, final String dataProvider, final String serviceId) {
+        AddLayer toAddLayer = new AddLayer(layerAlias, "WMS", serviceId, dataProvider, dataName);
         providerManager.addLayer(toAddLayer);
-        return MapController_.editMapService(serviceId, "wms");
+        return MapController_.dashboard(serviceId, "wms");
     }
 
     /**

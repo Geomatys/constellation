@@ -17,6 +17,12 @@
 
 package org.constellation.map.configuration;
 
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
@@ -25,18 +31,27 @@ import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
+import org.constellation.dto.BandDescription;
+import org.constellation.dto.CoverageDataDescription;
+import org.constellation.dto.DataDescription;
+import org.constellation.dto.FeatureDataDescription;
+import org.constellation.dto.PropertyDescription;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.LayerProviders;
 import org.constellation.ws.rs.MapUtilities;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} base for "map" services.
@@ -47,6 +62,8 @@ import java.util.List;
  * @since 0.9
  */
 public class MapConfigurer extends OGCConfigurer {
+
+    private static final Logger LOGGER = Logging.getLogger(MapConfigurer.class);
 
     /**
      * Create a new {@link MapConfigurer} instance.
@@ -69,11 +86,42 @@ public class MapConfigurer extends OGCConfigurer {
 
         final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(addLayerData.getProviderId());
         final String namespace = ProviderParameters.getNamespace(provider);
-        final String layerId = "{" + namespace + "}" + addLayerData.getLayerId();
+        final String layerId = namespace != null ? "{" + namespace + "}" + addLayerData.getLayerId() : addLayerData.getLayerId();
 
-        // Set layer and style provider reference.
+        // Set layer provider reference.
         final DataReference layerProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, addLayerData.getProviderId(), layerId);
-        final DataReference styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, addLayerData.getStyleProviderId(), addLayerData.getStyleId());
+
+        // Set style provider reference.
+        DataReference styleProviderReference;
+        try {
+            final DataDescription dataDescription = LayerProviders.getDataDescription(addLayerData.getProviderId(), addLayerData.getLayerId());
+            if (dataDescription instanceof FeatureDataDescription) {
+                final PropertyDescription geometryProp = ((FeatureDataDescription) dataDescription).getGeometryProperty();
+                if (Polygon.class.isAssignableFrom(geometryProp.getType()) || MultiPolygon.class.isAssignableFrom(geometryProp.getType())) {
+                    styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-polygon");
+                } else if (LineString.class.isAssignableFrom(geometryProp.getType()) || MultiLineString.class.isAssignableFrom(geometryProp.getType()) || LinearRing.class.isAssignableFrom(geometryProp.getType())) {
+                    styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-line");
+                } else {
+                    styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-point");
+                }
+            } else {
+                styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-raster");
+            }
+        } catch (CstlServiceException ex) {
+            LOGGER.log(Level.INFO, "Error when trying to find an appropriate default style. Fallback to an hybrid style.");
+            styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-hybrid");
+        }
+
+        // Declare the style as "applicable" for the layer data.
+        try {
+            StyleProviderConfig.linkToData(
+                    styleProviderReference.getProviderId(),
+                    styleProviderReference.getLayerId().getLocalPart(),
+                    layerProviderReference.getProviderId(),
+                    layerProviderReference.getLayerId().getLocalPart());
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, "Error when associating layer default style to the layer source data.", ex);
+        }
 
         // Build descriptor.
         final ProcessDescriptor desc = getProcessDescriptor("service.add_layer");

@@ -10,13 +10,16 @@ import org.constellation.dto.DataInformation;
 import org.constellation.dto.MetadataLists;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.templates.raster_description;
+import org.constellation.gui.service.ProviderManager;
+import org.constellation.dto.DataInformation;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Locale;
 
 /**
- * @author Benjamin Garcia (Geomatys)
+ * @author Benjamin Garcia (Geomatys).
+ * @author Fabien Bernard (Geomatys).
  */
 public class RasterController {
 
@@ -55,6 +58,6 @@ public class RasterController {
         DataInformation information = informationContainer.getInformation();
         //create provider
         providerManager.createProvider("coverage-file", information.getName(), information.getPath(), information.getDataType(), null);
-        return StyleController_.edition(information.getName(), information.getName(), null, null, returnURL);
+        return Response.redirect(returnURL);
     }
 }

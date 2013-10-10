@@ -32,10 +32,23 @@
             <div data-role="list"></div>
         </div>
         <div id="dataName" class="dashboard" style="display:none;">
-            #{include path=add_data_alias.gtmpl/}
-        </div>
-        <div id="styleList" class="dashboard" style="display:none;">
-            #{include path=add_data_style.gtmpl/}
+            <div class="alert alert-info">
+                &{adddata.popup.informations.subtitle.label}
+            </div>
+            <div>
+                <form class="form-horizontal" id="addLayerForm" action="@{addLayer(serviceId = service.identifier)}" method="post">
+                    <input type="hidden" name="dataName" />
+                    <input type="hidden" name="dataProvider" />
+                    <input type="hidden" name="styleName" />
+                    <input type="hidden" name="styleProvider" />
+                    <div class="control-group">
+                        <label class="control-label" for="layerAlias">&{adddata.popup.informations.name.label}</label>
+                        <div class="controls">
+                            <input type="text" name="layerAlias" id="layerAlias" placeholder="Nom de la couche">
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     <div class="modal-footer">

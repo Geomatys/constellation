@@ -4,19 +4,19 @@
     <p>&{msg.no.selected.style}</p>
 </div>
 <%if(selected != null){%>
-    <div class="selected-item" data-name="${selected.record.name}" data-provider="${selected.record.provider}">
+    <div class="selected-item" data-name="${selected.brief.name}" data-provider="${selected.brief.provider}">
         <div class="block-header">
-            <strong>${selected.record.name}</strong><i class="icon-chevron-up pull-right"></i>
+            <strong>${selected.brief.name}</strong><i class="icon-chevron-up pull-right"></i>
         </div>
         <div class="block-content">
             <h6>&{label.description}</h6>
             <span><%if(selected.description != null && selected.description != ''){%>${selected.description}<%}else{%>&{label.no.description}<%}%></span>
             <div class="separator"></div>
             <h6>&{label.owner}</h6>
-            <span><%if(selected.record.owner != null && selected.record.owner != ''){%>${selected.record.owner}<%}else{%>&{label.unknown}<%}%></span>
+            <span><%if(selected.brief.owner != null && selected.brief.owner != ''){%>${selected.brief.owner}<%}else{%>&{label.unknown}<%}%></span>
             <div class="separator"></div>
             <h6>&{label.date}</h6>
-            <span>${selected.record.date}</span>
+            <span>${selected.brief.date}</span>
             <div class="separator"></div>
             <h6>&{label.symbols}</h6>
             <%for(def type : selected.symbolizerTypes){%>
@@ -43,16 +43,16 @@
         </div>
         <div class="block-action">
             <div class="row-fluid">
-                <a href="@{StyleController.edition(styleName = selected.record.name, styleProvider = selected.record.provider)}&returnURL=@{StyleController.dashboard()}" title="&{msg.edit.style.selected}" class="btn btn-info span6">
+                <a href="@{StyleController.edition(styleName = selected.brief.name, styleProvider = selected.brief.provider)}&returnURL=@{StyleController.dashboard()}" title="&{msg.edit.style.selected}" class="btn btn-info span6">
                     <i class="icon-edit"></i> &{label.edit}
                 </a>
-                <button type="button" title="&{msg.delete.style.selected}" class="btn btn-danger span6" onclick="CSTL.StyleDashboard.removeStyle('${selected.record.name}','${selected.record.provider}');">
+                <button type="button" title="&{msg.delete.style.selected}" class="btn btn-danger span6" onclick="CSTL.StyleDashboard.removeStyle('${selected.brief.name}','${selected.brief.provider}');">
                     <i class="icon-trash"></i> &{label.delete}
                 </button>
             </div>
         </div>
         <script type="text/javascript">
-            CSTL.LinkDataWorkflow.setStyle('${selected.record.name}','${selected.record.provider}');
+            CSTL.LinkDataWorkflow.setStyle('${selected.brief.name}','${selected.brief.provider}');
         </script>
     </div>
 <%}%>

@@ -17,6 +17,7 @@
 
 package org.constellation.ws.rs;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.sis.geometry.Envelope2D;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.Static;
@@ -362,7 +363,7 @@ public final class LayerProviders extends Static {
         description.setGeometryProperty(new PropertyDescription(
                 geometryDesc.getName().getNamespaceURI(),
                 geometryDesc.getName().getLocalPart(),
-                geometryDesc.getType().getBinding()));
+                geometryDesc.getType().getBinding() != null ? geometryDesc.getType().getBinding() : Geometry.class));
         for (final PropertyDescriptor desc : featureType.getDescriptors()) {
             description.getProperties().add(new PropertyDescription(
                     desc.getName().getNamespaceURI(),

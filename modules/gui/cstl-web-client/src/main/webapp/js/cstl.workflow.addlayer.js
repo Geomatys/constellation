@@ -32,21 +32,16 @@ CSTL.AddLayerWorkflow = {
     $form:       null,
     $dataList:   null,
     $dataName:   null,
-    $styleList:  null,
     $nextBtn:    null,
-    $selectData: null,
 
     dataList:    null,
-    styleList:   null,
 
     init: function() {
         // Select persistent HTML element.
-        this.$form       = $('#addLayerForm');
-        this.$dataList   = $('#dataList');
-        this.$dataName   = $('#dataName');
-        this.$styleList  = $('#styleList');
-        this.$nextBtn    = $('#continue');
-        this.$selectData = $('[data-part="selectedData"]');
+        this.$form      = $('#addLayerForm');
+        this.$dataList  = $('#dataList');
+        this.$dataName  = $('#dataName');
+        this.$nextBtn   = $('#continue');
 
         // Event listeners.
         this.$form.find('input[name="layerAlias"]').on('keyup', this.onAliasChanged);
@@ -56,16 +51,8 @@ CSTL.AddLayerWorkflow = {
             $root:    this.$dataList,
             loadFunc: 'Controller.getAvailableData()',
             params:   {'dataTypes':['raster','vector']},
-            onLoad:    $.proxy(this.onDataLoaded, this),
-            onSelect:  $.proxy(this.onDataSelect, this)
-        });
-
-        // Style list dashboard.
-        this.styleList = new Dashboard({
-            $root:     this.$styleList,
-            loadFunc: 'StyleController.styleList()',
-            onLoad:    $.proxy(this.onStyleLoaded, this),
-            onSelect:  $.proxy(this.onStyleSelect, this)
+            onLoad:   $.proxy(this.onDataLoaded, this),
+            onSelect: $.proxy(this.onDataSelect, this)
         });
     },
 
@@ -76,17 +63,6 @@ CSTL.AddLayerWorkflow = {
     onDataSelect: function($elt) {
         this.$form.find('input[name="dataName"]').val($elt.data('name'));
         this.$form.find('input[name="dataProvider"]').val($elt.data('provider'));
-        this.$nextBtn.removeAttr('disabled'); // the user has selected an item, allow next step
-        this.$selectData.empty().append($elt.clone());
-    },
-
-    onStyleLoaded: function() {
-        this.$nextBtn.attr('disabled','disabled'); // selection lost, do not allow next step
-    },
-
-    onStyleSelect: function($elt) {
-        this.$form.find('input[name="styleName"]').val($elt.data('name'));
-        this.$form.find('input[name="styleProvider"]').val($elt.data('provider'));
         this.$nextBtn.removeAttr('disabled'); // the user has selected an item, allow next step
     },
 
@@ -102,12 +78,7 @@ CSTL.AddLayerWorkflow = {
         // Reset form.
         this.$form.find('input[name="dataName"]').val('');
         this.$form.find('input[name="dataProvider"]').val('');
-        this.$form.find('input[name="styleName"]').val('');
-        this.$form.find('input[name="styleProvider"]').val('');
         this.$form.find('input[name="layerAlias"]').val('');
-
-        // Empty selected data.
-        this.$selectData.empty();
 
         // Disabled next button (the user should select a data).
         this.$nextBtn.attr('disabled','disabled');
@@ -118,7 +89,6 @@ CSTL.AddLayerWorkflow = {
         // Show first workflow panel, hide others.
         $("#dataList").fadeIn("slow");
         $("#dataName").fadeOut("slow", function(){$(this).hide()});
-        $("#styleList").fadeOut("slow", function(){$(this).hide()});
     },
 
     next: function($clicked) {
@@ -137,13 +107,6 @@ CSTL.AddLayerWorkflow = {
                 $("#dataName").fadeToggle();
             });
         } else if (this.$dataName.is(':visible')) {
-            this.styleList.loadItems();
-            this.$form.find('input[name="layerAlias"]').trigger('focus');
-            $("#dataName").fadeToggle(function() {
-                $(this).hide();
-                $("#styleList").fadeToggle();
-            });
-        } else if (this.$styleList.is(':visible')) {
             this.$form.submit();
         }
     }

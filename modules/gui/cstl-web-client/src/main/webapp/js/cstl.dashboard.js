@@ -52,8 +52,6 @@ function Dashboard(config) {
     // Sort parameters (cache).
     this.startIndex    = 0;                                         // current start index
     this.nbItems       = 10;                                        // current nb/page
-    this.sortCriteria  = null;                                      // current sort criteria
-    this.sortDirection = null;                                      // current sort direction
 
     // Event handling.
     this.$sortLinks.on('click', $.proxy(this.sort, this));                                  // listen sort button click
@@ -95,8 +93,6 @@ Dashboard.prototype.fromIndex = function(index) {
  */
 Dashboard.prototype.reset = function() {
     this.startIndex    = 0;
-    this.sortCriteria  = null;
-    this.sortDirection = null;
     this.$sortLinks.removeClass('descending ascending');
     this.$filterInput.val('');
     this.loadItems();
@@ -121,10 +117,9 @@ Dashboard.prototype.filter = function() {
  */
 Dashboard.prototype.sort = function(e) {
     var $source = $(e.currentTarget);
-    this.sortCriteria  = $source.data('order-by');
-    this.sortDirection = $source.hasClass('descending') ? 'ascending' : 'descending';
+    var direction = $source.hasClass('descending') ? 'ascending' : 'descending';
     this.$sortLinks.removeClass('descending ascending');
-    $source.addClass(this.sortDirection);
+    $source.addClass(direction);
     this.loadItems();
     return false;
 };
@@ -161,11 +156,20 @@ Dashboard.prototype.loadItems = function() {
     // Display ajax loader.
     this.$ajaxLoader.show();
 
+    // Resolve sort criteria and direction.
+    var sortCriteria  = null,
+        sortDirection = null,
+        $active       = this.$sortLinks.filter('.ascending, .descending');
+    if ($active.length !== 0) {
+        sortCriteria  = $active.data('order-by');
+        sortDirection = $active.hasClass('ascending') ? 'ascending' : 'descending'
+    }
+
     // Prepare parameters.
     var parameters = {
         filter:    this.$filterInput.val(),
-        orderBy:   this.sortCriteria,
-        direction: this.sortDirection,
+        orderBy:   sortCriteria,
+        direction: sortDirection,
         count:     this.nbItems,
         start:     this.startIndex
     };

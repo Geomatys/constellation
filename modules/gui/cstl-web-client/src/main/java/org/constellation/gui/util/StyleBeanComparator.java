@@ -109,7 +109,7 @@ public class StyleBeanComparator implements Comparator<StyleBean> {
     }
 
     private int compareDate(final StyleBean s1, final StyleBean s2) {
-        return ObjectUtils.compare(s1.getDate(), s2.getDate(), true);
+        return -ObjectUtils.compare(s1.getDate(), s2.getDate(), true);
     }
 
     private int compareOwner(final StyleBean s1, final StyleBean s2) {

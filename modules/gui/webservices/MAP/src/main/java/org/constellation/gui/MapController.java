@@ -31,10 +31,12 @@ import org.constellation.dto.StyleBean;
 import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.MapManager;
 import org.constellation.gui.service.ServicesManager;
+import org.constellation.gui.util.LayerComparator;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,26 +89,28 @@ public class MapController {
     }
 
     /**
-     * Generate WMS service edition page.
+     * Returns the view for map service dashboard.
      *
-     * @param serviceId the service identifier
+     * @param serviceId   the service identifier
+     * @param serviceType the service type
+     * @param selected    the selected layer name (optional)
      * @return the view {@link juzu.Response}
-     * @throws java.io.IOException on communication error with Constellation server
+     * @throws IOException on communication error with Constellation server
      */
     @View
     @Route("edit/{serviceType}/{serviceId}")
-    public Response editMapService(String serviceId, String serviceType) throws IOException {
+    public Response dashboard(final String serviceId, final String serviceType) throws IOException {
         final Service metadata    = servicesManager.getMetadata(serviceId, Specification.fromShortName(serviceType));
         final Instance instance   = servicesManager.getInstance(serviceId, Specification.fromShortName(serviceType));
         final LayerList layerList = mapManager.getLayers(serviceId);
 
         // Build service capabilities URL.
-        String capabilitiesUrl = cstl.getUrl() + "WS/"+serviceType+"/" + serviceId +"?REQUEST=GetCapabilities&SERVICE="+Specification.fromShortName(serviceType).name();
+        String capabilitiesUrl = cstl.getUrl() + "WS/" + serviceType + "/" + serviceId + "?REQUEST=GetCapabilities&SERVICE=" + serviceType;
         if (metadata.getVersions()!=null && metadata.getVersions().size() == 1) {
             capabilitiesUrl += "&VERSION=" + metadata.getVersions().get(0);
         }
 
-        // Truncate the list.
+        // Truncate and sort the list.
         final List<Layer> layers;
         if (!layerList.getLayer().isEmpty()) {
             final int endIndex = Math.min(layerList.getLayer().size(), 10);
@@ -114,6 +118,7 @@ public class MapController {
         } else {
             layers = new ArrayList<>(0);
         }
+        Collections.sort(layers, new LayerComparator("date", "descending"));
 
         //use parameter map (not type safe technique) because we aren't on juzu project => gtmpl aren't build.
         final Map<String, Object> parameters = new HashMap<>(0);

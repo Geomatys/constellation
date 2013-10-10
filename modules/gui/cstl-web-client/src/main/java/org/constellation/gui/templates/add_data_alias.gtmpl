@@ -1,4 +1,3 @@
-<div data-part="selectedData" class="item-list"></div>
 <div class="alert alert-info">
     &{adddata.popup.informations.subtitle.label}
 </div>
