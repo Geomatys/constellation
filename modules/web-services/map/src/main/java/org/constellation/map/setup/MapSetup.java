@@ -63,7 +63,7 @@ public class MapSetup implements SetupService {
     @Override
     public void initialize(Properties properties, boolean reinit) {
         
-        LOGGER.log(Level.WARNING, "=== Activating Native Codec ===");
+        LOGGER.log(Level.INFO, "=== Activating Native Codec ===");
         
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){
