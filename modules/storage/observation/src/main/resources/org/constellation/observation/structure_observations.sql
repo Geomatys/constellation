@@ -31,8 +31,7 @@ CREATE TABLE "observation"."any_results" (
 CREATE SEQUENCE "any_results_id_result_seq"
     INCREMENT BY 1
     NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
+    NO MINVALUE;
 
 CREATE TABLE "observation"."any_scalars" (
     "id_datablock"  character varying(40) NOT NULL,
