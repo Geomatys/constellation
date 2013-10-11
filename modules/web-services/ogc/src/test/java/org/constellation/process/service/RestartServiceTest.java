@@ -94,7 +94,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
     }
 
     @Test
-    public void testRestartAllNoClose() throws NoSuchIdentifierException, ProcessException {
+    public void testRestartAllNoClose() throws NoSuchIdentifierException, ProcessException, InterruptedException {
 
         startAllInstance();
         createInstance("restartInstance3");
@@ -111,6 +111,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(false);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
+        Thread.sleep(1000);
 
         final int newSize =  WSEngine.getInstanceSize(serviceName);
         final Set<String> instances = WSEngine.getInstanceNames(serviceName);
