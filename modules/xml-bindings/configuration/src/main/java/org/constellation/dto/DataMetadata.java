@@ -4,6 +4,8 @@ package org.constellation.dto;
 import juzu.Mapped;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Just pojo for metadata information write by user
@@ -11,59 +13,126 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9
  * @since 0.9
- *
  */
 @Mapped
 @XmlRootElement
 public class DataMetadata {
 
-   private String Name;
+    private String dataPath;
+    private String title;
+    private String anAbstract;
+    private List<String> keywords;
+    private String username;
+    private String organisationName;
+    private String role;
+    private String localeMetadata;
+    private String topicCategory;
+    private Date date;
+    private String dateType;
+    private String localeData;
+    private String type;
 
-    private String keywords;
-
-    private String description;
-
-    private String date;
-
-    private String dataType;
-
-    public String getDataType() {
-        return dataType;
+    public String getDataPath() {
+        return dataPath;
     }
 
-    public void setDataType(final String dataType) {
-        this.dataType = dataType;
+    public void setDataPath(final String dataPath) {
+        this.dataPath = dataPath;
     }
 
-    public String getName() {
-        return Name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(final String name) {
-        Name = name;
+    public void setTitle(final String title) {
+        this.title = title;
     }
 
-    public String getKeywords() {
+    public String getAnAbstract() {
+        return anAbstract;
+    }
+
+    public void setAnAbstract(final String anAbstract) {
+        this.anAbstract = anAbstract;
+    }
+
+    public List<String> getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(final String keywords) {
+    public void setKeywords(final List<String> keywords) {
         this.keywords = keywords;
     }
 
-    public String getDescription() {
-        return description;
+    public String getUsername() {
+        return username;
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
+    public void setUsername(final String username) {
+        this.username = username;
     }
 
-    public String getDate() {
+    public String getOrganisationName() {
+        return organisationName;
+    }
+
+    public void setOrganisationName(final String organisationName) {
+        this.organisationName = organisationName;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(final String role) {
+        this.role = role;
+    }
+
+    public String getLocaleMetadata() {
+        return localeMetadata;
+    }
+
+    public void setLocaleMetadata(final String localeMetadata) {
+        this.localeMetadata = localeMetadata;
+    }
+
+    public String getTopicCategory() {
+        return topicCategory;
+    }
+
+    public void setTopicCategory(final String topicCategory) {
+        this.topicCategory = topicCategory;
+    }
+
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(final String date) {
+    public void setDate(final Date date) {
         this.date = date;
+    }
+
+    public String getDateType() {
+        return dateType;
+    }
+
+    public void setDateType(final String dateType) {
+        this.dateType = dateType;
+    }
+
+    public String getLocaleData() {
+        return localeData;
+    }
+
+    public void setLocaleData(final String localeData) {
+        this.localeData = localeData;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 }

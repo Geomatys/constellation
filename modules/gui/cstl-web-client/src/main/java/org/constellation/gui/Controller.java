@@ -35,9 +35,7 @@ import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.AddLayer;
 import org.constellation.dto.Contact;
 import org.constellation.dto.DataInformation;
-import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
-import org.constellation.dto.StyleListBean;
 import org.constellation.gui.service.InstanceSummary;
 import org.constellation.gui.service.MapManager;
 import org.constellation.gui.service.ProviderManager;
@@ -46,7 +44,6 @@ import org.constellation.gui.service.bean.LayerData;
 import org.constellation.gui.templates.webservices;
 import org.constellation.gui.util.LayerComparator;
 import org.constellation.gui.util.LayerDataComparator;
-import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -196,7 +193,7 @@ public class Controller {
                                   String v111, String v130, String keywords, String serviceType) throws IOException {
 
         //create version list to set on createdService
-        List<String> versionList = new ArrayList<String>(0);
+        List<String> versionList = new ArrayList<>(0);
         if (v111 != null) {
             versionList.add(v111);
         }

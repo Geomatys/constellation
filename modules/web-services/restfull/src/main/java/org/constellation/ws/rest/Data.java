@@ -12,13 +12,16 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
+import org.constellation.utils.MetadataFeeder;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
@@ -51,6 +54,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileFilter;
@@ -248,6 +252,68 @@ public class Data {
             return Response.status(200).entity(information).build();
         }
         return Response.status(418).build();
+    }
+
+    /**
+     * Save metadata with merge from ISO19115 form
+     *
+     * @param metadataToSave {@link org.constellation.dto.DataMetadata} which contains new information for metadata.
+     * @return {@link javax.ws.rs.core.Response} with code 200.
+     */
+    @POST
+    @Path("metadata")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response saveMetadata(final DataMetadata metadataToSave) {
+        //Recover metadata
+        DefaultMetadata dm = null;
+        switch (metadataToSave.getType()) {
+            case "raster":
+                try {
+                    dm = getRasterMetadata(metadataToSave);
+                } catch (CoverageStoreException e) {
+                    LOGGER.log(Level.WARNING, "Error when try to access to metadata from data file", e);
+                }
+                break;
+            case "vector":
+                break;
+            default:
+                if (LOGGER.isLoggable(Level.INFO)) {
+                    LOGGER.log(Level.INFO, "Type unknown");
+                    Response.status(200).build();
+                }
+                ;
+        }
+
+        //Update metadata
+        MetadataFeeder mf = new MetadataFeeder(dm);
+        mf.feed(metadataToSave);
+
+        //Save metadata
+        final File dataFile = new File(metadataToSave.getDataPath());
+        saveMetaData(dataFile.getParentFile(), dm, dataFile.getName());
+        return Response.status(200).build();
+    }
+
+    private void saveMetaData(final File parentFile, final DefaultMetadata fileMetadata, final String dataName) {
+        try {
+            final Marshaller m = CSWMarshallerPool.getInstance().acquireMarshaller();
+            final File metadataFile = new File(parentFile, dataName + ".xml");
+            m.marshal(fileMetadata, metadataFile);
+            GenericDatabaseMarshallerPool.getInstance().recycle(m);
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "metadata not saved", ex);
+        }
+    }
+
+    private DefaultMetadata getRasterMetadata(final DataMetadata metadataToSave) throws CoverageStoreException {
+
+        final File dataFile = new File(metadataToSave.getDataPath());
+        GridCoverageReader coverageReader = CoverageIO.createSimpleReader(dataFile);
+        if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
+            return (DefaultMetadata) coverageReader.getMetadata();
+        }
+        return null;
     }
 
     /**

@@ -24,6 +24,7 @@ import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.dto.AddLayer;
 import org.constellation.dto.DataInformation;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Database;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.MetadataLists;
@@ -192,5 +193,13 @@ public class ProviderManager {
                 LOGGER.log(Level.WARNING, "MetadataCodeList service isn't accessible", e);
         }
         return null;
+    }
+
+    public void saveISO19115Metadata(final DataMetadata metadataToSave) {
+        try {
+            cstl.openClient().providers.saveISO19115Metadata(metadataToSave);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Unable to access to service to save metadata", e);
+        }
     }
 }

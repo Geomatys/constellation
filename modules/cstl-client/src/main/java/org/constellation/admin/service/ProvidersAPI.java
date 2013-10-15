@@ -19,6 +19,7 @@ package org.constellation.admin.service;
 
 import org.constellation.configuration.StyleReport;
 import org.constellation.dto.DataInformation;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
 import org.constellation.dto.MetadataLists;
@@ -74,7 +75,7 @@ public final class ProvidersAPI {
      * @param providerId the style provider identifier
      * @return the list of available styles
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-     * @throws IOException on HTTP communication error or response entity parsing error
+     * @throws IOException           on HTTP communication error or response entity parsing error
      */
     public StyleListBean getStyles(final String providerId) throws HttpResponseException, IOException {
         ensureNonNull("providerId", providerId);
@@ -89,7 +90,7 @@ public final class ProvidersAPI {
      * @param providerId the style provider identifier
      * @param styleName  the style name
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-     * @throws IOException on HTTP communication error or response entity parsing error
+     * @throws IOException           on HTTP communication error or response entity parsing error
      */
     public void deleteStyle(final String providerId, final String styleName) throws HttpResponseException, IOException {
         ensureNonNull("providerId", providerId);
@@ -105,11 +106,11 @@ public final class ProvidersAPI {
      * @param providerId the style provider identifier
      * @param styleName  the style name
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-     * @throws IOException on HTTP communication error or response entity parsing error
+     * @throws IOException           on HTTP communication error or response entity parsing error
      */
     public StyleReport getStyleReport(final String providerId, final String styleName) throws HttpResponseException, IOException {
         ensureNonNull("providerId", providerId);
-        ensureNonNull("styleName",  styleName);
+        ensureNonNull("styleName", styleName);
 
         final String path = "SP/" + providerId + "/style/" + styleName + "/report";
         return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(StyleReport.class);
@@ -123,17 +124,17 @@ public final class ProvidersAPI {
      * @param dataProvider  the data provider identifier
      * @param dataName      the data name
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-     * @throws IOException on HTTP communication error or response entity parsing error
+     * @throws IOException           on HTTP communication error or response entity parsing error
      */
     public void linkStyleToData(final String styleProvider, final String styleName, final String dataProvider, final String dataName) throws HttpResponseException, IOException {
         ensureNonNull("styleProvider", styleProvider);
-        ensureNonNull("styleName",     styleName);
-        ensureNonNull("dataProvider",  dataProvider);
-        ensureNonNull("dataName",      dataName);
+        ensureNonNull("styleName", styleName);
+        ensureNonNull("dataProvider", dataProvider);
+        ensureNonNull("dataName", dataName);
 
         final ParameterValues values = new ParameterValues();
         values.getValues().put("dataProvider", dataProvider);
-        values.getValues().put("dataId",       dataName);
+        values.getValues().put("dataId", dataName);
 
         final String path = "SP/" + styleProvider + "/style/" + styleName + "/linkData";
         client.post(path, MediaType.APPLICATION_XML_TYPE, values).ensure2xxStatus();
@@ -147,17 +148,17 @@ public final class ProvidersAPI {
      * @param dataProvider  the data provider identifier
      * @param dataName      the data name
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-     * @throws IOException on HTTP communication error or response entity parsing error
+     * @throws IOException           on HTTP communication error or response entity parsing error
      */
     public void unlinkStyleFromData(final String styleProvider, final String styleName, final String dataProvider, final String dataName) throws HttpResponseException, IOException {
         ensureNonNull("styleProvider", styleProvider);
-        ensureNonNull("styleName",     styleName);
-        ensureNonNull("dataProvider",  dataProvider);
-        ensureNonNull("dataName",      dataName);
+        ensureNonNull("styleName", styleName);
+        ensureNonNull("dataProvider", dataProvider);
+        ensureNonNull("dataName", dataName);
 
         final ParameterValues values = new ParameterValues();
         values.getValues().put("dataProvider", dataProvider);
-        values.getValues().put("dataId",       dataName);
+        values.getValues().put("dataId", dataName);
 
         final String path = "SP/" + styleProvider + "/style/" + styleName + "/unlinkData";
         client.post(path, MediaType.APPLICATION_XML_TYPE, values).ensure2xxStatus();
@@ -187,6 +188,10 @@ public final class ProvidersAPI {
     }
 
     public MetadataLists getMetadataCodeLists(final String locale) throws IOException {
-        return client.get("data/metadataCodeLists/"+locale, MediaType.APPLICATION_XML_TYPE).getEntity(MetadataLists.class);
+        return client.get("data/metadataCodeLists/" + locale, MediaType.APPLICATION_XML_TYPE).getEntity(MetadataLists.class);
+    }
+
+    public void saveISO19115Metadata(final DataMetadata metadataToSave) throws IOException {
+        client.post("data/metadata", MediaType.APPLICATION_XML_TYPE, metadataToSave);
     }
 }

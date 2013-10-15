@@ -1,101 +1,135 @@
-<form class="form-horizontal">
-    <div class="control-group">
-        <label class="control-label" for="metadataLocale">Locale metadata</label>
-        <div class="controls">
-            <select name="metadataLocale" id="metadataLocale" required>
-                <% for (def locale: locales.keySet()) {%>
-                    <option value="${locale}" />${locales.get(locale)}</option>
-                <%}%>
-            </select>
+<div class="row">
+    <div class="span6">
+        <div class="control-group">
+            <label class="control-label" for="title">Title</label>
+
+            <div class="controls">
+                <input type="text" name="metadataToSave.title" id="title" required/>
+            </div>
         </div>
+
+        <div class="control-group">
+            <label class="control-label" for="abstract">Abstract</label>
+
+            <div class="controls">
+                <textarea name="metadataToSave.anAbstract" id="abstract" rows="5" class="span4" required></textarea>
+
+                <p class="help-block"></p>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="keywords">keywords</label>
+
+            <div class="controls">
+                <input type="text" name="keywords" id="keywords" required/>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="username">User name</label>
+
+            <div class="controls">
+                <input type="text" name="metadataToSave.username" id="username" required
+                       data-validation-matches-message="what?" aria-invalid="false"/>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="organisationName">Organisation name</label>
+
+            <div class="controls">
+                <input type="text" name="metadataToSave.organisationName" id="organisationName" required/>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="roleCode">Role</label>
+
+            <div class="controls">
+                <select name="metadataToSave.role" id="roleCode" required>
+                    <% for (def role : roles.keySet()) { %>
+                    <option value="${role}"/>${roles.get(role)}</option>
+                    <% } %>
+                </select>
+            </div>
+        </div>
+
     </div>
 
-    <div class="control-group">
-        <label class="control-label" for="individualName">User name</label>
-        <div class="controls">
-            <input type="text" name="individualName" id="individualName" required/>
-        </div>
-    </div>
+    <div class="span6">
+        <div class="control-group">
+            <label class="control-label" for="localeMetadata">Locale metadata</label>
 
-    <div class="control-group">
-        <label class="control-label" for="organisationName">Organisation name</label>
-        <div class="controls">
-            <input type="text" name="organisationName" id="organisationName required"/>
+            <div class="controls">
+                <select name="metadataToSave.localeMetadata" id="localeMetadata" required>
+                    <% for (def locale : locales.keySet()) { %>
+                    <option value="${locale}"/>${locales.get(locale)}</option>
+                    <% } %>
+                </select>
+            </div>
         </div>
-    </div>
 
-    <div class="control-group">
-        <label class="control-label" for="roleCode">Role</label>
-        <div class="controls">
-            <select name="roleCode" id="roleCode" required>
-                <% for (def role: roles.keySet()) {%>
-                    <option value="${role}" />${roles.get(role)}</option>
-                <%}%>
-            </select>
-        </div>
-    </div>
+        <div class="control-group">
+            <label class="control-label" for="topicCategory">Topic category</label>
 
-    <div class="control-group">
-        <label class="control-label" for="title">Title</label>
-        <div class="controls">
-            <input type="text" name="title" id="title" required/>
+            <div class="controls">
+                <select name="metadataToSave.topicCategory" id="topicCategory" required>
+                    <% for (def topic : topics.keySet()) { %>
+                    <option value="${topic}"/>${topics.get(topic)}</option>
+                    <% } %>
+                </select>
+            </div>
         </div>
-    </div>
 
-    <div class="control-group">
-        <label class="control-label" for="date">Data date</label>
-        <div class="controls">
-            <input type="text" name="date" id="date" required/>
-        </div>
-    </div>
+        <div class="control-group">
+            <label class="control-label" for="date">Data date</label>
 
-    <div class="control-group">
-        <label class="control-label" for="dateType">Date type</label>
-        <div class="controls">
-            <select name="dateType" id="dateType" required>
-                <% for (def type: dateTypes.keySet()) {%>
-                    <option value="${type}" >${dateTypes.get(type)}</option>
-                <%}%>
-            </select>
+            <div class="controls">
+                <input type="text" name="date" id="date" required/>
+            </div>
         </div>
-    </div>
 
-    <div class="control-group">
-        <label class="control-label" for="abstract">Abstract</label>
-        <div class="controls">
-            <textarea name="abstrat" id="abstract" required></textarea>
-        </div>
-    </div>
+        <div class="control-group">
+            <label class="control-label" for="dateType">Date type</label>
 
-    <div class="control-group">
-        <label class="control-label" for="dataLocale">Locale data</label>
-        <div class="controls">
-            <select name="dataLocale" id="dataLocale" required>
-                <% for (def locale: locales.keySet()) {%>
-                    <option value="${locale}" />${locales.get(locale)}</option>
-                <%}%>
-            </select>
+            <div class="controls">
+                <select name="metadataToSave.dateType" id="dateType" required>
+                    <% for (def type : dateTypes.keySet()) { %>
+                    <option value="${type}">${dateTypes.get(type)}</option>
+                    <% } %>
+                </select>
+            </div>
         </div>
-    </div>
 
-    <div class="control-group">
-        <label class="control-label" for="topicCategory">Locale metadata</label>
-        <div class="controls">
-            <select name="topicCategory" id="topicCategory" required>
-                <% for (def topic: topics.keySet()) {%>
-                    <option value="${topic}" />${topics.get(topic)}</option>
-                <%}%>
-            </select>
-        </div>
-    </div>
+        <div class="control-group">
+            <label class="control-label" for="localeData">Locale data</label>
 
-    <div class="control-group">
-        <label class="control-label" for="keywords">keywords</label>
-        <div class="controls">
-            <input type="text" name="keywords" id="keywords" required/>
+            <div class="controls">
+                <select name="metadataToSave.localeData" id="localeData" required>
+                    <% for (def locale : locales.keySet()) { %>
+                    <option value="${locale}"/>${locales.get(locale)}</option>
+                    <% } %>
+                </select>
+            </div>
         </div>
     </div>
-</form>
-<script>
-    $("#date").datepicker({});
-</script>
+    <script>
+        $("#date").datepicker({
+            todayBtn: true,
+            todayHighlight: true,
+            language: "<%= userLocale %>"
+        });
+        $('#keywords').selectize({
+            plugins: ['remove_button'],
+            delimiter: ',',
+            persist: false,
+            create: function (input) {
+                return {
+                    value: input,
+                    text: input
+                }
+            }
+        });
+    </script>
+</div>

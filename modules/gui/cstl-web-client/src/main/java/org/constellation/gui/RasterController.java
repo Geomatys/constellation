@@ -6,16 +6,23 @@ import juzu.Response;
 import juzu.Route;
 import juzu.View;
 import juzu.impl.request.Request;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.dto.DataInformation;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.MetadataLists;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.templates.raster_description;
-import org.constellation.gui.service.ProviderManager;
-import org.constellation.dto.DataInformation;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Benjamin Garcia (Geomatys).
@@ -23,6 +30,7 @@ import java.util.Locale;
  */
 public class RasterController {
 
+    private static final Logger LOGGER = Logging.getLogger(RasterController.class);
     /**
      * Manager used to call constellation server side.
      */
@@ -49,14 +57,37 @@ public class RasterController {
                 .locales(codeLists.getLocales())
                 .roles(codeLists.getRoles())
                 .topics(codeLists.getCategories())
+                .userLocale(userLocale.getLanguage())
                 .ok().withMimeType("text/html");
     }
 
     @Action
     @Route("/raster/create")
-    public Response createProvider(final String returnURL){
+    public Response createProvider(String returnURL, DataMetadata metadataToSave, String date, String keywords) {
+        final Locale userLocale = Request.getCurrent().getUserContext().getLocale();
+        DateFormat formatDate = DateFormat.getDateInstance(DateFormat.SHORT, userLocale);
+        Date metadataDate = null;
+        try {
+            metadataDate = formatDate.parse(date);
+        } catch (ParseException e) {
+            LOGGER.log(Level.WARNING, "", e);
+        }
+        metadataToSave.setDate(metadataDate);
         DataInformation information = informationContainer.getInformation();
+        metadataToSave.setDataPath(information.getPath());
+        metadataToSave.setType(information.getDataType());
+
+        //split keywords
+        String[] keywordArray = keywords.split(",");
+        List<String> keywordList = new ArrayList<>(0);
+        for (int i = 0; i < keywordArray.length; i++) {
+            String keyword = keywordArray[i];
+            keywordList.add(keyword);
+        }
+        metadataToSave.setKeywords(keywordList);
+
         //create provider
+        providerManager.saveISO19115Metadata(metadataToSave);
         providerManager.createProvider("coverage-file", information.getName(), information.getPath(), information.getDataType(), null);
         return Response.redirect(returnURL);
     }
