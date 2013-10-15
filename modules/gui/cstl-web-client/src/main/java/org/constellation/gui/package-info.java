@@ -70,19 +70,24 @@
  * javascript and css loaded
  */
 @Assets({@Asset("cstl-web-client.css"),
-        @Asset(id = "jquery",           value = "js/jquery-2.0.0.js",                                   location = AssetLocation.SERVER),
-        @Asset(id = "json",             value = "js/jquery.json-2.4.js",        depends = "jquery",     location = AssetLocation.SERVER),
-        @Asset(id = "jquery-growl",     value = "js/jquery.growl.js",           depends = "jquery",     location = AssetLocation.SERVER),
-        @Asset(id = "bootstrap",        value = "js/bootstrap.min.js",          depends = "jquery",     location = AssetLocation.SERVER),
-        @Asset(id = "colorpicker",      value = "js/bootstrap-colorpicker.js",  depends = "bootstrap",  location = AssetLocation.SERVER),
-        @Asset(id = "slider",           value = "js/bootstrap-slider.js",       depends = "bootstrap",  location = AssetLocation.SERVER),
-        @Asset(id = "upload",           value = "js/bootstrap-fileupload.js",   depends = "bootstrap",  location = AssetLocation.SERVER),
-        @Asset(id = "datepicker",       value = "js/bootstrap-datepicker.js",   depends = "bootstrap",  location = AssetLocation.SERVER),
-        @Asset(id = "validation",       value = "js/bootstrap-validation.js",   depends = "bootstrap",  location = AssetLocation.SERVER),
-        @Asset(id = "openlayers",       value = "js/openlayers.js",             depends = "jquery",     location = AssetLocation.SERVER),
-        @Asset(id = "openlayers-ext",   value = "js/openlayers-ext.js",         depends = "openlayers", location = AssetLocation.SERVER),
-        @Asset(id = "pagination",       value = "js/pagination.js",             depends = "jquery",     location = AssetLocation.SERVER),
-        @Asset(id = "selection",        value = "js/selection.js",              depends = "jquery",     location = AssetLocation.SERVER),
+        @Asset(id = "selectizecss",     value = "css/selectize.bootstrap2.css",                                                                 location = AssetLocation.SERVER),
+        @Asset(id = "jquery",           value = "js/jquery-2.0.0.js",                                                                           location = AssetLocation.SERVER),
+        @Asset(id = "json",             value = "js/jquery.json-2.4.js",                    depends = "jquery",                                 location = AssetLocation.SERVER),
+        @Asset(id = "jquery-growl",     value = "js/jquery.growl.js",                       depends = "jquery",                                 location = AssetLocation.SERVER),
+        @Asset(id = "bootstrap",        value = "js/bootstrap.min.js",                      depends = "jquery",                                 location = AssetLocation.SERVER),
+        @Asset(id = "colorpicker",      value = "js/bootstrap-colorpicker.js",              depends = "bootstrap",                              location = AssetLocation.SERVER),
+        @Asset(id = "slider",           value = "js/bootstrap-slider.js",                   depends = "bootstrap",                              location = AssetLocation.SERVER),
+        @Asset(id = "upload",           value = "js/bootstrap-fileupload.js",               depends = "bootstrap",                              location = AssetLocation.SERVER),
+        @Asset(id = "datepicker",       value = "js/bootstrap-datepicker.js",               depends = "bootstrap",                              location = AssetLocation.SERVER),
+        @Asset(id = "datepickerfr",     value = "js/locales/bootstrap-datepicker.fr.js",    depends = "datepicker",                             location = AssetLocation.SERVER),
+        @Asset(id = "validation",       value = "js/bootstrap-validation.js",               depends = "bootstrap",                              location = AssetLocation.SERVER),
+        @Asset(id = "openlayers",       value = "js/openlayers.js",                         depends = "jquery",                                 location = AssetLocation.SERVER),
+        @Asset(id = "openlayers-ext",   value = "js/openlayers-ext.js",                     depends = "openlayers",                             location = AssetLocation.SERVER),
+        @Asset(id = "pagination",       value = "js/pagination.js",                         depends = "jquery",                                 location = AssetLocation.SERVER),
+        @Asset(id = "selection",        value = "js/selection.js",                          depends = "jquery",                                 location = AssetLocation.SERVER),
+        @Asset(id = "sifter",           value = "js/sifter.min.js",                         depends = "jquery",                                 location = AssetLocation.SERVER),
+        @Asset(id = "microplugin",      value = "js/microplugin.js",                        depends = "jquery",                                 location = AssetLocation.SERVER),
+        @Asset(id = "selectize",        value = "js/selectize.min.js",                      depends = {"jquery", "sifter", "microplugin"},      location = AssetLocation.SERVER),
 
         // Constellation
         @Asset(id = "cstl",                     value = "js/cstl.js",                   depends = "jquery",         location = AssetLocation.SERVER),
@@ -113,7 +118,6 @@
  */
 @WithAssets
 package org.constellation.gui;
-
 import juzu.Alias;
 import juzu.asset.AssetLocation;
 import juzu.plugin.asset.Asset;
