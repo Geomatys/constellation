@@ -25,6 +25,7 @@ import org.geotoolkit.coverage.postgresql.PGCoverageStoreFactory;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.process.ProcessListener;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
@@ -314,6 +315,8 @@ public class PyramidCoverageHelper {
         private String outputFormat = "PNG";
         private String inputFormat = "geotiff";
 
+        private double[] deeps = new double[] { 1, 0.5, 0.25, 0.125 };
+
         private InterpolationCase interpolation = InterpolationCase.BILINEAR;
         private CoverageNamer coverageNamer = new CoverageNamer() {
 
@@ -333,6 +336,11 @@ public class PyramidCoverageHelper {
 
         public Builder inputFormat(String inputFormat) {
             this.inputFormat = inputFormat;
+            return this;
+        }
+
+        public Builder withDeeps(double[] deeps){
+            this.deeps = deeps;
             return this;
         }
 
@@ -380,6 +388,8 @@ public class PyramidCoverageHelper {
 
     final private String baseCoverageName;
 
+    private double[] deeps;
+
     public PyramidCoverageHelper(Builder builder) throws DataStoreException {
 
         this.store = builder.buildInputStore();
@@ -394,6 +404,7 @@ public class PyramidCoverageHelper {
         this.coverageNamer = builder.coverageNamer;
         this.baseCoverageName = builder.baseCoverageName;
 
+        this.deeps = builder.deeps;
     }
 
     public CoverageStore getCoverageStore() {
@@ -416,7 +427,7 @@ public class PyramidCoverageHelper {
     public Map<Envelope, double[]> getResolutionPerEnvelope(
             GridCoverage coverage) {
         Map<Envelope, double[]> map = new HashMap<>();
-        map.put(coverage.getEnvelope(), new double[] { 1, 0.5, 0.25, 0.125 });
+        map.put(coverage.getEnvelope(), deeps);
         return map;
     }
 
@@ -428,7 +439,7 @@ public class PyramidCoverageHelper {
         return coverages;
     }
 
-    public void buildPyramid() throws DataStoreException, TransformException,
+    public void buildPyramid(final ProcessListener listener) throws DataStoreException, TransformException,
             FactoryException {
         List<GridCoverage2D> coverages = getCoverages();
         int coverageCount = 1;
@@ -436,7 +447,7 @@ public class PyramidCoverageHelper {
             Map<Envelope, double[]> resolution_Per_Envelope = getResolutionPerEnvelope(coverage);
             pyramidCoverageBuilder.create(coverage, getCoverageStore(),
                     coverageNamer.getName(baseCoverageName, coverageCount),
-                    resolution_Per_Envelope, null);
+                    resolution_Per_Envelope, null, listener);
             coverageCount++;
 
         }
@@ -446,8 +457,7 @@ public class PyramidCoverageHelper {
     /**
      * Builder factory with a base name for coverage.
      * 
-     * @param baseName
-     *            of coverage
+     * @param name of coverage
      * @return Builder instance
      */
     public static Builder builder(String name) {

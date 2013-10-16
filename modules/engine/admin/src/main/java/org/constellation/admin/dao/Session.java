@@ -891,7 +891,7 @@ public final class Session {
     }
 
     /* internal */ void updateTask(final String identifier, final TaskState newState) throws SQLException {
-        new Query(UPDATE_TASK).with(newState.name(), new Date().getTime(), identifier).update();
+        new Query(UPDATE_TASK).with(newState.name(), new Date(), identifier).update();
     }
 
     public void deleteTask(final String identifier) throws SQLException {
@@ -926,6 +926,8 @@ public final class Session {
                     stmt.setLong(i + 1, (Long) args[i]);
                 } else if (args[i] instanceof StringReader) {
                     stmt.setClob(i + 1, (StringReader) args[i]);
+                } else if (args[i] instanceof Date) {
+                    stmt.setLong(i + 1, ((Date)args[i]).getTime());
                 } else {
                     stmt.setObject(i + 1, args[i]);
                 }

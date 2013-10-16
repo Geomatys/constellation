@@ -116,7 +116,7 @@ public final class OGCServices {
     @POST
     @Path("{id}/rename")
     public Response rename(final @PathParam("spec") String spec, final @PathParam("id") String id, final SimpleValue newId) throws Exception {
-        getConfigurer(spec).renameInstance(id, newId.getAsString());
+        getConfigurer(spec).renameInstance(id, newId.getValue());
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully renamed."));
     }
 

@@ -53,7 +53,7 @@ public final class SimpleValue implements Serializable {
         this.value = value;
     }
 
-    public String getAsString() {
+    public String getValue() {
         return value;
     }
 

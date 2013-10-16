@@ -46,7 +46,7 @@ public class Admin {
      * @return
      */
     @GET
-    @Path("serviceType/")
+    @Path("serviceType")
     public Response serviceType() {
         final ServiceReport response = new ServiceReport(WSEngine.getRegisteredServices());
         return Response.ok(response).build();

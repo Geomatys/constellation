@@ -10,6 +10,8 @@ import org.apache.sis.util.collection.TreeTable;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.coverage.PyramidCoverageHelper;
+import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
@@ -17,6 +19,7 @@ import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
+import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
@@ -31,6 +34,7 @@ import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.process.metadata.MetadataProcessingRegistry;
 import org.geotoolkit.process.metadata.merge.MergeDescriptor;
 import org.geotoolkit.util.FileUtilities;
@@ -40,6 +44,8 @@ import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.ImageCRS;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.FactoryException;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.NoSuchIdentifierException;
@@ -79,7 +85,7 @@ import java.util.logging.Logger;
  *
  * @author Benjamin Garcia (Geomatys)
  */
-@Path("/1/data")
+@Path("/1/data/")
 public class Data {
 
 
@@ -92,7 +98,7 @@ public class Data {
      * @return A {@link Response} with 200 code if upload work, 500 if not work.
      */
     @POST
-    @Path("/upload")
+    @Path("upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadFile(final MultiPart multi) {
 
@@ -140,8 +146,13 @@ public class Data {
         return Response.status(200).entity(information).build();
     }
 
+    /**
+     * Give metadata CodeList (example {@link org.opengis.metadata.citation.Role} codes
+     * @param pLocale locale to found right translation
+     * @return a {@link javax.ws.rs.core.Response} which contain codelists
+     */
     @GET
-    @Path("/metadataCodeLists/{locale}")
+    @Path("metadataCodeLists/{locale}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getMetadataCodeLists(@PathParam("locale") final String pLocale) {
@@ -190,11 +201,14 @@ public class Data {
         return Response.status(200).entity(mdList).build();
     }
 
+
     /**
-     * @return
+     * Give subfolder list from a server file path
+     * @param path server file path
+     * @return a {@link javax.ws.rs.core.Response} which contain file list
      */
     @POST
-    @Path("datapath/")
+    @Path("datapath")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getDataFolder(String path) {
@@ -237,6 +251,11 @@ public class Data {
         return Response.status(200).entity(list).build();
     }
 
+    /**
+     * Load data from file selected
+     * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
+     * @return a {@link javax.ws.rs.core.Response} with a {@link org.constellation.dto.DataInformation}
+     */
     @POST
     @Path("load")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -282,7 +301,6 @@ public class Data {
                     LOGGER.log(Level.INFO, "Type unknown");
                     Response.status(200).build();
                 }
-                ;
         }
 
         //Update metadata
@@ -292,6 +310,46 @@ public class Data {
         //Save metadata
         final File dataFile = new File(metadataToSave.getDataPath());
         saveMetaData(dataFile.getParentFile(), dm, dataFile.getName());
+        return Response.status(200).build();
+    }
+
+    @POST
+    @Path("pyramid/{id}/")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response pyramidDate(@PathParam("id") final String providerId, final SimpleValue path){
+
+        if(path.getValue()!=null){
+            // create folder to save pyramid
+            File dataDirectory = ConfigDirectory.getDataDirectory();
+            File pyramidFolder = new File(dataDirectory, "pyramid");
+            if(!pyramidFolder.exists()){
+                pyramidFolder.mkdir();
+            }
+
+            final File dataPyramidFolder = new File(pyramidFolder, providerId);
+            final String pyramidPath = dataPyramidFolder.getAbsolutePath();
+
+            //create listener which save information on Database
+            final ProcessListener listener = new PyramidCoverageProcessListener();
+
+            Runnable pyramidRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        PyramidCoverageHelper pyramidHelper = PyramidCoverageHelper.builder(providerId).
+                                inputFormat("AUTO").withDeeps(new double[]{1}).
+                                fromImage(path.getValue()).toFileStore(pyramidPath).build();
+                        pyramidHelper.buildPyramid(listener);
+                    } catch (MalformedURLException | DataStoreException | TransformException | FactoryException exception ) {
+                        LOGGER.log(Level.WARNING, "Error on pyramid building", exception);
+                    }
+                }
+            };
+            final Thread pyramidalThread = new Thread(pyramidRunnable);
+            pyramidalThread.start();
+
+        }
         return Response.status(200).build();
     }
 
