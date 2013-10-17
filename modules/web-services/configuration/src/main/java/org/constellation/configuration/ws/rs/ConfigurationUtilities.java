@@ -6,14 +6,12 @@ import org.constellation.admin.dao.UserRecord;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.generic.database.BDD;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -111,7 +109,6 @@ public class ConfigurationUtilities {
 
         if (cn != null) {
             if (!configurerLock(new AbstractConfigurer[0])) {
-                BDD.clearConnectionPool();
                 WSEngine.prepareRestart();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
@@ -121,7 +118,6 @@ public class ConfigurationUtilities {
                 for (AbstractConfigurer configurer : configurers) {
                     configurer.closeForced();
                 }
-                BDD.clearConnectionPool();
                 WSEngine.prepareRestart();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted (previous indexation was stopped)");

@@ -27,6 +27,7 @@ import java.sql.Statement;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
@@ -111,10 +112,12 @@ public class DefaultObservationFilter implements ObservationFilter {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
         try {
-            this.connection = DatabasePool.getDatabaseConnection(db);
-            if (this.connection == null) {
-                db.getConnection();
+            Connection candidate = DatabasePool.getDatabaseConnection(db);
+            if (candidate == null) {
+                final DataSource ds = db.getPooledDataSource();
+                candidate = ds.getConnection();
             }
+            this.connection = candidate;
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the observation filter:" +'\n'+
                                            "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);

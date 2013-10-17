@@ -21,8 +21,6 @@ package org.constellation.generic.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,9 +54,6 @@ public class BDD {
     public static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
 
     public static final String ORACLE_DRIVER_CLASS = "oracle.jdbc.driver.OracleDriver";
-
-    @Deprecated
-    private static final Map<BDD, Connection> CONNECTION_MAP = new HashMap<BDD, Connection>();
 
     /**
      * The className of the driver
@@ -257,43 +252,6 @@ public class BDD {
     }
 
     /**
-     * Return a new connection to the database.
-     *
-     * @return
-     * @throws java.sql.SQLException
-     *
-     * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
-     */
-    @Deprecated
-    public Connection getConnection() throws SQLException {
-        if (sharedConnection) {
-            Connection conec = CONNECTION_MAP.get(this);
-            if (conec == null || conec.isClosed()) {
-                // by Default  we use the postgres driver.
-                if (className == null) {
-                    className = POSTGRES_DRIVER_CLASS;
-                }
-                try {
-                    Class.forName(className);
-                } catch (ClassNotFoundException e) {
-                    // Non-fatal exception, ignore. If there is really a problem, the
-                    // following line is expected to throw the appropriate SQLException.
-                }
-                conec = DriverManager.getConnection(connectURL, user, password);
-                CONNECTION_MAP.put(this, conec);
-            }
-            return conec;
-        } else {
-            return getFreshConnection();
-        }
-    }
-
-    @Deprecated
-    public static void clearConnectionPool() {
-        CONNECTION_MAP.clear();
-    }
-
-    /**
      * Creates a data source for the given classname using the reflection API.
      * This avoid direct dependency to a driver that we can not redistribute.
      */
@@ -331,18 +289,22 @@ public class BDD {
         if (className == null) {
             className = POSTGRES_DRIVER_CLASS;
         }
-        if (className.equals(POSTGRES_DRIVER_CLASS)) {
-            if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
-                final PGSimpleDataSource pgSource = new PGSimpleDataSource();
-                fillSourceFromURL(pgSource);
-                source = pgSource;
-            } else {
-                return null;
-            }
-        } else if (className.equals(ORACLE_DRIVER_CLASS)) {
-            source = (DataSource) createDataSourceByReflection("oracle.jdbc.pool.OracleDataSource");
-        } else {
-            source = new DefaultDataSource(connectURL);
+        switch (className) {
+            case POSTGRES_DRIVER_CLASS:
+                if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
+                    final PGSimpleDataSource pgSource = new PGSimpleDataSource();
+                    fillSourceFromURL(pgSource);
+                    source = pgSource;
+                } else {
+                    return null;
+                }
+                break;
+            case ORACLE_DRIVER_CLASS:
+                source = (DataSource) createDataSourceByReflection("oracle.jdbc.pool.OracleDataSource");
+                break;
+            default:
+                source = new DefaultDataSource(connectURL);
+                break;
         }
         return source;
     }
@@ -359,68 +321,71 @@ public class BDD {
         if (className == null) {
             className = POSTGRES_DRIVER_CLASS;
         }
-        if (className.equals(POSTGRES_DRIVER_CLASS)) {
-            if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
-                //final PGConnectionPoolDataSource pgSource = new PGConnectionPoolDataSource();
-                final BasicDataSource dataSource = new BasicDataSource();
+        switch (className) {
+            case POSTGRES_DRIVER_CLASS:
+                if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
+                    //final PGConnectionPoolDataSource pgSource = new PGConnectionPoolDataSource();
+                    final BasicDataSource dataSource = new BasicDataSource();
 
-                // some default data source behaviour
-                dataSource.setPoolPreparedStatements(true);
+                    // some default data source behaviour
+                    dataSource.setPoolPreparedStatements(true);
 
-                // driver
-                dataSource.setDriverClassName(POSTGRES_DRIVER_CLASS);
+                    // driver
+                    dataSource.setDriverClassName(POSTGRES_DRIVER_CLASS);
 
-                // url
-                dataSource.setUrl(connectURL);
+                    // url
+                    dataSource.setUrl(connectURL);
 
-                // username
-                dataSource.setUsername(user);
+                    // username
+                    dataSource.setUsername(user);
 
-                // password
-                if (password != null) {
-                    dataSource.setPassword(password);
+                    // password
+                    if (password != null) {
+                        dataSource.setPassword(password);
+                    }
+
+                    /* max wait
+                    final Integer maxWait = (Integer) params.parameter(MAXWAIT.getName().toString()).getValue();
+                    if (maxWait != null && maxWait != -1) {
+                        dataSource.setMaxWait(maxWait * 1000);
+                    }
+
+                    // connection pooling options
+                    final Integer minConn = (Integer) params.parameter(MINCONN.getName().toString()).getValue();
+                    if ( minConn != null ) {
+                        dataSource.setMinIdle(minConn);
+                    }
+
+                    final Integer maxConn = (Integer) params.parameter(MAXCONN.getName().toString()).getValue();
+                    if ( maxConn != null ) {
+                        dataSource.setMaxActive(maxConn);
+                    }
+
+                    final Boolean validate = (Boolean) params.parameter(VALIDATECONN.getName().toString()).getValue();
+                    if(validate != null && validate && getValidationQuery() != null) {
+                        dataSource.setTestOnBorrow(true);
+                        dataSource.setValidationQuery(getValidationQuery());
+                    }*/
+
+                    // some datastores might need this
+                    dataSource.setAccessToUnderlyingConnectionAllowed(true);
+
+                    return new DBCPDataSource(dataSource);
+                } else {
+                    return null;
                 }
-
-                /* max wait
-                final Integer maxWait = (Integer) params.parameter(MAXWAIT.getName().toString()).getValue();
-                if (maxWait != null && maxWait != -1) {
-                    dataSource.setMaxWait(maxWait * 1000);
+            case ORACLE_DRIVER_CLASS:
+                try {
+                    source = new WrappedDataSource((ConnectionPoolDataSource)
+                            createDataSourceByReflection("oracle.jdbc.pool.OracleConnectionPoolDataSource"));
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.SEVERE, "SQLException while creating oracle datasource", ex);
+                    return null;
                 }
-
-                // connection pooling options
-                final Integer minConn = (Integer) params.parameter(MINCONN.getName().toString()).getValue();
-                if ( minConn != null ) {
-                    dataSource.setMinIdle(minConn);
-                }
-
-                final Integer maxConn = (Integer) params.parameter(MAXCONN.getName().toString()).getValue();
-                if ( maxConn != null ) {
-                    dataSource.setMaxActive(maxConn);
-                }
-
-                final Boolean validate = (Boolean) params.parameter(VALIDATECONN.getName().toString()).getValue();
-                if(validate != null && validate && getValidationQuery() != null) {
-                    dataSource.setTestOnBorrow(true);
-                    dataSource.setValidationQuery(getValidationQuery());
-                }*/
-
-                // some datastores might need this
-                dataSource.setAccessToUnderlyingConnectionAllowed(true);
-
-                return new DBCPDataSource(dataSource);
-            } else {
-                return null;
-            }
-        } else if (className.equals(ORACLE_DRIVER_CLASS)) {
-            try {
-                source = new WrappedDataSource((ConnectionPoolDataSource)
-                        createDataSourceByReflection("oracle.jdbc.pool.OracleConnectionPoolDataSource"));
-            } catch (SQLException ex) {
-                LOGGER.log(Level.SEVERE, "SQLException while creating oracle datasource", ex);
-                return null;
-            }
-        } else {
-            source = new DefaultDataSource(connectURL);
+                break;
+            default:
+                source = new DefaultDataSource(connectURL);
+                break;
         }
         return source;
     }

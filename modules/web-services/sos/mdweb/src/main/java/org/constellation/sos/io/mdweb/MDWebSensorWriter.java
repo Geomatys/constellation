@@ -27,6 +27,7 @@ import java.sql.Savepoint;
 // JAXB dependencies
 import java.util.*;
 import java.util.logging.Level;
+import javax.sql.DataSource;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
@@ -71,7 +72,8 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         final String sensorIdBase = (String) properties.get(OMFactory.SENSOR_ID_BASE);
         final BDD db = configuration.getBdd();
         try {
-            smlConnection   = db.getConnection();
+            final DataSource ds = db.getPooledDataSource();
+            smlConnection       = ds.getConnection();
              //we build the prepared Statement
             final String version = ((AbstractReader)mdWriter).getVersion();
             if ("2.0".equals(version)) {
@@ -259,6 +261,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         super.destroy();
         try {
             newSensorIdStmt.close();
+            smlConnection.close();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while closing MDW sensor Writer:{0}", ex.getMessage());
         }
