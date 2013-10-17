@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.util.ReflectionUtilities;
 
 /**
  *
@@ -38,22 +39,39 @@ public final class WSEngine {
      */
     private static final Map<String, Map<String, Worker>> WORKERS_MAP = new HashMap<>();
 
+    /**
+     * A map of the registred OGC services and their endpoint protocols (SOAP, REST).
+     */
     private static final Map<String, List<String>> REGISTERED_SERVICE = new HashMap<>();
 
-    private static final Map<String, Class> SERVICE_WORKER_CLASS = new HashMap<>();
+    /**
+     * A map of {@link Worker} class for each OGC registred service.
+     */
+    private static final Map<String, Class<? extends Worker>> SERVICE_WORKER_CLASS = new HashMap<>();
 
+    /**
+     * A map of {@link ServiceConfigurer} class for eache OGC resgitred service.
+     */
     private static final Map<String, Class<? extends ServiceConfigurer>> SERVICE_CONFIGURER_CLASS = new HashMap<>();
 
+    @Deprecated
     private static final List<String> TO_RESTART = new ArrayList<>();
 
     public static Map<String, Worker> getWorkersMap(final String specification) {
         return WORKERS_MAP.get(specification);
     }
 
+    @Deprecated
     public static void prepareRestart() {
         TO_RESTART.addAll(WORKERS_MAP.keySet());
     }
 
+    /**
+     * Return the number of instances for the specified OGC service.
+     *
+     * @param specification the OGC service type (WMS, CSW, WFS, ...)
+     * @return
+     */
     public static int getInstanceSize(final String specification) {
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap != null) {
@@ -160,9 +178,9 @@ public final class WSEngine {
      * @param serviceName A service type (CSW, SOS, WMS, ...).
      * @param protocol
      * @param workerClass the class binding of the service worker.
-      * @param workerClass the class binding of the service configurer
+     * @param configurerClass the class binding of the service configurer
      */
-    public static void registerService(final String serviceName, final String protocol, final Class workerClass,
+    public static void registerService(final String serviceName, final String protocol, final Class <? extends Worker> workerClass,
         final Class<? extends ServiceConfigurer> configurerClass) {
         if (REGISTERED_SERVICE.containsKey(serviceName)) {
             final List<String> protocols = REGISTERED_SERVICE.get(serviceName);
@@ -184,15 +202,29 @@ public final class WSEngine {
     }
 
     /**
-     * Return the worker class of a registered service.
-     * @param serviceName
+     * Return the {@link Worker} implementation {@link Class} of a registered OGC service.
+     *
+     * @param serviceType The OGC service type (WMS, CSW, WFS, ...).
      * @return the worker class of a registered service or null if service not registered.
      */
-    public static Class getServiceWorkerClass(final String serviceName) {
-        if (SERVICE_WORKER_CLASS.containsKey(serviceName)) {
-            return SERVICE_WORKER_CLASS.get(serviceName);
+    private static Class getServiceWorkerClass(final String serviceType) {
+        if (SERVICE_WORKER_CLASS.containsKey(serviceType)) {
+            return SERVICE_WORKER_CLASS.get(serviceType);
         }
         return null;
+    }
+
+    /**
+     * Instanciate a new {@link Worker} for the specified OGC service.
+     *
+     * @param serviceType The OGC service type (WMS, CSW, WFS, ...).
+     * @param identifier The identifier of the new {@link Worker}.
+     * 
+     * @return The new instancied {@link Worker}.
+     */
+    public static Worker buildWorker(final String serviceType, final String identifier) {
+        final Class workerClass = getServiceWorkerClass(serviceType);
+        return (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
     }
 
     /**

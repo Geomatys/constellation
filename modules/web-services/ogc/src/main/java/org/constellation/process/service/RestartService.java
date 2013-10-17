@@ -27,7 +27,6 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.parameter.Parameters.value;
 import static org.constellation.process.service.RestartServiceDescriptor.*;
-import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessFinder;
 import org.opengis.util.NoSuchIdentifierException;
@@ -48,13 +47,12 @@ public final class RestartService extends AbstractCstlProcess {
         final String serviceName = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         final Boolean closeFirst = value(CLOSE, inputParameters);
-        final Class workerClass = WSEngine.getServiceWorkerClass(serviceName);
 
         if (identifier == null || "".equals(identifier)) {
-            buildWorkers(serviceName, null, closeFirst, workerClass);
+            buildWorkers(serviceName, null, closeFirst);
         } else {
             if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
-                buildWorkers(serviceName, identifier, closeFirst, workerClass);
+                buildWorkers(serviceName, identifier, closeFirst);
             } else {
                 //try to start service
                 try {
@@ -78,7 +76,7 @@ public final class RestartService extends AbstractCstlProcess {
      * @param identifier
      * @throws ProcessException
      */
-    private void buildWorkers(final String serviceType, final String identifier, final boolean closeInstance, final Class workerClass) throws ProcessException {
+    private void buildWorkers(final String serviceType, final String identifier, final boolean closeInstance) throws ProcessException {
 
         /*
          * Single refresh
@@ -88,7 +86,7 @@ public final class RestartService extends AbstractCstlProcess {
                 WSEngine.shutdownInstance(serviceType, identifier);
             }
             try {
-                final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
+                final Worker worker = WSEngine.buildWorker(serviceType, identifier);
                 if (worker != null) {
                     WSEngine.addServiceInstance(serviceType, identifier, worker);
                     if (!worker.isStarted()) {
@@ -113,8 +111,7 @@ public final class RestartService extends AbstractCstlProcess {
 
             for (String instanceID : ConfigurationEngine.getServiceConfigurationIds(serviceType)) {
                 try {
-                    final Worker worker = (Worker)  ReflectionUtilities.newInstance(workerClass, instanceID);
-
+                    final Worker worker = WSEngine.buildWorker(serviceType, instanceID);
                     if (worker != null) {
                         workersMap.put(instanceID, worker);
                     } else {

@@ -47,9 +47,7 @@ public final class StartService extends AbstractCstlProcess {
         }
         
         try {
-            final Class workerClass   = WSEngine.getServiceWorkerClass(serviceType);
-            final Worker worker = (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
-
+            final Worker worker = WSEngine.buildWorker(serviceType, identifier);
             if (worker != null) {
                 WSEngine.addServiceInstance(serviceType, identifier, worker);
                 if (!worker.isStarted()) {
