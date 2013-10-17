@@ -28,7 +28,6 @@ import java.lang.ref.WeakReference;
 
 // Jersey dependencies
 import javax.annotation.PreDestroy;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
@@ -56,7 +55,6 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.rs.WebService;
-import org.constellation.ws.rs.ContainerNotifierImpl;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.api.CommonConstants.*;
@@ -85,12 +83,6 @@ import org.apache.sis.xml.MarshallerPool;
 public final class ConfigurationService extends WebService  {
 
     private static WeakReference<ConfigurationService> INSTANCE = null;
-
-    /**
-     * A container notifier allowing to dynamically reload all the active service.
-     */
-    @Context
-    protected volatile ContainerNotifierImpl cn;
 
     /**
      * The implementation specific configurers.
@@ -145,7 +137,7 @@ public final class ConfigurationService extends WebService  {
 
             if (REQUEST_FULL_RESTART.equalsIgnoreCase(request)) {
                 final boolean force = getBooleanParameter("FORCED", false);
-                return Response.ok(ConfigurationUtilities.restartService(force, configurers, cn)).build();
+                return Response.ok(ConfigurationUtilities.restartService(force, configurers)).build();
             }
 
             else if (REQUEST_DOWNLOAD.equalsIgnoreCase(request)) {

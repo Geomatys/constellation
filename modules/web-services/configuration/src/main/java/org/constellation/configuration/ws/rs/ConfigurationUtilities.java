@@ -8,14 +8,16 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
-import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.api.CommonConstants.*;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.ws.Worker;
 
 /**
  * @author Benjamin Garcia (Geomatys)
@@ -101,33 +103,26 @@ public class ConfigurationUtilities {
      *
      * @return an Acknowledgment if the restart succeed.
      */
-    public static AcknowlegementType restartService(final boolean forced, final List<AbstractConfigurer> configurers, ContainerNotifierImpl cn) {
+    public static AcknowlegementType restartService(final boolean forced, final List<AbstractConfigurer> configurers) {
         LOGGER.info("\n restart requested \n");
 
-        // clear cache
-        for (AbstractConfigurer configurer : configurers) {
-            configurer.beforeRestart();
-        }
-
-        if (cn != null) {
-            if (!configurerLock(new AbstractConfigurer[0])) {
-                WSEngine.prepareRestart();
-                cn.reload();
-                return new AcknowlegementType(SUCCESS, "services succefully restarted");
-            } else if (!forced) {
-                return new AcknowlegementType("failed", "There is an indexation running use the parameter FORCED=true to bypass it.");
-            } else {
-                for (AbstractConfigurer configurer : configurers) {
-                    configurer.closeForced();
+        for (String serviceType : WSEngine.getRegisteredServices().keySet()) {
+            final Map<String, Worker> workersMap = new HashMap<>();
+            for (String instanceID : WSEngine.getInstanceNames(serviceType)) {
+                try {
+                    final Worker worker = WSEngine.buildWorker(serviceType, instanceID);
+                    if (worker != null) {
+                        workersMap.put(instanceID, worker);
+                    } else {
+                        LOGGER.log(Level.WARNING, "The instance {0} can be started, maybe there is no configuration directory with this name.", instanceID);
+                    }
+                } catch (IllegalArgumentException ex) {
+                    LOGGER.log(Level.WARNING, ex.getMessage(), ex);
                 }
-                WSEngine.prepareRestart();
-                cn.reload();
-                return new AcknowlegementType(SUCCESS, "services succefully restarted (previous indexation was stopped)");
             }
-        } else {
-            return new AcknowlegementType("failed", "The services can not be restarted (ContainerNotifier is null)");
+            WSEngine.setServiceInstances(serviceType, workersMap);
         }
-
+        return new AcknowlegementType(SUCCESS, "services succefully restarted");
     }
 
     public static boolean configurerLock(final AbstractConfigurer[] configurers) {

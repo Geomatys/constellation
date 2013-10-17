@@ -29,9 +29,9 @@ import java.util.logging.Level;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.ws.Endpoint;
 import com.sun.jersey.api.container.grizzly2.servlet.GrizzlyWebContainerFactory;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.util.*;
 import java.util.Map.Entry;
-import org.constellation.ws.rs.CstlServletContainer;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import org.geotoolkit.console.CommandLine;
@@ -127,9 +127,9 @@ public class CstlEmbeddedService extends CommandLine {
     //      map.put("com.sun.jersey.config.property.packages", "org.constellation.coverage.ws.rs");
     //      map.put(TODO: get providers line from Cedric);
     //  below we add in one of the properties needed by all services.
-    protected Map<String, String> grizzlyWebContainerProperties = new HashMap<String, String>();
+    protected Map<String, String> grizzlyWebContainerProperties = new HashMap<>();
     //FOR SOAP, DEFINE THIS REFERENCE:
-    public final Map<String, Object> serviceInstanceSOAP = new HashMap<String, Object>();
+    public final Map<String, Object> serviceInstanceSOAP = new HashMap<>();
 
     //INCLUDE THIS MAIN.
 //	public static void main(String[] args) {
@@ -215,9 +215,9 @@ public class CstlEmbeddedService extends CommandLine {
             working = true;
             try {
                 if (grizzlyWebContainerProperties.isEmpty()) {
-                    threadSelector = GrizzlyWebContainerFactory.create(currentUri, CstlServletContainer.class);
+                    threadSelector = GrizzlyWebContainerFactory.create(currentUri, ServletContainer.class);
                 } else {
-                    threadSelector = GrizzlyWebContainerFactory.create(currentUri, CstlServletContainer.class, grizzlyWebContainerProperties);
+                    threadSelector = GrizzlyWebContainerFactory.create(currentUri, ServletContainer.class, grizzlyWebContainerProperties);
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -268,7 +268,7 @@ public class CstlEmbeddedService extends CommandLine {
 
         LOGGER.log(Level.INFO, "Starting jax-ws server at: {0}", f.format(new Date()));
 
-        final List<Endpoint> eps = new ArrayList<Endpoint>();
+        final List<Endpoint> eps = new ArrayList<>();
         for (Entry<String, Object> instance : serviceInstanceSOAP.entrySet()) {
             final String service = uriSoap.toString() + instance.getKey();
             Endpoint ep =  Endpoint.create(instance.getValue());
@@ -302,7 +302,7 @@ public class CstlEmbeddedService extends CommandLine {
         LOGGER.log(Level.INFO, "Started Grizzly application server for: {0}", uri);
         LOGGER.log(Level.INFO, "The service definition file can be found at: {0}application.wadl", uri);
 
-        final List<Endpoint> eps = new ArrayList<Endpoint>();
+        final List<Endpoint> eps = new ArrayList<>();
         for (Entry<String, Object> instance : serviceInstanceSOAP.entrySet()) {
             final String service = uriSoap.toString() + instance.getKey();
             final Endpoint ep =  Endpoint.create(instance.getValue());
@@ -335,7 +335,7 @@ public class CstlEmbeddedService extends CommandLine {
 
         if (duration > 0) {
             //Survive 'duration' milliseconds
-            LOGGER.info("  Service will stop in " + duration / (60 * 1000) + " minutes.");
+            LOGGER.log(Level.INFO, "  Service will stop in {0} minutes.", duration / (60 * 1000));
             try {
                 Thread.sleep(duration);
             } catch (InterruptedException iex) {
