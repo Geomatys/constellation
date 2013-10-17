@@ -18,6 +18,7 @@ package org.constellation.ws;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ServiceConfigurer;
@@ -126,7 +127,7 @@ public final class WSEngine {
         }
         final Worker oldWorker = workersMap.put(serviceID, instance);
         if (oldWorker != null) {
-            LOGGER.info("Destroying old worker");
+            LOGGER.log(Level.INFO, "Destroying old worker: {0}({1})", new Object[]{specification, serviceID});
             oldWorker.destroy();
         }
     }

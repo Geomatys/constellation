@@ -69,6 +69,7 @@ public class RenameService extends AbstractProcess {
                     if (newWorker == null) {
                         throw new ProcessException("The instance " + newName + " can be started, maybe there is no configuration directory with this name.", this, null);
                     } else {
+                        WSEngine.addServiceInstance(serviceType, newName, newWorker);
                         if (!newWorker.isStarted()) {
                             throw new ProcessException("unable to start the renamed instance", this, null);
                         }

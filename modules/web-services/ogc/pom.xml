@@ -79,10 +79,6 @@
       <artifactId>cstl-web-base</artifactId>
       <version>${project.version}</version>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>org.apache.shiro</groupId> -->
-<!--       <artifactId>shiro-core</artifactId> -->
-<!--     </dependency> -->
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>cstl-xml-configuration</artifactId>

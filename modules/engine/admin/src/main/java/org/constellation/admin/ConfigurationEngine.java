@@ -228,9 +228,9 @@ public class ConfigurationEngine {
     }
 
     public static boolean renameConfiguration(final String serviceType, final String identifier, final String newID) {
-        final File directory         = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
-        final File instanceDirectory = new File(directory, identifier);
-        final File newDirectory      = new File(directory, newID);
+        final File serviceDirectory  = ConfigDirectory.getServiceDirectory(serviceType);
+        final File instanceDirectory = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
+        final File newDirectory      = new File(serviceDirectory, newID);
         return instanceDirectory.renameTo(newDirectory);
     }
 

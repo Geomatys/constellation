@@ -9,6 +9,7 @@ import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.rs.ContainerNotifierImpl;
+import static org.constellation.api.CommonConstants.*;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -32,7 +33,7 @@ public class ConfigurationUtilities {
             if (users != null && !users.isEmpty()) {
                 userName = users.get(0).getLogin();
             }
-            return new AcknowlegementType("Success", userName);
+            return new AcknowlegementType(SUCCESS, userName);
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "Error while reading users", ex);
         } finally {
@@ -47,7 +48,7 @@ public class ConfigurationUtilities {
 //        try {
 //            session = EmbeddedDatabase.createSession();
 //            session.deleteUser(userName);
-//            return new AcknowlegementType("Success", "The user has been deleted");
+//            return new AcknowlegementType(SUCCESS, "The user has been deleted");
 //        } catch (SQLException ex) {
 //            LOGGER.log(Level.WARNING, "Error while deleting user", ex);
 //        } finally {
@@ -64,7 +65,7 @@ public class ConfigurationUtilities {
 //        try {
 //            session = EmbeddedDatabase.createSession();
 //            session.updateUser(oldLogin, userName, password, "Default Constellation Administrator", Arrays.asList("cstl-admin"));
-//            return new AcknowlegementType("Success", "The user has been changed");
+//            return new AcknowlegementType(SUCCESS, "The user has been changed");
 //        } catch (SQLException ex) {
 //            LOGGER.log(Level.WARNING, "Error while deleting user", ex);
 //        } finally {
@@ -85,12 +86,12 @@ public class ConfigurationUtilities {
             ConfigDirectory.setConfigDirectory(userDirectory);
         }
 
-        return new AcknowlegementType("Success", path);
+        return new AcknowlegementType(SUCCESS, path);
     }
 
     public static AcknowlegementType getConfigPath() throws CstlServiceException {
         final String path = ConfigDirectory.getConfigDirectory().getPath();
-        return new AcknowlegementType("Success", path);
+        return new AcknowlegementType(SUCCESS, path);
     }
 
     /**
@@ -102,6 +103,7 @@ public class ConfigurationUtilities {
      */
     public static AcknowlegementType restartService(final boolean forced, final List<AbstractConfigurer> configurers, ContainerNotifierImpl cn) {
         LOGGER.info("\n restart requested \n");
+
         // clear cache
         for (AbstractConfigurer configurer : configurers) {
             configurer.beforeRestart();
@@ -111,7 +113,7 @@ public class ConfigurationUtilities {
             if (!configurerLock(new AbstractConfigurer[0])) {
                 WSEngine.prepareRestart();
                 cn.reload();
-                return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
+                return new AcknowlegementType(SUCCESS, "services succefully restarted");
             } else if (!forced) {
                 return new AcknowlegementType("failed", "There is an indexation running use the parameter FORCED=true to bypass it.");
             } else {
@@ -120,7 +122,7 @@ public class ConfigurationUtilities {
                 }
                 WSEngine.prepareRestart();
                 cn.reload();
-                return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted (previous indexation was stopped)");
+                return new AcknowlegementType(SUCCESS, "services succefully restarted (previous indexation was stopped)");
             }
         } else {
             return new AcknowlegementType("failed", "The services can not be restarted (ContainerNotifier is null)");

@@ -59,6 +59,7 @@ import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 
 import static org.constellation.api.QueryConstants.*;
+import static org.constellation.api.CommonConstants.*;
 import static org.constellation.ws.ExceptionCode.*;
 
 // Geotoolkit dependencies
@@ -140,7 +141,7 @@ public final class ConfigurationService extends WebService  {
     @Override
     public Response treatIncomingRequest(Object objectRequest) {
         try {
-            final String request = getParameter("REQUEST", true);
+            final String request = getParameter(REQUEST_PARAMETER, true);
 
             if (REQUEST_FULL_RESTART.equalsIgnoreCase(request)) {
                 final boolean force = getBooleanParameter("FORCED", false);
@@ -188,7 +189,7 @@ public final class ConfigurationService extends WebService  {
             }
 
             else if (REQUEST_ACCESS.equalsIgnoreCase(request)) {
-                final AcknowlegementType response = new AcknowlegementType("Success", "You have access to the configuration service");
+                final AcknowlegementType response = new AcknowlegementType(SUCCESS, "You have access to the configuration service");
                 return Response.ok(response).build();
             }
 
@@ -210,7 +211,7 @@ public final class ConfigurationService extends WebService  {
             }
 
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                                 OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
+                                                 OPERATION_NOT_SUPPORTED, REQUEST_PARAMETER);
 
 
         } catch (CstlServiceException ex) {
@@ -307,7 +308,7 @@ public final class ConfigurationService extends WebService  {
     @Override
     protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException, CstlServiceException {
 
-        final String request = (String) getParameter("REQUEST", true);
+        final String request = (String) getParameter(REQUEST_PARAMETER, true);
         final MultivaluedMap<String,String> parameters = getParameters();
         for (AbstractConfigurer configurer: configurers) {
             if (configurer.needCustomUnmarshall(request,parameters)) {

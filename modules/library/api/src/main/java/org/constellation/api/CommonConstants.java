@@ -29,7 +29,7 @@ public class CommonConstants {
     /*
      * Default declareded CRS codes for each layer in the getCapabilities
      */
-    public static final List<String> DEFAULT_CRS = new ArrayList<String>();
+    public static final List<String> DEFAULT_CRS = new ArrayList<>();
     static {
         DEFAULT_CRS.add("EPSG:4326");
         DEFAULT_CRS.add("CRS:84");
@@ -41,11 +41,15 @@ public class CommonConstants {
         DEFAULT_CRS.add("EPSG:27574");
     }
 
-    public static final List<String> WXS = new ArrayList<String>();
+    public static final List<String> WXS = new ArrayList<>();
     static {
         WXS.add("WMS");
         WXS.add("WCS");
         WXS.add("WFS");
         WXS.add("WMTS");
     }
+
+    public static final String SUCCESS = "Success";
+
+    public static final String SERVICE = "Service";
 }
