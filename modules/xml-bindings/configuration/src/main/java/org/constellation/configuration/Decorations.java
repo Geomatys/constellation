@@ -52,7 +52,7 @@ public class Decorations {
                         @XmlElement(name="ScaleBarDecoration", type=ScaleBarDecoration.class),
                         @XmlElement(name="LegendDecoration", type=LegendDecoration.class),
                         @XmlElement(name="CompasDecoration", type=CompasDecoration.class)})
-    private List<AbstractDecoration> decorations = new ArrayList<AbstractDecoration>();
+    private List<AbstractDecoration> decorations = new ArrayList<>();
 
     public Decorations() {
     }
@@ -65,7 +65,7 @@ public class Decorations {
         Map<String, Object> decorationMap;
         for (final AbstractDecoration decoration : decorations) {
             if(decoration != null) {
-                decorationMap = new HashMap<String, Object>();
+                decorationMap = new HashMap<>();
 
                 if (decoration instanceof GridDecoration) {
                     final GridDecoration gridDeco = (GridDecoration) decoration;

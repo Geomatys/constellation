@@ -20,22 +20,24 @@ package org.constellation.metadata.configuration;
 
 // J2SE dependencies
 import java.io.File;
+import java.util.logging.Level;
 import javax.ws.rs.core.MultivaluedMap;
-
-// JAXB dependencies
 
 // constellation dependencies
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.generic.database.BDD;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.service.RestartServiceDescriptor;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.constellation.ws.WSEngine;
-
 
 // Geotoolkit dependencies
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * The base for The CSW configurer.
@@ -47,11 +49,9 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     /**
      * Build a new CSW configurer.
      *
-     * @param cn a injected container notifier allowing to reload all the jersey web-services.
      * @throws org.constellation.configuration.exception.ConfigurationException
      */
-    public AbstractCSWConfigurer(final ContainerNotifierImpl cn) throws ConfigurationException {
-        this.containerNotifier = cn;
+    public AbstractCSWConfigurer() throws ConfigurationException {
     }
 
 
@@ -66,7 +66,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
 
                 final AcknowlegementType ack = CSWConfigurationManager.getInstance().refreshIndex(id, asynchrone, forced);
                 if (!asynchrone && ack.getStatus().equals("Success")) {
-                    restart();
+                    restartCSW(id);
                 }
                 return ack;
             }
@@ -134,15 +134,20 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     /**
      * Reload all the web-services.
      */
-    @Deprecated
-    protected boolean restart() {
-        if (containerNotifier != null) {
-            BDD.clearConnectionPool();
-            WSEngine.prepareRestart();
-            containerNotifier.reload();
+    protected boolean restartCSW(final String identifier) {
+        try {
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
+            final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+            inputs.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue("CSW");
+            inputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
+            inputs.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(true);
+            desc.createProcess(inputs).call();
             return true;
-        } else {
-            return false;
+        } catch (ProcessException ex) {
+            LOGGER.log(Level.WARNING, "Process to restart a service instance has reported an error.", ex);
+        } catch (NoSuchIdentifierException ex) {
+            LOGGER.log(Level.WARNING, "Unable to find the RestartService process");
         }
+        return false;
     }
 }

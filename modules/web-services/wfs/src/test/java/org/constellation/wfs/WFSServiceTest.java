@@ -33,7 +33,6 @@ import java.net.URL;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.constellation.ws.rs.WebService;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.wfs.ws.rs.WFSService;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
@@ -105,7 +104,6 @@ public class WFSServiceTest {
         if (derbyLog.exists()) {
             derbyLog.delete();
         }
-        ConfigDirectory.setConfigDirectory(null);
     }
 
     @Before

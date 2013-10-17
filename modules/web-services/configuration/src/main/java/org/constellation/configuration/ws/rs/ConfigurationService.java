@@ -113,7 +113,7 @@ public final class ConfigurationService extends WebService  {
             while (ite.hasNext()) {
                 AbstractConfigurerFactory currentfactory = ite.next();
                 try {
-                    AbstractConfigurer ac = currentfactory.getConfigurer(cn);
+                    AbstractConfigurer ac = currentfactory.getConfigurer();
                     LOGGER.log(Level.INFO, "Found a configurer:{0}", ac.getClass().getName());
                     configurers.add(ac);
                 } catch (ConfigurationException ex) {
@@ -141,10 +141,6 @@ public final class ConfigurationService extends WebService  {
     public Response treatIncomingRequest(Object objectRequest) {
         try {
             final String request = getParameter("REQUEST", true);
-
-            for (AbstractConfigurer configurer: configurers) {
-                configurer.setContainerNotifier(cn);
-            }
 
             if (REQUEST_FULL_RESTART.equalsIgnoreCase(request)) {
                 final boolean force = getBooleanParameter("FORCED", false);

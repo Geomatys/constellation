@@ -16,9 +16,7 @@
  */
 package org.constellation.process.service;
 
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.ServiceProcessTest;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;

@@ -18,7 +18,6 @@
 package org.constellation.ogc.configuration;
 
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
@@ -42,8 +41,6 @@ import org.geotoolkit.process.ProcessFinder;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -25,7 +25,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.constellation.ws.ExceptionCode.*;
 
 import org.apache.sis.util.logging.Logging;
@@ -37,19 +36,6 @@ import org.apache.sis.util.logging.Logging;
 public abstract class AbstractConfigurer {
 
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.configuration.ws.rs");
-
-    /**
-     * A container notifier allowing to restart the webService.
-     */
-    protected ContainerNotifierImpl containerNotifier;
-
-    /**
-     * Because the injectable fields are null at initialization time
-     * @param containerNotifier
-     */
-    public void setContainerNotifier(final ContainerNotifierImpl containerNotifier) {
-        this.containerNotifier = containerNotifier;
-    }
 
     /**
      * Extracts the value, for a parameter specified, from a query.

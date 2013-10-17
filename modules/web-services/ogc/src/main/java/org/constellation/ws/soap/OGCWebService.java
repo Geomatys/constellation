@@ -17,7 +17,6 @@
 package org.constellation.ws.soap;
 
 // J2SE dependencies
-import java.io.File;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -51,7 +50,6 @@ import javax.xml.ws.handler.MessageContext;
 
 // Constellation dependencies
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.WebServiceUtilities;
@@ -146,25 +144,6 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
     
     protected synchronized MarshallerPool getMarshallerPool() {
         return marshallerPool;
-    }
-
-    private File getServiceDirectory() {
-        final File configDirectory   = ConfigDirectory.getConfigDirectory();
-        if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
-            final File serviceDirectory = new File(configDirectory, specification.name());
-            if (serviceDirectory.exists() && serviceDirectory.isDirectory()) {
-                return serviceDirectory;
-            } else {
-                LOGGER.log(Level.SEVERE, "The service configuration directory: {0} does not exist or is not a directory.", serviceDirectory.getPath());
-            }
-        } else {
-            if (configDirectory == null) {
-                LOGGER.severe("The service was unable to find a config directory.");
-            } else {
-                LOGGER.log(Level.SEVERE, "The configuration directory: {0} does not exist or is not a directory.", configDirectory.getPath());
-            }
-        }
-        return null;
     }
 
     /**

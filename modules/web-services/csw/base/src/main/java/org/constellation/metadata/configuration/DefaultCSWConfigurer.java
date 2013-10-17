@@ -19,7 +19,6 @@ package org.constellation.metadata.configuration;
 
 // Constellation dependencies
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.ws.rs.ContainerNotifierImpl;
 
 /**
  * Default implementation of CSW Configurer
@@ -28,7 +27,7 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
  */
 public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
 
-    public DefaultCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
-        super(cn);
+    public DefaultCSWConfigurer() throws ConfigurationException {
+        super();
     }
 }

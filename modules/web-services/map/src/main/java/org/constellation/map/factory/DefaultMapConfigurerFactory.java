@@ -20,7 +20,6 @@ import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.map.configuration.DefaultMapConfigurer;
-import org.constellation.ws.rs.ContainerNotifierImpl;
 
 /**
  *
@@ -29,7 +28,7 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 public class DefaultMapConfigurerFactory extends AbstractConfigurerFactory {
 
     @Override
-    public AbstractConfigurer getConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
+    public AbstractConfigurer getConfigurer() throws ConfigurationException {
         return new DefaultMapConfigurer();
     }
 
