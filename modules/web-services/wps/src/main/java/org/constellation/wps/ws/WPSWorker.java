@@ -215,9 +215,7 @@ public class WPSWorker extends AbstractWorker {
         final boolean webdav = createWebDav();
         if (!webdav) {
             this.supportStorage = false;
-            startError = "Error during WPS WebDav service creation.";
-            isStarted = false;
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) does not support stockage!\nCause: Error during WPS WebDav service creation.", id);
         } else {
             this.supportStorage = true;
         }
