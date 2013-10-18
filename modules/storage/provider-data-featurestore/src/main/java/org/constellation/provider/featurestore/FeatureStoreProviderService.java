@@ -43,6 +43,10 @@ import org.opengis.parameter.ParameterValueGroup;
 public class FeatureStoreProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
+    /**
+     * Service name
+     */
+    public static final String NAME = "feature-store";
     private static final String ERROR_MSG = "[PROVIDER]> Invalid featurestore provider config";
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR;
 
@@ -70,7 +74,7 @@ public class FeatureStoreProviderService extends AbstractProviderService
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
 
     public FeatureStoreProviderService(){
-        super("feature-store");
+        super(NAME);
     }
 
     @Override

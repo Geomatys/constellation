@@ -43,6 +43,10 @@ import org.opengis.parameter.ParameterValueGroup;
 public class CoverageStoreProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
+    /**
+     * Service name
+     */
+    public static final String NAME = "coverage-store";
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR;
 
     static {
@@ -69,7 +73,7 @@ public class CoverageStoreProviderService extends AbstractProviderService
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
 
     public CoverageStoreProviderService(){
-        super("coverage-store");
+        super(NAME);
     }
 
     @Override
