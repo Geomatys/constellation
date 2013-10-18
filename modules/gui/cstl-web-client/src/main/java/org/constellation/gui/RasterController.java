@@ -89,6 +89,7 @@ public class RasterController {
         //create provider
         providerManager.saveISO19115Metadata(metadataToSave);
         providerManager.createProvider("coverage-file", information.getName(), information.getPath(), information.getDataType(), null);
+        providerManager.pyramidData(information.getName(), information.getPath());
         return Response.redirect(returnURL);
     }
 }

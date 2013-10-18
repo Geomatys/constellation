@@ -202,4 +202,12 @@ public class ProviderManager {
             LOGGER.log(Level.WARNING, "Unable to access to service to save metadata", e);
         }
     }
+
+    public void pyramidData(final String name, final String path) {
+        try {
+            cstl.openClient().providers.pyramidData(name, path);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when ask pyramidal data ", e);
+        }
+    }
 }

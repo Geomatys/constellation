@@ -90,6 +90,10 @@ public final class ConfigDirectory {
         if (propertiesFile.exists()) {
             try {
                 Properties prop = FileUtilities.getPropertiesFromFile(propertiesFile);
+
+                // set object to access properties
+                ConfigProperties.setCstlProperties(prop);
+
                 USER_DIRECTORY = prop.getProperty("configuration_directory");
                 DATA_DIRECTORY = prop.getProperty("data_directory");
             } catch (IOException ex) {

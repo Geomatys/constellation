@@ -24,6 +24,7 @@ import org.constellation.dto.FileBean;
 import org.constellation.dto.FileListBean;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
+import org.constellation.dto.SimpleValue;
 import org.constellation.dto.StyleListBean;
 
 import javax.ws.rs.core.MediaType;
@@ -187,11 +188,33 @@ public final class ProvidersAPI {
         return client.post("data/load", MediaType.APPLICATION_XML_TYPE, pv).getEntity(DataInformation.class);
     }
 
+    /**
+     *
+     * @param locale
+     * @return
+     * @throws IOException
+     */
     public MetadataLists getMetadataCodeLists(final String locale) throws IOException {
         return client.get("data/metadataCodeLists/" + locale, MediaType.APPLICATION_XML_TYPE).getEntity(MetadataLists.class);
     }
 
+    /**
+     *
+     * @param metadataToSave
+     * @throws IOException
+     */
     public void saveISO19115Metadata(final DataMetadata metadataToSave) throws IOException {
         client.post("data/metadata", MediaType.APPLICATION_XML_TYPE, metadataToSave);
+    }
+
+    /**
+     *
+     * @param name
+     * @param pPath
+     * @throws IOException
+     */
+    public void pyramidData(final String name, final String pPath) throws IOException {
+        final SimpleValue path = new SimpleValue(pPath);
+        client.post("data/pyramid/"+name, MediaType.APPLICATION_XML_TYPE, path);
     }
 }

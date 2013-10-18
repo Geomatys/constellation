@@ -317,9 +317,11 @@ public class Data {
     @Path("pyramid/{id}/")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response pyramidDate(@PathParam("id") final String providerId, final SimpleValue path){
+    public Response pyramidData(@PathParam("id") final String providerId, final SimpleValue path){
 
         if(path.getValue()!=null){
+            final File dataFile = new File(path.getValue());
+
             // create folder to save pyramid
             File dataDirectory = ConfigDirectory.getDataDirectory();
             File pyramidFolder = new File(dataDirectory, "pyramid");
