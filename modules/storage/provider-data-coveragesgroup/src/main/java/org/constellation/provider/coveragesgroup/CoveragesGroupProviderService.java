@@ -22,7 +22,6 @@ import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderService;
-import org.geotoolkit.map.MapContext;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.feature.type.Name;
@@ -45,20 +44,19 @@ import static org.constellation.provider.coveragesgroup.CoveragesGroupProvider.*
 public class CoveragesGroupProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
-    public static final ParameterDescriptor<URL> URL =
-             new DefaultParameterDescriptor<URL>(KEY_PATH, "Map context path", URL.class, null, true);
+    public static final String NAME = "coverages-group";
 
-    public static final ParameterDescriptor<MapContext> MAP_CONTEXT =
-             new DefaultParameterDescriptor<MapContext>(KEY_MAP_CONTEXT, "Map context", MapContext.class, null, false);
+    public static final ParameterDescriptor<URL> URL =
+            new DefaultParameterDescriptor<URL>(KEY_PATH, "Map context path", URL.class, null, true);
 
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup("coveragesgroup", URL, MAP_CONTEXT);
+            new DefaultParameterDescriptorGroup("coveragesgroup", URL);
 
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
 
     public CoveragesGroupProviderService(){
-        super("coverages-group");
+        super(NAME);
     }
 
     @Override
@@ -80,7 +78,7 @@ public class CoveragesGroupProviderService extends AbstractProviderService
         final CoveragesGroupProvider provider = new CoveragesGroupProvider(this, ps);
         ps = getOrCreate(SOURCE_CONFIG_DESCRIPTOR, ps);
         getLogger().log(Level.INFO, "[PROVIDER]> Coverages group provider created : {0}",
-                    value(URL, ps));
+                value(URL, ps));
         return provider;
     }
 
