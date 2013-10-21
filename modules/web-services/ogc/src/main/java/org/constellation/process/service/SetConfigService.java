@@ -49,7 +49,7 @@ public class SetConfigService extends AbstractProcess {
     @Override
     protected void execute() throws ProcessException {
 
-        final String serviceType             = value(SERVICE_TYPE, inputParameters);
+        final String serviceType       = value(SERVICE_TYPE, inputParameters);
         final String identifier        = value(IDENTIFIER, inputParameters);
         Object configuration           = value(CONFIGURATION, inputParameters);
         final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
@@ -66,18 +66,11 @@ public class SetConfigService extends AbstractProcess {
 
         //write configuration file.
         try {
-            ConfigurationEngine.storeConfiguration(serviceType, identifier, configFileName, configuration);
+            ConfigurationEngine.storeConfiguration(serviceType, identifier, configFileName, configuration, serviceMetadata);
         } catch (JAXBException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
-        }
-
-        // Override the service metadata.
-        if (serviceMetadata != null) {
-            try {
-                ConfigurationEngine.writeMetadata(identifier, serviceType, serviceMetadata, null);
-            } catch (IOException ex) {
-                throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
-            }
+        } catch (IOException ex) {
+            throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
         }
     }
 }

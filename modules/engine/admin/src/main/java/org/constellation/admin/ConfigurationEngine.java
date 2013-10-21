@@ -119,6 +119,13 @@ public class ConfigurationEngine {
         throw new FileNotFoundException("The configuration file " + fileName + " has not been found.");
     }
 
+    public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj, final Service metadata) throws JAXBException, IOException {
+        storeConfiguration(serviceType, serviceID, fileName, obj,  GenericDatabaseMarshallerPool.getInstance());
+        if (metadata != null) {
+            writeMetadata(serviceID, serviceType, metadata, null);
+        }
+    }
+
     public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj) throws JAXBException {
         storeConfiguration(serviceType, serviceID, fileName, obj,  GenericDatabaseMarshallerPool.getInstance());
     }
@@ -131,12 +138,15 @@ public class ConfigurationEngine {
         pool.recycle(marshaller);
     }
 
-    public static void createConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj) throws JAXBException {
+    public static void createConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj, final Service metadata) throws JAXBException, IOException {
         final File instanceDirectory = ConfigDirectory.getInstanceDirectory(serviceType, serviceID);
         if (!instanceDirectory.isDirectory()) {
             instanceDirectory.mkdir();
         }
         storeConfiguration(serviceType, serviceID, fileName, obj,  GenericDatabaseMarshallerPool.getInstance());
+        if (metadata != null) {
+            writeMetadata(serviceID, serviceType, metadata, null);
+        }
     }
 
     public static void writeMetadata(final String identifier, final String serviceType, final Service metadata, final String language) throws IOException {

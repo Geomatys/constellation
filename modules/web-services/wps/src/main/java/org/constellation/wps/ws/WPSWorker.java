@@ -65,6 +65,7 @@ import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
@@ -402,8 +403,8 @@ public class WPSWorker extends AbstractWorker {
             final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
             webdavCtx.setId(webDavName);
             try {
-                ConfigurationEngine.createConfiguration("webdav", webDavName, "WebdavContext.xml", webdavCtx);
-            } catch (JAXBException ex) {
+                ConfigurationEngine.createConfiguration("webdav", webDavName, "WebdavContext.xml", webdavCtx, null);
+            } catch (JAXBException | IOException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;
             }
