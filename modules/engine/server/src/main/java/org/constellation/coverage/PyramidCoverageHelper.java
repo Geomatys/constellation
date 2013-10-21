@@ -1,7 +1,7 @@
 package org.constellation.coverage;
 
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.configuration.ConfigProperties;
+import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
@@ -17,6 +17,7 @@ import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.process.ProcessListener;
+import org.geotoolkit.referencing.adapters.NetcdfCRS;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
@@ -26,6 +27,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 
 import java.awt.*;
+import java.awt.geom.Arc2D;
 import java.io.File;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -44,32 +46,32 @@ import java.util.concurrent.CancellationException;
  */
 public class PyramidCoverageHelper {
 
-    private final CoverageStore store;
-    private final CoverageStore outputCoverageStore;
-    private final PyramidCoverageBuilder pyramidCoverageBuilder;
-    final private String baseCoverageName;
+    private CoverageStore store;
+    private CoverageStore outputCoverageStore;
+    private PyramidCoverageBuilder pyramidCoverageBuilder;
+    private String baseCoverageName;
     private CoverageNamer coverageNamer;
     private List<GridCoverage2D> coveragesPyramid;
-    private List<GridCoverage2D> coveragesCloned;
-    private double[] deeps;
+    private double[] depth;
 
     public PyramidCoverageHelper(Builder builder) throws DataStoreException {
 
         this.store = builder.buildInputStore();
-        coveragesPyramid = new ArrayList<>(0);
-        coveragesCloned = new ArrayList<>(0);
-        buildCoverages();
+        final List<GridCoverage2D> coverages = buildCoverages();
 
-        this.outputCoverageStore = builder.buildOutputStore();
+        if (coverages.size() > 0) {
+            coveragesPyramid = coverages;
+            this.outputCoverageStore = builder.buildOutputStore();
 
-        this.pyramidCoverageBuilder = new PyramidCoverageBuilder(new Dimension(
-                builder.tileWidth, builder.tileHeight), builder.interpolation,
-                1);
+            this.pyramidCoverageBuilder = new PyramidCoverageBuilder(new Dimension(
+                    builder.tileWidth, builder.tileHeight), builder.interpolation,
+                    1);
 
-        this.coverageNamer = builder.coverageNamer;
-        this.baseCoverageName = builder.baseCoverageName;
+            this.coverageNamer = builder.coverageNamer;
+            this.baseCoverageName = builder.baseCoverageName;
 
-        this.deeps = builder.deeps;
+            this.depth = builder.depth;
+        }
     }
 
     /**
@@ -87,7 +89,16 @@ public class PyramidCoverageHelper {
         return outputCoverageStore;
     }
 
-    private void buildCoverages() throws CancellationException, DataStoreException {
+    /**
+     * Build coverage list which can be pyramided
+     *
+     * @return a {@link org.geotoolkit.coverage.grid.GridCoverage2D} {@link java.util.List}
+     * @throws CancellationException
+     * @throws DataStoreException
+     */
+    private List<GridCoverage2D> buildCoverages() throws CancellationException, DataStoreException {
+        final List<GridCoverage2D> coverages = new ArrayList<>(0);
+
 
         for (Name name : store.getNames()) {
             final CoverageReference ref = store.getCoverageReference(name);
@@ -96,26 +107,37 @@ public class PyramidCoverageHelper {
             final GridCoverage2D coverage = (GridCoverage2D) reader.read(0, null);
             final GridGeometry2D gridGeometry = (GridGeometry2D) reader.getGridGeometry(ref.getImageIndex());
 
+            if ((gridGeometry.getCoordinateReferenceSystem() instanceof NetcdfCRS)) {
+                break;
+            }
+
+
             final double widthGeometry = gridGeometry.getExtent2D().getWidth();
             final double heightGeometry = gridGeometry.getExtent2D().getHeight();
 
-            final Properties cstlProps = ConfigProperties.getCstlProperties();
-            double userWidth = Double.parseDouble(cstlProps.getProperty("picture_max_width"));
-            double userHeight = Double.parseDouble(cstlProps.getProperty("picture_max_height"));
+
+            double userWidth = 500;
+            double userHeight = 500;
+
+            if(ConfigDirectory.CSTL_PROPERTIES!=null){
+                String pictureHeight = ConfigDirectory.CSTL_PROPERTIES.getProperty("picture_max_height", "500");
+                String pictureWidth = ConfigDirectory.CSTL_PROPERTIES.getProperty("picture_max_width", "500");
+                userWidth = Double.parseDouble(pictureWidth);
+                userHeight = Double.parseDouble(pictureHeight);
+            }
 
             //If coverage size higher than user selected size else add on an other list to create separate file
             if (widthGeometry > userWidth || heightGeometry > userHeight) {
-                coveragesPyramid.add(coverage);
-            } else {
-                coveragesCloned.add(coverage);
+                coverages.add(coverage);
             }
         }
+        return coverages;
     }
 
     public Map<Envelope, double[]> getResolutionPerEnvelope(
             GridCoverage coverage) {
         Map<Envelope, double[]> map = new HashMap<>();
-        map.put(coverage.getEnvelope(), deeps);
+        map.put(coverage.getEnvelope(), depth);
         return map;
     }
 
@@ -127,6 +149,14 @@ public class PyramidCoverageHelper {
         return coveragesPyramid;
     }
 
+    /**
+     * Build pyramid and give a {@link org.geotoolkit.process.ProcessListener} to
+     *
+     * @param listener
+     * @throws DataStoreException
+     * @throws TransformException
+     * @throws FactoryException
+     */
     public void buildPyramid(final ProcessListener listener) throws DataStoreException, TransformException,
             FactoryException {
 
@@ -138,9 +168,7 @@ public class PyramidCoverageHelper {
                     coverageNamer.getName(baseCoverageName, coverageCount),
                     resolution_Per_Envelope, null, listener);
             coverageCount++;
-
         }
-
     }
 
     /**
@@ -399,7 +427,7 @@ public class PyramidCoverageHelper {
         private int tileHeight = 256;
         private String outputFormat = "PNG";
         private String inputFormat = "geotiff";
-        private double[] deeps = new double[]{1, 0.5, 0.25, 0.125};
+        private double[] depth = new double[]{1, 0.5, 0.25, 0.125};
         private InterpolationCase interpolation = InterpolationCase.BILINEAR;
         private CoverageNamer coverageNamer = new CoverageNamer() {
 
@@ -421,7 +449,7 @@ public class PyramidCoverageHelper {
         }
 
         public Builder withDeeps(double[] deeps) {
-            this.deeps = deeps;
+            this.depth = deeps;
             return this;
         }
 

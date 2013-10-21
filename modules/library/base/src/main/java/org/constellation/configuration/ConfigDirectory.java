@@ -77,6 +77,8 @@ public final class ConfigDirectory {
 
     public static String DATA_DIRECTORY = null;
 
+    public static Properties CSTL_PROPERTIES = null;
+
     /**
      * This should be a class loader from the main constellation application.
      */
@@ -90,9 +92,7 @@ public final class ConfigDirectory {
         if (propertiesFile.exists()) {
             try {
                 Properties prop = FileUtilities.getPropertiesFromFile(propertiesFile);
-
-                // set object to access properties
-                ConfigProperties.setCstlProperties(prop);
+                CSTL_PROPERTIES = prop;
 
                 USER_DIRECTORY = prop.getProperty("configuration_directory");
                 DATA_DIRECTORY = prop.getProperty("data_directory");
