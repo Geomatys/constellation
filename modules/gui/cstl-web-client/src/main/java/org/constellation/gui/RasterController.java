@@ -74,6 +74,11 @@ public class RasterController {
         }
         metadataToSave.setDate(metadataDate);
         DataInformation information = informationContainer.getInformation();
+
+        String path = information.getPath();
+        int lastPointIndex = path.lastIndexOf('.');
+        String extension = path.substring(lastPointIndex+1, path.length());
+
         metadataToSave.setDataPath(information.getPath());
         metadataToSave.setType(information.getDataType());
 
@@ -88,9 +93,15 @@ public class RasterController {
 
         //create pyramid, provider and metadata
         providerManager.saveISO19115Metadata(metadataToSave);
-        providerManager.pyramidData(information.getName(), information.getPath());
-        final String pyramidPath = providerManager.getPyramidPath(information.getName());
-        providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null);
+
+        //if it's netCDF, we don't pyramid data
+        if("nc".equalsIgnoreCase(extension)){
+            providerManager.createProvider("coverage-file", information.getName(), information.getPath(), information.getDataType(), null);
+        }else{
+            providerManager.pyramidData(information.getName(), information.getPath());
+            final String pyramidPath = providerManager.getPyramidPath(information.getName());
+            providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null);
+        }
 
         return Response.redirect(returnURL);
     }
