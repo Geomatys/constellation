@@ -113,7 +113,9 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
     @Override
     public void reload() {
         synchronized(this){
-            index.clear();
+            if (index != null) {
+                index.clear();
+            }
             visit();
         }
     }
@@ -124,7 +126,9 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
     @Override
     public void dispose() {
         synchronized(this){
-            index.clear();
+            if (index != null) {
+                index.clear();
+            }
         }
     }
 
