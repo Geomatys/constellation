@@ -58,9 +58,9 @@ public class StandardAnalyzerTest extends AbstractAnalyzerTest {
     public static void setUpClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StandardAnalyzer(Version.LUCENE_40), Level.FINER, true);
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StandardAnalyzer(Version.LUCENE_45), Level.FINER, true);
         indexer.destroy();
-        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new StandardAnalyzer(Version.LUCENE_40), true);
+        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new StandardAnalyzer(Version.LUCENE_45), true);
         indexSearcher.setLogLevel(Level.FINER);
 
     }
