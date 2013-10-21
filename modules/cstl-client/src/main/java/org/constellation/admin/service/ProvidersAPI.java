@@ -217,4 +217,15 @@ public final class ProvidersAPI {
         final SimpleValue path = new SimpleValue(pPath);
         client.post("data/pyramid/"+name, MediaType.APPLICATION_XML_TYPE, path);
     }
+
+    /**
+     * Ask pyramid data folder
+     * @param providerName provider name to found pyramid folder
+     * @return path as String
+     * @throws IOException
+     */
+    public String getPyramidPath(final String providerName) throws IOException {
+        SimpleValue sentValue = client.get("data/pyramid/"+providerName+"/folder", MediaType.APPLICATION_XML_TYPE).getEntity(SimpleValue.class);
+        return sentValue.getValue();
+    }
 }

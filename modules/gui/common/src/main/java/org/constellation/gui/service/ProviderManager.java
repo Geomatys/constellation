@@ -35,6 +35,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,17 +108,32 @@ public class ProviderManager {
                 }
                 break;
             case "coverage-store":
-                //database connection
-                ParameterValueGroup postGresParametersFolder = sources.groups("choice").get(0).addGroup("PGRasterParameters");
-                int port = Integer.parseInt(database.getPort());
+                if(path!=null){
+                    URL fileUrl = null;
+                    try {
+                        fileUrl = URI.create(path).toURL();
+                    } catch (MalformedURLException e) {
+                        LOGGER.log(Level.WARNING, "unnable to create url from path", e);
+                    }
 
-                postGresParametersFolder.parameter("identifier").setValue("postgresql");
-                postGresParametersFolder.parameter("host").setValue(database.getHost());
-                postGresParametersFolder.parameter("port").setValue(port);
-                postGresParametersFolder.parameter("user").setValue(database.getLogin());
-                postGresParametersFolder.parameter("password").setValue(database.getPassword());
-                postGresParametersFolder.parameter("database").setValue(database.getName());
-                postGresParametersFolder.parameter("simple types").setValue(true);
+                    ParameterValueGroup xmlCoverageStoreParameters = sources.groups("choice").get(0).addGroup("XMLCoverageStoreParameters");
+                    xmlCoverageStoreParameters.parameter("identifier").setValue("coverage-xml-pyramid");
+                    xmlCoverageStoreParameters.parameter("path").setValue(fileUrl);
+                    xmlCoverageStoreParameters.parameter("type").setValue("AUTO");
+                }
+                else{
+                    //database connection
+                    ParameterValueGroup postGresParametersFolder = sources.groups("choice").get(0).addGroup("PGRasterParameters");
+                    int port = Integer.parseInt(database.getPort());
+
+                    postGresParametersFolder.parameter("identifier").setValue("postgresql");
+                    postGresParametersFolder.parameter("host").setValue(database.getHost());
+                    postGresParametersFolder.parameter("port").setValue(port);
+                    postGresParametersFolder.parameter("user").setValue(database.getLogin());
+                    postGresParametersFolder.parameter("password").setValue(database.getPassword());
+                    postGresParametersFolder.parameter("database").setValue(database.getName());
+                    postGresParametersFolder.parameter("simple types").setValue(true);
+                }
                 break;
             default:
                 if (LOGGER.isLoggable(Level.FINER)) {
@@ -209,5 +225,14 @@ public class ProviderManager {
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when ask pyramidal data ", e);
         }
+    }
+
+    public String getPyramidPath(final String providerName) {
+        try {
+            return cstl.openClient().providers.getPyramidPath(providerName);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to know pyramid data path", e);
+        }
+        return null;
     }
 }

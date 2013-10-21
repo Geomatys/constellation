@@ -86,10 +86,12 @@ public class RasterController {
         }
         metadataToSave.setKeywords(keywordList);
 
-        //create provider
+        //create pyramid, provider and metadata
         providerManager.saveISO19115Metadata(metadataToSave);
-        providerManager.createProvider("coverage-file", information.getName(), information.getPath(), information.getDataType(), null);
         providerManager.pyramidData(information.getName(), information.getPath());
+        final String pyramidPath = providerManager.getPyramidPath(information.getName());
+        providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null);
+
         return Response.redirect(returnURL);
     }
 }

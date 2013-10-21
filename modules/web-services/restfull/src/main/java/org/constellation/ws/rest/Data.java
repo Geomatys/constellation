@@ -69,6 +69,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -353,6 +354,23 @@ public class Data {
 
         }
         return Response.status(200).build();
+    }
+
+    @GET
+    @Path("pyramid/{id}/folder/")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getPyramidFolder(@PathParam("id") final String providerId){
+        // create folder to save pyramid
+        File dataDirectory = ConfigDirectory.getDataDirectory();
+        File pyramidFolder = new File(dataDirectory, "pyramid");
+        if(!pyramidFolder.exists()){
+            pyramidFolder.mkdir();
+        }
+        final File dataPyramidFolder = new File(pyramidFolder, providerId);
+        final SimpleValue value = new SimpleValue(dataPyramidFolder.toURI().toString());
+
+        return Response.ok(value).build();
     }
 
     private void saveMetaData(final File parentFile, final DefaultMetadata fileMetadata, final String dataName) {
