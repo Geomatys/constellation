@@ -21,7 +21,6 @@ import java.util.List;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.ws.WSEngine;
 import static org.constellation.process.service.RenameServiceDescriptor.*;
-import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -41,19 +40,9 @@ public class RenameService extends AbstractProcess {
 
     @Override
     protected void execute() throws ProcessException {
-        String serviceType      = value(SERVICE_TYPE, inputParameters);
+        final String serviceType      = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         final String newName    = value(NEW_NAME, inputParameters);
-
-        if (serviceType != null && !serviceType.isEmpty()
-        && ("WMS".equalsIgnoreCase(serviceType) || "WMTS".equalsIgnoreCase(serviceType) ||
-            "WFS".equalsIgnoreCase(serviceType) || "WCS".equalsIgnoreCase(serviceType)  ||
-            "WPS".equalsIgnoreCase(serviceType) || "SOS".equalsIgnoreCase(serviceType)  ||
-            "CSW".equalsIgnoreCase(serviceType))) {
-            serviceType = serviceType.toUpperCase();
-        } else {
-            throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\", \"WPS\", \"CSW\", \"SOS\").", this, null);
-        }
         
         final List<String> existingService = ConfigurationEngine.getServiceConfigurationIds(serviceType);
         if (existingService.contains(identifier)) {

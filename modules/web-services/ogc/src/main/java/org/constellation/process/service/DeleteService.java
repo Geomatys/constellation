@@ -44,14 +44,8 @@ public class DeleteService extends AbstractCstlProcess {
      */
     @Override
     protected void execute() throws ProcessException {
-        String serviceType = value(SERVICE_TYPE, inputParameters);
+        final String serviceType = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
-
-        if (serviceType != null && !serviceType.isEmpty()) {
-            serviceType = serviceType.toUpperCase();
-        } else {
-            throw new ProcessException("Service name can't be null or empty.", this, null);
-        }
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);

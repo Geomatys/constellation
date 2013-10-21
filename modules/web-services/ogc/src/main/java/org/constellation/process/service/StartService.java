@@ -16,17 +16,17 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
+
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.parameter.Parameters.value;
 import static org.constellation.process.service.StartServiceDescriptor.*;
-import org.constellation.util.ReflectionUtilities;
-import org.constellation.ws.Worker;
+
 /**
  *
  * @author Quentin Boileau (Geomatys).

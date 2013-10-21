@@ -54,22 +54,12 @@ public class CreateService extends AbstractProcess {
     @Override
     protected void execute() throws ProcessException {
 
-        String serviceType             = value(SERVICE_TYPE, inputParameters);
+        final String serviceType             = value(SERVICE_TYPE, inputParameters);
         final String identifier        = value(IDENTIFIER, inputParameters);
         Object configuration           = value(CONFIGURATION, inputParameters);
         final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
         final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
         final String configFileName    = value(FILENAME, inputParameters);
-
-        if (serviceType != null && !serviceType.isEmpty()
-        && ("WMS".equalsIgnoreCase(serviceType) || "WMTS".equalsIgnoreCase(serviceType) ||
-            "WFS".equalsIgnoreCase(serviceType) || "WCS".equalsIgnoreCase(serviceType)  ||
-            "WPS".equalsIgnoreCase(serviceType) || "SOS".equalsIgnoreCase(serviceType)  ||
-            "CSW".equalsIgnoreCase(serviceType))) {
-            serviceType = serviceType.toUpperCase();
-        } else {
-            throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\", \"WPS\", \"CSW\", \"SOS\").", this, null);
-        }
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
