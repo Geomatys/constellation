@@ -310,7 +310,7 @@ public class Data {
 
         //Save metadata
         final File dataFile = new File(metadataToSave.getDataPath());
-        saveMetaData(dataFile.getParentFile(), dm, dataFile.getName());
+        saveMetaData(dm, dataFile.getName());
         return Response.status(200).build();
     }
 
@@ -373,10 +373,18 @@ public class Data {
         return Response.ok(value).build();
     }
 
-    private void saveMetaData(final File parentFile, final DefaultMetadata fileMetadata, final String dataName) {
+    /**
+     * Save metadata on specific folder
+     * @param fileMetadata
+     * @param dataName
+     */
+    private void saveMetaData(final DefaultMetadata fileMetadata, final String dataName) {
         try {
+
+            //Get metadata folder
+            final File metadataFolder = ConfigDirectory.getMetadataDirectory();
             final Marshaller m = CSWMarshallerPool.getInstance().acquireMarshaller();
-            final File metadataFile = new File(parentFile, dataName + ".xml");
+            final File metadataFile = new File(metadataFolder, dataName + ".xml");
             m.marshal(fileMetadata, metadataFile);
             GenericDatabaseMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {

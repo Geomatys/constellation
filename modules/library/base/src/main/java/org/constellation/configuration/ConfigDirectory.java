@@ -16,6 +16,13 @@
  */
 package org.constellation.configuration;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.util.FileUtilities;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.naming.RefAddr;
+import javax.naming.Reference;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -24,61 +31,34 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.naming.RefAddr;
-import javax.naming.Reference;
-import org.geotoolkit.util.FileUtilities;
-import org.apache.sis.util.logging.Logging;
 
 /**
  * Temporary copy of static methods from the WebService class (in module web-base),
  * in order to retrieve the configuration directory of Constellation.
- *
+ * <p/>
  * TODO: this implementation should probably been handled by the server registry, so
- *       move it there.
- *
- * @version $Id$
+ * move it there.
  *
  * @author Cédric Briançon (Geomatys)
  * @author Guilhem Legal (Geomatys)
+ * @version $Id$
  */
 public final class ConfigDirectory {
 
-    private ConfigDirectory() {}
-    
     /**
      * The default debugging logger.
      */
     private static final Logger LOGGER = Logging.getLogger("org.constellation.provider.configuration");
-
-    /**
-     * Specifies if the process is running on a Glassfish application server.
-     */
-    private static Boolean runningOnGlassfish = null;
-
     /**
      * The user directory where configuration files are stored on Unix platforms.
      * TODO: How does this relate to the directories used in deployment? This is
-     *       in the home directory of the user running the container?
+     * in the home directory of the user running the container?
      */
     private static final String UNIX_DIRECTORY = ".constellation";
-
     /**
      * The user directory where configuration files are stored on Windows platforms.
      */
     private static final String WINDOWS_DIRECTORY = "Application Data\\Constellation";
-
-    /**
-     * The user directory where configuration files are stored.
-     * this variable is fill by the user in the JSF interface.
-     */
-    public static String USER_DIRECTORY = null;
-
-    public static String DATA_DIRECTORY = null;
-
-    public static Properties CSTL_PROPERTIES = null;
-
     /**
      * This should be a class loader from the main constellation application.
      */
@@ -96,10 +76,27 @@ public final class ConfigDirectory {
 
                 USER_DIRECTORY = prop.getProperty("configuration_directory");
                 DATA_DIRECTORY = prop.getProperty("data_directory");
+                METADATA_DIRECTORY=prop.getProperty("metadata_directory");
             } catch (IOException ex) {
                 LOGGER.warning("IOException while reading the constellation properties file");
             }
-        } 
+        }
+    }
+
+    /**
+     * The user directory where configuration files are stored.
+     * this variable is fill by the user in the JSF interface.
+     */
+    public static String USER_DIRECTORY = null;
+    public static String DATA_DIRECTORY = null;
+    public static String METADATA_DIRECTORY = null;
+    public static Properties CSTL_PROPERTIES = null;
+    /**
+     * Specifies if the process is running on a Glassfish application server.
+     */
+    private static Boolean runningOnGlassfish = null;
+
+    private ConfigDirectory() {
     }
 
     private static File getWebInfDiretory() {
@@ -134,7 +131,7 @@ public final class ConfigDirectory {
             }
         } else {
             constellationDataDirectory = new File(System.getProperty("user.home"), ".constellation-data");
-            if(!constellationDataDirectory.exists()){
+            if (!constellationDataDirectory.exists()) {
                 constellationDataDirectory.mkdir();
             }
         }
@@ -142,13 +139,39 @@ public final class ConfigDirectory {
     }
 
     /**
+     * Give Metadata directory {@link java.io.File} defined on constellaiton.properties or
+     * by default on .constellation-data/metadata from user home directory
+     *
+     * @return metadata directory as {@link java.io.File}
+     */
+    public static File getMetadataDirectory() {
+        final File constellationMetadataFolder;
+
+        if (METADATA_DIRECTORY != null && !METADATA_DIRECTORY.isEmpty()) {
+            constellationMetadataFolder = new File(METADATA_DIRECTORY);
+            if (!constellationMetadataFolder.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", METADATA_DIRECTORY);
+            } else if (!constellationMetadataFolder.isDirectory()) {
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", METADATA_DIRECTORY);
+            }
+        } else {
+            constellationMetadataFolder = new File(System.getProperty("user.home") + "/.constellation-data", "metadata");
+            if (!constellationMetadataFolder.exists()) {
+                constellationMetadataFolder.mkdir();
+            }
+        }
+
+        return constellationMetadataFolder;
+    }
+
+    /**
      * Return the configuration directory.
-     * 
+     * <p/>
      * priority is :
-     *  1) packaged war file
-     *  2) resource packaged config
-     *  3) user defined directory
-     *  4) .constellation in home directory
+     * 1) packaged war file
+     * 2) resource packaged config
+     * 3) user defined directory
+     * 4) .constellation in home directory
      */
     public static File getConfigDirectory() {
         File constellationDirectory;
@@ -156,20 +179,20 @@ public final class ConfigDirectory {
         /*
          * 1) WAR packaged config located in WEB-INF
          */
-         final File webInfDirectory = getWebInfDiretory();
+        final File webInfDirectory = getWebInfDiretory();
 
-         constellationDirectory = new File(webInfDirectory, "constellation");
-         if (constellationDirectory.isDirectory()) {
-             return constellationDirectory;
-         }
+        constellationDirectory = new File(webInfDirectory, "constellation");
+        if (constellationDirectory.isDirectory()) {
+            return constellationDirectory;
+        }
 
         /*
          * 2) resource packaged config
          */
-         constellationDirectory = FileUtilities.getDirectoryFromResource("constellation");
-         if (constellationDirectory != null && constellationDirectory.isDirectory()) {
+        constellationDirectory = FileUtilities.getDirectoryFromResource("constellation");
+        if (constellationDirectory != null && constellationDirectory.isDirectory()) {
             return constellationDirectory;
-         }
+        }
 
         /*
          * 3) user defined config
@@ -178,7 +201,7 @@ public final class ConfigDirectory {
             constellationDirectory = new File(USER_DIRECTORY);
             if (!constellationDirectory.exists()) {
                 LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", USER_DIRECTORY);
-            } else if (!constellationDirectory.isDirectory()){
+            } else if (!constellationDirectory.isDirectory()) {
                 LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", USER_DIRECTORY);
             }
             return constellationDirectory;
@@ -188,8 +211,37 @@ public final class ConfigDirectory {
          * 4) .constellation in home directory
          */
         constellationDirectory = getConstellationDirectory();
-        
+
         return constellationDirectory;
+    }
+
+    public static void setConfigDirectory(final File directory) {
+        USER_DIRECTORY = null;
+        if (directory != null && directory.isDirectory()) {
+            if (!directory.getPath().equals(getConstellationDirectory().getPath())) {
+                USER_DIRECTORY = directory.getPath();
+            }
+        }
+        //store the configuration properties file
+        final File webInfDirectory = getWebInfDiretory();
+        final File propertiesFile = new File(webInfDirectory, "constellation.properties");
+        try {
+            if (!propertiesFile.exists()) {
+                propertiesFile.createNewFile();
+            }
+            final Properties prop = new Properties();
+            final String pathValue;
+            if (USER_DIRECTORY == null) {
+                pathValue = "";
+            } else {
+                pathValue = USER_DIRECTORY;
+            }
+            prop.put("configuration_directory", pathValue);
+            FileUtilities.storeProperties(prop, propertiesFile);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "IOException while writing the constellation properties file", ex);
+        }
+
     }
 
     /**
@@ -205,15 +257,14 @@ public final class ConfigDirectory {
     public static List<File> getInstanceDirectories(final String serviceType) {
         return Arrays.asList(ConfigDirectory.getServiceDirectory(serviceType).listFiles());
     }
-    
+
     public static File getInstanceDirectory(final String serviceType, final String instance) {
         return new File(ConfigDirectory.getServiceDirectory(serviceType), instance);
     }
 
-    
     /**
      * Return the ".constellation" configuration directory in the user home.
-     * 
+     *
      * @return
      */
     private static File getConstellationDirectory() {
@@ -221,9 +272,9 @@ public final class ConfigDirectory {
         final String home = System.getProperty("user.home");
 
         if (System.getProperty("os.name", "").startsWith("Windows")) {
-             constellationDirectory = new File(home, WINDOWS_DIRECTORY);
+            constellationDirectory = new File(home, WINDOWS_DIRECTORY);
         } else {
-             constellationDirectory = new File(home, UNIX_DIRECTORY);
+            constellationDirectory = new File(home, UNIX_DIRECTORY);
         }
         return constellationDirectory;
     }
@@ -234,7 +285,7 @@ public final class ConfigDirectory {
     public static File getProviderConfigDirectory() {
         final File constellationDirectory = getConfigDirectory();
 
-        if(!constellationDirectory.exists()){
+        if (!constellationDirectory.exists()) {
             constellationDirectory.mkdirs();
         }
 
@@ -272,35 +323,6 @@ public final class ConfigDirectory {
         return new File(providerDirectory, fileName);
     }
 
-    public static void setConfigDirectory(final File directory) {
-        USER_DIRECTORY = null;
-        if (directory != null && directory.isDirectory()) {
-            if (!directory.getPath().equals(getConstellationDirectory().getPath())) {
-                USER_DIRECTORY = directory.getPath();
-            }
-        }
-        //store the configuration properties file
-        final File webInfDirectory = getWebInfDiretory();
-        final File propertiesFile = new File(webInfDirectory, "constellation.properties");
-        try {
-            if (!propertiesFile.exists()) {
-                propertiesFile.createNewFile();
-            }
-            final Properties prop = new Properties();
-            final String pathValue;
-            if (USER_DIRECTORY == null) {
-                pathValue = "";
-            } else {
-                pathValue = USER_DIRECTORY;
-            }
-            prop.put("configuration_directory", pathValue);
-            FileUtilities.storeProperties(prop, propertiesFile);
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "IOException while writing the constellation properties file", ex);
-        }
-        
-    }
-
     /**
      * Get the value for a property defined in the JNDI context chosen.
      *
@@ -308,7 +330,7 @@ public final class ConfigDirectory {
      *                  owns the property you wish to get. Otherwise you should specify {@code null}
      * @param propName  The name of the property to get.
      * @return The property value defines in the context, or {@code null} if no property of this name
-     *         is defined in the resource given in parameter.
+     * is defined in the resource given in parameter.
      * @throws NamingException if an error occurs while initializing the context, or if an empty value
      *                         for propGroup has been passed while using a Glassfish application server.
      */
@@ -340,7 +362,7 @@ public final class ConfigDirectory {
      * Returns the context value for the key specified, or {@code null} if not found
      * in this context.
      *
-     * @param key The key to search in the context.
+     * @param key     The key to search in the context.
      * @param context The context which to consider.
      */
     private static Object getContextProperty(final String key, final javax.naming.Context context) {
