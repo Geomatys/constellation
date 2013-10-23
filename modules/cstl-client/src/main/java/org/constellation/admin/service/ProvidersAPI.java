@@ -98,7 +98,7 @@ public final class ProvidersAPI {
         ensureNonNull("styleName", styleName);
 
         final String path = "SP/" + providerId + "/style/" + styleName;
-        client.delete(path, MediaType.APPLICATION_XML_TYPE, null).ensure2xxStatus();
+        client.delete(path, MediaType.APPLICATION_XML_TYPE).ensure2xxStatus();
     }
 
     /**

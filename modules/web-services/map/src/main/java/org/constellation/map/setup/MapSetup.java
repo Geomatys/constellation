@@ -24,7 +24,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 
-import com.sun.jersey.core.spi.component.ProviderServices;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.map.configuration.StyleProviderConfig;
@@ -41,7 +40,6 @@ import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.style.DefaultRasterSymbolizer;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.parameter.ParameterDescriptorGroup;

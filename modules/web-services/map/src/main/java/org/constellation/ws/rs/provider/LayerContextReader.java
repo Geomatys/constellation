@@ -1,9 +1,9 @@
 package org.constellation.ws.rs.provider;
 
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONUnmarshaller;
-import com.sun.jersey.json.impl.JSONUnmarshallerImpl;
+import org.glassfish.jersey.jettison.JettisonConfig;
+import org.glassfish.jersey.jettison.JettisonJaxbContext;
+import org.glassfish.jersey.jettison.JettisonUnmarshaller;
+
 import org.constellation.configuration.LayerContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
@@ -13,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
@@ -54,13 +53,13 @@ public class LayerContextReader implements MessageBodyReader<LayerContext> {
             if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)) {
                 Map<String, String> nSMap = new HashMap<String, String>(0);
                 nSMap.put("http://www.constellation.org/config", "constellation-config");
-                JSONConfiguration config = JSONConfiguration.mappedJettison().xml2JsonNs(nSMap).build();
-                JAXBContext cxtx = new JSONJAXBContext("org.constellation.configuration:" +
+                JettisonConfig config = JettisonConfig.mappedJettison().xml2JsonNs(nSMap).build();
+                JettisonJaxbContext cxtx = new JettisonJaxbContext(config, "org.constellation.configuration:" +
                         "org.constellation.generic.database:" +
                         "org.geotoolkit.ogc.xml.v110:" +
                         "org.apache.sis.internal.jaxb.geometry:" +
                         "org.geotoolkit.gml.xml.v311");
-                JSONUnmarshaller jsonUnmarshaller = new JSONUnmarshallerImpl(cxtx, config);
+                JettisonUnmarshaller jsonUnmarshaller = cxtx.createJsonUnmarshaller();
                 context = jsonUnmarshaller.unmarshalFromJSON(entityStream, LayerContext.class);
             } else {
                 final Unmarshaller m = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();

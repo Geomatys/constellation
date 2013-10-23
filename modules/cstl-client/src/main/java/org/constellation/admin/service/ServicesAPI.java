@@ -217,7 +217,7 @@ public final class ServicesAPI {
         ensureNonNull("identifier",  identifier);
 
         final String path = "OGC/" + serviceType + "/" + identifier;
-        client.delete(path, MediaType.APPLICATION_XML_TYPE, null).ensure2xxStatus();
+        client.delete(path, MediaType.APPLICATION_XML_TYPE).ensure2xxStatus();
     }
 
     /**

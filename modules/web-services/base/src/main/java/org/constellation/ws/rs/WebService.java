@@ -36,10 +36,10 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import com.sun.jersey.api.core.HttpContext;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
@@ -61,7 +61,6 @@ import static org.constellation.ws.ExceptionCode.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.Versioned;
 
 // Apache SIS dependencies
 import org.apache.sis.util.logging.Logging;
@@ -157,7 +156,7 @@ public abstract class WebService {
      * arrives.
      */
     @Context
-    private volatile HttpContext httpContext;
+    protected volatile HttpHeaders httpHeaders;
 
     /**
      * Automatically set by Jersey.
@@ -211,16 +210,6 @@ public abstract class WebService {
      */
     protected final HttpServletRequest getHttpServletRequest(){
         return httpServletRequest;
-    }
-
-    /**
-     * The HTTP context used to get information about the client which sent the
-     * request.
-     *
-     * @return
-     */
-    protected final HttpContext getHttpContext(){
-        return httpContext;
     }
 
    /**
@@ -350,7 +339,7 @@ public abstract class WebService {
                 requestValidationActivated = false;
             }
 
-            final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
+            final Map<String, String> prefixMapping = new LinkedHashMap<>();
             try {
                 final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
                 if (requestValidationActivated) {
@@ -385,12 +374,13 @@ public abstract class WebService {
                 return launchException(e.getMessage(), e.getExceptionCode().identifier(), e.getLocator());
             }
 
-            if (request instanceof Versioned) {
+            /* parameters are now immutable
+             *  if (request instanceof Versioned) {
                 final Versioned ar = (Versioned) request;
                 if (ar.getVersion() != null) {
                     getUriContext().getQueryParameters().add("VERSION", ar.getVersion().toString());
                 }
-            }
+            }*/
             return treatIncomingRequest(request);
         } else {
             return Response.ok("This service is not running", MimeType.TEXT_PLAIN).build();

@@ -41,7 +41,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 // jersey dependencies
-import com.sun.jersey.spi.resource.Singleton;
+import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MediaType;
@@ -318,7 +318,7 @@ public class WFSService extends GridWebService<WFSWorker> {
      */
     @Override
     protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException {
-        final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
+        final Map<String, String> prefixMapping = new LinkedHashMap<>();
         return unmarshallRequestWithMapping(unmarshaller, is, prefixMapping);
     }
     
@@ -397,7 +397,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         }
         w.checkVersionSupported(currentVersion, true);
 
-        final List<String> versions = new ArrayList<String>();
+        final List<String> versions = new ArrayList<>();
         if (version != null) {
             String[] vArray = version.split(",");
             versions.addAll(Arrays.asList(vArray));

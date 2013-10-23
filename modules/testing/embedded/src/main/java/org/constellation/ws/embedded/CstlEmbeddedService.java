@@ -28,8 +28,7 @@ import java.util.logging.Level;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.ws.Endpoint;
-import com.sun.jersey.api.container.grizzly2.servlet.GrizzlyWebContainerFactory;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
+import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
 import java.util.*;
 import java.util.Map.Entry;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -37,6 +36,8 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.geotoolkit.console.CommandLine;
 import org.geotoolkit.console.Option;
 import org.apache.sis.util.logging.Logging;
+import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.servlet.ServletContainer;
 
 /**
  * An Abstract class to run the web service in an embedded container.
@@ -162,6 +163,7 @@ public class CstlEmbeddedService extends CommandLine {
             "org.constellation.wfs.ws.rs",
             "org.constellation.wps.ws.rs",
             "org.constellation.sos.ws.rs",
+            "org.constellation.sos.ws.rs.provider",
             "org.constellation.configuration.ws.rs",
             "org.constellation.metadata.ws.rs",
             "org.constellation.metadata.ws.rs.provider",
@@ -197,7 +199,7 @@ public class CstlEmbeddedService extends CommandLine {
                 sb.append(';');
             }
         }
-        grizzlyWebContainerProperties.put("com.sun.jersey.config.property.packages", sb.toString());
+        grizzlyWebContainerProperties.put(ServerProperties.PROVIDER_PACKAGES, sb.toString());
 
         final String base = "http://" + host + "/";
         uri = UriBuilder.fromUri(base).port(port).build();
@@ -292,8 +294,8 @@ public class CstlEmbeddedService extends CommandLine {
      */
     public void runAll() {
 
-        grizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
-                "com.sun.jersey.api.core.PackagesResourceConfig");
+        /*grizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
+                "com.sun.jersey.api.core.PackagesResourceConfig");*/
 
         LOGGER.log(Level.INFO, "Starting grizzly server at: {0}", f.format(new Date()));
 

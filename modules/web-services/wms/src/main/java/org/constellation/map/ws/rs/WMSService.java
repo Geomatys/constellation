@@ -20,7 +20,7 @@ package org.constellation.map.ws.rs;
 import org.constellation.map.configuration.MapConfigurer;
 import org.constellation.wms.configuration.WMSConfigurer;
 import org.constellation.map.visitor.GetFeatureInfoVisitor;
-import com.sun.jersey.spi.resource.Singleton;
+import javax.inject.Singleton;
 
 //J2SE dependencies
 import java.awt.Color;

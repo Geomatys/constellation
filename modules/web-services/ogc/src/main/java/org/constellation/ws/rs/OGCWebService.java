@@ -39,11 +39,6 @@ import javax.xml.validation.Schema;
 //import org.apache.shiro.authc.IncorrectCredentialsException;
 //import org.apache.shiro.authc.UnknownAccountException;
 
-
-
-
-
-
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
@@ -231,7 +226,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
             if (worker.isSecured()) {
                 final String ip = getHttpServletRequest().getRemoteAddr();
-                final String referer = getHttpContext().getRequest().getHeaderValue("referer");
+                final String referer = httpHeaders.getHeaderString("referer");
                 if (!worker.isAuthorized(ip, referer)) {
                     LOGGER.log(Level.INFO, "Received a request from unauthorized ip:{0} or referer:{1}",
                             new String[]{ip, referer});
@@ -260,8 +255,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     }
 
     private void processAuthentication() throws UnknownAccountException, IncorrectCredentialsException{
-        if (getHttpServletRequest() != null) {
-            final String authorization = getHttpServletRequest().getHeader("authorization");
+        if (httpHeaders != null) {
+            final String authorization = httpHeaders.getHeaderString("authorization");
             if (authorization != null) {
                 if (authorization.startsWith("Basic ")) {
                     final String toDecode = authorization.substring(6);

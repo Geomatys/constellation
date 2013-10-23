@@ -26,7 +26,7 @@ import java.util.logging.Level;
 // Jersey dependencies
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import com.sun.jersey.spi.resource.Singleton;
+import javax.inject.Singleton;
 
 //JAXB dependencies
 import javax.xml.namespace.QName;

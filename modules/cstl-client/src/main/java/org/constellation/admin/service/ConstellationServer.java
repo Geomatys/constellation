@@ -16,13 +16,15 @@
  */
 package org.constellation.admin.service;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.jersey.multipart.MultiPart;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import org.glassfish.jersey.client.ClientResponse;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.MultiPart;
+
 import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
@@ -92,6 +94,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.constellation.api.QueryConstants.*;
+
 
 
 /**
@@ -1102,11 +1105,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             multi.bodyPart(dataTypeBody);
 
             // generate jersey client to send file
-            Client c = Client.create();
-            WebResource service = c.resource(getURLWithEndSlash());
-            ClientResponse response = service.path("data/upload").type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multi);
+            Client c = ClientBuilder.newClient();
+            WebTarget service = c.target(getURLWithEndSlash());
+            ClientResponse response = service.path("data/upload").request(MediaType.MULTIPART_FORM_DATA).post(Entity.entity(multi, MediaType.MULTIPART_FORM_DATA), ClientResponse.class);
 
-            DataInformation information = response.getEntity(DataInformation.class);
+            DataInformation information = response.readEntity(DataInformation.class, null);
             return information;
         }
 

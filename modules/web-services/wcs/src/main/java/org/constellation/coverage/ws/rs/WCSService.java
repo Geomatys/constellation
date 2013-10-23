@@ -18,7 +18,7 @@
 package org.constellation.coverage.ws.rs;
 
 // Jersey dependencies
-import com.sun.jersey.spi.resource.Singleton;
+import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -341,7 +341,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             final String section = getParameter(SECTIONS_PARAMETER, false);
             final List<String> requestedSections;
             if (section != null) {
-                requestedSections = new ArrayList<String>();
+                requestedSections = new ArrayList<>();
                 final StringTokenizer tokens = new StringTokenizer(section, ",;");
                 while (tokens.hasMoreTokens()) {
                     final String token = tokens.nextToken().trim();
@@ -441,7 +441,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         }
         List<DirectPositionType> pos = null;
         if (bbox != null) {
-            pos = new ArrayList<DirectPositionType>();
+            pos = new ArrayList<>();
             final List<String> bboxValues = StringUtilities.toStringList(bbox);
             final double minimumLon = RequestsUtilities.toDouble(bboxValues.get(0));
             final double maximumLon = RequestsUtilities.toDouble(bboxValues.get(2));
@@ -480,7 +480,7 @@ public class WCSService extends GridWebService<WCSWorker> {
                     INVALID_DIMENSION_VALUE);
         }
 
-        final List<String> axis = new ArrayList<String>();
+        final List<String> axis = new ArrayList<>();
         axis.add("width");
         axis.add("height");
         int[] low = null;
@@ -517,7 +517,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         final String categories = getParameter(KEY_CATEGORIES, false);
         if (categories != null) {
             final List<Double[]> ranges = RequestsUtilities.toCategoriesRange(categories);
-            final List<Object> objects = new ArrayList<Object>();
+            final List<Object> objects = new ArrayList<>();
             for (Double[] range : ranges) {
                 if (Objects.equals(range[0], range[1])) {
                     objects.add(new org.geotoolkit.wcs.xml.v100.TypedLiteralType(String.valueOf(range[0]), "xs:double"));
@@ -542,7 +542,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         //output
         final List<Double> resolutions;
         if (resx != null && resy != null) {
-            resolutions = new ArrayList<Double>();
+            resolutions = new ArrayList<>();
             resolutions.add(Double.valueOf(resx));
             resolutions.add(Double.valueOf(resy));
             if (resz != null) {
@@ -625,7 +625,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             }
 
             final StringTokenizer tokens = new StringTokenizer(rangeSubset, ";");
-            final List<FieldSubset> fields = new ArrayList<FieldSubset>(tokens.countTokens());
+            final List<FieldSubset> fields = new ArrayList<>(tokens.countTokens());
             while (tokens.hasMoreTokens()) {
                 final String value = tokens.nextToken();
                 String interpolation = null;
@@ -653,13 +653,13 @@ public class WCSService extends GridWebService<WCSWorker> {
         }
 
         StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
-        final List<Double> origin = new ArrayList<Double>(tokens.countTokens());
+        final List<Double> origin = new ArrayList<>(tokens.countTokens());
         while (tokens.hasMoreTokens()) {
             origin.add(RequestsUtilities.toDouble(tokens.nextToken()));
         }
 
         final String gridOffsets = getParameter(KEY_GRIDOFFSETS, false);
-        final List<Double> offset = new ArrayList<Double>();
+        final List<Double> offset = new ArrayList<>();
         if (gridOffsets != null) {
             tokens = new StringTokenizer(gridOffsets, ",;");
             while (tokens.hasMoreTokens()) {
