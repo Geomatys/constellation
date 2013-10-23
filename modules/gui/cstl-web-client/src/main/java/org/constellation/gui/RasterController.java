@@ -72,6 +72,7 @@ public class RasterController {
         } catch (ParseException e) {
             LOGGER.log(Level.WARNING, "", e);
         }
+        metadataToSave.setLocaleMetadata(userLocale.toString());
         metadataToSave.setDate(metadataDate);
         DataInformation information = informationContainer.getInformation();
 

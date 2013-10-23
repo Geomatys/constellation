@@ -7,7 +7,7 @@ CREATE SEQUENCE "admin"."i18n_id" AS INTEGER START WITH 0;
 
 CREATE TABLE "admin"."i18n"(
   "id"    INTEGER     NOT NULL,
-  "lang"  VARCHAR(5)  NOT NULL,
+  "lang"  VARCHAR(7)  NOT NULL,
   "value" CLOB        NOT NULL
 );
 

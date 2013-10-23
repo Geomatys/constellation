@@ -258,7 +258,7 @@ public final class Session {
     /* internal */ String readI18n(final int id, final Locale locale) throws SQLException {
         ensureNonNull("locale", locale);
         try {
-            final InputStream stream = new Query(READ_I18N).with(id, locale.getLanguage()).select().getClob();
+            final InputStream stream = new Query(READ_I18N).with(id, locale.toString()).select().getClob();
             if (stream != null) {
                 return IOUtilities.readString(stream);
             }
@@ -279,7 +279,8 @@ public final class Session {
      */
     /* internal */ void writeI18n(final int id, final Locale locale, final String value) throws SQLException {
         ensureNonNull("locale", locale);
-        new Query(WRITE_I18N).with(id, locale.getLanguage(), new StringReader(value)).update();
+
+        new Query(WRITE_I18N).with(id, locale.toString(), new StringReader(value)).update();
     }
 
     /**
@@ -293,7 +294,7 @@ public final class Session {
      */
     /* internal */ void updateI18n(final int id, final Locale locale, final String newValue) throws SQLException {
         ensureNonNull("locale", locale);
-        new Query(UPDATE_I18N).with(new StringReader(newValue), id, locale.getLanguage()).update();
+        new Query(UPDATE_I18N).with(new StringReader(newValue), id, locale.toString()).update();
     }
 
     /**

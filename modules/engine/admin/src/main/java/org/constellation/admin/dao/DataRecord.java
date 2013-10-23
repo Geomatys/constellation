@@ -107,7 +107,13 @@ public final class DataRecord implements Record {
     }
 
     public void setTitle(final Locale locale, final String value) throws SQLException {
-        session.updateI18n(title, locale, value);
+        final String title = session.readI18n(this.title, locale);
+        if(title !=null){
+            session.updateI18n(this.title, locale, value);
+        }
+        else{
+            session.writeI18n(this.title, locale, value);
+        }
     }
 
     public String getDescription(final Locale locale) throws SQLException {
@@ -115,7 +121,13 @@ public final class DataRecord implements Record {
     }
 
     public void setDescription(final Locale locale, final String value) throws SQLException {
-        session.updateI18n(description, locale, value);
+        final String title = session.readI18n(this.description, locale);
+        if(title !=null){
+            session.updateI18n(this.description, locale, value);
+        }
+        else{
+            session.writeI18n(this.description, locale, value);
+        }
     }
 
     public String getOwnerLogin() {

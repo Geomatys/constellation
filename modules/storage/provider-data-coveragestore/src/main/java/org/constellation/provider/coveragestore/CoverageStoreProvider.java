@@ -16,6 +16,9 @@
  */
 package org.constellation.provider.coveragestore;
 
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.identification.AbstractIdentification;
+import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.dao.DataRecord;
@@ -25,6 +28,7 @@ import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.DefaultCoverageStoreLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
+import org.constellation.utils.MetadataUtilities;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
@@ -40,6 +44,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -224,13 +229,30 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
                     }
                 }
                 if (!found) {
-                    session.writeData(key.getLocalPart(), pr, DataRecord.DataType.COVERAGE, null);
+                    DataRecord dr = session.writeData(key.getLocalPart(), pr, DataRecord.DataType.COVERAGE, null);
+
+                    // TODO
+                    //Get metadata
+                    final String providerId = this.getId();
+                    final DefaultMetadata metadata = MetadataUtilities.loadMetadata(providerId);
+                    if(metadata!=null){
+                        final String description = metadata.getIdentificationInfo().iterator().next().getAbstract().toString();
+                        final String title = metadata.getIdentificationInfo().iterator().next().getCitation().getTitle().toString();
+                        final Locale locale = metadata.getLocales().iterator().next();
+
+                        //Save title and description
+                        dr.setTitle(locale, title);
+                        dr.setDescription(locale, description);
+                    }
                 }
             }
+
+
         } catch (IOException | SQLException ex) {
             getLogger().log(Level.WARNING, "An error occurred while updating database on provider startup.", ex);
         } finally {
             if (session != null) session.close();
         }
+
     }
 }
