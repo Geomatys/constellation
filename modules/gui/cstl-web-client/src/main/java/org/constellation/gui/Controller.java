@@ -50,6 +50,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -341,17 +343,20 @@ public class Controller {
      */
     @Resource
     @Route("/upload")
-    public Response upload(final FileItem file, final String dataType, final String returnURL) {
+    public Response upload(final FileItem file, final FileItem metadataFile, final String dataType, final String returnURL) {
         if (file != null) {
             DataInformation di;
             // Create file on temporary folder
             String tempDir = System.getProperty("java.io.tmpdir");
             final File newFile = new File(tempDir + "/" + file.getName());
+            File newMetadataFile = null;
+            if(!metadataFile.getName().isEmpty()){
+                newMetadataFile = new File(tempDir + "/" + metadataFile.getName());
+            }
 
             try {
-                //open stream on file
+                //open stream on data file
                 final InputStream stream = file.getInputStream();
-
 
                 // write on file
                 final FileOutputStream fos = new FileOutputStream(newFile);
@@ -360,12 +365,26 @@ public class Controller {
                     fos.write(intVal);
                     intVal = stream.read();
                 }
+
+
+                if(!metadataFile.getName().isEmpty()){
+                    //open stream on metadata file
+                    final InputStream metadataStream = file.getInputStream();
+                    // write on file
+                    final FileOutputStream metadataFos = new FileOutputStream(newMetadataFile);
+                    intVal = metadataStream.read();
+                    while (intVal != -1) {
+                        metadataFos.write(intVal);
+                        intVal = metadataStream.read();
+                    }
+                }
+
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "error when saving file on server", e);
-                return Response.error("error when saving file on server");
+                return Response.error(e);
             }
 
-            di = servicesManager.uploadToServer(newFile, dataType);
+            di = servicesManager.uploadToServer(newFile, newMetadataFile, dataType);
             informationContainer.setInformation(di);
             Response aResponse = Response.error("response not initialized");
             switch (dataType) {

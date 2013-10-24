@@ -16,6 +16,7 @@
  */
 package org.constellation.gui.service;
 
+import org.apache.commons.fileupload.FileItem;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
@@ -191,8 +192,8 @@ public class  ServicesManager {
         return instancesSummary;
     }
 
-    public DataInformation uploadToServer(File newFile, String dataType) {
-        return cstl.openServer().providers.uploadData(newFile, dataType);
+    public DataInformation uploadToServer(final File newFile, final File metadataFile, final String dataType) {
+        return cstl.openServer().providers.uploadData(newFile, metadataFile, dataType);
     }
 
     public StyleListBean getStyleList() {

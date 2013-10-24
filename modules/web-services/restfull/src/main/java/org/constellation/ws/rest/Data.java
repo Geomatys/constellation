@@ -80,6 +80,7 @@ public class Data {
         String fileName = "";
         int extensionPoint = 0;
         InputStream uploadedInputStream = null;
+        InputStream uploadedMetadataInputStream = null;
 
         for (BodyPart bodyPart : multi.getBodyParts()) {
 
@@ -87,10 +88,14 @@ public class Data {
             String name = cdParameter.get("name");
             switch (name) {
                 case "file":
-                    BodyPartEntity bpe = (BodyPartEntity) bodyPart.getEntity();
-                    uploadedInputStream = bpe.getInputStream();
+                    BodyPartEntity bpeData = (BodyPartEntity) bodyPart.getEntity();
+                    uploadedInputStream = bpeData.getInputStream();
                     fileName = bodyPart.getContentDisposition().getFileName();
                     extensionPoint = fileName.lastIndexOf('.');
+                    break;
+                case "metadatafile":
+                    BodyPartEntity bpeMetadata = (BodyPartEntity) bodyPart.getEntity();
+                    uploadedMetadataInputStream = bpeMetadata.getInputStream();
                     break;
                 case "type":
                     dataType = bodyPart.getEntityAs(String.class);

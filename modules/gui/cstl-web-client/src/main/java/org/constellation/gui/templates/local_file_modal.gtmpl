@@ -8,6 +8,7 @@
             <div id="part1">
                 <!-- Upload part -->
                 <div class="fileupload fileupload-new" data-provides="fileupload">
+                    <label for="file">Donnée</label>
                     <div class="input-append">
                         <div class="uneditable-input span3">
                             <i class="icon-file fileupload-exists"></i>
@@ -17,6 +18,22 @@
                             <span class="fileupload-new">&{layer.listing.data.upload.select.label}</span>
                             <span class="fileupload-exists">&{layer.listing.data.upload.change.label}</span>
                             <input type="file" name="file" id="file"/>
+                        </span>
+                        <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">&{layer.listing.data.upload.remove.label}</a>
+                    </div>
+                </div>
+
+                <div class="fileupload fileupload-new" data-provides="fileupload">
+                    <label for="metadataFile">Metadata</label>
+                    <div class="input-append">
+                        <div class="uneditable-input span3">
+                            <i class="icon-file fileupload-exists"></i>
+                            <span class="fileupload-preview"></span>
+                        </div>
+                        <span class="btn btn-file">
+                            <span class="fileupload-new">&{layer.listing.data.upload.select.label}</span>
+                            <span class="fileupload-exists">&{layer.listing.data.upload.change.label}</span>
+                            <input type="file" name="metadataFile" id="metadataFile"/>
                         </span>
                         <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">&{layer.listing.data.upload.remove.label}</a>
                     </div>
