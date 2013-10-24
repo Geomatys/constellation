@@ -115,7 +115,7 @@ public abstract class LayerWorker extends AbstractWorker {
         } catch (FileNotFoundException ex) {
             startError = "The configuration file layerContext.xml has not been found";
             isStarted = false;
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: ", id);
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + ex.getMessage(), id);
         }
         
 

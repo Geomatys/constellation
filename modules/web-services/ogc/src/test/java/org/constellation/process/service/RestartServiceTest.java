@@ -16,8 +16,9 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
+import java.util.List;
 import java.util.Set;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -39,13 +40,13 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
     }
 
 
+    /**
+     * Start all the existing  instance.
+     */
     private void startAllInstance() {
-        // start all the existing  instance
-        final File serviceDir =  new File(configDirectory, serviceName);
-        for (File instanceDir : serviceDir.listFiles()) {
-            if (instanceDir.isDirectory()) {
-                startInstance(instanceDir.getName());
-            }
+        final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(serviceName);
+        for (String serviceID : serviceIDs) {
+            startInstance(serviceID);
         }
     }
 
@@ -103,6 +104,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         startInstance("restartInstance4");
 
         final int initSize = WSEngine.getInstanceSize(serviceName);
+        final Set<String> instancesBefore = WSEngine.getInstanceNames(serviceName);
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
@@ -115,7 +117,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
 
         final int newSize =  WSEngine.getInstanceSize(serviceName);
         final Set<String> instances = WSEngine.getInstanceNames(serviceName);
-        assertTrue("expected " + initSize + " but was:" + newSize + "(" + instances + ")", newSize == initSize);
+        assertTrue("expected " + initSize + " (" +  instancesBefore + ") but was:" + newSize + "(" + instances + ")", newSize == initSize);
         assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance3"));
         assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance4"));
 

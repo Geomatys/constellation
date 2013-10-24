@@ -17,12 +17,12 @@
 package org.constellation.process.service;
 
 import java.io.File;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
-import org.geotoolkit.util.FileUtilities;
 import org.junit.AfterClass;
 
 /**
@@ -31,6 +31,7 @@ import org.junit.AfterClass;
  */
 public abstract class ServiceProcessTest extends AbstractProcessTest {
 
+    @Deprecated
     protected static File configDirectory;
     protected static String serviceName;
     private static Class workerClass;
@@ -57,16 +58,13 @@ public abstract class ServiceProcessTest extends AbstractProcessTest {
 
     /**
      * Check if an service instance exist.
-     * @param serviceName
      * @param identifier
      * @return
      */
     protected abstract boolean checkInstanceExist(final String identifier);
 
     protected static void deleteInstance(String identifier) {
-        final File serviceDir = new File(configDirectory, serviceName);
-        final File instance = new File(serviceDir, identifier);
-        FileUtilities.deleteDirectory(instance);
+        ConfigurationEngine.deleteConfiguration(serviceName, identifier);
         if (WSEngine.getWorkersMap(serviceName) != null) {
             WSEngine.getWorkersMap(serviceName).remove(identifier);
         }
