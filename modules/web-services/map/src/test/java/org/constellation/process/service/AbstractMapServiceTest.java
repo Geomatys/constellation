@@ -16,12 +16,12 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.LayerContext;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 /**
  *
@@ -41,53 +41,31 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     }
 
     protected void createInstance(final String identifier, LayerContext context) {
-        final File wms = new File(configDirectory, serviceName);
-        final File instance = new File(wms, identifier);
-        instance.mkdir();
-
-        final File configFile = new File(instance, "layerContext.xml");
         final LayerContext configuration = context != null ? context : new LayerContext();
         try {
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-        } catch (JAXBException ex) {
-            //
+            ConfigurationEngine.createConfiguration(serviceName, identifier, "layerContext.xml", configuration, null);
+        } catch (JAXBException | IOException ex) {
+            LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
     }
 
     /** {@inheritDoc} */
     @Override
     protected boolean checkInstanceExist(final String identifier) {
-
-        final File instanceDir = new File(configDirectory.getAbsolutePath() + "/" + serviceName, identifier);
-        if (instanceDir.exists() && instanceDir.isDirectory()) {
-            final File configFile = new File(instanceDir, "layerContext.xml");
-            return configFile.exists();
-        } else {
-            return false;
-        }
+        return ConfigurationEngine.getServiceConfigurationIds(serviceName).contains(identifier);
     }
 
     /**
      * Create a custom instance.
-     * @param serviceName
+     * 
      * @param identifier
      * @param context
      */
     protected void createCustomInstance(final String identifier, LayerContext context) {
-        final File wms = new File(configDirectory, serviceName);
-        final File instance = new File(wms, identifier);
-        instance.mkdir();
-
-        final File configFile = new File(instance, "layerContext.xml");
-        final LayerContext configuration = context;
         try {
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-        } catch (JAXBException ex) {
-            //
+            ConfigurationEngine.createConfiguration(serviceName, identifier, "layerContext.xml", context, null);
+        }  catch (JAXBException | IOException ex) {
+            LOGGER.log(Level.SEVERE, "Error while creating custom instance", ex);
         }
     }
 
@@ -97,17 +75,11 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
      * @return
      */
     protected  LayerContext getConfig(final String identifier) {
-        final File wms = new File(configDirectory, serviceName);
-        final File instance = new File(wms, identifier);
-        final File configFile = new File(instance, "layerContext.xml");
-
-        LayerContext  context = null;
+        LayerContext context = null;
         try {
-            final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-            context = (LayerContext) unmarshaller.unmarshal(configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-        } catch (JAXBException ex) {
-            //
+            context = (LayerContext) ConfigurationEngine.getConfiguration(serviceName, identifier, "layerContext.xml");
+        } catch (JAXBException | FileNotFoundException ex) {
+            LOGGER.log(Level.SEVERE, "Error while getting configuration", ex);
         }
         return context;
     }
