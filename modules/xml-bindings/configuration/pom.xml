@@ -127,6 +127,7 @@
         <dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-core</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
