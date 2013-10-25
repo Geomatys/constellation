@@ -57,22 +57,7 @@ public interface Configurator {
 
         @Override
         public ParameterValueGroup getConfiguration(final ProviderService service) {
-            final ParameterValueGroup params = service.getServiceDescriptor().createValue();
-            Session session = null;
-            try {
-                session = EmbeddedDatabase.createSession();
-                final List<ProviderRecord> records = session.readProviders(service.getName());
-                for (ProviderRecord record : records) {
-                    params.values().add(record.getConfig(service.getServiceDescriptor().descriptor("source")));
-                }
-                return params;
-                
-            } catch (IOException | SQLException ex) {
-                LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
-            } finally {
-                if (session != null) session.close();
-            }
-            return null;
+            return ConfigurationEngine.getProviderConfiguration(service.getName(), service.getServiceDescriptor());
         }
 
         @Override
@@ -174,7 +159,6 @@ public interface Configurator {
             } finally {
                 if (session != null) session.close();
             }
-            ConfigurationEngine.storePoviderConfiguration(serviceName, params);
         }
     }
 }
