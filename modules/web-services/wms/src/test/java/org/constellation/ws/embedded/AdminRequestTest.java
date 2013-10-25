@@ -33,6 +33,8 @@ import org.constellation.configuration.ServiceStatus;
 
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
@@ -73,11 +75,11 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         final Configurator config = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
 
-                final ParameterValueGroup config = desc.createValue();
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("coverage-sql".equals(serviceName)){
+                if("coverage-sql".equals(service.getName())){
                     // Defines a PostGrid data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
@@ -91,7 +93,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
 
-                }else if("shapefile".equals(serviceName)){
+                }else if("shapefile".equals(service.getName())){
                     try{
                         final File outputDir = initDataDirectory();
 
@@ -121,7 +123,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

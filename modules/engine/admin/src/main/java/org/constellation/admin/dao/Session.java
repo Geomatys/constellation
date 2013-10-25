@@ -17,6 +17,8 @@
 
 package org.constellation.admin.dao;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
@@ -29,10 +31,8 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
-import javax.swing.plaf.nimbus.State;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -53,6 +53,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * Session for administration database operations
@@ -103,6 +104,7 @@ public final class Session {
     private static final String READ_PROVIDER_CONFIG      = "provider.read.config";
     private static final String LIST_PROVIDERS            = "provider.list";
     private static final String LIST_PROVIDERS_FROM_TYPE  = "provider.list.from.type";
+    private static final String LIST_PROVIDERS_FROM_IMPL  = "provider.list.from.impl";
     private static final String WRITE_PROVIDER            = "provider.write";
     private static final String UPDATE_PROVIDER           = "provider.update";
     private static final String UPDATE_PROVIDER_CONFIG    = "provider.update.config";
@@ -419,7 +421,7 @@ public final class Session {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the configuration cannot be read
      */
-    /* internal */ GeneralParameterValue readProviderConfig(final int generatedId, final ParameterDescriptorGroup descriptor) throws SQLException, IOException {
+    /* internal */ GeneralParameterValue readProviderConfig(final int generatedId, final GeneralParameterDescriptor descriptor) throws SQLException, IOException {
         final InputStream stream = new Query(READ_PROVIDER_CONFIG).with(generatedId).select().getClob();
         return IOUtilities.readParameter(stream, descriptor);
     }
@@ -444,6 +446,18 @@ public final class Session {
     public List<ProviderRecord> readProviders(final ProviderType type) throws SQLException {
         ensureNonNull("type", type);
         return new Query(LIST_PROVIDERS_FROM_TYPE).with(type.name()).select().getAll(ProviderRecord.class);
+    }
+
+    /**
+     * Queries the list of registered providers for the specified implementation.
+     *
+     * @param implementation the provider implementation to query
+     * @return a {@link List} of {@link ProviderRecord}s
+     * @throws SQLException if a database access error occurs
+     */
+    public List<ProviderRecord> readProviders(final String implementation) throws SQLException {
+        ensureNonNull("implementation", implementation);
+        return new Query(LIST_PROVIDERS_FROM_IMPL).with(implementation).select().getAll(ProviderRecord.class);
     }
 
     /**
@@ -1022,8 +1036,19 @@ public final class Session {
         InputStream getClob() throws SQLException {
             try {
                 if (rs.next()) {
-                    return rs.getClob(1).getAsciiStream();
+                    final InputStream stream = rs.getClob(1).getAsciiStream();
+                    // copy the stream into a new one
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = stream.read(buffer)) > -1 ) {
+                        baos.write(buffer, 0, len);
+                    }
+                    baos.flush();
+                    return new ByteArrayInputStream(baos.toByteArray());
                 }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Error while copying clob into new Stream", ex);
             } finally {
                 rs.close();
                 stmt.close();

@@ -17,12 +17,6 @@
 package org.constellation.provider.coveragefile;
 
 import org.apache.sis.util.collection.Cache;
-import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.admin.dao.Session;
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.dao.DataRecord.DataType;
-import org.constellation.admin.dao.ProviderRecord.ProviderType;
-import org.constellation.admin.dao.DataRecord;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -46,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import org.constellation.admin.dao.DataRecord;
 
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_IS_ELEVATION_MODEL_DESCRIPTOR;
@@ -154,9 +149,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                 try {
                     //we have this data source in the folder
                     reader = loadReader(f);
-                } catch (IOException ex) {
-                    getLogger().log(Level.SEVERE, null, ex);
-                } catch (CoverageStoreException ex) {
+                } catch (IOException | CoverageStoreException ex) {
                     getLogger().log(Level.SEVERE, null, ex);
                 }
                 if (reader != null) {
@@ -234,49 +227,6 @@ public class CoverageFileProvider extends AbstractLayerProvider{
 
         visit(folder);
         super.visit();
-
-        // Update administration database.
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            ProviderRecord pr = session.readProvider(this.getId());
-            if (pr == null) {
-                pr = session.writeProvider(this.getId(), ProviderType.LAYER, "coverage-file", param, null);
-            }
-            final List<DataRecord> list = pr.getData();
-
-            // Remove no longer existing data.
-            for (final DataRecord data : list) {
-                boolean found = false;
-                for (final Name key : index.keySet()) {
-                    if (data.getName().equals(key.getLocalPart())) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    session.deleteData(this.getId(), data.getName());
-                }
-            }
-
-            // Add not registered new data.
-            for (final Name key : index.keySet()) {
-                boolean found = false;
-                for (final DataRecord data : list) {
-                    if (key.getLocalPart().equals(data.getName())) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    session.writeData(key.getLocalPart(), pr, DataType.COVERAGE, null);
-                }
-            }
-        } catch (IOException | SQLException ex) {
-            getLogger().log(Level.WARNING, "An error occurred while updating database on provider startup.", ex);
-        } finally {
-            if (session != null) session.close();
-        }
     }
 
     /**
@@ -345,6 +295,11 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         }
 
         return null;
+    }
+
+    @Override
+    public DataRecord.DataType getDataType() {
+        return DataRecord.DataType.COVERAGE;
     }
     
 }

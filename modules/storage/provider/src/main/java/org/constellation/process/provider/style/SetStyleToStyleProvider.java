@@ -16,10 +16,6 @@
  */
 package org.constellation.process.provider.style;
 
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.dao.Session;
-import org.constellation.admin.dao.StyleRecord;
-import org.constellation.admin.dao.StyleRecord.StyleType;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
@@ -27,10 +23,6 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.parameter.ParameterValueGroup;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.logging.Level;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor.OWNER;
@@ -80,22 +72,5 @@ public class SetStyleToStyleProvider extends AbstractCstlProcess {
 
         // Add style into provider.
         provider.set(styleName, style);
-
-        // Register style into administration database.
-        // TODO: implement style type analysis
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final StyleRecord st = session.readStyle(styleName, providerID);
-            if (st == null) {
-                session.writeStyle(styleName, session.readProvider(providerID), StyleType.VECTOR, style, owner != null ? session.readUser(owner) : null);
-            } else {
-                // TODO: update style type
-            }
-        } catch (IOException | SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating administration database after setting the style named \"" + styleName + "\".", ex);
-        } finally {
-            if (session != null) session.close();
-        }
     }
 }

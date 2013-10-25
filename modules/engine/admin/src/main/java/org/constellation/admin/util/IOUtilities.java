@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * @author Fabien Bernard (Geomatys).
@@ -92,6 +93,23 @@ public final class IOUtilities extends Static {
      * @throws IOException on error while reading {@link GeneralParameterValue} XML
      */
     public static GeneralParameterValue readParameter(final InputStream stream, final ParameterDescriptorGroup descriptor) throws IOException {
+        ensureNonNull("stream",     stream);
+        ensureNonNull("descriptor", descriptor);
+        try {
+            final ParameterValueReader reader = new ParameterValueReader(descriptor);
+            reader.setInput(stream);
+            return reader.read();
+        } catch (XMLStreamException ex) {
+            throw new IOException("An error occurred while parsing ParameterDescriptorGroup XML.", ex);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException ignore) {
+            }
+        }
+    }
+
+    public static GeneralParameterValue readParameter(final InputStream stream, final GeneralParameterDescriptor descriptor) throws IOException {
         ensureNonNull("stream",     stream);
         ensureNonNull("descriptor", descriptor);
         try {

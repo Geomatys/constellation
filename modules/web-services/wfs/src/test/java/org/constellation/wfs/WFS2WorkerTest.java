@@ -87,6 +87,8 @@ import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v200.*;
 import org.geotoolkit.wfs.xml.v200.Title;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
@@ -2063,10 +2065,10 @@ public class WFS2WorkerTest {
          final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("feature-store".equals(serviceName)){
+                if("feature-store".equals(service.getName())){
                     try{ 
                         
                         {//OBSERVATION
@@ -2173,7 +2175,7 @@ public class WFS2WorkerTest {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 //throw new UnsupportedOperationException("Not supported yet.");
             }
         };

@@ -29,8 +29,11 @@ import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 
 import org.constellation.ws.rs.WebService;
 import org.constellation.wfs.ws.rs.WFSService;
@@ -197,10 +200,10 @@ public class WFSServiceTest {
          final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("feature-store".equals(serviceName)){
+                if("feature-store".equals(service.getName())){
                     try{ 
                         
                         {//OBSERVATION
@@ -307,7 +310,7 @@ public class WFSServiceTest {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

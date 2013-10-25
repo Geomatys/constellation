@@ -18,13 +18,13 @@
 package org.constellation.admin.dao;
 
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * @author Fabien Bernard (Geomatys).
@@ -91,7 +91,7 @@ public final class ProviderRecord implements Record {
         session.updateProvider(id, identifier, type, impl, owner);
     }
 
-    public GeneralParameterValue getConfig(final ParameterDescriptorGroup descriptor) throws SQLException, IOException {
+    public GeneralParameterValue getConfig(final GeneralParameterDescriptor descriptor) throws SQLException, IOException {
         return session.readProviderConfig(id, descriptor);
     }
 

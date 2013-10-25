@@ -42,10 +42,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import org.constellation.admin.dao.DataRecord.DataType;
 
-import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.FOLDER_DESCRIPTOR;
-import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.MAP_CONTEXT_DESCRIPTOR;
-import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.SOURCE_CONFIG_DESCRIPTOR;
+import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.*;
 
 /**
  *
@@ -57,7 +56,7 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
     public static final String KEY_FOLDER_PATH = "path";
     public static final String KEY_MAP_CONTEXT = "mapContext";
 
-    private final Map<Name,File> index = new HashMap<Name,File>();
+    private final Map<Name,File> index = new HashMap<>();
 
     private File folder;
 
@@ -294,6 +293,11 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
             final String name = fullName.substring(0, idx);
             index.put(new DefaultName(name), candidate);
         }
+    }
+
+    @Override
+    public DataType getDataType() {
+        return DataType.COVERAGE;
     }
 
 }

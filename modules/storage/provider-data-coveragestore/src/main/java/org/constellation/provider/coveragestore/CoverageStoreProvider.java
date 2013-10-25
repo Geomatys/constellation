@@ -16,19 +16,11 @@
  */
 package org.constellation.provider.coveragestore;
 
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.metadata.iso.identification.AbstractIdentification;
-import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.admin.dao.Session;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.DefaultCoverageStoreLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
-import org.constellation.utils.MetadataUtilities;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
@@ -39,14 +31,11 @@ import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
+import org.constellation.admin.dao.DataRecord.DataType;
 
 /**
  *
@@ -148,9 +137,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
                 }
                 return new DefaultCoverageStoreLayerDetails(key, coverageReference);
             }
-        } catch (DataStoreException ex) {
-            getLogger().log(Level.WARNING, ex.getMessage(), ex);
-        } catch (VersioningException ex) {
+        } catch (DataStoreException | VersioningException ex) {
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
         return null;
@@ -190,69 +177,8 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         }
     }
 
-
     @Override
-    protected void visit() {
-        super.visit();
-
-        // Update administration database.
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            ProviderRecord pr = session.readProvider(this.getId());
-            if (pr == null) {
-                pr = session.writeProvider(this.getId(), ProviderRecord.ProviderType.LAYER, "coverage-store", getSource(), null);
-            }
-            final List<DataRecord> list = pr.getData();
-
-            // Remove no longer existing data.
-            for (final DataRecord data : list) {
-                boolean found = false;
-                for (final Name key : this.names) {
-                    if (data.getName().equals(key.getLocalPart())) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    session.deleteData(this.getId(), data.getName());
-                }
-            }
-
-            // Add not registered new data.
-            for (final Name key : this.names) {
-                boolean found = false;
-                for (final DataRecord data : list) {
-                    if (key.getLocalPart().equals(data.getName())) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    DataRecord dr = session.writeData(key.getLocalPart(), pr, DataRecord.DataType.COVERAGE, null);
-
-                    // TODO
-                    //Get metadata
-                    final String providerId = this.getId();
-                    final DefaultMetadata metadata = MetadataUtilities.loadMetadata(providerId);
-                    if(metadata!=null){
-                        final String description = metadata.getIdentificationInfo().iterator().next().getAbstract().toString();
-                        final String title = metadata.getIdentificationInfo().iterator().next().getCitation().getTitle().toString();
-                        final Locale locale = metadata.getLocales().iterator().next();
-
-                        //Save title and description
-                        dr.setTitle(locale, title);
-                        dr.setDescription(locale, description);
-                    }
-                }
-            }
-
-
-        } catch (IOException | SQLException ex) {
-            getLogger().log(Level.WARNING, "An error occurred while updating database on provider startup.", ex);
-        } finally {
-            if (session != null) session.close();
-        }
-
+    public DataType getDataType() {
+        return DataType.COVERAGE;
     }
 }

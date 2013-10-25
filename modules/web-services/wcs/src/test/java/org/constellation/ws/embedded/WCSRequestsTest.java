@@ -31,6 +31,8 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
@@ -119,11 +121,11 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
         final Configurator config = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
 
-                final ParameterValueGroup config = desc.createValue();
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("coverage-sql".equals(serviceName)){
+                if("coverage-sql".equals(service.getName())){
                     // Defines a PostGrid data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
@@ -144,7 +146,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

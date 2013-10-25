@@ -46,6 +46,8 @@ import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirect
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.referencing.CRS;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
@@ -70,7 +72,6 @@ import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 
 // GeoAPI dependencies
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.ParametersExt.*;
 
@@ -142,11 +143,11 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
        final Configurator config = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
 
-                final ParameterValueGroup config = desc.createValue();
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("feature-store".equals(serviceName)){
+                if("feature-store".equals(service.getName())){
                     try{ 
                         
                         {//OBSERVATION
@@ -220,7 +221,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

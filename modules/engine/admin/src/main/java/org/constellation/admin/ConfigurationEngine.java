@@ -61,7 +61,7 @@ public class ConfigurationEngine {
 
     private static final Logger LOGGER = Logging.getLogger(ConfigurationEngine.class);
     
-    
+    @Deprecated
     public static ParameterValueGroup getProviderConfiguration(final String serviceName, final ParameterDescriptorGroup desc) {
 
         final String fileName = serviceName + ".xml";
@@ -84,6 +84,7 @@ public class ConfigurationEngine {
         return config;
     }
 
+    @Deprecated
     public static void storePoviderConfiguration(final String serviceName, final ParameterValueGroup params) {
         final String fileName = serviceName + ".xml";
         final File configFile = ConfigDirectory.getProviderConfigFile(fileName);

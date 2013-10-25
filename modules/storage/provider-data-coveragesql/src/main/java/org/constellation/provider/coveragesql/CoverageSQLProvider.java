@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
+import org.constellation.admin.dao.DataRecord;
 
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_IS_ELEVATION_MODEL_DESCRIPTOR;
@@ -53,7 +54,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
 
     private CoverageDatabase database;
 
-    private final Set<Name> index = new HashSet<Name>();
+    private final Set<Name> index = new HashSet<>();
 
     protected CoverageSQLProvider(final CoverageSQLProviderService service,
             final ParameterValueGroup source) {
@@ -175,9 +176,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
             for(String name : layers){
                 test(name);
             }
-        } catch (CoverageStoreException ex) {
-            getLogger().log(Level.WARNING, ex.getMessage(), ex);
-        } catch (CancellationException ex) {
+        } catch (CoverageStoreException | CancellationException ex) {
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
         super.visit();
@@ -225,5 +224,8 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         return null;
     }
 
-    
+    @Override
+    public DataRecord.DataType getDataType() {
+        return DataRecord.DataType.COVERAGE;
+    }
 }

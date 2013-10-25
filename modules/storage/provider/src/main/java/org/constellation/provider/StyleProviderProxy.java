@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
+import org.constellation.admin.dao.DataRecord;
+import org.constellation.admin.dao.ProviderRecord.ProviderType;
 
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
@@ -111,5 +113,15 @@ public final class StyleProviderProxy extends AbstractProviderProxy
     @Override
     public void remove(String key) {
         throw new UnsupportedOperationException("Not supported yet. Proxy class is immutable.");
+    }
+
+    @Override
+    public ProviderType getProviderType() {
+        return ProviderType.STYLE;
+    }
+
+    @Override
+    public DataRecord.DataType getDataType() {
+        throw new UnsupportedOperationException("Not supported for style provider.");
     }
 }

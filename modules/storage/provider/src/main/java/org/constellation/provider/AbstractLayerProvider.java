@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import org.constellation.admin.dao.ProviderRecord.ProviderType;
 
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.gui.swing.tree.Trees;
@@ -67,7 +68,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
     }
 
     @Override
-    public boolean contains(Name key) {
+    public boolean contains(final Name key) {
         for(Name n : getKeys()){
             if(DefaultName.match(n, key)){
                 return true;
@@ -79,7 +80,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
     /**
      * Fill namespace on name is not present.
      */
-    protected Name fullyQualified(Name key){
+    protected Name fullyQualified(final Name key){
         for(Name n : getKeys()){
             if(DefaultName.match(n, key)){
                 return n;
@@ -92,7 +93,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails getByIdentifier(Name key) {
+    public LayerDetails getByIdentifier(final Name key) {
         for(final Name n : getKeys()){
             if(n.equals(key)){
                 return get(n);
@@ -105,7 +106,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
      * {@inheritDoc }
      */
     @Override
-    public ElevationModel getElevationModel(Name name) {
+    public ElevationModel getElevationModel(final Name name) {
         return null;
     }
 
@@ -118,7 +119,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
         final ParameterValueGroup config = getSource();
         final Set<Name> keys = getKeys();
 
-        final List<String> missingLayers = new ArrayList<String>();
+        final List<String> missingLayers = new ArrayList<>();
 
         loop:
         for(final ParameterValueGroup declaredLayer : getLayers(config)){
@@ -163,4 +164,8 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
         return null;
     }
 
+    @Override
+    public ProviderType getProviderType() {
+        return ProviderType.LAYER;
+    }
 }

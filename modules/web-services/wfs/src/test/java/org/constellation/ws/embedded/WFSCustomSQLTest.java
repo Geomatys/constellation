@@ -33,6 +33,8 @@ import static org.constellation.provider.configuration.ProviderParameters.*;
 
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
@@ -78,11 +80,11 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
 
         final Configurator config = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
 
-                final ParameterValueGroup config = desc.createValue();
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("feature-store".equals(serviceName)){
+                if("feature-store".equals(service.getName())){
                     final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
                     getOrCreateValue(source, "id").setValue("postgisSrc");
                     getOrCreateValue(source, "load_all").setValue(true);                        
@@ -109,7 +111,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

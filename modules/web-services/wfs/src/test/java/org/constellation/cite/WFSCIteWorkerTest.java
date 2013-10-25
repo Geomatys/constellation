@@ -32,6 +32,8 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.apache.sis.geometry.GeneralDirectPosition;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
@@ -163,10 +165,10 @@ public class WFSCIteWorkerTest {
         final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("feature-store".equals(serviceName)){
+                if("feature-store".equals(service.getName())){
                     // Defines a PostGis data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
@@ -187,7 +189,7 @@ public class WFSCIteWorkerTest {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

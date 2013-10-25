@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import org.constellation.admin.dao.DataRecord.DataType;
 
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_IS_ELEVATION_MODEL_DESCRIPTOR;
@@ -115,7 +116,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final Name key, Date version) {
+    public LayerDetails get(final Name key, final Date version) {
         final GridCoverageReader reader = index.get(key);
 
         if (reader != null) {
@@ -219,5 +220,10 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         }
 
         return null;
+    }
+
+    @Override
+    public DataType getDataType() {
+        return DataType.COVERAGE;
     }
 }

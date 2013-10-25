@@ -32,6 +32,8 @@ import org.constellation.configuration.WMSPortrayal;
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
@@ -54,7 +56,6 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
-import org.geotoolkit.parameter.Parameters;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
@@ -146,11 +147,11 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
         final Configurator config = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
 
-                final ParameterValueGroup config = desc.createValue();
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("coverage-sql".equals(serviceName)){
+                if("coverage-sql".equals(service.getName())){
                     // Defines a PostGrid data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
@@ -164,7 +165,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
 
-                }else if("feature-store".equals(serviceName)){
+                }else if("feature-store".equals(service.getName())){
                     try{
                         final File outputDir = initDataDirectory();
                         final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
@@ -189,7 +190,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
