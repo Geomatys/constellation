@@ -39,6 +39,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.admin.util.SQLExecuter;
 
 /**
  * Constellation embedded administration database class.
@@ -87,6 +88,17 @@ public final class EmbeddedDatabase extends Static {
             }
         }
         return new Session(DATA_SOURCE.getConnection(), USER_CACHE);
+    }
+
+    public static SQLExecuter createSQLExecuter() throws SQLException {
+        if (DATA_SOURCE == null) {
+            synchronized(EmbeddedDatabase.class) {
+                if (DATA_SOURCE == null) {
+                    setup();
+                }
+            }
+        }
+        return new SQLExecuter(DATA_SOURCE.getConnection());
     }
 
     /**

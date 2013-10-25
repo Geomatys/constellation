@@ -19,6 +19,7 @@ package org.constellation.admin.dao;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
@@ -62,7 +63,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * @version 0.9
  * @since 0.9
  */
-public final class Session {
+public final class Session implements Closeable {
 
     /**
      * Logger used for debugging and event notification.
@@ -185,6 +186,7 @@ public final class Session {
     /**
      * Close the session. {@link Session} instance should not be used after this.
      */
+    @Override
     public void close() {
         try {
             connect.close();
