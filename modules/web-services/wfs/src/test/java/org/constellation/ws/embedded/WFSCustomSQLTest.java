@@ -35,7 +35,6 @@ import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
@@ -45,7 +44,6 @@ import org.constellation.provider.ProviderService;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
-import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 import org.junit.*;
@@ -60,8 +58,6 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public class WFSCustomSQLTest extends AbstractGrizzlyServer {
 
-    private static final File configDirectory = new File("WFSCustomSQLTest");
-
      private static final String WFS_DESCRIBE_FEATURE_TYPE_URL =
                "request=DescribeFeatureType"
              + "&service=WFS"
@@ -75,11 +71,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
      */
     @BeforeClass
     public static void initPool() throws JAXBException {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("WFSCustomSQLTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
                                                    new Source("omSrc", true, null, null),
@@ -146,8 +138,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
 
     @AfterClass
     public static void shutDown() {
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("WFSCustomSQLTest");
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {

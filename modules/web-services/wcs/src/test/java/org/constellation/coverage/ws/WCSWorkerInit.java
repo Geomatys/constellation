@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
@@ -33,12 +32,10 @@ import org.constellation.provider.configuration.Configurator;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
-import org.geotoolkit.util.FileUtilities;
 
 /**
  * Initializes a {@link WCSWorker} for testing GetCapabilities, DescribeCoverage and GetCoverage
@@ -58,8 +55,6 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
 
     protected static WCSWorker WORKER;
 
-    private static final File configDirectory = new File("WCSWorkerInit");
-
     /**
      * Initialisation of the worker and the PostGRID data provider before launching
      * the different tests.
@@ -67,11 +62,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("WCSWorkerInit");
         
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null));
         final Layers layers = new Layers(sources);
@@ -121,7 +112,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-         FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("WCSWorkerInit");
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {

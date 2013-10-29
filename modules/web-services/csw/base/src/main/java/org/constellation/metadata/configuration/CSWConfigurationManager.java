@@ -189,9 +189,11 @@ public class CSWConfigurationManager {
     /**
      * Add some CSW record to the index.
      *
-     * @param asynchrone
+     * @param id identifier of the CSW service.
+     * @param identifierList list of metadata identifier to add into the index.
+     * 
      * @return
-     * @throws CstlServiceException
+     * @throws ConfigurationException
      */
     public AcknowlegementType addToIndex(final String id, final String identifierList) throws ConfigurationException {
         LOGGER.info("Add to index requested");
@@ -234,9 +236,11 @@ public class CSWConfigurationManager {
     /**
      * Remove some CSW record to the index.
      *
-     * @param asynchrone
+     * @param id identifier of the CSW service.
+     * @param identifierList list of metadata identifier to add into the index.
+     *
      * @return
-     * @throws CstlServiceException
+     * @throws ConfigurationException
      */
     public AcknowlegementType removeFromIndex(final String id, final String identifierList) throws ConfigurationException {
         LOGGER.info("Remove from index requested");
@@ -266,6 +270,7 @@ public class CSWConfigurationManager {
     /**
      * Stop all the indexation going on.
      *
+     * @param id identifier of the CSW service.
      * @return an Acknowledgment.
      */
     public AcknowlegementType stopIndexation(final String id) {
@@ -366,7 +371,8 @@ public class CSWConfigurationManager {
 
     /**
      * Refresh the map of configuration object.
-     *
+     * 
+     * @param id identifier of the CSW service.
      * @throws ConfigurationException
      */
     protected Automatic getServiceConfiguration(final String id) throws ConfigurationException {
@@ -469,10 +475,10 @@ public class CSWConfigurationManager {
      * Build a new Indexer for the specified service ID.
      *
      * @param serviceID the service identifier (form multiple CSW) default: ""
-     * @param cswConfigDir the CSW configuration directory.
+     * @param currentReader the metadata reader of the specified sevrice.
      *
-     * @return A lucene Indexer
-     * @throws org.constellation.ws.CstlServiceException
+     * @return A lucene Indexer.
+     * @throws ConfigurationException
      */
     protected AbstractIndexer getIndexer(final String serviceID, CSWMetadataReader currentReader) throws ConfigurationException {
 
@@ -503,7 +509,7 @@ public class CSWConfigurationManager {
      * @param serviceID the service identifier (form multiple CSW) default: ""
      *
      * @return A metadata reader.
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws ConfigurationException
      */
     protected CSWMetadataReader getReader(final String serviceID) throws ConfigurationException {
 
@@ -528,7 +534,7 @@ public class CSWConfigurationManager {
      * @param serviceID the service identifier (form multiple CSW) default: ""
      *
      * @return A metadata reader.
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws ConfigurationException
      */
     protected MetadataWriter getWriter(final String serviceID) throws ConfigurationException {
 

@@ -16,12 +16,8 @@
  */
 package org.constellation.process;
 
-import java.io.File;
 import org.constellation.process.service.GetConfigMapServiceTest;
 import org.constellation.wfs.ws.DefaultWFSWorker;
-import org.geotoolkit.util.FileUtilities;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 /**
  *
@@ -29,17 +25,7 @@ import org.junit.BeforeClass;
  */
 public class GetConfigWFSServiceTest extends GetConfigMapServiceTest {
 
-    @BeforeClass
-    public static void createConfig () {
-        configDirectory = new File("WFSConfigTest");
-    }
-
-    @AfterClass
-    public static void deleteConfig () {
-        FileUtilities.deleteDirectory(configDirectory);
-    }
     public GetConfigWFSServiceTest() {
         super("WFS", DefaultWFSWorker.class);
     }
-
 }

@@ -88,7 +88,6 @@ import org.geotoolkit.wfs.xml.v200.*;
 import org.geotoolkit.wfs.xml.v200.Title;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
@@ -117,8 +116,6 @@ import org.opengis.feature.type.Name;
  */
 @RunWith(TestRunner.class)
 public class WFS2WorkerTest {
-    private static final File configDirectory = new File("WFS2WorkerTest");
-
     private static MarshallerPool pool;
     private static WFSWorker worker ;
 
@@ -160,11 +157,7 @@ public class WFS2WorkerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("WFS2WorkerTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
                                                    new Source("omSrc", true, null, null),
@@ -214,8 +207,7 @@ public class WFS2WorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("WFS2WorkerTest");
         if (ds != null) {
             ds.shutdown();
         }

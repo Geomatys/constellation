@@ -17,7 +17,6 @@
 
 package org.constellation.sos.ws;
 
-import java.io.File;
 import java.io.StringWriter;
 import java.sql.Statement;
 import javax.xml.bind.Marshaller;
@@ -25,7 +24,6 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.util.SQLExecuter;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -36,7 +34,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // JUnit dependencies
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -48,19 +45,16 @@ import static org.junit.Assert.*;
 public class SOSWorkerInitialisationTest {
 
     private static MarshallerPool pool;
-    private static File constellationDirectory = new File("SOSWorkerInitialisationTest");
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        FileUtilities.deleteDirectory(constellationDirectory);
-        constellationDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(constellationDirectory);
+        ConfigurationEngine.setupTestEnvironement("SOSWorkerInitialisationTest");
         pool = SOSMarshallerPool.getInstance();
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        FileUtilities.deleteDirectory(constellationDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("SOSWorkerInitialisationTest");
     }
 
     @After

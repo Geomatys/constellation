@@ -16,12 +16,8 @@
  */
 package org.constellation.process;
 
-import java.io.File;
 import org.constellation.process.service.AddLayerToMapServiceTest;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
-import org.geotoolkit.util.FileUtilities;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 /**
  *
@@ -29,18 +25,7 @@ import org.junit.BeforeClass;
  */
 public class AddLayerToWMTSServiceTest  extends AddLayerToMapServiceTest {
 
-    @BeforeClass
-    public static void createConfig () {
-        configDirectory = new File("WMTSConfigTest");
-    }
-
-    @AfterClass
-    public static void deleteConfig () {
-        FileUtilities.deleteDirectory(configDirectory);
-    }
-    
     public AddLayerToWMTSServiceTest() {
         super("WMTS", DefaultWMTSWorker.class);
     }
-    
 }

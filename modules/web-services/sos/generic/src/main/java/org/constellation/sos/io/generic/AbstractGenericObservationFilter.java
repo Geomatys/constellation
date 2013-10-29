@@ -59,7 +59,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
     /**
      * A map of static variable to replace in the statements.
      */
-    protected HashMap<String, Object> staticParameters = new HashMap<String, Object>();
+    protected HashMap<String, Object> staticParameters = new HashMap<>();
     
     /**
      *  The current query built by the sos worker in the scope of a getObservation/getResult request.
@@ -118,6 +118,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
         try {
             this.dataSource = db.getDataSource();
             final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+
             final File affinage = new File(configuration.getConfigurationDirectory(), "affinage.xml");
             if (affinage.exists()) {
                 final Object object = unmarshaller.unmarshal(affinage);
@@ -160,7 +161,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
         final String textQuery      = query.buildSQLQuery(staticParameters);
         try {
             final ResultSet res = stmt.executeQuery(textQuery);
-            final Map<String, StringBuilder> parameterValue = new HashMap<String, StringBuilder>();
+            final Map<String, StringBuilder> parameterValue = new HashMap<>();
             for (String varName : varNames) {
                 parameterValue.put(varName, new StringBuilder());
             }
@@ -209,14 +210,14 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
      */
     @Override
     public List<String> supportedQueryableResultProperties() {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
      /**
      * {@inheritDoc}
      */
     @Override
-    public void setResultEquals(final String propertyName, final String value) throws CstlServiceException{
+    public void setResultEquals(final String propertyName, final String value) throws CstlServiceException {
         throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
     }
 

@@ -30,7 +30,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
@@ -50,7 +49,6 @@ import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.data.shapefile.ShapefileFolderFeatureStoreFactory;
 import org.geotoolkit.parameter.Parameters;
-import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 import org.junit.*;
@@ -65,18 +63,12 @@ import org.opengis.parameter.ParameterValueGroup;
 @RunWith(TestRunner.class)
 public class AdminRequestTest extends AbstractGrizzlyServer {
 
-    private static final File configDirectory = new File("AdminRequestTest");
-
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
     public static void start() throws JAXBException {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("AdminRequestTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
                                                    new Source("shapeSrc", true, null, null));
@@ -171,8 +163,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("AdminRequestTest");
         finish();
     }
 

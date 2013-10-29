@@ -17,7 +17,6 @@
 package org.constellation.ws.embedded.wps;
 
 // JUnit dependencies
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -27,13 +26,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
 import org.constellation.configuration.Processes;
 import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
-import org.geotoolkit.util.FileUtilities;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -46,19 +43,13 @@ import static org.junit.Assume.*;
  */
 public class WPSRequestTest  extends AbstractGrizzlyServer {
 
-    private static final File configDirectory = new File("WPSRequestTest");
-
     private static final String WPS_GETCAPABILITIES ="request=GetCapabilities&service=WPS&version=1.0.0";
 
     private static final String WPS_GETCAPABILITIES2 ="request=GetCapabilities&service=WpS&version=1.0.0";
 
     @BeforeClass
     public static void initLayerList() throws Exception {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("WPSRequestTest");
 
         final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
         final Processes processes = new Processes(process);
@@ -79,8 +70,7 @@ public class WPSRequestTest  extends AbstractGrizzlyServer {
 
     @AfterClass
     public static void shutDown() {
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("WPSRequestTest");
         finish();
     }
 

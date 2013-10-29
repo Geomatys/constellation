@@ -32,7 +32,6 @@ import org.junit.runner.RunWith;
 
 import javax.xml.bind.JAXBContext;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.generic.database.Automatic;
 import static org.constellation.ws.embedded.ConfigurationRequestTest.writeDataFile;
 
@@ -43,16 +42,10 @@ import static org.constellation.ws.embedded.ConfigurationRequestTest.writeDataFi
 @RunWith(TestRunner.class)
 public class ConstellationServerTest extends AbstractGrizzlyServer {
 
-    private static final File configDirectory = new File("ConstellationServerTest");
-
     @BeforeClass
     public static void initPool() throws Exception {
 
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        final File configDirectory = ConfigurationEngine.setupTestEnvironement("ConstellationServerTest");
 
         final File dataDirectory2 = new File(configDirectory, "dataCsw2");
         dataDirectory2.mkdir();
@@ -109,8 +102,7 @@ public class ConstellationServerTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("ConstellationServerTest");
         finish();
     }
 

@@ -26,7 +26,6 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
@@ -35,7 +34,6 @@ import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 
 import org.junit.*;
@@ -50,18 +48,12 @@ import org.junit.runner.RunWith;
 @RunWith(TestRunner.class)
 public class SOSSoapRequestTest extends AbstractGrizzlyServer {
 
-    private static final File configDirectory = new File("SOSSoapRequestTest");
-
     private static final String SOS_DEFAULT = "http://localhost:9191/sos/default?";
 
     @BeforeClass
     public static void initLayerList() throws Exception {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
-
+        final File configDirectory = ConfigurationEngine.setupTestEnvironement("SOSSoapRequestTest");
+       
         final File dataDirectory = new File(configDirectory, "dataSos");
         dataDirectory.mkdir();
 
@@ -92,8 +84,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer {
 
     @AfterClass
     public static void shutDown() {
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("SOSSoapRequestTest");
         finish();
     }
 

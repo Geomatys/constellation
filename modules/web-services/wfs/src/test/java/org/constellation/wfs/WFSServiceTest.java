@@ -34,7 +34,6 @@ import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
@@ -67,8 +66,6 @@ import static org.junit.Assert.*;
  */
 public class WFSServiceTest {
 
-    private static final File configDirectory = new File("WFSServiceTest");
-
     private static WFSService service;
 
     private static DefaultDataSource ds = null;
@@ -82,11 +79,7 @@ public class WFSServiceTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("WFSServiceTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
                                                    new Source("omSrc", true, null, null),
@@ -115,8 +108,7 @@ public class WFSServiceTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("WFSServiceTest");
         
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         if (ds != null) {

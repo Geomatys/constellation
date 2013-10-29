@@ -20,9 +20,8 @@ package org.constellation.metadata;
 
 import java.io.File;
 import java.sql.Connection;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.test.utils.Order;
@@ -47,57 +46,48 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
     private static final File dbDirectory = new File("MDCSWWorkerTestDatabase");
 
-    private static final File configDir = new File("MDCSWWorkerTest");
-
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
+        final File configDir = ConfigurationEngine.setupTestEnvironement("MDCSWWorkerTest");
 
-        if (!configDir.exists()) {
-            configDir.mkdir();
+        File CSWDirectory  = new File(configDir, "CSW");
+        CSWDirectory.mkdir();
+        final File instDirectory = new File(CSWDirectory, "default");
+        instDirectory.mkdir();
 
-            ConfigDirectory.setConfigDirectory(configDir);
+        final String url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/');
+        DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
 
-            File CSWDirectory  = new File(configDir, "CSW");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
-            
-            final String url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/');
-            DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
+        Connection con = ds.getConnection();
 
-            Connection con = ds.getConnection();
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115-2.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/profiles/inputLevels.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/catalog_web_service.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv2.5.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv3.0.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-3.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-4.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-9.sql"));
 
-            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115-2.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/profiles/inputLevels.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/catalog_web_service.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv2.5.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv3.0.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-3.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-4.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-9.sql"));
+        //we write the configuration file
+        BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
+        Automatic configuration = new Automatic("mdweb", bdd);
+        configuration.putParameter("transactionSecurized", "false");
+        configuration.putParameter("shiroAccessible", "false");
 
-            //we write the configuration file
-            BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
-            Automatic configuration = new Automatic("mdweb", bdd);
-            configuration.putParameter("transactionSecurized", "false");
-            configuration.putParameter("shiroAccessible", "false");
+        ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
 
-            ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
-        }
         pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
@@ -110,12 +100,11 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             worker.destroy();
         }
         FileUtilities.deleteDirectory(dbDirectory);
-        FileUtilities.deleteDirectory(configDir);
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();
         }
-        ConfigurationEngine.deleteConfiguration("CSW", "default");
+        ConfigurationEngine.shutdownTestEnvironement("MDCSWWorkerTest");
     }
 
     @Before

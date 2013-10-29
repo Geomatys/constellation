@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.soap.SOService;
@@ -45,7 +44,6 @@ import org.constellation.ws.ExceptionCode;
 import static org.constellation.ws.embedded.CSWRequestTest.writeDataFile;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
-import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
@@ -57,15 +55,11 @@ import org.junit.runner.RunWith;
 @RunWith(TestRunner.class)
 public class ConfigurationRequestTest extends AbstractGrizzlyServer {
 
-    private static final File configDirectory = new File("ConfigurationRequestTest");
+    private static File configDirectory;
 
     @BeforeClass
     public static void initPool() throws Exception {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        configDirectory = ConfigurationEngine.setupTestEnvironement("ConfigurationRequestTest");
 
         final File dataDirectory2 = new File(configDirectory, "dataCsw2");
         dataDirectory2.mkdir();
@@ -122,8 +116,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("ConfigurationRequestTest");
         finish();
     }
 
@@ -213,10 +206,10 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         // build 2 new metadata file
         RecordType record = new RecordType();
         record.setIdentifier(new SimpleLiteral("urn_test00"));
-        File f = new File(ConfigDirectory.getConfigDirectory(), "dataCsw/urn_test00.xml");
+        File f = new File(configDirectory, "dataCsw/urn_test00.xml");
         RecordType record2 = new RecordType();
         record2.setIdentifier(new SimpleLiteral("urn_test01"));
-        File f2 = new File(ConfigDirectory.getConfigDirectory(), "dataCsw/urn_test01.xml");
+        File f2 = new File(configDirectory, "dataCsw/urn_test01.xml");
 
 
         Marshaller m = pool.acquireMarshaller();
@@ -293,7 +286,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         // build a new metadata file
         RecordType record = new RecordType();
         record.setIdentifier(new SimpleLiteral("urn_test"));
-        File f = new File(ConfigDirectory.getConfigDirectory(), "dataCsw/urn_test.xml");
+        File f = new File(configDirectory, "dataCsw/urn_test.xml");
 
         Marshaller m = pool.acquireMarshaller();
         m.marshal(record, f);

@@ -16,12 +16,8 @@
  */
 package org.constellation.process;
 
-import java.io.File;
 import org.constellation.coverage.ws.DefaultWCSWorker;
 import org.constellation.process.service.SetConfigMapServiceTest;
-import org.geotoolkit.util.FileUtilities;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 /**
  *
@@ -29,16 +25,6 @@ import org.junit.BeforeClass;
  */
 public class SetConfigWCSServiceTest extends SetConfigMapServiceTest {
 
-    @BeforeClass
-    public static void createConfig () {
-        configDirectory = new File("WCSConfigTest");
-    }
-
-    @AfterClass
-    public static void deleteConfig () {
-        FileUtilities.deleteDirectory(configDirectory);
-    }
-    
     public SetConfigWCSServiceTest() {
         super("WCS", DefaultWCSWorker.class);
     }

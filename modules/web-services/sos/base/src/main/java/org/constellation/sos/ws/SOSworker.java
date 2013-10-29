@@ -607,7 +607,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * Web service operation describing the service and its capabilities.
      *
-     * @param requestCapabilities A document specifying the section you would obtain like :
+     * @param request A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
     public Capabilities getCapabilities(final GetCapabilities request) throws CstlServiceException {

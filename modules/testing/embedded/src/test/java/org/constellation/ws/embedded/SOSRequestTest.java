@@ -34,7 +34,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
@@ -51,7 +50,6 @@ import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
 import org.geotoolkit.sos.xml.v200.CapabilitiesType;
 import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
-import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
@@ -62,8 +60,6 @@ import org.junit.runner.RunWith;
  */
 @RunWith(TestRunner.class)
 public class SOSRequestTest extends AbstractGrizzlyServer {
-
-    private static final File configDirectory = new File("SOSRequestTest");
 
     private static String getDefaultURL() {
         return "http://localhost:" +  grizzly.getCurrentPort() + "/sos/default?";
@@ -79,11 +75,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
      */
     @BeforeClass
     public static void initPool() throws Exception {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        final File configDirectory = ConfigurationEngine.setupTestEnvironement("SOSRequestTest");
 
         final File dataDirectory = new File(configDirectory, "dataSos");
         dataDirectory.mkdir();
@@ -122,8 +114,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("SOSRequestTest");
         finish();
     }
 

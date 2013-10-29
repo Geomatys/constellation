@@ -16,7 +16,6 @@
  */
 package org.constellation.process;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
@@ -24,25 +23,12 @@ import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.service.StopServiceTest;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
-import org.geotoolkit.util.FileUtilities;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 /**
  *
  * @author Quentin Boileau (Geomatys)
  */
 public class StopWMTSServiceTest extends StopServiceTest {
-
-    @BeforeClass
-    public static void createConfig () {
-        configDirectory = new File("WMTSConfigTest");
-    }
-
-    @AfterClass
-    public static void deleteConfig () {
-        FileUtilities.deleteDirectory(configDirectory);
-    }
 
     public StopWMTSServiceTest() {
         super("WMTS", DefaultWMTSWorker.class);
@@ -64,5 +50,4 @@ public class StopWMTSServiceTest extends StopServiceTest {
     protected boolean checkInstanceExist(final String identifier) {
         return ConfigurationEngine.getServiceConfigurationIds(serviceName).contains(identifier);
     }
-
 }

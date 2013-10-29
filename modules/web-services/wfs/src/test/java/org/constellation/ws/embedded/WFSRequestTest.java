@@ -47,7 +47,6 @@ import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.referencing.CRS;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
@@ -127,18 +126,12 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
     private static String EPSG_VERSION;
 
-    private static final File configDirectory = new File("WFSRequestTest");
-
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
     public static void initPool() throws JAXBException {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("WFSRequestTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
                                                    new Source("omSrc", true, null, null),
@@ -266,8 +259,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
     @AfterClass
     public static void shutDown() {
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("WFSRequestTest");
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {

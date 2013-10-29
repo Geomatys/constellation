@@ -35,7 +35,6 @@ import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 
 import static org.constellation.test.utils.MetadataUtilities.*;
@@ -43,7 +42,6 @@ import static org.constellation.test.utils.MetadataUtilities.*;
 // JUnit dependencies
 import org.apache.sis.util.ComparisonMode;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import static org.junit.Assert.*;
@@ -58,39 +56,29 @@ import org.junit.runner.RunWith;
 @RunWith(TestRunner.class)
 public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
-     private static final File configDir =  new File("NCCSWWorkerTest");
-
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
 
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
-
-        if (!configDir.exists()) {
-            configDir.mkdir();
-
-            ConfigDirectory.setConfigDirectory(configDir);
+        final File configDir = ConfigurationEngine.setupTestEnvironement("NCCSWWorkerTest");
             
-            File CSWDirectory  = new File(configDir, "CSW");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
+        File CSWDirectory  = new File(configDir, "CSW");
+        CSWDirectory.mkdir();
+        final File instDirectory = new File(CSWDirectory, "default");
+        instDirectory.mkdir();
 
-            //we write the data files
-            File dataDirectory = new File(instDirectory, "data");
-            dataDirectory.mkdir();
-            writeDataFile(dataDirectory, "2005092200_sst_21-24.en.nc", "2005092200_sst_21-24.en");
+        //we write the data files
+        File dataDirectory = new File(instDirectory, "data");
+        dataDirectory.mkdir();
+        writeDataFile(dataDirectory, "2005092200_sst_21-24.en.nc", "2005092200_sst_21-24.en");
 
-            //we write the configuration file
-            File configFile = new File(instDirectory, "config.xml");
-            Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
-            configuration.putParameter("transactionSecurized", "false");
-            configuration.putParameter("shiroAccessible", "false");
+        //we write the configuration file
+        File configFile = new File(instDirectory, "config.xml");
+        Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
+        configuration.putParameter("transactionSecurized", "false");
+        configuration.putParameter("shiroAccessible", "false");
 
-            ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
-        }
+        ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
 
         pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
@@ -112,8 +100,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        FileUtilities.deleteDirectory(configDir);
-        ConfigurationEngine.deleteConfiguration("CSW", "default");
+        ConfigurationEngine.shutdownTestEnvironement("NCCSWWorkerTest");
     }
 
     @Before

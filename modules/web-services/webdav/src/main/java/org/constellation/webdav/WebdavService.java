@@ -58,7 +58,7 @@ public final class WebdavService implements ResourceFactory {
 
 
     private Map<String, WebdavWorker> buildWorkerMap() {
-        final Map<String, WebdavWorker> workersMap = new HashMap<String, WebdavWorker>();
+        final Map<String, WebdavWorker> workersMap = new HashMap<>();
         final File serviceDirectory = getServiceDirectory();
         if (serviceDirectory != null && serviceDirectory.isDirectory()) {
             for (File instanceDirectory : serviceDirectory.listFiles()) {

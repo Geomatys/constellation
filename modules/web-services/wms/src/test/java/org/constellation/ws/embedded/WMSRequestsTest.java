@@ -29,7 +29,6 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.LayerContext;
@@ -70,7 +69,6 @@ import org.geotoolkit.image.jai.Registry;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
-import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 
@@ -90,8 +88,6 @@ import org.opengis.parameter.ParameterValueGroup;
  * @since 0.3
  */
 public class WMSRequestsTest extends AbstractGrizzlyServer {
-
-    private static final File configDirectory = new File("AdminRequestTest");
 
     /**
      * The layer to test.
@@ -151,11 +147,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     @BeforeClass
     public static void initLayerList() throws JAXBException, IOException {
 
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("AdminRequestTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
                                                    new Source("shapeSrc", true, null, null));
@@ -275,8 +267,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     @AfterClass
     public static void shutDown() throws JAXBException {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("AdminRequestTest");
         finish();
     }
 

@@ -18,7 +18,6 @@
 package org.constellation.metadata;
 
 // JAXB dependencies
-import java.io.File;
 import java.io.StringWriter;
 import java.sql.Statement;
 import java.util.logging.Level;
@@ -39,9 +38,7 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.util.SQLExecuter;
-import org.constellation.configuration.ConfigDirectory;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 import org.junit.*;
@@ -56,22 +53,16 @@ public class CSWorkerInitialisationTest {
 
     private static MarshallerPool pool;
 
-    private static final File constellationDirectory = new File("CSWorkerInitialisationTest");
-    
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        FileUtilities.deleteDirectory(constellationDirectory);
-        constellationDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(constellationDirectory);
-        
-        
+        ConfigurationEngine.setupTestEnvironement("CSWorkerInitialisationTest");
         pool = CSWMarshallerPool.getInstance();
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        FileUtilities.deleteDirectory(constellationDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("CSWorkerInitialisationTest");
     }
     
 

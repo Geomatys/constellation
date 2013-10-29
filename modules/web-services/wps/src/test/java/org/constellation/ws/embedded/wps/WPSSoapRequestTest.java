@@ -26,13 +26,11 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
 import org.constellation.configuration.Processes;
 import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 
 import org.junit.*;
@@ -45,15 +43,9 @@ import static org.junit.Assume.*;
  */
 public class WPSSoapRequestTest extends AbstractGrizzlyServer {
 
-    private static final File configDirectory = new File("WPSSoapRequestTest");
-
     @BeforeClass
     public static void initLayerList() throws Exception {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("WPSSoapRequestTest");
 
         final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
         final Processes processes = new Processes(process);
@@ -73,8 +65,7 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
 
     @AfterClass
     public static void shutdown() {
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("WPSSoapRequestTest");
         finish();
     }
 

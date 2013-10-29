@@ -21,7 +21,6 @@ package org.constellation.metadata.utils;
 import com.sun.mail.smtp.SMTPTransport;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -42,8 +41,12 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.naming.NamingException;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.ConfigDirectory;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.MailingProperties;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 /**
  * Utility class to send mails
@@ -66,23 +69,29 @@ public final class MailSendingUtilities {
     private MailSendingUtilities() {}
     
     static{
-        final Properties configProps = new Properties();
 
+        MailingProperties mailProp = null;
         try {
-            final File f = new File(ConfigDirectory.getConfigDirectory(), "mailing.properties");
-            configProps.load(new FileInputStream(f));
-        } catch (IOException ex) {
+            final File f = new File(ConfigDirectory.getConfigDirectory(), "mailingProperties.xml");
+            final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+            mailProp = (MailingProperties) u.unmarshal(f);
+            GenericDatabaseMarshallerPool.getInstance().recycle(u);
+        } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
         }
 
-        FROM        = configProps.getProperty("from");
-        MAILHOST    = configProps.getProperty("mailhost");
-        MAILER      = configProps.getProperty("mailer");
-        USER        = configProps.getProperty("user");
-        PASSWORD    = configProps.getProperty("password");
-        AUTH        = configProps.getProperty("auth");
-        PROTOCOLE   = configProps.getProperty("protocole");
-        PORT        = Integer.valueOf(configProps.getProperty("port"));
+        if (mailProp == null) {
+            mailProp = new MailingProperties();
+        }
+        
+        FROM        = mailProp.getFrom();
+        MAILHOST    = mailProp.getMailhost();
+        MAILER      = mailProp.getMailer();
+        USER        = mailProp.getUser();
+        PASSWORD    = mailProp.getPassword();
+        AUTH        = mailProp.getAuth();
+        PROTOCOLE   = mailProp.getProtocol();
+        PORT        = mailProp.getPort();
 
 
         final Properties mailingProps = System.getProperties();
@@ -112,15 +121,7 @@ public final class MailSendingUtilities {
             mailingProps.put("javax.net.ssl.keyStorePassword", keyStorePassword);
             mailingProps.put("javax.net.ssl.trustStorePassword", store);
 
-        } catch (NoSuchProviderException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (CertificateException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (KeyStoreException ex) {
+        } catch (NoSuchProviderException | IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
         }
 

@@ -61,10 +61,9 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     /**
      * Build a new Generic Observation Filter for CSTL O&M datasource.
      *
-     * @param observationIdBase
-     * @param observationTemplateIdBase
-     * @param map
      * @param configuration
+     * @param properties
+     * 
      * @throws CstlServiceException
      */
     public GenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {

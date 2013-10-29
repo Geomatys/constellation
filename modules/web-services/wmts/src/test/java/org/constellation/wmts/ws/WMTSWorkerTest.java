@@ -16,7 +16,6 @@
  */
 package org.constellation.wmts.ws;
 
-import java.io.File;
 import java.io.StringWriter;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
@@ -31,7 +30,6 @@ import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -49,16 +47,10 @@ public class WMTSWorkerTest {
 
     private static MarshallerPool pool;
     private static WMTSWorker worker ;
-    private static final File configDir = new File("WMTSWorkerTest");
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
-        configDir.mkdir();
-
-        ConfigDirectory.setConfigDirectory(configDir);
+        ConfigurationEngine.setupTestEnvironement("WMTSWorkerTest");
         pool = WMTSMarshallerPool.getInstance();
         
         ConfigurationEngine.storeConfiguration("WMTS", "default", new LayerContext());
@@ -71,7 +63,7 @@ public class WMTSWorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        FileUtilities.deleteDirectory(configDir);
+        ConfigurationEngine.shutdownTestEnvironement("WMTSWorkerTest");
     }
 
     @Before

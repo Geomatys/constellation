@@ -17,7 +17,6 @@
 
 package org.constellation.map.ws.rs;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import javax.ws.rs.core.MultivaluedMap;
 import java.lang.reflect.Field;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.TimeZone;
 import javax.xml.bind.JAXBException;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
@@ -45,7 +43,6 @@ import org.constellation.ws.Worker;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.referencing.ReferencingUtilities;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
 import org.junit.AfterClass;
@@ -73,15 +70,9 @@ public class WMSServiceTest {
     private final MultivaluedMap<String,String> queryParameters = new BasicMultiValueMap<>();
     private final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<>();
 
-    private static final File configDirectory = new File("WMSServiceTest");
-
     @BeforeClass
     public static void init() throws JAXBException {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("WMSServiceTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
                                                    new Source("shapeSrc", true, null, null));
@@ -97,8 +88,7 @@ public class WMSServiceTest {
     @AfterClass
     public static void finish() {
         service.destroy();
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("WMSServiceTest");
     }
     
     public WMSServiceTest() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {

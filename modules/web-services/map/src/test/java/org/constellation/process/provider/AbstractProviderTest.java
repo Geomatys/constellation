@@ -21,13 +21,12 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.process.AbstractProcessTest;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.ProviderService;
-import org.geotoolkit.util.FileUtilities;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -38,7 +37,6 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public abstract class AbstractProviderTest extends AbstractProcessTest {
 
-    private static File configDirectory;
     protected static URL EMPTY_CSV;
     // dataStore service
     protected static ProviderService DATASTORE_SERVICE;
@@ -58,16 +56,9 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
     @BeforeClass
     public static void initFolder() throws MalformedURLException {
 
-        configDirectory = new File("ProcessProviderTest");
-
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-
-        configDirectory.mkdir();
-        File providerDirectory = new File(configDirectory, "provider");
+        final File configDirectory = ConfigurationEngine.setupTestEnvironement("ProcessProviderTest");
+        final File providerDirectory = new File(configDirectory, "provider");
         providerDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
 
         File csv = new File(configDirectory, "file.csv");
         EMPTY_CSV = csv.toURI().toURL();
@@ -76,8 +67,7 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
 
     @AfterClass
     public static void destroyFolder() {
-        FileUtilities.deleteDirectory(configDirectory);
-        ConfigDirectory.setConfigDirectory(null);
+        ConfigurationEngine.shutdownTestEnvironement("ProcessProviderTest");
     }
 
     /**

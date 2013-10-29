@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
@@ -46,7 +45,6 @@ import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.*;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
-import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 import org.junit.*;
@@ -60,19 +58,13 @@ import org.junit.runner.RunWith;
 @RunWith(TestRunner.class)
 public class CSWRequestTest extends AbstractGrizzlyServer {
 
-    private static final File configDirectory = new File("CSWRequestTest");
-
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
     public static void initPool() throws Exception {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
-
+        final File configDirectory = ConfigurationEngine.setupTestEnvironement("CSWRequestTest");
+        
         final File dataDirectory2 = new File(configDirectory, "dataCsw2");
         dataDirectory2.mkdir();
 
@@ -124,9 +116,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("CSWRequestTest");
         finish();
     }
 

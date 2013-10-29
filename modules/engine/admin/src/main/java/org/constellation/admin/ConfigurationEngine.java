@@ -17,6 +17,7 @@
 
 package org.constellation.admin;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +43,8 @@ import org.constellation.ServiceDef;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
+import org.constellation.configuration.ConfigDirectory;
+import org.geotoolkit.util.FileUtilities;
 
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -301,5 +304,21 @@ public class ConfigurationEngine {
 
     public static void clearDatabase() {
         EmbeddedDatabase.clear();
+    }
+
+    public static File setupTestEnvironement(final String directoryName) {
+         final File configDir = new File(directoryName);
+         if (configDir.exists()) {
+             FileUtilities.deleteDirectory(configDir);
+         }
+         configDir.mkdir();
+         ConfigDirectory.setConfigDirectory(configDir);
+         return configDir;
+    }
+
+    public static void shutdownTestEnvironement(final String directoryName) {
+        FileUtilities.deleteDirectory(new File(directoryName));
+        clearDatabase();
+        ConfigDirectory.setConfigDirectory(null);
     }
 }

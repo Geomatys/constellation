@@ -17,7 +17,6 @@
 
 package org.constellation.admin.dao;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -29,11 +28,9 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.ServiceDef;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.geotoolkit.util.FileUtilities;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -44,21 +41,14 @@ import static org.junit.Assert.*;
  */
 public class SessionTest {
 
-    private static final File configDirectory = new File("SessionTest");
-
     @BeforeClass
     public static void startup() throws JAXBException, IOException {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.setupTestEnvironement("SessionTest");
     }
 
     @AfterClass
     public static void shutDown() throws JAXBException {
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("SessionTest");
     }
 
     @Test

@@ -34,16 +34,6 @@ import org.junit.BeforeClass;
  */
 public class DeleteWMTSServiceTest extends DeleteServiceTest {
 
-     @BeforeClass
-    public static void createConfig () {
-        configDirectory = new File("WMTSConfigTest");
-    }
-
-    @AfterClass
-    public static void deleteConfig () {
-        FileUtilities.deleteDirectory(configDirectory);
-    }
-
     public DeleteWMTSServiceTest() {
         super("WMTS", DefaultWMTSWorker.class);
     }
@@ -64,5 +54,4 @@ public class DeleteWMTSServiceTest extends DeleteServiceTest {
     protected boolean checkInstanceExist(final String identifier) {
         return ConfigurationEngine.getServiceConfigurationIds(serviceName).contains(identifier);
     }
-
 }

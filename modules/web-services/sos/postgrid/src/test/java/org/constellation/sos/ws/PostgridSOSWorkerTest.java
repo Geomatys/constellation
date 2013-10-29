@@ -31,11 +31,9 @@ import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -48,7 +46,6 @@ import org.junit.runner.RunWith;
 public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
     private static DefaultDataSource ds = null;
-    private static File workingDirectory;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -67,47 +64,38 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
 
-        File configDir = new File("SOSWorkerTest");
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
 
-        if (!configDir.exists()) {
-            configDir.mkdir();
+        File configDir = ConfigurationEngine.setupTestEnvironement("SOSWorkerTest");
 
-            ConfigDirectory.setConfigDirectory(configDir);
+        File CSWDirectory  = new File(configDir, "SOS");
+        CSWDirectory.mkdir();
+        final File instDirectory = new File(CSWDirectory, "default");
+        instDirectory.mkdir();
 
-            File CSWDirectory  = new File(configDir, "SOS");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
+        //we write the configuration file
+        Automatic SMLConfiguration = new Automatic();
 
-            //we write the configuration file
-            Automatic SMLConfiguration = new Automatic();
+        Automatic OMConfiguration  = new Automatic();
+        BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
+        OMConfiguration.setBdd(bdd);
+        SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
+        configuration.setObservationReaderType(DataSourceType.POSTGRID);
+        configuration.setObservationWriterType(DataSourceType.POSTGRID);
+        configuration.setObservationFilterType(DataSourceType.POSTGRID);
+        configuration.setSMLType(DataSourceType.NONE);
+        configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
+        configuration.setProfile("transactional");
+        configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+        configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+        configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+        configuration.getParameters().put("transactionSecurized", "false");
 
-            Automatic OMConfiguration  = new Automatic();
-            BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
-            OMConfiguration.setBdd(bdd);
-            SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
-            configuration.setObservationReaderType(DataSourceType.POSTGRID);
-            configuration.setObservationWriterType(DataSourceType.POSTGRID);
-            configuration.setObservationFilterType(DataSourceType.POSTGRID);
-            configuration.setSMLType(DataSourceType.NONE);
-            configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
-            configuration.setProfile("transactional");
-            configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
-            configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
-            configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
-            configuration.getParameters().put("transactionSecurized", "false");
-            
-            ConfigurationEngine.storeConfiguration("SOS", "default", configuration);
-        }
+        ConfigurationEngine.storeConfiguration("SOS", "default", configuration);
         pool.recycle(marshaller);
         init();
         worker = new SOSworker("default");
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
-        workingDirectory = configDir;
     }
 
     @Override
@@ -122,7 +110,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        FileUtilities.deleteDirectory(new File("SOSWorkerTest"));
+        ConfigurationEngine.shutdownTestEnvironement("SOSWorkerTest");
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();
@@ -134,7 +122,6 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         if (ds != null) {
             ds.shutdown();
         }
-        ConfigurationEngine.deleteConfiguration("SOS", "default");
     }
 
 

@@ -35,15 +35,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.validation.Schema;
 
-// Shiro dependencies
-//import org.apache.shiro.authc.IncorrectCredentialsException;
-//import org.apache.shiro.authc.UnknownAccountException;
-
-
-
-
-
-
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
@@ -77,7 +68,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.util.iso.Types;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 
 // GeoAPI dependencies
 import org.opengis.parameter.ParameterValueGroup;
@@ -377,44 +367,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 final InstanceReport report = new InstanceReport(configurer.getInstances());
                 return Response.ok(report).build();
 
-            /*
-             * Set service instance capabilities.
-             */
-            } else if ("updateCapabilities".equalsIgnoreCase(request)) {
-                LOGGER.info("updating instance capabilities");
-                final String identifier = getParameter("id", true);
-                final String fileName   = getParameter("fileName", true);
-                final File serviceDirectory = ConfigDirectory.getServiceDirectory(serviceName);
-                final AcknowlegementType response;
-                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                    File instanceDirectory     = new File (serviceDirectory, identifier);
-                    if (instanceDirectory.isDirectory()) {
-                        // recup the file
-                        if (objectRequest instanceof File) {
-                            try {
-                                final File newCapabilitiesFile = new File(instanceDirectory, fileName);
-                                if (!newCapabilitiesFile.exists()) {
-                                    newCapabilitiesFile.createNewFile();
-                                }
-                                FileUtilities.copy((File)objectRequest, newCapabilitiesFile);
-                                response = new AcknowlegementType("Success", "Instance Capabilities correctly updated");
-                            } catch (IOException ex) {
-                                throw new CstlServiceException("An IO exception occurs when creating the new Capabilities File.", ex, NO_APPLICABLE_CODE);
-                            }
-                        } else {
-                            throw new CstlServiceException("Unable to find the specified File.", NO_APPLICABLE_CODE);
-                        }
-                    } else {
-                        throw new CstlServiceException("Unable to find an instance:" + identifier, NO_APPLICABLE_CODE);
-                    }
-                } else {
-                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
-                }
-                return Response.ok(response).build();
-
-            /*
-             * Treat other specific administration operations.
-             */
             } else {
                 return treatSpecificAdminRequest(request);
             }

@@ -34,7 +34,6 @@ import javax.xml.namespace.QName;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.Layer;
@@ -59,7 +58,6 @@ import org.geotoolkit.image.jai.Registry;
 
 // Geotoolkit.org dependencies
 import org.geotoolkit.test.Commons;
-import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 import org.junit.*;
@@ -81,8 +79,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class WMSAxesOrderTest extends AbstractGrizzlyServer {
 
-    private static final File configDirectory = new File("WMSAxesOrderTest");
-    
     /**
      * The layer to test.
      */
@@ -135,11 +131,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-        configDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("WMSAxesOrderTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
                                                    new Source("shapeSrc", true, null, null));
@@ -232,8 +224,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.clearDatabase();
-        FileUtilities.deleteDirectory(configDirectory);
+        ConfigurationEngine.shutdownTestEnvironement("WMSAxesOrderTest");
         finish();
     }
     /**

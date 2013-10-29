@@ -27,7 +27,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 
 import java.awt.*;
-import java.awt.geom.Arc2D;
 import java.io.File;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -36,7 +35,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.CancellationException;
 
 /**
