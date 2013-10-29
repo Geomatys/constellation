@@ -19,62 +19,40 @@ package org.constellation.webdav;
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Resource;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ServiceDef;
 import org.constellation.configuration.WebdavContext;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.ws.AbstractWorker;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WebdavWorker {
+public class WebdavWorker extends AbstractWorker {
  
-    private static final Logger LOGGER = Logging.getLogger(WebdavWorker.class);
-    
     private final WebdavContext context;
     
-    private boolean isStarted;
-    
-    private String startError;
-    
-    private String id;
-    
-    public WebdavWorker(final String id, final File configurationDirectory) {
-        this.id = id;
+    public WebdavWorker(final String id) {
+        super(id, ServiceDef.Specification.WEBDAV);
         WebdavContext candidate = null;
-        if (configurationDirectory != null) {
-            final File lcFile = new File(configurationDirectory, "WebdavContext.xml");
-            if (lcFile.exists()) {
-                try {
-                    final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    Object obj = unmarshaller.unmarshal(lcFile);
-                    GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-                    if (obj instanceof WebdavContext) {
-                        candidate = (WebdavContext) obj;
-                        isStarted = true;
-                    } else {
-                        startError = "The webdav context File does not contain a WebdavContext object";
-                        isStarted = false;
-                        LOGGER.log(Level.WARNING, startError);
-                    }
-                } catch (JAXBException ex) {
-                    startError = "JAXBExeception while unmarshalling the webdav context File";
-                    isStarted = false;
-                    LOGGER.log(Level.WARNING, startError, ex);
-                }
+        try {
+            Object obj = ConfigurationEngine.getConfiguration("webdav", id);
+            if (obj instanceof WebdavContext) {
+                candidate = (WebdavContext) obj;
+                isStarted = true;
             } else {
-                startError = "The configuration file processContext.xml has not been found";
+                startError = "The webdav context File does not contain a WebdavContext object";
                 isStarted = false;
-                LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: ", id);
+                LOGGER.log(Level.WARNING, startError);
             }
-        } else {
-            startError = "The configuration directory has not been found";
+        } catch (FileNotFoundException | JAXBException ex) {
+            startError = "JAXBExeception while unmarshalling the webdav context File";
             isStarted = false;
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
+            LOGGER.log(Level.WARNING, startError, ex);
         }
         this.context = candidate;
         this.context.setId(id);
@@ -117,7 +95,7 @@ public class WebdavWorker {
         if (context.getContextPath() != null && context.getContextPath().length() > 0) {
             url = Path.path(url).getStripFirst().toPath();
             url = url.replaceFirst('/' + context.getContextPath(), "");
-            url = url.replaceFirst('/' + id, "");
+            url = url.replaceFirst('/' + getId(), "");
             return url;
         } else {
              return Path.path(url).getStripFirst().toPath();
@@ -129,5 +107,15 @@ public class WebdavWorker {
             return context.getContextPath();
         }
         return null;
+    }
+
+    @Override
+    protected String getProperty(String propertyName) {
+        return null; // not available in webDav
+    }
+
+    @Override
+    protected MarshallerPool getMarshallerPool() {
+        return null; // not available in webDav
     }
 }
