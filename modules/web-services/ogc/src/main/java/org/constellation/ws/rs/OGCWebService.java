@@ -121,6 +121,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     /**
      * Initialize the basic attributes of a web serviceType.
      *
+     * @param specification The OGC specification.
      */
     public OGCWebService(final Specification specification) {
         super();
@@ -334,7 +335,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             } else if ("newInstance".equalsIgnoreCase(request)) {
                 LOGGER.info("creating an instance");
                 final String identifier = getParameter("id", true);
-                if (!configurer.getConfigurationFile(identifier).exists()) {
+                if (!ConfigurationEngine.serviceConfigurationExist(serviceName, identifier)) {
                     configurer.createInstance(identifier, null, objectRequest);
                     return Response.ok(new AcknowlegementType("Success", "Service instance successfully created.")).build();
                 } else {

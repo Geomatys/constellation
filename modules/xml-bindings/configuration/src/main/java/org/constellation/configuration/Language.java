@@ -36,6 +36,20 @@ public class Language {
     @XmlValue
     private String languageCode;
 
+    public Language() {
+
+    }
+
+    public Language(final String languageCode) {
+        this.languageCode = languageCode;
+        this.defaultt = false;
+    }
+
+    public Language(final String languageCode, final Boolean defaultt) {
+        this.languageCode = languageCode;
+        this.defaultt = defaultt;
+    }
+    
     /**
      * @return the default
      */

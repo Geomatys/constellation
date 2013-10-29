@@ -23,11 +23,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
@@ -79,13 +78,11 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             writeDataFile(dataDirectory, "meta13.xml", "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
 
             //we write the configuration file
-            File configFile = new File(instDirectory, "config.xml");
             Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
             configuration.putParameter("transactionSecurized", "false");
             configuration.putParameter("shiroAccessible", "false");
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
+
+            ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
         }
 
         pool = EBRIMMarshallerPool.getInstance();
@@ -109,6 +106,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             worker.destroy();
         }
         FileUtilities.deleteDirectory(configDir);
+        ConfigurationEngine.deleteConfiguration("CSW", "default");
     }
 
     @Before

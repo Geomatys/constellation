@@ -101,6 +101,24 @@ ALTER TABLE "admin"."service" ADD CONSTRAINT service_pk       PRIMARY KEY ("id")
 ALTER TABLE "admin"."service" ADD CONSTRAINT service_uq       UNIQUE ("identifier","type");
 ALTER TABLE "admin"."service" ADD CONSTRAINT service_owner_fk FOREIGN KEY ("owner") REFERENCES "admin"."user"("login");
 
+CREATE TABLE "admin"."service_extra_config"(
+  "id"          INTEGER     NOT NULL,
+  "filename"    VARCHAR(32) NOT NULL,
+  "content"     CLOB
+);
+
+ALTER TABLE "admin"."service_extra_config" ADD CONSTRAINT service_extra_config_pk  PRIMARY KEY ("id", "filename");
+ALTER TABLE "admin"."service_extra_config" ADD CONSTRAINT service_extra_config_service_fk FOREIGN KEY ("id") REFERENCES "admin"."service"("id");
+
+CREATE TABLE "admin"."service_metadata"(
+  "id"          INTEGER     NOT NULL,
+  "lang"        VARCHAR(3) NOT NULL,
+  "content"     CLOB
+);
+
+ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_pk  PRIMARY KEY ("id", "lang");
+ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_service_fk FOREIGN KEY ("id") REFERENCES "admin"."service"("id");
+
 
 -- service items
 

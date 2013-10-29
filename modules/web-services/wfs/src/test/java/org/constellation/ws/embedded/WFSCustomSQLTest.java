@@ -21,6 +21,7 @@ package org.constellation.ws.embedded;
 import java.net.MalformedURLException;
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -33,18 +34,23 @@ import static org.constellation.provider.configuration.ProviderParameters.*;
 
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assume.*;
 import static org.junit.Assert.*;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -53,6 +59,8 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Johann Sorel (Geomatys)
  */
 public class WFSCustomSQLTest extends AbstractGrizzlyServer {
+
+    private static final File configDirectory = new File("WFSCustomSQLTest");
 
      private static final String WFS_DESCRIBE_FEATURE_TYPE_URL =
                "request=DescribeFeatureType"
@@ -67,6 +75,23 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
      */
     @BeforeClass
     public static void initPool() throws JAXBException {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null),
+                                                   new Source("postgisSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+        config.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "default", config);
+
         initServer(new String[] {"org.constellation.wfs.ws.rs",
             "org.constellation.configuration.ws.rs",
             "org.constellation.ws.rs.provider"}, null);
@@ -78,7 +103,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
                           ":org.geotoolkit.sampling.xml.v100" +
                          ":org.apache.sis.internal.jaxb.geometry"), null);
 
-        final Configurator config = new Configurator() {
+        final Configurator configurator = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(final ProviderService service) {
 
@@ -116,17 +141,19 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        LayerProviderProxy.getInstance().setConfigurator(configurator);
     }
 
     @AfterClass
     public static void shutDown() {
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
-        //finish();
+        finish();
     }
 
     @Test

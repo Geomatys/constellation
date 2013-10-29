@@ -36,9 +36,12 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.StringReader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -137,12 +140,20 @@ public final class Session implements Closeable {
     private static final String READ_SERVICE              = "service.read";
     private static final String READ_SERVICE_FROM_ID      = "service.read.from.id";
     private static final String READ_SERVICES_CONFIG      = "service.read.config";
+    private static final String READ_SERVICES_EXTRA_CONFIG = "service.read.extra.config";
+    private static final String READ_SERVICES_METADATA    = "service.read.metadata";
     private static final String LIST_SERVICES             = "service.list";
     private static final String LIST_SERVICES_FROM_TYPE   = "service.list.from.type";
     private static final String WRITE_SERVICE             = "service.write";
+    private static final String WRITE_SERVICE_EXTRA_CONFIG = "service.write.extra.config";
+    private static final String WRITE_SERVICE_METADATA    = "service.write.metadata";
     private static final String UPDATE_SERVICE            = "service.update";
     private static final String UPDATE_SERVICE_CONFIG     = "service.update.config";
+    private static final String UPDATE_SERVICE_EXTRA_CONFIG = "service.update.extra.config";
+    private static final String UPDATE_SERVICE_METADATA   = "service.update.metadata";
     private static final String DELETE_SERVICE            = "service.delete";
+    private static final String DELETE_SERVICE_METADATA   = "service.delete.metadata";
+    private static final String DELETE_SERVICE_EXTRA_CONFIG = "service.delete.extra.config";
 
     private static final String READ_LAYER                = "layer.read";
     private static final String READ_LAYER_FROM_ID        = "layer.read.from.id";
@@ -772,6 +783,14 @@ public final class Session implements Closeable {
         return new Query(READ_SERVICES_CONFIG).with(generatedId).select().getClob();
     }
 
+    /* internal */ InputStream readExtraServiceConfig(final int generatedId, final String fileName) throws SQLException {
+        return new Query(READ_SERVICES_EXTRA_CONFIG).with(generatedId, fileName).select().getClob();
+    }
+
+    /* internal */ InputStream readServiceMetadata(final int generatedId, final String lang) throws SQLException {
+        return new Query(READ_SERVICES_METADATA).with(generatedId, lang).select().getClob();
+    }
+
     public List<ServiceRecord> readServices() throws SQLException {
         return new Query(LIST_SERVICES).select().getAll(ServiceRecord.class);
     }
@@ -780,7 +799,7 @@ public final class Session implements Closeable {
         return new Query(LIST_SERVICES_FROM_TYPE).with(spec.name()).select().getAll(ServiceRecord.class);
     }
 
-    public ServiceRecord writeService(final String identifier, final Specification spec, final Object config, final UserRecord owner) throws SQLException {
+    public ServiceRecord writeService(final String identifier, final Specification spec, final StringReader config, final UserRecord owner) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
 
@@ -797,6 +816,26 @@ public final class Session implements Closeable {
         return new ServiceRecord(this, id, identifier, spec, date, title, description, login);
     }
 
+    public void writeServiceExtraConfig(final String identifier, final Specification spec, final StringReader config, final String fileName) throws SQLException {
+        ensureNonNull("identifier", identifier);
+        ensureNonNull("spec",       spec);
+
+        final ServiceRecord record = readService(identifier, spec);
+
+        // Proceed to insertion.
+        new Query(WRITE_SERVICE_EXTRA_CONFIG).with(record.id, fileName, config).insert();
+    }
+
+    public void writeServiceMetadata(final String identifier, final Specification spec, final StringReader metadata, final String lang) throws SQLException {
+        ensureNonNull("identifier", identifier);
+        ensureNonNull("spec",       spec);
+
+        final ServiceRecord record = readService(identifier, spec);
+
+        // Proceed to insertion.
+        new Query(WRITE_SERVICE_METADATA).with(record.id, lang, metadata).insert();
+    }
+
     /* internal */ void updateService(final int generatedId, final String newIdentifier, final Specification newType, final String newOwner) throws SQLException {
         new Query(UPDATE_SERVICE).with(newIdentifier, newType.name(), newOwner, generatedId).update();
     }
@@ -805,10 +844,23 @@ public final class Session implements Closeable {
         new Query(UPDATE_SERVICE_CONFIG).with(newConfig, generatedId).update();
     }
 
+    /* internal */ void updateServiceExtraConfig(final int generatedId, final String fileName, final StringReader newConfig) throws SQLException {
+        new Query(UPDATE_SERVICE_EXTRA_CONFIG).with(newConfig, generatedId, fileName).update();
+    }
+
+    /* internal */ void updateServiceMetadata(final int generatedId, final String lang, final StringReader newMetadata) throws SQLException {
+        new Query(UPDATE_SERVICE_METADATA).with(newMetadata, generatedId, lang).update();
+    }
+
     public void deleteService(final String identifier, final Specification spec) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
-        new Query(DELETE_SERVICE).with(identifier, spec.name()).update();
+        final ServiceRecord record = readService(identifier, spec);
+        if (record != null) {
+            new Query(DELETE_SERVICE_METADATA).with(record.id).update();
+            new Query(DELETE_SERVICE_EXTRA_CONFIG).with(record.id).update();
+            new Query(DELETE_SERVICE).with(identifier, spec.name()).update();
+        }
     }
 
 
@@ -1038,16 +1090,21 @@ public final class Session implements Closeable {
         InputStream getClob() throws SQLException {
             try {
                 if (rs.next()) {
-                    final InputStream stream = rs.getClob(1).getAsciiStream();
-                    // copy the stream into a new one
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while ((len = stream.read(buffer)) > -1 ) {
-                        baos.write(buffer, 0, len);
+                    final Clob clob = rs.getClob(1);
+                    if (clob != null) {
+                        final Reader stream = clob.getCharacterStream();
+                        // copy the stream into a new one
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        OutputStreamWriter osw = new OutputStreamWriter(baos, "UTF-8");
+                        char[] buffer = new char[1024];
+                        int len;
+                        while ((len = stream.read(buffer)) > -1 ) {
+                            osw.append(new String(buffer), 0, len);
+                        }
+                        osw.flush();
+                        baos.flush();
+                        return new ByteArrayInputStream(baos.toByteArray());
                     }
-                    baos.flush();
-                    return new ByteArrayInputStream(baos.toByteArray());
                 }
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, "Error while copying clob into new Stream", ex);

@@ -20,12 +20,11 @@ package org.constellation.metadata;
 
 import java.io.File;
 import java.sql.Connection;
-import javax.xml.bind.Marshaller;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
@@ -54,7 +53,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     public static void setUpClass() throws Exception {
 
         if (configDir.exists()) {
-            FileUtilities.deleteDirectory(new File("CSWWorkerTest"));
+            FileUtilities.deleteDirectory(configDir);
         }
 
         if (!configDir.exists()) {
@@ -92,20 +91,17 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-9.sql"));
 
             //we write the configuration file
-            File configFile = new File(instDirectory, "config.xml");
             BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
             Automatic configuration = new Automatic("mdweb", bdd);
             configuration.putParameter("transactionSecurized", "false");
             configuration.putParameter("shiroAccessible", "false");
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
+
+            ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
         }
         pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         worker = new CSWworker("default");
-        //worker.setLogLevel(Level.FINER);
     }
 
     @AfterClass
@@ -119,6 +115,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         if (derbyLog.exists()) {
             derbyLog.delete();
         }
+        ConfigurationEngine.deleteConfiguration("CSW", "default");
     }
 
     @Before

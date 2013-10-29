@@ -22,6 +22,9 @@ import org.constellation.configuration.ExceptionReport;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
@@ -29,15 +32,20 @@ import java.net.URLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ServiceReport;
+import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
+import org.constellation.util.Util;
 import org.constellation.ws.ExceptionCode;
+import static org.constellation.ws.embedded.CSWRequestTest.writeDataFile;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
+import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
@@ -49,9 +57,54 @@ import org.junit.runner.RunWith;
 @RunWith(TestRunner.class)
 public class ConfigurationRequestTest extends AbstractGrizzlyServer {
 
+    private static final File configDirectory = new File("ConfigurationRequestTest");
+
     @BeforeClass
     public static void initPool() throws Exception {
-        final Map<String, Object> map = new HashMap<String, Object>();
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final File dataDirectory2 = new File(configDirectory, "dataCsw2");
+        dataDirectory2.mkdir();
+
+        writeDataFile(dataDirectory2, "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58");
+
+        final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
+        config2.putParameter("shiroAccessible", "false");
+        config2.putParameter("CSWCascading", "http://localhost:9090/csw/default");
+        ConfigurationEngine.storeConfiguration("CSW", "csw2", config2);
+
+
+        final File dataDirectory = new File(configDirectory, "dataCsw");
+        dataDirectory.mkdir();
+
+        writeDataFile(dataDirectory, "urn-uuid-19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        writeDataFile(dataDirectory, "urn-uuid-1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        writeDataFile(dataDirectory, "urn-uuid-66ae76b7-54ba-489b-a582-0f0633d96493");
+        writeDataFile(dataDirectory, "urn-uuid-6a3de50b-fa66-4b58-a0e6-ca146fdd18d4");
+        writeDataFile(dataDirectory, "urn-uuid-784e2afd-a9fd-44a6-9a92-a3848371c8ec");
+        writeDataFile(dataDirectory, "urn-uuid-829babb0-b2f1-49e1-8cd5-7b489fe71a1e");
+        writeDataFile(dataDirectory, "urn-uuid-88247b56-4cbc-4df9-9860-db3f8042e357");
+        writeDataFile(dataDirectory, "urn-uuid-94bc9c83-97f6-4b40-9eb8-a8e8787a5c63");
+        writeDataFile(dataDirectory, "urn-uuid-9a669547-b69b-469f-a11f-2d875366bbdc");
+        writeDataFile(dataDirectory, "urn-uuid-e9330592-0932-474b-be34-c3a3bb67c7db");
+
+        final File subDataDirectory = new File(dataDirectory, "sub1");
+        subDataDirectory.mkdir();
+        writeDataFile(subDataDirectory, "urn-uuid-ab42a8c4-95e8-4630-bf79-33e59241605a");
+
+        final File subDataDirectory2 = new File(dataDirectory, "sub2");
+        subDataDirectory2.mkdir();
+        writeDataFile(subDataDirectory2, "urn-uuid-a06af396-3105-442d-8b40-22b57a90d2f2");
+
+        final Automatic config = new Automatic("filesystem", dataDirectory.getPath());
+        config.putParameter("shiroAccessible", "false");
+        ConfigurationEngine.storeConfiguration("CSW", "default", config);
+        
+        final Map<String, Object> map = new HashMap<>();
         map.put("sos", new SOService());
         initServer(null, map);
         // Get the list of layers
@@ -69,7 +122,9 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        //finish();
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
+        finish();
     }
 
     private static String getConfigurationURL() {
@@ -158,10 +213,10 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         // build 2 new metadata file
         RecordType record = new RecordType();
         record.setIdentifier(new SimpleLiteral("urn_test00"));
-        File f = new File(ConfigDirectory.getConfigDirectory(), "CSW/default/data/urn_test00.xml");
+        File f = new File(ConfigDirectory.getConfigDirectory(), "dataCsw/urn_test00.xml");
         RecordType record2 = new RecordType();
         record2.setIdentifier(new SimpleLiteral("urn_test01"));
-        File f2 = new File(ConfigDirectory.getConfigDirectory(), "CSW/default/data/urn_test01.xml");
+        File f2 = new File(ConfigDirectory.getConfigDirectory(), "dataCsw/urn_test01.xml");
 
 
         Marshaller m = pool.acquireMarshaller();
@@ -238,7 +293,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         // build a new metadata file
         RecordType record = new RecordType();
         record.setIdentifier(new SimpleLiteral("urn_test"));
-        File f = new File(ConfigDirectory.getConfigDirectory(), "CSW/default/data/urn_test.xml");
+        File f = new File(ConfigDirectory.getConfigDirectory(), "dataCsw/urn_test.xml");
 
         Marshaller m = pool.acquireMarshaller();
         m.marshal(record, f);
@@ -394,5 +449,27 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertEquals(result.getAvailableServices().toString(), 2, result.getAvailableServices().size());
 
 
+    }
+
+    public static void writeDataFile(File dataDirectory, String resourceName) throws IOException {
+
+        final File dataFile;
+        if (System.getProperty("os.name", "").startsWith("Windows")) {
+            final String windowsIdentifier = resourceName.replace(':', '-');
+            dataFile = new File(dataDirectory, windowsIdentifier + ".xml");
+        } else {
+            dataFile = new File(dataDirectory, resourceName + ".xml");
+        }
+        FileWriter fw = new FileWriter(dataFile);
+        InputStream in = Util.getResourceAsStream("org/constellation/embedded/test/" + resourceName + ".xml");
+
+        byte[] buffer = new byte[1024];
+        int size;
+
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            fw.write(new String(buffer, 0, size));
+        }
+        in.close();
+        fw.close();
     }
 }

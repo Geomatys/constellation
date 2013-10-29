@@ -27,7 +27,18 @@ import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.Language;
+import org.constellation.configuration.Languages;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.configuration.WMSPortrayal;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
+import org.constellation.dto.Service;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
@@ -59,6 +70,7 @@ import org.geotoolkit.image.jai.Registry;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 
@@ -66,7 +78,6 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 
@@ -79,6 +90,8 @@ import org.opengis.parameter.ParameterValueGroup;
  * @since 0.3
  */
 public class WMSRequestsTest extends AbstractGrizzlyServer {
+
+    private static final File configDirectory = new File("AdminRequestTest");
 
     /**
      * The layer to test.
@@ -136,7 +149,55 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
-    public static void initLayerList() throws JAXBException {
+    public static void initLayerList() throws JAXBException, IOException {
+
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WMS", "default", config);
+
+        final List<Source> sources2 = Arrays.asList(new Source("coverageTestSrc", true, null, Arrays.asList(new org.constellation.configuration.Layer(new QName("SST_tests")))),
+                                                    new Source("shapeSrc", false, Arrays.asList(new org.constellation.configuration.Layer(new QName("http://www.opengis.net/gml","Lakes"))), null),
+                                                    new Source("postgisSrc", true, null, null));
+        final Layers layers2 = new Layers(sources2);
+        final LayerContext config2 = new LayerContext(layers2);
+        config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
+        config2.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WMS", "wms1", config2);
+        final Service serviceEng = new Service();
+        serviceEng.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
+        serviceEng.setIdentifier("wms1");
+        serviceEng.setKeywords(Arrays.asList("WMS"));
+        serviceEng.setName("this is the default english capabilities");
+        final AccessConstraint cstr = new AccessConstraint("NONE", "NONE", 20, 1024, 1024);
+        serviceEng.setServiceConstraints(cstr);
+        final Contact ct = new Contact();
+        serviceEng.setServiceContact(ct);
+        serviceEng.setVersions(Arrays.asList("1.1.1", "1.3.0"));
+
+        ConfigurationEngine.writeMetadata("wms1", "WMS", serviceEng, "eng");
+
+        final Service serviceFre = new Service();
+        serviceFre.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
+        serviceFre.setIdentifier("wms1");
+        serviceFre.setKeywords(Arrays.asList("WMS"));
+        serviceFre.setName("Ceci est le document capabilities français");
+        serviceFre.setServiceConstraints(cstr);
+        serviceFre.setServiceContact(ct);
+        serviceFre.setVersions(Arrays.asList("1.1.1", "1.3.0"));
+        ConfigurationEngine.writeMetadata("wms1", "WMS", serviceFre, "fre");
+    
+
         initServer(new String[] {
             "org.constellation.map.ws.rs",
             "org.constellation.configuration.ws.rs",
@@ -145,7 +206,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
         pool = WMSMarshallerPool.getInstance();
 
-        final Configurator config = new Configurator() {
+        final Configurator configurator = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(final ProviderService service) {
 
@@ -195,7 +256,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        LayerProviderProxy.getInstance().setConfigurator(configurator);
 
         WorldFileImageReader.Spi.registerDefaults(null);
         WMSPortrayal.setEmptyExtension(true);
@@ -214,7 +275,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     @AfterClass
     public static void shutDown() throws JAXBException {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
-        //finish();
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
+        finish();
     }
 
     /**

@@ -406,7 +406,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                                     // save new Configuration
                                     LOGGER.log(Level.INFO, "Updating service {0}-{1} for deleted provider", new Object[]{specification, w.getId()});
                                     try {
-                                        ConfigurationEngine.storeConfiguration(specification, w.getId(), "layerContext.xml", configuration);
+                                        ConfigurationEngine.storeConfiguration(specification, w.getId(), configuration);
                                     } catch (JAXBException ex) {
                                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                                     }

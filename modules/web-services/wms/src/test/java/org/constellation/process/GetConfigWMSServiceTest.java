@@ -16,8 +16,12 @@
  */
 package org.constellation.process;
 
+import java.io.File;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.process.service.GetConfigMapServiceTest;
+import org.geotoolkit.util.FileUtilities;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
  *
@@ -25,6 +29,16 @@ import org.constellation.process.service.GetConfigMapServiceTest;
  */
 public class GetConfigWMSServiceTest extends GetConfigMapServiceTest {
 
+    @BeforeClass
+    public static void createConfig () {
+        configDirectory = new File("WMSConfigTest");
+    }
+
+    @AfterClass
+    public static void deleteConfig () {
+        FileUtilities.deleteDirectory(configDirectory);
+    }
+    
     public GetConfigWMSServiceTest() {
         super("WMS", DefaultWMSWorker.class);
     }

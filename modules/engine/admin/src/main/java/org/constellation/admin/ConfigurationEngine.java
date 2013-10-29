@@ -17,10 +17,11 @@
 
 package org.constellation.admin;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +31,16 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
 
-import org.geotoolkit.util.FileUtilities;
-
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.constellation.ServiceDef;
 import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
 
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -78,144 +78,228 @@ public class ConfigurationEngine {
         // TODO move from Configurator
     }
 
+    public static Object getConfiguration(final String serviceType, final String serviceID) throws JAXBException, FileNotFoundException {
+        return getConfiguration(serviceType, serviceID, null);
+    }
     public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName) throws JAXBException, FileNotFoundException {
         return getConfiguration(serviceType, serviceID, fileName, GenericDatabaseMarshallerPool.getInstance());
     }
 
     public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName, final MarshallerPool pool) throws JAXBException, FileNotFoundException {
-        final File configurationDirectory = ConfigDirectory.getInstanceDirectory(serviceType, serviceID);
-        final File confFile = new File(configurationDirectory, fileName);
-        if (confFile.exists()) {
-            final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-            final Object obj = unmarshaller.unmarshal(confFile);
-            pool.recycle(unmarshaller);
-            return obj;
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final ServiceRecord rec = session.readService(serviceID, ServiceDef.Specification.fromShortName(serviceType));
+            if (rec != null) {
+                final InputStream is;
+                if (fileName == null) {
+                    is = rec.getConfig();
+                } else {
+                    is = rec.getExtraFile(fileName);
+                }
+                if (is != null) {
+                    final Unmarshaller u = pool.acquireUnmarshaller();
+                    final Object config = u.unmarshal(is);
+                    pool.recycle(u);
+                    return config;
+                }
+            }
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
+        } finally {
+            if (session != null) session.close();
         }
-        throw new FileNotFoundException("The configuration file " + fileName + " has not been found.");
+
+        throw new FileNotFoundException("The configuration (" + fileName != null ? fileName : "default" + ") has not been found.");
     }
 
-    public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj, final Service metadata) throws JAXBException, IOException {
-        storeConfiguration(serviceType, serviceID, fileName, obj,  GenericDatabaseMarshallerPool.getInstance());
+    public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj, final Service metadata) throws JAXBException, IOException {
+        storeConfiguration(serviceType, serviceID, null, obj,  GenericDatabaseMarshallerPool.getInstance());
         if (metadata != null) {
             writeMetadata(serviceID, serviceType, metadata, null);
         }
     }
 
-    public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj) throws JAXBException {
-        storeConfiguration(serviceType, serviceID, fileName, obj,  GenericDatabaseMarshallerPool.getInstance());
+    public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj) throws JAXBException {
+        storeConfiguration(serviceType, serviceID, null, obj,  GenericDatabaseMarshallerPool.getInstance());
     }
 
     public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj, final MarshallerPool pool) throws JAXBException {
-        final File configurationDirectory = ConfigDirectory.getInstanceDirectory(serviceType, serviceID);
-        final File confFile = new File(configurationDirectory, fileName);
-        final Marshaller marshaller = pool.acquireMarshaller();
-        marshaller.marshal(obj, confFile);
-        pool.recycle(marshaller);
-    }
+        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final StringReader sr;
+            if (obj != null) {
+                final StringWriter sw = new StringWriter();
+                final Marshaller m = pool.acquireMarshaller();
+                m.marshal(obj, sw);
+                pool.recycle(m);
+                sr = new StringReader(sw.toString());
+            } else {
+                sr = null;
+            }
+            final ServiceRecord service = session.readService(serviceID, spec);
+            if (service == null) {
+                if (fileName == null) {
+                    session.writeService(serviceID, spec, sr, null);
+                } else {
+                    session.writeServiceExtraConfig(serviceID, spec, sr, fileName);
+                }
+            } else {
+                if (fileName == null) {
+                    service.setConfig(sr);
+                } else {
+                    service.setExtraFile(fileName, sr);
+                }
+            }
 
-    public static void createConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj, final Service metadata) throws JAXBException, IOException {
-        final File instanceDirectory = ConfigDirectory.getInstanceDirectory(serviceType, serviceID);
-        if (!instanceDirectory.isDirectory()) {
-            instanceDirectory.mkdir();
-        }
-        storeConfiguration(serviceType, serviceID, fileName, obj,  GenericDatabaseMarshallerPool.getInstance());
-        if (metadata != null) {
-            writeMetadata(serviceID, serviceType, metadata, null);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null) session.close();
         }
     }
 
     public static List<String> getServiceConfigurationIds(final String serviceType) {
         final List<String> results = new ArrayList<>();
-        final File serviceDir = ConfigDirectory.getServiceDirectory(serviceType);
-        for (File instanceDir : serviceDir.listFiles()) {
-            if (instanceDir.isDirectory()) {
-                final String instanceID = instanceDir.getName();
-                if (!instanceID.startsWith(".")) {
-                   results.add(instanceID);
-                }
+        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final List<ServiceRecord> records = session.readServices(spec);
+            for (ServiceRecord record : records) {
+                results.add(record.getIdentifier());
             }
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while get services in database", ex);
+        } finally {
+            if (session != null) session.close();
         }
         return results;
     }
 
+    public static boolean serviceConfigurationExist(final String serviceType, final String identifier) {
+        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readService(identifier, spec) != null;
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while get services in database", ex);
+        } finally {
+            if (session != null) session.close();
+        }
+        return false;
+    }
+
     public static boolean deleteConfiguration(final String serviceType, final String identifier) {
-        final File directory = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
-        if (directory.exists()) {
-            return FileUtilities.deleteDirectory(directory);
+        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            // look fr existence
+            final ServiceRecord serv = session.readService(identifier, spec);
+            if (serv != null) {
+                session.deleteService(identifier, spec);
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while deleting service in database", ex);
+        } finally {
+            if (session != null) session.close();
         }
         return false;
     }
 
     public static boolean renameConfiguration(final String serviceType, final String identifier, final String newID) {
-        final File serviceDirectory  = ConfigDirectory.getServiceDirectory(serviceType);
-        final File instanceDirectory = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
-        final File newDirectory      = new File(serviceDirectory, newID);
-        return instanceDirectory.renameTo(newDirectory);
+        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final ServiceRecord service = session.readService(identifier, spec);
+            service.setIdentifier(identifier);
+            return true;
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while deleting service in database", ex);
+            return false;
+        } finally {
+            if (session != null) session.close();
+        }
     }
 
-    public static void writeMetadata(final String identifier, final String serviceType, final Service metadata, final String language) throws IOException {
+    public static void writeMetadata(final String identifier, final String serviceType, final Service metadata, String language) throws IOException, JAXBException {
         ensureNonNull("metadata", metadata);
 
-        final File directory = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
-        ensureNonNull("directory", directory);
-        
-        final String fileName;
         if (language == null) {
-            fileName = serviceType + "Capabilities.xml";
-        } else {
-            fileName = serviceType + "Capabilities-" + language + ".xml";
+            language = "eng";
         }
+        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
+        Session session = null;
         try {
+            session = EmbeddedDatabase.createSession();
+            final StringWriter sw = new StringWriter();
             final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            final File metadataFile = new File(directory, fileName);
-            m.marshal(metadata, metadataFile);
+            m.marshal(metadata, sw);
             GenericDatabaseMarshallerPool.getInstance().recycle(m);
-        } catch (JAXBException ex) {
-            throw new IOException("Metadata marshalling has failed.", ex);
+            final StringReader sr = new StringReader(sw.toString());
+            final ServiceRecord service = session.readService(identifier, spec);
+            if (service != null) {
+               service.setMetadata(language, sr);
+            } 
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null) session.close();
         }
     }
 
-    public static Service readMetadata(final String identifier, final String serviceType, final String language) throws IOException {
+    public static Service readMetadata(final String identifier, final String serviceType, String language) throws IOException, JAXBException {
         ensureNonNull("identifier",  identifier);
         ensureNonNull("serviceType", serviceType);
-
-        final File directory = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
-        ensureNonNull("directory", directory);
-
-        final String fileName;
         if (language == null) {
-            fileName = serviceType + "Capabilities.xml";
-        } else {
-            fileName = serviceType + "Capabilities-" + language + ".xml";
+            language = "eng";
         }
-
-        final File metadataFile = new File(directory, fileName);
+        Session session = null;
         try {
-            final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-            final Object metadata;
-            if (metadataFile.exists() && !metadataFile.isDirectory()) {
-                metadata = um.unmarshal(metadataFile);
-                GenericDatabaseMarshallerPool.getInstance().recycle(um);
-            } else {
-                final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + fileName);
-                if (in != null) {
-                    metadata = um.unmarshal(in);
-                    GenericDatabaseMarshallerPool.getInstance().recycle(um);
-                    in.close();
+            session = EmbeddedDatabase.createSession();
+            final ServiceRecord rec = session.readService(identifier, ServiceDef.Specification.fromShortName(serviceType));
+            if (rec != null) {
+                final InputStream is = rec.getMetadata(language);
+                if (is != null) {
+                    final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    final Service config = (Service) u.unmarshal(is);
+                    GenericDatabaseMarshallerPool.getInstance().recycle(u);
+                    return config;
                 } else {
-                    throw new IOException("Unable to find the capabilities skeleton from resource:" + fileName);
+                    final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType + "Capabilities.xml");
+                    if (in != null) {
+                        final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                        final Service metadata = (Service) u.unmarshal(in);
+                        GenericDatabaseMarshallerPool.getInstance().recycle(u);
+                        in.close();
+                        metadata.setIdentifier(identifier);
+                        return metadata;
+                    } else {
+                        throw new IOException("Unable to find the capabilities skeleton from resource.");
+                    }
                 }
             }
-            if (metadata instanceof Service) {
-                final Service serv = (Service) metadata;
-                // override identifier
-                serv.setIdentifier(identifier);
-                return serv;
-            } else {
-                throw new IOException("Unexpected metadata object: " + metadata.getClass());
-            }
-        } catch (JAXBException ex) {
-            throw new IOException("Metadata unmarshalling has failed.", ex);
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
+        } finally {
+            if (session != null) session.close();
         }
+        return null;
+    }
+
+    public static void clearDatabase() {
+        EmbeddedDatabase.clear();
     }
 }

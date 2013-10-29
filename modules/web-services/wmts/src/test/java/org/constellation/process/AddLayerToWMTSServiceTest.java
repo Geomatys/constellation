@@ -17,7 +17,6 @@
 package org.constellation.process;
 
 import java.io.File;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.process.service.AddLayerToMapServiceTest;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
 import org.geotoolkit.util.FileUtilities;
@@ -32,12 +31,7 @@ public class AddLayerToWMTSServiceTest  extends AddLayerToMapServiceTest {
 
     @BeforeClass
     public static void createConfig () {
-        final File configDir = new File("WMTSConfigTest");
-        configDir.mkdir();
-        final File wmts = new File(configDir, "WMTS");
-        wmts.mkdir();
-
-        ConfigDirectory.setConfigDirectory(configDir);
+        configDirectory = new File("WMTSConfigTest");
     }
 
     @AfterClass

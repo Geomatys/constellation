@@ -30,7 +30,9 @@ import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -47,22 +49,19 @@ public class WMTSWorkerTest {
 
     private static MarshallerPool pool;
     private static WMTSWorker worker ;
-    
+    private static final File configDir = new File("WMTSWorkerTest");
+
     @BeforeClass
     public static void setUpClass() throws Exception {
-        pool = WMTSMarshallerPool.getInstance();
-        
-        File configDir = new File("WMTSWorkerTest");
         if (configDir.exists()) {
             FileUtilities.deleteDirectory(configDir);
         }
         configDir.mkdir();
+
         ConfigDirectory.setConfigDirectory(configDir);
+        pool = WMTSMarshallerPool.getInstance();
         
-        final File WMTSDir = new File(configDir, "WMTS");
-        WMTSDir.mkdir();
-        final File instDir = new File(WMTSDir, "default");
-        instDir.mkdir();
+        ConfigurationEngine.storeConfiguration("WMTS", "default", new LayerContext());
 
         worker = new DefaultWMTSWorker("default");
         worker.setLogLevel(Level.FINER);
@@ -72,6 +71,7 @@ public class WMTSWorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        FileUtilities.deleteDirectory(configDir);
     }
 
     @Before

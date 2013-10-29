@@ -244,6 +244,35 @@ public final class ConfigDirectory {
 
     }
 
+    public static void setDataDirectory(final File directory) {
+        DATA_DIRECTORY = null;
+        if (directory != null && directory.isDirectory()) {
+            if (!directory.getPath().equals(getConstellationDirectory().getPath())) {
+                DATA_DIRECTORY = directory.getPath();
+            }
+        }
+        //store the configuration properties file
+        final File webInfDirectory = getWebInfDiretory();
+        final File propertiesFile = new File(webInfDirectory, "constellation.properties");
+        try {
+            if (!propertiesFile.exists()) {
+                propertiesFile.createNewFile();
+            }
+            final Properties prop = new Properties();
+            final String pathValue;
+            if (DATA_DIRECTORY == null) {
+                pathValue = "";
+            } else {
+                pathValue = DATA_DIRECTORY;
+            }
+            prop.put("data_directory", pathValue);
+            FileUtilities.storeProperties(prop, propertiesFile);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "IOException while writing the constellation properties file", ex);
+        }
+
+    }
+
     /**
      * Return the directory for the configuration files of all instance of serviceType?
      *

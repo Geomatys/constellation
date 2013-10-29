@@ -84,8 +84,19 @@ import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.ValueType;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
+import org.geotoolkit.wfs.xml.StoredQueries;
+import org.geotoolkit.wfs.xml.StoredQueryDescription;
+import org.geotoolkit.wfs.xml.v200.ObjectFactory;
+import org.geotoolkit.wfs.xml.v200.ParameterExpressionType;
+import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
+import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
@@ -93,7 +104,6 @@ import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 
@@ -103,6 +113,8 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 @RunWith(TestRunner.class)
 public class WFSWorkerTest {
+
+    private static final File configDirectory = new File("WFSWorkerTest");
 
     private static MarshallerPool pool;
     private static WFSWorker worker ;
@@ -117,9 +129,52 @@ public class WFSWorkerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null),
+                                                   new Source("postgisSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+        config.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "default", config);
+        ConfigurationEngine.storeConfiguration("WFS", "test", config);
+
+        final List<Source> sources2 = Arrays.asList(new Source("shapeSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("smlSrc", true, null, null));
+        final Layers layers2 = new Layers(sources2);
+        final LayerContext config2 = new LayerContext(layers2);
+        config2.getCustomParameters().put("shiroAccessible", "false");
+        config2.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "test1", config2);
+
+        pool = WFSMarshallerPool.getInstance();
+
+        final List<StoredQueryDescription> descriptions = new ArrayList<>();
+        final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
+        final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
+        final org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType pis = new org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType(new org.geotoolkit.ogc.xml.v200.LiteralType("$name"), "name", true);
+        final org.geotoolkit.ogc.xml.v200.FilterType filter = new org.geotoolkit.ogc.xml.v200.FilterType(pis);
+        final org.geotoolkit.wfs.xml.v200.QueryType query = new org.geotoolkit.wfs.xml.v200.QueryType(filter, types, "2.0.0");
+        final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
+        final ObjectFactory factory = new ObjectFactory();
+        queryEx.getContent().add(factory.createQuery(query));
+        final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
+        descriptions.add(des1);
+        final StoredQueries queries = new StoredQueries(descriptions);
+        ConfigurationEngine.storeConfiguration("WFS", "test1", "StoredQueries.xml", queries, pool);
+
         EPSG_VERSION = CRS.getVersion("EPSG").toString();
         initFeatureSource();
-        pool = WFSMarshallerPool.getInstance();
         worker = new DefaultWFSWorker("test1");
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
@@ -128,6 +183,8 @@ public class WFSWorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
         if (ds != null) {
             ds.shutdown();
         }

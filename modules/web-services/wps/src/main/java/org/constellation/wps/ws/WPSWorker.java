@@ -174,7 +174,7 @@ public class WPSWorker extends AbstractWorker {
         setSupportedVersion(ServiceDef.WPS_1_0_0);
         ProcessContext candidate = null;
         try {
-            final Object obj = ConfigurationEngine.getConfiguration("WPS", id, "processContext.xml");
+            final Object obj = ConfigurationEngine.getConfiguration("WPS", id);
             if (obj instanceof ProcessContext) {
                 candidate = (ProcessContext) obj;
                 isStarted = true;
@@ -398,12 +398,12 @@ public class WPSWorker extends AbstractWorker {
         final String webDavName = getId();
         //configure webdav if not exist
         try {
-            ConfigurationEngine.getConfiguration("webdav", webDavName, "WebdavContext.xml");
+            ConfigurationEngine.getConfiguration("webdav", webDavName);
         } catch (FileNotFoundException | JAXBException e) {
             final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
             webdavCtx.setId(webDavName);
             try {
-                ConfigurationEngine.createConfiguration("webdav", webDavName, "WebdavContext.xml", webdavCtx, null);
+                ConfigurationEngine.storeConfiguration("webdav", webDavName, webdavCtx, null);
             } catch (JAXBException | IOException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;

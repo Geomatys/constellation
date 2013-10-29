@@ -31,7 +31,6 @@ import org.junit.AfterClass;
  */
 public abstract class ServiceProcessTest extends AbstractProcessTest {
 
-    @Deprecated
     protected static File configDirectory;
     protected static String serviceName;
     private static Class workerClass;
@@ -40,14 +39,16 @@ public abstract class ServiceProcessTest extends AbstractProcessTest {
         super(str);
         ServiceProcessTest.serviceName     = serviceName;
         ServiceProcessTest.workerClass     = workerClass;
-
-        configDirectory = ConfigDirectory.getConfigDirectory();
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+        
         WSEngine.registerService(serviceName, "REST", workerClass, null);
     }
 
     @AfterClass
     public static void destroyFolder() {
         WSEngine.destroyInstances(serviceName);
+        ConfigurationEngine.clearDatabase();
     }
 
     /**

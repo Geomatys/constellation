@@ -70,7 +70,7 @@ public abstract class LayerWorker extends AbstractWorker {
         LayerContext candidate          = null;
         
         try {
-            final Object obj = ConfigurationEngine.getConfiguration(specification.name(), id, "layerContext.xml");
+            final Object obj = ConfigurationEngine.getConfiguration(specification.name(), id);
             if (obj instanceof LayerContext) {
                 candidate = (LayerContext) obj;
                 final String sec = candidate.getSecurity();
@@ -105,7 +105,7 @@ public abstract class LayerWorker extends AbstractWorker {
                 LOGGER.log(Level.WARNING, startError);
             }
         } catch (JAXBException ex) {
-            startError = "JAXBExeception while unmarshalling the layer context File";
+            startError = "JAXBException while unmarshalling the layer context File";
             isStarted  = false;
             LOGGER.log(Level.WARNING, startError, ex);
         } catch (FactoryNotFoundException ex) {

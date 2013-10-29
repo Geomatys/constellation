@@ -17,15 +17,23 @@
 
 package org.constellation.map.ws.rs;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import javax.ws.rs.core.MultivaluedMap;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.TimeZone;
 import javax.xml.bind.JAXBException;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 
 import org.constellation.map.ws.QueryContext;
 import org.constellation.ws.rs.WebService;
@@ -35,9 +43,9 @@ import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.referencing.ReferencingUtilities;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
 import org.junit.AfterClass;
@@ -62,17 +70,35 @@ public class WMSServiceTest {
     private static final double DELTA = 0.00000001;
     private static WMSService service;
     private final BasicUriInfo info = new BasicUriInfo(null, null);
-    private final MultivaluedMap<String,String> queryParameters = new BasicMultiValueMap<String, String>();
-    private final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<String, String>();
+    private final MultivaluedMap<String,String> queryParameters = new BasicMultiValueMap<>();
+    private final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<>();
+
+    private static final File configDirectory = new File("WMSServiceTest");
 
     @BeforeClass
     public static void init() throws JAXBException {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WMS", "default", config);
+        
         service = new WMSService();
     }
     
     @AfterClass
     public static void finish() {
         service.destroy();
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
     }
     
     public WMSServiceTest() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
@@ -116,8 +142,7 @@ public class WMSServiceTest {
      * - Dim_Range value
      */
     @Test
-    public void testAdaptGetMap() throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, 
-                   InvocationTargetException, NoSuchAuthorityCodeException, FactoryException, TransformException{
+    public void testAdaptGetMap() throws Exception {
         queryParameters.clear();
         pathParameters.clear();
         queryParameters.putSingle("AZIMUTH", "49");

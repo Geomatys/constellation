@@ -33,6 +33,7 @@ import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.util.FileUtilities;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 
 
@@ -141,7 +142,6 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
             sensor10.createNewFile();
             
             //we write the configuration file
-            File configFile = new File(instDirectory, "config.xml");
             Automatic SMLConfiguration = new Automatic();
 
             Automatic OMConfiguration  = new Automatic();
@@ -157,7 +157,8 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
-            marshaller.marshal(configuration, configFile);
+
+            ConfigurationEngine.storeConfiguration("SOS", "default", configuration);
 
         }
         pool.recycle(marshaller);
@@ -180,6 +181,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
             worker.destroy();
         }
         FileUtilities.deleteDirectory(configDir);
+        ConfigurationEngine.deleteConfiguration("SOS", "default");
     }
 
     @Before

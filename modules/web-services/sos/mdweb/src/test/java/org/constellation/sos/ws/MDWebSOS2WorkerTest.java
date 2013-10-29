@@ -34,6 +34,7 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 
 import org.junit.*;
@@ -87,7 +88,6 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
             instDirectory.mkdir();
 
             //we write the configuration file
-            File configFile = new File(instDirectory, "config.xml");
             Automatic SMLConfiguration = new Automatic();
             BDD smBdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url2, "", "");
             SMLConfiguration.setBdd(smBdd);
@@ -107,7 +107,8 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
-            marshaller.marshal(configuration, configFile);
+
+            ConfigurationEngine.storeConfiguration("SOS", "default", configuration);
 
         }
         pool.recycle(marshaller);
@@ -141,6 +142,7 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
         if (ds2 != null) {
             ds2.shutdown();
         }
+        ConfigurationEngine.deleteConfiguration("SOS", "default");
     }
 
 

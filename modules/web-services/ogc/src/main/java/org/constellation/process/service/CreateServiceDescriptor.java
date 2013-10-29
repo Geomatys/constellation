@@ -74,16 +74,11 @@ public class CreateServiceDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<Class> CONFIGURATION_CLASS =
             new DefaultParameterDescriptor(CONFIGURATION_CLASS_NAME, CONFIGURATION_CLASS_REMARKS, Class.class, null, true);
 
-    public static final String FILENAME_NAME = "fileName";
-    private static final String FILENAME_REMARKS = "name of the configuration file.";
-    public static final ParameterDescriptor<String> FILENAME =
-            new DefaultParameterDescriptor(FILENAME_NAME, FILENAME_REMARKS, String.class, null, true);
-
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, SERVICE_METADATA, CONFIGURATION_CLASS, FILENAME});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, SERVICE_METADATA, CONFIGURATION_CLASS});
 
 
     public static final String OUT_CONFIG_NAME = "out_configuration";

@@ -59,7 +59,6 @@ public class CreateService extends AbstractProcess {
         Object configuration           = value(CONFIGURATION, inputParameters);
         final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
         final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
-        final String configFileName    = value(FILENAME, inputParameters);
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
@@ -71,11 +70,11 @@ public class CreateService extends AbstractProcess {
 
         boolean createConfig = false;
         try {
-            final Object obj = ConfigurationEngine.getConfiguration(serviceType, identifier, configFileName);
+            final Object obj = ConfigurationEngine.getConfiguration(serviceType, identifier);
             if (obj.getClass().isAssignableFrom(configurationClass)) {
                 configuration = obj;
             } else {
-                throw new ProcessException("The " + configFileName + " file does not contain a " + configurationClass.getName() + " object", this, null);
+                throw new ProcessException("The configuration does not contain a " + configurationClass.getName() + " object", this, null);
             }
         } catch (JAXBException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
@@ -86,7 +85,7 @@ public class CreateService extends AbstractProcess {
         if (createConfig) {
             //create config file for the default configuration.
             try {
-                ConfigurationEngine.createConfiguration(serviceType, identifier, configFileName, configuration, serviceMetadata);
+                ConfigurationEngine.storeConfiguration(serviceType, identifier, configuration, serviceMetadata);
             } catch (JAXBException ex) {
                 throw new ProcessException(ex.getMessage(), this, ex);
             } catch (IOException ex) {

@@ -308,7 +308,7 @@ public class SOSworker extends AbstractWorker {
         // Database configuration
         try {
                 
-            final Object object = ConfigurationEngine.getConfiguration("SOS", id, "config.xml");
+            final Object object = ConfigurationEngine.getConfiguration("SOS", id);
             if (object instanceof SOSConfiguration) {
                 configuration = (SOSConfiguration) object;
             } else {

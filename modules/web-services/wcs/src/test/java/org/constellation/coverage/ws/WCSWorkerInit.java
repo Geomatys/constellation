@@ -17,7 +17,13 @@
 package org.constellation.coverage.ws;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.Provider;
@@ -32,6 +38,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.geotoolkit.util.FileUtilities;
 
 /**
  * Initializes a {@link WCSWorker} for testing GetCapabilities, DescribeCoverage and GetCoverage
@@ -51,6 +58,8 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
 
     protected static WCSWorker WORKER;
 
+    private static final File configDirectory = new File("WCSWorkerInit");
+
     /**
      * Initialisation of the worker and the PostGRID data provider before launching
      * the different tests.
@@ -58,7 +67,21 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        final Configurator config = new Configurator() {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+        
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WCS", "default", config);
+        ConfigurationEngine.storeConfiguration("WCS", "test", config);
+
+        final Configurator configurator = new Configurator() {
 
             @Override
             public ParameterValueGroup getConfiguration(final ProviderService service) {
@@ -87,7 +110,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        LayerProviderProxy.getInstance().setConfigurator(configurator);
 
 
         WORKER = new DefaultWCSWorker("default");
@@ -98,6 +121,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+         FileUtilities.deleteDirectory(configDirectory);
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {

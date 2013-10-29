@@ -16,14 +16,28 @@
  */
 package org.constellation.process;
 
+import java.io.File;
 import org.constellation.coverage.ws.DefaultWCSWorker;
 import org.constellation.process.service.AddLayerToMapServiceTest;
+import org.geotoolkit.util.FileUtilities;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
  *
  * @author Quentin Boileau (Geomatys)
  */
 public class AddLayerToWCSServiceTest extends AddLayerToMapServiceTest {
+
+    @BeforeClass
+    public static void createConfig () {
+        configDirectory = new File("WCSConfigTest");
+    }
+
+    @AfterClass
+    public static void deleteConfig () {
+        FileUtilities.deleteDirectory(configDirectory);
+    }
 
     public AddLayerToWCSServiceTest() {
         super("WCS", DefaultWCSWorker.class);

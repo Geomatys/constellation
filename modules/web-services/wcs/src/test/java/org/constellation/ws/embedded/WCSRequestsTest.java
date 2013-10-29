@@ -18,15 +18,22 @@ package org.constellation.ws.embedded;
 
 // J2SE dependencies
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
@@ -50,6 +57,7 @@ import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
 import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 
 // JUnit dependencies
@@ -57,7 +65,6 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -69,6 +76,8 @@ import org.opengis.parameter.ParameterValueGroup;
  * @since 0.3
  */
 public class WCSRequestsTest extends AbstractGrizzlyServer {
+
+    private static final File configDirectory = new File("WCSRequestsTest");
 
     /**
      * The layer to test.
@@ -111,6 +120,20 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+        
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WCS", "default", config);
+        ConfigurationEngine.storeConfiguration("WCS", "test", config);
+        
         initServer(new String[] {
             "org.constellation.coverage.ws.rs",
             "org.constellation.configuration.ws.rs",
@@ -119,7 +142,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
         pool = WCSMarshallerPool.getInstance();
 
-        final Configurator config = new Configurator() {
+        final Configurator configurator = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(final ProviderService service) {
 
@@ -151,7 +174,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        LayerProviderProxy.getInstance().setConfigurator(configurator);
 
         WorldFileImageReader.Spi.registerDefaults(null);
 
@@ -169,7 +192,9 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     @AfterClass
     public static void shutDown() throws JAXBException {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
-        //finish();
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
+        finish();
     }
 
     /**

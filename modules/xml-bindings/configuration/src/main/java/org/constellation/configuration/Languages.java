@@ -34,12 +34,20 @@ public class Languages {
     @XmlElement(name="language")
     private List<Language> languages;
 
+    public Languages() {
+        
+    }
+    
+    public Languages(final List<Language> languages) {
+        this.languages = languages;
+    }
+    
     /**
      * @return the languages
      */
     public List<Language> getLanguages() {
         if (languages == null) {
-            languages = new ArrayList<Language>();
+            languages = new ArrayList<>();
         }
         return languages;
     }

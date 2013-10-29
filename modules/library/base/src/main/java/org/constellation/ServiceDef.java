@@ -174,7 +174,8 @@ public enum ServiceDef {
         PEP("Policy Enforcement Point"),
         PDP("Policy Decision Point"),
         MDW("MDWeb"),
-        THW("Thesaurus");
+        THW("Thesaurus"),
+        WEBDAV("Webdav");
 
         public final String fullName;
 
@@ -207,6 +208,8 @@ public enum ServiceDef {
                 return MDW;
             } else if (THW.name().equalsIgnoreCase(shortName)) {
                 return THW;
+            } else if (WEBDAV.name().equalsIgnoreCase(shortName)) {
+                return WEBDAV;
             }
             throw new IllegalArgumentException(shortName + " is not a valid service specification.");
         }

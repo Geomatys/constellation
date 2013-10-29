@@ -22,14 +22,25 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.Language;
+import org.constellation.configuration.Languages;
+import org.constellation.configuration.Layer;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.configuration.WMSPortrayal;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
@@ -42,17 +53,18 @@ import org.geotoolkit.feature.DefaultName;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.constellation.ws.embedded.AbstractGrizzlyServer.finish;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
 
 // Geotoolkit.org dependencies
 import org.geotoolkit.test.Commons;
+import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -69,6 +81,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class WMSAxesOrderTest extends AbstractGrizzlyServer {
 
+    private static final File configDirectory = new File("WMSAxesOrderTest");
+    
     /**
      * The layer to test.
      */
@@ -120,14 +134,38 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
-    public static void initLayerList() {
+    public static void initLayerList() throws JAXBException {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null));
+        final Layers layers1 = new Layers(sources);
+        final LayerContext config = new LayerContext(layers1);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WMS", "default", config);
+
+        final List<Source> sources2 = Arrays.asList(new Source("coverageTestSrc", true, null, Arrays.asList(new Layer(new QName("SST_tests")))),
+                                                    new Source("shapeSrc", false, Arrays.asList(new Layer(new QName("http://www.opengis.net/gml","Lakes"))), null),
+                                                    new Source("postgisSrc", true, null, null));
+        final Layers layers2 = new Layers(sources2);
+        final LayerContext config2 = new LayerContext(layers2);
+        config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
+        config2.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WMS", "wms1", config2);
+        
         initServer(new String[] {
             "org.constellation.map.ws.rs",
             "org.constellation.configuration.ws.rs",
             "org.constellation.ws.rs.provider"
         }, null);
 
-        final Configurator config = new Configurator() {
+        final Configurator configurator = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(final ProviderService service) {
 
@@ -158,7 +196,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        LayerProviderProxy.getInstance().setConfigurator(configurator);
 
 
         WorldFileImageReader.Spi.registerDefaults(null);
@@ -194,7 +232,9 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        //finish();
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
+        finish();
     }
     /**
      * Returns {@code true} if the {@code SST_tests} layer is found in the list of

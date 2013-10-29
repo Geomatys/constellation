@@ -183,4 +183,11 @@ public final class EmbeddedDatabase extends Static {
             }
         }
     }
+
+    public static void clear() {
+        if (DATA_SOURCE != null) {
+            DATA_SOURCE.shutdown();
+        }
+        DATA_SOURCE = null;
+    }
 }

@@ -21,8 +21,6 @@ import org.constellation.ServiceDef.Specification;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.WSEngine;
 
-import java.io.File;
-
 /**
  * @author Bernard Fabien (Geomatys).
  * @version 0.9
@@ -53,11 +51,6 @@ public abstract class ServiceConfigurer {
     protected final Specification specification;
 
     /**
-     * Configuration file name.
-     */
-    protected final String configFileName;
-
-    /**
      * Configuration object class.
      */
     protected final Class configClass;
@@ -72,37 +65,5 @@ public abstract class ServiceConfigurer {
     protected ServiceConfigurer(final Specification specification, final Class configClass, final String configFileName) {
         this.specification  = specification;
         this.configClass    = configClass;
-        this.configFileName = configFileName;
-    }
-
-    /**
-     * Returns a service instance configuration file.
-     *
-     * @param identifier the service identifier
-     * @return a {@link File} instance
-     */
-    public File getConfigurationFile(final String identifier) {
-        return new File(ConfigDirectory.getInstanceDirectory(specification.name(), identifier), configFileName);
-    }
-
-    /**
-     * Ensure that a service instance really exists.
-     *
-     * @param identifier the service identifier
-     * @throws TargetNotFoundException if the service with specified identifier does not exist
-     */
-    protected void ensureExistingInstance(final String identifier) throws TargetNotFoundException {
-        if (!WSEngine.serviceInstanceExist(specification.name(), identifier)) {
-            final File directory = ConfigDirectory.getInstanceDirectory(specification.name(), identifier);
-            if (!directory.exists() || !directory.isDirectory()) {
-                throw new TargetNotFoundException(specification + " service instance with identifier \"" + identifier +
-                        "\" not found. The service instance directory does not exist.");
-            }
-            final File configFile = getConfigurationFile(identifier);
-            if (!configFile.exists() || configFile.isDirectory()) {
-                throw new TargetNotFoundException(specification + " service instance with identifier \"" + identifier +
-                        "\" not found. The service instance directory exists but there is not configuration file inside.");
-            }
-        }
     }
 }

@@ -51,18 +51,17 @@ public class GetConfigService extends AbstractProcess {
         final String serviceType       = value(SERVICE_TYPE, inputParameters);
         final String identifier        = value(IDENTIFIER, inputParameters);
         final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
-        final String configFileName    = value(FILENAME, inputParameters);
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
         }
 
         try {
-            final Object obj = ConfigurationEngine.getConfiguration(serviceType, identifier, configFileName);
+            final Object obj = ConfigurationEngine.getConfiguration(serviceType, identifier);
             if (obj.getClass().isAssignableFrom(configurationClass)) {
                 getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
             } else {
-                throw new ProcessException("The " + configFileName + " file does not contain a " + configurationClass.getName() + " object.", this, null);
+                throw new ProcessException("The configuration does not contain a " + configurationClass.getName() + " object.", this, null);
             }
         } catch (JAXBException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);

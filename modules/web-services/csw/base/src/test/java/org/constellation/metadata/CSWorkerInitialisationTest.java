@@ -19,6 +19,8 @@ package org.constellation.metadata;
 
 // JAXB dependencies
 import java.io.File;
+import java.io.StringWriter;
+import java.sql.Statement;
 import java.util.logging.Level;
 
 import javax.xml.bind.JAXBContext;
@@ -34,6 +36,9 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.util.SQLExecuter;
 import org.constellation.configuration.ConfigDirectory;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.util.FileUtilities;
@@ -51,8 +56,7 @@ public class CSWorkerInitialisationTest {
 
     private static MarshallerPool pool;
 
-    private static File constellationDirectory = new File("CSWorkerInitialisationTest");
-    private static File instDirectory;
+    private static final File constellationDirectory = new File("CSWorkerInitialisationTest");
     
 
     @BeforeClass
@@ -71,37 +75,6 @@ public class CSWorkerInitialisationTest {
     }
     
 
-    @Before
-    public void setUp() throws Exception {
-        if (constellationDirectory.exists()) {
-
-            File CSWDirectory  = new File(constellationDirectory, "CSW");
-            CSWDirectory.mkdir();
-            instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
-            File dataDirectory = new File(instDirectory, "data");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            File indexDirectory = new File(instDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            File conf = new File(instDirectory, "config.xml");
-            conf.delete();
-        }
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
     /**
      * Tests the initialisation of the CSW worker with different configuration mistake
      *
@@ -113,6 +86,7 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
+        ConfigurationEngine.storeConfiguration("CSW", "default", null);
         CSWworker worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
@@ -133,8 +107,9 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 2: An empty configuration file.
          */
-        File configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
+        final SQLExecuter executer = EmbeddedDatabase.createSQLExecuter();
+        final Statement stmt = executer.createStatement();
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"=''");
         
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -155,13 +130,11 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 3: A malformed configuration file (bad recognized type).
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
+        StringWriter sw = new StringWriter();
         final Marshaller m = pool.acquireMarshaller();
-        m.marshal(request, configFile);
+        m.marshal(request, sw);
         pool.recycle(m);
-
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -183,11 +156,10 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 4: A malformed configuration file (bad not recognized type).
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
+        sw = new StringWriter();
         Marshaller tempMarshaller = JAXBContext.newInstance(UnknowObject.class, Automatic.class).createMarshaller();
-        tempMarshaller.marshal(new UnknowObject(), configFile);
+        tempMarshaller.marshal(new UnknowObject(), sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -208,12 +180,11 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 5: A configuration file with missing part.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
+        sw = new StringWriter();
         String s = null;
         Automatic configuration = new Automatic(null, s);
-        tempMarshaller.marshal(configuration, configFile);
+        tempMarshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -234,13 +205,12 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 6: A configuration file with missing part and wrong part.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
+        sw = new StringWriter();
         s = null;
         configuration = new Automatic("whatever", s);
-        tempMarshaller.marshal(configuration, configFile);
-
+        tempMarshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
@@ -260,12 +230,11 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 7: A configuration file with mdweb database and wrong database config.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
+        sw = new StringWriter();
         s = null;
         configuration = new Automatic("mdweb", s);
-        tempMarshaller.marshal(configuration, configFile);
+        tempMarshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -286,12 +255,11 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 8:  A configuration file with mdweb mode and wrong database config.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
+        sw = new StringWriter();
         configuration = new Automatic("mdweb", new BDD());
-        tempMarshaller.marshal(configuration, configFile);
-
+        tempMarshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
@@ -311,11 +279,10 @@ public class CSWorkerInitialisationTest {
          /**
          * Test 9:  A configuration file with mdweb mode and wrong database config.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
+        sw = new StringWriter();
         configuration = new Automatic("mdweb", new BDD(null, null, null, null));
-        tempMarshaller.marshal(configuration, configFile);
+        tempMarshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -336,11 +303,10 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 10:  A configuration file with mdweb mode and wrong database config.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
+        sw = new StringWriter();
         configuration = new Automatic("mdweb", new BDD(null, "whatever", null, null));
-        tempMarshaller.marshal(configuration, configFile);
+        tempMarshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -361,11 +327,10 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 11:  A configuration file with mdweb mode and wrong database config.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
+        sw = new StringWriter();
         configuration = new Automatic("mdweb", new BDD("org.postgresql.Driver", "whatever", null, null));
-        tempMarshaller.marshal(configuration, configFile);
+        tempMarshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -390,9 +355,9 @@ public class CSWorkerInitialisationTest {
     @XmlRootElement(name = "Unknow")
     private static class UnknowObject {
 
-        private String field1 = "something";
+        private final String field1 = "something";
 
-        private String field2 = "other thing";
+        private final String field2 = "other thing";
 
     }
 

@@ -43,77 +43,81 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
     @Test
     public void testCreateWMS() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
+        try {
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
 
-        //WMS
-        ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance1");
-        in.parameter(CreateServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
-        in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
+            //WMS
+            ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance1");
+            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        proc.call();
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            proc.call();
 
-        assertTrue(checkInstanceExist("createInstance1"));
-        deleteInstance("createInstance1");
+            assertTrue(checkInstanceExist("createInstance1"));
+        } finally {
+            deleteInstance("createInstance1");
+        }
     }
 
     @Test
     public void testCreateMapServiceWithContext() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
+        try {
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
 
-        final List<Source> sources = new ArrayList<>();
-        sources.add(new Source("source1", Boolean.TRUE, null, null));
-        final Layers layers = new Layers(sources);
-        final LayerContext conf = new LayerContext(layers);
+            final List<Source> sources = new ArrayList<>();
+            sources.add(new Source("source1", Boolean.TRUE, null, null));
+            final Layers layers = new Layers(sources);
+            final LayerContext conf = new LayerContext(layers);
 
-        //WMS
-        ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance11");
-        in.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(conf);
-        in.parameter(CreateServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
-        in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
+            //WMS
+            ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance11");
+            in.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(conf);
+            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
 
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        proc.call();
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            proc.call();
 
-        assertTrue(checkInstanceExist("createInstance11"));
-        assertEquals(conf, getConfig("createInstance11"));
-
-        deleteInstance("createInstance11");
+            assertTrue(checkInstanceExist("createInstance11"));
+            assertEquals(conf, getConfig("createInstance11"));
+        } finally {
+            deleteInstance("createInstance11");
+        }
     }
     
     @Test
     public void testGetMapServiceWithContext() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
+        try {
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
 
-        final List<Source> sources = new ArrayList<>();
-        sources.add(new Source("source1", Boolean.TRUE, null, null));
-        final Layers layers = new Layers(sources);
-        final LayerContext conf = new LayerContext(layers);
-        createCustomInstance("createInstance15", conf);
-        //create 
-        ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance15");
-        in.parameter(CreateServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
-        in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
+            final List<Source> sources = new ArrayList<>();
+            sources.add(new Source("source1", Boolean.TRUE, null, null));
+            final Layers layers = new Layers(sources);
+            final LayerContext conf = new LayerContext(layers);
+            createCustomInstance("createInstance15", conf);
+            //create
+            ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance15");
+            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
 
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        ParameterValueGroup out = proc.call();
-        
-        final LayerContext outContext = (LayerContext)out.parameter(CreateServiceDescriptor.OUT_CONFIG_NAME).getValue();
-                
-        assertTrue(checkInstanceExist("createInstance15"));
-        assertEquals(conf, outContext);
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            ParameterValueGroup out = proc.call();
 
-        deleteInstance("createInstance15");
+            final LayerContext outContext = (LayerContext)out.parameter(CreateServiceDescriptor.OUT_CONFIG_NAME).getValue();
+
+            assertTrue(checkInstanceExist("createInstance15"));
+            assertEquals(conf, outContext);
+        } finally {
+            deleteInstance("createInstance15");
+        }
     }
 
     @Test
@@ -124,7 +128,6 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("");
-        in.parameter(CreateServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
         in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
         try {

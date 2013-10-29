@@ -28,17 +28,25 @@ import org.geotoolkit.csw.xml.v202.GetDomainType;
 import java.net.URLConnection;
 import java.net.URL;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.namespace.QName;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
+import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.*;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
+import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 import org.junit.*;
@@ -52,11 +60,57 @@ import org.junit.runner.RunWith;
 @RunWith(TestRunner.class)
 public class CSWRequestTest extends AbstractGrizzlyServer {
 
+    private static final File configDirectory = new File("CSWRequestTest");
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
     public static void initPool() throws Exception {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final File dataDirectory2 = new File(configDirectory, "dataCsw2");
+        dataDirectory2.mkdir();
+
+        writeDataFile(dataDirectory2, "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        
+        final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
+        config2.putParameter("shiroAccessible", "false");
+        config2.putParameter("CSWCascading", "http://localhost:9090/csw/default");
+        ConfigurationEngine.storeConfiguration("CSW", "csw2", config2);
+
+
+        final File dataDirectory = new File(configDirectory, "dataCsw");
+        dataDirectory.mkdir();
+
+        writeDataFile(dataDirectory, "urn-uuid-19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        writeDataFile(dataDirectory, "urn-uuid-1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        writeDataFile(dataDirectory, "urn-uuid-66ae76b7-54ba-489b-a582-0f0633d96493");
+        writeDataFile(dataDirectory, "urn-uuid-6a3de50b-fa66-4b58-a0e6-ca146fdd18d4");
+        writeDataFile(dataDirectory, "urn-uuid-784e2afd-a9fd-44a6-9a92-a3848371c8ec");
+        writeDataFile(dataDirectory, "urn-uuid-829babb0-b2f1-49e1-8cd5-7b489fe71a1e");
+        writeDataFile(dataDirectory, "urn-uuid-88247b56-4cbc-4df9-9860-db3f8042e357");
+        writeDataFile(dataDirectory, "urn-uuid-94bc9c83-97f6-4b40-9eb8-a8e8787a5c63");
+        writeDataFile(dataDirectory, "urn-uuid-9a669547-b69b-469f-a11f-2d875366bbdc");
+        writeDataFile(dataDirectory, "urn-uuid-e9330592-0932-474b-be34-c3a3bb67c7db");
+
+        final File subDataDirectory = new File(dataDirectory, "sub1");
+        subDataDirectory.mkdir();
+        writeDataFile(subDataDirectory, "urn-uuid-ab42a8c4-95e8-4630-bf79-33e59241605a");
+        
+        final File subDataDirectory2 = new File(dataDirectory, "sub2");
+        subDataDirectory2.mkdir();
+        writeDataFile(subDataDirectory2, "urn-uuid-a06af396-3105-442d-8b40-22b57a90d2f2");
+
+        final Automatic config = new Automatic("filesystem", dataDirectory.getPath());
+        config.putParameter("shiroAccessible", "false");
+        ConfigurationEngine.storeConfiguration("CSW", "default", config);
+
+
         final Map<String, Object> map = new HashMap<>();
         map.put("sos", new SOService());
         initServer(null, map);
@@ -70,7 +124,10 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        //finish();
+        
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
+        finish();
     }
 
     private static String getDefaultURL() {
@@ -91,7 +148,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         URL fedCatURL = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/csw/admin?request=setFederatedCatalog&id=csw2&servers=" + getDefaultURL());
         URLConnection conec = fedCatURL.openConnection();
 
-        Object obj = getStringResponse(conec);
+        getStringResponse(conec);
 
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL(getDefaultURL());
@@ -102,7 +159,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         final GetCapabilitiesType request = new GetCapabilitiesType("CSW");
 
         postRequestObject(conec, request);
-        obj = unmarshallResponse(conec);
+        Object obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof Capabilities);
 
@@ -449,5 +506,27 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
         assertEquals(result.getSchemaComponent().get(2).getTargetNamespace(), "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0");
         assertEquals(result.getSchemaComponent().get(3).getTargetNamespace(), "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
 
+    }
+
+    public static void writeDataFile(File dataDirectory, String resourceName) throws IOException {
+
+        final File dataFile;
+        if (System.getProperty("os.name", "").startsWith("Windows")) {
+            final String windowsIdentifier = resourceName.replace(':', '-');
+            dataFile = new File(dataDirectory, windowsIdentifier + ".xml");
+        } else {
+            dataFile = new File(dataDirectory, resourceName + ".xml");
+        }
+        FileWriter fw = new FileWriter(dataFile);
+        InputStream in = Util.getResourceAsStream("org/constellation/embedded/test/" + resourceName + ".xml");
+
+        byte[] buffer = new byte[1024];
+        int size;
+
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            fw.write(new String(buffer, 0, size));
+        }
+        in.close();
+        fw.close();
     }
 }

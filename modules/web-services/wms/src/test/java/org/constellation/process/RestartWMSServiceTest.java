@@ -16,6 +16,7 @@
  */
 package org.constellation.process;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
@@ -23,6 +24,9 @@ import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.process.service.RestartServiceTest;
+import org.geotoolkit.util.FileUtilities;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
  *
@@ -30,6 +34,16 @@ import org.constellation.process.service.RestartServiceTest;
  */
 public class RestartWMSServiceTest extends RestartServiceTest {
 
+    @BeforeClass
+    public static void createConfig () {
+        configDirectory = new File("WMSConfigTest");
+    }
+
+    @AfterClass
+    public static void deleteConfig () {
+        FileUtilities.deleteDirectory(configDirectory);
+    }
+    
     public RestartWMSServiceTest() {
         super("WMS", DefaultWMSWorker.class);
     }
@@ -39,7 +53,7 @@ public class RestartWMSServiceTest extends RestartServiceTest {
     protected void createInstance(final String identifier) {
         try {
             final LayerContext configuration = new LayerContext();
-            ConfigurationEngine.createConfiguration(serviceName, identifier, "layerContext.xml", configuration, null);
+            ConfigurationEngine.storeConfiguration(serviceName, identifier, configuration, null);
         } catch (JAXBException | IOException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }

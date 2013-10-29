@@ -54,7 +54,6 @@ public class SetConfigService extends AbstractProcess {
         Object configuration           = value(CONFIGURATION, inputParameters);
         final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
         final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
-        final String configFileName    = value(FILENAME, inputParameters);
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
@@ -66,7 +65,7 @@ public class SetConfigService extends AbstractProcess {
 
         //write configuration file.
         try {
-            ConfigurationEngine.storeConfiguration(serviceType, identifier, configFileName, configuration, serviceMetadata);
+            ConfigurationEngine.storeConfiguration(serviceType, identifier, configuration, serviceMetadata);
         } catch (JAXBException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
         } catch (IOException ex) {

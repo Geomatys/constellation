@@ -35,6 +35,7 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 
 import org.junit.*;
@@ -91,7 +92,6 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
             marshaller.marshal(query, filterFile);
 
             //we write the configuration file
-            File configFile = new File(instDirectory, "config.xml");
             Automatic SMLConfiguration = new Automatic();
             SMLConfiguration.setFormat("nosml");
 
@@ -99,7 +99,6 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
             pool.recycle(unmarshaller);
 
             OMConfiguration.getBdd().setConnectURL(url);
-
 
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(DataSourceType.GENERIC);
@@ -112,7 +111,8 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
-            marshaller.marshal(configuration, configFile);
+
+            ConfigurationEngine.storeConfiguration("SOS", "default", configuration);
 
         }
         pool.recycle(marshaller);
@@ -147,6 +147,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
         if (ds != null) {
             ds.shutdown();
         }
+        ConfigurationEngine.deleteConfiguration("SOS", "default");
     }
 
 

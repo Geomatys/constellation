@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.service.StartServiceTest;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
@@ -37,12 +36,7 @@ public class StartWMTSServiceTest extends StartServiceTest {
 
     @BeforeClass
     public static void createConfig () {
-        final File configDir = new File("WMTSConfigTest");
-        configDir.mkdir();
-        final File wmts = new File(configDir, "WMTS");
-        wmts.mkdir();
-
-        ConfigDirectory.setConfigDirectory(configDir);
+        configDirectory = new File("WMTSConfigTest");
     }
 
     @AfterClass
@@ -59,7 +53,7 @@ public class StartWMTSServiceTest extends StartServiceTest {
     protected void createInstance(final String identifier) {
         try {
             final LayerContext configuration = new LayerContext();
-            ConfigurationEngine.createConfiguration(serviceName, identifier, "layerContext.xml", configuration, null);
+            ConfigurationEngine.storeConfiguration(serviceName, identifier, configuration, null);
         } catch (JAXBException | IOException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }

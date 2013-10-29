@@ -16,6 +16,7 @@
  */
 package org.constellation.cite;
 
+import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,11 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.apache.sis.geometry.GeneralDirectPosition;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
@@ -44,7 +50,6 @@ import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.ResultTypeType;
 
 import org.junit.*;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.junit.Assert.*;
@@ -53,6 +58,7 @@ import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.*;
 import org.geotoolkit.db.postgres.PostgresFeatureStoreFactory;
+import org.geotoolkit.util.FileUtilities;
 
 
 /**
@@ -61,12 +67,31 @@ import org.geotoolkit.db.postgres.PostgresFeatureStoreFactory;
  */
 public class WFSCIteWorkerTest {
 
+    private static final File configDirectory = new File("WFSCIteWorkerTest");
+    
     private static WFSWorker worker;
 
     private XmlFeatureWriter featureWriter;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null),
+                                                   new Source("postgisSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+        config.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "default", config);
+
         initFeatureSource();
         worker = new DefaultWFSWorker("default");
         worker.setLogLevel(Level.FINER);
@@ -75,6 +100,8 @@ public class WFSCIteWorkerTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
     }
 
     @Before

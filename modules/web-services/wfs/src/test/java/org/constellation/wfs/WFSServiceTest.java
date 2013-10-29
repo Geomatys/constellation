@@ -29,9 +29,15 @@ import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 
@@ -50,7 +56,6 @@ import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.util.FileUtilities;
 
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptorGroup;
 
 // JUnit dependencies
 import org.junit.*;
@@ -62,8 +67,9 @@ import static org.junit.Assert.*;
  */
 public class WFSServiceTest {
 
-    private static WFSService service;
+    private static final File configDirectory = new File("WFSServiceTest");
 
+    private static WFSService service;
 
     private static DefaultDataSource ds = null;
 
@@ -76,6 +82,23 @@ public class WFSServiceTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null),
+                                                   new Source("postgisSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+        config.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "default", config);
+        
         initFeatureSource();
         service = new WFSService();
 
@@ -92,6 +115,9 @@ public class WFSServiceTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
+        
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         if (ds != null) {
             ds.shutdown();

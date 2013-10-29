@@ -20,11 +20,19 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.configuration.ProcessFactory;
+import org.constellation.configuration.Processes;
 import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 
 import org.junit.*;
@@ -37,9 +45,25 @@ import static org.junit.Assume.*;
  */
 public class WPSSoapRequestTest extends AbstractGrizzlyServer {
 
+    private static final File configDirectory = new File("WPSSoapRequestTest");
+
     @BeforeClass
     public static void initLayerList() throws Exception {
-        final Map<String, Object> map = new HashMap<String, Object>();
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
+        final Processes processes = new Processes(process);
+        final ProcessContext config = new ProcessContext(processes);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WPS", "default", config);
+        ConfigurationEngine.storeConfiguration("WPS", "test", config);
+        
+        final Map<String, Object> map = new HashMap<>();
         map.put("wps", new WPSService());
         initServer(new String[] {
             "org.constellation.wps.ws.rs",
@@ -48,7 +72,10 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutdown() {
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
+        finish();
     }
 
     /**

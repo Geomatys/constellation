@@ -16,14 +16,28 @@
  */
 package org.constellation.process;
 
+import java.io.File;
 import org.constellation.process.service.AddLayerToMapServiceTest;
 import org.constellation.wfs.ws.DefaultWFSWorker;
+import org.geotoolkit.util.FileUtilities;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
  *
  * @author Quentin Boileau (Geomatys)
  */
 public class AddLayerToWFSServiceTest extends AddLayerToMapServiceTest {
+
+    @BeforeClass
+    public static void createConfig () {
+        configDirectory = new File("WFSConfigTest");
+    }
+
+    @AfterClass
+    public static void deleteConfig () {
+        FileUtilities.deleteDirectory(configDirectory);
+    }
 
     public AddLayerToWFSServiceTest() {
         super("WFS", DefaultWFSWorker.class);

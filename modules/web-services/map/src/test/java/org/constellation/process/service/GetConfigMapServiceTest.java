@@ -43,28 +43,29 @@ public abstract class GetConfigMapServiceTest extends AbstractMapServiceTest {
      @Test
     public void testGetConfigWMS() throws ProcessException, NoSuchIdentifierException {
 
-        final List<Source> sources = new ArrayList<>();
-        sources.add(new Source("source1", Boolean.TRUE, null, null));
-        final Layers layers = new Layers(sources);
-        final LayerContext conf = new LayerContext(layers);
+        try {
+            final List<Source> sources = new ArrayList<>();
+            sources.add(new Source("source1", Boolean.TRUE, null, null));
+            final Layers layers = new Layers(sources);
+            final LayerContext conf = new LayerContext(layers);
 
-        createCustomInstance("getConfInstance5", conf);
+            createCustomInstance("getConfInstance5", conf);
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigServiceDescriptor.NAME);
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigServiceDescriptor.NAME);
 
-        //WMS
-        ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(GetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(GetConfigServiceDescriptor.IDENTIFIER_NAME).setValue("getConfInstance5");
-        in.parameter(GetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
-        in.parameter(GetConfigServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
+            //WMS
+            ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(GetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(GetConfigServiceDescriptor.IDENTIFIER_NAME).setValue("getConfInstance5");
+            in.parameter(GetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        ParameterValueGroup ouptuts = proc.call();
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            ParameterValueGroup ouptuts = proc.call();
 
-        assertEquals(conf, ouptuts.parameter(GetConfigServiceDescriptor.CONFIG_NAME).getValue());
-
-        deleteInstance( "getConfInstance5");
+            assertEquals(conf, ouptuts.parameter(GetConfigServiceDescriptor.CONFIG_NAME).getValue());
+        } finally {
+            deleteInstance( "getConfInstance5");
+        }
     }
 
     @Test
@@ -77,7 +78,6 @@ public abstract class GetConfigMapServiceTest extends AbstractMapServiceTest {
         in.parameter(GetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(GetConfigServiceDescriptor.IDENTIFIER_NAME).setValue("getConfInstance10");
         in.parameter(GetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
-        in.parameter(GetConfigServiceDescriptor.FILENAME_NAME).setValue("layerContext.xml");
 
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);

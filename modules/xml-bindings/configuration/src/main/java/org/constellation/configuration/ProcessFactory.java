@@ -40,6 +40,15 @@ public class ProcessFactory {
     @XmlElement
     private ProcessList exclude;
 
+    public ProcessFactory() {
+
+    }
+
+    public ProcessFactory(final String autorityCode, final Boolean loadAll) {
+        this.autorityCode = autorityCode;
+        this.loadAll = loadAll;
+    }
+
     /**
      * @return the autorityCode
      */

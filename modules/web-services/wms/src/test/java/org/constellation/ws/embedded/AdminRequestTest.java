@@ -25,9 +25,16 @@ import java.util.ArrayList;
 import java.net.URLConnection;
 import java.net.URL;
 import java.io.File;
+import java.util.Arrays;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.Language;
+import org.constellation.configuration.Languages;
+import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ServiceStatus;
 
@@ -43,12 +50,12 @@ import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.data.shapefile.ShapefileFolderFeatureStoreFactory;
 import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.util.FileUtilities;
 
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -58,11 +65,37 @@ import org.opengis.parameter.ParameterValueGroup;
 @RunWith(TestRunner.class)
 public class AdminRequestTest extends AbstractGrizzlyServer {
 
+    private static final File configDirectory = new File("AdminRequestTest");
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
     public static void start() throws JAXBException {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WMS", "default", config);
+
+        final List<Source> sources2 = Arrays.asList(new Source("coverageTestSrc", true, null, Arrays.asList(new Layer(new QName("SST_tests")))),
+                                                    new Source("shapeSrc", false, Arrays.asList(new Layer(new QName("http://www.opengis.net/gml","Lakes"))), null),
+                                                    new Source("postgisSrc", true, null, null));
+        final Layers layers2 = new Layers(sources2);
+        final LayerContext config2 = new LayerContext(layers2);
+        config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
+        config2.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WMS", "wms1", config2);
+
 
         initServer(new String[] {
             "org.constellation.map.ws.rs",
@@ -73,7 +106,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
         // Get the list of layers
         pool = GenericDatabaseMarshallerPool.getInstance();
 
-        final Configurator config = new Configurator() {
+        final Configurator configurator = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(final ProviderService service) {
 
@@ -128,7 +161,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        LayerProviderProxy.getInstance().setConfigurator(configurator);
     }
 
     @AfterClass
@@ -138,7 +171,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        //finish();
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
+        finish();
     }
 
     @Test

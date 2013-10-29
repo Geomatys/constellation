@@ -53,49 +53,58 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
     @Test
     public void testRestartOneNoClose() throws NoSuchIdentifierException, ProcessException {
 
+        LOGGER.info("TEST Restart One no close");
         createInstance("restartInstance1");
         startInstance("restartInstance1");
 
-        final int initSize = WSEngine.getInstanceSize(serviceName);
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
+        try {
+            final int initSize = WSEngine.getInstanceSize(serviceName);
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
-        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue("restartInstance1");
-        in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(false);
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        proc.call();
+            final ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue("restartInstance1");
+            in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(false);
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            proc.call();
 
-        assertTrue(WSEngine.getInstanceSize(serviceName) == initSize);
-        assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance1"));
-
-        deleteInstance("restartInstance1");
+            assertTrue(WSEngine.getInstanceSize(serviceName) == initSize);
+            assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance1"));
+        } finally {
+            deleteInstance("restartInstance1");
+        }
     }
 
     @Test
     public void testRestartOneClose() throws NoSuchIdentifierException, ProcessException {
 
+        LOGGER.info("TEST Restart One close");
+
         createInstance("restartInstance2");
         startInstance("restartInstance2");
 
-        final int initSize = WSEngine.getInstanceSize(serviceName);
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
+        try {
+            final int initSize = WSEngine.getInstanceSize(serviceName);
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
-        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue("restartInstance2");
-        in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(true);
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        proc.call();
+            final ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue("restartInstance2");
+            in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(true);
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            proc.call();
 
-        assertTrue(WSEngine.getInstanceSize(serviceName) == initSize);
-        assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance2"));
-
-        deleteInstance("restartInstance2");
+            assertTrue(WSEngine.getInstanceSize(serviceName) == initSize);
+            assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance2"));
+        } finally {
+            deleteInstance("restartInstance2");
+        }
     }
 
     @Test
     public void testRestartAllNoClose() throws NoSuchIdentifierException, ProcessException, InterruptedException {
+
+        LOGGER.info("TEST Restart all no close");
 
         startAllInstance();
         createInstance("restartInstance3");
@@ -103,55 +112,61 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         startInstance("restartInstance3");
         startInstance("restartInstance4");
 
-        final int initSize = WSEngine.getInstanceSize(serviceName);
-        final Set<String> instancesBefore = WSEngine.getInstanceNames(serviceName);
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
+        try {
+            final int initSize = WSEngine.getInstanceSize(serviceName);
+            final Set<String> instancesBefore = WSEngine.getInstanceNames(serviceName);
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
-        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(null);
-        in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(false);
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        proc.call();
-        Thread.sleep(1000);
+            final ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(null);
+            in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(false);
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            proc.call();
+            Thread.sleep(1000);
 
-        final int newSize =  WSEngine.getInstanceSize(serviceName);
-        final Set<String> instances = WSEngine.getInstanceNames(serviceName);
-        assertTrue("expected " + initSize + " (" +  instancesBefore + ") but was:" + newSize + "(" + instances + ")", newSize == initSize);
-        assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance3"));
-        assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance4"));
+            final int newSize =  WSEngine.getInstanceSize(serviceName);
+            final Set<String> instances = WSEngine.getInstanceNames(serviceName);
+            assertTrue("expected " + initSize + " (" +  instancesBefore + ") but was:" + newSize + "(" + instances + ")", newSize == initSize);
+            assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance3"));
+            assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance4"));
 
-        deleteInstance("restartInstance3");
-        deleteInstance("restartInstance4");
-
+        } finally {
+            deleteInstance("restartInstance3");
+            deleteInstance("restartInstance4");
+        }
     }
 
     @Test
     public void testRestartAllClose() throws NoSuchIdentifierException, ProcessException {
 
+        LOGGER.info("TEST Restart all close");
+        
         startAllInstance();
         createInstance("restartInstance5");
         createInstance("restartInstance6");
         startInstance("restartInstance5");
         startInstance("restartInstance6");
 
-        final int initSize = WSEngine.getInstanceSize(serviceName);
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
+        try {
+            final int initSize = WSEngine.getInstanceSize(serviceName);
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
-        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(null);
-        in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(true);
+            final ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(null);
+            in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(true);
 
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        proc.call();
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            proc.call();
 
-        assertTrue(WSEngine.getInstanceSize(serviceName) == initSize);
-        assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance5"));
-        assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance6"));
-
-        deleteInstance("restartInstance5");
-        deleteInstance("restartInstance6");
+            assertTrue(WSEngine.getInstanceSize(serviceName) == initSize);
+            assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance5"));
+            assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance6"));
+        } finally {
+            deleteInstance("restartInstance5");
+            deleteInstance("restartInstance6");
+        }
     }
 
     /**
@@ -159,21 +174,25 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
      */
     @Test
     public void testStart() throws NoSuchIdentifierException, ProcessException {
-        
+
+        LOGGER.info("TEST start");
+
         createInstance("restartInstance40");
-        final int initSize = WSEngine.getInstanceSize(serviceName);
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
+        try {
+            final int initSize = WSEngine.getInstanceSize(serviceName);
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
-        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue("restartInstance40");
+            final ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue("restartInstance40");
 
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        proc.call();
-        
-        assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance40"));
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            proc.call();
 
-        deleteInstance("restartInstance40");
+            assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance40"));
+        } finally {
+            deleteInstance("restartInstance40");
+        }
     }
 
     /**
@@ -183,6 +202,8 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
      */
     @Test
     public void testFailRestart2() throws NoSuchIdentifierException, ProcessException {
+        LOGGER.info("TEST fail Restart 2");
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();

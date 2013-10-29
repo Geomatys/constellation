@@ -43,7 +43,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     protected void createInstance(final String identifier, LayerContext context) {
         final LayerContext configuration = context != null ? context : new LayerContext();
         try {
-            ConfigurationEngine.createConfiguration(serviceName, identifier, "layerContext.xml", configuration, null);
+            ConfigurationEngine.storeConfiguration(serviceName, identifier, configuration, null);
         } catch (JAXBException | IOException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
@@ -63,7 +63,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
      */
     protected void createCustomInstance(final String identifier, LayerContext context) {
         try {
-            ConfigurationEngine.createConfiguration(serviceName, identifier, "layerContext.xml", context, null);
+            ConfigurationEngine.storeConfiguration(serviceName, identifier, context, null);
         }  catch (JAXBException | IOException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating custom instance", ex);
         }
@@ -77,7 +77,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     protected  LayerContext getConfig(final String identifier) {
         LayerContext context = null;
         try {
-            context = (LayerContext) ConfigurationEngine.getConfiguration(serviceName, identifier, "layerContext.xml");
+            context = (LayerContext) ConfigurationEngine.getConfiguration(serviceName, identifier);
         } catch (JAXBException | FileNotFoundException ex) {
             LOGGER.log(Level.SEVERE, "Error while getting configuration", ex);
         }

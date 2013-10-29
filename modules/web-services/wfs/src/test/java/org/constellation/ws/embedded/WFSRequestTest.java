@@ -46,6 +46,11 @@ import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirect
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.referencing.CRS;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.internal.sql.DefaultDataSource;
@@ -122,11 +127,41 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
     private static String EPSG_VERSION;
 
+    private static final File configDirectory = new File("WFSRequestTest");
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
     public static void initPool() throws JAXBException {
+        if (configDirectory.exists()) {
+            FileUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null),
+                                                   new Source("postgisSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+        config.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "default", config);
+        ConfigurationEngine.storeConfiguration("WFS", "test", config);
+
+        final List<Source> sources2 = Arrays.asList(new Source("shapeSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("smlSrc", true, null, null));
+        final Layers layers2 = new Layers(sources2);
+        final LayerContext config2 = new LayerContext(layers2);
+        config2.getCustomParameters().put("shiroAccessible", "false");
+        config2.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "test1", config2);
+
         initServer(new String[] {"org.constellation.wfs.ws.rs",
             "org.constellation.configuration.ws.rs",
             "org.constellation.ws.rs.provider"}, null);
@@ -141,7 +176,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
                          ":org.apache.sis.internal.jaxb.geometry"), null);
 
 
-       final Configurator config = new Configurator() {
+       final Configurator configurator = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(final ProviderService service) {
 
@@ -226,17 +261,19 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        LayerProviderProxy.getInstance().setConfigurator(configurator);
     }
 
     @AfterClass
     public static void shutDown() {
+        ConfigurationEngine.clearDatabase();
+        FileUtilities.deleteDirectory(configDirectory);
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
-        //finish();
+        finish();
     }
 
     @Test

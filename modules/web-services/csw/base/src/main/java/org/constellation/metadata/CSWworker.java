@@ -224,7 +224,7 @@ public class CSWworker extends AbstractWorker {
         isStarted = true;
         try {
             //we look if the configuration have been specified
-            final Object obj = ConfigurationEngine.getConfiguration(CSW, getId(), "config.xml");
+            final Object obj = ConfigurationEngine.getConfiguration(CSW, getId());
             if (obj instanceof Automatic) {
                 configuration = (Automatic) obj;
             } else {
@@ -1585,6 +1585,14 @@ public class CSWworker extends AbstractWorker {
         } else {
             throw new CstlServiceException("you must specify a source",
                                               MISSING_PARAMETER_VALUE, SOURCE);
+        }
+
+        try {
+            indexSearcher.refresh();
+            mdReader.clearCache();
+        } catch (IndexingException ex) {
+            throw new CstlServiceException("The service does not succeed to refresh the index after deleting documents:" + ex.getMessage(),
+                    NO_APPLICABLE_CODE);
         }
 
         LOGGER.log(logLevel, "Harvest operation finished");
