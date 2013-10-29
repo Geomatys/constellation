@@ -34,6 +34,7 @@ import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 
+import org.geotoolkit.coverage.DefaultCoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
@@ -125,7 +126,8 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
         }
 
         final String title = getName().getLocalPart();
-        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, 0, style, title);
+        final DefaultCoverageReference reference = new DefaultCoverageReference(reader, getName());
+        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reference, style);
         mapLayer.setDescription(STYLE_FACTORY.description(title,title));
 
         //search if we need an elevationmodel for style

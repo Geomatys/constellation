@@ -108,7 +108,7 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
             return;
         }
 
-        final String layerName = coverage.getLayer().getCoverageName().getLocalPart();
+        final String layerName = coverage.getLayer().getName();
         List<String> strs = coverages.get(layerName);
         if (strs == null) {
             strs = new ArrayList<String>();

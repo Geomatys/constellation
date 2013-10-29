@@ -94,7 +94,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
             return;
         }
 
-        final Name fullLayerName = coverage.getLayer().getCoverageName();
+        final Name fullLayerName = coverage.getLayer().getCoverageReference().getName();
         final String layerName = fullLayerName.getLocalPart();
 
         List<String> strs = values.get(layerName);

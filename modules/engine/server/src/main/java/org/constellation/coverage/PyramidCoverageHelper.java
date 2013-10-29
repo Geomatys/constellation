@@ -102,7 +102,7 @@ public class PyramidCoverageHelper {
 
         for (Name name : store.getNames()) {
             final CoverageReference ref = store.getCoverageReference(name);
-            final GridCoverageReader reader = ref.createReader();
+            final GridCoverageReader reader = ref.acquireReader();
 
             final GridCoverage2D coverage = (GridCoverage2D) reader.read(0, null);
             final GridGeometry2D gridGeometry = (GridGeometry2D) reader.getGridGeometry(ref.getImageIndex());

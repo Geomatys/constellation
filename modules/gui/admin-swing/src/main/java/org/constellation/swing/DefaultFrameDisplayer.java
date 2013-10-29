@@ -151,7 +151,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
             if (cStore != null) {
                 MutableStyle style = new DefaultStyleFactory().style(StyleConstants.DEFAULT_RASTER_SYMBOLIZER);
                 for (Name name : cStore.getNames()) {
-                    final MapLayer layer = MapBuilder.createCoverageLayer(cStore.getCoverageReference(name), style, name.getLocalPart());
+                    final MapLayer layer = MapBuilder.createCoverageLayer(cStore.getCoverageReference(name), style);
                     result.layers().add(layer);
                 }
                 //datastore
@@ -189,7 +189,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
             for (Name n : cs.getNames()) {
                 final CoverageReference ref = cs.getCoverageReference(n);
                 final CoverageMapLayer layer = MapBuilder.createCoverageLayer(ref,
-                        GO2Utilities.STYLE_FACTORY.style(StyleConstants.DEFAULT_RASTER_SYMBOLIZER), ref.getName().toString());
+                        GO2Utilities.STYLE_FACTORY.style(StyleConstants.DEFAULT_RASTER_SYMBOLIZER));
                 layer.setVisible(false);
                 context.layers().add(layer);
             }

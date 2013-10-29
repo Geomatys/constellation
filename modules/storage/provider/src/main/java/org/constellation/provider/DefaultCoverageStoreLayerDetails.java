@@ -51,7 +51,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 
 /**
- * Regroups information about a {@linkplain Layer layer}.
+ * Regroups information about a {@linkplain org.constellation.provider.LayerDetails layer}.
  *
  * @author Johann Sorel (Geomatys)
  */
@@ -79,7 +79,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
     public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension, final Double elevation,
                                       final Date time) throws DataStoreException, IOException
     {
-        final GridCoverageReader reader = ref.createReader();
+        final GridCoverageReader reader = ref.acquireReader();
 
         final GridCoverageReadParam param = new GridCoverageReadParam();
         param.setEnvelope(envelope);
@@ -102,10 +102,9 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
             style = getDefaultStyle();
         }
 
-        final MapLayer layer = MapBuilder.createCoverageLayer(
-                    ref,
-                    style,
-                    getName().getLocalPart());
+        final MapLayer layer;
+
+            layer = MapBuilder.createCoverageLayer(ref, style);
 
         // EXTRA FILTER extra parameter ////////////////////////////////////////
         if (params != null && layer instanceof DefaultCoverageMapLayer) {
@@ -126,7 +125,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
                 }
                 if (filter != null) {
                     final DefaultCoverageMapLayer cml = (DefaultCoverageMapLayer) layer;
-                    cml.setQuery(QueryBuilder.filtered(cml.getCoverageName(), filter));
+                    cml.setQuery(QueryBuilder.filtered(cml.getCoverageReference().getName(), filter));
                 }
             }
         }
@@ -233,7 +232,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
 
     @Override
     public Envelope getEnvelope() throws DataStoreException {
-        final GridCoverageReader reader = ref.createReader();
+        final GridCoverageReader reader = ref.acquireReader();
 
         try {
             final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
@@ -267,7 +266,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
 
     @Override
     public SpatialMetadata getSpatialMetadata() throws DataStoreException {
-        final GridCoverageReader reader = ref.createReader();
+        final GridCoverageReader reader = ref.acquireReader();
 
         try {
             return reader.getCoverageMetadata(0);
