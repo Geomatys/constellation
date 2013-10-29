@@ -33,7 +33,7 @@ public class VectorController {
 
     @View
     @Route("/vector/description")
-    public Response showVector(final String returnUrl) throws IOException {
+    public Response showVector(final String returnUrl, final String metadataUploaded) throws IOException {
         final DataInformation di = DataInformationContainer.getInformation();
         return vectorDescription.with().crs(di.getCrs()).returnURL(returnUrl).name(di.getName()).ok().withMimeType("text/html");
     }

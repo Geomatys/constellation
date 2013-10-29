@@ -344,13 +344,19 @@ public class Controller {
     @Resource
     @Route("/upload")
     public Response upload(final FileItem file, final FileItem metadataFile, final String dataType, final String returnURL) {
+        boolean metadataUploaded = false;
+        if(!metadataFile.getName().isEmpty()){
+            metadataUploaded = true;
+        }
+
+
         if (file != null) {
             DataInformation di;
             // Create file on temporary folder
             String tempDir = System.getProperty("java.io.tmpdir");
             final File newFile = new File(tempDir + "/" + file.getName());
             File newMetadataFile = null;
-            if(!metadataFile.getName().isEmpty()){
+            if(metadataUploaded){
                 newMetadataFile = new File(tempDir + "/" + metadataFile.getName());
             }
 
@@ -367,7 +373,7 @@ public class Controller {
                 }
 
 
-                if(!metadataFile.getName().isEmpty()){
+                if(metadataUploaded){
                     //open stream on metadata file
                     final InputStream metadataStream = metadataFile.getInputStream();
                     // write on file
@@ -389,10 +395,10 @@ public class Controller {
             Response aResponse = Response.error("response not initialized");
             switch (dataType) {
                 case "raster":
-                    aResponse = RasterController_.showRaster(returnURL);
+                    aResponse = RasterController_.showRaster(returnURL, metadataUploaded+"");
                     break;
                 case "vector":
-                    aResponse = VectorController_.showVector(returnURL);
+                    aResponse = VectorController_.showVector(returnURL, metadataUploaded+"");
             }
             return aResponse;
         } else {

@@ -46,10 +46,10 @@ public class DataController {
         Response aResponse = Response.error("response not initialized");
         switch(dataType){
             case "raster":
-                aResponse =  RasterController_.showRaster(returnURL);
+                aResponse =  RasterController_.showRaster(returnURL, "false");
                 break;
             case "vector":
-                aResponse = VectorController_.showVector(returnURL);
+                aResponse = VectorController_.showVector(returnURL, "false");
         }
         return aResponse;
     }
