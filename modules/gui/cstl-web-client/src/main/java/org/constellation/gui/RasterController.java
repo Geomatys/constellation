@@ -64,37 +64,42 @@ public class RasterController {
 
     @Action
     @Route("/raster/create")
-    public Response createProvider(String returnURL, DataMetadata metadataToSave, String date, String keywords) {
-        final Locale userLocale = Request.getCurrent().getUserContext().getLocale();
-        DateFormat formatDate = DateFormat.getDateInstance(DateFormat.SHORT, userLocale);
-        Date metadataDate = null;
-        try {
-            metadataDate = formatDate.parse(date);
-        } catch (ParseException e) {
-            LOGGER.log(Level.WARNING, "", e);
-        }
-        metadataToSave.setLocaleMetadata(userLocale.toString());
-        metadataToSave.setDate(metadataDate);
-        DataInformation information = informationContainer.getInformation();
+    public Response createProvider(String returnURL, DataMetadata metadataToSave, String date, String keywords, String metadataUploaded) {
 
+        DataInformation information = informationContainer.getInformation();
         String path = information.getPath();
         int lastPointIndex = path.lastIndexOf('.');
         String extension = path.substring(lastPointIndex+1, path.length());
 
-        metadataToSave.setDataPath(information.getPath());
-        metadataToSave.setType(information.getDataType());
+        boolean metadataUpload = Boolean.parseBoolean(metadataUploaded);
+        if(!metadataUpload){
+            final Locale userLocale = Request.getCurrent().getUserContext().getLocale();
+            DateFormat formatDate = DateFormat.getDateInstance(DateFormat.SHORT, userLocale);
+            Date metadataDate = null;
+            try {
+                metadataDate = formatDate.parse(date);
+            } catch (ParseException e) {
+                LOGGER.log(Level.WARNING, "can't parse data", e);
+            }
+            metadataToSave.setLocaleMetadata(userLocale.toString());
+            metadataToSave.setDate(metadataDate);
 
-        //split keywords
-        String[] keywordArray = keywords.split(",");
-        List<String> keywordList = new ArrayList<>(0);
-        for (int i = 0; i < keywordArray.length; i++) {
-            String keyword = keywordArray[i];
-            keywordList.add(keyword);
+
+            metadataToSave.setDataPath(information.getPath());
+            metadataToSave.setType(information.getDataType());
+
+            //split keywords
+            String[] keywordArray = keywords.split(",");
+            List<String> keywordList = new ArrayList<>(0);
+            for (int i = 0; i < keywordArray.length; i++) {
+                String keyword = keywordArray[i];
+                keywordList.add(keyword);
+            }
+            metadataToSave.setKeywords(keywordList);
+
+            //create pyramid, provider and metadata
+            providerManager.saveISO19115Metadata(metadataToSave);
         }
-        metadataToSave.setKeywords(keywordList);
-
-        //create pyramid, provider and metadata
-        providerManager.saveISO19115Metadata(metadataToSave);
 
         //if it's netCDF, we don't pyramid data
         if("nc".equalsIgnoreCase(extension)){

@@ -51,6 +51,7 @@
                     <div class="tab-pane" id="metadata">
                     </div>
                 </div>
+                <input type="hidden" name="metadataUploaded" value="${metadataUploaded}">
                 <button type="submit" class="btn btn-info pull-right" id="providerCreation"/>&{label.finish}</button>
             </form>
         </div>
