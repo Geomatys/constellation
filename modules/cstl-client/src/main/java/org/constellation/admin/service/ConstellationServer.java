@@ -1083,7 +1083,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public DataInformation uploadData(final File file, final File metadataFile, final String dataType){
             //create form body part
             final FormDataBodyPart fileBody = new FormDataBodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
-            final FormDataBodyPart metadataFileBody = new FormDataBodyPart(metadataFile, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+            final FormDataBodyPart metadataFileBody = new FormDataBodyPart(metadataFile, MediaType.TEXT_XML_TYPE);
             final FormDataBodyPart dataTypeBody = new FormDataBodyPart(dataType, MediaType.TEXT_PLAIN_TYPE);
 
 

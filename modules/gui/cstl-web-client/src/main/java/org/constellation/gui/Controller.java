@@ -369,7 +369,7 @@ public class Controller {
 
                 if(!metadataFile.getName().isEmpty()){
                     //open stream on metadata file
-                    final InputStream metadataStream = file.getInputStream();
+                    final InputStream metadataStream = metadataFile.getInputStream();
                     // write on file
                     final FileOutputStream metadataFos = new FileOutputStream(newMetadataFile);
                     intVal = metadataStream.read();

@@ -67,7 +67,6 @@ public class Data {
     /**
      * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
      *
-     * @param multi {@link MultiPart} with the file
      * @return A {@link Response} with 200 code if upload work, 500 if not work.
      */
     @POST
@@ -78,6 +77,7 @@ public class Data {
 
         String dataType = "";
         String fileName = "";
+        String metadataFileName = null;
         int extensionPoint = 0;
         InputStream uploadedInputStream = null;
         InputStream uploadedMetadataInputStream = null;
@@ -96,6 +96,7 @@ public class Data {
                 case "metadatafile":
                     BodyPartEntity bpeMetadata = (BodyPartEntity) bodyPart.getEntity();
                     uploadedMetadataInputStream = bpeMetadata.getInputStream();
+                    metadataFileName = bodyPart.getContentDisposition().getFileName();
                     break;
                 case "type":
                     dataType = bodyPart.getEntityAs(String.class);
@@ -106,15 +107,23 @@ public class Data {
         }
 
 
-        String dataName = fileName.substring(0, extensionPoint);
-        String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath() + "/" + dataName;
-        String uploadedFileName = uploadedFileLocation + "/" + fileName;
+        //prepare save data
+        final String dataName = fileName.substring(0, extensionPoint);
+        final String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath() + "/" + dataName;
+        final String uploadedFileName = uploadedFileLocation + "/" + fileName;
+
+        //prepare save metadata
+        final String uploadMetadataLocation = ConfigDirectory.getMetadataDirectory().getAbsolutePath();
+        final String uploadedMetadataFileName = uploadMetadataLocation + "/" + metadataFileName;
+
+
         DataInformation information;
 
         // save it
         try {
             File file = UploadUtilities.writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName);
-            information = MetadataUtilities.generateMetadatasInformation(file, dataType);
+            File metadataFile = UploadUtilities.writeToFile(uploadedMetadataInputStream, uploadMetadataLocation, uploadedMetadataFileName);
+            information = MetadataUtilities.generateMetadatasInformation(file, metadataFile, dataType);
             information.setName(dataName);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when saving file", e);
@@ -248,7 +257,7 @@ public class Data {
         final File root = ConfigDirectory.getDataDirectory();
         final File choosingFile = new File(root, filePath);
         if (choosingFile.exists()) {
-            DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, dataType);
+            DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, null, dataType);
             return Response.status(200).entity(information).build();
         }
         return Response.status(418).build();
