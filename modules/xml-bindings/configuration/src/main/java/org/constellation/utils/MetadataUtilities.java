@@ -155,12 +155,6 @@ public final class MetadataUtilities {
      * @throws CoverageStoreException
      */
     public static DataInformation getRasterDataInformation(final File file, final File metadataFile, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
-
-        //global initialization
-        Setup.initialize(null);
-        //force loading all image readers/writers
-        ImageIO.scanForPlugins();
-
         GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
 
         if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {

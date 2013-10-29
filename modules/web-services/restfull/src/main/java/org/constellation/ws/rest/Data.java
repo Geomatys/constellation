@@ -4,6 +4,7 @@ import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.content.DefaultCoverageDescription;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
@@ -21,10 +22,13 @@ import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.constellation.utils.UploadUtilities;
+import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.process.ProcessListener;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.content.RangeDimension;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
@@ -298,11 +302,10 @@ public class Data {
         mf.feed(metadataToSave);
 
 
-
         //Save metadata
         final File dataFile = new File(metadataToSave.getDataPath());
         int extensionStart = dataFile.getName().lastIndexOf(".");
-        String dataName = dataFile.getName().substring(0,extensionStart);
+        String dataName = dataFile.getName().substring(0, extensionStart);
         MetadataUtilities.saveMetaData(dm, dataName);
         return Response.status(200).build();
     }
@@ -348,6 +351,48 @@ public class Data {
         }
         return Response.status(200).build();
     }
+
+
+    /**
+     * Send an ArrayList which contains coverage list from a file
+     *
+     * @param path
+     * @return an {@link java.util.ArrayList}
+     */
+    @POST
+    @Path("coverage/list/")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getCoverageList(final SimpleValue path) {
+        File choosenFile = new File(path.getValue());
+        if (choosenFile.exists()) {
+            try {
+                final GridCoverageReader coverageReader = CoverageIO.createSimpleReader(choosenFile);
+
+                //Search on Metadata to found description
+                final List contents = (List) coverageReader.getMetadata().getContentInfo();
+                final HashMap<String, String> coveragesDescription = new HashMap<>(0);
+                for (Object contentObj : contents) {
+                    if (contentObj instanceof DefaultCoverageDescription) {
+                        DefaultCoverageDescription coverageDesc = (DefaultCoverageDescription) contentObj;
+                        for (RangeDimension rangeDimension : coverageDesc.getDimensions()) {
+                            coveragesDescription.put(rangeDimension.getSequenceIdentifier().toString(), rangeDimension.getDescriptor().toString());
+                        }
+                    }
+                }
+
+                //Send String Map via REST
+                ParameterValues pv = new ParameterValues(coveragesDescription);
+                return Response.ok(pv).build();
+            } catch (CoverageStoreException e) {
+                LOGGER.log(Level.WARNING, "Error when try to read coverage list", e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     @GET
     @Path("pyramid/{id}/folder/")
