@@ -1,7 +1,6 @@
 package org.constellation.coverage;
 
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
@@ -36,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
+import org.constellation.admin.ConfigurationEngine;
 
 /**
  * Helper class to ease the pyramid process.
@@ -44,7 +44,7 @@ import java.util.concurrent.CancellationException;
  */
 public class PyramidCoverageHelper {
 
-    private CoverageStore store;
+    private final CoverageStore store;
     private CoverageStore outputCoverageStore;
     private PyramidCoverageBuilder pyramidCoverageBuilder;
     private String baseCoverageName;
@@ -113,16 +113,10 @@ public class PyramidCoverageHelper {
             final double widthGeometry = gridGeometry.getExtent2D().getWidth();
             final double heightGeometry = gridGeometry.getExtent2D().getHeight();
 
-
-            double userWidth = 500;
-            double userHeight = 500;
-
-            if(ConfigDirectory.CSTL_PROPERTIES!=null){
-                String pictureHeight = ConfigDirectory.CSTL_PROPERTIES.getProperty("picture_max_height", "500");
-                String pictureWidth = ConfigDirectory.CSTL_PROPERTIES.getProperty("picture_max_width", "500");
-                userWidth = Double.parseDouble(pictureWidth);
-                userHeight = Double.parseDouble(pictureHeight);
-            }
+            final String pictureHeight = ConfigurationEngine.getConstellationProperty("picture_max_height", "500");
+            final String pictureWidth  = ConfigurationEngine.getConstellationProperty("picture_max_width", "500");
+            final double userWidth     = Double.parseDouble(pictureWidth);
+            final double userHeight    = Double.parseDouble(pictureHeight);
 
             //If coverage size higher than user selected size else add on an other list to create separate file
             if (widthGeometry > userWidth || heightGeometry > userHeight) {
@@ -231,6 +225,7 @@ public class PyramidCoverageHelper {
             this.builder = builder;
         }
 
+        @Override
         public WithOutput outputFormat(String output) {
             builder.outputFormat = output;
             return this;
@@ -238,6 +233,7 @@ public class PyramidCoverageHelper {
 
         abstract CoverageStore createOutputStore() throws DataStoreException;
 
+        @Override
         public PyramidCoverageHelper build() throws DataStoreException {
             PyramidCoverageHelper helper = new PyramidCoverageHelper(builder);
 
@@ -255,26 +251,29 @@ public class PyramidCoverageHelper {
 
         Builder builder;
 
-        public WithInputImpl(Builder builder) {
+        public WithInputImpl(final Builder builder) {
             this.builder = builder;
         }
 
-        public WithOutput toFileStore(String path) throws MalformedURLException {
-            WithFileOutput fileOutput = new WithFileOutput(builder);
+        @Override
+        public WithOutput toFileStore(final String path) throws MalformedURLException {
+            final WithFileOutput fileOutput = new WithFileOutput(builder);
             fileOutput.tileFolder = new File(path, "tiles").toURI().toURL();
             builder.output = fileOutput;
             return fileOutput;
         }
 
+        @Override
         public WithOutput toMemoryStore() {
-            WithMemoryOutput memoryOutput = new WithMemoryOutput(builder);
+            final WithMemoryOutput memoryOutput = new WithMemoryOutput(builder);
             builder.output = memoryOutput;
             return memoryOutput;
         }
 
+        @Override
         public WithPGOutput toPostGisStore(String databaseName, String login,
                                            String password) {
-            WithPGOutputImpl pgOutput = new WithPGOutputImpl(builder);
+            final WithPGOutputImpl pgOutput = new WithPGOutputImpl(builder);
             pgOutput.pgDatabaseName = databaseName;
             pgOutput.pgLogin = login;
             pgOutput.pgPassword = password;
@@ -300,8 +299,8 @@ public class PyramidCoverageHelper {
                 super(builder);
             }
 
-            protected CoverageStore createOutputStore()
-                    throws DataStoreException {
+            @Override
+            protected CoverageStore createOutputStore() throws DataStoreException {
 
                 final XMLCoverageStoreFactory factory = new XMLCoverageStoreFactory();
                 Map<String, Serializable> parameters = new HashMap<>();
@@ -328,8 +327,7 @@ public class PyramidCoverageHelper {
 
         }
 
-        public static class WithPGOutputImpl extends WithOutputImpl implements
-                WithPGOutput {
+        public static class WithPGOutputImpl extends WithOutputImpl implements WithPGOutput {
             private String pgPassword;
             private String pgLogin;
             private String pgDatabaseName;
@@ -341,21 +339,25 @@ public class PyramidCoverageHelper {
                 super(builder);
             }
 
+            @Override
             public WithPGOutput withHostname(String hostname) {
                 this.pgHostname = hostname;
                 return this;
             }
 
+            @Override
             public WithPGOutput withPgPort(int port) {
                 this.pgPort = port;
                 return this;
             }
 
+            @Override
             public WithPGOutput withSchema(String schema) {
                 this.pgSchema = schema;
                 return this;
             }
 
+            @Override
             protected CoverageStore createOutputStore()
                     throws DataStoreException {
 
@@ -388,11 +390,12 @@ public class PyramidCoverageHelper {
 
         public URL imageFile;
 
-        public WithFileInput(Builder builder) {
+        public WithFileInput(final Builder builder) {
             super(builder);
         }
 
-        protected CoverageStore buildInputStore(String inputFormat)
+        @Override
+        protected CoverageStore buildInputStore(final String inputFormat)
                 throws DataStoreException {
 
             final ParameterValueGroup params = FileCoverageStoreFactory.PARAMETERS_DESCRIPTOR

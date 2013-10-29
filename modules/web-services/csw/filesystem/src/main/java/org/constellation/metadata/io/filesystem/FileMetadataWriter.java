@@ -81,12 +81,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      */
     public FileMetadataWriter(final Automatic configuration, final AbstractIndexer index) throws MetadataIoException {
         super(index);
-        File dataDir = configuration.getDataDirectory();
-        if (!dataDir.exists()) {
-            final File configDir = configuration.getConfigurationDirectory();
-            dataDir = new File(configDir, dataDir.getName());
-        }
-        dataDirectory = dataDir;
+        dataDirectory = configuration.getDataDirectory();
         if (dataDirectory == null || !dataDirectory.isDirectory()) {
             throw new MetadataIoException("Unable to find the data directory", NO_APPLICABLE_CODE);
         }

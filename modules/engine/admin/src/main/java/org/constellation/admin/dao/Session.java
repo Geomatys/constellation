@@ -172,6 +172,8 @@ public final class Session implements Closeable {
     private static final String UPDATE_TASK               = "task.update";
     private static final String DELETE_TASK               = "task.delete";
 
+    private static final String READ_PROPERTY             = "properties.read";
+    private static final String WRITE_PROPERTY            = "properties.write";
 
     /**
      * Wrapper database {@link Connection} instance.
@@ -966,6 +968,22 @@ public final class Session implements Closeable {
     public void deleteTask(final String identifier) throws SQLException {
         ensureNonNull("identifier", identifier);
         new Query(DELETE_TASK).with(identifier).update();
+    }
+
+    /**************************************************************************
+     *                          properties table queries                            *
+     **************************************************************************/
+
+    public String readProperty(final String key) throws SQLException {
+        ensureNonNull("key", key);
+        return new Query(READ_PROPERTY).with(key).select().getFirstAt(1, String.class);
+    }
+
+    public void writeProperty(final String key, final String value) throws SQLException {
+        ensureNonNull("key", key);
+
+        // Proceed to insertion.
+        new Query(WRITE_PROPERTY).with(key, value).insert();
     }
 
 

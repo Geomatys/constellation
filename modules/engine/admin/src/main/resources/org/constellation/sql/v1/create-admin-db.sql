@@ -156,3 +156,9 @@ CREATE TABLE "admin"."task"(
 
 ALTER TABLE "admin"."task" ADD CONSTRAINT task_pk       PRIMARY KEY ("identifier");
 ALTER TABLE "admin"."task" ADD CONSTRAINT task_owner_fk FOREIGN KEY ("owner") REFERENCES "admin"."user"("login");
+
+CREATE TABLE "admin"."properties"(
+  "key"    VARCHAR(32) NOT NULL,
+  "value"  VARCHAR(64) NOT NULL
+);
+ALTER TABLE "admin"."properties" ADD CONSTRAINT properties_pk PRIMARY KEY ("key");

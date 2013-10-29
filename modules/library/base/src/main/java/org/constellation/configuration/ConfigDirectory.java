@@ -72,11 +72,10 @@ public final class ConfigDirectory {
         if (propertiesFile.exists()) {
             try {
                 Properties prop = FileUtilities.getPropertiesFromFile(propertiesFile);
-                CSTL_PROPERTIES = prop;
 
-                USER_DIRECTORY = prop.getProperty("configuration_directory");
-                DATA_DIRECTORY = prop.getProperty("data_directory");
-                METADATA_DIRECTORY=prop.getProperty("metadata_directory");
+                USER_DIRECTORY    = prop.getProperty("configuration_directory");
+                DATA_DIRECTORY    = prop.getProperty("data_directory");
+                METADATA_DIRECTORY= prop.getProperty("metadata_directory");
             } catch (IOException ex) {
                 LOGGER.warning("IOException while reading the constellation properties file");
             }
@@ -90,7 +89,6 @@ public final class ConfigDirectory {
     public static String USER_DIRECTORY = null;
     public static String DATA_DIRECTORY = null;
     public static String METADATA_DIRECTORY = null;
-    public static Properties CSTL_PROPERTIES = null;
     /**
      * Specifies if the process is running on a Glassfish application server.
      */

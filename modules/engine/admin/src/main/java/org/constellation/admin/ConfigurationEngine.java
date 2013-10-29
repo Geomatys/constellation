@@ -321,4 +321,21 @@ public class ConfigurationEngine {
         clearDatabase();
         ConfigDirectory.setConfigDirectory(null);
     }
+
+    public static String getConstellationProperty(final String key, final String defaultValue) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final String value = session.readProperty(key);
+            if (value == null) {
+                return defaultValue;
+            }
+            return value;
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred getting constellation property", ex);
+        } finally {
+            if (session != null) session.close();
+        }
+        return defaultValue;
+    }
 }
