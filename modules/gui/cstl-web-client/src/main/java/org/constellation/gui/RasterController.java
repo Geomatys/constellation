@@ -10,7 +10,9 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
 import org.constellation.dto.MetadataLists;
+import org.constellation.dto.ParameterValues;
 import org.constellation.gui.service.ProviderManager;
+import org.constellation.gui.templates.netcdf_coverage_listing;
 import org.constellation.gui.templates.raster_description;
 
 import javax.inject.Inject;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +43,10 @@ public class RasterController {
     @Inject
     @Path("raster_description.gtmpl")
     raster_description rasterDescription;
+
+    @Inject
+    @Path("netcdf_coverage_listing.gtmpl")
+    netcdf_coverage_listing netcdf_coverageListing;
 
 //    @Inject
     public DataInformationContainer informationContainer;
@@ -73,43 +80,63 @@ public class RasterController {
 
         boolean metadataUpload = Boolean.parseBoolean(metadataUploaded);
         if(!metadataUpload){
-            final Locale userLocale = Request.getCurrent().getUserContext().getLocale();
-            DateFormat formatDate = DateFormat.getDateInstance(DateFormat.SHORT, userLocale);
-            Date metadataDate = null;
-            try {
-                metadataDate = formatDate.parse(date);
-            } catch (ParseException e) {
-                LOGGER.log(Level.WARNING, "can't parse data", e);
-            }
-            metadataToSave.setLocaleMetadata(userLocale.toString());
-            metadataToSave.setDate(metadataDate);
-
-
-            metadataToSave.setDataPath(information.getPath());
-            metadataToSave.setType(information.getDataType());
-
-            //split keywords
-            String[] keywordArray = keywords.split(",");
-            List<String> keywordList = new ArrayList<>(0);
-            for (int i = 0; i < keywordArray.length; i++) {
-                String keyword = keywordArray[i];
-                keywordList.add(keyword);
-            }
-            metadataToSave.setKeywords(keywordList);
-
-            //create pyramid, provider and metadata
-            providerManager.saveISO19115Metadata(metadataToSave);
+            saveEditedMetadata(metadataToSave, date, keywords, information);
         }
 
         //if it's netCDF, we don't pyramid data
         if("nc".equalsIgnoreCase(extension)){
             providerManager.createProvider("coverage-file", information.getName(), information.getPath(), information.getDataType(), null);
+            return RasterController_.getNetCDFListing(returnURL, information.getPath());
         }else{
             providerManager.pyramidData(information.getName(), information.getPath());
             final String pyramidPath = providerManager.getPyramidPath(information.getName());
             providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null);
+            return Response.redirect(returnURL);
         }
 
-        return Response.redirect(returnURL);
+    }
+
+    @View
+    @Route("/netcdf/listing")
+    public Response getNetCDFListing(final String returnUrl, final String filePath){
+        ParameterValues coveragesPV = providerManager.getCoverageList(filePath);
+        Map<String, String> coveragesMap = coveragesPV.getValues();
+        return netcdf_coverageListing.with().coveragesMap(coveragesMap).ok();
+    }
+
+    /**
+     * Save Metadata if it was edited (not given by user)
+     * @param metadataToSave {@link org.constellation.dto.DataMetadata} which define global metadata except date and keywords
+     * @param date data date
+     * @param keywords data keywords
+     * @param information information receive from server.
+     */
+    private void saveEditedMetadata(final DataMetadata metadataToSave, final String date, final String keywords, final DataInformation information) {
+        final Locale userLocale = Request.getCurrent().getUserContext().getLocale();
+        DateFormat formatDate = DateFormat.getDateInstance(DateFormat.SHORT, userLocale);
+        Date metadataDate = null;
+        try {
+            metadataDate = formatDate.parse(date);
+        } catch (ParseException e) {
+            LOGGER.log(Level.WARNING, "can't parse data", e);
+        }
+        metadataToSave.setLocaleMetadata(userLocale.toString());
+        metadataToSave.setDate(metadataDate);
+
+
+        metadataToSave.setDataPath(information.getPath());
+        metadataToSave.setType(information.getDataType());
+
+        //split keywords
+        String[] keywordArray = keywords.split(",");
+        List<String> keywordList = new ArrayList<>(0);
+        for (int i = 0; i < keywordArray.length; i++) {
+            String keyword = keywordArray[i];
+            keywordList.add(keyword);
+        }
+        metadataToSave.setKeywords(keywordList);
+
+        //create pyramid, provider and metadata
+        providerManager.saveISO19115Metadata(metadataToSave);
     }
 }

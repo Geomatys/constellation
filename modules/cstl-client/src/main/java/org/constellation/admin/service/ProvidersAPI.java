@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
@@ -176,11 +177,10 @@ public final class ProvidersAPI {
         return list.getList();
     }
 
-    public DataInformation loadData(final String filePath, final String name, final String dataType) throws IOException {
+    public DataInformation loadData(final String filePath, final String dataType) throws IOException {
         ParameterValues pv = new ParameterValues();
         HashMap<String, String> parameters = new HashMap<>(0);
         parameters.put("filePath", filePath);
-        parameters.put("name", name);
         parameters.put("dataType", dataType);
         pv.setValues(parameters);
 
@@ -227,5 +227,11 @@ public final class ProvidersAPI {
     public String getPyramidPath(final String providerName) throws IOException {
         SimpleValue sentValue = client.get("data/pyramid/"+providerName+"/folder", MediaType.APPLICATION_XML_TYPE).getEntity(SimpleValue.class);
         return sentValue.getValue();
+    }
+
+    public ParameterValues getCoverageList(final String filePath) throws IOException {
+        SimpleValue simpleValuePath = new SimpleValue(filePath);
+        ParameterValues coverageList = client.post("data/coverage/list/", MediaType.APPLICATION_XML_TYPE, simpleValuePath).getEntity(ParameterValues.class);
+        return coverageList;
     }
 }

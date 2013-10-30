@@ -28,6 +28,7 @@ import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Database;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.MetadataLists;
+import org.constellation.dto.ParameterValues;
 import org.constellation.gui.service.bean.LayerData;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -39,6 +40,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -193,9 +195,9 @@ public class ProviderManager {
         return new ArrayList<>(0);
     }
 
-    public DataInformation loadData(final String filePath, final String name, final String dataType) {
+    public DataInformation loadData(final String filePath, final String dataType) {
         try {
-            return cstl.openClient().providers.loadData(filePath, name, dataType);
+            return cstl.openClient().providers.loadData(filePath, dataType);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when try to found data on file", e);
         }
@@ -232,6 +234,15 @@ public class ProviderManager {
             return cstl.openClient().providers.getPyramidPath(providerName);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when call web service to know pyramid data path", e);
+        }
+        return null;
+    }
+
+    public ParameterValues getCoverageList(final String filePath) {
+        try {
+            return cstl.openClient().providers.getCoverageList(filePath);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to find coverage list", e);
         }
         return null;
     }
