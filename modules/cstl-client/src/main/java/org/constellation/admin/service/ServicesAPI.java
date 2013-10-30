@@ -257,4 +257,16 @@ public final class ServicesAPI {
         final String path = "MAP/" + serviceType + "/" + identifier + "/layer";
         client.put(path, MediaType.APPLICATION_XML_TYPE, layer).ensure2xxStatus();
     }
+
+    /**
+     * Return a complete URL for the specified service (wms, wfs, csw,...) and
+     * instance identifier.
+     *
+     * @param service The service name (wms, wfs, csw,...).
+     * @param instanceId The instance identifier.
+     * @return A complete URL for the specified service.
+     */
+    public String getInstanceURL(final String service, final String instanceId) {
+        return client.getUrl() + service.toLowerCase() + '/' + instanceId;
+    }
 }

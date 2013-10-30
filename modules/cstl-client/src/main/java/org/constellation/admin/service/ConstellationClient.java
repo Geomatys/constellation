@@ -111,6 +111,10 @@ public final class ConstellationClient {
         this.providers  = new ProvidersAPI(this);
     }
 
+    public String getUrl() {
+        return url;
+    }
+
     /**
      * Authenticates an user before trying to communicate with the Constellation server.
      *

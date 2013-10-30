@@ -21,7 +21,6 @@ import javax.imageio.spi.ServiceRegistry;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Properties;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -73,7 +72,7 @@ public class SOSFactoryTest {
 
         final BDD bdd            = new BDD("org.postgresql.driver", "SomeUrl", "boby", "gary");
         final Automatic config   = new Automatic("postgrid", bdd);
-        final Map<String, Object> parameters = new HashMap<String, Object>();
+        final Map<String, Object> parameters = new HashMap<>();
         parameters.put(OMFactory.OBSERVATION_ID_BASE, "idbase");
         parameters.put(OMFactory.OBSERVATION_TEMPLATE_ID_BASE, "templateIdBase");
         parameters.put(OMFactory.SENSOR_ID_BASE, "sensorBase");
@@ -83,7 +82,7 @@ public class SOSFactoryTest {
             ObservationFilter of = omFactory.getObservationFilter(DataSourceType.GENERIC, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getMessage(), "Unable to find affinage.xml");
+            assertEquals(ex.getMessage(), "Unable to find the filter queries part");
         }
         assertTrue(exLaunched);
 

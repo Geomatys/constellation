@@ -21,13 +21,11 @@ package org.constellation.sos.ws;
 import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.generic.database.Query;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
@@ -60,24 +58,10 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
         sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
 
+        ConfigurationEngine.setupTestEnvironement("GPGSOSWorkerTest");
 
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
-        Marshaller marshaller =  pool.acquireMarshaller();
-
-        final File configDir = ConfigurationEngine.setupTestEnvironement("GPGSOSWorkerTest");
-
-        File CSWDirectory  = new File(configDir, "SOS");
-        CSWDirectory.mkdir();
-        final File instDirectory = new File(CSWDirectory, "default");
-        instDirectory.mkdir();
-
-
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-
-        //we write the configuration file
-        File filterFile = new File(instDirectory, "affinage.xml");
-        Query query = (Query) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/affinage.xml"));
-        marshaller.marshal(query, filterFile);
 
         //we write the configuration file
         Automatic SMLConfiguration = new Automatic();
@@ -103,7 +87,6 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
         ConfigurationEngine.storeConfiguration("SOS", "default", configuration);
 
-        pool.recycle(marshaller);
         init();
         worker = new SOSworker("default");
         worker.setServiceUrl(URL);

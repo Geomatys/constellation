@@ -359,8 +359,11 @@ public class ConfigurationEngine {
     }
 
     /**
-     * Load a metadata for a providerId
+     * Load a metadata for a provider.
+     * 
      * @param providerId
+     * @param pool
+     * @return
      */
     public static DefaultMetadata loadMetadata(final String providerId, final MarshallerPool pool){
         try {
