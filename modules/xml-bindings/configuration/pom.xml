@@ -104,16 +104,8 @@
   -->
     <dependencies>
         <dependency>
-            <groupId>org.mdweb.metamodel</groupId>
-            <artifactId>mdweb-metamodel-lib-auth</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-utility-pending</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-utility-jdbc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
@@ -129,7 +121,6 @@
             <artifactId>juzu-core</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -142,7 +133,6 @@
         <dependency>
             <groupId>org.opengis</groupId>
             <artifactId>geoapi-conformance</artifactId>
-            <version>${geoapi.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -152,22 +142,5 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-shapefile</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-xml-csw</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-processing-metadata</artifactId>
-        </dependency>
     </dependencies>
-
 </project>

@@ -4,20 +4,16 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.geotoolkit.lang.Setup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -31,9 +27,7 @@ import org.opengis.util.GenericName;
 import org.opengis.util.NoSuchIdentifierException;
 import org.w3c.dom.Node;
 
-import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileFilter;
@@ -42,9 +36,9 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 
 /**
  * Utility class to do some operation on metadata file (generate, revover, ...)
@@ -57,48 +51,6 @@ import java.util.logging.Logger;
 public final class MetadataUtilities {
 
     private static final Logger LOGGER = Logger.getLogger(MetadataUtilities.class.getName());
-
-    /**
-     * Save metadata on specific folder
-     * @param fileMetadata
-     * @param dataName
-     */
-    public static void saveMetaData(final DefaultMetadata fileMetadata, final String dataName) {
-        try {
-            //Get metadata folder
-            final File metadataFolder = ConfigDirectory.getMetadataDirectory();
-            final Marshaller m = CSWMarshallerPool.getInstance().acquireMarshaller();
-            final File metadataFile = new File(metadataFolder, dataName + ".xml");
-            m.marshal(fileMetadata, metadataFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(m);
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "metadata not saved", ex);
-        }
-    }
-
-    /**
-     * Load a metadata for a providerId
-     * @param providerId
-     */
-    public static DefaultMetadata loadMetadata(String providerId){
-        //Get metadata folder
-
-        try {
-            final File metadataFolder = ConfigDirectory.getMetadataDirectory();
-            final Unmarshaller m = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-            final File metadataFile = new File(metadataFolder, providerId + ".xml");
-            if(metadataFile.exists()){
-                final DefaultMetadata metadata = (DefaultMetadata) m.unmarshal(metadataFile);
-                return metadata;
-            }
-        } catch (JAXBException e) {
-            LOGGER.log(Level.WARNING, "metadata not loaded", e);
-        }
-
-        return null;
-    }
-
-
 
     /**
      * Generate {@link org.constellation.dto.DataInformation} for require file data

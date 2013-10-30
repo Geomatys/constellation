@@ -317,7 +317,7 @@ public abstract class AbstractWorker implements Worker {
         Service metadata = capabilities.get(key);
         if (metadata == null) {
             try {
-                metadata = ConfigurationEngine.readMetadata(getId(), service, language);
+                metadata = ConfigurationEngine.readServiceMetadata(getId(), service, language);
                 capabilities.put(key, metadata);
             } catch (JAXBException | IOException ex) {
                 LOGGER.log(Level.WARNING, "An error occurred when trying to read the service metadata. Returning default capabilities.", ex);

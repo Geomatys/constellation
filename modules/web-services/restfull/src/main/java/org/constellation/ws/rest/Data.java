@@ -3,11 +3,14 @@ package org.constellation.ws.rest;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
+
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.content.DefaultCoverageDescription;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
+
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
@@ -22,10 +25,13 @@ import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.constellation.utils.UploadUtilities;
+
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.process.ProcessListener;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
+
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.content.RangeDimension;
@@ -305,8 +311,8 @@ public class Data {
         //Save metadata
         final File dataFile = new File(metadataToSave.getDataPath());
         int extensionStart = dataFile.getName().lastIndexOf(".");
-        String dataName = dataFile.getName().substring(0, extensionStart);
-        MetadataUtilities.saveMetaData(dm, dataName);
+        String dataName = dataFile.getName().substring(0,extensionStart);
+        ConfigurationEngine.saveMetaData(dm, dataName, CSWMarshallerPool.getInstance());
         return Response.status(200).build();
     }
 

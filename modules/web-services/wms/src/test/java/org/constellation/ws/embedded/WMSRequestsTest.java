@@ -177,7 +177,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         serviceEng.setServiceContact(ct);
         serviceEng.setVersions(Arrays.asList("1.1.1", "1.3.0"));
 
-        ConfigurationEngine.writeMetadata("wms1", "WMS", serviceEng, "eng");
+        ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceEng, "eng");
 
         final Service serviceFre = new Service();
         serviceFre.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
@@ -187,7 +187,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         serviceFre.setServiceConstraints(cstr);
         serviceFre.setServiceContact(ct);
         serviceFre.setVersions(Arrays.asList("1.1.1", "1.3.0"));
-        ConfigurationEngine.writeMetadata("wms1", "WMS", serviceFre, "fre");
+        ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceFre, "fre");
     
 
         initServer(new String[] {

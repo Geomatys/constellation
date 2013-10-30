@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -120,7 +121,7 @@ public class ConfigurationEngine {
     public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj, final Service metadata) throws JAXBException, IOException {
         storeConfiguration(serviceType, serviceID, null, obj,  GenericDatabaseMarshallerPool.getInstance());
         if (metadata != null) {
-            writeMetadata(serviceID, serviceType, metadata, null);
+            writeServiceMetadata(serviceID, serviceType, metadata, null);
         }
     }
 
@@ -235,7 +236,7 @@ public class ConfigurationEngine {
         }
     }
 
-    public static void writeMetadata(final String identifier, final String serviceType, final Service metadata, String language) throws IOException, JAXBException {
+    public static void writeServiceMetadata(final String identifier, final String serviceType, final Service metadata, String language) throws IOException, JAXBException {
         ensureNonNull("metadata", metadata);
 
         if (language == null) {
@@ -262,7 +263,7 @@ public class ConfigurationEngine {
         }
     }
 
-    public static Service readMetadata(final String identifier, final String serviceType, String language) throws IOException, JAXBException {
+    public static Service readServiceMetadata(final String identifier, final String serviceType, String language) throws IOException, JAXBException {
         ensureNonNull("identifier",  identifier);
         ensureNonNull("serviceType", serviceType);
         if (language == null) {
@@ -337,5 +338,44 @@ public class ConfigurationEngine {
             if (session != null) session.close();
         }
         return defaultValue;
+    }
+
+    /**
+     * Save metadata on specific folder
+     * @param fileMetadata
+     * @param dataName
+     */
+    public static void saveMetaData(final DefaultMetadata fileMetadata, final String dataName, final MarshallerPool pool) {
+        try {
+            //Get metadata folder
+            final File metadataFolder = ConfigDirectory.getMetadataDirectory();
+            final Marshaller m = pool.acquireMarshaller();
+            final File metadataFile = new File(metadataFolder, dataName + ".xml");
+            m.marshal(fileMetadata, metadataFile);
+            pool.recycle(m);
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "metadata not saved", ex);
+        }
+    }
+
+    /**
+     * Load a metadata for a providerId
+     * @param providerId
+     */
+    public static DefaultMetadata loadMetadata(final String providerId, final MarshallerPool pool){
+        try {
+            final File metadataFolder = ConfigDirectory.getMetadataDirectory();
+            final Unmarshaller m = pool.acquireUnmarshaller();
+            final File metadataFile = new File(metadataFolder, providerId + ".xml");
+            if(metadataFile.exists()){
+                final DefaultMetadata metadata = (DefaultMetadata) m.unmarshal(metadataFile);
+                pool.recycle(m);
+                return metadata;
+            }
+
+        } catch (JAXBException e) {
+            LOGGER.log(Level.WARNING, "metadata not loaded", e);
+        }
+        return null;
     }
 }
