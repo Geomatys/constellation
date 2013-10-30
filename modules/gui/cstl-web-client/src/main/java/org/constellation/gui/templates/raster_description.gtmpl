@@ -11,7 +11,7 @@
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
-        <img src="../images/constellation.png"/>
+        <a href="@{index()}"><img src="../images/constellation.png"/></a>
     </div>
 </div>
 
@@ -37,7 +37,7 @@
             </ul>
 
             <form class="form-horizontal" id="metadataForm"
-                  action="@{ RasterController.createProvider(returnURL= returnURL)}" method="post">
+                  action="@{RasterController.createProvider(returnURL= returnURL)}" method="post">
                 <div class="tab-content">
                     <% if(metadataUploaded.equalsIgnoreCase("false")){%>
                         <div class="tab-pane" id="requiredISO19115">

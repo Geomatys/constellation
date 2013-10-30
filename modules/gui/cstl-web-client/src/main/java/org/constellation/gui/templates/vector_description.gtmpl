@@ -6,7 +6,7 @@
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
-        <img src="../images/constellation.png"/>
+        <a href="@{index()}"><img src="../images/constellation.png"/></a>
     </div>
 </div>
 <div class="row">
