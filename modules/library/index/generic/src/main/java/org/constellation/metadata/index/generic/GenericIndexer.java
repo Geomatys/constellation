@@ -154,7 +154,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         if ("unknow".equals(identifier)) {
             throw new IndexingException("unexpected metadata type.");
         }
-        doc.add(new Field("id", identifier,  Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("id", identifier,  ftna));
     }
 
     /**

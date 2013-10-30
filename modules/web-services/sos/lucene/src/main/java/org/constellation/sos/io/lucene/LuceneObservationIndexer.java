@@ -28,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -68,7 +69,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
      * @param serviceID  The identifier, if there is one, of the index/service.
      */
     public LuceneObservationIndexer(final Automatic configuration, final String serviceID, final boolean create) throws IndexingException {
-        super(serviceID, configuration.getConfigurationDirectory(), new WhitespaceAnalyzer(Version.LUCENE_40));
+        super(serviceID, configuration.getConfigurationDirectory(), new WhitespaceAnalyzer(Version.LUCENE_45));
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             observationDirectory = new File(dataDirectory, "observations");
@@ -115,7 +116,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
         int nbTemplate    = 0;
         try {
             final Unmarshaller unmarshaller = SOSMarshallerPool.getInstance().acquireUnmarshaller();
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_45, analyzer);
             final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
 
             // getting the objects list and index avery item in the IndexWriter.
@@ -178,29 +179,32 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
         // make a new, empty document
         final Document doc = new Document();
 
-        doc.add(new Field("id",      observation.getName(),        Field.Store.YES, Field.Index.ANALYZED));
+        final FieldType ft = new FieldType();
+        ft.setIndexed(true);
+        ft.setStored(true);
+        doc.add(new Field("id", observation.getName(), ft));
         if (observation instanceof MeasurementType) {
-            doc.add(new Field("type",    "measurement" , Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("type", "measurement" , ft));
         } else {
-            doc.add(new Field("type",    "observation" , Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("type", "observation" , ft));
         }
-        doc.add(new Field("procedure",   ((Process)observation.getProcedure()).getHref(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("procedure", ((Process)observation.getProcedure()).getHref(), ft));
 
-        doc.add(new Field("observed_property",   ((Phenomenon)observation.getObservedProperty()).getName(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("observed_property",   ((Phenomenon)observation.getObservedProperty()).getName(), ft));
 
-        doc.add(new Field("feature_of_interest",   ((AbstractGML)observation.getFeatureOfInterest()).getId(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("feature_of_interest", ((AbstractGML)observation.getFeatureOfInterest()).getId(), ft));
 
         try {
             final TemporalObject time = observation.getSamplingTime();
             if (time instanceof Period) {
                 final Period period = (Period) time;
-                doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(period.getBeginning().getPosition()), Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field("sampling_time_end",   Utils.getLuceneTimeValue(period.getEnding().getPosition()), Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field("sampling_time_begin", Utils.getLuceneTimeValue(period.getBeginning().getPosition()), ft));
+                doc.add(new Field("sampling_time_end",   Utils.getLuceneTimeValue(period.getEnding().getPosition()), ft));
 
             } else if (time instanceof Instant) {
                 final Instant instant = (Instant) time;
-                doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(instant.getPosition()), Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field("sampling_time_end",    "NULL", Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(instant.getPosition()), ft));
+                doc.add(new Field("sampling_time_end",    "NULL", ft));
 
             } else if (time != null) {
                 LOGGER.log(Level.WARNING, "unrecognized sampling time type:{0}", time);
@@ -209,12 +213,12 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
             LOGGER.severe("error while indexing sampling time.");
         }
         if (template) {
-            doc.add(new Field("template", "TRUE", Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("template", "TRUE", ft));
         } else {
-            doc.add(new Field("template", "FALSE", Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("template", "FALSE", ft));
         }
         // add a default meta field to make searching all documents easy
-	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
+	doc.add(new Field("metafile", "doc", ft));
 
         return doc;
     }

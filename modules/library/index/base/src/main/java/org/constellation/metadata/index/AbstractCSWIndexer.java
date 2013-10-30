@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 import java.util.logging.Level;
 
 // Apache Lucene dependencies
@@ -35,6 +34,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
@@ -59,6 +59,20 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     protected static final DateFormat LUCENE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
 
     private final Map<String, List<String>> additionalQueryable;
+
+    protected static final FieldType ftna = new FieldType();
+    static {
+        ftna.setTokenized(false);
+        ftna.setStored(true);
+        ftna.setIndexed(true);
+    }
+
+    protected static final FieldType ft = new FieldType();
+    static {
+        ft.setTokenized(true);
+        ft.setStored(true);
+        ft.setIndexed(true);
+    }
 
     /**
      * Build a new CSW metadata indexer.
@@ -103,7 +117,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     protected Document createDocument(final A metadata, final int docId) throws IndexingException {
         // make a new, empty document
         final Document doc = new Document();
-        doc.add(new Field("docid", docId + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("docid", docId + "", ftna));
 
         indexSpecialField(metadata, doc);
 
@@ -118,22 +132,22 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             //we add the geometry parts
             alreadySpatiallyIndexed = indexSpatialPart(doc, metadata, isoQueryable, 268435540);
             
-            doc.add(new Field("objectType", "MD_Metadata", Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("objectType", "MD_Metadata", ft));
 
         } else if (isEbrim30(metadata)) {
            // TODO
-            doc.add(new Field("objectType", "Ebrim", Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("objectType", "Ebrim", ft));
         } else if (isEbrim25(metadata)) {
             // TODO
-            doc.add(new Field("objectType", "Ebrim", Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("objectType", "Ebrim", ft));
         } else if (isFeatureCatalogue(metadata)) {
             final Map<String, List<String>> fcQueryable = removeOverridenField(ISO_FC_QUERYABLE);
             indexQueryableSet(doc, metadata, fcQueryable, anyText);
             
-            doc.add(new Field("objectType", "FC_FeatureCatalogue", Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("objectType", "FC_FeatureCatalogue", ft));
         } else if (isDublinCore(metadata)) {
             
-            doc.add(new Field("objectType", "Record", Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("objectType", "Record", ft));
         } else {
             LOGGER.log(Level.WARNING, "unknow Object classe unable to index: {0}", getType(metadata));
         }
@@ -152,10 +166,10 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         indexQueryableSet(doc, metadata, additionalQueryable, anyText);
 
         // add a default meta field to make searching all documents easy
-        doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("metafile", "doc",ft));
 
         //we add the anyText values
-        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("AnyText", anyText.toString(),   ft));
 
         return doc;
     }
@@ -205,8 +219,8 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      * @param doc
      */
     protected void indexField(final String fieldName, final String stringValue, final StringBuilder anyText, final Document doc) {
-        final Field field        = new Field(fieldName, stringValue, Field.Store.YES, Field.Index.ANALYZED);
-        final Field fieldSort    = new Field(fieldName + "_sort", stringValue, Field.Store.YES, Field.Index.NOT_ANALYZED);
+        final Field field        = new Field(fieldName, stringValue, ft);
+        final Field fieldSort    = new Field(fieldName + "_sort", stringValue, ftna);
         if (!stringValue.equals(NULL_VALUE) && anyText.indexOf(stringValue) == -1) {
             anyText.append(stringValue).append(" ");
         }
