@@ -19,6 +19,7 @@ package org.constellation.provider.coveragesgroup;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -31,23 +32,30 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import org.constellation.ServiceDef.Query;
 import org.constellation.provider.AbstractLayerDetails;
 import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
+
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.display2d.GO2Utilities;
+import org.geotoolkit.filter.visitor.DefaultFilterVisitor;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
+
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.PropertyName;
@@ -174,26 +182,40 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
     private void setFilter(final MapItem item, final Filter filter) {
         if (item instanceof FeatureMapLayer) {
             final FeatureMapLayer fml = (FeatureMapLayer) item;
-            if (filter instanceof PropertyIsEqualTo) {
-                final Collection<PropertyDescriptor> propsDesc = fml.getCollection().getFeatureType().getDescriptors();
-                final String propName = ((PropertyName)((PropertyIsEqualTo)filter).getExpression1()).getPropertyName();
+            final PropertyIsEqualToFilterVisitor myVisit = new PropertyIsEqualToFilterVisitor();
+            // load PropertyIsEqualTo filters
+            filter.accept(myVisit, null);
 
+            // Remove filters that can't apply to this layer.
+            for (int i=myVisit.props.size() - 1; i>=0; i--) {
+                final PropertyIsEqualTo tempProp = myVisit.props.get(i);
+                final Collection<PropertyDescriptor> propsDesc = fml.getCollection().getFeatureType().getDescriptors();
+                final String propName = ((PropertyName)(tempProp).getExpression1()).getPropertyName();
+                boolean found = false;
                 for (PropertyDescriptor prop : propsDesc) {
-                    // If the feature type for the collection contains the property,
-                    // we can apply this filter to this collection.
                     if (prop.getName().getLocalPart().equalsIgnoreCase(propName)) {
-                        fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filter));
-                        return;
+                        found = true;
+                        break;
                     }
                 }
-
-                // Property not found in the feature type, just filter on feature type name
-                fml.setQuery(QueryBuilder.all(fml.getCollection().getFeatureType().getName()));
-                return;
+                if (!found) {
+                    myVisit.props.remove(tempProp);
+                }
             }
 
-            // Just apply the filter
-            fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filter));
+            final Filter newFilter;
+            if (myVisit.props.isEmpty()) {
+                newFilter = Filter.INCLUDE;
+            } else if (myVisit.props.size() == 1) {
+                newFilter = myVisit.props.get(0);
+            } else {
+                newFilter = GO2Utilities.FILTER_FACTORY.and((List) myVisit.props);
+            }
+
+            final QueryBuilder qb = new QueryBuilder(fml.getQuery());
+            qb.setFilter(newFilter);
+            fml.setQuery(qb.buildQuery());
+
             return;
         }
 
@@ -209,7 +231,7 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
 
     @Override
     public boolean isQueryable(Query query) {
-        return false;
+        return true;
     }
 
     @Override
@@ -217,4 +239,17 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
         return TYPE.COVERAGE;
     }
 
+    /**
+     * Visitor to find {@link PropertyIsEqualTo} filters in a {@link And} filter.
+     */
+    private class PropertyIsEqualToFilterVisitor extends DefaultFilterVisitor {
+        private final List<PropertyIsEqualTo> props = new ArrayList<PropertyIsEqualTo>();
+
+        @Override
+        public Object visit(PropertyIsEqualTo filter, Object data) {
+            props.add(filter);
+            return super.visit(filter, data);
+        }
+
+    }
 }
