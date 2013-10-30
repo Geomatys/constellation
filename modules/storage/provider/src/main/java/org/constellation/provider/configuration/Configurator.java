@@ -71,7 +71,7 @@ public interface Configurator {
                 session = EmbeddedDatabase.createSession();
 
                 // look for deleted providers
-                final List<ProviderRecord> records = session.readProviders();
+                final List<ProviderRecord> records = session.readProviders(serviceName);
                 for (ProviderRecord record : records) {
                     boolean remove = true;
                     for (Provider provider : providers) {
