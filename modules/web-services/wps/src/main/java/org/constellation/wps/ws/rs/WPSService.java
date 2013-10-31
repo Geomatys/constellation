@@ -233,7 +233,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
             return adaptKvpExecuteRequest();
         }
         throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                INVALID_PARAMETER_VALUE, REQUEST_PARAMETER.toLowerCase());
+                OPERATION_NOT_SUPPORTED, REQUEST_PARAMETER.toLowerCase());
     }
 
     /**

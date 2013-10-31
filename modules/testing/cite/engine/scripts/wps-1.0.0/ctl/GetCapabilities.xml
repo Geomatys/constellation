@@ -138,8 +138,8 @@
     <ctl:test name="getCapabilities:core-WPS.GetCapabilities-KVPRequestRequestParameterHandling.1">
         <ctl:param name="serviceURL"/>
         <ctl:param name="exceptionReportSchema"/>
-        <ctl:assertion>The server returns a valid error report message with an exceptionCode of InvalidRequest when the request key value is not GetCapabilities.</ctl:assertion>
-        <ctl:comment>Check the server returns a valid error report message with an exceptionCode of InvalidRequest when the request key value is not GetCapabilities.  Pass if the server returns a valid error report message with an exception code of InvalideParameterValue; fail otherwise.</ctl:comment>
+        <ctl:assertion>The server returns a valid error report message with an exceptionCode of OperationNotSupported when the request key value is not GetCapabilities.</ctl:assertion>
+        <ctl:comment>Check the server returns a valid error report message with an exceptionCode of OperationNotSupported when the request key value is not GetCapabilities.  Pass if the server returns a valid error report message with an exception code of OperationNotSupported fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the server handles invalid request key values correctly.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.GetCapabilities-KVPRequestRequestParameterHandling</ctl:link>
         <ctl:code>
             <xsl:variable name="invalidRequestValue" select="'GetMeASandwich'"/>
@@ -170,12 +170,12 @@
                     <ctl:fail/>
                 </xsl:when>
 				<!-- check for correct exception code -->
-                <xsl:when test="not(wpsFunctions:exceptionCode($thisRequest) = 'InvalidParameterValue')">
+                <xsl:when test="not(wpsFunctions:exceptionCode($thisRequest) = 'OperationNotSupported')">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($thisRequest))"/>
                     </ctl:message>
-                    <ctl:message>Exception code should be: 'InvalidParameterValue'.</ctl:message>
+                    <ctl:message>Exception code should be: 'OperationNotSupported'.</ctl:message>
                     <ctl:fail/>
                 </xsl:when>
                 <xsl:when test="not(contains(lower-case(wpsFunctions:exceptionCodeLocator($thisRequest)), 'request'))">
