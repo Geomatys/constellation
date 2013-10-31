@@ -113,8 +113,8 @@
     </sch:p>
     <sch:rule id="RequiredCommonParameters" context="//ows:OperationsMetadata">
       <sch:assert id="ServiceParameter" 
-        test="ows:Parameter[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='service']/ows:Value = 'http://www.opengis.net/cat/csw/2.0.2'">
-	Missing mandatory service parameter, "http://www.opengis.net/cat/csw/2.0.2".
+        test="ows:Parameter[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='service']/ows:Value = 'CSW'">
+	Missing mandatory service parameter, "CSW".
       </sch:assert>
       <sch:assert id="VersionParameter" 
         test="ows:Parameter[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='version']/ows:Value = '2.0.2'">

@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ctl:package 
+<ctl:package
     xmlns:getCapabilities="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/GetCapabilities.xml"
     xmlns:wpsFunctions="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/functions.xml"
-    xmlns:ctl="http://www.occamlab.com/ctl" 
-    xmlns:html="http://www.w3.org/1999/xhtml" 	
-    xmlns:saxon="http://saxon.sf.net/" 
-    xmlns:tep="http://teamengine.sourceforge.net/parsers" 
-    xmlns:xi="http://www.w3.org/2001/XInclude" 
+    xmlns:ctl="http://www.occamlab.com/ctl"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:tep="http://teamengine.sourceforge.net/parsers"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:parsers="http://www.occamlab.com/te/parsers"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xows="http://www.opengeospatial.net/ows"
-    xmlns:ows="http://www.opengis.net/ows/1.1" 
-    xmlns:gml="http://www.opengis.net/gml" 
+    xmlns:ows="http://www.opengis.net/ows/1.1"
+    xmlns:gml="http://www.opengis.net/gml"
     xmlns:wps="http://www.opengis.net/wps/1.0.0"
     xmlns:xml="http://www.w3.org/XML/1998/namespace">
 
-		
 
-<!--*****************************************************************************************************************************************************************************-->		
+
+<!--*****************************************************************************************************************************************************************************-->
     <ctl:test name="getCapabilities:core-WPS.GetCapabilities-KVPRequestParameterHandling.1">
         <ctl:param name="serviceURL"/>
         <ctl:param name="exceptionReportSchema"/>
         <ctl:assertion>The server returns a valid error report message with an exceptionCode of MissingParameterValue when mandatory parameters are missing from the request. </ctl:assertion>
         <ctl:comment>Check that the server returns a valid error report message with an exception code of MissingParameterValue when mandatory parameters are missing from the request.  Pass if the server returns a valid error report message with an exception code of MissingParameterValue; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the server handles missing parameters correctly.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.GetCapabilities-KVPRequestParameterHandling</ctl:link>
-        <ctl:code>				
+        <ctl:code>
             <xsl:variable name="thisRequest">
                 <ctl:message select="'Making GetCapabilities request with no &quot;service&quot; parameter...'"/>
-                <ctl:message>and no version parameter</ctl:message>				
+                <ctl:message>and no version parameter</ctl:message>
                 <ctl:request>
                     <ctl:url>
                         <xsl:value-of select="$serviceURL"/>
                     </ctl:url>
-                    <ctl:method>get</ctl:method>						
+                    <ctl:method>get</ctl:method>
                     <ctl:param name="request">GetCapabilities</ctl:param>
-					<!-- leaving out the "service" parameter -->		
-                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">							
+					<!-- leaving out the "service" parameter -->
+                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">
                         <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>
                     </ctl:call-function>
-                </ctl:request>	
-            </xsl:variable>										
+                </ctl:request>
+            </xsl:variable>
             <xsl:choose>
 				<!-- check for valid schema or missing response-->
                 <xsl:when test="not($thisRequest/*)">
@@ -57,7 +57,7 @@
                     </ctl:message>
                     <ctl:message>Exception code should be: 'MissingParameterValue'.</ctl:message>
                     <ctl:fail/>
-                </xsl:when>			
+                </xsl:when>
                 <xsl:when test="not(contains(lower-case(wpsFunctions:exceptionCodeLocator($thisRequest)), 'service'))">
                     <ctl:message>Invalid locator.</ctl:message>
                     <ctl:message>
@@ -65,14 +65,14 @@
                     </ctl:message>
                     <ctl:message>Locator value should be: 'service'.</ctl:message>
                     <ctl:fail/>
-                </xsl:when>				
-				
+                </xsl:when>
+
 				<!-- looks good -->
                 <xsl:otherwise>
                     <ctl:message>OK</ctl:message>
                 </xsl:otherwise>
-            </xsl:choose>					
-			
+            </xsl:choose>
+
         </ctl:code>
     </ctl:test>
 	<!--*****************************************************************************************************************************************************************************-->
@@ -82,7 +82,7 @@
         <ctl:assertion>The server returns a valid error report message with an exceptionCode of InvalidParameterValue when the service key value is not WPS. </ctl:assertion>
         <ctl:comment>Check the server returns a valid error report message with an exception code of InvalidParameterValue when the service key value is not WPS.  Pass if the server returns a valid error report message with an exception code of InvalideParameterValue; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the server handles invalid service key values correctly.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.GetCapabilities-KVPRequestServiceParameterHandling</ctl:link>
-        <ctl:code>		
+        <ctl:code>
             <xsl:variable name="invalidServiceValue" select = "'XYZ'"/>
             <ctl:message select="concat('Making GetCapabilities request with &quot;service&quot; parameter value of &quot;',
 										$invalidServiceValue, '&quot;...')"/>
@@ -92,17 +92,17 @@
                     <ctl:url>
                         <xsl:value-of select="$serviceURL"/>
                     </ctl:url>
-                    <ctl:method>get</ctl:method>						
+                    <ctl:method>get</ctl:method>
                     <ctl:param name="request">GetCapabilities</ctl:param>
                     <ctl:param name="service">
                         <xsl:value-of select="$invalidServiceValue"/>
-                    </ctl:param>  <!-- Invalid service parameter -->					
-                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">		
+                    </ctl:param>  <!-- Invalid service parameter -->
+                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">
                         <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>
                     </ctl:call-function>
-                </ctl:request>							
-            </xsl:variable>										
-			
+                </ctl:request>
+            </xsl:variable>
+
             <xsl:choose>
 				<!-- check for valid schema or missing response-->
                 <xsl:when test="not($thisRequest/*)">
@@ -126,7 +126,7 @@
                     </ctl:message>
                     <ctl:message>Locator value should be: 'service'.</ctl:message>
                     <ctl:fail/>
-                </xsl:when>					
+                </xsl:when>
 				<!-- looks good -->
                 <xsl:otherwise>
                     <ctl:message>OK</ctl:message>
@@ -134,34 +134,34 @@
             </xsl:choose>
         </ctl:code>
     </ctl:test>
-	<!--*****************************************************************************************************************************************************************************-->		
+	<!--*****************************************************************************************************************************************************************************-->
     <ctl:test name="getCapabilities:core-WPS.GetCapabilities-KVPRequestRequestParameterHandling.1">
         <ctl:param name="serviceURL"/>
-        <ctl:param name="exceptionReportSchema"/>			
+        <ctl:param name="exceptionReportSchema"/>
         <ctl:assertion>The server returns a valid error report message with an exceptionCode of InvalidRequest when the request key value is not GetCapabilities.</ctl:assertion>
         <ctl:comment>Check the server returns a valid error report message with an exceptionCode of InvalidRequest when the request key value is not GetCapabilities.  Pass if the server returns a valid error report message with an exception code of InvalideParameterValue; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the server handles invalid request key values correctly.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.GetCapabilities-KVPRequestRequestParameterHandling</ctl:link>
         <ctl:code>
             <xsl:variable name="invalidRequestValue" select="'GetMeASandwich'"/>
             <ctl:message select="concat('Making GetCapabilities request with &quot;request&quot; parameter value of &quot;',
-										$invalidRequestValue, '&quot;...')"/>	
+										$invalidRequestValue, '&quot;...')"/>
             <ctl:message>and no version parameter</ctl:message>
             <xsl:variable name="thisRequest">
                 <ctl:request>
                     <ctl:url>
                         <xsl:value-of select="$serviceURL"/>
                     </ctl:url>
-                    <ctl:method>get</ctl:method>						
+                    <ctl:method>get</ctl:method>
                     <ctl:param name="request">
                         <xsl:value-of select="$invalidRequestValue"/>
                     </ctl:param> <!-- Invalid request parameter -->
-                    <ctl:param name="service">WPS</ctl:param>  								
-				
-                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">		
+                    <ctl:param name="service">WPS</ctl:param>
+
+                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">
                         <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>
-                    </ctl:call-function>		
+                    </ctl:call-function>
                 </ctl:request>
-            </xsl:variable>										
+            </xsl:variable>
             <xsl:choose>
 				<!-- check for valid schema or missing response-->
                 <xsl:when test="not($thisRequest/*)">
@@ -178,14 +178,14 @@
                     <ctl:message>Exception code should be: 'InvalidParameterValue'.</ctl:message>
                     <ctl:fail/>
                 </xsl:when>
-                <xsl:when test="not(contains(lower-case(wpsFunctions:exceptionCodeLocator($thisRequest)), 'request'))">								
+                <xsl:when test="not(contains(lower-case(wpsFunctions:exceptionCodeLocator($thisRequest)), 'request'))">
                     <ctl:message>Invalid locator.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Locator is: ', wpsFunctions:exceptionCodeLocator($thisRequest))"/>
                     </ctl:message>
                     <ctl:message>Locator value should be: 'request'.</ctl:message>
                     <ctl:fail/>
-                </xsl:when>				
+                </xsl:when>
 				<!-- looks good -->
                 <xsl:otherwise>
                     <ctl:message>OK</ctl:message>
@@ -193,15 +193,15 @@
             </xsl:choose>
         </ctl:code>
     </ctl:test>
-		
-	<!--*****************************************************************************************************************************************************************************-->		
+
+	<!--*****************************************************************************************************************************************************************************-->
 
     <ctl:test name="getCapabilities:core-WPS.GetCapabilities-OperationsMetadataMandatoryOperations.1">
-        <ctl:param name="capabilitiesDocument"/>			
+        <ctl:param name="capabilitiesDocument"/>
         <ctl:assertion>The OperationsMetadata section lists the mandatory operations of the WPS.</ctl:assertion>
         <ctl:comment>Check that the OperationsMetadata section lists the mandatory operations of the WPS.  Pass if assertion holds; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the OperationsMetadata section advertises the mandatory operations of the WPS.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.GetCapabilities-OperationsMetadataMandatoryOperations</ctl:link>
-        <ctl:code>				
+        <ctl:code>
             <xsl:choose>
                 <xsl:when test="not($capabilitiesDocument//ows:Operation[@name='GetCapabilities'])
 								or not($capabilitiesDocument//ows:Operation[@name='DescribeProcess'])
@@ -215,35 +215,35 @@
 					<!-- check for missing DescribeSensor -->
                     <xsl:if test="not($capabilitiesDocument//ows:OperationsMetadata/ows:Operation[@name='DescribeProcess'])">
                         <ctl:message>Missing required operation 'DescribeProcess'</ctl:message>
-						
+
                     </xsl:if>
 					<!-- check for missing GetObservation -->
                     <xsl:if test="not($capabilitiesDocument//ows:OperationsMetadata/ows:Operation[@name='Execute'])">
                         <ctl:message>Missing required operation 'Execute'</ctl:message>
                         <ctl:fail/>
-                    </xsl:if>					
+                    </xsl:if>
                     <ctl:fail/>
                 </xsl:when>
 					<!-- looks good -->
                 <xsl:otherwise>
                     <ctl:message>OK</ctl:message>
-                </xsl:otherwise>					
+                </xsl:otherwise>
             </xsl:choose>
         </ctl:code>
     </ctl:test>
-		
+
 	<!--*****************************************************************************************************************************************************************************-->
-		
+
     <ctl:test name="getCapabilities:core-WPS.GetCapabilities-ResponseContentsValidProccesIdentifier.1">
         <ctl:param name="capabilitiesDocument"/>
         <ctl:assertion>The values in the identifier element(s) for each Process contain a value and are valid URNs.</ctl:assertion>
         <ctl:comment>Check that the values in the identifier element(s) for each Process contain a value and are valid URNs according to the OGC URN scheme.  Pass if values in the procedure element(s) contain a value and are valid URNs; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the procedure values provided for each Process are valid.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.GetCapabilities-ResponseContentsValidProcedure</ctl:link>
-        <ctl:code>			
-		
-            <xsl:for-each select="$capabilitiesDocument//wps:Process//ows:Identifier">				
-			
-                <xsl:variable name="thisURN"> 
+        <ctl:code>
+
+            <xsl:for-each select="$capabilitiesDocument//wps:Process//ows:Identifier">
+
+                <xsl:variable name="thisURN">
                     <xsl:value-of select="."/>
                 </xsl:variable>
                 <xsl:choose>
@@ -258,5 +258,5 @@
             </xsl:for-each>
         </ctl:code>
     </ctl:test>
-	
+
 </ctl:package>
