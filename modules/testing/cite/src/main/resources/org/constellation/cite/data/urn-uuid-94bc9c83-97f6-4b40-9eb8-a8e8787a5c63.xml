@@ -5,8 +5,8 @@
   xmlns:dct="http://purl.org/dc/terms/"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <dc:identifier>urn:uuid:94bc9c83-97f6-4b40-9eb8-a8e8787a5c63</dc:identifier>
-    <dc:type>http://purl.org/dc/dcmitype/Dataset</dc:type>
     <dc:title>Mauris sed neque</dc:title>
+    <dc:type>http://purl.org/dc/dcmitype/Dataset</dc:type>
     <dc:subject scheme="http://www.digest.org/2.1">Vegetation-Cropland</dc:subject>
     <dct:abstract>Curabitur lacinia, ante non porta tempus, mi lorem feugiat odio, eget suscipit eros pede ac velit.</dct:abstract>
     <dc:date>2006-03-26Z</dc:date>

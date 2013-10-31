@@ -5,8 +5,8 @@
   xmlns:dct="http://purl.org/dc/terms/"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <dc:identifier>urn:uuid:9a669547-b69b-469f-a11f-2d875366bbdc</dc:identifier>
-    <dc:type>http://purl.org/dc/dcmitype/Dataset</dc:type>
     <dc:title>Ñunç elementum</dc:title>
+    <dc:type>http://purl.org/dc/dcmitype/Dataset</dc:type>
     <dc:subject scheme="http://www.digest.org/2.1">Hydrography-Oceanographic</dc:subject>
     <dc:date>2005-10-24Z</dc:date>
     <ows:BoundingBox crs="urn:x-ogc:def:crs:EPSG:6.11:4326">

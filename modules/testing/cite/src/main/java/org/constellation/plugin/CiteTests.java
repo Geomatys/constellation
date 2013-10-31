@@ -65,7 +65,7 @@ public class CiteTests extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             LaunchTests.main(services);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
     }
