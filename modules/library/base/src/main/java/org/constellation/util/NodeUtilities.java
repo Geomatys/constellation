@@ -178,7 +178,6 @@ public class NodeUtilities {
      *           name    return -1
      * @param propertyName A property name extract from an Xpath
      * @return an ordinal if there is one, -1 else.
-     * @throws MetadataIoException
      */
     public static int extractOrdinal(final String propertyName) {
         int ordinal = -1;
@@ -199,8 +198,12 @@ public class NodeUtilities {
         return ordinal;
     }
 
-    public static List<Node> buildNodes(final Document doc, final String namespace, final String localName, final List<String> values) {
+    public static List<Node> buildNodes(final Document doc, final String namespace, final String localName, final List<String> values, final boolean mandatory) {
         final List<Node> nodes = new ArrayList<>();
+        if (mandatory && values.isEmpty()) {
+            final Node n = doc.createElementNS(namespace, localName);
+            nodes.add(n);
+        }
         for (String value : values) {
             final Node n = doc.createElementNS(namespace, localName);
             n.setTextContent(value);
