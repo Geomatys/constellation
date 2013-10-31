@@ -57,7 +57,7 @@
                     <ctl:fail/>
                 </xsl:when>
 		<!-- check for correct exception code -->
-                <xsl:when test="not(contains(wpsFunctions:exceptionCode($noIdentifierRequest) = 'MissingParameterValue'))">
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($noIdentifierRequest), 'MissingParameterValue'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($noIdentifierRequest))"/>
@@ -113,7 +113,7 @@
                     <ctl:fail/>
                 </xsl:when>
 		<!-- check for correct exception code -->
-                <xsl:when test="not(contains(wpsFunctions:exceptionCode($invalidProcessIdentifierRequest) = 'InvalidParameterValue'))">
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($invalidProcessIdentifierRequest), 'InvalidParameterValue'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($invalidProcessIdentifierRequest))"/>

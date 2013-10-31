@@ -212,12 +212,12 @@
                         <ctl:message>Missing required operation 'GetCapabilities'</ctl:message>
                         <ctl:fail/>
                     </xsl:if>
-					<!-- check for missing DescribeSensor -->
+					<!-- check for missing DescribeProcess -->
                     <xsl:if test="not($capabilitiesDocument//ows:OperationsMetadata/ows:Operation[@name='DescribeProcess'])">
                         <ctl:message>Missing required operation 'DescribeProcess'</ctl:message>
 
                     </xsl:if>
-					<!-- check for missing GetObservation -->
+					<!-- check for missing Execute -->
                     <xsl:if test="not($capabilitiesDocument//ows:OperationsMetadata/ows:Operation[@name='Execute'])">
                         <ctl:message>Missing required operation 'Execute'</ctl:message>
                         <ctl:fail/>
@@ -236,9 +236,9 @@
 
     <ctl:test name="getCapabilities:core-WPS.GetCapabilities-ResponseContentsValidProccesIdentifier.1">
         <ctl:param name="capabilitiesDocument"/>
-        <ctl:assertion>The values in the identifier element(s) for each Process contain a value and are valid URNs.</ctl:assertion>
-        <ctl:comment>Check that the values in the identifier element(s) for each Process contain a value and are valid URNs according to the OGC URN scheme.  Pass if values in the procedure element(s) contain a value and are valid URNs; fail otherwise.</ctl:comment>
-        <ctl:link title="Verify that the procedure values provided for each Process are valid.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.GetCapabilities-ResponseContentsValidProcedure</ctl:link>
+        <ctl:assertion>The values in the identifier element(s) for each Process contain a value.</ctl:assertion>
+        <ctl:comment>Check that the values in the identifier element(s) for each Process contain a value.  Pass if values in the procedure element(s) contain a value; fail otherwise.</ctl:comment>
+        <ctl:link title="Verify that the procedure values provided for each Process are valid.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.GetCapabilities-ResponseContentsValidProccesIdentifier</ctl:link>
         <ctl:code>
 
             <xsl:for-each select="$capabilitiesDocument//wps:Process//ows:Identifier">
@@ -247,8 +247,8 @@
                     <xsl:value-of select="."/>
                 </xsl:variable>
                 <xsl:choose>
-                    <xsl:when test="wpsFunctions:isValidURN($thisURN) = 'false'">
-                        <ctl:message select="concat($thisURN, '  **INVALID**')"/>
+                    <xsl:when test="$thisURN = ''">
+                        <ctl:message select="concat($thisURN, '  **INVALID (EMPTY)**')"/>
                         <ctl:fail/>
                     </xsl:when>
                     <xsl:otherwise>
