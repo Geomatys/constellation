@@ -1,5 +1,16 @@
 package org.constellation.coverage;
 
+import java.awt.Dimension;
+import java.io.File;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CancellationException;
+
 import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
@@ -39,10 +50,26 @@ import org.constellation.admin.ConfigurationEngine;
 
 /**
  * Helper class to ease the pyramid process.
- *
+ * 
  * @author olivier.nouguier@geomatys.com
  */
 public class PyramidCoverageHelper {
+
+    public interface IBuilder {
+
+        WithInput fromImage(String string) throws MalformedURLException;
+
+        IBuilder withInterpolation(InterpolationCase bilinear);
+
+        IBuilder inputFormat(String inputFormat);
+
+        IBuilder withDeeps(double[] deeps);
+
+        IBuilder withTile(int width, int height);
+
+        IBuilder withBaseCoverageNamer(CoverageNamer coverageNamer);
+
+    }
 
     private final CoverageStore store;
     private CoverageStore outputCoverageStore;
@@ -61,9 +88,9 @@ public class PyramidCoverageHelper {
             coveragesPyramid = coverages;
             this.outputCoverageStore = builder.buildOutputStore();
 
-            this.pyramidCoverageBuilder = new PyramidCoverageBuilder(new Dimension(
-                    builder.tileWidth, builder.tileHeight), builder.interpolation,
-                    1);
+            this.pyramidCoverageBuilder = new PyramidCoverageBuilder(
+                    new Dimension(builder.tileWidth, builder.tileHeight),
+                    builder.interpolation, 1);
 
             this.coverageNamer = builder.coverageNamer;
             this.baseCoverageName = builder.baseCoverageName;
@@ -74,11 +101,12 @@ public class PyramidCoverageHelper {
 
     /**
      * Builder factory with a base name for coverage.
-     *
-     * @param name of coverage
+     * 
+     * @param name
+     *            of coverage
      * @return Builder instance
      */
-    public static Builder builder(String name) {
+    public static IBuilder builder(String name) {
         Builder builder = new Builder(name);
         return builder;
     }
@@ -89,26 +117,28 @@ public class PyramidCoverageHelper {
 
     /**
      * Build coverage list which can be pyramided
-     *
-     * @return a {@link org.geotoolkit.coverage.grid.GridCoverage2D} {@link java.util.List}
+     * 
+     * @return a {@link org.geotoolkit.coverage.grid.GridCoverage2D}
+     *         {@link java.util.List}
      * @throws CancellationException
      * @throws DataStoreException
      */
-    private List<GridCoverage2D> buildCoverages() throws CancellationException, DataStoreException {
+    private List<GridCoverage2D> buildCoverages() throws CancellationException,
+            DataStoreException {
         final List<GridCoverage2D> coverages = new ArrayList<>(0);
-
 
         for (Name name : store.getNames()) {
             final CoverageReference ref = store.getCoverageReference(name);
             final GridCoverageReader reader = ref.acquireReader();
 
-            final GridCoverage2D coverage = (GridCoverage2D) reader.read(0, null);
-            final GridGeometry2D gridGeometry = (GridGeometry2D) reader.getGridGeometry(ref.getImageIndex());
+            final GridCoverage2D coverage = (GridCoverage2D) reader.read(0,
+                    null);
+            final GridGeometry2D gridGeometry = (GridGeometry2D) reader
+                    .getGridGeometry(ref.getImageIndex());
 
             if ((gridGeometry.getCoordinateReferenceSystem() instanceof NetcdfCRS)) {
                 break;
             }
-
 
             final double widthGeometry = gridGeometry.getExtent2D().getWidth();
             final double heightGeometry = gridGeometry.getExtent2D().getHeight();
@@ -118,7 +148,8 @@ public class PyramidCoverageHelper {
             final double userWidth     = Double.parseDouble(pictureWidth);
             final double userHeight    = Double.parseDouble(pictureHeight);
 
-            //If coverage size higher than user selected size else add on an other list to create separate file
+            // If coverage size higher than user selected size else add on an
+            // other list to create separate file
             if (widthGeometry > userWidth || heightGeometry > userHeight) {
                 coverages.add(coverage);
             }
@@ -142,15 +173,16 @@ public class PyramidCoverageHelper {
     }
 
     /**
-     * Build pyramid and give a {@link org.geotoolkit.process.ProcessListener} to
-     *
+     * Build pyramid and give a {@link org.geotoolkit.process.ProcessListener}
+     * to
+     * 
      * @param listener
      * @throws DataStoreException
      * @throws TransformException
      * @throws FactoryException
      */
-    public void buildPyramid(final ProcessListener listener) throws DataStoreException, TransformException,
-            FactoryException {
+    public void buildPyramid(final ProcessListener listener)
+            throws DataStoreException, TransformException, FactoryException {
 
         List<GridCoverage2D> coverages = getCoveragesPyramid();
         int coverageCount = 1;
@@ -165,7 +197,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Command that produce coverage names during the pyramid generation.
-     *
+     * 
      * @author olivier.nouguier@geomatys.com
      */
     public interface CoverageNamer {
@@ -179,7 +211,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Exposed builder when output is set.
-     *
+     * 
      * @author olivier.nouguier@geomatys.com
      */
     public static interface WithOutput {
@@ -191,7 +223,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Exposed when PGStorage is set.
-     *
+     * 
      * @author olivier.nouguier@geomatys.com
      */
     public interface WithPGOutput extends WithOutput {
@@ -210,12 +242,12 @@ public class PyramidCoverageHelper {
         WithOutput toMemoryStore();
 
         WithPGOutput toPostGisStore(String databaseName, String login,
-                                    String password);
+                String password);
     }
 
     /**
      * Non exposed builder.
-     *
+     * 
      * @author olivier.nouguier@geomatys.com
      */
     private static abstract class WithOutputImpl implements WithOutput {
@@ -244,7 +276,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Only exposed to this classes.
-     *
+     * 
      * @author olivier.nouguier@geomatys.com
      */
     public static abstract class WithInputImpl implements WithInput {
@@ -289,7 +321,7 @@ public class PyramidCoverageHelper {
 
         /**
          * Inner builder when output is set to file.
-         *
+         * 
          * @author olivier.nouguier@geomatys.com
          */
         private static class WithFileOutput extends WithOutputImpl {
@@ -382,7 +414,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Inner builder when input is set.
-     *
+     * 
      * @author olivier.nouguier@geomatys.com
      */
 
@@ -412,10 +444,10 @@ public class PyramidCoverageHelper {
 
     /**
      * External builder.
-     *
+     * 
      * @author Olivier NOUGUIER
      */
-    public static class Builder {
+    public static class Builder implements IBuilder {
 
         /**
          * Mandatory property, it is the base name used to define coverage(s)
@@ -428,7 +460,7 @@ public class PyramidCoverageHelper {
         private int tileHeight = 256;
         private String outputFormat = "PNG";
         private String inputFormat = "geotiff";
-        private double[] depth = new double[]{1, 0.5, 0.25, 0.125};
+        private double[] depth = new double[] { 1, 0.5, 0.25, 0.125 };
         private InterpolationCase interpolation = InterpolationCase.BILINEAR;
         private CoverageNamer coverageNamer = new CoverageNamer() {
 
@@ -444,23 +476,23 @@ public class PyramidCoverageHelper {
             this.baseCoverageName = baseCoverageName;
         }
 
-        public Builder inputFormat(String inputFormat) {
+        public IBuilder inputFormat(String inputFormat) {
             this.inputFormat = inputFormat;
             return this;
         }
 
-        public Builder withDeeps(double[] deeps) {
+        public IBuilder withDeeps(double[] deeps) {
             this.depth = deeps;
             return this;
         }
 
-        public Builder withTile(int width, int height) {
+        public IBuilder withTile(int width, int height) {
             this.tileWidth = width;
             this.tileHeight = height;
             return this;
         }
 
-        public Builder withInterpolation(InterpolationCase interpolation) {
+        public IBuilder withInterpolation(InterpolationCase interpolation) {
             this.interpolation = interpolation;
             return this;
         }
@@ -473,7 +505,7 @@ public class PyramidCoverageHelper {
 
         }
 
-        public Builder withBaseCoverageNamer(CoverageNamer coverageNamer) {
+        public IBuilder withBaseCoverageNamer(CoverageNamer coverageNamer) {
             this.coverageNamer = coverageNamer;
             return this;
         }
