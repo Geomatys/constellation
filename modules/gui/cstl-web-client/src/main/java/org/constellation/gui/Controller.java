@@ -50,8 +50,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -345,7 +343,7 @@ public class Controller {
     @Route("/upload")
     public Response upload(final FileItem file, final FileItem metadataFile, final String dataType, final String returnURL) {
         boolean metadataUploaded = false;
-        if(!metadataFile.getName().isEmpty()){
+        if (!metadataFile.getName().isEmpty()) {
             metadataUploaded = true;
         }
 
@@ -356,7 +354,7 @@ public class Controller {
             String tempDir = System.getProperty("java.io.tmpdir");
             final File newFile = new File(tempDir + "/" + file.getName());
             File newMetadataFile = null;
-            if(metadataUploaded){
+            if (metadataUploaded) {
                 newMetadataFile = new File(tempDir + "/" + metadataFile.getName());
             }
 
@@ -373,7 +371,7 @@ public class Controller {
                 }
 
 
-                if(metadataUploaded){
+                if (metadataUploaded) {
                     //open stream on metadata file
                     final InputStream metadataStream = metadataFile.getInputStream();
                     // write on file
@@ -395,10 +393,10 @@ public class Controller {
             Response aResponse = Response.error("response not initialized");
             switch (dataType) {
                 case "raster":
-                    aResponse = RasterController_.showRaster(returnURL, metadataUploaded+"");
+                    aResponse = RasterController_.showRaster(returnURL, metadataUploaded + "");
                     break;
                 case "vector":
-                    aResponse = VectorController_.showVector(returnURL, metadataUploaded+"");
+                    aResponse = VectorController_.showVector(returnURL, metadataUploaded + "");
             }
             return aResponse;
         } else {

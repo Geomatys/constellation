@@ -97,63 +97,6 @@ public final class OverviewServlet extends HttpServlet {
         final String sldBody = req.getParameter("SLD_BODY");
         final String sldVersion  = req.getParameter("SLD_VERSION");
 
-        // Perform a GetMap.
-        if ("GetMap".equalsIgnoreCase(request)) {
-            final String wms         = req.getParameter("WMS");
-            final String styles      = req.getParameter("STYLES");
-            final String version     = req.getParameter("VERSION");
-            final String transparent = req.getParameter("TRANSPARENT");
-            final String exceptions  = req.getParameter("EXCEPTIONS");
-
-            // Handle style JSON body.
-            String sldXml = null;
-            if (sldBody != null && !sldBody.isEmpty()) {
-                try {
-                    final Style style = StyleUtilities.readJson(sldBody, Style.class);
-
-                    final MutableNamedLayer layer = SLDF.createNamedLayer();
-                    layer.setName(layers);
-                    layer.styles().add(style.toType());
-                    final MutableStyledLayerDescriptor sld = SLDF.createSLD();
-                    sld.layers().add(layer);
-
-                    final StringWriter writer = new StringWriter();
-                    if ("1.1.0".equals(sldVersion)) {
-                        new StyleXmlIO().writeSLD(writer, sld, Specification.StyledLayerDescriptor.V_1_1_0);
-                    } else {
-                        new StyleXmlIO().writeSLD(writer, sld, Specification.StyledLayerDescriptor.V_1_0_0);
-                    }
-                    sldXml = writer.toString();
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, "Invalid style JSON body.", ex);
-                } catch (JAXBException ex) {
-                    LOGGER.log(Level.WARNING, "The style marshalling has failed.", ex);
-                }
-            }
-
-            // Prepare request.
-            final HttpPost httpPost = new HttpPost(wms);
-            final List<NameValuePair> params = new ArrayList<NameValuePair>(0);
-            params.add(new BasicNameValuePair("SERVICE", "WMS"));
-            params.add(new BasicNameValuePair("REQUEST", request));
-            params.add(new BasicNameValuePair("LAYERS", layers));
-            params.add(new BasicNameValuePair("STYLES", styles));
-            params.add(new BasicNameValuePair("VERSION", version));
-            params.add(new BasicNameValuePair("CRS", crs));
-            params.add(new BasicNameValuePair("BBOX", bbox));
-            params.add(new BasicNameValuePair("WIDTH", width));
-            params.add(new BasicNameValuePair("HEIGHT", height));
-            params.add(new BasicNameValuePair("FORMAT", format));
-            params.add(new BasicNameValuePair("TRANSPARENT", transparent));
-            params.add(new BasicNameValuePair("EXCEPTIONS", exceptions));
-            params.add(new BasicNameValuePair("SLD_BODY", sldXml));
-            params.add(new BasicNameValuePair("SLD_VERSION", sldVersion));
-            httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-
-            // Perform request.
-            execute(httpPost, resp.getOutputStream());
-        }
-
         // Perform a portrayal.
         if ("Portray".equalsIgnoreCase(request)) {
             final String method      = req.getParameter("METHOD");
