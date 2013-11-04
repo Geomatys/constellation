@@ -220,7 +220,7 @@ public final class StyleController {
             final Style style = readJson(styleJson, Style.class);
 
             String stylePath = ConfigDirectory.getDataDirectory().getAbsolutePath()+"/styles/";
-            provider.createProvider("sld", "sld", stylePath, "sld", null);
+            provider.createProvider("sld", "sld", stylePath, "sld", null, null);
 
             // Create the style.
             service.createStyle(DEFAULT_PROVIDER_ID, styleName, style);

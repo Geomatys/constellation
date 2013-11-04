@@ -12,8 +12,6 @@ import org.constellation.dto.DataMetadata;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.gui.service.ProviderManager;
-import org.constellation.gui.templates.netcdf_coverage_listing;
-import org.constellation.gui.templates.raster_description;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -42,11 +40,11 @@ public class RasterController {
 
     @Inject
     @Path("raster_description.gtmpl")
-    raster_description rasterDescription;
+    org.constellation.gui.templates.raster_description rasterDescription;
 
     @Inject
     @Path("netcdf_coverage_listing.gtmpl")
-    netcdf_coverage_listing netcdf_coverageListing;
+    org.constellation.gui.templates.netcdf_coverage_listing netcdf_coverageListing;
 
 //    @Inject
     public DataInformationContainer informationContainer;
@@ -85,12 +83,12 @@ public class RasterController {
 
         //if it's netCDF, we don't pyramid data
         if("nc".equalsIgnoreCase(extension)){
-            providerManager.createProvider("coverage-file", information.getName(), information.getPath(), information.getDataType(), null);
+            providerManager.createProvider("coverage-store", information.getName(), information.getPath(), information.getDataType(), null, "coverage-file");
             return RasterController_.getNetCDFListing(returnURL, information.getPath());
         }else{
             providerManager.pyramidData(information.getName(), information.getPath());
             final String pyramidPath = providerManager.getPyramidPath(information.getName());
-            providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null);
+            providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null, "coverage-xml-pyramid");
             return Response.redirect(returnURL);
         }
 
@@ -101,7 +99,7 @@ public class RasterController {
     public Response getNetCDFListing(final String returnUrl, final String filePath){
         ParameterValues coveragesPV = providerManager.getCoverageList(filePath);
         Map<String, String> coveragesMap = coveragesPV.getValues();
-        return netcdf_coverageListing.with().coveragesMap(coveragesMap).ok();
+        return netcdf_coverageListing.with().coveragesMap(coveragesMap).ok().withMimeType("text/html");
     }
 
     /**

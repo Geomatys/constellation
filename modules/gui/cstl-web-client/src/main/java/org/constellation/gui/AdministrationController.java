@@ -61,7 +61,7 @@ public class AdministrationController {
                 //TODO update database connection on constellation server
                 break;
             default:
-                providerManager.createProvider(database.getType(), "defaultDatabase", null, database.getProviderType(), database);
+                providerManager.createProvider(database.getType(), "defaultDatabase", null, database.getProviderType(), database, "pgrasters");
 
         }
         return AdministrationController_.getDatabase(databaseType, database);

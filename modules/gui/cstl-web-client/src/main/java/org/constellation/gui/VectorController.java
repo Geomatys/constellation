@@ -43,7 +43,7 @@ public class VectorController {
     public Response createProvider(final String returnURL, final String crsSelected){
         DataInformation information = informationContainer.getInformation();
         //create provider
-        providerManager.createProvider("feature-store", information.getName(), information.getPath(), information.getDataType(), null);
+        providerManager.createProvider("feature-store", information.getName(), information.getPath(), information.getDataType(), null, null);
         return StyleController_.edition(information.getName(), information.getName(), null, null, returnURL);
     }
 }
