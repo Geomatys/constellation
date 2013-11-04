@@ -84,7 +84,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
         final GridCoverageReadParam param = new GridCoverageReadParam();
         param.setEnvelope(envelope);
         try {
-            return (GridCoverage2D) reader.read(0, param);
+            return (GridCoverage2D) reader.read(ref.getImageIndex(), param);
         } catch (CancellationException ex) {
             throw new IOException(ex.getMessage(),ex);
         }finally{

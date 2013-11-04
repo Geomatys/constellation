@@ -30,5 +30,41 @@
                 </tbody>
             </table>
         </div>
+        <div class="span6">
+            <div id="right">
+                <div class="title-row">
+                    <span class="medium-title">&{edition.style.label.overview}: </span>
+                    <span>F1_resu_mask.U</span>
+                </div>
+                <div id="map" style="height: 400px; width: 770px"></div>
+                <script type="text/javascript">
+                    var map = new OpenLayers.Map('map', {
+                        controls: [new OpenLayers.Control.Navigation()],
+                        projection: new OpenLayers.Projection('EPSG:4326'),
+                        maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
+                        fractionalZoom: true
+                    });
+                    var layer = new OpenLayers.Layer.WMS('portray',
+                            '/constellation/api/1/portrayal/portray2',
+                            {
+                                request:    'Portray',
+                                layers:     'F1_resu_mask.XE',
+                                provider:   'F1'
+                            },
+                            {
+                                ratio: 1,
+                                isBaseLayer: true,
+                                singleTile: true,
+                                transitionEffect: 'resize',
+                                tileOptions: {
+                                    maxGetUrlLength: 2048
+                                }
+                            }
+                    );
+                    map.addLayer(layer);
+                    map.zoomToMaxExtent()
+                </script>
+            </div>
+        </div>
     </div>
 </div>
