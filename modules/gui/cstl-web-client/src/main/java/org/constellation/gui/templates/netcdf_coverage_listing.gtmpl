@@ -1,6 +1,7 @@
 #{decorate path=menu.gtmpl/}
 
 #{param name=coveragesMap/}
+#{param name=providerId/}
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
@@ -12,58 +13,50 @@
         <div class="navbar">
             <div class="navbar-inner">
                 <a class="brand" href="#">&{data.information.page.title}</a>
-                <a class="pull-right" href="#"
-                   style="display:block;padding:10px 20px 10px;margin-left:-20px;font-size:20px;font-weight:200;color:#777777;text-shadow:0 1px 0 #ffffff;">dataName</a>
             </div>
         </div>
     </div>
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
-        <div class="span4">
-            <table class="table table-striped table-bordered">
-                <thead>
-                    <tr><th>description</th></tr>
-                </thead>
-                <tbody>
-                    <% for (def identifier : coveragesMap.keySet()) {%>
-                    <tr><td><%=coveragesMap.get(identifier)%></td></tr>
-                    <%}%>
-                </tbody>
-            </table>
-        </div>
-        <div class="span6">
-            <div id="right">
-                <div class="title-row">
-                    <span class="medium-title">&{edition.style.label.overview}: </span>
-                    <span>F1_resu_mask.U</span>
+        <div class="span12">
+            <div class="row">
+                <div class="span4">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr><th>description</th></tr>
+                        </thead>
+                        <tbody>
+                            <% for (def identifier : coveragesMap.keySet()) {%>
+                            <tr><td><a class="coverage" href="#" data-value="<%=identifier%>"><%=coveragesMap.get(identifier)%></a></td></tr>
+                            <%}%>
+                        </tbody>
+                    </table>
                 </div>
-                <div id="map" style="height: 400px; width: 770px"></div>
-                <script type="text/javascript">
-                    var map = new OpenLayers.Map('map', {
-                        controls: [new OpenLayers.Control.Navigation()],
-                        projection: new OpenLayers.Projection('EPSG:4326'),
-                        maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
-                        fractionalZoom: true
-                    });
-                    var layer = new OpenLayers.Layer.WMS('portray',
-                            '/constellation/api/1/portrayal/portray2',
-                            {
-                                request:    'Portray',
-                                layers:     'F1_resu_mask.XE',
-                                provider:   'F1'
-                            },
-                            {
-                                ratio: 1,
-                                isBaseLayer: true,
-                                singleTile: true,
-                                transitionEffect: 'resize',
-                                tileOptions: {
-                                    maxGetUrlLength: 2048
-                                }
-                            }
-                    );
-                    map.addLayer(layer);
-                    map.zoomToMaxExtent()
-                </script>
+                <div class="span6">
+                    <div id="right">
+                        <div class="title-row">
+                            <span class="medium-title">&{edition.style.label.overview}: </span>
+                            <span id="coverageName"></span>
+                        </div>
+                        <div id="map" style="height: 400px; width: 770px"></div>
+                        <script type="text/javascript">
+                            $(".coverage").on("click", function(){
+                                changeLayer($(this), "${providerId}");
+                            });
+
+                            var map = new OpenLayers.Map('map', {
+                                controls: [new OpenLayers.Control.Navigation()],
+                                projection: new OpenLayers.Projection('EPSG:4326'),
+                                maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
+                                fractionalZoom: true
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="span12">
+            <div class="row" style="padding-top: 15px;">
+                <button type="button" class="btn btn-info pull-right">next</button>
             </div>
         </div>
     </div>

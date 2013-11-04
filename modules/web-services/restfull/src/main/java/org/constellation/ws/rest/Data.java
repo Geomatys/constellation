@@ -21,6 +21,10 @@ import org.constellation.dto.FileListBean;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
+import org.constellation.provider.LayerProvider;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
@@ -32,6 +36,7 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 
+import org.opengis.feature.type.Name;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.content.RangeDimension;
@@ -268,6 +273,10 @@ public class Data {
         final File choosingFile = new File(root, filePath);
         if (choosingFile.exists()) {
             DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, null, dataType);
+            int extensionPoint = filePath.lastIndexOf('.');
+            int lastSlash = filePath.lastIndexOf("/");
+            String dataName = filePath.substring(lastSlash+1, extensionPoint);
+            information.setName(dataName);
             return Response.status(200).entity(information).build();
         }
         return Response.status(418).build();
@@ -362,41 +371,28 @@ public class Data {
     /**
      * Send an ArrayList which contains coverage list from a file
      *
-     * @param path
+     * @param value
      * @return an {@link java.util.ArrayList}
      */
     @POST
     @Path("coverage/list/")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getCoverageList(final SimpleValue path) {
-        File choosenFile = new File(path.getValue());
-        if (choosenFile.exists()) {
-            try {
-                final GridCoverageReader coverageReader = CoverageIO.createSimpleReader(choosenFile);
+    public Response getCoverageList(final SimpleValue value) {
 
-                //Search on Metadata to found description
-                final List contents = (List) coverageReader.getMetadata().getContentInfo();
-                final HashMap<String, String> coveragesDescription = new HashMap<>(0);
-                for (Object contentObj : contents) {
-                    if (contentObj instanceof DefaultCoverageDescription) {
-                        DefaultCoverageDescription coverageDesc = (DefaultCoverageDescription) contentObj;
-                        for (RangeDimension rangeDimension : coverageDesc.getDimensions()) {
-                            coveragesDescription.put(rangeDimension.getSequenceIdentifier().toString(), rangeDimension.getDescriptor().toString());
-                        }
-                    }
-                }
+        CoverageStoreProvider provider = (CoverageStoreProvider) LayerProviderProxy.getInstance().getProvider(value.getValue());
+        Set<Name> nameSet = provider.getKeys();
 
-                //Send String Map via REST
-                ParameterValues pv = new ParameterValues(coveragesDescription);
-                return Response.ok(pv).build();
-            } catch (CoverageStoreException e) {
-                LOGGER.log(Level.WARNING, "Error when try to read coverage list", e);
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-            }
-        } else {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        //Search on Metadata to found description
+        final HashMap<String, String> coveragesDescription = new HashMap<>(0);
+        for (Name name : nameSet) {
+            String exist = name.getLocalPart();
+            coveragesDescription.put(exist, exist);
         }
+
+        //Send String Map via REST
+        ParameterValues pv = new ParameterValues(coveragesDescription);
+        return Response.ok(pv).build();
     }
 
 

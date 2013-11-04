@@ -229,9 +229,9 @@ public final class ProvidersAPI {
         return sentValue.getValue();
     }
 
-    public ParameterValues getCoverageList(final String filePath) throws IOException {
-        SimpleValue simpleValuePath = new SimpleValue(filePath);
-        ParameterValues coverageList = client.post("data/coverage/list/", MediaType.APPLICATION_XML_TYPE, simpleValuePath).getEntity(ParameterValues.class);
+    public ParameterValues getCoverageList(final String providerId) throws IOException {
+        SimpleValue value = new SimpleValue(providerId);
+        ParameterValues coverageList = client.post("data/coverage/list/", MediaType.APPLICATION_XML_TYPE, value).getEntity(ParameterValues.class);
         return coverageList;
     }
 }

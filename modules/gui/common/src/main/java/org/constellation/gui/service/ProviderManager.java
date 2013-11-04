@@ -121,7 +121,7 @@ public class ProviderManager {
                         break;
                     case "coverage-file":
                         try {
-                            fileUrl = URI.create("file:/"+path).toURL();
+                            fileUrl = URI.create("file:"+path).toURL();
                         } catch (MalformedURLException e) {
                             LOGGER.log(Level.WARNING, "unnable to create url from path", e);
                         }
@@ -247,9 +247,9 @@ public class ProviderManager {
         return null;
     }
 
-    public ParameterValues getCoverageList(final String filePath) {
+    public ParameterValues getCoverageList(final String providerId) {
         try {
-            return cstl.openClient().providers.getCoverageList(filePath);
+            return cstl.openClient().providers.getCoverageList(providerId);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when call web service to find coverage list", e);
         }

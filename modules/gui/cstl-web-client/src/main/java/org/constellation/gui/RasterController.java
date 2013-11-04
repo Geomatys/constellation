@@ -84,7 +84,7 @@ public class RasterController {
         //if it's netCDF, we don't pyramid data
         if("nc".equalsIgnoreCase(extension)){
             providerManager.createProvider("coverage-store", information.getName(), information.getPath(), information.getDataType(), null, "coverage-file");
-            return RasterController_.getNetCDFListing(returnURL, information.getPath());
+            return RasterController_.getNetCDFListing(returnURL, information.getName());
         }else{
             providerManager.pyramidData(information.getName(), information.getPath());
             final String pyramidPath = providerManager.getPyramidPath(information.getName());
@@ -96,10 +96,10 @@ public class RasterController {
 
     @View
     @Route("/netcdf/listing")
-    public Response getNetCDFListing(final String returnUrl, final String filePath){
-        ParameterValues coveragesPV = providerManager.getCoverageList(filePath);
+    public Response getNetCDFListing(final String returnUrl, final String providerId){
+        ParameterValues coveragesPV = providerManager.getCoverageList(providerId);
         Map<String, String> coveragesMap = coveragesPV.getValues();
-        return netcdf_coverageListing.with().coveragesMap(coveragesMap).ok().withMimeType("text/html");
+        return netcdf_coverageListing.with().coveragesMap(coveragesMap).providerId(providerId).ok().withMimeType("text/html");
     }
 
     /**
