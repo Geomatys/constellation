@@ -36,6 +36,7 @@ import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.query.QueryBuilder;
@@ -61,6 +62,7 @@ import org.geotoolkit.style.MutableStyleFactory;
 import org.geotoolkit.style.function.InterpolationPoint;
 import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
+import org.opengis.coverage.Coverage;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
@@ -426,7 +428,7 @@ public final class LayerProviders extends Static {
         // Acquire coverage data.
         GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
 
-        //Coverage = coverage.view(ViewType.NATIVE);
+        coverage = coverage.view(ViewType.GEOPHYSICS);
         RenderedImage ri = coverage.getRenderedImage();
         Map<String, Object> map = StatisticOp.analyze(ri);
         double[] min = (double[]) map.get("min");
