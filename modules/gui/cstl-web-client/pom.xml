@@ -18,7 +18,6 @@
     <name>Constellation web client</name>
 
     <properties>
-        <slf4j.version>1.6.4</slf4j.version>
         <version.spring>3.2.4.RELEASE</version.spring>
     </properties>
 
@@ -26,25 +25,21 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <!-- <version>${slf4j.version}</version> -->
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <!-- <version>1.2.17</version> -->
             <scope>runtime</scope>
         </dependency>
         <dependency>

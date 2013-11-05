@@ -166,6 +166,7 @@
         <geotoolkit.version>4.x-SNAPSHOT</geotoolkit.version>
         <mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>
         <juzu.version>0.7.0-beta22-SNAPSHOT</juzu.version>
+        <slf4j.version>1.6.4</slf4j.version>
         <jersey.version>1.11</jersey.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
@@ -980,6 +981,27 @@
                 <artifactId>geotk-epsg-javadb</artifactId>
                 <version>${geotoolkit.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                 <version>1.2.17</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
