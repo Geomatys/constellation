@@ -31,25 +31,46 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="span6">
-                    <div id="right">
-                        <div class="title-row">
-                            <span class="medium-title">&{edition.style.label.overview}: </span>
-                            <span id="coverageName"></span>
+                <div class="span8">
+                    <ul class="nav nav-tabs" id="coverageTabs">
+                        <li><a href="#visualisation" data-toggle="tab">Visualisation</a></li>
+                        <li><a href="#coveragecrs" data-toggle="tab">CRS</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane" id="visualisation">
+                            <div>
+                                <div class="title-row">
+                                    <span class="medium-title">&{edition.style.label.overview}: </span>
+                                    <span id="coverageName"></span>
+                                </div>
+                                <div id="map" style="height: 400px; width: 770px"></div>
+                            </div>
                         </div>
-                        <div id="map" style="height: 400px; width: 770px"></div>
-                        <script type="text/javascript">
-                            $(".coverage").on("click", function(){
-                                changeLayer($(this), "${providerId}");
-                            });
-
-                            var map = new OpenLayers.Map('map', {
-                                controls: [new OpenLayers.Control.Navigation()],
-                                projection: new OpenLayers.Projection('EPSG:4326'),
-                                maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
-                                fractionalZoom: true
-                            });
-                        </script>
+                        <div class="tab-pane" id="coveragecrs">
+                            <form class="form-horizontal">
+                                <div class="control-group">
+                                    <label class="control-label" for="horizontal">Horizontal</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <input type="text" id="horizontal">
+                                            <button class="btn" type="button" onclick="CSTL.Netcdf.chooseHorizontal()"><i class="icon-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="vertical">Vertical</label>
+                                    <div class="controls">
+                                        <input type="text" id="vertical" readonly>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="temporal">Temporel</label>
+                                    <div class="controls">
+                                        <input type="text" id="temporal" readonly>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -61,3 +82,20 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    $(function () {
+        $('#coverageTabs a:first').tab('show');
+    })
+
+    $(".coverage").on("click", function(){
+        CSTL.Netcdf.changeLayer($(this), "${providerId}");
+    });
+
+    var map = new OpenLayers.Map('map', {
+        controls: [],
+        projection: new OpenLayers.Projection('EPSG:4326'),
+        maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
+        fractionalZoom: true
+    });
+
+</script>

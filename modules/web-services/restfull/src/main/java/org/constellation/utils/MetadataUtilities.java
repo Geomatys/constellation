@@ -4,6 +4,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
+import org.constellation.dto.CRSCoverageList;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
@@ -19,9 +20,11 @@ import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.metadata.MetadataProcessingRegistry;
 import org.geotoolkit.process.metadata.merge.MergeDescriptor;
+import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.metadata.Metadata;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.GenericName;
 import org.opengis.util.NoSuchIdentifierException;
@@ -36,6 +39,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
@@ -76,8 +80,11 @@ public final class MetadataUtilities {
                     FileUtilities.unzip(file, file.getParentFile(), null);
                     final FileFilter shapeFilter = new SuffixFileFilter(".shp");
                     final File[] files = file.getParentFile().listFiles(shapeFilter);
+
                     if (files.length > 0) {
                         final ShapefileFeatureStore shapeStore = new ShapefileFeatureStore(files[0].toURI().toURL());
+
+                        //extract crs
                         final String crsName = shapeStore.getFeatureType().getCoordinateReferenceSystem().getName().toString();
                         final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), file.getParent(),
                                 dataType, crsName);
@@ -108,13 +115,13 @@ public final class MetadataUtilities {
      */
     public static DataInformation getRasterDataInformation(final File file, final File metadataFile, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
         GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
+        CoordinateReferenceSystem cRs = coverageReader.getGridGeometry(0).getCoordinateReferenceSystem();
 
-        if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
+        if (!(cRs instanceof ImageCRS)) {
 
             // get Metadata as a List
             final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
             DefaultMetadata finalMetadata = null;
-
             //mergeTemplate(fileMetadata);
             if(metadataFile!=null){
                 finalMetadata = (DefaultMetadata) mergeTemplate(fileMetadata, metadataFile);
@@ -132,26 +139,41 @@ public final class MetadataUtilities {
             final ArrayList<SimplyMetadataTreeNode> metadataList = MetadataMapBuilder.createMetadataList(rootNode, null, 11);
 
             final DataInformation information = new DataInformation(file.getPath(), dataType, metadataList);
+            addCoverageData(coverageReader, information);
 
-            //coverage data
-            final HashMap<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
-            for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
-                final GenericName name = coverageReader.getCoverageNames().get(i);
-                final SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
-                final String rootNodeName = sm.getNativeMetadataFormatName();
-                final Node coverateRootNode = sm.getAsTree(rootNodeName);
-
-                MetadataMapBuilder.setCounter(0);
-                final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11, i);
-
-                final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
-                nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
-            }
-            information.setCoveragesMetadata(nameSpatialMetadataMap);
             return information;
         } else {
             return new DataInformation();
         }
+    }
+
+    /**
+     * Update information param with coverage metadata
+     * @param coverageReader Contains coverages which want to extract metadata
+     * @param information {@link org.constellation.dto.DataInformation} which be updated
+     * @throws CoverageStoreException if we can't extract information from coverageReader
+     */
+    private static void addCoverageData(final GridCoverageReader coverageReader, final DataInformation information) throws CoverageStoreException {
+        final Map<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
+
+        //iterate on picture coverages
+        for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
+
+            //build metadata
+            final GenericName name = coverageReader.getCoverageNames().get(i);
+            final SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
+            final String rootNodeName = sm.getNativeMetadataFormatName();
+            final Node coverateRootNode = sm.getAsTree(rootNodeName);
+
+            MetadataMapBuilder.setCounter(0);
+            final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11, i);
+
+            final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
+            nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
+        }
+
+        //update DataInformation
+        information.setCoveragesMetadata(nameSpatialMetadataMap);
     }
 
     /**

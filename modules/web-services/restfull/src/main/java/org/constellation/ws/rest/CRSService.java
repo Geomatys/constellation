@@ -1,8 +1,12 @@
 package org.constellation.ws.rest;
 
 
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.StringList;
 import org.constellation.dto.ParameterValues;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.LayerProviders;
 import org.geotoolkit.factory.AuthorityFactoryFinder;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
@@ -12,11 +16,15 @@ import org.opengis.util.FactoryException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,5 +78,25 @@ public class CRSService {
             }
         }
         return map;
+    }
+
+    /**
+     * return crs list string for a layer
+     * @param providerId provider identifier which contain layer
+     * @param LayerId layer identifier on provider
+     * @return crs {@link String} {@link java.util.List}
+     */
+    @GET
+    @Path("{id}/{layer}")
+    public Response getCrsList(@PathParam("id") final String providerId, @PathParam("layer") final String LayerId){
+        List<String> crs;
+        try {
+            crs = LayerProviders.getCrs(providerId, LayerId);
+        } catch (CstlServiceException | IOException | DataStoreException e) {
+            LOGGER.log(Level.WARNING, "error when search CRS", e);
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        final StringList sl = new StringList(crs);
+        return Response.ok(sl).build();
     }
 }

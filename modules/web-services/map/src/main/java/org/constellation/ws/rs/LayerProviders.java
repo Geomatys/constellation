@@ -55,6 +55,7 @@ import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.process.coverage.copy.StatisticOp;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sld.xml.Specification;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
@@ -71,6 +72,7 @@ import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.style.ChannelSelection;
 import org.opengis.style.ColorMap;
@@ -430,6 +432,7 @@ public final class LayerProviders extends Static {
 
         coverage = coverage.view(ViewType.GEOPHYSICS);
         RenderedImage ri = coverage.getRenderedImage();
+
         Map<String, Object> map = StatisticOp.analyze(ri);
         double[] min = (double[]) map.get("min");
         double[] max = (double[]) map.get("max");
@@ -502,5 +505,33 @@ public final class LayerProviders extends Static {
             upper = new double[]{180, 90};
         }
         description.setBoundingBox(new double[]{lower[0], lower[1], upper[0], upper[1]});
+    }
+
+    /**
+     *
+     * @param providerId
+     * @param layerName
+     * @return
+     * @throws CstlServiceException
+     * @throws IOException
+     * @throws DataStoreException
+     */
+    public static List<String> getCrs(final String providerId, final String layerName) throws CstlServiceException, IOException, DataStoreException {
+        final List<String> crsListString = new ArrayList<>(0);
+        final LayerDetails layer = getLayer(getProvider(providerId), layerName);
+
+        // Acquire coverage data.
+        GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
+        CoordinateReferenceSystem coverageCRS = coverage.getCoordinateReferenceSystem();
+
+        // decompose crs to found all components
+        final List<CoordinateReferenceSystem> crsList = ReferencingUtilities.decompose(coverageCRS);
+
+        //create list
+        for (CoordinateReferenceSystem referenceSystem : crsList) {
+            crsListString.add(referenceSystem.getName().toString());
+        }
+
+        return crsListString;
     }
 }

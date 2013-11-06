@@ -30,6 +30,8 @@ import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.constellation.utils.UploadUtilities;
 
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.LayerProviders;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;

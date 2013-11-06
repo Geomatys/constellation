@@ -6,6 +6,8 @@ import org.constellation.util.SimplyMetadataTreeNode;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Pojo which contains all metadata for a specific data and his path and type (vector, raster, sensor)
@@ -24,7 +26,7 @@ public class DataInformation {
 
     private String dataType;
 
-    private HashMap<String, CoverageMetadataBean> coveragesMetadata;
+    private Map<String, CoverageMetadataBean> coveragesMetadata;
 
     private ArrayList<SimplyMetadataTreeNode> fileMetadata;
 
@@ -70,11 +72,11 @@ public class DataInformation {
         this.dataType = dataType;
     }
 
-    public HashMap<String, CoverageMetadataBean> getCoveragesMetadata() {
+    public Map<String, CoverageMetadataBean> getCoveragesMetadata() {
         return coveragesMetadata;
     }
 
-    public void setCoveragesMetadata(HashMap<String,CoverageMetadataBean> coveragesMetadata) {
+    public void setCoveragesMetadata(Map<String,CoverageMetadataBean> coveragesMetadata) {
         this.coveragesMetadata = coveragesMetadata;
     }
 
