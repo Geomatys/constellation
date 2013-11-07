@@ -73,15 +73,24 @@ CSTL.Netcdf = {
     },
 
     chooseHorizontal : function(){
-        //TODO get Json EPSG list
-        var url = window.location.protocol + "//" + window.location.host +"/constellation/api/1/crs/all";
+        //Get Json EPSG list
+        var url = window.location.protocol + "//" + window.location.host +"/constellation/api/1/crs/all/0/10/none";
         $.getJSON(url, function(data){
-            alert(data);
+            var epsgs = data.values.entry;
 
+            var $epsgTable = $("#epsgTable");
+            $epsgTable.empty();
             //TODO build Inner HTML on modal
-
+            for (var i = 0; i < epsgs.length; i++) {
+                var epsg = epsgs[i];
+                var line = '<tr><td>'+epsg.key+'</td></tr>';
+                $epsgTable.append(line);
+                console.warn(epsg.key + " : " + epsg.value);
+            }
 
             //TODO open modal
+            $('#chooseHorizontal').modal();
+
         });
     }
 }

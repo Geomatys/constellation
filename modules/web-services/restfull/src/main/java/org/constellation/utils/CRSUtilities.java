@@ -108,4 +108,8 @@ public class CRSUtilities {
         return sortedMap;
     }
 
+    public static int getEPSGCodesLength(){
+        return ePSGCodes.size();
+    }
+
 }
