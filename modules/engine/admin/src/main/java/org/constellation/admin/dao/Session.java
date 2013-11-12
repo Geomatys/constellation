@@ -175,6 +175,12 @@ public final class Session implements Closeable {
     private static final String READ_PROPERTY             = "properties.read";
     private static final String WRITE_PROPERTY            = "properties.write";
 
+    private static final String READ_CRS                  = "crs.read";
+    private static final String LIST_CRS                  = "crs.list";
+    private static final String WRITE_CRS                  = "crs.write";
+    private static final String UPDATE_CRS                  = "crs.update";
+    private static final String DELETE_CRS                  = "crs.delete";
+
     /**
      * Wrapper database {@link Connection} instance.
      */
@@ -749,6 +755,34 @@ public final class Session implements Closeable {
         new Query(DELETE_DATA).with(name, providerId).update();
     }
 
+
+    /**************************************************************************
+     *                      crs-data table queries                            *
+     **************************************************************************/
+    public void writeCRSData(final DataRecord record, final String crsCode) throws SQLException {
+        ensureNonNull("crscode", crsCode);
+        ensureNonNull("data",  record);
+        new Query(WRITE_CRS).with(record.id, crsCode).update();
+    }
+
+    public void updateCRSData(final DataRecord record) throws SQLException {
+        ensureNonNull("data",  record);
+        new Query(UPDATE_CRS).with(record.id).update();
+    }
+
+    public void deleteCRSData(final DataRecord record) throws SQLException {
+        ensureNonNull("data",  record);
+        new Query(DELETE_CRS).with(record.id).update();
+    }
+
+    public CRSRecord readCRSData(final DataRecord record) throws SQLException{
+        ensureNonNull("data",  record);
+        return new Query(READ_CRS).with(record.id).select().getFirst(CRSRecord.class);
+    }
+
+    public List<CRSRecord> listCRSData()  throws SQLException{
+        return new Query(LIST_CRS).select().getAll(CRSRecord.class);
+    }
 
     /**************************************************************************
      *                      styled-data table queries                         *

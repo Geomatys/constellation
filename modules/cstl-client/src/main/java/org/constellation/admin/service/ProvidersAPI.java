@@ -234,4 +234,12 @@ public final class ProvidersAPI {
         ParameterValues coverageList = client.post("data/coverage/list/", MediaType.APPLICATION_XML_TYPE, value).getEntity(ParameterValues.class);
         return coverageList;
     }
+
+    /**
+     *
+     * @param values
+     */
+    public void saveCRSModification(final ParameterValues values) throws IOException {
+       client.post("crs/update", MediaType.APPLICATION_XML_TYPE, values);
+    }
 }

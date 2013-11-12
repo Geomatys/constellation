@@ -3,6 +3,7 @@ CSTL.Netcdf = {
 
     index: 0,
 
+    changedCRS: new Array(),
     /**
      * Change layer saw
      * @param $caller
@@ -26,7 +27,14 @@ CSTL.Netcdf = {
 
     updateCRS : function (data) {
         var crs = data.Entry;
-        $("#horizontal").val(crs[0]);
+
+        var val = CSTL.Netcdf.searchOnChanged();
+        if(val === undefined){
+            $("#horizontal").val(crs[0]);
+        }else{
+            $("#horizontal").val(val.crsName);
+            $("#horizontal").data("value", val.crsCode);
+        }
 
         if(crs[1]===undefined){
             $("#vertical").parent().parent().hide();
@@ -105,9 +113,21 @@ CSTL.Netcdf = {
         //build Inner HTML on modal
         for (var i = 0; i < epsgs.length; i++) {
             var epsg = epsgs[i];
-            var line = '<tr><td>'+epsg.key+'</td></tr>';
+            var line = '<tr><td><a href="#" data-value="'+epsg.value+'"> '+epsg.key+'</a></td></tr>';
             $epsgTable.append(line);
         }
+
+        $("#epsgTable a").on("click", function(event){
+            console.log("clicked on "+$(this).data("value"));
+            event.stopPropagation();
+
+            $("#horizontal").val($(this).html());
+            $("#horizontal").data("value", $(this).data("value"));
+            var layer = CSTL.Netcdf.$caller.data("value");
+            CSTL.Netcdf.updateChangedCRS(layer, $(this).data("value"), $(this).html());
+
+            $('#chooseHorizontal').modal("hide");
+        })
 
         var $nbElement = $("#nbElements");
         $nbElement.empty();
@@ -126,6 +146,34 @@ CSTL.Netcdf = {
 
         //open modal
         $('#chooseHorizontal').modal();
+    },
+
+    updateChangedCRS: function(layer, value, name){
+        var toSaved = {"crsCode":value, "crsName":name};
+        for (var i = 0; i < CSTL.Netcdf.changedCRS.length; i++) {
+            var alreadyChanged = CSTL.Netcdf.changedCRS[i];
+            if(layer == alreadyChanged[0]){
+                alreadyChanged[1] = toSaved;
+                var layerId = "#"+layer.replace(/[^\w\s]/gi, '');
+                $(layerId).val(value);
+                return;
+            }
+        }
+        CSTL.Netcdf.changedCRS[CSTL.Netcdf.changedCRS.length] = [layer, toSaved];
+        var idparsed = layer.replace(/[^\w\s]/gi, '');
+        var newInput = '<input type="hidden" id="'+idparsed+'" name="'+layer+'" value="'+value+'"/>';
+        $("#crsSubmition").append(newInput);
+    },
+
+    searchOnChanged : function(){
+        var search = CSTL.Netcdf.$caller.data("value");
+        for (var i = 0; i < CSTL.Netcdf.changedCRS.length; i++) {
+            var changed = CSTL.Netcdf.changedCRS[i];
+            if(search == changed[0]){
+                return changed[1];
+            }
+        }
+        return undefined;
     }
 }
 

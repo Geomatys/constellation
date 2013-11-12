@@ -6,6 +6,7 @@ import juzu.Response;
 import juzu.Route;
 import juzu.View;
 import juzu.impl.request.Request;
+import juzu.request.RequestParameter;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
@@ -19,6 +20,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -99,7 +101,7 @@ public class RasterController {
     public Response getNetCDFListing(final String returnUrl, final String providerId){
         ParameterValues coveragesPV = providerManager.getCoverageList(providerId);
         Map<String, String> coveragesMap = coveragesPV.getValues();
-        return netcdf_coverageListing.with().coveragesMap(coveragesMap).providerId(providerId).ok().withMimeType("text/html");
+        return netcdf_coverageListing.with().returnURL(returnUrl).coveragesMap(coveragesMap).providerId(providerId).ok().withMimeType("text/html");
     }
 
     /**
@@ -136,5 +138,25 @@ public class RasterController {
 
         //create pyramid, provider and metadata
         providerManager.saveISO19115Metadata(metadataToSave);
+    }
+
+    @Action
+    @Route("/netcdf/save")
+    public Response saveCRSModification(final String returnUrl, final String providerId){
+        final Map<String, RequestParameter> parameters = Request.getCurrent().getParameters();
+
+        final Map<String, String> dataCRSModified = new HashMap<>(0);
+
+        ///remove url & providerId from parameters to loop without test
+        parameters.remove("returnUrl");
+        parameters.remove("providerId");
+        if (parameters.size()>0){
+            for (String key : parameters.keySet()) {
+                dataCRSModified.put(key, parameters.get(key).getValue());
+            }
+        }
+
+        providerManager.saveCRSModifications(dataCRSModified, providerId);
+        return Response.redirect(returnUrl);
     }
 }

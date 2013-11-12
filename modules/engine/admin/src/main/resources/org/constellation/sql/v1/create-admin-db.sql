@@ -74,6 +74,13 @@ ALTER TABLE "admin"."data" ADD CONSTRAINT data_pk          PRIMARY KEY ("id");
 ALTER TABLE "admin"."data" ADD CONSTRAINT data_owner_fk    FOREIGN KEY ("owner")    REFERENCES "admin"."user"("login");
 ALTER TABLE "admin"."data" ADD CONSTRAINT data_provider_fk FOREIGN KEY ("provider") REFERENCES "admin"."provider"("id") ON DELETE CASCADE;
 
+
+CREATE TABLE "admin"."crs"(
+  "dataid"  INTEGER NOT NULL,
+  "crscode" VARCHAR(64)
+);
+
+
 CREATE TABLE "admin"."styled_data"(
   "style"       INTEGER     NOT NULL,
   "data"        INTEGER     NOT NULL

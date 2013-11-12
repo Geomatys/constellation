@@ -3,6 +3,9 @@ package org.constellation.ws.rest;
 
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.dao.CRSRecord;
+import org.constellation.admin.dao.DataRecord;
 import org.constellation.configuration.StringList;
 import org.constellation.dto.CRSCoverageList;
 import org.constellation.dto.ParameterValues;
@@ -13,12 +16,14 @@ import org.constellation.ws.rs.LayerProviders;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -72,4 +77,22 @@ public class CRSService {
         return Response.ok(sl).build();
     }
 
+    @POST
+    @Path("/update")
+    public Response saveCRSModification(final ParameterValues values){
+        //save on database
+        Map<String, String> layers = values.getValues();
+        String providerId = layers.get("providerId");
+        layers.remove("providerId");
+        for (String s : layers.keySet()) {
+            try {
+                DataRecord record = EmbeddedDatabase.createSession().readData(s, providerId);
+                EmbeddedDatabase.createSession().writeCRSData(record, layers.get(s));
+            } catch (SQLException e) {
+                LOGGER.log(Level.WARNING, "Error when write CRS", e);
+            }
+        }
+
+        return Response.ok().build();
+    }
 }

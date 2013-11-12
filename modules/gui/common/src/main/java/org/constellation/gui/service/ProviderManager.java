@@ -39,7 +39,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -254,5 +256,15 @@ public class ProviderManager {
             LOGGER.log(Level.WARNING, "Error when call web service to find coverage list", e);
         }
         return null;
+    }
+
+    public void saveCRSModifications(final Map<String, String> dataCRSModified, final String providerId) {
+        dataCRSModified.put("providerId", providerId);
+        final ParameterValues values = new ParameterValues(dataCRSModified);
+        try {
+            cstl.openClient().providers.saveCRSModification(values);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to save CRS modifications", e);
+        }
     }
 }

@@ -150,4 +150,6 @@ public final class DataRecord implements Record {
     public void linkToStyle(final StyleRecord style) throws SQLException {
         session.writeStyledData(style, this);
     }
+
+
 }
