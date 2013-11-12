@@ -1,6 +1,8 @@
 CSTL.Netcdf = {
     $caller : null,
 
+    index: 0,
+
     /**
      * Change layer saw
      * @param $caller
@@ -72,26 +74,58 @@ CSTL.Netcdf = {
         return layer;
     },
 
-    chooseHorizontal : function(){
+    chooseHorizontal : function(filter, state){
+        var filterSelected = "none";
+        if(filter != ""){
+            filterSelected=filter;
+        }
+
+
+        if(state === "previous"){
+            CSTL.Netcdf.index = CSTL.Netcdf.index-10;
+        }else if(state === "next"){
+            CSTL.Netcdf.index = CSTL.Netcdf.index+10;
+        }
+
+        var url = window.location.protocol + "//" + window.location.host +"/constellation/api/1/crs/all/"+CSTL.Netcdf.index+"/10/"+filterSelected;
+        console.warn("URL : "+url);
+
+
         //Get Json EPSG list
-        var url = window.location.protocol + "//" + window.location.host +"/constellation/api/1/crs/all/0/10/none";
-        $.getJSON(url, function(data){
-            var epsgs = data.values.entry;
+        $.getJSON(url, CSTL.Netcdf.buildCRSListing);
+    },
 
-            var $epsgTable = $("#epsgTable");
-            $epsgTable.empty();
-            //TODO build Inner HTML on modal
-            for (var i = 0; i < epsgs.length; i++) {
-                var epsg = epsgs[i];
-                var line = '<tr><td>'+epsg.key+'</td></tr>';
-                $epsgTable.append(line);
-                console.warn(epsg.key + " : " + epsg.value);
-            }
+    buildCRSListing : function(data){
+        var max = data.length;
+        var epsgs = data.selectedEPSGCode.entry;
 
-            //TODO open modal
-            $('#chooseHorizontal').modal();
+        var $epsgTable = $("#epsgTable");
+        $epsgTable.empty();
 
-        });
+        //build Inner HTML on modal
+        for (var i = 0; i < epsgs.length; i++) {
+            var epsg = epsgs[i];
+            var line = '<tr><td>'+epsg.key+'</td></tr>';
+            $epsgTable.append(line);
+        }
+
+        var $nbElement = $("#nbElements");
+        $nbElement.empty();
+        $nbElement.append(max+ "elements");
+
+        $("#previous").parent().removeClass("disabled");
+        $("#next").parent().removeClass("disabled");
+
+        if(CSTL.Netcdf.index==0){
+            $("#previous").parent().addClass("disabled");
+        }
+
+        if((CSTL.Netcdf.index+10)>max){
+            $("#next").parent().addClass("disabled");
+        }
+
+        //open modal
+        $('#chooseHorizontal').modal();
     }
 }
 

@@ -2,7 +2,9 @@ package org.constellation.utils;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
+import org.constellation.dto.CRSCoverageList;
 import org.geotoolkit.factory.AuthorityFactoryFinder;
+import org.geotoolkit.referencing.CRS;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -26,10 +28,12 @@ public class CRSUtilities {
     private static SortedMap<String, String> ePSGCodes;
 
     public static void main(String[] args) throws FactoryException {
-        Map<String, String> allCodes = pagingAndFilterCode(0, 10, "Lambert");
-        LOGGER.log(Level.INFO, allCodes.size() + " elements");
-        for (String key : allCodes.keySet()) {
-            LOGGER.log(Level.INFO, key + " => " + allCodes.get(key));
+        CRSCoverageList allCodes = pagingAndFilterCode(0, 10, "Lambert");
+        LOGGER.log(Level.INFO, allCodes.getLength() + " total elements");
+        LOGGER.log(Level.INFO, allCodes.getSelectedEPSGCode().size() + " elements");
+
+        for (String key : allCodes.getSelectedEPSGCode().keySet()) {
+            LOGGER.log(Level.INFO, key + " => " + allCodes.getSelectedEPSGCode().get(key));
         }
     }
 
@@ -59,8 +63,9 @@ public class CRSUtilities {
         return ePSGCodes;
     }
 
-    public static Map<String, String> pagingAndFilterCode(final int start, final int nbByPage, final String filter) {
+    public static CRSCoverageList pagingAndFilterCode(final int start, final int nbByPage, final String filter) {
         SortedMap<String, String> selectedEPSGCode = new TreeMap<>();
+        final CRSCoverageList coverageList = new CRSCoverageList();
         try {
             setWKTMap();
         } catch (FactoryException e) {
@@ -72,25 +77,33 @@ public class CRSUtilities {
             Predicate<String> myStringPredicate = new Predicate<String>() {
                 @Override
                 public boolean apply(final String s) {
-                    return s.contains(filter) || s.equalsIgnoreCase(filter);
+                    String s1 = s.toLowerCase();
+                    String filter1 = filter.toLowerCase();
+                    return s1.contains(filter1) || s1.equalsIgnoreCase(filter1);
                 }
             };
 
             selectedEPSGCode = Maps.filterKeys(ePSGCodes, myStringPredicate);
+            coverageList.setLength(selectedEPSGCode.size());
+        }else{
+            coverageList.setLength(ePSGCodes.size());
         }
+
 
         //selectedEPSGCode is empty because they don't have a filter applied
         if (selectedEPSGCode.isEmpty()) {
             int epsgCode = ePSGCodes.size();
             if (nbByPage > epsgCode) {
-                return ePSGCodes;
+                coverageList.setSelectedEPSGCode(ePSGCodes);
+                return coverageList;
             } else {
                 selectedEPSGCode = getSubCRSMap(start, nbByPage, ePSGCodes);
             }
         } else {
             selectedEPSGCode = getSubCRSMap(start, nbByPage, selectedEPSGCode);
         }
-        return selectedEPSGCode;
+        coverageList.setSelectedEPSGCode(selectedEPSGCode);
+        return coverageList;
     }
 
 
@@ -109,6 +122,13 @@ public class CRSUtilities {
     }
 
     public static int getEPSGCodesLength(){
+        if(ePSGCodes==null){
+            try {
+                setWKTMap();
+            } catch (FactoryException e) {
+                LOGGER.log(Level.WARNING, "error on epsg map building", e);
+            }
+        }
         return ePSGCodes.size();
     }
 

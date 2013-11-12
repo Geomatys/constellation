@@ -4,7 +4,9 @@ package org.constellation.ws.rest;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.StringList;
+import org.constellation.dto.CRSCoverageList;
 import org.constellation.dto.ParameterValues;
+import org.constellation.dto.SimpleValue;
 import org.constellation.utils.CRSUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
@@ -44,11 +46,9 @@ public class CRSService {
     @GET
     @Path("all/{start}/{nbByPage}/{filter}")
     public Response getAll(@PathParam("start") int start, @PathParam("nbByPage") int nbByPage, @PathParam("filter") String filter){
-        Map<String, String> allCodes = CRSUtilities.pagingAndFilterCode(start, nbByPage, filter);
-        ParameterValues pv = new ParameterValues(allCodes);
-        return Response.ok(pv).build();
+        final CRSCoverageList coverageList = CRSUtilities.pagingAndFilterCode(start, nbByPage, filter);
+        return Response.ok(coverageList).build();
     }
-
 
 
 
@@ -71,4 +71,5 @@ public class CRSService {
         final StringList sl = new StringList(crs);
         return Response.ok(sl).build();
     }
+
 }
