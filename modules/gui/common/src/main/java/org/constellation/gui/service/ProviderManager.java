@@ -269,4 +269,13 @@ public class ProviderManager {
             LOGGER.log(Level.WARNING, "Error when call web service to save CRS modifications", e);
         }
     }
+
+    public DataBrief getDataSummary(final String name, final String providerId) {
+        try {
+            return cstl.openClient().providers.getDataSummary(name, providerId);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to access to data summary", e);
+        }
+        return null;
+    }
 }

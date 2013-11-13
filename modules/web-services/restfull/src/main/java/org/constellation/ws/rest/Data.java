@@ -12,6 +12,7 @@ import org.apache.sis.util.logging.Logging;
 
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.DataBrief;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.DataInformation;
@@ -414,6 +415,16 @@ public class Data {
 
         return Response.ok(value).build();
     }
+
+    @GET
+    @Path("summary/{providerid}/{name}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getDataSummary(@PathParam("providerid") String providerid, @PathParam("name") String name){
+        final DataBrief db = ConfigurationEngine.getData(name, providerid);
+        return Response.ok(db).build();
+    }
+
 }
 
 

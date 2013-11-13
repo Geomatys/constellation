@@ -7,13 +7,16 @@ import juzu.Response;
 import juzu.Route;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
+import org.constellation.configuration.DataBrief;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.FileBean;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.templates.folder_listing;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Main data controller. For common action without data type
@@ -62,7 +65,10 @@ public class DataController {
     @Ajax
     @Resource
     @Route("/selectData")
-    public Response selectData() {
-        return dataSelected.ok().withMimeType("text/html");
+    public Response selectData(final String name, final String providerId) {
+        final Map<String, Object> parameters = new HashMap<>(0);
+        final DataBrief db = providerManager.getDataSummary(name, providerId);
+        parameters.put("selected", db);
+        return dataSelected.with(parameters).ok().withMimeType("text/html");
     }
 }

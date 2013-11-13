@@ -173,6 +173,7 @@ public class Controller {
         parameters.put("nbResults", nbResults);
         parameters.put("startIndex", 0);
         parameters.put("nbPerPage", 10);
+        parameters.put("selected",   null);
         return dataDashboard.ok(parameters).withMimeType("text/html");
     }
 

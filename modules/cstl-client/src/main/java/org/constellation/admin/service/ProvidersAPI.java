@@ -17,6 +17,7 @@
 
 package org.constellation.admin.service;
 
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
@@ -241,5 +242,9 @@ public final class ProvidersAPI {
      */
     public void saveCRSModification(final ParameterValues values) throws IOException {
        client.post("crs/update", MediaType.APPLICATION_XML_TYPE, values);
+    }
+
+    public DataBrief getDataSummary(final String name, final String providerId) throws IOException {
+        return client.get("data/summary/"+providerId+"/"+name, MediaType.APPLICATION_XML_TYPE).getEntity(DataBrief.class);
     }
 }

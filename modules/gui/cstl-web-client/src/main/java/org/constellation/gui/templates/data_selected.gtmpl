@@ -1,7 +1,7 @@
 #{param name=selected/}
 <div class="alert alert-info">
     <h5>&{label.no.selected.style}</h5>
-    <p>&{msg.no.selected.style}</p>
+    <p>&{msg.no.selected.style} ${selected}</p>
 </div>
 <%if(selected != null){%>
     <div class="selected-item" data-name="${selected.brief.name}" data-provider="${selected.brief.provider}">

@@ -20,12 +20,9 @@
     <div class="span3">
         <div class="well nav-frame">
             <ul id="dataTypesNav" class="nav nav-list">
-                <li class="nav-header">&{label.data.raw}</li>
                 <li class="active"><a href="#" data-type="vector">&{label.vector}</a></li>
                 <li><a href="#" data-type="raster">&{label.raster}</a></li>
                 <li><a href="#" data-type="sensor">&{label.sensor}</a></li>
-                <li class="nav-header">&{label.data.processed}</li>
-                <li><a href="#" data-type="pyramid">&{label.data.pyramidal}</a></li>
                 <li><a href="#" data-type="virtual">&{label.data.virtual.sensor}</a>
                 </li>
             </ul>
@@ -70,10 +67,7 @@
             </div>
             <div class="pull-left" style="width: 40%;">
                 <div id="selection" data-role="selected">
-                    <div class="alert alert-info">
-                        <h5>&{label.no.selected.data}</h5>
-                        <p>&{msg.no.selected.data}</p>
-                    </div>
+                    #{include path=data_selected.gtmpl/}
                 </div>
             </div>
         </div>
