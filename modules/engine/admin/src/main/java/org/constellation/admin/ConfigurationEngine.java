@@ -33,6 +33,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 
+import org.constellation.admin.dao.DataRecord;
+import org.constellation.configuration.DataBrief;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
@@ -378,6 +380,28 @@ public class ConfigurationEngine {
 
         } catch (JAXBException e) {
             LOGGER.log(Level.WARNING, "metadata not loaded", e);
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param name
+     * @param providerId
+     * @return
+     */
+    public static DataBrief getData(String name, String providerId){
+        try {
+            DataRecord record = EmbeddedDatabase.createSession().readData(name, providerId);
+            final DataBrief db = new DataBrief();
+            db.setOwner(record.getOwnerLogin());
+            db.setName(record.getName());
+            db.setDate(record.getDate());
+            db.setProvider(record.getProvider().getIdentifier());
+            db.setType(record.getType().toString());
+            return db;
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to read data", e);
         }
         return null;
     }

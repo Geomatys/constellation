@@ -19,14 +19,17 @@ public class LayerData {
 
     private Date date;
 
+    private String owner;
+
     public LayerData() {
     }
 
-    public LayerData(final String idProvider, final String type, final String name, final Date date) {
+    public LayerData(final String idProvider, final String type, final String name, final Date date, final String owner) {
         this.idProvider = idProvider;
         this.type = type;
         this.name = name;
         this.date = date;
+        this.owner = owner;
     }
 
     public String getIdProvider() {
@@ -59,5 +62,13 @@ public class LayerData {
 
     public void setDate(final Date date) {
         this.date = date;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(final String owner) {
+        this.owner = owner;
     }
 }

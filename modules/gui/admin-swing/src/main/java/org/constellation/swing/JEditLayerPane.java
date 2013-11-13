@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.ListCellRenderer;
 import javax.xml.namespace.QName;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ProviderReport;
@@ -82,11 +83,11 @@ public class JEditLayerPane extends javax.swing.JPanel {
             for (final ProviderReport providerReport : providers) {
                 
                 final String providerID = providerReport.getId();
-                final List<String> layers = providerReport.getItems();
-                for (final String item : layers) {
+                final List<DataBrief> layers = providerReport.getItems();
+                for (final DataBrief item : layers) {
                     
                     if ("sld".equals(serviceProviderType)) {
-                        styleList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, providerID, item));
+                        styleList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, providerID, item.getName()));
                     } else {
                         boolean addProviderToList = false;
                         //WFS -> data-store
@@ -105,7 +106,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
                         }
                         
                         if (addProviderToList) {
-                            providerList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, providerID, item).getReference());
+                            providerList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, providerID, item.getName()).getReference());
                         }
                     }
                 }

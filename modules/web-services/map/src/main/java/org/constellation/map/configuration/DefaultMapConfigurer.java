@@ -30,6 +30,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.dao.DataRecord;
+import org.constellation.configuration.DataBrief;
+import org.constellation.dto.Configuration;
 import org.constellation.provider.*;
 import org.quartz.TriggerBuilder;
 import org.quartz.SimpleScheduleBuilder;
@@ -873,9 +877,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final List<ProviderReport> providerReports = new ArrayList<>();
             for (final LayerProvider p : layerProviders) {
                 if (p.getService().equals(service)) {
-                    final List<String> keys = new ArrayList<>();
+                    final List<DataBrief> keys = new ArrayList<>();
                     for(Name n : p.getKeys()){
-                        keys.add(DefaultName.toJCRExtendedForm(n));
+                        final DataBrief db = ConfigurationEngine.getData(n.getLocalPart(), p.getId());
+                        keys.add(db);
                     }
                     final Date date = (Date) p.getSource().parameter("date").getValue();
                     final String providerType = (String) p.getSource().parameter("providerType").getValue();
@@ -884,9 +889,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             }
             for (final StyleProvider p : styleProviders) {
                 if (p.getService().equals(service)) {
-                    final List<String> keys = new ArrayList<>();
+                    final List<DataBrief> keys = new ArrayList<>();
                     for(String n : p.getKeys()){
-                        keys.add(n);
+                        final DataBrief db = new DataBrief();
+                        db.setName(n);
+                        keys.add(db);
                     }
                     final Date date = (Date) p.getSource().parameter("date").getValue();
                     final String providerType = (String) p.getSource().parameter("providerType").getValue();

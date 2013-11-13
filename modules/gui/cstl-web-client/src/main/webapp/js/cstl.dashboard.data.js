@@ -61,5 +61,20 @@ CSTL.DataDashboard = {
         $("#serverFileModal").modal({
             backdrop:true
         });
-    }
+    },
+
+    onSelect: function($elt) {
+        $('[data-role="selected"]').jzLoad('DataController.selectData()', {
+            name:       $elt.data('name'),
+            providerId: $elt.data('provider')
+        }, function() {
+            var $selected = CSTL.StyleDashboard.instance.$root.find('.selected-item');
+            $selected.find('.block-header').click(function() {
+                var $this = $(this);
+                $this.next().slideToggle(200);
+                $this.find('i').toggleClass('icon-chevron-down icon-chevron-up');
+            });
+            $selected.find('[title]').tooltip({delay:{show: 200}})
+        });
+    },
 };

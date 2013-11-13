@@ -6,6 +6,7 @@ import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.plugin.ajax.Ajax;
+import juzu.template.Template;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.FileBean;
 import org.constellation.gui.service.ProviderManager;
@@ -26,6 +27,10 @@ public class DataController {
     @Inject
     @Path("folder_listing.gtmpl")
     folder_listing folderListing;
+
+    @Inject
+    @Path("data_selected.gtmpl")
+    Template dataSelected;
 
     @Inject
     private ProviderManager providerManager;
@@ -52,5 +57,12 @@ public class DataController {
                 aResponse = VectorController_.showVector(returnURL, "false");
         }
         return aResponse;
+    }
+
+    @Ajax
+    @Resource
+    @Route("/selectData")
+    public Response selectData() {
+        return dataSelected.ok().withMimeType("text/html");
     }
 }

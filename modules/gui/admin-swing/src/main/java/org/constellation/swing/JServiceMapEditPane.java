@@ -28,6 +28,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.xml.namespace.QName;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
@@ -142,9 +143,9 @@ public class JServiceMapEditPane extends JServiceEditionPane {
                 }
 
                 if (provider != null) {
-                    final List<String> layers = provider.getItems();
-                    for (final String layerName : layers) {
-                        final QName layerQname = new QName(layerName);
+                    final List<DataBrief> layers = provider.getItems();
+                    for (final DataBrief layerName : layers) {
+                        final QName layerQname = new QName(layerName.getName());
                         if (!source.isExcludedLayer(layerQname)) {
                             final Layer layer = new Layer(layerQname);
                             layerModelList.add(new LayerModel(layer, providerId));

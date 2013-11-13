@@ -21,6 +21,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
@@ -32,6 +33,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderReport;
 import org.geotoolkit.gui.swing.misc.ActionCell;
 import org.geotoolkit.gui.swing.misc.JOptionDialog;
@@ -127,7 +129,13 @@ public class JProviderEditPane extends javax.swing.JPanel {
         final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("",
                 ICON_DELETE, Color.WHITE, fontNormal, Color.DARK_GRAY));
 
-        guiData.setModel(new DataModel(providerReport.getItems(),styleType));
+
+        final List<String> itemNames = new ArrayList<>(0);
+        for (DataBrief dataBrief : providerReport.getItems()) {
+            itemNames.add(dataBrief.getName());
+        }
+
+        guiData.setModel(new DataModel(itemNames,styleType));
 
         if(styleType){
             guiData.getColumn(1).setCellRenderer(new ActionCell.Renderer(editIcon));

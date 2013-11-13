@@ -19,6 +19,7 @@ package org.constellation.gui.service;
 
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
@@ -170,10 +171,11 @@ public class ProviderManager {
                 String type = providerReport.getAbstractType();
 
                 if (providerTypes.contains(type)) {
-                    for (String name : providerReport.getItems()) {
+                    for (DataBrief dataBrief : providerReport.getItems()) {
+                        String name = dataBrief.getName();
                         int rightBracket = name.indexOf('}') + 1;
                         name = name.substring(rightBracket);
-                        LayerData layerData = new LayerData(providerReport.getId(), type, name, providerReport.getDate());
+                        LayerData layerData = new LayerData(providerReport.getId(), type, name, dataBrief.getDate(), dataBrief.getOwner());
                         layerDatas.add(layerData);
                     }
                 }

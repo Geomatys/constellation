@@ -50,12 +50,12 @@ public class ProviderReport {
     private Date date;
 
     @XmlElement(name = "item")
-    private List<String> items;
+    private List<DataBrief> items;
 
     public ProviderReport() {
     }
 
-    public ProviderReport(final String id, final String type, final List<String> items, final Date date, final String abstractType) {
+    public ProviderReport(final String id, final String type, final List<DataBrief> items, final Date date, final String abstractType) {
         this.id = id;
         this.type = type;
         this.items = items;
@@ -84,8 +84,10 @@ public class ProviderReport {
         return type;
     }
 
+
     /**
-     * @param id : provider id
+     *
+     * @param type
      */
     public void setType(String type) {
         this.type = type;
@@ -94,9 +96,9 @@ public class ProviderReport {
     /**
      * @return the provider items (styles or layers)
      */
-    public List<String> getItems() {
+    public List<DataBrief> getItems() {
         if (items == null) {
-            items = new ArrayList<String>();
+            items = new ArrayList<DataBrief>(0);
         }
         return items;
     }
@@ -104,7 +106,7 @@ public class ProviderReport {
     /**
      * @param items the provider items to set
      */
-    public void setItems(List<String> items) {
+    public void setItems(List<DataBrief> items) {
         this.items = items;
     }
 
