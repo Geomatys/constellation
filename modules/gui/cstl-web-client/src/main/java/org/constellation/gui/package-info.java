@@ -31,9 +31,6 @@
         @Alias(of = "/org/constellation/gui/templates/create_service_metadata.gtmpl",   as = "create_service_metadata.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/create_map_service.gtmpl",        as = "create_map_service.gtmpl"),
 
-        //Raster
-        @Alias(of = "/org/constellation/gui/templates/raster_description.gtmpl",        as = "raster_description.gtmpl"),
-
         // Style
         @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",           as = "style_dashboard.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/style_edition.gtmpl",             as = "style_edition.gtmpl"),

@@ -89,7 +89,7 @@ public class RasterController {
             return RasterController_.getNetCDFListing(returnURL, information.getName());
         }else{
             providerManager.pyramidData(information.getName(), information.getPath());
-            final String pyramidPath = providerManager.getPyramidPath(information.getName());
+            final String pyramidPath = providerManager.getPyramidPath(information.getName())+"/tiles";
             providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null, "coverage-xml-pyramid");
             return Response.redirect(returnURL);
         }
