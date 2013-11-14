@@ -34,7 +34,9 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 
 import org.constellation.admin.dao.DataRecord;
+import org.constellation.admin.dao.StyleRecord;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
@@ -392,13 +394,27 @@ public class ConfigurationEngine {
      */
     public static DataBrief getData(String name, String providerId){
         try {
-            DataRecord record = EmbeddedDatabase.createSession().readData(name, providerId);
+            final DataRecord record = EmbeddedDatabase.createSession().readData(name, providerId);
+            final List<StyleRecord> styleRecords = EmbeddedDatabase.createSession().readStyles(record);
+
             final DataBrief db = new DataBrief();
             db.setOwner(record.getOwnerLogin());
             db.setName(record.getName());
             db.setDate(record.getDate());
             db.setProvider(record.getProvider().getIdentifier());
             db.setType(record.getType().toString());
+
+            final List<StyleBrief> styleBriefs = new ArrayList<>(0);
+            for (StyleRecord styleRecord : styleRecords) {
+                final StyleBrief sb = new StyleBrief();
+                sb.setType(styleRecord.getType().toString());
+                sb.setProvider(styleRecord.getProvider().getIdentifier());
+                sb.setDate(styleRecord.getDate());
+                sb.setName(styleRecord.getName());
+                sb.setOwner(styleRecord.getOwnerLogin());
+                styleBriefs.add(sb);
+            }
+            db.setTargetStyle(styleBriefs);
             return db;
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error when try to read data", e);

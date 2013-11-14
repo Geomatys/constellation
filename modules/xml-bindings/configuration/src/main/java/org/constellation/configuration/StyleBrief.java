@@ -22,7 +22,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -99,4 +101,5 @@ public final class StyleBrief implements Serializable {
     public void setOwner(final String owner) {
         this.owner = owner;
     }
+
 }

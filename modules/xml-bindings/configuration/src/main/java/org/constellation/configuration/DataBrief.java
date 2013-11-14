@@ -22,10 +22,13 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Bernard Fabien (Geomatys)
+ * @author Garcia Benjamin (Geomatys)
  * @version 0.9
  * @since 0.9
  */
@@ -51,6 +54,8 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="Owner")
     private String owner;
 
+    @XmlElement(name="TargetStyle")
+    private List<StyleBrief> targetStyle = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -98,5 +103,26 @@ public final class DataBrief implements Serializable {
 
     public void setOwner(final String owner) {
         this.owner = owner;
+    }
+
+    public List<StyleBrief> getTargetStyle() {
+        return targetStyle;
+    }
+
+    public void setTargetStyle(final List<StyleBrief> targetStyle) {
+        this.targetStyle = targetStyle;
+    }
+
+    @Override
+    public String toString() {
+        return "DataBrief{" +
+                "name='" + name + '\'' +
+                ", provider='" + provider + '\'' +
+                ", title='" + title + '\'' +
+                ", date=" + date +
+                ", type='" + type + '\'' +
+                ", owner='" + owner + '\'' +
+                ", targetStyle=" + targetStyle +
+                '}';
     }
 }

@@ -46,7 +46,6 @@ public final class StyleReport implements Serializable {
     @XmlElement(name="TargetData")
     private List<DataBrief> targetData = new ArrayList<>();
 
-
     public StyleBrief getBrief() {
         return brief;
     }

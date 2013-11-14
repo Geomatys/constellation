@@ -69,7 +69,7 @@ CSTL.DataDashboard = {
             name:       $elt.data('name'),
             providerId: $elt.data('provider')
         }, function() {
-            var $selected = CSTL.StyleDashboard.instance.$root.find('.selected-item');
+            var $selected = CSTL.DataDashboard.instance.$root.find('.selected-item');
             $selected.find('.block-header').click(function() {
                 var $this = $(this);
                 $this.next().slideToggle(200);
