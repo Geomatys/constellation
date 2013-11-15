@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.swing.DefaultComboBoxModel;
@@ -30,6 +32,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
 import org.constellation.admin.service.ConstellationServer;
@@ -96,6 +99,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         refreshIndexButton = new JButton();
         jLabel2 = new JLabel();
         logLevelCombo = new JComboBox();
+        purgeDbButton = new JButton();
 
         ResourceBundle bundle = ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("sourceType")); // NOI18N
@@ -117,7 +121,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         );
         centerPaneLayout.setVerticalGroup(
             centerPaneLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGap(0, 182, Short.MAX_VALUE)
+            .addGap(0, 175, Short.MAX_VALUE)
         );
 
         refreshIndexButton.setText(bundle.getString("refreshIndex")); // NOI18N
@@ -131,6 +135,13 @@ public class JServiceCswEditPane extends JServiceEditionPane {
 
         logLevelCombo.setModel(new DefaultComboBoxModel(new String[] { "INFO", "FINE", "FINER" }));
 
+        purgeDbButton.setText(bundle.getString("purgeDb")); // NOI18N
+        purgeDbButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                purgeDbButtonActionPerformed(evt);
+            }
+        });
+
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -138,17 +149,19 @@ public class JServiceCswEditPane extends JServiceEditionPane {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
+                    .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 564, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(logLevelCombo, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
+                        .addComponent(purgeDbButton)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(refreshIndexButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(guiDataSourceCombo, 0, 315, Short.MAX_VALUE)))
+                        .addComponent(guiDataSourceCombo, 0, 434, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -159,12 +172,13 @@ public class JServiceCswEditPane extends JServiceEditionPane {
                     .addComponent(jLabel1)
                     .addComponent(guiDataSourceCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(refreshIndexButton)
                     .addComponent(jLabel2)
-                    .addComponent(logLevelCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addComponent(logLevelCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(purgeDbButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -189,12 +203,29 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         server.csws.refreshIndex(serviceInstance.getName(), false);
     }//GEN-LAST:event_refreshIndexButtonActionPerformed
 
+    private void purgeDbButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_purgeDbButtonActionPerformed
+        final ResourceBundle bundle = ResourceBundle.getBundle("org/constellation/swing/Bundle");
+        final String message = bundle.getString("purgeWarning");
+        final String title = bundle.getString("purgeWarningTitle");
+        final int result = JOptionPane.showConfirmDialog(this, message, title, JOptionPane.OK_CANCEL_OPTION);
+        
+        switch (result) {
+            case JOptionPane.OK_OPTION:
+                server.csws.deleteAllMetadata(serviceInstance.getName());
+                server.csws.refreshIndex(serviceInstance.getName(), false);
+                break;
+            case JOptionPane.CANCEL_OPTION:
+                break;
+        }
+    }//GEN-LAST:event_purgeDbButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel centerPane;
     private JComboBox guiDataSourceCombo;
     private JLabel jLabel1;
     private JLabel jLabel2;
     private JComboBox logLevelCombo;
+    private JButton purgeDbButton;
     private JButton refreshIndexButton;
     // End of variables declaration//GEN-END:variables
 

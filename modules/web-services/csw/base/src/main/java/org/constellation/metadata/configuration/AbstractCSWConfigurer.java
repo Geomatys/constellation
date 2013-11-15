@@ -105,6 +105,12 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
                 return CSWConfigurationManager.getInstance().deleteMetadata(id, metadata);
             }
 
+            if ("deleteAllRecords".equalsIgnoreCase(request)) {
+
+                final String id       = getParameter("ID", true, parameters);
+                return CSWConfigurationManager.getInstance().deleteAllMetadata(id);
+            }
+
             if ("metadataExist".equalsIgnoreCase(request)) {
 
                 final String id       = getParameter("ID", true, parameters);

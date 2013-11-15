@@ -74,6 +74,7 @@ public final class QueryConstants {
     public static final String REQUEST_REMOVE_FROM_INDEX     = "RemoveFromIndex";
     public static final String REQUEST_IMPORT_RECORDS        = "importRecords"; 
     public static final String REQUEST_DELETE_RECORDS        = "deleteRecords";
+    public static final String REQUEST_DELETE_ALL_RECORDS    = "deleteAllRecords";
     public static final String REQUEST_METADATA_EXIST        = "metadataExist"; 
     public static final String REQUEST_AVAILABLE_SOURCE_TYPE = "getCSWDatasourceType"; 
     public static final String REQUEST_CLEAR_CACHE           = "clearCache"; 

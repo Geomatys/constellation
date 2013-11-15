@@ -355,6 +355,23 @@ public class CSWConfigurationManager {
         }
     }
 
+    public AcknowlegementType deleteAllMetadata(final String id) throws ConfigurationException {
+        final CSWMetadataReader reader = getReader(id);
+        final MetadataWriter writer    = getWriter(id);
+        try {
+            final List<String> metaIDS = reader.getAllIdentifiers();
+            for (String metaID : metaIDS) {
+                writer.deleteMetadata(metaID);
+            }
+            final String msg = "All specified record has been deleted from the CSW";
+            return new AcknowlegementType("Success", msg);
+
+        } catch (MetadataIoException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+
+
     public StringList getAvailableCSWDataSourceType() {
         final List<DataSourceType> sources = new ArrayList<>();
         final Iterator<AbstractCSWFactory> ite = ServiceRegistry.lookupProviders(AbstractCSWFactory.class);
@@ -373,6 +390,7 @@ public class CSWConfigurationManager {
      * Refresh the map of configuration object.
      * 
      * @param id identifier of the CSW service.
+     * @return
      * @throws ConfigurationException
      */
     protected Automatic getServiceConfiguration(final String id) throws ConfigurationException {

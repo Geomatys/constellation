@@ -20,7 +20,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.util.ArgumentChecks;
@@ -40,7 +39,6 @@ import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringTreeNode;
 import org.constellation.dto.DataDescription;
-import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.dto.DataInformation;
@@ -393,15 +391,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return ((ServiceReport) response).getAvailableServices();
                 } else if (response instanceof ExceptionReport) {
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return new HashMap<String, List<String>>();
+                    return new HashMap<>();
                 } else {
                     LOGGER.warning("The service respond uncorrectly");
-                    return new HashMap<String, List<String>>();
+                    return new HashMap<>();
                 }
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
-            return new HashMap<String, List<String>>();
+            return new HashMap<>();
         }
 
         /**
@@ -439,6 +437,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * Restart all the instance of a specific web-service (wms, wfs, csw,...)
          *
          * @param service The service name to restart (wms, wfs, csw,...).
+         * @param instanceId The instance to rename identifier.
+         * @param newName The new name of the instance.
+         * 
          * @return true if the operation succeed
          */
         public boolean renameInstance(final String service, final String instanceId, final String newName) {
@@ -709,6 +710,8 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Restart all layer providers.
+         * 
+         * @return True if the operation succeed.
          */
         public boolean restartAllLayerProviders() {
             try {
@@ -722,6 +725,8 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Restart all layer providers.
+         * 
+         * @return True if the operation succeed.
          */
         public boolean restartAllStyleProviders() {
             try {
@@ -768,6 +773,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * Get the source provider configuration.
          *
          * @param id The identifier of the source
+         * @param descriptor The descriptor allowing to read the configuration Object.
          * @return
          */
         public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) {
@@ -880,6 +886,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * Add a new layer to a source provider in the service.
          *
          * @param id The identifier of the provider
+         * @param config the configuration object of the layer.
          * @return
          */
         public boolean createLayer(final String id, final ParameterValueGroup config) {
@@ -898,6 +905,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * Remove a source provider in the service.
          *
          * @param id The identifier of the provider
+         * @param layerName The name of the layer to delete.
          * @return
          */
         public boolean deleteLayer(final String id, final String layerName) {
@@ -914,6 +922,8 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * Add a new layer to a source provider in the service.
          *
          * @param id The identifier of the provider
+         * @param layerName The name of the layer to update.
+         * @param layer the new configuration object of the layer.
          * @return
          */
         public boolean updateLayer(final String id, final String layerName, final ParameterValueGroup layer) {
@@ -942,18 +952,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     final StyleXmlIO utils = new StyleXmlIO();
                     return utils.readStyle(response, SymbologyEncoding.V_1_1_0);
                 }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            } catch (FactoryException ex) {
+            } catch (IOException | JAXBException | FactoryException ex) {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
         }
 
         /**
-         * @param id
+         * @param id name of the SLD provider
+         * @param styleName name of the new style.
          * @param style : SLD or other
          * @return null if successful, AcknowlegementType if failed
          */
@@ -971,9 +978,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
 
         /**
-         * @param id        : provider id
-         * @param styleName : style id
-         * @return true if successful
+         * Remove a style in the specified provider.
+         * 
+         * @param id provider id.
+         * @param styleName style id.
+         * @return true if successful.
          */
         public boolean deleteStyle(final String id, final String styleName) {
             ArgumentChecks.ensureNonNull("id", id);
@@ -1012,6 +1021,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         /**
          * Get the provider service configuration description.
          *
+         * @param serviceName name of the provider service.
          * @return
          */
         public GeneralParameterDescriptor getServiceDescriptor(final String serviceName) {
@@ -1034,6 +1044,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         /**
          * Get the provider service source configuration description.
          *
+         * @param serviceName name of the provider service.
          * @return
          */
         public GeneralParameterDescriptor getSourceDescriptor(final String serviceName) {
@@ -1078,7 +1089,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          *
          * @param file file to sent
          * @param metadataFile
-         *@param dataType data type (raster, vector or sensor)  @return true if file sent without problem
+         * @param dataType data type (raster, vector or sensor)  @return true if file sent without problem
          */
         public DataInformation uploadData(final File file, final File metadataFile, final String dataType){
             //create form body part
@@ -1148,6 +1159,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Ask for a list of all available process.
+         * @return A list of process identifier.
          */
         public StringList listProcess() {
             try {
@@ -1170,6 +1182,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Ask for a list of all tasks.
+         * @return A tree representing the registered tasks.
          */
         public StringTreeNode listTasks() {
             try {
@@ -1192,6 +1205,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Get the parameters description for the given process.
+         * @param authority
+         * @param code
+         * @return
          */
         public GeneralParameterDescriptor getProcessDescriptor(final String authority, final String code) {
             try {
@@ -1214,6 +1230,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * Get the parameters for the given task
          *
          * @param id
+         * @param desc
          * @return
          */
         public GeneralParameterValue getTaskParameters(final String id, ParameterDescriptorGroup desc) {
@@ -1238,6 +1255,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          *
          * @param authority
          * @param code
+         * @param id
          * @param title
          * @param step
          * @param parameters
@@ -1271,6 +1289,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          *
          * @param authority
          * @param code
+         * @param id
          * @param title
          * @param step
          * @param parameters
@@ -1301,6 +1320,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Delete an existing task.
+         * @param id
          */
         public boolean deleteTask(final String id) {
             ArgumentChecks.ensureNonNull("id", id);
@@ -1404,6 +1424,16 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return false;
         }
 
+         public boolean deleteAllMetadata(final String id) {
+            try {
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_ALL_RECORDS + "&id=" + id;
+                return sendRequestAck(url, null);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+            return false;
+        }
+
         public Collection<String> getAvailableDataSourceType() {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_AVAILABLE_SOURCE_TYPE;
@@ -1417,7 +1447,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
     }
 
@@ -1455,6 +1485,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      *
      * @param sourceURL the URL of the distant web-service
      * @param request   The XML object to send in POST mode (if null the request is GET)
+     * @param descriptor
+     * @param unmarshallerPool
+     * @param put
      * @return The object corresponding to the XML response of the distant web-service
      * @throws java.net.MalformedURLException
      * @throws java.io.IOException
