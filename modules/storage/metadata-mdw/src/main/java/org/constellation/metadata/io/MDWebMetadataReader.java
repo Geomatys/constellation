@@ -240,7 +240,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * A constructor used in profile Test .
      *
-     * @param MDReader a reader to the MDWeb database.
+     * @param mdReader a reader to the MDWeb database.
      */
     public MDWebMetadataReader(final Reader mdReader) {
         super(true, false);
@@ -334,7 +334,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @return A metadata Object (Dublin core Record / GeotoolKit metadata / EBrim registry object)
      *
-     * @throws java.sql.MetadataIoException
+     * @throws MetadataIoException
      */
     @Override
     public Object getMetadata(String identifier, final MetadataType mode) throws MetadataIoException {
@@ -1201,7 +1201,17 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        final List<String> results = new ArrayList<>();
+        try {
+            final List<RecordSet> recordSets   = mdReader.getRecordSets();
+            final Collection<FullRecord> records = mdReader.getAllRecord(recordSets);
+            for (FullRecord f: records) {
+                results.add(f.getIdentifier());
+            }
+        } catch (MD_IOException ex) {
+            throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage());
+        }
+        return results;
     }
 
     /**

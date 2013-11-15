@@ -285,42 +285,49 @@ public class CSWConfigurationManager {
 
     public AcknowlegementType importRecords(final String id, final File f, final String fileName) throws ConfigurationException {
         LOGGER.info("Importing record");
-        final MetadataWriter writer = getWriter(id);
-        final List<File> files;
-        if (fileName.endsWith("zip")) {
-            try  {
-                final FileInputStream fis = new FileInputStream(f);
-                files = FileUtilities.unZipFileList(fis);
-                fis.close();
-            } catch (IOException ex) {
+        final AbstractIndexer indexer = getIndexer(id, null);
+        try {
+            final MetadataWriter writer = getWriter(id, indexer);
+            final List<File> files;
+            if (fileName.endsWith("zip")) {
+                try  {
+                    final FileInputStream fis = new FileInputStream(f);
+                    files = FileUtilities.unZipFileList(fis);
+                    fis.close();
+                } catch (IOException ex) {
+                    throw new ConfigurationException(ex);
+                }
+            } else if (fileName.endsWith("xml")) {
+                files = Arrays.asList(f);
+            } else {
+                throw new ConfigurationException("Unexpected file extension, accepting zip or xml");
+            }
+            try {
+
+                final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                dbf.setNamespaceAware(true);
+                final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+                for (File importedFile: files) {
+                    if (importedFile != null) {
+                        Document document = docBuilder.parse(importedFile);
+                        writer.storeMetadata(document.getDocumentElement());
+                    } else {
+                        throw new ConfigurationException("An imported file is null");
+                    }
+                }
+                final String msg = "The specified record have been imported in the CSW";
+                return new AcknowlegementType("Success", msg);
+            } catch (SAXException | ParserConfigurationException | IOException ex) {
+                LOGGER.log(Level.WARNING, "Exception while unmarshalling imported file", ex);
+            } catch (MetadataIoException ex) {
                 throw new ConfigurationException(ex);
             }
-        } else if (fileName.endsWith("xml")) {
-            files = Arrays.asList(f);
-        } else {
-            throw new ConfigurationException("Unexpected file extension, accepting zip or xml");
-        }
-        try {
-
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-            for (File importedFile: files) {
-                if (importedFile != null) {
-                    Document document = docBuilder.parse(importedFile);
-                    writer.storeMetadata(document.getDocumentElement());
-                } else {
-                    throw new ConfigurationException("An imported file is null");
-                }
+            return new AcknowlegementType("Error", "An error occurs during the process");
+        } finally {
+            if (indexer != null) {
+                indexer.destroy();
             }
-            final String msg = "The specified record have been imported in the CSW";
-            return new AcknowlegementType("Success", msg);
-        } catch (SAXException | ParserConfigurationException | IOException ex) {
-            LOGGER.log(Level.WARNING, "Exception while unmarshalling imported file", ex);
-        } catch (MetadataIoException ex) {
-            throw new ConfigurationException(ex);
         }
-        return new AcknowlegementType("Error", "An error occurs during the process");
     }
 
     public AcknowlegementType metadataExist(final String id, final String metadataName) throws ConfigurationException {
@@ -340,34 +347,48 @@ public class CSWConfigurationManager {
     }
 
     public AcknowlegementType deleteMetadata(final String id, final String metadataName) throws ConfigurationException {
-        final MetadataWriter writer = getWriter(id);
+        final AbstractIndexer indexer = getIndexer(id, null);
         try {
-            final boolean deleted = writer.deleteMetadata(metadataName);
-            if (deleted) {
-                final String msg = "The specified record has been deleted from the CSW";
-                return new AcknowlegementType("Success", msg);
-            } else {
-                final String msg = "The specified record has not been deleted from the CSW";
-                return new AcknowlegementType("Failure", msg);
+            final MetadataWriter writer = getWriter(id, indexer);
+            try {
+                final boolean deleted = writer.deleteMetadata(metadataName);
+                if (deleted) {
+                    final String msg = "The specified record has been deleted from the CSW";
+                    return new AcknowlegementType("Success", msg);
+                } else {
+                    final String msg = "The specified record has not been deleted from the CSW";
+                    return new AcknowlegementType("Failure", msg);
+                }
+            } catch (MetadataIoException ex) {
+                throw new ConfigurationException(ex);
             }
-        } catch (MetadataIoException ex) {
-            throw new ConfigurationException(ex);
+        } finally {
+            if (indexer != null) {
+                indexer.destroy();
+            }
         }
     }
 
     public AcknowlegementType deleteAllMetadata(final String id) throws ConfigurationException {
         final CSWMetadataReader reader = getReader(id);
-        final MetadataWriter writer    = getWriter(id);
+        final AbstractIndexer indexer  = getIndexer(id, reader);
         try {
-            final List<String> metaIDS = reader.getAllIdentifiers();
-            for (String metaID : metaIDS) {
-                writer.deleteMetadata(metaID);
-            }
-            final String msg = "All specified record has been deleted from the CSW";
-            return new AcknowlegementType("Success", msg);
+            final MetadataWriter writer    = getWriter(id, indexer);
+            try {
+                final List<String> metaIDS = reader.getAllIdentifiers();
+                for (String metaID : metaIDS) {
+                    writer.deleteMetadata(metaID);
+                }
+                final String msg = "All specified record has been deleted from the CSW";
+                return new AcknowlegementType("Success", msg);
 
-        } catch (MetadataIoException ex) {
-            throw new ConfigurationException(ex);
+            } catch (MetadataIoException ex) {
+                throw new ConfigurationException(ex);
+            }
+        } finally {
+            if (indexer != null) {
+                indexer.destroy();
+            }
         }
     }
 
@@ -550,18 +571,19 @@ public class CSWConfigurationManager {
      * Build a new Metadata writer for the specified service ID.
      *
      * @param serviceID the service identifier (form multiple CSW) default: ""
+     * @param indexer
      *
      * @return A metadata reader.
      * @throws ConfigurationException
      */
-    protected MetadataWriter getWriter(final String serviceID) throws ConfigurationException {
+    protected MetadataWriter getWriter(final String serviceID, final AbstractIndexer indexer) throws ConfigurationException {
 
         // we get the CSW configuration file
         final Automatic config = getServiceConfiguration(serviceID);
         if (config != null) {
             final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
             try {
-                return cswfactory.getMetadataWriter(config, null);
+                return cswfactory.getMetadataWriter(config, indexer);
 
             } catch (MetadataIoException ex) {
                 throw new ConfigurationException("JAXBException while initializing the writer!", ex);
