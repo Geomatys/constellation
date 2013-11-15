@@ -49,6 +49,9 @@ import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
+import javax.measure.unit.SI;
+import javax.measure.unit.Unit;
+
 
 /**
  * Regroups information about a {@linkplain org.constellation.provider.LayerDetails layer}.
@@ -201,18 +204,22 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
         for (int i = 0; i < nbDim; i++) {
             final CoordinateSystemAxis axis = cs.getAxis(i);
             final AxisDirection direction = axis.getDirection();
-            
-            //ELEVATION AXIS
-            if (direction.equals(AxisDirection.DOWN) || direction.equals(AxisDirection.UP)) {
-                if (axis instanceof DiscreteCoordinateSystemAxis) {
-                    final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
-                    final int nbOrdinate = discretAxis.length();
-                    for (int j = 0; j < nbOrdinate; j++) {
-                        elevations.add((Number) discretAxis.getOrdinateAt(j));
+            final Unit unit = axis.getUnit();
+
+            //test if axis unit is a length unit
+            if (unit.isCompatible(SI.METRE)) {
+                //ELEVATION AXIS
+                if (direction.equals(AxisDirection.DOWN) || direction.equals(AxisDirection.UP)) {
+                    if (axis instanceof DiscreteCoordinateSystemAxis) {
+                        final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
+                        final int nbOrdinate = discretAxis.length();
+                        for (int j = 0; j < nbOrdinate; j++) {
+                            elevations.add((Number) discretAxis.getOrdinateAt(j));
+                        }
+                    } else {
+                        elevations.add(Double.valueOf(axis.getMinimumValue()));
+                        elevations.add(Double.valueOf(axis.getMaximumValue()));
                     }
-                } else {
-                    elevations.add(Double.valueOf(axis.getMinimumValue()));
-                    elevations.add(Double.valueOf(axis.getMaximumValue()));
                 }
             }
         }

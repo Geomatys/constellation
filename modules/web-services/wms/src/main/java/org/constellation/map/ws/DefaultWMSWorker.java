@@ -44,6 +44,7 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.spi.ServiceRegistry;
+import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
@@ -146,7 +147,6 @@ import org.opengis.sld.StyledLayerDescriptor;
 import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
 
-
 /**
  * A WMS worker for a local WMS service which handles requests from either REST
  * or SOAP facades and issues appropriate responses.
@@ -188,6 +188,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             "NORTH", "EAST", "SOUTH", "WEST",
             "UP", "DOWN",
             "FUTURE", "PAST"});
+
+    /**
+     * Only Elevation dimension.
+     */
+    private static final List<String> VERTICAL_DIM = UnmodifiableArrayList.wrap(new String[] {"UP", "DOWN"});
 
     private WMSPortrayal mapPortrayal;
 
@@ -429,16 +434,28 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 for (int i = 0; i < nbDim; i++) {
                     final CoordinateSystemAxis axis = cs.getAxis(i);
                     final AxisDirection direction = axis.getDirection();
+                    final Unit axisUnit = axis.getUnit();
 
                     final String directionName = direction.name();
+
+                    boolean addDimension = false;
+
+                    //valid axis if a common dimensions
                     if (!COMMONS_DIM.contains(directionName)) {
+                        addDimension = true;
+
+                        //or a vertical direction without axis length unit.
+                    } else if (VERTICAL_DIM.contains(directionName) && axisUnit != null && !axisUnit.isCompatible(SI.METRE)) {
+                        addDimension = true;
+                    }
+
+                    if (addDimension) {
                         final org.opengis.metadata.Identifier axisName = axis.getName();
 
-                        final Unit<?> u = axis.getUnit();
-                        final String unit = (u != null) ? u.toString() : null;
+                        final String unit = (axisUnit != null) ? axisUnit.toString() : null;
                         String unitSymbol;
                         try {
-                            unitSymbol = UnitFormat.getInstance().format(u);
+                            unitSymbol = UnitFormat.getInstance().format(axisUnit);
                         } catch (IllegalArgumentException e) {
                             // Workaround for one more bug in javax.measure...
                             unitSymbol = unit;
