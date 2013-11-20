@@ -50,7 +50,7 @@
                     <ctl:fail/>
                 </xsl:when>
 				<!-- check for correct exception code -->
-                <xsl:when test="not(wpsFunctions:exceptionCode($thisRequest) = 'MissingParameterValue')">
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($thisRequest), 'MissingParameterValue'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($thisRequest))"/>
@@ -111,7 +111,7 @@
                     <ctl:fail/>
                 </xsl:when>
 				<!-- check for correct exception code -->
-                <xsl:when test="not(wpsFunctions:exceptionCode($thisRequest) = 'InvalidParameterValue')">
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($thisRequest), 'InvalidParameterValue'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($thisRequest))"/>
@@ -170,7 +170,7 @@
                     <ctl:fail/>
                 </xsl:when>
 				<!-- check for correct exception code -->
-                <xsl:when test="not(wpsFunctions:exceptionCode($thisRequest) = 'OperationNotSupported')">
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($thisRequest), 'OperationNotSupported'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($thisRequest))"/>
@@ -178,12 +178,12 @@
                     <ctl:message>Exception code should be: 'OperationNotSupported'.</ctl:message>
                     <ctl:fail/>
                 </xsl:when>
-                <xsl:when test="not(contains(lower-case(wpsFunctions:exceptionCodeLocator($thisRequest)), 'request'))">
+                <xsl:when test="not(contains(wpsFunctions:exceptionCodeLocator($thisRequest), 'GetMeASandwich'))">
                     <ctl:message>Invalid locator.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Locator is: ', wpsFunctions:exceptionCodeLocator($thisRequest))"/>
                     </ctl:message>
-                    <ctl:message>Locator value should be: 'request'.</ctl:message>
+                    <ctl:message>Locator value should be: 'GetMeASandwich'.</ctl:message>
                     <ctl:fail/>
                 </xsl:when>
 				<!-- looks good -->
