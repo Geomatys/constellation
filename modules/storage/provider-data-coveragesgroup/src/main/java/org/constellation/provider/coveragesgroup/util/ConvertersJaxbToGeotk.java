@@ -443,22 +443,13 @@ public final class ConvertersJaxbToGeotk {
      */
     private static class CoverageReferenceWrapper extends AbstractCoverageReference {
 
-        private CoverageReference reference;
-        private String name;
+        private final CoverageReference reference;
+        private final String name;
 
         public CoverageReferenceWrapper(final String name, final CoverageReference ref) {
+            super(ref.getStore(), new DefaultName(null, name));
             this.name = name;
             this.reference = ref;
-        }
-
-        @Override
-        public Name getName() {
-            return new DefaultName(null, name);
-        }
-
-        @Override
-        public CoverageStore getStore() {
-            return reference.getStore();
         }
 
         @Override
