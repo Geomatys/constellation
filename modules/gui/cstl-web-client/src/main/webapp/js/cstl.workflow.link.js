@@ -27,15 +27,24 @@
  *
  * @type {object}
  */
+
 CSTL.LinkWorkflow = {
 
-    template:
-        '<div class="linkWorkflow" data-name="{name}" data-provider="{provider}">' +
-            '<button type="button" class="btn btn-small" onclick="CSTL.LinkWorkflow.unlink(\'{name}\',\'{provider}\');">' +
+    styleTemplate : '<div class="linkWorkflow" data-name="{name}" data-provider="{provider}">' +
+        '<button type="button" class="btn btn-small" onclick="styleFlow.unlink(\'{name}\',\'{provider}\', dataUnlink);">' +
+        '<i class="icon-minus"></i>' +
+        '</button>' +
+        ' {name}' +
+        '</div>',
+
+    dataTemplate:
+        '<div class="data" data-name="{name}" data-provider="{provider}">' +
+            '<button type="button" class="btn btn-small" onclick="dataFlow.unlink(\'{name}\',\'{provider}\', styleUnlink);">' +
             '<i class="icon-minus"></i>' +
             '</button>' +
             ' {name}' +
             '</div>',
+
 
     $modal:        null,
     $selected:     null,
@@ -47,21 +56,22 @@ CSTL.LinkWorkflow = {
     linkedList:      null,
 
 
-    init: function(loadFunc, validateFunc) {
+    init: function(loadFunc, validateFunc, template) {
         // Select persistent HTML element.
-        this.$modal      = $('#styleModal');
+        this.$modal      = $('#linkedModal');
         this.$nextBtn    = this.$modal.find('#associate');
-
+        this.template = template;
         // Handle events.
         this.$nextBtn.click($.proxy(this.validate, this, validateFunc));
 
         // Data list dashboard.
         this.linkedList = new Dashboard({
-            $root:    this.$modal.find('#linkedList'),
-            loadFunc: loadFunc,
-            onLoad:    $.proxy(this.onElementLoaded, this),
-            onSelect:  $.proxy(this.onElementSelect, this)
+            $root:      this.$modal.find('#linkedList'),
+            loadFunc:   loadFunc,
+            onLoad:     $.proxy(this.onElementLoaded, this),
+            onSelect:   $.proxy(this.onElementSelect, this)
         });
+        return this;
     },
 
     setSelected: function(selectedName, selectedProvider) {
@@ -76,7 +86,7 @@ CSTL.LinkWorkflow = {
 
         // Disabled already attached items.
         this.$linkedList.find('.linkWorkflow').each(function() {
-            var item = CSTL.LinkStyleWorkflow.linkedList.$itemList.
+            var item = CSTL.LinkWorkflow.linkedList.$itemList.
                 find('[data-provider="' + $(this).data('provider') + '"]').
                 filter('[data-name="' + $(this).data('name') + '"]');
             if (item.length > 0) {
@@ -103,7 +113,7 @@ CSTL.LinkWorkflow = {
 
     unlink: function(selectedName, selectedProvider, unLinkFunc) {
         // Break association.
-        $.proxy(unLinkFunc, this, selectedProvider, selectedName, this.selectedProvider, this.selectedName).
+        unLinkFunc(selectedProvider, selectedName, this.selectedProvider, this.selectedName).
             // Update linked list.
             success($.proxy(function(){
                 this.$linkedList.find('[data-provider="' + selectedProvider + '"]').
@@ -121,7 +131,7 @@ CSTL.LinkWorkflow = {
         }
 
         // Apply association.
-        $.proxy(validateFunc, this, this.$selected.data('provider'), this.$selected.data('name'), this.selectedProvider, this.selectedName).
+        validateFunc(this.$selected.data('provider'), this.$selected.data('name'), this.selectedProvider, this.selectedName).
             // Update linked list.
             success($.proxy(function(){
                 if (this.$linkedList.children().length === 0) {

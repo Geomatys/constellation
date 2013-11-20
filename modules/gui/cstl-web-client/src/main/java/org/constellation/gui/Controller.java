@@ -73,6 +73,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class Controller {
 
 
+
     private static final Logger LOGGER = Logger.getLogger(Controller.class.toString());
     /**
      * Manager used to call constellation server side.
@@ -123,12 +124,15 @@ public class Controller {
     @Inject
     @Path("success.gtmpl")
     org.constellation.gui.templates.success success;
+
     @Inject
     @Path("add_data_alias.gtmpl")
     Template addDataAlias;
+
     @Inject
     @Path("layer.gtmpl")
     Template dataElement;
+
 
     /**
      * Generate homepage
@@ -293,8 +297,14 @@ public class Controller {
     @Ajax
     @Resource
     @Route("/providerList")
-    public Response getAvailableData(final List<String> dataTypes, final String start, final String count, final String orderBy,
+    public Response getAvailableData(List<String> dataTypes, final String start, final String count, final String orderBy,
                                      final String direction, final String filter) {
+        if(dataTypes==null){
+            dataTypes = new ArrayList<>(0);
+            dataTypes.add("vector");
+            dataTypes.add("raster");
+
+        }
         final List<LayerData> list = providerManager.getDataListing(dataTypes);
 
         // Search layers by name.

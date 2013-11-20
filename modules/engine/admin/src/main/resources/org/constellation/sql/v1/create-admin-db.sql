@@ -80,6 +80,8 @@ CREATE TABLE "admin"."crs"(
   "crscode" VARCHAR(64)
 );
 
+ALTER TABLE "admin"."crs" ADD CONSTRAINT crs_data_fk FOREIGN KEY ("dataid") REFERENCES "admin"."data"("id") ON DELETE CASCADE;
+
 
 CREATE TABLE "admin"."styled_data"(
   "style"       INTEGER     NOT NULL,

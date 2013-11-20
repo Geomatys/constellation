@@ -34,7 +34,23 @@ CSTL.MapDashboard = {
         this.instance = new Dashboard({
             $root:    $('#mapDashboard'),
             loadFunc: 'Controller.generateDataList()',
-            params:   {serviceId: identifier}
+            params:   {serviceId: identifier},
+            onSelect:  $.proxy(this.onSelect, this)
+        });
+    },
+
+    onSelect: function($elt) {
+        $('[data-role="selected"]').jzLoad('MapController.selectLayer()', {
+            layerAlias: $elt.data('alias'),
+            providerId: $elt.data('provider')
+        }, function() {
+            var $selected = CSTL.MapDashboard.instance.$root.find('.selected-item');
+            $selected.find('.block-header').click(function() {
+                var $this = $(this);
+                $this.next().slideToggle(200);
+                $this.find('i').toggleClass('icon-chevron-down icon-chevron-up');
+            });
+            $selected.find('[title]').tooltip({delay:{show: 200}})
         });
     }
 };

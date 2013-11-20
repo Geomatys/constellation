@@ -23,12 +23,17 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.dao.ServiceRecord;
+import org.constellation.admin.dao.Session;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Source;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.dto.BandDescription;
@@ -36,6 +41,7 @@ import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PropertyDescription;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.provider.LayerProvider;
@@ -49,6 +55,16 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.File;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -164,5 +180,48 @@ public class MapConfigurer extends OGCConfigurer {
         final Instance instance = super.getInstance(identifier);
         instance.setLayersNumber(getLayers(identifier).size());
         return instance;
+    }
+
+    public void removeLayer(final String serviceId, final String layerid) throws JAXBException {
+        try {
+
+            final Session session = EmbeddedDatabase.createSession();
+            final ServiceRecord service = session.readService(serviceId, specification);
+            final InputStream config =  service.getConfig();
+            final Unmarshaller unmarshall = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+            final LayerContext layerContext = (LayerContext) unmarshall.unmarshal(config);
+            final List<Source> sources = layerContext.getLayers();
+            String alias = null;
+            boolean found = false;
+
+            for (Source source : sources) {
+                List<Layer> layers = source.getInclude();
+                for (Layer layer : layers) {
+                    final String localPart = layer.getName().getLocalPart();
+                    if(localPart.equalsIgnoreCase(layerid)){
+                        alias = layer.getAlias();
+                        layers.remove(layer);
+                        found = true;
+                        break;
+                    }
+                }
+                if(found){
+                    break;
+                }
+            }
+
+            if(found){
+                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                final StringWriter writer = new StringWriter();
+                marshaller.marshal(layerContext, writer);
+                final StringReader reader = new StringReader(writer.toString());
+                service.setConfig(reader);
+
+                session.deleteLayer(alias, service);
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "", e);
+        }
     }
 }

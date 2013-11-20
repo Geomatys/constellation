@@ -36,6 +36,10 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.Layer;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.ServiceProtocol;
+import org.constellation.configuration.Source;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -145,6 +149,7 @@ public class ConfigurationEngine {
                 m.marshal(obj, sw);
                 pool.recycle(m);
                 sr = new StringReader(sw.toString());
+
             } else {
                 sr = null;
             }
@@ -156,6 +161,18 @@ public class ConfigurationEngine {
                     session.writeServiceExtraConfig(serviceID, spec, sr, fileName);
                 }
             } else {
+                if(obj instanceof LayerContext){
+                    session.deleteServiceLayer(service);
+                    //save Layers
+                    LayerContext context = (LayerContext)obj;
+                    for (Source source : context.getLayers()) {
+                        for (Layer layer : source.getInclude()) {
+                            DataRecord data = session.readData(layer.getName().getLocalPart(), source.getId());
+                            session.writeLayer(layer.getAlias(), service, data, "", null);
+                        }
+                    }
+                }
+
                 if (fileName == null) {
                     service.setConfig(sr);
                 } else {
@@ -394,31 +411,76 @@ public class ConfigurationEngine {
      */
     public static DataBrief getData(String name, String providerId){
         try {
-            final DataRecord record = EmbeddedDatabase.createSession().readData(name, providerId);
-            final List<StyleRecord> styleRecords = EmbeddedDatabase.createSession().readStyles(record);
-
-            final DataBrief db = new DataBrief();
-            db.setOwner(record.getOwnerLogin());
-            db.setName(record.getName());
-            db.setDate(record.getDate());
-            db.setProvider(record.getProvider().getIdentifier());
-            db.setType(record.getType().toString());
-
-            final List<StyleBrief> styleBriefs = new ArrayList<>(0);
-            for (StyleRecord styleRecord : styleRecords) {
-                final StyleBrief sb = new StyleBrief();
-                sb.setType(styleRecord.getType().toString());
-                sb.setProvider(styleRecord.getProvider().getIdentifier());
-                sb.setDate(styleRecord.getDate());
-                sb.setName(styleRecord.getName());
-                sb.setOwner(styleRecord.getOwnerLogin());
-                styleBriefs.add(sb);
+            final Session session = EmbeddedDatabase.createSession();
+            final DataRecord record = session.readData(name, providerId);
+            if(record!=null){
+                return getDataBrief(session, record);
             }
-            db.setTargetStyle(styleBriefs);
-            return db;
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error when try to read data", e);
         }
         return null;
     }
+
+    /**
+     *
+     * @param layerAlias
+     * @param providerId
+     * @return
+     */
+    public static DataBrief getDataLayer(final String layerAlias, final String providerId) {
+        try {
+            final Session session = EmbeddedDatabase.createSession();
+            DataRecord record = session.readDatafromLayer(layerAlias, providerId);
+            if(record!=null){
+                return getDataBrief(session, record);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Error on sql execution when search data layer", e);
+        }
+        return null;
+    }
+
+    /**
+     * create a {@link org.constellation.configuration.DataBrief} with style link and service link.
+     * @param session current {@link org.constellation.admin.dao.Session} used
+     * @param record data found
+     * @return a {@link org.constellation.configuration.DataBrief} with all informations linked.
+     * @throws SQLException if they have an error when search style, service or provider.
+     */
+    private static DataBrief getDataBrief(final Session session, final DataRecord record) throws SQLException {
+        final List<StyleRecord> styleRecords = session.readStyles(record);
+        final List<ServiceRecord> serviceRecords = session.readDataServices(record);
+
+        final DataBrief db = new DataBrief();
+        db.setOwner(record.getOwnerLogin());
+        db.setName(record.getName());
+        db.setDate(record.getDate());
+        db.setProvider(record.getProvider().getIdentifier());
+        db.setType(record.getType().toString());
+
+        final List<StyleBrief> styleBriefs = new ArrayList<>(0);
+        for (StyleRecord styleRecord : styleRecords) {
+            final StyleBrief sb = new StyleBrief();
+            sb.setType(styleRecord.getType().toString());
+            sb.setProvider(styleRecord.getProvider().getIdentifier());
+            sb.setDate(styleRecord.getDate());
+            sb.setName(styleRecord.getName());
+            sb.setOwner(styleRecord.getOwnerLogin());
+            styleBriefs.add(sb);
+        }
+        db.setTargetStyle(styleBriefs);
+
+        final List<ServiceProtocol> serviceProtocols = new ArrayList<>(0);
+        for (ServiceRecord serviceRecord : serviceRecords) {
+            final List<String> protocol = new ArrayList<>(0);
+            protocol.add(serviceRecord.getType().fullName);
+            final ServiceProtocol sp = new ServiceProtocol(serviceRecord.getIdentifier(), protocol);
+            serviceProtocols.add(sp);
+        }
+        db.setTargetService(serviceProtocols);
+
+        return db;
+    }
+
 }

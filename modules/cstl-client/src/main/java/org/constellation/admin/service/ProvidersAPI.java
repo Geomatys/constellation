@@ -247,4 +247,8 @@ public final class ProvidersAPI {
     public DataBrief getDataSummary(final String name, final String providerId) throws IOException {
         return client.get("data/summary/"+providerId+"/"+name, MediaType.APPLICATION_XML_TYPE).getEntity(DataBrief.class);
     }
+
+    public DataBrief getLaterSummary(final String layerAlias, final String providerId) throws IOException {
+        return client.get("data/layer/summary/"+providerId+"/"+layerAlias, MediaType.APPLICATION_XML_TYPE).getEntity(DataBrief.class);
+    }
 }

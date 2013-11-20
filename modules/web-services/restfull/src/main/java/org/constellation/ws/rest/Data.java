@@ -425,6 +425,14 @@ public class Data {
         return Response.ok(db).build();
     }
 
+    @GET
+    @Path("layer/summary/{providerid}/{layerAlias}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getLayerSummary(@PathParam("providerid") String providerid, @PathParam("layerAlias") String layerAlias){
+        final DataBrief db = ConfigurationEngine.getDataLayer(layerAlias, providerid);
+        return Response.ok(db).build();
+    }
 }
 
 

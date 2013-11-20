@@ -221,6 +221,22 @@ public final class ConstellationClient {
     }
 
     /**
+     * Submits a HTTP DELETE request and returns the response.
+     *
+     * @param path the request path
+     * @param type the submitted/expected media type
+     * @return the response instance
+     * @throws IOException on HTTP communication problem like connection or read timeout
+     */
+    Response delete(final String path, final MediaType type) throws IOException {
+        try {
+            return new Response(newRequest(path, type).delete(ClientResponse.class));
+        } catch (ClientHandlerException | UniformInterfaceException ex) {
+            throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
+        }
+    }
+
+    /**
      * Creates a new request from the specified path and {@link MediaType}.
      *
      * @param path the request path

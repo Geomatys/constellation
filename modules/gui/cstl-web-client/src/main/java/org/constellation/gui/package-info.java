@@ -30,6 +30,7 @@
         @Alias(of = "/org/constellation/gui/templates/create_service_description.gtmpl",as = "create_service_description.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/create_service_metadata.gtmpl",   as = "create_service_metadata.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/create_map_service.gtmpl",        as = "create_map_service.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/layer_selected.gtmpl",             as = "layer_selected.gtmpl"),
 
         // Style
         @Alias(of = "/org/constellation/gui/templates/style_dashboard.gtmpl",           as = "style_dashboard.gtmpl"),
@@ -92,12 +93,13 @@
         @Asset(id = "cstl.providers",           value = "js/cstl.providers.js",             depends = "cstl",           location = AssetLocation.SERVER),
         @Asset(id = "cstl.services",            value = "js/cstl.services.js",              depends = "cstl",           location = AssetLocation.SERVER),
         @Asset(id = "cstl.dashboard",           value = "js/cstl.dashboard.js",             depends = "cstl",           location = AssetLocation.SERVER),
-        @Asset(id = "cstl.dashboard.map",       value = "js/cstl.dashboard.map.js",         depends = "cstl.dashboard", location = AssetLocation.SERVER),
+        @Asset(id = "cstl.dashboard.map",       value = "js/cstl.dashboard.map.js",         depends = "cstl.dashboard", location = AssetLocation.APPLICATION),
         @Asset(id = "cstl.dashboard.data",      value = "js/cstl.dashboard.data.js",        depends = "cstl.dashboard", location = AssetLocation.SERVER),
         @Asset(id = "cstl.dashboard.style",     value = "js/cstl.dashboard.style.js",       depends = "cstl.dashboard", location = AssetLocation.SERVER),
         @Asset(id = "cstl.workflow.addlayer",   value = "js/cstl.workflow.addlayer.js",     depends = "cstl.dashboard", location = AssetLocation.SERVER),
-        @Asset(id = "cstl.workflow.linkdata",   value = "js/cstl.workflow.linkdata.js",     depends = "cstl.dashboard", location = AssetLocation.SERVER),
-        @Asset(id = "cstl.workflow.linkstyle",  value = "js/cstl.workflow.linkstyle.js",    depends = "cstl.dashboard", location = AssetLocation.SERVER),
+//        @Asset(id = "cstl.workflow.linkdata",   value = "js/cstl.workflow.linkdata.js",     depends = "cstl.dashboard", location = AssetLocation.SERVER),
+//        @Asset(id = "cstl.workflow.linkstyle",  value = "js/cstl.workflow.linkstyle.js",    depends = "cstl.dashboard", location = AssetLocation.SERVER),
+        @Asset(id = "cstl.workflow",            value = "js/cstl.workflow.link.js",         depends = "cstl.dashboard", location = AssetLocation.SERVER),
         @Asset(id = "cstl.filemodal",           value = "js/cstl.filemodal.js",             depends = "jquery",         location = AssetLocation.SERVER),
         @Asset(id = "cstl.netcdf",              value = "js/cstl.netcdf.js",                depends = "openlayers",     location = AssetLocation.SERVER),
 

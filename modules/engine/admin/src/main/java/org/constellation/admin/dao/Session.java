@@ -91,93 +91,96 @@ public final class Session implements Closeable {
         }
     }
 
-    private static final String READ_NEXT_I18N_ID         = "i18n_id.read.next";
+    private static final String READ_NEXT_I18N_ID           = "i18n_id.read.next";
 
-    private static final String READ_I18N                 = "i18n.read";
-    private static final String WRITE_I18N                = "i18n.write";
-    private static final String UPDATE_I18N               = "i18n.update";
-    private static final String DELETE_I18N               = "i18n.delete";
+    private static final String READ_I18N                   = "i18n.read";
+    private static final String WRITE_I18N                  = "i18n.write";
+    private static final String UPDATE_I18N                 = "i18n.update";
+    private static final String DELETE_I18N                 = "i18n.delete";
 
-    private static final String READ_USER                 = "user.read";
-    private static final String LIST_USERS                = "user.list";
-    private static final String WRITE_USER                = "user.write";
-    private static final String UPDATE_USER               = "user.update";
+    private static final String READ_USER                   = "user.read";
+    private static final String LIST_USERS                  = "user.list";
+    private static final String WRITE_USER                  = "user.write";
+    private static final String UPDATE_USER                 = "user.update";
 
-    private static final String READ_PROVIDER             = "provider.read";
-    private static final String READ_PROVIDER_FROM_ID     = "provider.read.from.id";
-    private static final String READ_PROVIDER_CONFIG      = "provider.read.config";
-    private static final String LIST_PROVIDERS            = "provider.list";
-    private static final String LIST_PROVIDERS_FROM_TYPE  = "provider.list.from.type";
-    private static final String LIST_PROVIDERS_FROM_IMPL  = "provider.list.from.impl";
-    private static final String WRITE_PROVIDER            = "provider.write";
-    private static final String UPDATE_PROVIDER           = "provider.update";
-    private static final String UPDATE_PROVIDER_CONFIG    = "provider.update.config";
-    private static final String DELETE_PROVIDER           = "provider.delete";
+    private static final String READ_PROVIDER               = "provider.read";
+    private static final String READ_PROVIDER_FROM_ID       = "provider.read.from.id";
+    private static final String READ_PROVIDER_CONFIG        = "provider.read.config";
+    private static final String LIST_PROVIDERS              = "provider.list";
+    private static final String LIST_PROVIDERS_FROM_TYPE    = "provider.list.from.type";
+    private static final String LIST_PROVIDERS_FROM_IMPL    = "provider.list.from.impl";
+    private static final String WRITE_PROVIDER              = "provider.write";
+    private static final String UPDATE_PROVIDER             = "provider.update";
+    private static final String UPDATE_PROVIDER_CONFIG      = "provider.update.config";
+    private static final String DELETE_PROVIDER             = "provider.delete";
 
-    private static final String READ_STYLE                = "style.read";
-    private static final String READ_STYLE_FROM_ID        = "style.read";
-    private static final String READ_STYLE_BODY           = "style.read.body";
-    private static final String LIST_STYLES               = "style.list";
-    private static final String LIST_STYLES_FROM_DATA     = "style.list.from.data";
-    private static final String LIST_STYLES_FROM_PROVIDER = "style.list.from.provider";
-    private static final String WRITE_STYLE               = "style.write";
-    private static final String UPDATE_STYLE              = "style.update";
-    private static final String UPDATE_STYLE_BODY         = "style.update.body";
-    private static final String DELETE_STYLE              = "style.delete";
+    private static final String READ_STYLE                  = "style.read";
+    private static final String READ_STYLE_FROM_ID          = "style.read";
+    private static final String READ_STYLE_BODY             = "style.read.body";
+    private static final String LIST_STYLES                 = "style.list";
+    private static final String LIST_STYLES_FROM_DATA       = "style.list.from.data";
+    private static final String LIST_STYLES_FROM_PROVIDER   = "style.list.from.provider";
+    private static final String WRITE_STYLE                 = "style.write";
+    private static final String UPDATE_STYLE                = "style.update";
+    private static final String UPDATE_STYLE_BODY           = "style.update.body";
+    private static final String DELETE_STYLE                = "style.delete";
 
-    private static final String READ_DATA                 = "data.read";
-    private static final String READ_DATA_FROM_ID         = "data.read.from.id";
-    private static final String LIST_DATA                 = "data.list";
-    private static final String LIST_DATA_FROM_STYLE      = "data.list.from.style";
-    private static final String LIST_DATA_FROM_PROVIDER   = "data.list.from.provider";
-    private static final String WRITE_DATA                = "data.write";
-    private static final String UPDATE_DATA               = "data.update";
-    private static final String DELETE_DATA               = "data.delete";
+    private static final String READ_DATA                   = "data.read";
+    private static final String READ_DATA_FROM_ID           = "data.read.from.id";
+    private static final String READ_DATA_FROM_LAYER        = "data.read.from.layer";
+    private static final String LIST_DATA                   = "data.list";
+    private static final String LIST_DATA_FROM_STYLE        = "data.list.from.style";
+    private static final String LIST_DATA_FROM_PROVIDER     = "data.list.from.provider";
+    private static final String WRITE_DATA                  = "data.write";
+    private static final String UPDATE_DATA                 = "data.update";
+    private static final String DELETE_DATA                 = "data.delete";
 
-    private static final String WRITE_STYLED_DATA         = "styled_data.write";
-    private static final String DELETE_STYLED_DATA        = "styled_data.delete";
+    private static final String WRITE_STYLED_DATA           = "styled_data.write";
+    private static final String DELETE_STYLED_DATA          = "styled_data.delete";
 
-    private static final String READ_SERVICE              = "service.read";
-    private static final String READ_SERVICE_FROM_ID      = "service.read.from.id";
-    private static final String READ_SERVICES_CONFIG      = "service.read.config";
-    private static final String READ_SERVICES_EXTRA_CONFIG = "service.read.extra.config";
-    private static final String READ_SERVICES_METADATA    = "service.read.metadata";
-    private static final String LIST_SERVICES             = "service.list";
-    private static final String LIST_SERVICES_FROM_TYPE   = "service.list.from.type";
-    private static final String WRITE_SERVICE             = "service.write";
-    private static final String WRITE_SERVICE_EXTRA_CONFIG = "service.write.extra.config";
-    private static final String WRITE_SERVICE_METADATA    = "service.write.metadata";
-    private static final String UPDATE_SERVICE            = "service.update";
-    private static final String UPDATE_SERVICE_CONFIG     = "service.update.config";
+    private static final String READ_SERVICE                = "service.read";
+    private static final String READ_SERVICE_FROM_ID        = "service.read.from.id";
+    private static final String READ_SERVICES_CONFIG        = "service.read.config";
+    private static final String READ_SERVICES_EXTRA_CONFIG  = "service.read.extra.config";
+    private static final String READ_SERVICES_METADATA      = "service.read.metadata";
+    private static final String LIST_SERVICES               = "service.list";
+    private static final String LIST_SERVICES_FROM_TYPE     = "service.list.from.type";
+    private static final String LIST_SERVICES_FROM_DATA     = "service.list.from.data";
+    private static final String WRITE_SERVICE               = "service.write";
+    private static final String WRITE_SERVICE_EXTRA_CONFIG  = "service.write.extra.config";
+    private static final String WRITE_SERVICE_METADATA      = "service.write.metadata";
+    private static final String UPDATE_SERVICE              = "service.update";
+    private static final String UPDATE_SERVICE_CONFIG       = "service.update.config";
     private static final String UPDATE_SERVICE_EXTRA_CONFIG = "service.update.extra.config";
-    private static final String UPDATE_SERVICE_METADATA   = "service.update.metadata";
-    private static final String DELETE_SERVICE            = "service.delete";
-    private static final String DELETE_SERVICE_METADATA   = "service.delete.metadata";
+    private static final String UPDATE_SERVICE_METADATA     = "service.update.metadata";
+    private static final String DELETE_SERVICE              = "service.delete";
+    private static final String DELETE_SERVICE_METADATA     = "service.delete.metadata";
     private static final String DELETE_SERVICE_EXTRA_CONFIG = "service.delete.extra.config";
 
-    private static final String READ_LAYER                = "layer.read";
-    private static final String READ_LAYER_FROM_ID        = "layer.read.from.id";
-    private static final String READ_LAYER_CONFIG         = "layer.read.config";
-    private static final String LIST_LAYERS               = "layer.list";
-    private static final String LIST_LAYERS_FROM_SERVICE  = "layer.list.from.service";
-    private static final String WRITE_LAYER               = "layer.write";
-    private static final String UPDATE_LAYER              = "layer.update";
-    private static final String UPDATE_LAYER_CONFIG       = "layer.update.config";
-    private static final String DELETE_LAYER              = "layer.delete";
+    private static final String READ_LAYER                  = "layer.read";
+    private static final String READ_LAYER_FROM_ID          = "layer.read.from.id";
+    private static final String READ_LAYER_CONFIG           = "layer.read.config";
+    private static final String LIST_LAYERS                 = "layer.list";
+    private static final String LIST_LAYERS_FROM_SERVICE    = "layer.list.from.service";
+    private static final String WRITE_LAYER                 = "layer.write";
+    private static final String UPDATE_LAYER                = "layer.update";
+    private static final String UPDATE_LAYER_CONFIG         = "layer.update.config";
+    private static final String DELETE_LAYER                = "layer.delete";
+    private static final String DELETE_SERVICE_LAYER        = "layer.service.delete";
 
-    private static final String READ_TASK                 = "task.read";
-    private static final String LIST_TASKS                = "task.list";
-    private static final String LIST_TASKS_FROM_STATE     = "task.list.from.state";
-    private static final String WRITE_TASK                = "task.write";
-    private static final String UPDATE_TASK               = "task.update";
-    private static final String DELETE_TASK               = "task.delete";
+    private static final String READ_TASK                   = "task.read";
+    private static final String LIST_TASKS                  = "task.list";
+    private static final String LIST_TASKS_FROM_STATE       = "task.list.from.state";
+    private static final String WRITE_TASK                  = "task.write";
+    private static final String UPDATE_TASK                 = "task.update";
+    private static final String DELETE_TASK                 = "task.delete";
 
-    private static final String READ_PROPERTY             = "properties.read";
-    private static final String WRITE_PROPERTY            = "properties.write";
+    private static final String READ_PROPERTY               = "properties.read";
+    private static final String WRITE_PROPERTY              = "properties.write";
 
-    private static final String READ_CRS                  = "crs.read";
-    private static final String LIST_CRS                  = "crs.list";
-    private static final String WRITE_CRS                  = "crs.write";
+    private static final String READ_CRS                    = "crs.read";
+    private static final String LIST_CRS                    = "crs.list";
+    private static final String WRITE_CRS                   = "crs.write";
     private static final String UPDATE_CRS                  = "crs.update";
     private static final String DELETE_CRS                  = "crs.delete";
 
@@ -707,6 +710,12 @@ public final class Session implements Closeable {
         return new Query(READ_DATA_FROM_ID).with(generatedId).select().getFirst(DataRecord.class);
     }
 
+    public DataRecord readDatafromLayer(final String layerAlias, final String providerId) throws SQLException {
+        ensureNonNull("layerAlias", layerAlias);
+        ensureNonNull("providerId", providerId);
+        return new Query(READ_DATA_FROM_LAYER).with(layerAlias, providerId).select().getFirst(DataRecord.class);
+    }
+
     public DataRecord readData(final String name, final String providerId) throws SQLException {
         ensureNonNull("name",       name);
         ensureNonNull("providerId", providerId);
@@ -835,6 +844,10 @@ public final class Session implements Closeable {
         return new Query(LIST_SERVICES_FROM_TYPE).with(spec.name()).select().getAll(ServiceRecord.class);
     }
 
+    public List<ServiceRecord> readDataServices(final DataRecord record) throws SQLException {
+        return new Query(LIST_SERVICES_FROM_DATA).with(record.id).select().getAll(ServiceRecord.class);
+    }
+
     public ServiceRecord writeService(final String identifier, final Specification spec, final StringReader config, final UserRecord owner) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
@@ -959,6 +972,10 @@ public final class Session implements Closeable {
         new Query(DELETE_LAYER).with(alias, service.id).update();
     }
 
+    public void deleteServiceLayer(final ServiceRecord service) throws SQLException {
+        ensureNonNull("service", service);
+        new Query(DELETE_SERVICE_LAYER).with(service.id).update();
+    }
 
     /**************************************************************************
      *                          task table queries                            *

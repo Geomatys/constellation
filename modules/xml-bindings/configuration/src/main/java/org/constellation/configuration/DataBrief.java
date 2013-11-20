@@ -55,7 +55,10 @@ public final class DataBrief implements Serializable {
     private String owner;
 
     @XmlElement(name="TargetStyle")
-    private List<StyleBrief> targetStyle = new ArrayList<>();
+    private List<StyleBrief> targetStyle = new ArrayList<>(0);
+
+    @XmlElement(name="TargetService")
+    private List<ServiceProtocol> targetService = new ArrayList<>(0);
 
     public String getName() {
         return name;
@@ -113,6 +116,14 @@ public final class DataBrief implements Serializable {
         this.targetStyle = targetStyle;
     }
 
+    public List<ServiceProtocol> getTargetService() {
+        return targetService;
+    }
+
+    public void setTargetService(final List<ServiceProtocol> targetService) {
+        this.targetService = targetService;
+    }
+
     @Override
     public String toString() {
         return "DataBrief{" +
@@ -125,4 +136,5 @@ public final class DataBrief implements Serializable {
                 ", targetStyle=" + targetStyle +
                 '}';
     }
+
 }

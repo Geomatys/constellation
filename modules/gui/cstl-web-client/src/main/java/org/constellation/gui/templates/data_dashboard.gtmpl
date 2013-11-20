@@ -83,13 +83,13 @@
 </script>
 
 
-<div id="styleModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+<div id="linkedModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="modalLabel">&{label.data.list}</h3>
     </div>
     <div class="modal-body">
-        <div id="styleList" class="dashboard">
+        <div id="linkedList" class="dashboard">
             <div class="navbar sort-navbar">
                 <div class="navbar-inner" style="border:1px solid #e3e3e3;padding-right:5px;">
                     <ul class="nav">
@@ -120,5 +120,9 @@
     </div>
 </div>
 <script type="text/javascript">
-    CSTL.LinkStyleWorkflow.init();
+        function validateData(styleProvider, styleName, dataProvider, dataName){
+            return CSTL.Providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName);
+        }
+
+        var styleFlow = CSTL.LinkWorkflow.init('StyleController.styleList()', validateData, CSTL.LinkWorkflow.styleTemplate);
 </script>

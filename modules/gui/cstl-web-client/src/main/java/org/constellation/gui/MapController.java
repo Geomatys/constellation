@@ -17,21 +17,26 @@
 
 package org.constellation.gui;
 
+import juzu.Action;
 import juzu.Path;
+import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
+import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.Service;
-import org.constellation.dto.StyleBean;
 import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.MapManager;
+import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.service.ServicesManager;
 import org.constellation.gui.util.LayerComparator;
+import org.constellation.util.QnameLocalComparator;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -59,6 +64,10 @@ public class MapController {
     @Inject
     private MapManager mapManager;
 
+    @Inject
+    private ProviderManager providerManager;
+
+
     /**
      * root wms service page
      */
@@ -69,6 +78,10 @@ public class MapController {
     @Inject
     @Path("map_service.gtmpl")
     Template serviceDescription;
+
+    @Inject
+    @Path("layer_selected.gtmpl")
+    Template layerSelected;
 
     @Inject
     @Path("layer_listings.gtmpl")
@@ -129,6 +142,27 @@ public class MapController {
         parameters.put("startIndex", 0);
         parameters.put("nbPerPage",  10);
         parameters.put("capabilitiesUrl", capabilitiesUrl);
+        parameters.put("selected", null);
         return serviceDescription.ok(parameters).withMimeType("text/html");
+    }
+
+    @Ajax
+    @Resource
+    @Route("selectLayer")
+    public Response selectLayer(final String layerAlias, final String providerId){
+        final Map<String, Object> parameters = new HashMap<>(0);
+        final DataBrief data = providerManager.getLayerSummary(layerAlias, providerId);
+        parameters.put("selected", data);
+        return layerSelected.ok(parameters).withMimeType("text/html");
+    }
+
+    @Action
+    @Route("removeLayer")
+    public Response removeLayer(final String layerName, final String serviceId, final String serviceType){
+        //remove namespace from layer name
+        final int index = layerName.lastIndexOf('}');
+        final String name = layerName.substring(index+1);
+        mapManager.removeLayer(name, serviceId, serviceType.toLowerCase());
+        return MapController_.dashboard(serviceId, serviceType);
     }
 }

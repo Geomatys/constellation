@@ -36,7 +36,7 @@ import java.util.Objects;
  */
 @XmlRootElement(name="LayerContext")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class LayerContext {
+public class    LayerContext {
 
     @XmlAttribute
     private DataSourceType implementation;

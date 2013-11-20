@@ -148,4 +148,26 @@ public final class StyleRecord implements Record {
     public void linkToData(final DataRecord data) throws SQLException {
         session.writeStyledData(this, data);
     }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StyleRecord that = (StyleRecord) o;
+
+        if (id != that.id) return false;
+        if (provider != that.provider) return false;
+        if (!name.equals(that.name)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + name.hashCode();
+        result = 31 * result + provider;
+        return result;
+    }
 }

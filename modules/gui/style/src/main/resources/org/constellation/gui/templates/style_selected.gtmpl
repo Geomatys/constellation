@@ -27,14 +27,14 @@
                 <%if('raster'.equals(type)){%><span title="&{edition.style.label.raster}" class="symbol-raster"></span><%}%>
             <%}%>
             <div class="separator"></div>
-            <h6 style="margin-bottom:12px;">&{label.related.data}<button type="button" onclick="CSTL.LinkDataWorkflow.start();" class="btn btn-small pull-right" title="&{msg.add.style.association}"><i class="icon-plus"></i></button></h6>
+            <h6 style="margin-bottom:12px;">&{label.related.data}<button type="button" onclick="dataFlow.start();" class="btn btn-small pull-right" title="&{msg.add.style.association}"><i class="icon-plus"></i></button></h6>
             <div id="linkedList">
                 <%if (selected.targetData == null || selected.targetData.isEmpty()) {%>
                     &{label.no.association}
                 <%} else {%>
                     <%for (def data : selected.targetData) {%>
                         <div class="data" data-name="${data.name}" data-provider="${data.provider}">
-                            <button type="button" onclick="CSTL.LinkDataWorkflow.unlink('${data.name}','${data.provider}');" class="btn btn-small"><i class="icon-minus"></i></button>
+                            <button type="button" onclick="dataFlow.unlink('${data.name}','${data.provider}', styleUnlink);" class="btn btn-small"><i class="icon-minus"></i></button>
                             ${data.name}
                         </div>
                     <%}%>
@@ -52,7 +52,11 @@
             </div>
         </div>
         <script type="text/javascript">
-            CSTL.LinkDataWorkflow.setStyle('${selected.brief.name}','${selected.brief.provider}');
+            function styleUnlink(dataProvider, dataName, styleProvider, styleName){
+                return CSTL.Providers.unlinkStyleFromData(styleProvider,styleName,dataProvider,dataName);
+            }
+
+            dataFlow.setSelected('${selected.brief.name}','${selected.brief.provider}');
         </script>
     </div>
 <%}%>

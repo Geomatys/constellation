@@ -31,16 +31,16 @@
     <div class="pull-left" style="width:35%;">
         <div style="padding: 0 10px;">
             <div class="row-fluid">
-                <a href="#addModal" style="margin-bottom:10px;" role="button" class="btn btn-info span6" data-toggle="modal" onmousedown="CSTL.AddLayerWorkflow.start();">&{layer.listing.data.add.button.label}</a>
-                <a href="#myModal" style="margin-bottom:10px;" role="button" class="btn btn-info span6" data-toggle="modal">&{layer.listing.data.create.button.label}</a>
+                <a href="#addModal" style="margin-bottom:10px;" role="button" class="btn btn-info btn-large btn-block" data-toggle="modal" onmousedown="CSTL.AddLayerWorkflow.start();">&{layer.listing.data.add.button.label}</a>
             </div>
-            <div class="alert alert-info">
-                <h5>&{label.no.selected.layer}</h5>
-                <p>&{msg.no.selected.layer}</p>
+            <div id="selection" data-role="selected">
+                #{include path=layer_selected.gtmpl/}
             </div>
         </div>
     </div>
 </div>
 <script type="text/javascript">
     CSTL.MapDashboard.init('${service.identifier}');
+
+
 </script>

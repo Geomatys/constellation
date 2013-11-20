@@ -22,6 +22,8 @@ import org.constellation.configuration.LayerList;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manager for WMS service operations.
@@ -32,6 +34,7 @@ import java.io.IOException;
  */
 public class MapManager {
 
+    private static final Logger LOGGER = Logger.getLogger(MapManager.class.getName());
     /**
      * Constellation manager used to communicate with the Constellation server.
      */
@@ -47,5 +50,13 @@ public class MapManager {
      */
     public LayerList getLayers(final String serviceId) throws IOException {
         return cstl.openClient().services.getLayers(Specification.WMS, serviceId);
+    }
+
+    public void removeLayer(final String layerName, final String serviceId, final String spec) {
+        try {
+            cstl.openClient().services.deleteLayer(serviceId, layerName, spec);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to remove layer", e);
+        }
     }
 }

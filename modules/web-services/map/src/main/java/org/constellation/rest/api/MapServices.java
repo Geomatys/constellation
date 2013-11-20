@@ -27,6 +27,7 @@ import org.constellation.dto.AddLayer;
 import org.constellation.map.configuration.MapConfigurer;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -34,6 +35,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -66,6 +68,13 @@ public final class MapServices {
     public Response addLayer(final @PathParam("spec") String spec, final @PathParam("id") String id, final AddLayer layer) throws Exception {
         getConfigurer(spec).addLayer(layer);
         return ok(AcknowlegementType.success("Layer \"" + layer.getLayerId() + "\" successfully added to " + spec + " service \"" + id + "\"."));
+    }
+
+    @DELETE
+    @Path("{id}/{layerid}")
+    public Response deleteLayer(final @PathParam("spec") String spec, @PathParam("id") String serviceId, @PathParam("layerid") String layerid) throws NotRunningServiceException, JAXBException {
+        getConfigurer(spec).removeLayer(serviceId, layerid);
+        return Response.ok().build();
     }
 
     /**

@@ -259,14 +259,13 @@ public final class ServicesAPI {
     }
 
     /**
-     * Return a complete URL for the specified service (wms, wfs, csw,...) and
-     * instance identifier.
-     *
-     * @param service The service name (wms, wfs, csw,...).
-     * @param instanceId The instance identifier.
-     * @return A complete URL for the specified service.
+     * dele te service layer
+     * @param serviceId service identifier
+     * @param layerId data layer name
+     * @param spec service specofication
+     * @throws IOException
      */
-    public String getInstanceURL(final String service, final String instanceId) {
-        return client.getUrl() + service.toLowerCase() + '/' + instanceId;
+    public void deleteLayer(final String serviceId, final String layerId, final String spec) throws IOException {
+        client.delete("MAP/" + spec + "/" + serviceId + "/" + layerId, MediaType.APPLICATION_XML_TYPE).ensure2xxStatus();
     }
 }

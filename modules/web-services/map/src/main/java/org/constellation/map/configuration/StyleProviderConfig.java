@@ -340,7 +340,10 @@ public final class StyleProviderConfig extends Static {
             if (data == null) {
                 throw new ConfigurationException("Data named \"" + dataId + "\" from provider with id \"" + dataProvider + "\" can't be found from database.");
             }
-            session.writeStyledData(style, data);
+            final List<StyleRecord> sylesList = session.readStyles(data);
+            if(!sylesList.contains(style)){
+                session.writeStyledData(style, data);
+            }
         } catch (SQLException ex) {
             throw new ConfigurationException("An error occurred while trying to link the style named \"" + styleId + "\" to data named \"" + dataId + "\".", ex);
         } finally {

@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ServiceReport {
     
-    private List<ServiceProtocol> availableServices = new ArrayList<ServiceProtocol>();
+    private List<ServiceProtocol> availableServices = new ArrayList<>();
     
     public ServiceReport() {
         
@@ -50,7 +50,7 @@ public class ServiceReport {
      * @return the availableServices
      */
     public Map<String, List<String>> getAvailableServices() {
-        final Map<String, List<String>> response = new HashMap<String, List<String>>();
+        final Map<String, List<String>> response = new HashMap<>();
         for (ServiceProtocol sp : availableServices) {
             response.put(sp.getName(), sp.getProtocol());
         }
