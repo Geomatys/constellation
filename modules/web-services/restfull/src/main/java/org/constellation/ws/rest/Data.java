@@ -3,16 +3,14 @@ package org.constellation.ws.rest;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
-
 import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.metadata.iso.content.DefaultCoverageDescription;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
-
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.DataInformation;
@@ -22,31 +20,30 @@ import org.constellation.dto.FileListBean;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
+import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.constellation.utils.UploadUtilities;
-
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.LayerProviders;
-import org.geotoolkit.coverage.io.CoverageIO;
+import org.geotoolkit.coverage.filestore.FileCoverageReference;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
-
+import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessListener;
 import org.opengis.feature.type.Name;
+import org.opengis.metadata.Metadata;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.content.RangeDimension;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.InternationalString;
+import org.opengis.util.NoSuchIdentifierException;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -56,10 +53,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -278,7 +277,7 @@ public class Data {
             DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, null, dataType);
             int extensionPoint = filePath.lastIndexOf('.');
             int lastSlash = filePath.lastIndexOf("/");
-            String dataName = filePath.substring(lastSlash+1, extensionPoint);
+            String dataName = filePath.substring(lastSlash + 1, extensionPoint);
             information.setName(dataName);
             return Response.status(200).entity(information).build();
         }
@@ -323,7 +322,7 @@ public class Data {
         //Save metadata
         final File dataFile = new File(metadataToSave.getDataPath());
         int extensionStart = dataFile.getName().lastIndexOf(".");
-        String dataName = dataFile.getName().substring(0,extensionStart);
+        String dataName = dataFile.getName().substring(0, extensionStart);
         ConfigurationEngine.saveMetaData(dm, dataName, CSWMarshallerPool.getInstance());
         return Response.status(200).build();
     }
@@ -420,7 +419,7 @@ public class Data {
     @Path("summary/{providerid}/{name}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getDataSummary(@PathParam("providerid") String providerid, @PathParam("name") String name){
+    public Response getDataSummary(@PathParam("providerid") String providerid, @PathParam("name") String name) {
         final DataBrief db = ConfigurationEngine.getData(name, providerid);
         return Response.ok(db).build();
     }
@@ -429,9 +428,31 @@ public class Data {
     @Path("layer/summary/{providerid}/{layerAlias}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getLayerSummary(@PathParam("providerid") String providerid, @PathParam("layerAlias") String layerAlias){
+    public Response getLayerSummary(@PathParam("providerid") String providerid, @PathParam("layerAlias") String layerAlias) {
         final DataBrief db = ConfigurationEngine.getDataLayer(layerAlias, providerid);
         return Response.ok(db).build();
+    }
+
+    @GET
+    @Path("metadata/{providerId}/{dataId}/{dataType}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getMetadata(final @PathParam("spec") String spec, final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("dataType") String dataType) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+        //get reader from metadata
+        GridCoverageReader reader = null;
+        final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(providerId);
+        final LayerDetails layer = provider.get(new DefaultName(dataId));
+        final Object origin = layer.getOrigin();
+        Metadata meta = null;
+        if (origin instanceof FileCoverageReference) {
+            final FileCoverageReference fcr = (FileCoverageReference) origin;
+            reader = fcr.acquireReader();
+            meta = reader.getMetadata();
+        }
+
+        final DataInformation di = MetadataUtilities.getRasterDataInformation(reader, null, dataType);
+        //TODO get metadata from file
+        return Response.ok(di).build();
     }
 }
 

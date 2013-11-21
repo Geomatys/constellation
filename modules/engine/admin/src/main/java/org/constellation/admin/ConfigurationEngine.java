@@ -410,14 +410,17 @@ public class ConfigurationEngine {
      * @return
      */
     public static DataBrief getData(String name, String providerId){
+        Session session = null;
         try {
-            final Session session = EmbeddedDatabase.createSession();
+            session = EmbeddedDatabase.createSession();
             final DataRecord record = session.readData(name, providerId);
             if(record!=null){
                 return getDataBrief(session, record);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error when try to read data", e);
+        } finally {
+            if (session != null) session.close();
         }
         return null;
     }
@@ -429,14 +432,17 @@ public class ConfigurationEngine {
      * @return
      */
     public static DataBrief getDataLayer(final String layerAlias, final String providerId) {
+        Session session = null;
         try {
-            final Session session = EmbeddedDatabase.createSession();
+            session = EmbeddedDatabase.createSession();
             DataRecord record = session.readDatafromLayer(layerAlias, providerId);
             if(record!=null){
                 return getDataBrief(session, record);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Error on sql execution when search data layer", e);
+        } finally {
+            if (session != null) session.close();
         }
         return null;
     }

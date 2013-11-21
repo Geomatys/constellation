@@ -22,9 +22,16 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.LayerList;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
-import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.map.configuration.MapConfigurer;
+import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerProvider;
+import org.constellation.provider.LayerProviderProxy;
+import org.geotoolkit.coverage.filestore.FileCoverageReference;
+import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.feature.DefaultName;
+import org.opengis.metadata.Metadata;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -36,6 +43,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+import java.sql.SQLException;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -90,4 +98,6 @@ public final class MapServices {
         }
         return (MapConfigurer) ServiceConfigurer.newInstance(spec);
     }
+
+
 }

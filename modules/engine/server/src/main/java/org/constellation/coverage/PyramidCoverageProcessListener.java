@@ -28,12 +28,15 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     @Override
     public void started(final ProcessEvent processEvent) {
         //Create task on database (state : pending)
+        Session session = null;
         try {
-            Session session = EmbeddedDatabase.createSession();
+            session = EmbeddedDatabase.createSession();
             String uuidTask = UUID.randomUUID().toString();
             pyramidTask = session.writeTask(uuidTask, "pyramid", null);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Unable to save task", e);
+        } finally {
+            if (session != null) session.close();
         }
     }
 

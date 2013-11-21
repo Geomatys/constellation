@@ -66,7 +66,10 @@ public final class MetadataUtilities {
         switch (dataType) {
             case "raster":
                 try {
-                    return getRasterDataInformation(file, metadataFile, dataType);
+                    final GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
+                    final DataInformation di = getRasterDataInformation(coverageReader, metadataFile, dataType);
+                    di.setPath(file.getPath());
+                    return di;
                 } catch (CoverageStoreException | NoSuchIdentifierException | ProcessException | JAXBException e) {
                     LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
                 }
@@ -106,13 +109,12 @@ public final class MetadataUtilities {
     /**
      *
      *
-     * @param file data file or folder
      * @param metadataFile
      *@param dataType (raster, vector, ...)  @return a {@link org.constellation.dto.DataInformation} from data file
      * @throws CoverageStoreException
      */
-    public static DataInformation getRasterDataInformation(final File file, final File metadataFile, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
-        GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
+    public static DataInformation getRasterDataInformation(final GridCoverageReader coverageReader, final File metadataFile, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+
         CoordinateReferenceSystem cRs = coverageReader.getGridGeometry(0).getCoordinateReferenceSystem();
 
         if (!(cRs instanceof ImageCRS)) {
@@ -136,7 +138,7 @@ public final class MetadataUtilities {
             MetadataMapBuilder.setCounter(0);
             final ArrayList<SimplyMetadataTreeNode> metadataList = MetadataMapBuilder.createMetadataList(rootNode, null, 11);
 
-            final DataInformation information = new DataInformation(file.getPath(), dataType, metadataList);
+            final DataInformation information = new DataInformation(null, dataType, metadataList);
             addCoverageData(coverageReader, information);
 
             return information;

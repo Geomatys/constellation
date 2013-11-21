@@ -183,9 +183,10 @@ public class MapConfigurer extends OGCConfigurer {
     }
 
     public void removeLayer(final String serviceId, final String layerid) throws JAXBException {
-        try {
+        Session session = null;
 
-            final Session session = EmbeddedDatabase.createSession();
+        try {
+            session = EmbeddedDatabase.createSession();
             final ServiceRecord service = session.readService(serviceId, specification);
             final InputStream config =  service.getConfig();
             final Unmarshaller unmarshall = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
@@ -222,6 +223,8 @@ public class MapConfigurer extends OGCConfigurer {
 
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "", e);
+        } finally {
+            if(session!=null) session.close();
         }
     }
 }
