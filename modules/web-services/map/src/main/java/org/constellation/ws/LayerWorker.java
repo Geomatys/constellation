@@ -148,6 +148,15 @@ public abstract class LayerWorker extends AbstractWorker {
         }
         throw new FactoryNotFoundException("No Map factory has been found for type:" + type);
     }
+
+    protected List<Layer> getConfigurationLayers(final String login, final List<Name> layerNames) {
+        final List<Layer> layerConfigs = new ArrayList<Layer>();
+        for (Name layerName : layerNames) {
+            Layer l = getConfigurationLayer(layerName, login);
+            layerConfigs.add(l);
+        }
+        return layerConfigs;
+    }
     
     protected Layer getConfigurationLayer(final Name layerName, final String login) {
         if (layerName != null && layerName.getLocalPart() != null) {
@@ -298,7 +307,11 @@ public abstract class LayerWorker extends AbstractWorker {
         }
         return style;
     }
-    
+
+    protected MutableStyle getLayerStyle(final String styleName) {
+        return StyleProviderProxy.getInstance().get(styleName);
+    }
+
     protected Layer getMainLayer() {
         if (layerContext == null) {
             return null;
