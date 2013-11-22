@@ -1,15 +1,6 @@
 package org.constellation.coverage;
 
 import java.awt.Dimension;
-import java.io.File;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CancellationException;
 
 import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.coverage.CoverageReference;
@@ -36,7 +27,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 
-import java.awt.*;
 import java.io.File;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -190,7 +180,7 @@ public class PyramidCoverageHelper {
             Map<Envelope, double[]> resolution_Per_Envelope = getResolutionPerEnvelope(coverage);
             pyramidCoverageBuilder.create(coverage, getCoverageStore(),
                     coverageNamer.getName(baseCoverageName, coverageCount),
-                    resolution_Per_Envelope, null, listener);
+                    resolution_Per_Envelope, null, listener, null);
             coverageCount++;
         }
     }
@@ -476,27 +466,32 @@ public class PyramidCoverageHelper {
             this.baseCoverageName = baseCoverageName;
         }
 
+        @Override
         public IBuilder inputFormat(String inputFormat) {
             this.inputFormat = inputFormat;
             return this;
         }
 
+        @Override
         public IBuilder withDeeps(double[] deeps) {
             this.depth = deeps;
             return this;
         }
 
+        @Override
         public IBuilder withTile(int width, int height) {
             this.tileWidth = width;
             this.tileHeight = height;
             return this;
         }
 
+        @Override
         public IBuilder withInterpolation(InterpolationCase interpolation) {
             this.interpolation = interpolation;
             return this;
         }
 
+        @Override
         public WithInput fromImage(String path) throws MalformedURLException {
             WithFileInput fileInput = new WithFileInput(this);
             fileInput.imageFile = new File(path).toURI().toURL();
@@ -505,6 +500,7 @@ public class PyramidCoverageHelper {
 
         }
 
+        @Override
         public IBuilder withBaseCoverageNamer(CoverageNamer coverageNamer) {
             this.coverageNamer = coverageNamer;
             return this;
