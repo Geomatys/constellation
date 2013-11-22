@@ -248,7 +248,11 @@ public final class ProvidersAPI {
         return client.get("data/summary/"+providerId+"/"+name, MediaType.APPLICATION_XML_TYPE).getEntity(DataBrief.class);
     }
 
-    public DataBrief getLaterSummary(final String layerAlias, final String providerId) throws IOException {
+    public DataBrief getLayerSummary(final String layerAlias, final String providerId) throws IOException {
         return client.get("data/layer/summary/"+providerId+"/"+layerAlias, MediaType.APPLICATION_XML_TYPE).getEntity(DataBrief.class);
+    }
+
+    public DataInformation getMetadata(final String providerId, final String dataId, final String dataType) throws IOException {
+        return client.get("data/metadata/"+providerId+"/"+dataId+"/"+dataType, MediaType.APPLICATION_XML_TYPE).getEntity(DataInformation.class);
     }
 }

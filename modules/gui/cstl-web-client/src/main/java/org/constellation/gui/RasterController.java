@@ -54,7 +54,7 @@ public class RasterController {
 
     @View
     @Route("/raster/description")
-    public Response showRaster(final String returnURL, final String metadataUploaded) throws IOException {
+    public Response showRaster(final String returnURL, final String metadataUploaded, final String creationMode) throws IOException {
         final Locale userLocale = Request.getCurrent().getUserContext().getLocale();
         final MetadataLists codeLists = providerManager.getMetadataCodeLists(userLocale.toString());
 
@@ -66,6 +66,7 @@ public class RasterController {
                 .topics(codeLists.getCategories())
                 .userLocale(userLocale.getLanguage())
                 .metadataUploaded(metadataUploaded)
+                .creationMode(creationMode)
                 .ok().withMimeType("text/html");
     }
 

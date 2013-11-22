@@ -54,7 +54,7 @@ public class DataController {
         Response aResponse = Response.error("response not initialized");
         switch(dataType){
             case "raster":
-                aResponse =  RasterController_.showRaster(returnURL, "false");
+                aResponse =  RasterController_.showRaster(returnURL, "false", "true");
                 break;
             case "vector":
                 aResponse = VectorController_.showVector(returnURL, "false");
@@ -70,5 +70,13 @@ public class DataController {
         final DataBrief db = providerManager.getDataSummary(name, providerId);
         parameters.put("selected", db);
         return dataSelected.with(parameters).ok().withMimeType("text/html");
+    }
+
+    @Action
+    @Route("/metadata")
+    public Response getMetadata(final String providerId, final String dataId, final String dataType, final String returnUrl){
+        final DataInformation di = providerManager.getMetadata(providerId, dataId, dataType);
+        DataInformationContainer.setInformation(di);
+        return RasterController_.showRaster(returnUrl, "true", "false");
     }
 }

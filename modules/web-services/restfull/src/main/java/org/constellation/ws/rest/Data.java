@@ -28,6 +28,7 @@ import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.constellation.utils.UploadUtilities;
+import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.filestore.FileCoverageReference;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
@@ -437,22 +438,22 @@ public class Data {
     @Path("metadata/{providerId}/{dataId}/{dataType}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getMetadata(final @PathParam("spec") String spec, final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("dataType") String dataType) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
-        //get reader from metadata
+    public Response getMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("dataType") String dataType) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+
+        //get reader
         GridCoverageReader reader = null;
         final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(providerId);
         final LayerDetails layer = provider.get(new DefaultName(dataId));
         final Object origin = layer.getOrigin();
-        Metadata meta = null;
-        if (origin instanceof FileCoverageReference) {
-            final FileCoverageReference fcr = (FileCoverageReference) origin;
+        if (origin instanceof CoverageReference) {
+            final CoverageReference fcr = (CoverageReference) origin;
             reader = fcr.acquireReader();
-            meta = reader.getMetadata();
         }
 
-        final DataInformation di = MetadataUtilities.getRasterDataInformation(reader, null, dataType);
-        //TODO get metadata from file
-        return Response.ok(di).build();
+        //generate DataInformation
+        final DataInformation information = MetadataUtilities.getRasterDataInformation(reader, null, dataType);
+        information.setName(dataId);
+        return Response.ok(information).build();
     }
 }
 
