@@ -107,7 +107,7 @@
                     <artifactId>cstl-web-sos-postgrid</artifactId>
                     <version>${project.version}</version>
                 </dependency>
-		<dependency>
+		        <dependency>
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-sos-om2</artifactId>
                     <version>${project.version}</version>
@@ -126,11 +126,23 @@
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-csw-netcdf</artifactId>
                     <version>${project.version}</version>
+                    <exclusions>
+                     <exclusion>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                     </exclusion>
+                    </exclusions>
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-wms</artifactId>
                     <version>${project.version}</version>
+                    <exclusions>
+                     <exclusion>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                     </exclusion>
+                    </exclusions>
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.web-services</groupId>
@@ -151,6 +163,12 @@
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-wps</artifactId>
                     <version>${project.version}</version>
+                    <exclusions>
+                     <exclusion>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                     </exclusion>
+                    </exclusions>
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.web-services-rest</groupId>
@@ -200,6 +218,10 @@
 		          <groupId>org.slf4j</groupId>
 		          <artifactId>slf4j-jdk14</artifactId>
 		       </exclusion>
+               <exclusion>
+                 <groupId>commons-logging</groupId>
+                 <artifactId>commons-logging</artifactId>
+               </exclusion>
 		    </exclusions>
                 </dependency>
             </dependencies>
@@ -211,6 +233,12 @@
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-wms</artifactId>
                     <version>${project.version}</version>
+                    <exclusions>
+                     <exclusion>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                     </exclusion>
+                    </exclusions>
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
@@ -245,6 +273,12 @@
                 <dependency>
                     <groupId>org.geotoolkit</groupId>
                     <artifactId>geotk-coverageio-netcdf</artifactId>
+                    <exclusions>
+                     <exclusion>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                     </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>
@@ -284,6 +318,12 @@
                 <dependency>
                     <groupId>org.geotoolkit</groupId>
                     <artifactId>geotk-coverageio-netcdf</artifactId>
+                    <exclusions>
+                     <exclusion>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                     </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>
@@ -323,6 +363,12 @@
                 <dependency>
                     <groupId>org.geotoolkit</groupId>
                     <artifactId>geotk-coverageio-netcdf</artifactId>
+                    <exclusions>
+                     <exclusion>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                     </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>
@@ -333,6 +379,12 @@
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-wms</artifactId>
                     <version>${project.version}</version>
+                    <exclusions>
+                     <exclusion>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                     </exclusion>
+                    </exclusions>
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.web-services</groupId>
@@ -372,6 +424,12 @@
                 <dependency>
                     <groupId>org.geotoolkit</groupId>
                     <artifactId>geotk-coverageio-netcdf</artifactId>
+                    <exclusions>
+                     <exclusion>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                     </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>
@@ -452,6 +510,12 @@
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-wps</artifactId>
                     <version>${project.version}</version>
+                    <exclusions>
+                     <exclusion>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                     </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>
@@ -472,7 +536,43 @@
     included in the JARs' list for which Maven will move into "target/binaries".
   -->
     <dependencies>
-    <dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>1.0.13</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.0.13</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <scope>compile</scope>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>log4j-over-slf4j</artifactId>
+	    <version>1.6.4</version>
+      </dependency>
+<!--       <dependency> -->
+<!--         <groupId>log4j</groupId> -->
+<!--         <artifactId>log4j</artifactId> -->
+<!--         <scope>runtime</scope> -->
+<!--       </dependency> -->
+      <dependency>
       <groupId>org.constellation.engine</groupId>
       <artifactId>cstl-engine-shiro</artifactId>
       <version>${project.version}</version>
@@ -491,6 +591,12 @@
             <groupId>org.constellation.web-services</groupId>
             <artifactId>cstl-web-webdav</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+             <exclusion>
+              <groupId>log4j</groupId>
+              <artifactId>log4j</artifactId>
+             </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.constellation.engine</groupId>
@@ -539,6 +645,10 @@
             <version>1.2.1</version>
         </dependency>
     </dependencies>
+
+    <properties>
+      <conf>dev</conf>
+    </properties>
 
     <build>
         <plugins>

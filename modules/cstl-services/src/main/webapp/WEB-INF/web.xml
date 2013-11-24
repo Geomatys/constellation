@@ -17,6 +17,18 @@
         <filter-name>Shiro</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <filter>
+      <description>Filter that exposes ogcServiceType and ogcServiceName to logging appender.</description>
+      <display-name>MDC Log4j filter</display-name>
+      <filter-name>MDCFilter</filter-name>
+      <filter-class>org.constellation.service.logger.MDCFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>MDCFilter</filter-name>
+      <url-pattern>/WS/*</url-pattern>
+    </filter-mapping>
+    
+  
 
     <!-- Filter to allow AJAX cross-origin requests -->
     <!--filter>
