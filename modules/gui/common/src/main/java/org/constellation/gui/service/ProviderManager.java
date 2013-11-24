@@ -281,9 +281,18 @@ public class ProviderManager {
 
     public DataBrief getLayerSummary(final String layerAlias, final String providerId) {
         try {
-            return cstl.openClient().providers.getLaterSummary(layerAlias, providerId);
+            return cstl.openClient().providers.getLayerSummary(layerAlias, providerId);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when call web service to access to data summary", e);
+        }
+        return null;
+    }
+
+    public DataInformation getMetadata(final String providerId, final String dataId, final String dataType) {
+        try {
+            return cstl.openClient().providers.getMetadata(providerId, dataId, dataType);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to get metadata from a layer", e);
         }
         return null;
     }

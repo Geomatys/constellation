@@ -1,0 +1,20 @@
+<div class="tab-pane" id="description">
+</div>
+
+<div class="tab-pane" id="metadata">
+</div>
+
+<script type="text/javascript">
+    //file
+    var metadatasFile = ${datainformation.fileMetadata};
+    CSTL.Data.createMetadataTree(metadatasFile, '#description');
+
+    //coverage
+    <%for(def key : datainformation.coveragesMetadata.keySet()){%>
+        var coverageMetadata = ${datainformation.coveragesMetadata.get(key).coverageMetadataTree};
+        CSTL.Data.createMetadataTree(coverageMetadata, '#metadata');
+    <%}%>
+
+    $("#description .collapse").collapse('show')
+    $("#metadata .collapse").collapse('show')
+</script>

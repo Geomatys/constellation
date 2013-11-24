@@ -8,6 +8,7 @@
 #{param name=topics /}
 #{param name=userLocale /}
 #{param name=metadataUploaded /}
+#{param name=creationMode /}
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
@@ -45,14 +46,15 @@
                         </div>
                     <%}%>
 
-                    <div class="tab-pane" id="description">
-                    </div>
 
-                    <div class="tab-pane" id="metadata">
-                    </div>
+                    #{include path=raster_metadata.gtmpl/}
                 </div>
                 <input type="hidden" name="metadataUploaded" value="${metadataUploaded}">
-                <button type="submit" class="btn btn-info pull-right" id="providerCreation"/>&{label.finish}</button>
+                <% if(creationMode.equalsIgnoreCase("true")){%>
+                    <button type="submit" class="btn btn-info pull-right" id="providerCreation"/>&{label.finish}</button>
+                <% } else { %>
+                    <button type="button" class="btn btn-info pull-right" id="goTo" onclick="document.location.assign('${returnURL}')"/>Return</button>
+                <% } %>
             </form>
         </div>
     </div>
@@ -60,15 +62,6 @@
         $(function () {
             $("#metadataForm input,select,textarea").not("[type=submit]").jqBootstrapValidation();
         });
-        //file
-        var metadatasFile = ${datainformation.fileMetadata};
-        CSTL.Data.createMetadataTree(metadatasFile, '#description');
-
-        //coverage
-        <%for(def key : datainformation.coveragesMetadata.keySet()){%>
-        var coverageMetadata = ${datainformation.coveragesMetadata.get(key).coverageMetadataTree};
-        CSTL.Data.createMetadataTree(coverageMetadata, '#metadata');
-        <%}%>
 
         <% if(metadataUploaded.equalsIgnoreCase("false")){%>
             $("#requiredISO19115Tab").addClass("active");

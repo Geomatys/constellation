@@ -404,7 +404,7 @@ public class Controller {
             Response aResponse = Response.error("response not initialized");
             switch (dataType) {
                 case "raster":
-                    aResponse = RasterController_.showRaster(returnURL, metadataUploaded + "");
+                    aResponse = RasterController_.showRaster(returnURL, metadataUploaded + "", "true");
                     break;
                 case "vector":
                     aResponse = VectorController_.showVector(returnURL, metadataUploaded + "");

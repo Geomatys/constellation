@@ -69,7 +69,7 @@
             <button type="button" class="btn btn-info span6">
                 <i class="icon-download-alt"></i> Export
             </button>
-            <button type="button" class="btn btn-warning span6">
+            <button type="button" id="seeMetadata" class="btn btn-warning span6">
                 <i class="icon-file-alt"></i> See metadata
             </button>
         </div>
@@ -82,10 +82,25 @@
             </button>
         </div>
     </div>
+
+
+    <form action="@{DataController.getMetadata()}" id="metadataForm">
+        <input type="hidden" name="providerId" id="providerId"/>
+        <input type="hidden" name="dataId" value="${selected.name}"/>
+        <input type="hidden" name="dataType" value="${selected.type}"/>
+        <input type="hidden" name="returnUrl" id="returnUrl"/>
+    </form>
+
     <script type="text/javascript">
         $("#deleteLayer").on("click", function(){
             $("#deleteLayerId").val($(".selected").data("name"));
             $("#deleteForm").submit();
+        });
+
+        $("#seeMetadata").on("click", function(){
+            $("#providerId").val($(".selected").data("provider"));
+            $("#returnUrl").val(document.URL);
+            $("#metadataForm").submit();
         });
 
         function dataUnlink(styleProvider, styleName, dataProvider, dataName){

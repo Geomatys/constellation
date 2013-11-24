@@ -162,14 +162,17 @@ public final class MetadataUtilities {
             //build metadata
             final GenericName name = coverageReader.getCoverageNames().get(i);
             final SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
-            final String rootNodeName = sm.getNativeMetadataFormatName();
-            final Node coverateRootNode = sm.getAsTree(rootNodeName);
+            if(sm!=null){
+                final String rootNodeName = sm.getNativeMetadataFormatName();
+                final Node coverateRootNode = sm.getAsTree(rootNodeName);
 
-            MetadataMapBuilder.setCounter(0);
-            final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11, i);
+                MetadataMapBuilder.setCounter(0);
+                final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11, i);
 
-            final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
-            nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
+                final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
+                nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
+            }
+
         }
 
         //update DataInformation
