@@ -134,7 +134,8 @@ ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_service_f
 
 CREATE TABLE "admin"."layer"(
   "id"           INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
-  "alias"        VARCHAR(64) NOT NULL,
+  "name"         VARCHAR(64) NOT NULL,
+  "alias"        VARCHAR(64),
   "service"      INTEGER     NOT NULL,
   "data"         INTEGER     NOT NULL,
   "date"         BIGINT      NOT NULL,
@@ -145,7 +146,7 @@ CREATE TABLE "admin"."layer"(
 );
 
 ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_pk         PRIMARY KEY ("id");
-ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_uq         UNIQUE ("alias","service");
+ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_uq         UNIQUE ("name","service");
 ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_service_fk FOREIGN KEY ("service") REFERENCES "admin"."service"("id") ON DELETE CASCADE;
 ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_data_fk    FOREIGN KEY ("data")  REFERENCES "admin"."data"("id")      ON DELETE CASCADE;
 ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_owner_fk   FOREIGN KEY ("owner") REFERENCES "admin"."user"("login");

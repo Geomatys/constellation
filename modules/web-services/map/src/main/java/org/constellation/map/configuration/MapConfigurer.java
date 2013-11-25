@@ -192,7 +192,7 @@ public class MapConfigurer extends OGCConfigurer {
             final Unmarshaller unmarshall = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
             final LayerContext layerContext = (LayerContext) unmarshall.unmarshal(config);
             final List<Source> sources = layerContext.getLayers();
-            String alias = null;
+            String name = null;
             boolean found = false;
 
             for (Source source : sources) {
@@ -200,7 +200,7 @@ public class MapConfigurer extends OGCConfigurer {
                 for (Layer layer : layers) {
                     final String localPart = layer.getName().getLocalPart();
                     if(localPart.equalsIgnoreCase(layerid)){
-                        alias = layer.getAlias();
+                        name = layer.getName().getLocalPart();
                         layers.remove(layer);
                         found = true;
                         break;
@@ -218,7 +218,7 @@ public class MapConfigurer extends OGCConfigurer {
                 final StringReader reader = new StringReader(writer.toString());
                 service.setConfig(reader);
 
-                session.deleteLayer(alias, service);
+                session.deleteLayer(name, service);
             }
 
         } catch (SQLException e) {

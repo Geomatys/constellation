@@ -167,8 +167,9 @@ public class ConfigurationEngine {
                     LayerContext context = (LayerContext)obj;
                     for (Source source : context.getLayers()) {
                         for (Layer layer : source.getInclude()) {
-                            DataRecord data = session.readData(layer.getName().getLocalPart(), source.getId());
-                            session.writeLayer(layer.getAlias(), service, data, "", null);
+                            String dataName = layer.getName().getLocalPart();
+                            DataRecord data = session.readData(dataName, source.getId());
+                            session.writeLayer(dataName, layer.getAlias(), service, data, "", null);
                         }
                     }
                 }

@@ -968,7 +968,7 @@ public final class Session implements Closeable {
         return new Query(LIST_LAYERS_FROM_SERVICE).with(service.id).select().getAll(LayerRecord.class);
     }
 
-    public LayerRecord writeLayer(final String alias, final ServiceRecord service, final DataRecord data, final Object config, final UserRecord owner) throws SQLException {
+    public LayerRecord writeLayer(final String name, final String alias, final ServiceRecord service, final DataRecord data, final Object config, final UserRecord owner) throws SQLException {
         ensureNonNull("alias",   alias);
         ensureNonNull("service", service);
         ensureNonNull("data",    data);
@@ -983,21 +983,21 @@ public final class Session implements Closeable {
         final int id = new Query(WRITE_LAYER).with(alias, service.id, data.id, date.getTime(), title, description, config, login).insert();
 
         // Return inserted line.
-        return new LayerRecord(this, id, alias, service.id, data.id, date, title, description, login);
+        return new LayerRecord(this, id, name, alias, service.id, data.id, date, title, description, login);
     }
 
-    /* internal */ void updateLayer(final int generatedId, final String newAlias, final int newService, final int newData, final String newOwner) throws SQLException {
-        new Query(UPDATE_LAYER).with(newAlias, newService, newData, newOwner, generatedId).update();
+    /* internal */ void updateLayer(final int generatedId, final String newName, final String newAlias, final int newService, final int newData, final String newOwner) throws SQLException {
+        new Query(UPDATE_LAYER).with(newName, newAlias, newService, newData, newOwner, generatedId).update();
     }
 
     /* internal */ void updateLayerConfig(final int generatedId, final StringReader newConfig) throws SQLException {
         new Query(UPDATE_LAYER_CONFIG).with(newConfig).update();
     }
 
-    public void deleteLayer(final String alias, final ServiceRecord service) throws SQLException {
-        ensureNonNull("alias",   alias);
+    public void deleteLayer(final String name, final ServiceRecord service) throws SQLException {
+        ensureNonNull("name",   name);
         ensureNonNull("service", service);
-        new Query(DELETE_LAYER).with(alias, service.id).update();
+        new Query(DELETE_LAYER).with(name, service.id).update();
     }
 
     public void deleteServiceLayer(final ServiceRecord service) throws SQLException {
