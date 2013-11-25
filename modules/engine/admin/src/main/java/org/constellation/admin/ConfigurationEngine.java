@@ -365,6 +365,7 @@ public class ConfigurationEngine {
      * Save metadata on specific folder
      * @param fileMetadata
      * @param dataName
+     * @param pool
      */
     public static void saveMetaData(final DefaultMetadata fileMetadata, final String dataName, final MarshallerPool pool) {
         ensureNonNull("metadata", fileMetadata);
@@ -376,7 +377,7 @@ public class ConfigurationEngine {
             final StringWriter sw = new StringWriter();
             final Marshaller m = pool.acquireMarshaller();
             m.marshal(fileMetadata, sw);
-            GenericDatabaseMarshallerPool.getInstance().recycle(m);
+            pool.recycle(m);
             final StringReader sr = new StringReader(sw.toString());
             final ProviderRecord provider = session.readProvider(dataName);
             if (provider  != null) {
@@ -394,6 +395,7 @@ public class ConfigurationEngine {
      * Load a metadata for a provider.
      * 
      * @param providerId
+     * @param pool
      * @return
      */
     public static DefaultMetadata loadMetadata(final String providerId, final MarshallerPool pool){
@@ -405,7 +407,7 @@ public class ConfigurationEngine {
                 final InputStream sr = provider.getMetadata();
                 final Unmarshaller m = pool.acquireUnmarshaller();
                 final DefaultMetadata metadata = (DefaultMetadata) m.unmarshal(sr);
-                GenericDatabaseMarshallerPool.getInstance().recycle(m);
+                pool.recycle(m);
                 return metadata;
             }
         } catch (SQLException | IOException | JAXBException ex) {
