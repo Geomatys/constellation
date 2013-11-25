@@ -135,7 +135,9 @@ public class CSWworker extends AbstractWorker {
 
     /**
      * The current MIME type of return
+     * @deprecated thread unsafe
      */
+    @Deprecated
     private String outputFormat;
 
     /**
@@ -253,11 +255,7 @@ public class CSWworker extends AbstractWorker {
             startError = " Unable to find a CSW Factory";
             LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}", startError);
             isStarted = false;
-        } catch (MetadataIoException e) {
-            startError = e.getMessage();
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", startError);
-            isStarted = false;
-        } catch (IndexingException e) {
+        } catch (MetadataIoException | IndexingException e) {
             startError = e.getMessage();
             LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", startError);
             isStarted = false;
@@ -472,6 +470,9 @@ public class CSWworker extends AbstractWorker {
      *
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
+     * 
+     * @return the capabilities document
+     * @throws CstlServiceException
      */
     public AbstractCapabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
@@ -673,6 +674,8 @@ public class CSWworker extends AbstractWorker {
      *
      * @return A GetRecordsResponseType containing the result of the request or
      *         an AcknowledgementType if the resultType is set to VALIDATE.
+     * 
+     * @throws CstlServiceException
      */
     public Object getRecords(final GetRecordsRequest request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetRecords request processing\n");
@@ -887,14 +890,20 @@ public class CSWworker extends AbstractWorker {
         LOGGER.log(Level.FINER, "local max = " + max + " distributed max = " + maxDistributed);
 
         final MetadataType mode;
-        if (outputSchema.equals(Namespaces.GMD) || outputSchema.equals(Namespaces.GFC)) {
-            mode = MetadataType.ISO_19115;
-        } else if (outputSchema.equals(EBRIM_30) || outputSchema.equals(EBRIM_25)) {
-            mode = MetadataType.EBRIM;
-        } else if (outputSchema.equals(Namespaces.CSW)) {
-            mode = MetadataType.DUBLINCORE;
-        } else {
-            throw new IllegalArgumentException("undefined outputSchema");
+        switch (outputSchema) {
+            case Namespaces.GMD:
+            case Namespaces.GFC:
+                mode = MetadataType.ISO_19115;
+                break;
+            case EBRIM_30:
+            case EBRIM_25:
+                mode = MetadataType.EBRIM;
+                break;
+            case Namespaces.CSW:
+                mode = MetadataType.DUBLINCORE;
+                break;
+            default:
+                throw new IllegalArgumentException("undefined outputSchema");
         }
 
         // we return only the number of result matching
@@ -1006,6 +1015,7 @@ public class CSWworker extends AbstractWorker {
      * @param request
      *
      * @return A GetRecordByIdResponse containing a list of records.
+     * @throws CstlServiceException
      */
     public GetRecordByIdResponse getRecordById(final GetRecordById request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetRecordById request processing\n");
@@ -1151,6 +1161,7 @@ public class CSWworker extends AbstractWorker {
      *
      * @param request
      * @return
+     * @throws CstlServiceException
      */
     public DescribeRecordResponse describeRecord(final DescribeRecord request) throws CstlServiceException{
         LOGGER.log(logLevel, "DescribeRecords request processing\n");
@@ -1228,6 +1239,7 @@ public class CSWworker extends AbstractWorker {
      *
      * @param request
      * @return
+     * @throws CstlServiceException
      */
     public GetDomainResponse getDomain(final GetDomain request) throws CstlServiceException{
         LOGGER.log(logLevel, "GetDomain request processing\n");
@@ -1315,6 +1327,7 @@ public class CSWworker extends AbstractWorker {
      *
      * @param request
      * @return
+     * @throws CstlServiceException
      */
     public TransactionResponse transaction(final Transaction request) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
@@ -1493,6 +1506,7 @@ public class CSWworker extends AbstractWorker {
      *
      * @param request
      * @return
+     * @throws CstlServiceException
      */
     public HarvestResponse harvest(final Harvest request) throws CstlServiceException {
         LOGGER.log(logLevel, "Harvest request processing\n");
@@ -1679,7 +1693,9 @@ public class CSWworker extends AbstractWorker {
      *
      * @param request
      * @throws org.constellation.ws.CstlServiceException
+     * @deprecated thread unsafe
      */
+    @Deprecated
     private void initializeOutputFormat(final AbstractCswRequest request) throws CstlServiceException {
 
         // we initialize the output format of the response

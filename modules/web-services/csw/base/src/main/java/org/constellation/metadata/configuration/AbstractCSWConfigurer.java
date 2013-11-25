@@ -49,7 +49,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     /**
      * Build a new CSW configurer.
      *
-     * @throws org.constellation.configuration.exception.ConfigurationException
+     * @throws ConfigurationException
      */
     public AbstractCSWConfigurer() throws ConfigurationException {
     }
@@ -132,7 +132,10 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     }
 
     /**
-     * Reload all the web-services.
+     * Reload a CSW Instance.
+     *
+     * @param identifier the identifier of the CSW instance to restart.
+     * @return {@code true} if the CSW instance successfully restart.
      */
     protected boolean restartCSW(final String identifier) {
         try {
