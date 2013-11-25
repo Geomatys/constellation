@@ -379,6 +379,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
 
     /**
      * need to be overriden by subClasses to add specific admin operation
+     * @param request the request name of the specific admin operation
+     * @throws CstlServiceException
      */
     protected Response treatSpecificAdminRequest(final String request) throws CstlServiceException {
         throw new CstlServiceException("The operation " + request + " is not supported by the administration service",

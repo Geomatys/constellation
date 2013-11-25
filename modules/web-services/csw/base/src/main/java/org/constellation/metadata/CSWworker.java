@@ -60,7 +60,6 @@ import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -99,6 +98,7 @@ import org.constellation.dto.Service;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.metadata.io.MetadataType;
+import org.constellation.metadata.utils.CSWUtils;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
@@ -122,8 +122,7 @@ import org.w3c.dom.Node;
  */
 public class CSWworker extends AbstractWorker {
 
-    
-        /**
+    /**
      * A Database reader.
      */
     private CSWMetadataReader mdReader;
@@ -132,13 +131,6 @@ public class CSWworker extends AbstractWorker {
      * An Database Writer.
      */
     private MetadataWriter mdWriter;
-
-    /**
-     * The current MIME type of return
-     * @deprecated thread unsafe
-     */
-    @Deprecated
-    private String outputFormat;
 
     /**
      * A lucene index searcher to make quick search on the metadatas.
@@ -179,18 +171,6 @@ public class CSWworker extends AbstractWorker {
      * A map of QName - xsd schema object
      */
     private final Map<QName, Object> schemas = new HashMap<>();
-
-    /**
-     * A list of supported MIME type.
-     */
-    private static final List<String> ACCEPTED_OUTPUT_FORMATS;
-    static {
-        ACCEPTED_OUTPUT_FORMATS = new ArrayList<>();
-        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_XML);
-        ACCEPTED_OUTPUT_FORMATS.add(MimeType.APPLICATION_XML);
-        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_HTML);
-        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_PLAIN);
-    }
 
     /**
      * A list of supported resource type.
@@ -686,8 +666,8 @@ public class CSWworker extends AbstractWorker {
         final String id        = request.getRequestId();
         final String userLogin = getUserLogin();
 
-        // we initialize the output format of the response
-        initializeOutputFormat(request);
+        // verify the output format of the response
+        CSWUtils.getOutputFormat(request);
 
         //we get the output schema and verify that we handle it
         final String outputSchema;
@@ -1024,10 +1004,10 @@ public class CSWworker extends AbstractWorker {
 
         final String version   = request.getVersion().toString();
         final String userLogin = getUserLogin();
-        
-        // we initialize the output format of the response
-        initializeOutputFormat(request);
 
+        // verify the output format of the response
+        CSWUtils.getOutputFormat(request);
+        
         // we get the level of the record to return (Brief, summary, full)
         ElementSetType set = ElementSetType.SUMMARY;
         if (request.getElementSetName() != null && request.getElementSetName().getValue() != null) {
@@ -1169,9 +1149,9 @@ public class CSWworker extends AbstractWorker {
 
         verifyBaseRequest(request);
 
-        // we initialize the output format of the response
-        initializeOutputFormat(request);
-
+        // verify the output format of the response
+        CSWUtils.getOutputFormat(request);
+        
         final String version = request.getVersion().toString();
         
         // we initialize the type names
@@ -1613,30 +1593,6 @@ public class CSWworker extends AbstractWorker {
         return response;
     }
 
-
-
-    /**
-     * Return the current output format (default: application/xml)
-     *
-     * @deprecated Thread unsafe todo replace.
-     */
-    @Deprecated
-    public String getOutputFormat() {
-        if (outputFormat == null) {
-            return MimeType.APPLICATION_XML;
-        }
-        return outputFormat;
-    }
-
-    /**
-     * Return true if the MIME type is supported.
-     *
-     * @param format a MIME type represented by a String.
-     */
-    private boolean isSupportedFormat(final String format) {
-        return ACCEPTED_OUTPUT_FORMATS.contains(format);
-    }
-
     /**
      * Verify that the bases request attributes are correct.
      *
@@ -1685,32 +1641,6 @@ public class CSWworker extends AbstractWorker {
             result.append(qn.getPrefix()).append(qn.getLocalPart()).append('\n');
         }
         return result.toString();
-    }
-
-    /**
-     * Initialize the outputFormat (MIME type) of the response.
-     * if the format is not supported it throws a WebService Exception.
-     *
-     * @param request
-     * @throws org.constellation.ws.CstlServiceException
-     * @deprecated thread unsafe
-     */
-    @Deprecated
-    private void initializeOutputFormat(final AbstractCswRequest request) throws CstlServiceException {
-
-        // we initialize the output format of the response
-        final String format = request.getOutputFormat();
-        if (format != null && isSupportedFormat(format)) {
-            outputFormat = format;
-        } else if (format != null && !isSupportedFormat(format)) {
-            final StringBuilder supportedFormat = new StringBuilder();
-            for (String s: ACCEPTED_OUTPUT_FORMATS) {
-                supportedFormat.append(s).append('\n');
-            }
-            throw new CstlServiceException("The server does not support this output format: " + format + '\n' +
-                                             " supported ones are: " + '\n' + supportedFormat.toString(),
-                                             INVALID_PARAMETER_VALUE, "outputFormat");
-        }
     }
 
     /**

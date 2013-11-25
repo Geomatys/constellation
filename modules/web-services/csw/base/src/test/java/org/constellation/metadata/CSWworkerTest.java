@@ -1637,6 +1637,7 @@ public class CSWworkerTest {
         list.add("Feature Type Catalogue Extension Package");
         list.add("Sea surface temperature and history derived from an analysis of MODIS Level 3 data for the Gulf of Mexico");
         list.add("WMS Server for CORINE Land Cover France");
+        list.add("dcbbyyiioo");
         list.add("ebrim1Title");
         list.add("ebrim2Title");
         values = new ListOfValuesType(list);
