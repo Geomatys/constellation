@@ -311,6 +311,14 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         }
     }
 
+    private String getIdentifier(final Node metadata) throws MetadataIoException  {
+        final List<String> identifierValues = NodeUtilities.getValuesFromPaths(metadata, DUBLIN_CORE_QUERYABLE.get("Identifier"));
+        if (!identifierValues.isEmpty()) {
+            return identifierValues.get(0);
+        }
+        return null;
+    }
+
     private Node translateISOtoDCNode(final Node metadata, final ElementSetType type, final List<QName> elementName) throws MetadataIoException  {
         if (metadata != null) {
 
@@ -637,16 +645,22 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return getAllIdentifiers(dataDirectory);
     }
 
-    /**
-     * 
-     */
-    public List<String> getAllIdentifiers(final File directory) throws MetadataIoException {
+    
+    private List<String> getAllIdentifiers(final File directory) throws MetadataIoException {
         final List<String> results = new ArrayList<>();
         if (directory != null) {
             for (File f : directory.listFiles()) {
                 final String fileName = f.getName();
                 if (fileName.endsWith(XML_EXT)) {
-                    final String identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
+
+                    // for windows system the filename can be different from the real identifier (':' forbidden)
+                    final String identifier;
+                    if (System.getProperty("os.name", "").startsWith("Windows")) {
+                        final Node metadata = getNodeFromFile(f);
+                        identifier = getIdentifier(metadata);
+                    } else {
+                        identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
+                    }
                     results.add(identifier);
                 } else if (f.isDirectory()){
                     results.addAll(getAllIdentifiers(f));

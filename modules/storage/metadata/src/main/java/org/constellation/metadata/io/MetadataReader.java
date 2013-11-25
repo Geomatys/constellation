@@ -48,12 +48,15 @@ public interface MetadataReader {
     boolean existMetadata(final String identifier) throws MetadataIoException;
     
     /**
-     * Return all the entries from the database
+     * @return all the entries from the database
+     * @throws MetadataIoException
      */
     List<? extends Object> getAllEntries() throws MetadataIoException;
 
      /**
-     * Return all the entries identifiers from the database
+     * @return all the entries identifiers from the database
+     * 
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     List<String> getAllIdentifiers() throws MetadataIoException;
     
@@ -76,12 +79,12 @@ public interface MetadataReader {
     
     
     /**
-     * Return true is the cache mecanism is enabled.
+     * @return true is the cache mecanism is enabled.
      */
     boolean isCacheEnabled();
 
     /**
-     * Return true is the cache mecanism is enabled.
+     * @return true is the cache mecanism is enabled.
      */
     boolean isThreadEnabled();
 }

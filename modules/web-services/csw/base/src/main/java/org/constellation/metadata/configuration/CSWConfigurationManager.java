@@ -379,7 +379,7 @@ public class CSWConfigurationManager {
                 for (String metaID : metaIDS) {
                     writer.deleteMetadata(metaID);
                 }
-                final String msg = "All specified record has been deleted from the CSW";
+                final String msg = "All records have been deleted from the CSW";
                 return new AcknowlegementType("Success", msg);
 
             } catch (MetadataIoException ex) {
