@@ -68,7 +68,7 @@ public class LuceneObservationSearcher extends LuceneIndexSearcher {
      * @throws IndexingException
      */
     public LuceneObservationSearcher(final File configDir, final String serviceID) throws IndexingException  {
-        super(configDir, serviceID, new WhitespaceAnalyzer(Version.LUCENE_45), false);
+        super(configDir, serviceID, new WhitespaceAnalyzer(Version.LUCENE_46), false);
     }
 
     /**
@@ -91,7 +91,7 @@ public class LuceneObservationSearcher extends LuceneIndexSearcher {
             }
 
             final String field       = "Title";
-            final QueryParser parser = new QueryParser(Version.LUCENE_45, field, analyzer);
+            final QueryParser parser = new QueryParser(Version.LUCENE_46, field, analyzer);
             parser.setDefaultOperator(Operator.AND);
 
             // we enable the leading wildcard mode if the first character of the query is a '*'
