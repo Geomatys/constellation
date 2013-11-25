@@ -27,9 +27,9 @@
     <sift>
 
       <appender name="BY_SERVICE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${cslt.log.dir:-${catalina.base}}/logs/${ogcServicePath}-service.log</file>
+        <file>${cslt.log.dir:-${catalina.base}}/logs/cstl/${ogcServicePath}-service.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-          <fileNamePattern>${cslt.log.dir:-${catalina.base}}/logs/${ogcServicePath}-service-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+          <fileNamePattern>${cslt.log.dir:-${catalina.base}}/logs/cstl/${ogcServicePath}-service-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
           <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
             <!-- or whenever the file size reaches 10MB -->
             <maxFileSize>10MB</maxFileSize>
