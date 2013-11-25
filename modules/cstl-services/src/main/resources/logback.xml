@@ -6,8 +6,7 @@
   more details. */ -->
 <configuration>
 
-  <property resource="cstl-logback.properties" />
-  
+
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
     <resetJUL>true</resetJUL>
   </contextListener>
@@ -28,12 +27,12 @@
     <sift>
 
       <appender name="BY_SERVICE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${cstl.ogc.log.dir}/${ogcServicePath}-service.log</file>
+        <file>${cslt.log.dir:-${catalina.base}}/logs/${ogcServicePath}-service.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-          <fileNamePattern>${cstl.ogc.log.dir}/${ogcServicePath}-service-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+          <fileNamePattern>${cslt.log.dir:-${catalina.base}}/logs/${ogcServicePath}-service-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
           <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
             <!-- or whenever the file size reaches 10MB -->
-            <maxFileSize>50KB</maxFileSize>
+            <maxFileSize>10MB</maxFileSize>
           </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <append>true</append>
