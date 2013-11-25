@@ -29,7 +29,6 @@ import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.constellation.utils.UploadUtilities;
 import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.filestore.FileCoverageReference;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
@@ -37,7 +36,6 @@ import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessListener;
 import org.opengis.feature.type.Name;
-import org.opengis.metadata.Metadata;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.identification.TopicCategory;
@@ -451,7 +449,9 @@ public class Data {
         }
 
         //generate DataInformation
-        final DataInformation information = MetadataUtilities.getRasterDataInformation(reader, null, dataType);
+
+        final DefaultMetadata metadata = ConfigurationEngine.loadMetadata(providerId, CSWMarshallerPool.getInstance());
+        final DataInformation information = MetadataUtilities.getRasterDataInformation(reader, metadata, dataType);
         information.setName(dataId);
         return Response.ok(information).build();
     }

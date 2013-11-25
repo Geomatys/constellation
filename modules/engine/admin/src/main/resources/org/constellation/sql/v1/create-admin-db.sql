@@ -34,7 +34,8 @@ CREATE TABLE "admin"."provider"(
   "type"        VARCHAR(8)  NOT NULL,
   "impl"        VARCHAR(32) NOT NULL,
   "config"      CLOB        NOT NULL,
-  "owner"       VARCHAR(32)
+  "owner"       VARCHAR(32),
+  "metadata"    CLOB
 );
 
 ALTER TABLE "admin"."provider" ADD CONSTRAINT provider_pk       PRIMARY KEY ("id");

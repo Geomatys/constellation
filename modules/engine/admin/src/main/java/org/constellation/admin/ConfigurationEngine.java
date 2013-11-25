@@ -367,15 +367,26 @@ public class ConfigurationEngine {
      * @param dataName
      */
     public static void saveMetaData(final DefaultMetadata fileMetadata, final String dataName, final MarshallerPool pool) {
+        ensureNonNull("metadata", fileMetadata);
+
+        //save in database
+        Session session = null;
         try {
-            //Get metadata folder
-            final File metadataFolder = ConfigDirectory.getMetadataDirectory();
+            session = EmbeddedDatabase.createSession();
+            final StringWriter sw = new StringWriter();
             final Marshaller m = pool.acquireMarshaller();
-            final File metadataFile = new File(metadataFolder, dataName + ".xml");
-            m.marshal(fileMetadata, metadataFile);
-            pool.recycle(m);
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "metadata not saved", ex);
+            m.marshal(fileMetadata, sw);
+            GenericDatabaseMarshallerPool.getInstance().recycle(m);
+            final StringReader sr = new StringReader(sw.toString());
+            final ProviderRecord provider = session.readProvider(dataName);
+            if (provider  != null) {
+                provider.setMetadata(sr);
+            }
+
+        } catch (SQLException | IOException | JAXBException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null) session.close();
         }
     }
 
@@ -383,22 +394,24 @@ public class ConfigurationEngine {
      * Load a metadata for a provider.
      * 
      * @param providerId
-     * @param pool
      * @return
      */
     public static DefaultMetadata loadMetadata(final String providerId, final MarshallerPool pool){
+        Session session = null;
         try {
-            final File metadataFolder = ConfigDirectory.getMetadataDirectory();
-            final Unmarshaller m = pool.acquireUnmarshaller();
-            final File metadataFile = new File(metadataFolder, providerId + ".xml");
-            if(metadataFile.exists()){
-                final DefaultMetadata metadata = (DefaultMetadata) m.unmarshal(metadataFile);
-                pool.recycle(m);
+            session = EmbeddedDatabase.createSession();
+            final ProviderRecord provider = session.readProvider(providerId);
+            if (provider  != null) {
+                final InputStream sr = provider.getMetadata();
+                final Unmarshaller m = pool.acquireUnmarshaller();
+                final DefaultMetadata metadata = (DefaultMetadata) m.unmarshal(sr);
+                GenericDatabaseMarshallerPool.getInstance().recycle(m);
                 return metadata;
             }
-
-        } catch (JAXBException e) {
-            LOGGER.log(Level.WARNING, "metadata not loaded", e);
+        } catch (SQLException | IOException | JAXBException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null) session.close();
         }
         return null;
     }

@@ -106,12 +106,14 @@ public final class Session implements Closeable {
     private static final String READ_PROVIDER               = "provider.read";
     private static final String READ_PROVIDER_FROM_ID       = "provider.read.from.id";
     private static final String READ_PROVIDER_CONFIG        = "provider.read.config";
+    private static final String READ_PROVIDER_METADATA      = "provider.read.metadata";
     private static final String LIST_PROVIDERS              = "provider.list";
     private static final String LIST_PROVIDERS_FROM_TYPE    = "provider.list.from.type";
     private static final String LIST_PROVIDERS_FROM_IMPL    = "provider.list.from.impl";
     private static final String WRITE_PROVIDER              = "provider.write";
     private static final String UPDATE_PROVIDER             = "provider.update";
     private static final String UPDATE_PROVIDER_CONFIG      = "provider.update.config";
+    private static final String UPDATE_PROVIDER_METADATA    = "provider.update.metadata";
     private static final String DELETE_PROVIDER             = "provider.delete";
 
     private static final String READ_STYLE                  = "style.read";
@@ -449,6 +451,18 @@ public final class Session implements Closeable {
         final InputStream stream = new Query(READ_PROVIDER_CONFIG).with(generatedId).select().getClob();
         return IOUtilities.readParameter(stream, descriptor);
     }
+    /**
+     * Queries the configuration of the provider with the specified {@code generatedId}.
+     *
+     * @param generatedId the provider auto-generated id
+     * @return the {@link ParameterValueGroup} instance
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be read
+     */
+    /* internal */ InputStream readProviderMetadata(final int generatedId) throws SQLException, IOException {
+        final InputStream stream = new Query(READ_PROVIDER_METADATA).with(generatedId).select().getClob();
+        return stream;
+    }
 
     /**
      * Queries the complete list of registered providers.
@@ -539,6 +553,20 @@ public final class Session implements Closeable {
         final StringReader reader = new StringReader(IOUtilities.writeParameter(newConfig));
         new Query(UPDATE_PROVIDER_CONFIG).with(reader, generatedId).update();
     }
+
+    /**
+     * Updates provider metadata with the specified {@code generatedId}.
+     *
+     * @param generatedId the provider auto-generated id
+     * @param metadata   the metadata provider
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be written
+     */
+    /* internal */ void updateProviderMetadata(final int generatedId, final StringReader metadata) throws SQLException, IOException {
+        new Query(UPDATE_PROVIDER_METADATA).with(metadata, generatedId).update();
+    }
+
+
 
     /**
      * Deletes the provider with the specified {@code identifier}.

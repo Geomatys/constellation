@@ -78,23 +78,25 @@ public class RasterController {
         String path = information.getPath();
         int lastPointIndex = path.lastIndexOf('.');
         String extension = path.substring(lastPointIndex+1, path.length());
+        Response rep;
+
+        //if it's netCDF, we don't pyramid data
+        if("nc".equalsIgnoreCase(extension)){
+            providerManager.createProvider("coverage-store", information.getName(), information.getPath(), information.getDataType(), null, "coverage-file");
+            rep = RasterController_.getNetCDFListing(returnURL, information.getName());
+        }else{
+            providerManager.pyramidData(information.getName(), information.getPath());
+            final String pyramidPath = providerManager.getPyramidPath(information.getName())+"/tiles";
+            providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null, "coverage-xml-pyramid");
+            rep = Response.redirect(returnURL);
+        }
 
         boolean metadataUpload = Boolean.parseBoolean(metadataUploaded);
         if(!metadataUpload){
             saveEditedMetadata(metadataToSave, date, keywords, information);
         }
 
-        //if it's netCDF, we don't pyramid data
-        if("nc".equalsIgnoreCase(extension)){
-            providerManager.createProvider("coverage-store", information.getName(), information.getPath(), information.getDataType(), null, "coverage-file");
-            return RasterController_.getNetCDFListing(returnURL, information.getName());
-        }else{
-            providerManager.pyramidData(information.getName(), information.getPath());
-            final String pyramidPath = providerManager.getPyramidPath(information.getName())+"/tiles";
-            providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null, "coverage-xml-pyramid");
-            return Response.redirect(returnURL);
-        }
-
+        return rep;
     }
 
     @View

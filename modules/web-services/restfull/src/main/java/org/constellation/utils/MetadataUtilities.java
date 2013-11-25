@@ -67,7 +67,10 @@ public final class MetadataUtilities {
             case "raster":
                 try {
                     final GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
-                    final DataInformation di = getRasterDataInformation(coverageReader, metadataFile, dataType);
+
+                    final Unmarshaller xmlReader = CSWMarshallerPool.getInstance().acquireUnmarshaller();
+                    final DefaultMetadata templateMetadata = (DefaultMetadata) xmlReader.unmarshal(metadataFile);
+                    final DataInformation di = getRasterDataInformation(coverageReader, templateMetadata, dataType);
                     di.setPath(file.getPath());
                     return di;
                 } catch (CoverageStoreException | NoSuchIdentifierException | ProcessException | JAXBException e) {
@@ -109,11 +112,11 @@ public final class MetadataUtilities {
     /**
      *
      *
-     * @param metadataFile
-     *@param dataType (raster, vector, ...)  @return a {@link org.constellation.dto.DataInformation} from data file
+     * @param metadata
+     * @param dataType (raster, vector, ...)  @return a {@link org.constellation.dto.DataInformation} from data file
      * @throws CoverageStoreException
      */
-    public static DataInformation getRasterDataInformation(final GridCoverageReader coverageReader, final File metadataFile, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+    public static DataInformation getRasterDataInformation(final GridCoverageReader coverageReader, final DefaultMetadata metadata, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
 
         CoordinateReferenceSystem cRs = coverageReader.getGridGeometry(0).getCoordinateReferenceSystem();
 
@@ -123,8 +126,8 @@ public final class MetadataUtilities {
             final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
             DefaultMetadata finalMetadata = null;
             //mergeTemplate(fileMetadata);
-            if(metadataFile!=null){
-                finalMetadata = (DefaultMetadata) mergeTemplate(fileMetadata, metadataFile);
+            if(metadata!=null){
+                finalMetadata = (DefaultMetadata) mergeTemplate(fileMetadata, metadata);
             }
 
             final TreeTable.Node rootNode;
@@ -202,17 +205,16 @@ public final class MetadataUtilities {
      * @throws NoSuchIdentifierException
      * @throws ProcessException
      */
-    public static Metadata mergeTemplate(final DefaultMetadata fileMetadata, final File metadataToMerge) throws JAXBException, NoSuchIdentifierException, ProcessException {
+    public static Metadata mergeTemplate(final DefaultMetadata fileMetadata, final DefaultMetadata metadataToMerge) throws JAXBException, NoSuchIdentifierException, ProcessException {
         // unmarshall metadataFile Template
-        final Unmarshaller xmlReader = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-        final DefaultMetadata templateMetadata = (DefaultMetadata) xmlReader.unmarshal(metadataToMerge);
+
 
         // call Merge Process
         DefaultMetadata resultMetadata;
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(MetadataProcessingRegistry.NAME, MergeDescriptor.NAME);
         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
         inputs.parameter(MergeDescriptor.FIRST_IN_NAME).setValue(fileMetadata);
-        inputs.parameter(MergeDescriptor.SECOND_IN_NAME).setValue(templateMetadata);
+        inputs.parameter(MergeDescriptor.SECOND_IN_NAME).setValue(metadataToMerge);
         final org.geotoolkit.process.Process mergeProcess = desc.createProcess(inputs);
         final ParameterValueGroup resultParameters = mergeProcess.call();
 
