@@ -50,7 +50,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.AbstractCSWMetadataWriter;
+import org.constellation.metadata.io.AbstractMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.NodeUtilities;
@@ -64,7 +64,12 @@ import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileMetadataWriter extends AbstractCSWMetadataWriter {
+public class FileMetadataWriter extends AbstractMetadataWriter {
+
+    /**
+     * An indexer lucene to add object into the index.
+     */
+    private final AbstractIndexer indexer;
 
     /**
      * A directory in witch the metadata files are stored.
@@ -74,13 +79,13 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     /**
      * Build a new File metadata writer, with the specified indexer.
      *
-     * @param index A lucene indexer.
+     * @param indexer A lucene indexer.
      * @param configuration An object containing all the dataSource informations (in this case the data directory).
      *
      * @throws org.constellation.metadata.io.MetadataIoException
      */
-    public FileMetadataWriter(final Automatic configuration, final AbstractIndexer index) throws MetadataIoException {
-        super(index);
+    public FileMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
+        this.indexer = indexer;
         dataDirectory = configuration.getDataDirectory();
         if (dataDirectory == null || !dataDirectory.isDirectory()) {
             throw new MetadataIoException("Unable to find the data directory", NO_APPLICABLE_CODE);
@@ -324,5 +329,15 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             }
         }
         return null;
+    }
+
+    /**
+     * Destoy all the resource and close connection.
+     */
+    @Override
+    public void destroy() {
+        if (indexer != null) {
+            indexer.destroy();
+        }
     }
 }

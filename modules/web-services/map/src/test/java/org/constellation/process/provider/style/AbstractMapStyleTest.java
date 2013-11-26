@@ -67,7 +67,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
 
     @AfterClass
     public static void destroyFolder() {
-        ConfigurationEngine.shutdownTestEnvironement("ProcessProviderTest");
+        ConfigurationEngine.shutdownTestEnvironement("AbstractMapStyleTest");
     }
 
     /**

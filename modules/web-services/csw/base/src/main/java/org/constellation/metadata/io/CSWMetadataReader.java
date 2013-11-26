@@ -36,7 +36,10 @@ public interface CSWMetadataReader extends MetadataReader {
 
 
     /**
-     * Return a list of values for each specific fields specified as a coma separated String.
+     * @param propertyNames A comma speparated list of property to retrieve.
+     * 
+     * @return a list of values for each specific fields specified as a coma separated String.
+     * @throws MetadataIoException
      */
     List<DomainValues> getFieldDomainofValues(final String propertyNames) throws MetadataIoException;
 
@@ -56,29 +59,29 @@ public interface CSWMetadataReader extends MetadataReader {
     Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
     /**
-     * Return the list of supported data types.
+     * @return the list of supported data types.
      */
     List<MetadataType> getSupportedDataTypes();
 
     /**
-     * Return the list of QName for additional queryable element.
+     * @return the list of QName for additional queryable element.
      */
     List<QName> getAdditionalQueryableQName();
 
     /**
-     * Return the list of path for the additional queryable element.
+     * @return the list of path for the additional queryable element.
      */
     Map<String, List<String>> getAdditionalQueryablePathMap();
 
     /**
-     * Return the list of Additional queryable element.
+     * @return the list of Additional queryable element.
      */
     Map<String, URI> getConceptMap();
 
     /**
      * Execute a SQL query and return the result as a List of identifier;
      *
-     * @param query
+     * @param sqlQuery
      * @return
      * @throws MetadataIoException
      */

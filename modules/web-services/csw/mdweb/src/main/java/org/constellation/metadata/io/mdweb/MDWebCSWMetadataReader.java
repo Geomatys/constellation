@@ -140,7 +140,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final List<BDD> thesaurusDBs = configuration.getThesaurus();
         final List<Thesaurus> thesaurusList = new ArrayList<>();
         for (BDD thesaurusDB : thesaurusDBs) {
-            final DataSource source    =    thesaurusDB.getPooledDataSource();
+            final DataSource source    = thesaurusDB.getPooledDataSource();
             final String schema        = thesaurusDB.getSchema();
             final boolean derby        = !thesaurusDB.isPostgres();
             final ThesaurusDatabase th = new ThesaurusDatabase(source, schema, derby);
@@ -222,7 +222,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * @param elementName A list of QName describing the requested fields. (implies type == null)
      * @return A metadata Object (Dublin core Record / GeotoolKit metadata / EBrim registry object)
      *
-     * @throws java.sql.MetadataIoException
+     * @throws MetadataIoException
      */
     @Override
     public Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
