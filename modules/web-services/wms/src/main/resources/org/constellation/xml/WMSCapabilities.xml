@@ -5,7 +5,7 @@
     <keywords>WMS</keywords>
     <keywords>Constellation</keywords>
     <keywords>Geomatys</keywords>
-    <name>Constellation WMS Server</name>
+    <name>OGC:WMS</name>
     <serviceConstraints>
         <accessConstraint>NONE</accessConstraint>
         <fees>NONE</fees>
