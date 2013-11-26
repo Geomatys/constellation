@@ -9,6 +9,8 @@
     <serviceConstraints>
         <accessConstraint>NONE</accessConstraint>
         <fees>NONE</fees>
+        <maxWidth>1024</maxWidth>
+        <maxHeight>768</maxHeight>
     </serviceConstraints>
     <serviceContact>
         <address>24 rue Pierre Renaudel</address>

@@ -215,7 +215,7 @@ public final class GrizzlyServer {
         includes.add(new Layer(new QName("cite", "DividedRoutes"),   Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_DividedRoutes}"))));
         includes.add(new Layer(new QName("cite", "Forests"),         Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_Forests}"))));
         includes.add(new Layer(new QName("cite", "Lakes"),           Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_Lakes}"))));
-        includes.add(new Layer(new QName("cite", "MapNeatline"),     Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_MapNeatline}"))));
+        includes.add(new Layer(new QName("cite", "MapNeatline"),     Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_MapNeatLine}"))));
         includes.add(new Layer(new QName("cite", "NamedPlaces"),     Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_NamedPlaces}"))));
         includes.add(new Layer(new QName("cite", "Ponds"),           Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_Ponds}"))));
         includes.add(new Layer(new QName("cite", "RoadSegments"),    Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_RoadSegments}"))));

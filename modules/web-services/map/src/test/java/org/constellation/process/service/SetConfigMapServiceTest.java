@@ -18,6 +18,7 @@ package org.constellation.process.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
@@ -48,7 +49,7 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
             final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigServiceDescriptor.NAME);
 
             final List<Source> sources = new ArrayList<>();
-            sources.add(new Source("source1", Boolean.TRUE, null, null));
+            sources.add(new Source("source1", Boolean.TRUE, new ArrayList<Layer>(), null));
             final Layers layers = new Layers(sources);
             final LayerContext conf = new LayerContext(layers);
 

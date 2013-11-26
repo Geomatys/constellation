@@ -34,7 +34,7 @@ import java.util.Objects;
 public class LayerList {
 
     @XmlElement(name="Layer")
-    private List<Layer> layer;
+    private List<Layer> layer = new ArrayList<>();
 
     public LayerList() {
 
@@ -49,7 +49,7 @@ public class LayerList {
      */
     public List<Layer> getLayer() {
         if (layer == null) {
-            layer = new ArrayList<Layer>();
+            layer = new ArrayList<>();
         }
         return layer;
     }
