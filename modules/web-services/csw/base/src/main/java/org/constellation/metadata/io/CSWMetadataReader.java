@@ -59,11 +59,6 @@ public interface CSWMetadataReader extends MetadataReader {
     Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
     /**
-     * @return the list of supported data types.
-     */
-    List<MetadataType> getSupportedDataTypes();
-
-    /**
      * @return the list of QName for additional queryable element.
      */
     List<QName> getAdditionalQueryableQName();
@@ -72,11 +67,6 @@ public interface CSWMetadataReader extends MetadataReader {
      * @return the list of path for the additional queryable element.
      */
     Map<String, List<String>> getAdditionalQueryablePathMap();
-
-    /**
-     * @return the list of Additional queryable element.
-     */
-    Map<String, URI> getConceptMap();
 
     /**
      * Execute a SQL query and return the result as a List of identifier;

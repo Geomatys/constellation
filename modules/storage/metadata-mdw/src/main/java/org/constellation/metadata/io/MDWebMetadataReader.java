@@ -167,7 +167,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * Build a new metadata Reader.
      *
-     * @param MDReader a reader to the MDWeb database.
+     * @param configuration the configuration object conatining the database informations.
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     public MDWebMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(true, false);
@@ -1226,5 +1227,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     public void clearCache() {
         super.clearCache();
         mdReader.clearStorageCache();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<MetadataType> getSupportedDataTypes() {
+        return Arrays.asList(MetadataType.ISO_19115, MetadataType.DUBLINCORE, MetadataType.EBRIM, MetadataType.SENSORML, MetadataType.ISO_19110);
     }
 }

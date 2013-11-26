@@ -1324,7 +1324,7 @@ public class WFSWorkerTest {
                         
                         {//OBSERVATION
                         final String url = "jdbc:derby:memory:TestWFSWorkerOM";
-                        final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
+                        ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
                         sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.HashMap;
-import java.net.URI;
 import java.util.Map;
 import java.io.File;
 
@@ -113,7 +112,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * @param configuration A generic configuration object containing a directory path
      * in the configuration.dataDirectory field.
      *
-     * @throws org.constellation.ws.MetadataIoException If the configuration object does
+     * @throws MetadataIoException If the configuration object does
      * not contains an existing directory path in the configuration.dataDirectory field.
      * If the creation of a MarshallerPool throw a JAXBException.
      */
@@ -209,6 +208,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      *
      * @param identifier The metadata identifier.
      * @param directory The current directory to explore.
+     * @param ext file extension.
      * @return
      */
     public static File getFileFromIdentifier(final String identifier, final File directory, final String ext) {
@@ -245,6 +245,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      *
      * @param identifier The metadata identifier.
      * @param directory The current directory to explore.
+     * @param ext File extension.
      * @return
      */
     public static File getFileFromPathIdentifier(final String identifier, final File directory, final String ext) {
@@ -473,7 +474,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             }
 
 
-            List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+            List<SimpleLiteral> formats = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 for (Format f :identification.getResourceFormats()) {
                     if (f == null || f.getName() == null) {
@@ -798,14 +799,6 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
-        return new HashMap<>();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, URI> getConceptMap() {
         return new HashMap<>();
     }
 }

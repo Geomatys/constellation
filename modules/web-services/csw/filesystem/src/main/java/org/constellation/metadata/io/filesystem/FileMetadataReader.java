@@ -681,7 +681,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     }
 
     /**
-     * Return the list of Additional queryable element (0 in MDWeb).
+     * Return the list of Additional queryable element.
      */
     @Override
     public List<QName> getAdditionalQueryableQName() {
@@ -693,14 +693,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
-        return new HashMap<>();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, URI> getConceptMap() {
         return new HashMap<>();
     }
 }

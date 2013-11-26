@@ -18,7 +18,6 @@
 package org.constellation.metadata.io.generic;
 
 // J2SE dependencies
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,6 +52,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
     /**
      * Build a new Generic metadata reader and initialize the statement.
      * @param configuration
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     public GenericMetadataReader(Automatic configuration) throws MetadataIoException {
         super(configuration);
@@ -229,14 +229,6 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
         return new HashMap<>();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, URI> getConceptMap() {
-        return new HashMap<>();
-    }
-
     @Override
     public List<MetadataType> getSupportedDataTypes() {
         return Arrays.asList(MetadataType.ISO_19115, MetadataType.DUBLINCORE);
@@ -246,7 +238,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * {@inheritDoc}
      */
     @Override
-    public void removeFromCache(String string) {
+    public void removeFromCache(String identifier) {
         throw new UnsupportedOperationException("Cache is not enabled on this implementation");
     }
 

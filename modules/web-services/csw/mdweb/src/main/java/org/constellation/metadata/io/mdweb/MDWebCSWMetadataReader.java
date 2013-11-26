@@ -727,14 +727,6 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * {@inheritDoc}
      */
     @Override
-    public List<MetadataType> getSupportedDataTypes() {
-        return Arrays.asList(MetadataType.ISO_19115, MetadataType.DUBLINCORE, MetadataType.EBRIM, MetadataType.SENSORML, MetadataType.ISO_19110);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public List<QName> getAdditionalQueryableQName() {
         return Arrays.asList(DEGREE_QNAME,
                             ACCESS_CONSTRAINTS_QNAME,

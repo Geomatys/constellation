@@ -18,7 +18,10 @@
 
 package org.constellation.metadata.io;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 
 /**
  *
@@ -87,4 +90,20 @@ public interface MetadataReader {
      * @return true is the cache mecanism is enabled.
      */
     boolean isThreadEnabled();
+
+    /**
+     * @return the list of supported data types.
+     */
+    List<MetadataType> getSupportedDataTypes();
+
+    /**
+     * @return A map of label / Skos concept URI.
+     */
+    Map<String, URI> getConceptMap();
+
+    /**
+     * Set the global level of log for information message of this reader.
+     * @param logLevel
+     */
+    void setLogLevel(Level logLevel);
 }
