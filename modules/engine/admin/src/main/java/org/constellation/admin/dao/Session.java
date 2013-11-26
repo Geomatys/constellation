@@ -969,7 +969,7 @@ public final class Session implements Closeable {
     }
 
     public LayerRecord writeLayer(final String name, final String alias, final ServiceRecord service, final DataRecord data, final Object config, final UserRecord owner) throws SQLException {
-        ensureNonNull("alias",   alias);
+        ensureNonNull("name",   name);
         ensureNonNull("service", service);
         ensureNonNull("data",    data);
 
