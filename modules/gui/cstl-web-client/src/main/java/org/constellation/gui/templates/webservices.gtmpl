@@ -16,7 +16,10 @@
             </a>
             <ul class="dropdown-menu">
                 <li><a href="create/wms" id="wmschoice">&{webservicepage.button.dropdown.wms.label}</a></li>
-                <li><a href="create/wcs" id="wcschoice">&{webservicepage.button.dropdown.wcs.label}Coverage</a></li>
+                <li><a href="create/wmts" id="wmtschoice">&{webservicepage.button.dropdown.wmts.label}</a></li>
+                <li><a href="create/wfs" id="wfschoice">&{webservicepage.button.dropdown.wfs.label}</a></li>
+                <li><a href="create/wcs" id="wcschoice">&{webservicepage.button.dropdown.wcs.label}</a></li>
+                <li><a href="create/wps" id="wpschoice">&{webservicepage.button.dropdown.wps.label}</a></li>
             </ul>
         </div>
     </div>

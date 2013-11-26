@@ -69,7 +69,11 @@ public final class MetadataUtilities {
                     final GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
 
                     final Unmarshaller xmlReader = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-                    final DefaultMetadata templateMetadata = (DefaultMetadata) xmlReader.unmarshal(metadataFile);
+                    DefaultMetadata templateMetadata = null;
+                    if(metadataFile!=null){
+                        templateMetadata = (DefaultMetadata) xmlReader.unmarshal(metadataFile);
+                    }
+
                     final DataInformation di = getRasterDataInformation(coverageReader, templateMetadata, dataType);
                     di.setPath(file.getPath());
                     return di;
