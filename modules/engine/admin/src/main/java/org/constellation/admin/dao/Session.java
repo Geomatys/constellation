@@ -980,7 +980,7 @@ public final class Session implements Closeable {
         final String login        = owner != null ? owner.getLogin() : null;
 
         // Proceed to insertion.
-        final int id = new Query(WRITE_LAYER).with(alias, service.id, data.id, date.getTime(), title, description, config, login).insert();
+        final int id = new Query(WRITE_LAYER).with(name, alias, service.id, data.id, date.getTime(), title, description, config, login).insert();
 
         // Return inserted line.
         return new LayerRecord(this, id, name, alias, service.id, data.id, date, title, description, login);
