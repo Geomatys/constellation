@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
@@ -244,8 +245,8 @@ public final class ProvidersAPI {
        client.post("crs/update", MediaType.APPLICATION_XML_TYPE, values);
     }
 
-    public DataBrief getDataSummary(final String name, final String providerId) throws IOException {
-        return client.get("data/summary/"+providerId+"/"+name, MediaType.APPLICATION_XML_TYPE).getEntity(DataBrief.class);
+    public DataBrief getDataSummary(final QName name, final String providerId) throws IOException {
+        return client.get("data/summary/"+providerId+"/"+name.getLocalPart()+"/"+name.getNamespaceURI(), MediaType.APPLICATION_XML_TYPE).getEntity(DataBrief.class);
     }
 
     public DataBrief getLayerSummary(final String layerAlias, final String providerId) throws IOException {

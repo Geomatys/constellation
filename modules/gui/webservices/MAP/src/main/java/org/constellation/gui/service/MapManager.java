@@ -52,9 +52,9 @@ public class MapManager {
         return cstl.openClient().services.getLayers(Specification.WMS, serviceId);
     }
 
-    public void removeLayer(final String layerName, final String serviceId, final String spec) {
+    public void removeLayer(final String layerName, final String layerNamespace, final String serviceId, final String spec) {
         try {
-            cstl.openClient().services.deleteLayer(serviceId, layerName, spec);
+            cstl.openClient().services.deleteLayer(serviceId, layerName, layerNamespace, spec);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when call web service to remove layer", e);
         }

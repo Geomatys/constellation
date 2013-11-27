@@ -4,12 +4,10 @@ package org.constellation.ws.rest;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.dao.CRSRecord;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.configuration.StringList;
 import org.constellation.dto.CRSCoverageList;
 import org.constellation.dto.ParameterValues;
-import org.constellation.dto.SimpleValue;
 import org.constellation.utils.CRSUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
@@ -28,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -86,7 +85,7 @@ public class CRSService {
         layers.remove("providerId");
         for (String s : layers.keySet()) {
             try {
-                DataRecord record = EmbeddedDatabase.createSession().readData(s, providerId);
+                DataRecord record = EmbeddedDatabase.createSession().readData(new QName(s), providerId);
                 EmbeddedDatabase.createSession().writeCRSData(record, layers.get(s));
             } catch (SQLException e) {
                 LOGGER.log(Level.WARNING, "Error when write CRS", e);

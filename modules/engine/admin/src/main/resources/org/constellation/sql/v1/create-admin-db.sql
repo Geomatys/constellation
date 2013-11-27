@@ -63,6 +63,7 @@ ALTER TABLE "admin"."style" ADD CONSTRAINT style_provider_fk FOREIGN KEY ("provi
 CREATE TABLE "admin"."data"(
   "id"          INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
   "name"        VARCHAR(64) NOT NULL,
+  "namespace"   VARCHAR(256)NOT NULL,
   "provider"    INTEGER     NOT NULL,
   "type"        VARCHAR(16) NOT NULL,
   "date"        BIGINT      NOT NULL,
@@ -135,6 +136,7 @@ ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_service_f
 CREATE TABLE "admin"."layer"(
   "id"           INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
   "name"         VARCHAR(64) NOT NULL,
+  "namespace"    VARCHAR(256)NOT NULL,
   "alias"        VARCHAR(64),
   "service"      INTEGER     NOT NULL,
   "data"         INTEGER     NOT NULL,

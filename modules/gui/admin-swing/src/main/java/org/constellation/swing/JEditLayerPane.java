@@ -85,9 +85,14 @@ public class JEditLayerPane extends javax.swing.JPanel {
                 final String providerID = providerReport.getId();
                 final List<DataBrief> layers = providerReport.getItems();
                 for (final DataBrief item : layers) {
-                    
+                    final String fullName;
+                    if (item.getNamespace() != null) {
+                        fullName = '{' + item.getNamespace() + '}' + item.getName();
+                    } else {
+                        fullName = item.getName();
+                    }
                     if ("sld".equals(serviceProviderType)) {
-                        styleList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, providerID, item.getName()));
+                        styleList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, providerID, fullName));
                     } else {
                         boolean addProviderToList = false;
                         //WFS -> data-store
@@ -106,7 +111,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
                         }
                         
                         if (addProviderToList) {
-                            providerList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, providerID, item.getName()).getReference());
+                            providerList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, providerID, fullName).getReference());
                         }
                     }
                 }

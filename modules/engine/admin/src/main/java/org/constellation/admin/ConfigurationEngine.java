@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 
 import org.constellation.admin.dao.DataRecord;
@@ -167,8 +168,8 @@ public class ConfigurationEngine {
                     LayerContext context = (LayerContext)obj;
                     for (Source source : context.getLayers()) {
                         for (Layer layer : source.getInclude()) {
-                            String dataName = layer.getName().getLocalPart();
-                            DataRecord data = session.readData(dataName, source.getId());
+                            final QName dataName = layer.getName();
+                            final DataRecord data = session.readData(dataName, source.getId());
                             session.writeLayer(dataName, layer.getAlias(), service, data, "", null);
                         }
                     }
@@ -425,7 +426,7 @@ public class ConfigurationEngine {
      * @param providerId
      * @return
      */
-    public static DataBrief getData(String name, String providerId){
+    public static DataBrief getData(QName name, String providerId){
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -477,6 +478,7 @@ public class ConfigurationEngine {
         final DataBrief db = new DataBrief();
         db.setOwner(record.getOwnerLogin());
         db.setName(record.getName());
+        db.setNamespace(record.getNamespace());
         db.setDate(record.getDate());
         db.setProvider(record.getProvider().getIdentifier());
         db.setType(record.getType().toString());

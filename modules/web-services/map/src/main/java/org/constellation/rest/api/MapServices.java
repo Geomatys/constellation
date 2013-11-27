@@ -24,14 +24,6 @@ import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.dto.AddLayer;
 import org.constellation.map.configuration.MapConfigurer;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
-import org.geotoolkit.coverage.filestore.FileCoverageReference;
-import org.geotoolkit.coverage.io.CoverageStoreException;
-import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.feature.DefaultName;
-import org.opengis.metadata.Metadata;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -43,7 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-import java.sql.SQLException;
+import javax.xml.namespace.QName;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -80,8 +72,8 @@ public final class MapServices {
 
     @DELETE
     @Path("{id}/{layerid}")
-    public Response deleteLayer(final @PathParam("spec") String spec, @PathParam("id") String serviceId, @PathParam("layerid") String layerid) throws NotRunningServiceException, JAXBException {
-        getConfigurer(spec).removeLayer(serviceId, layerid);
+    public Response deleteLayer(final @PathParam("spec") String spec, @PathParam("id") String serviceId, @PathParam("layerid") String layerid, @PathParam("layernamespace") String layernmsp) throws NotRunningServiceException, JAXBException {
+        getConfigurer(spec).removeLayer(serviceId, new QName(layernmsp, layerid));
         return Response.ok().build();
     }
 

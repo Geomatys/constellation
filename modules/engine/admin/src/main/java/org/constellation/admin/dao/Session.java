@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -128,6 +129,7 @@ public final class Session implements Closeable {
     private static final String DELETE_STYLE                = "style.delete";
 
     private static final String READ_DATA                   = "data.read";
+    private static final String READ_DATA_NMSP              = "data.read.nmsp";
     private static final String READ_DATA_FROM_ID           = "data.read.from.id";
     private static final String READ_DATA_FROM_LAYER        = "data.read.from.layer";
     private static final String LIST_DATA                   = "data.list";
@@ -136,6 +138,7 @@ public final class Session implements Closeable {
     private static final String WRITE_DATA                  = "data.write";
     private static final String UPDATE_DATA                 = "data.update";
     private static final String DELETE_DATA                 = "data.delete";
+    private static final String DELETE_DATA_NMSP            = "data.delete.nmsp";
 
     private static final String WRITE_STYLED_DATA           = "styled_data.write";
     private static final String DELETE_STYLED_DATA          = "styled_data.delete";
@@ -168,6 +171,7 @@ public final class Session implements Closeable {
     private static final String UPDATE_LAYER                = "layer.update";
     private static final String UPDATE_LAYER_CONFIG         = "layer.update.config";
     private static final String DELETE_LAYER                = "layer.delete";
+    private static final String DELETE_LAYER_NMSP           = "layer.delete.nmsp";
     private static final String DELETE_SERVICE_LAYER        = "layer.service.delete";
 
     private static final String READ_TASK                   = "task.read";
@@ -744,10 +748,14 @@ public final class Session implements Closeable {
         return new Query(READ_DATA_FROM_LAYER).with(layerAlias, providerId).select().getFirst(DataRecord.class);
     }
 
-    public DataRecord readData(final String name, final String providerId) throws SQLException {
+    public DataRecord readData(final QName name, final String providerId) throws SQLException {
         ensureNonNull("name",       name);
         ensureNonNull("providerId", providerId);
-        return new Query(READ_DATA).with(name, providerId).select().getFirst(DataRecord.class);
+        if (name.getNamespaceURI() != null) {
+            return new Query(READ_DATA_NMSP).with(name.getLocalPart(), name.getNamespaceURI(), providerId).select().getFirst(DataRecord.class);
+        } else {
+            return new Query(READ_DATA).with(name.getLocalPart(), providerId).select().getFirst(DataRecord.class);
+        }
     }
 
     public List<DataRecord> readData() throws SQLException {
@@ -764,7 +772,7 @@ public final class Session implements Closeable {
         return new Query(LIST_DATA_FROM_PROVIDER).with(provider.id).select().getAll(DataRecord.class);
     }
 
-    public DataRecord writeData(final String name, final ProviderRecord provider, final DataType type, final UserRecord owner) throws SQLException {
+    public DataRecord writeData(final QName name, final ProviderRecord provider, final DataType type, final UserRecord owner) throws SQLException {
         ensureNonNull("name",     name);
         ensureNonNull("provider", provider);
         ensureNonNull("type",     type);
@@ -776,20 +784,24 @@ public final class Session implements Closeable {
         final String login        = owner != null ? owner.getLogin() : null;
 
         // Proceed to insertion.
-        final int id = new Query(WRITE_DATA).with(name, provider.id, type.name(), date.getTime(), title, description, login).insert();
+        final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), title, description, login).insert();
 
         // Return inserted line.
-        return new DataRecord(this, id, name, provider.id, type, date, title, description, login);
+        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, date, title, description, login);
     }
 
-    /* internal */ void updateData(final int generatedId, final String newName, final int newProvider, final DataType newType, final String newOwner) throws SQLException {
-        new Query(UPDATE_DATA).with(newName, newProvider, newType.name(), newOwner, generatedId).update();
+    /* internal */ void updateData(final int generatedId, final String newName, final String newNamespace, final int newProvider, final DataType newType, final String newOwner) throws SQLException {
+        new Query(UPDATE_DATA).with(newName, newNamespace, newProvider, newType.name(), newOwner, generatedId).update();
     }
 
-    public void deleteData(final String name, final String providerId) throws SQLException {
+    public void deleteData(final QName name, final String providerId) throws SQLException {
         ensureNonNull("name",       name);
         ensureNonNull("providerId", providerId);
-        new Query(DELETE_DATA).with(name, providerId).update();
+        if (name.getNamespaceURI() != null) {
+            new Query(DELETE_DATA_NMSP).with(name.getLocalPart(), name.getNamespaceURI(), providerId).update();
+        } else {
+            new Query(DELETE_DATA).with(name.getLocalPart(), providerId).update();
+        }
     }
 
 
@@ -968,7 +980,7 @@ public final class Session implements Closeable {
         return new Query(LIST_LAYERS_FROM_SERVICE).with(service.id).select().getAll(LayerRecord.class);
     }
 
-    public LayerRecord writeLayer(final String name, final String alias, final ServiceRecord service, final DataRecord data, final Object config, final UserRecord owner) throws SQLException {
+    public LayerRecord writeLayer(final QName name, final String alias, final ServiceRecord service, final DataRecord data, final Object config, final UserRecord owner) throws SQLException {
         ensureNonNull("name",   name);
         ensureNonNull("service", service);
         ensureNonNull("data",    data);
@@ -980,24 +992,28 @@ public final class Session implements Closeable {
         final String login        = owner != null ? owner.getLogin() : null;
 
         // Proceed to insertion.
-        final int id = new Query(WRITE_LAYER).with(name, alias, service.id, data.id, date.getTime(), title, description, config, login).insert();
+        final int id = new Query(WRITE_LAYER).with(name.getLocalPart(), name.getNamespaceURI(), alias, service.id, data.id, date.getTime(), title, description, config, login).insert();
 
         // Return inserted line.
-        return new LayerRecord(this, id, name, alias, service.id, data.id, date, title, description, login);
+        return new LayerRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), alias, service.id, data.id, date, title, description, login);
     }
 
-    /* internal */ void updateLayer(final int generatedId, final String newName, final String newAlias, final int newService, final int newData, final String newOwner) throws SQLException {
-        new Query(UPDATE_LAYER).with(newName, newAlias, newService, newData, newOwner, generatedId).update();
+    /* internal */ void updateLayer(final int generatedId, final String newName, final String newNamespace, final String newAlias, final int newService, final int newData, final String newOwner) throws SQLException {
+        new Query(UPDATE_LAYER).with(newName, newNamespace, newAlias, newService, newData, newOwner, generatedId).update();
     }
 
     /* internal */ void updateLayerConfig(final int generatedId, final StringReader newConfig) throws SQLException {
         new Query(UPDATE_LAYER_CONFIG).with(newConfig).update();
     }
 
-    public void deleteLayer(final String name, final ServiceRecord service) throws SQLException {
+    public void deleteLayer(final QName name, final ServiceRecord service) throws SQLException {
         ensureNonNull("name",   name);
         ensureNonNull("service", service);
-        new Query(DELETE_LAYER).with(name, service.id).update();
+        if (name.getNamespaceURI() != null) {
+            new Query(DELETE_LAYER_NMSP).with(name.getLocalPart(), name.getNamespaceURI(), service.id).update();
+        } else {
+            new Query(DELETE_LAYER).with(name.getLocalPart(), service.id).update();
+        }
     }
 
     public void deleteServiceLayer(final ServiceRecord service) throws SQLException {

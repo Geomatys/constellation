@@ -34,6 +34,7 @@ public final class LayerRecord implements Record {
 
     final int id;
     private String name;
+    private String namespace;
     private String alias;
     private int service;
     private int data;
@@ -42,11 +43,12 @@ public final class LayerRecord implements Record {
     private int description;
     private String owner;
 
-    LayerRecord(final Session session, final int id, final String name, final String alias, final int service, final int data,
+    LayerRecord(final Session session, final int id, final String name, final String namespace, final String alias, final int service, final int data,
                        final Date date, final int title, final int description, final String owner) {
         this.session     = session;
         this.id          = id;
         this.name        = name;
+        this.namespace   = namespace;
         this.alias       = alias;
         this.service     = service;
         this.data        = data;
@@ -60,12 +62,13 @@ public final class LayerRecord implements Record {
         this(s, rs.getInt(1),
                 rs.getString(2),
                 rs.getString(3),
-                rs.getInt(4),
+                rs.getString(4),
                 rs.getInt(5),
-                new Date(rs.getLong(6)),
-                rs.getInt(7),
+                rs.getInt(6),
+                new Date(rs.getLong(7)),
                 rs.getInt(8),
-                rs.getString(9));
+                rs.getInt(9),
+                rs.getString(10));
     }
 
     public String getName() {
@@ -74,7 +77,16 @@ public final class LayerRecord implements Record {
 
     public void setName(final String name) throws SQLException  {
         this.name = name;
-        session.updateLayer(id, name, alias, service, data, owner);
+        session.updateLayer(id, name, namespace, alias, service, data, owner);
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(final String namespace) throws SQLException  {
+        this.namespace = namespace;
+        session.updateLayer(id, name, namespace, alias, service, data, owner);
     }
 
     public String getAlias() {
@@ -83,7 +95,7 @@ public final class LayerRecord implements Record {
 
     public void setAlias(final String alias) throws SQLException {
         this.alias = alias;
-        session.updateLayer(id, name, alias, service, data, owner);
+        session.updateLayer(id, name, namespace, alias, service, data, owner);
     }
 
     public ServiceRecord getService() throws SQLException {
@@ -92,7 +104,7 @@ public final class LayerRecord implements Record {
 
     public void setService(final ServiceRecord service) throws SQLException {
         this.service = service.id;
-        session.updateLayer(id, name, alias, service.id, data, owner);
+        session.updateLayer(id, name, namespace, alias, service.id, data, owner);
     }
 
     public Date getDate() {
@@ -105,7 +117,7 @@ public final class LayerRecord implements Record {
 
     public void setData(final DataRecord data) throws SQLException {
         this.data = data.id;
-        session.updateLayer(id, name, alias, service, data.id, owner);
+        session.updateLayer(id, name, namespace, alias, service, data.id, owner);
     }
 
     public String getTitle(final Locale locale) throws SQLException {
@@ -142,6 +154,6 @@ public final class LayerRecord implements Record {
 
     public void setOwner(final UserRecord owner) throws SQLException {
         this.owner = owner.getLogin();
-        session.updateLayer(id, name, alias, service, data, owner.getLogin());
+        session.updateLayer(id, name, namespace, alias, service, data, owner.getLogin());
     }
 }

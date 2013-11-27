@@ -28,12 +28,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.dao.DataRecord;
 import org.constellation.configuration.DataBrief;
-import org.constellation.dto.Configuration;
 import org.constellation.provider.*;
 import org.quartz.TriggerBuilder;
 import org.quartz.SimpleScheduleBuilder;
@@ -879,7 +877,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 if (p.getService().equals(service)) {
                     final List<DataBrief> keys = new ArrayList<>();
                     for(Name n : p.getKeys()){
-                        final DataBrief db = ConfigurationEngine.getData(n.getLocalPart(), p.getId());
+                        final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
+                        final DataBrief db = ConfigurationEngine.getData(name, p.getId());
                         keys.add(db);
                     }
                     final Date date = (Date) p.getSource().parameter("date").getValue();

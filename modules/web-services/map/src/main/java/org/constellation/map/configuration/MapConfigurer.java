@@ -23,7 +23,6 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.dao.ServiceRecord;
@@ -36,8 +35,6 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
-import org.constellation.dto.BandDescription;
-import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PropertyDescription;
@@ -58,9 +55,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.File;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -68,6 +62,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} base for "map" services.
@@ -130,11 +125,12 @@ public class MapConfigurer extends OGCConfigurer {
 
         // Declare the style as "applicable" for the layer data.
         try {
+            final QName layerID = new QName(layerProviderReference.getLayerId().getNamespaceURI(), layerProviderReference.getLayerId().getLocalPart());
             StyleProviderConfig.linkToData(
                     styleProviderReference.getProviderId(),
                     styleProviderReference.getLayerId().getLocalPart(),
                     layerProviderReference.getProviderId(),
-                    layerProviderReference.getLayerId().getLocalPart());
+                    layerID);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, "Error when associating layer default style to the layer source data.", ex);
         }
@@ -182,7 +178,7 @@ public class MapConfigurer extends OGCConfigurer {
         return instance;
     }
 
-    public void removeLayer(final String serviceId, final String layerid) throws JAXBException {
+    public void removeLayer(final String serviceId, final QName layerid) throws JAXBException {
         Session session = null;
 
         try {
@@ -192,15 +188,14 @@ public class MapConfigurer extends OGCConfigurer {
             final Unmarshaller unmarshall = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
             final LayerContext layerContext = (LayerContext) unmarshall.unmarshal(config);
             final List<Source> sources = layerContext.getLayers();
-            String name = null;
+            QName name = null;
             boolean found = false;
 
             for (Source source : sources) {
                 List<Layer> layers = source.getInclude();
                 for (Layer layer : layers) {
-                    final String localPart = layer.getName().getLocalPart();
-                    if(localPart.equalsIgnoreCase(layerid)){
-                        name = layer.getName().getLocalPart();
+                    if(layer.getName().equals(layerid)){
+                        name = layer.getName();
                         layers.remove(layer);
                         found = true;
                         break;

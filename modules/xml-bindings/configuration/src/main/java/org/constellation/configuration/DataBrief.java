@@ -39,6 +39,9 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="Name")
     private String name;
 
+    @XmlElement(name="Namespace")
+    private String namespace;
+
     @XmlElement(name="Provider")
     private String provider;
 
@@ -66,6 +69,14 @@ public final class DataBrief implements Serializable {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(final String namespace) {
+        this.namespace = namespace;
     }
 
     public String getProvider() {
@@ -128,6 +139,7 @@ public final class DataBrief implements Serializable {
     public String toString() {
         return "DataBrief{" +
                 "name='" + name + '\'' +
+                ", namespace='" + namespace + '\'' +
                 ", provider='" + provider + '\'' +
                 ", title='" + title + '\'' +
                 ", date=" + date +

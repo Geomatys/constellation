@@ -160,9 +160,17 @@ public class MapController {
     @Route("removeLayer")
     public Response removeLayer(final String layerName, final String serviceId, final String serviceType){
         //remove namespace from layer name
+        final String name;
+        final String namespace;
         final int index = layerName.lastIndexOf('}');
-        final String name = layerName.substring(index+1);
-        mapManager.removeLayer(name, serviceId, serviceType.toLowerCase());
+        if (index != -1) {
+            namespace = layerName.substring(1, index - 1);
+            name = layerName.substring(index+1);
+        } else {
+            namespace = null;
+            name = layerName;
+        }
+        mapManager.removeLayer(name, namespace, serviceId, serviceType.toLowerCase());
         return MapController_.dashboard(serviceId, serviceType);
     }
 }

@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.namespace.QName;
 
 /**
  * Main data controller. For common action without data type
@@ -65,7 +66,7 @@ public class DataController {
     @Ajax
     @Resource
     @Route("/selectData")
-    public Response selectData(final String name, final String providerId) {
+    public Response selectData(final QName name, final String providerId) {
         final Map<String, Object> parameters = new HashMap<>(0);
         final DataBrief db = providerManager.getDataSummary(name, providerId);
         parameters.put("selected", db);

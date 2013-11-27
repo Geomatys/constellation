@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.EmbeddedDatabase;
@@ -108,7 +109,7 @@ public interface Configurator {
                                 }
                             }
                             if (!found) {
-                                session.deleteData(provider.getId(), data.getName());
+                                session.deleteData(data.getCompleteName(), provider.getId());
                             }
                         }
 
@@ -116,15 +117,16 @@ public interface Configurator {
                         // Add new layer.
                         for (final Object keyObj : provider.getKeys()) {
                             final Name key = (Name) keyObj;
+                            final QName name = new QName(key.getNamespaceURI(), key.getLocalPart());
                             boolean found = false;
                             for (final DataRecord data : list) {
-                                if (key.getLocalPart().equals(data.getName())) {
+                                if (name.equals(data.getCompleteName())) {
                                     found = true;
                                     break;
                                 }
                             }
                             if (!found) {
-                                session.writeData(key.getLocalPart(), pr, provider.getDataType(), null);
+                                session.writeData(name, pr, provider.getDataType(), null);
                             }
                         }
 

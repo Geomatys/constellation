@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 
 /**
  * Juzu service to call constellation services server side about providers
@@ -270,7 +271,7 @@ public class ProviderManager {
         }
     }
 
-    public DataBrief getDataSummary(final String name, final String providerId) {
+    public DataBrief getDataSummary(final QName name, final String providerId) {
         try {
             return cstl.openClient().providers.getDataSummary(name, providerId);
         } catch (IOException e) {

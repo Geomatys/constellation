@@ -108,8 +108,6 @@ public class MDCFilter implements Filter {
                         MDC.remove(serviceName);
                         MDC.remove(servicePath);
                     }
-                } else {
-                    LOGGER.warn("MDCFilter could not parse ogcServiceType and ogcServiceName from: " + servletPath);
                 }
 
             } else {

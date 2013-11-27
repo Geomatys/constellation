@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
@@ -324,7 +325,7 @@ public final class StyleProviderConfig extends Static {
      * @throws TargetNotFoundException if the style with the specified identifier can't be found
      * @throws ConfigurationException if the operation has failed for any reason
      */
-    public static void linkToData(final String styleProvider, final String styleId, final String dataProvider, final String dataId) throws ConfigurationException {
+    public static void linkToData(final String styleProvider, final String styleId, final String dataProvider, final QName dataId) throws ConfigurationException {
         ensureNonNull("dataProvider", dataProvider);
         ensureNonNull("dataId",       dataId);
         ensureExistingStyle(styleProvider, styleId);
@@ -361,7 +362,7 @@ public final class StyleProviderConfig extends Static {
      * @throws TargetNotFoundException if the style with the specified identifier can't be found
      * @throws ConfigurationException if the operation has failed for any reason
      */
-    public static void unlinkFromData(final String styleProvider, final String styleId, final String dataProvider, final String dataId) throws ConfigurationException {
+    public static void unlinkFromData(final String styleProvider, final String styleId, final String dataProvider, final QName dataId) throws ConfigurationException {
         ensureNonNull("dataProvider", dataProvider);
         ensureNonNull("dataId",       dataId);
         ensureExistingStyle(styleProvider, styleId);

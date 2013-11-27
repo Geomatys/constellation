@@ -265,7 +265,7 @@ public final class ServicesAPI {
      * @param spec service specofication
      * @throws IOException
      */
-    public void deleteLayer(final String serviceId, final String layerId, final String spec) throws IOException {
-        client.delete("MAP/" + spec + "/" + serviceId + "/" + layerId, MediaType.APPLICATION_XML_TYPE).ensure2xxStatus();
+    public void deleteLayer(final String serviceId, final String layerId, final String layerNamespace, final String spec) throws IOException {
+        client.delete("MAP/" + spec + "/" + serviceId + "/" + layerId + "/" + layerNamespace, MediaType.APPLICATION_XML_TYPE).ensure2xxStatus();
     }
 }

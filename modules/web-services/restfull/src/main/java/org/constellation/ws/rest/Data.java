@@ -68,6 +68,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 
 /**
  * Manage data sending
@@ -415,11 +416,12 @@ public class Data {
     }
 
     @GET
-    @Path("summary/{providerid}/{name}")
+    @Path("summary/{providerid}/{name}/{namespace}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getDataSummary(@PathParam("providerid") String providerid, @PathParam("name") String name) {
-        final DataBrief db = ConfigurationEngine.getData(name, providerid);
+    public Response getDataSummary(@PathParam("providerid") String providerid, @PathParam("name") String name, @PathParam("namespace") String namespace) {
+        final QName fullName = new QName(namespace, name);
+        final DataBrief db = ConfigurationEngine.getData(fullName, providerid);
         return Response.ok(db).build();
     }
 
