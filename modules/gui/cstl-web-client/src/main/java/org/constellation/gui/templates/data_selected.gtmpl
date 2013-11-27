@@ -2,7 +2,7 @@
 <div class="alert alert-info">
     <h5>&{label.no.selected.data}</h5>
 
-    <p>&{msg.no.selected.data} ${selected}</p>
+    <p>&{msg.no.selected.data}</p>
 </div>
 <% if (selected != null) { %>
 <div class="selected-item" data-name="${selected.name}" data-provider="${selected.provider}">
