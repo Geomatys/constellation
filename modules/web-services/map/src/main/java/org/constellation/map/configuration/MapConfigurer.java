@@ -24,7 +24,9 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.dao.LayerRecord;
 import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
 import org.constellation.configuration.ConfigProcessException;
@@ -59,6 +61,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -165,7 +168,17 @@ public class MapConfigurer extends OGCConfigurer {
 
         // Extracts the layer list from service configuration.
         final LayerContext layerContext = (LayerContext) this.getInstanceConfiguration(identifier);
-        return MapUtilities.getConfigurationLayers(layerContext, null, null);
+        List<Layer> layers = MapUtilities.getConfigurationLayers(layerContext, null, null);;
+
+        for (Layer layer : layers) {
+            final LayerRecord record = ConfigurationEngine.getLayer(identifier, this.specification, layer.getName());
+            if (record != null) {
+                layer.setDate(record.getDate());
+                layer.setOwner(record.getOwnerLogin());
+            }
+         }
+
+        return layers;
     }
 
     /**

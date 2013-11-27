@@ -52,7 +52,10 @@
                     <i class="icon-calendar"></i>${layer.date}
                 </div>
                 <div class="block">
-                    <i class="icon-user"></i>Admin
+                    <i class="icon-user"></i>
+                    <% if (layer.owner != null && layer.owner != '') { %>
+                    ${layer.owner}<% } else { %>&{label.unknown}
+                    <% } %>
                 </div>
             </div>
         </div>

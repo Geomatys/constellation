@@ -17,6 +17,7 @@
 
 package org.constellation.admin;
 
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,10 +33,18 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.apache.sis.metadata.iso.DefaultMetadata;
 
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ServiceDef;
 import org.constellation.admin.dao.DataRecord;
+import org.constellation.admin.dao.LayerRecord;
+import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.admin.dao.ServiceRecord;
+import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
@@ -45,28 +54,35 @@ import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
-
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.constellation.ServiceDef;
-import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.admin.dao.ServiceRecord;
-import org.constellation.admin.dao.Session;
-import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.util.FileUtilities;
-
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
 /**
- *
  * @author Guilhem Legal (Geomatys)
  */
 public class ConfigurationEngine {
 
     private static final Logger LOGGER = Logging.getLogger(ConfigurationEngine.class);
-    
+
     public static ParameterValueGroup getProviderConfiguration(final String serviceName, final ParameterDescriptorGroup desc) {
 
         final ParameterValueGroup params = desc.createValue();
@@ -94,6 +110,7 @@ public class ConfigurationEngine {
     public static Object getConfiguration(final String serviceType, final String serviceID) throws JAXBException, FileNotFoundException {
         return getConfiguration(serviceType, serviceID, null);
     }
+
     public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName) throws JAXBException, FileNotFoundException {
         return getConfiguration(serviceType, serviceID, fileName, GenericDatabaseMarshallerPool.getInstance());
     }
@@ -128,14 +145,14 @@ public class ConfigurationEngine {
     }
 
     public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj, final Service metadata) throws JAXBException, IOException {
-        storeConfiguration(serviceType, serviceID, null, obj,  GenericDatabaseMarshallerPool.getInstance());
+        storeConfiguration(serviceType, serviceID, null, obj, GenericDatabaseMarshallerPool.getInstance());
         if (metadata != null) {
             writeServiceMetadata(serviceID, serviceType, metadata, null);
         }
     }
 
     public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj) throws JAXBException {
-        storeConfiguration(serviceType, serviceID, null, obj,  GenericDatabaseMarshallerPool.getInstance());
+        storeConfiguration(serviceType, serviceID, null, obj, GenericDatabaseMarshallerPool.getInstance());
     }
 
     public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj, final MarshallerPool pool) throws JAXBException {
@@ -162,10 +179,10 @@ public class ConfigurationEngine {
                     session.writeServiceExtraConfig(serviceID, spec, sr, fileName);
                 }
             } else {
-                if(obj instanceof LayerContext){
+                if (obj instanceof LayerContext) {
                     session.deleteServiceLayer(service);
                     //save Layers
-                    LayerContext context = (LayerContext)obj;
+                    LayerContext context = (LayerContext) obj;
                     for (Source source : context.getLayers()) {
                         for (Layer layer : source.getInclude()) {
                             final QName dataName = layer.getName();
@@ -276,8 +293,8 @@ public class ConfigurationEngine {
             final StringReader sr = new StringReader(sw.toString());
             final ServiceRecord service = session.readService(identifier, spec);
             if (service != null) {
-               service.setMetadata(language, sr);
-            } 
+                service.setMetadata(language, sr);
+            }
 
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
@@ -287,7 +304,7 @@ public class ConfigurationEngine {
     }
 
     public static Service readServiceMetadata(final String identifier, final String serviceType, String language) throws IOException, JAXBException {
-        ensureNonNull("identifier",  identifier);
+        ensureNonNull("identifier", identifier);
         ensureNonNull("serviceType", serviceType);
         if (language == null) {
             language = "eng";
@@ -331,13 +348,13 @@ public class ConfigurationEngine {
     }
 
     public static File setupTestEnvironement(final String directoryName) {
-         final File configDir = new File(directoryName);
-         if (configDir.exists()) {
-             FileUtilities.deleteDirectory(configDir);
-         }
-         configDir.mkdir();
-         ConfigDirectory.setConfigDirectory(configDir);
-         return configDir;
+        final File configDir = new File(directoryName);
+        if (configDir.exists()) {
+            FileUtilities.deleteDirectory(configDir);
+        }
+        configDir.mkdir();
+        ConfigDirectory.setConfigDirectory(configDir);
+        return configDir;
     }
 
     public static void shutdownTestEnvironement(final String directoryName) {
@@ -365,6 +382,7 @@ public class ConfigurationEngine {
 
     /**
      * Save metadata on specific folder
+     *
      * @param fileMetadata
      * @param dataName
      * @param pool
@@ -382,7 +400,7 @@ public class ConfigurationEngine {
             pool.recycle(m);
             final StringReader sr = new StringReader(sw.toString());
             final ProviderRecord provider = session.readProvider(dataName);
-            if (provider  != null) {
+            if (provider != null) {
                 provider.setMetadata(sr);
             }
 
@@ -395,17 +413,17 @@ public class ConfigurationEngine {
 
     /**
      * Load a metadata for a provider.
-     * 
+     *
      * @param providerId
      * @param pool
      * @return
      */
-    public static DefaultMetadata loadMetadata(final String providerId, final MarshallerPool pool){
+    public static DefaultMetadata loadMetadata(final String providerId, final MarshallerPool pool) {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
             final ProviderRecord provider = session.readProvider(providerId);
-            if (provider  != null) {
+            if (provider != null) {
                 final InputStream sr = provider.getMetadata();
                 final Unmarshaller m = pool.acquireUnmarshaller();
                 final DefaultMetadata metadata = (DefaultMetadata) m.unmarshal(sr);
@@ -421,17 +439,17 @@ public class ConfigurationEngine {
     }
 
     /**
-     *
      * @param name
      * @param providerId
      * @return
      */
+
     public static DataBrief getData(QName name, String providerId){
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
             final DataRecord record = session.readData(name, providerId);
-            if(record!=null){
+            if (record != null) {
                 return getDataBrief(session, record);
             }
         } catch (SQLException e) {
@@ -443,7 +461,6 @@ public class ConfigurationEngine {
     }
 
     /**
-     *
      * @param layerAlias
      * @param providerId
      * @return
@@ -453,7 +470,7 @@ public class ConfigurationEngine {
         try {
             session = EmbeddedDatabase.createSession();
             DataRecord record = session.readDatafromLayer(layerAlias, providerId);
-            if(record!=null){
+            if (record != null) {
                 return getDataBrief(session, record);
             }
         } catch (SQLException e) {
@@ -466,8 +483,9 @@ public class ConfigurationEngine {
 
     /**
      * create a {@link org.constellation.configuration.DataBrief} with style link and service link.
+     *
      * @param session current {@link org.constellation.admin.dao.Session} used
-     * @param record data found
+     * @param record  data found
      * @return a {@link org.constellation.configuration.DataBrief} with all informations linked.
      * @throws SQLException if they have an error when search style, service or provider.
      */
@@ -507,4 +525,22 @@ public class ConfigurationEngine {
         return db;
     }
 
+    public static LayerRecord getLayer(final String identifier, final ServiceDef.Specification specification, final QName name) {
+        Session session = null;
+
+        try {
+            session = EmbeddedDatabase.createSession();
+            ServiceRecord service = session.readService(identifier, specification);
+            LayerRecord record = session.readLayer(name.getLocalPart(), service);
+            return record;
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return null;
+    }
 }

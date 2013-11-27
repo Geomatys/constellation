@@ -961,10 +961,10 @@ public final class Session implements Closeable {
         return new Query(READ_LAYER_FROM_ID).with(generatedId).select().getFirst(LayerRecord.class);
     }
 
-    public LayerRecord readLayer(final String alias, final ServiceRecord service) throws SQLException {
-        ensureNonNull("alias",   alias);
+    public LayerRecord readLayer(final String name, final ServiceRecord service) throws SQLException {
+        ensureNonNull("name",   name);
         ensureNonNull("service", service);
-        return new Query(READ_LAYER).with(alias, service.id).select().getFirst(LayerRecord.class);
+        return new Query(READ_LAYER).with(name, service.id).select().getFirst(LayerRecord.class);
     }
 
     /* internal */ InputStream readLayerConfig(final int generatedId) throws SQLException {

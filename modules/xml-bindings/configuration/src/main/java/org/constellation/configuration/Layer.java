@@ -95,6 +95,9 @@ public class Layer {
 
     @XmlElement(name="ProviderID")
     private String providerID;
+
+    @XmlElement(name = "owner")
+    private String owner;
     
     public Layer() {
 
@@ -351,6 +354,14 @@ public class Layer {
 
     public void setProviderType(final String providerType) {
         this.providerType = providerType;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(final String owner) {
+        this.owner = owner;
     }
 
     @Override
