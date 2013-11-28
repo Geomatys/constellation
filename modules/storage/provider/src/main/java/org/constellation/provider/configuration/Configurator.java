@@ -94,6 +94,9 @@ public interface Configurator {
                     ProviderRecord pr = session.readProvider(provider.getId());
                     if (pr == null) {
                         pr = session.writeProvider(provider.getId(), type, serviceName, provider.getSource(), null);
+                    } else {
+                        // update
+                        pr.setConfig(provider.getSource());
                     }
                     final List<DataRecord> list = pr.getData();
 
