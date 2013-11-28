@@ -67,6 +67,7 @@ public class MapUtilities {
                         final ParameterValueGroup provider = LayerProviderProxy.getInstance().getProvider(sourceID).getSource();
                         layer.setProviderType((String) provider.parameter("providerType").getValue());
                         layer.setProviderID(sourceID);
+                        layers.add(layer);
                     }
                 /*
                  * second case : we include only the layer in the balise include

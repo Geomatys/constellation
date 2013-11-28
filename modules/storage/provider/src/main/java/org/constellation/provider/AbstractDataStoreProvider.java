@@ -139,21 +139,20 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         final ParameterValueGroup source = getSource();
 
         FeatureStore candidate = createBaseFeatureStore();
-        String namespace = null;
-        ParameterValue paramns = candidate.getConfiguration().parameter(AbstractFeatureStoreFactory.NAMESPACE.getName().getCode());
-        if(paramns == null || paramns.getValue() == null){
-            namespace = null;
-        }else if("no namespace".equalsIgnoreCase(String.valueOf(paramns.getValue()))){
-            namespace = null;
-        }else{
-            namespace = paramns.stringValue();
-        }
-
         if (candidate == null) {
             //final StringBuilder sb = new StringBuilder("Could not create featurestore : "+this.getClass().getSimpleName()+" id="+getId());
 
             //use an empty datastore
             candidate = new MemoryFeatureStore();
+        }
+        final String namespace;
+        ParameterValue paramns = candidate.getConfiguration().parameter(AbstractFeatureStoreFactory.NAMESPACE.getName().getCode());
+        if (paramns == null || paramns.getValue() == null) {
+            namespace = null;
+        } else if("no namespace".equalsIgnoreCase(String.valueOf(paramns.getValue()))){
+            namespace = null;
+        } else {
+            namespace = paramns.stringValue();
         }
         store = new ExtendedFeatureStore(candidate);
 

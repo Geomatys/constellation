@@ -52,18 +52,18 @@ public class DefaultGeomPropertyVisitor extends DuplicatingFilterVisitor{
             }
         }
         final Expression exp2 = filter.getExpression2();
-        if(!(exp2 instanceof Literal)){
+        if(!(exp2 instanceof Literal)) {
             //this value is supposed to hold a BoundingBox
             throw new IllegalArgumentException("Illegal BBOX filter, "
                     + "second expression should have been a literal with a boundingBox value: \n" + filter);
-        }else{
-            Literal l = (Literal)visit(exp2,extraData);
+        } else {
+            final Literal l = (Literal)visit(exp2,extraData);
             final Object obj = l.getValue();
             if(obj instanceof BoundingBox){
                 if (filter instanceof UnreprojectedLooseBBox) {
-                    return new UnreprojectedLooseBBox((PropertyName)exp1, new DefaultLiteral<BoundingBox>((BoundingBox) obj));
+                    return new UnreprojectedLooseBBox((PropertyName)exp1, new DefaultLiteral<>((BoundingBox) obj));
                 } else if (filter instanceof LooseBBox) {
-                    return new LooseBBox((PropertyName)exp1, new DefaultLiteral<BoundingBox>((BoundingBox) obj));
+                    return new LooseBBox((PropertyName)exp1, new DefaultLiteral<>((BoundingBox) obj));
                 } else {
                     return getFactory(extraData).bbox(exp1, (BoundingBox) obj);
                 }

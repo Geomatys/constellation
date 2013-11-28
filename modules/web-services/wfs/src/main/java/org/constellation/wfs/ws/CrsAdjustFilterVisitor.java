@@ -75,9 +75,7 @@ public class CrsAdjustFilterVisitor extends DuplicatingFilterVisitor{
             }
         } catch (NoSuchAuthorityCodeException ex) {
             Logger.getLogger(FillCrsVisitor.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (FactoryException ex) {
-            Logger.getLogger(FillCrsVisitor.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (TransformException ex) {
+        } catch (FactoryException | TransformException ex) {
             Logger.getLogger(FillCrsVisitor.class.getName()).log(Level.SEVERE, null, ex);
         }
         

@@ -36,7 +36,7 @@ public class AliasFilterVisitor extends DuplicatingFilterVisitor {
         if (aliases != null) {
             this.aliases = aliases;
         } else {
-            this.aliases = new HashMap<String, QName>();
+            this.aliases = new HashMap<>();
         }
     }
     
