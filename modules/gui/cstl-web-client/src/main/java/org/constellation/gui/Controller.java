@@ -29,6 +29,7 @@ import juzu.template.Template;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AccessConstraint;
@@ -50,6 +51,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -361,46 +365,22 @@ public class Controller {
 
         if (file != null) {
             DataInformation di;
-            // Create file on temporary folder
-            String tempDir = System.getProperty("java.io.tmpdir");
-            final File newFile = new File(tempDir + "/" + file.getName());
-            File newMetadataFile = null;
-            if (metadataUploaded) {
-                newMetadataFile = new File(tempDir + "/" + metadataFile.getName());
-            }
-
-            try {
-                //open stream on data file
-                final InputStream stream = file.getInputStream();
-
-                // write on file
-                final FileOutputStream fos = new FileOutputStream(newFile);
-                int intVal = stream.read();
-                while (intVal != -1) {
-                    fos.write(intVal);
-                    intVal = stream.read();
-                }
-
+            try{
+                File dataDirectory = ConfigDirectory.getDataDirectory();
+                final File newFile = new File(dataDirectory, file.getName());
+                Files.copy(file.getInputStream(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
                 if (metadataUploaded) {
-                    //open stream on metadata file
-                    final InputStream metadataStream = metadataFile.getInputStream();
-                    // write on file
-                    final FileOutputStream metadataFos = new FileOutputStream(newMetadataFile);
-                    intVal = metadataStream.read();
-                    while (intVal != -1) {
-                        metadataFos.write(intVal);
-                        intVal = metadataStream.read();
-                    }
+                    File newMetadataFile = new File(dataDirectory.getAbsolutePath() + "/metadata/" + metadataFile.getName());
+                    Files.copy(metadataFile.getInputStream(), newMetadataFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
 
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "error when saving file on server", e);
-                return Response.error(e);
+                di = providerManager.loadData(file.getName(), metadataFile.getName(), dataType);
+                informationContainer.setInformation(di);
+            }catch (IOException ex){
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
 
-            di = servicesManager.uploadToServer(newFile, newMetadataFile, dataType);
-            informationContainer.setInformation(di);
             Response aResponse = Response.error("response not initialized");
             switch (dataType) {
                 case "raster":

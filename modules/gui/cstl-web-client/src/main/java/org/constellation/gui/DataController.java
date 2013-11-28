@@ -50,7 +50,7 @@ public class DataController {
     @Action
     @Route("/loadingFileData")
     public Response loadingFileData(final String filePath, final String returnURL, final String dataType){
-        DataInformation di = providerManager.loadData(filePath, dataType);
+        DataInformation di = providerManager.loadData(filePath, "", dataType);
         DataInformationContainer.setInformation(di);
         Response aResponse = Response.error("response not initialized");
         switch(dataType){

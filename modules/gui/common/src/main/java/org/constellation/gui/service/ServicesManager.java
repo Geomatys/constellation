@@ -192,10 +192,6 @@ public class  ServicesManager {
         return instancesSummary;
     }
 
-    public DataInformation uploadToServer(final File newFile, final File metadataFile, final String dataType) {
-        return cstl.openServer().providers.uploadData(newFile, metadataFile, dataType);
-    }
-
     public StyleListBean getStyleList() {
         try {
             return cstl.openClient().providers.getStyles();

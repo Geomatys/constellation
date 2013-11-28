@@ -179,10 +179,11 @@ public final class ProvidersAPI {
         return list.getList();
     }
 
-    public DataInformation loadData(final String filePath, final String dataType) throws IOException {
+    public DataInformation loadData(final String filePath, final String metadataFilePath, final String dataType) throws IOException {
         ParameterValues pv = new ParameterValues();
         HashMap<String, String> parameters = new HashMap<>(0);
         parameters.put("filePath", filePath);
+        parameters.put("metadataFilePath", metadataFilePath);
         parameters.put("dataType", dataType);
         pv.setValues(parameters);
 

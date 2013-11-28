@@ -209,9 +209,9 @@ public class ProviderManager {
         return new ArrayList<>(0);
     }
 
-    public DataInformation loadData(final String filePath, final String dataType) {
+    public DataInformation loadData(final String filePath, final String metadataFilePath, final String dataType) {
         try {
-            return cstl.openClient().providers.loadData(filePath, dataType);
+            return cstl.openClient().providers.loadData(filePath, metadataFilePath,  dataType);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when try to found data on file", e);
         }

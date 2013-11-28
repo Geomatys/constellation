@@ -81,74 +81,6 @@ public class Data {
 
     private static final Logger LOGGER = Logging.getLogger(Data.class);
 
-    /**
-     * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
-     *
-     * @return A {@link Response} with 200 code if upload work, 500 if not work.
-     */
-    @POST
-    @Path("upload")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadFile(final MultiPart multi) {
-
-
-        String dataType = "";
-        String fileName = "";
-        String metadataFileName = null;
-        int extensionPoint = 0;
-        InputStream uploadedInputStream = null;
-        InputStream uploadedMetadataInputStream = null;
-
-        for (BodyPart bodyPart : multi.getBodyParts()) {
-
-            Map<String, String> cdParameter = bodyPart.getContentDisposition().getParameters();
-            String name = cdParameter.get("name");
-            switch (name) {
-                case "file":
-                    BodyPartEntity bpeData = (BodyPartEntity) bodyPart.getEntity();
-                    uploadedInputStream = bpeData.getInputStream();
-                    fileName = bodyPart.getContentDisposition().getFileName();
-                    extensionPoint = fileName.lastIndexOf('.');
-                    break;
-                case "metadatafile":
-                    BodyPartEntity bpeMetadata = (BodyPartEntity) bodyPart.getEntity();
-                    uploadedMetadataInputStream = bpeMetadata.getInputStream();
-                    metadataFileName = bodyPart.getContentDisposition().getFileName();
-                    break;
-                case "type":
-                    dataType = bodyPart.getEntityAs(String.class);
-                    break;
-                default:
-                    LOGGER.log(Level.INFO, "property not use");
-            }
-        }
-
-
-        //prepare save data
-        final String dataName = fileName.substring(0, extensionPoint);
-        final String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath() + "/" + dataName;
-        final String uploadedFileName = uploadedFileLocation + "/" + fileName;
-
-        //prepare save metadata
-        final String uploadMetadataLocation = ConfigDirectory.getMetadataDirectory().getAbsolutePath();
-        final String uploadedMetadataFileName = uploadMetadataLocation + "/" + metadataFileName;
-
-
-        DataInformation information;
-
-        // save it
-        try {
-            File file = UploadUtilities.writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName);
-            File metadataFile = UploadUtilities.writeToFile(uploadedMetadataInputStream, uploadMetadataLocation, uploadedMetadataFileName);
-            information = MetadataUtilities.generateMetadatasInformation(file, metadataFile, dataType);
-            information.setName(dataName);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Error when saving file", e);
-            return Response.status(500).entity("upload file " + uploadedFileLocation + " is not saved").build();
-        }
-
-        return Response.status(200).entity(information).build();
-    }
 
     /**
      * Give metadata CodeList (example {@link org.opengis.metadata.citation.Role} codes
@@ -268,13 +200,20 @@ public class Data {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response loadData(final ParameterValues values) {
-        String filePath = values.getValues().get("filePath");
-        String dataType = values.getValues().get("dataType");
+        final String filePath = values.getValues().get("filePath");
+        final String metadataFilePath = values.getValues().get("metadataFilePath");
+        final String dataType = values.getValues().get("dataType");
 
         final File root = ConfigDirectory.getDataDirectory();
         final File choosingFile = new File(root, filePath);
+
+        File choosingMetadataFile = null;
+        if(!metadataFilePath.isEmpty()){
+            choosingMetadataFile = new File(root.getAbsolutePath() + "/metadata/" + metadataFilePath);
+        }
+
         if (choosingFile.exists()) {
-            DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, null, dataType);
+            DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, choosingMetadataFile, dataType);
             int extensionPoint = filePath.lastIndexOf('.');
             int lastSlash = filePath.lastIndexOf("/");
             String dataName = filePath.substring(lastSlash + 1, extensionPoint);

@@ -1083,52 +1083,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return null;
         }
 
-        /**
-         * Send file on constellation server
-         *
-         *
-         * @param file file to sent
-         * @param metadataFile
-         * @param dataType data type (raster, vector or sensor)  @return true if file sent without problem
-         */
-        public DataInformation uploadData(final File file, final File metadataFile, final String dataType){
-            //create form body part
-            final FormDataBodyPart fileBody = new FormDataBodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
-            final FormDataBodyPart metadataFileBody = new FormDataBodyPart(metadataFile, MediaType.TEXT_XML_TYPE);
-            final FormDataBodyPart dataTypeBody = new FormDataBodyPart(dataType, MediaType.TEXT_PLAIN_TYPE);
-
-
-            try {
-                // create content disposition do give file name on server
-                FormDataContentDisposition cdFile = new FormDataContentDisposition("form-data; name=\"file\"; filename=\""+file.getName()+"\"");
-                fileBody.setContentDisposition(cdFile);
-                if(metadataFile!=null){
-                    FormDataContentDisposition cdMetadataFile = new FormDataContentDisposition("form-data; name=\"metadatafile\"; filename=\""+metadataFile.getName()+"\"");
-                    metadataFileBody.setContentDisposition(cdMetadataFile);
-                }
-                FormDataContentDisposition cdDataType = new FormDataContentDisposition("form-data; name=\"type\"");
-                dataTypeBody.setContentDisposition(cdDataType);
-            } catch (ParseException e) {
-                LOGGER.log(Level.WARNING, "error on cd building", e);
-                return null;
-            }
-
-            MultiPart multi = new MultiPart();
-            multi.bodyPart(fileBody);
-            if(metadataFile!=null){
-                multi.bodyPart(metadataFileBody);
-            }
-            multi.bodyPart(dataTypeBody);
-
-            // generate jersey client to send file
-            Client c = Client.create();
-            WebResource service = c.resource(getURLWithEndSlash());
-            ClientResponse response = service.path("data/upload").type(MediaType.MULTIPART_FORM_DATA).post(ClientResponse.class, multi);
-
-            DataInformation information = response.getEntity(DataInformation.class);
-            return information;
-        }
-
         public DataDescription getLayerDataDescription(String providerId, String layerName) {
             ArgumentChecks.ensureNonNull("providerId", providerId);
             ArgumentChecks.ensureNonNull("layerName", layerName);
