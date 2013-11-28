@@ -7,6 +7,7 @@ import juzu.Route;
 import juzu.View;
 import juzu.impl.request.Request;
 import juzu.request.RequestParameter;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +36,9 @@ import java.util.logging.Logger;
 public class RasterController {
 
     private static final Logger LOGGER = Logging.getLogger(RasterController.class);
+
+        private static final String[] SUFFIXES = new String[] {"nc", "ncml", "cdf", "grib", "grib1", "grib2", "grb", "grb1", "grb2", "grd"};
+
     /**
      * Manager used to call constellation server side.
      */
@@ -75,13 +80,15 @@ public class RasterController {
     public Response createProvider(String returnURL, DataMetadata metadataToSave, String date, String keywords, String metadataUploaded) {
 
         DataInformation information = informationContainer.getInformation();
-        String path = information.getPath();
-        int lastPointIndex = path.lastIndexOf('.');
-        String extension = path.substring(lastPointIndex+1, path.length());
+        String extension = FilenameUtils.getExtension(information.getPath());
         Response rep;
 
+
+        final List<String> suffixes = new ArrayList<>(0);
+        Collections.addAll(suffixes, SUFFIXES);
+
         //if it's netCDF, we don't pyramid data
-        if("nc".equalsIgnoreCase(extension)){
+        if(suffixes.contains(extension)){
             providerManager.createProvider("coverage-store", information.getName(), information.getPath(), information.getDataType(), null, "coverage-file");
             rep = RasterController_.getNetCDFListing(returnURL, information.getName());
         }else{
