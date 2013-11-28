@@ -1,5 +1,22 @@
+/*
+ * Constellation - An open source and standard compliant SDI
+ *      http://www.constellation-sdi.org
+ *   (C) 2009-2013, Geomatys
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details..
+ */
+
 package org.constellation.utils;
 
+import com.google.common.io.Files;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
@@ -42,6 +59,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 
+
 /**
  * Utility class to do some operation on metadata file (generate, revover, ...)
  *
@@ -63,17 +81,23 @@ public final class MetadataUtilities {
      *@param dataType  @return a {@link org.constellation.dto.DataInformation}
      */
     public static DataInformation generateMetadatasInformation(final File file, final File metadataFile, final String dataType) {
+
+        final Unmarshaller xmlReader;
+        DefaultMetadata templateMetadata = null;
+
+        try {
+            xmlReader = CSWMarshallerPool.getInstance().acquireUnmarshaller();
+            if(metadataFile!=null){
+                templateMetadata = (DefaultMetadata) xmlReader.unmarshal(metadataFile);
+            }
+        } catch (JAXBException e) {
+            LOGGER.log(Level.WARNING, "", e);
+        }
+
         switch (dataType) {
             case "raster":
                 try {
                     final GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
-
-                    final Unmarshaller xmlReader = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-                    DefaultMetadata templateMetadata = null;
-                    if(metadataFile!=null){
-                        templateMetadata = (DefaultMetadata) xmlReader.unmarshal(metadataFile);
-                    }
-
                     final DataInformation di = getRasterDataInformation(coverageReader, templateMetadata, dataType);
                     di.setPath(file.getPath());
                     return di;
@@ -84,22 +108,25 @@ public final class MetadataUtilities {
             case "vector":
                 try {
                     //unzip file
-
-                    FileUtilities.unzip(file, file.getParentFile(), null);
-                    final FileFilter shapeFilter = new SuffixFileFilter(".shp");
-                    final File[] files = file.getParentFile().listFiles(shapeFilter);
-
-                    if (files.length > 0) {
-                        final ShapefileFeatureStore shapeStore = new ShapefileFeatureStore(files[0].toURI().toURL());
-
-                        //extract crs
-                        final String crsName = shapeStore.getFeatureType().getCoordinateReferenceSystem().getName().toString();
-                        final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), file.getParent(),
-                                dataType, crsName);
-                        return information;
+                    String extension = Files.getFileExtension(file.getName());
+                    ShapefileFeatureStore shapeStore = null;
+                    if(extension.equalsIgnoreCase("zip")){
+                        FileUtilities.unzip(file, file.getParentFile(), null);
+                        final FileFilter shapeFilter = new SuffixFileFilter(".shp");
+                        final File[] files = file.getParentFile().listFiles(shapeFilter);
+                        if (files.length > 0) {
+                            shapeStore = new ShapefileFeatureStore(files[0].toURI().toURL());
+                        }
+                    }else{
+                        shapeStore = new ShapefileFeatureStore(file.toURI().toURL());
                     }
 
-                    //create feature store
+                    final String crsName = shapeStore.getFeatureType().getCoordinateReferenceSystem().getName().toString();
+                    final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), file.getParent(), dataType, crsName);
+                    final ArrayList<SimplyMetadataTreeNode> metadataList = getVectorDataInformation(templateMetadata);
+                    information.setFileMetadata(metadataList);
+                    return information;
+
                 } catch (MalformedURLException e) {
                     LOGGER.log(Level.WARNING, "error on file URL", e);
                 } catch (DataStoreException e) {
@@ -152,6 +179,23 @@ public final class MetadataUtilities {
         } else {
             return new DataInformation();
         }
+    }
+
+    /**
+     *
+     * @param metadata
+     * @return
+     */
+    public static ArrayList<SimplyMetadataTreeNode> getVectorDataInformation(final DefaultMetadata metadata){
+        if(metadata!=null){
+            // get Metadata as a List
+            final TreeTable.Node rootNode;
+            rootNode = metadata.asTreeTable().getRoot();
+
+            MetadataMapBuilder.setCounter(0);
+            return MetadataMapBuilder.createMetadataList(rootNode, null, 11);
+        }
+        return new ArrayList<>(0);
     }
 
     /**

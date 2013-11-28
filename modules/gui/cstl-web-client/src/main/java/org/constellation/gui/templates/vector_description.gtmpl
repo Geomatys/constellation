@@ -1,5 +1,8 @@
+
+
 #{decorate path=menu.gtmpl/}
 
+#{param name=datainformation/}
 #{param name=name/}
 #{param name=crs/}
 #{param name=returnURL/}
@@ -20,10 +23,31 @@
     </div>
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <div class="span12">
+            <ul class="nav nav-tabs">
+                <% if(datainformation.fileMetadata != null) {%>
+                    <li id="crsTab"><a href="#crs" data-toggle="tab">CRS</a></li>
+                <% } %>
+                <li id="descriptionTab"><a href="#description" data-toggle="tab">&{data.information.tab.title}</a></li>
+            </ul>
+
             <form action="@{VectorController.createProvider(returnURL = returnURL)}" method="POST">
-                <input type="text" class="span3" name="crsSelected" value="${crs}"/>
+                <div class="tab-content">
+                    <div class="tab-pane" id="crs">
+                        <input type="text" class="span3" name="crsSelected" value="${crs}"/>
+                    </div>
+
+                    <% if(datainformation.fileMetadata != null) { %>
+                        #{include path=vector_metadata.gtmpl/}
+                    <% } %>
+                </div>
+
                 <button type="submit" class="btn btn-info pull-right"/>Open</button>
             </form>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $("#crsTab").addClass("active");
+    $("#crs").addClass("active")
+</script>

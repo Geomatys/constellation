@@ -1,3 +1,19 @@
+/*
+ * Constellation - An open source and standard compliant SDI
+ *      http://www.constellation-sdi.org
+ *   (C) 2009-2013, Geomatys
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details..
+ */
+
 package org.constellation.gui;
 
 import juzu.Action;
@@ -35,7 +51,12 @@ public class VectorController {
     @Route("/vector/description")
     public Response showVector(final String returnUrl, final String metadataUploaded) throws IOException {
         final DataInformation di = DataInformationContainer.getInformation();
-        return vectorDescription.with().crs(di.getCrs()).returnURL(returnUrl).name(di.getName()).ok().withMimeType("text/html");
+        return vectorDescription.with()
+                .crs(di.getCrs())
+                .returnURL(returnUrl)
+                .name(di.getName())
+                .datainformation(di)
+                .ok().withMimeType("text/html");
     }
 
     @Action
@@ -44,6 +65,6 @@ public class VectorController {
         DataInformation information = informationContainer.getInformation();
         //create provider
         providerManager.createProvider("feature-store", information.getName(), information.getPath(), information.getDataType(), null, null);
-        return StyleController_.edition(information.getName(), information.getName(), null, null, returnURL);
+        return Response.redirect(returnURL);
     }
 }

@@ -1,0 +1,10 @@
+<div class="tab-pane" id="description">
+</div>
+
+<script type="text/javascript">
+    //file
+    var metadatasFile = ${datainformation.fileMetadata};
+    CSTL.Data.createMetadataTree(metadatasFile, '#description');
+
+    $("#description .collapse").collapse('show')
+</script>
