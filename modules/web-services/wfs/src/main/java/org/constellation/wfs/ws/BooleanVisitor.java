@@ -21,6 +21,7 @@ import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsNotEqualTo;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
@@ -39,6 +40,35 @@ public class BooleanVisitor extends DuplicatingFilterVisitor {
 
     @Override
     public Object visit(final PropertyIsEqualTo filter, final Object extraData) {
+        final Expression exp1 = filter.getExpression1();
+        final Expression exp2 = filter.getExpression2();
+        if (exp1 instanceof PropertyName) {
+            final PropertyName property = (PropertyName) exp1;
+            if (exp2 instanceof Literal) {
+                final Literal literal = (Literal) exp2;
+
+                // Add a support for a filter on boolean property using integer 0 or 1
+                if (ft != null) {
+                    final AttributeDescriptor descriptor = (AttributeDescriptor) property.evaluate(ft);
+                    if (descriptor != null) {
+                        if (descriptor.getType().getBinding().equals(Boolean.class) && literal.getValue() instanceof Number) {
+                            final Literal booleanLit;
+                            if (literal.getValue().equals(1.0)) {
+                                booleanLit = getFactory(extraData).literal(true);
+                            } else {
+                                booleanLit = getFactory(extraData).literal(false);
+                            }
+                            return getFactory(extraData).equals(exp1, booleanLit);
+                        }
+                    }
+                }
+            }
+        }
+        return filter;
+    }
+
+    @Override
+    public Object visit(final PropertyIsNotEqualTo filter, final Object extraData) {
         final Expression exp1 = filter.getExpression1();
         final Expression exp2 = filter.getExpression2();
         if (exp1 instanceof PropertyName) {
