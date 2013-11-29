@@ -196,9 +196,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         //Tasks operations
         else if (REQUEST_LIST_PROCESS.equalsIgnoreCase(request)) {
-            return ListProcess();
+            return listProcess();
+        } else if (REQUEST_LIST_PROCESS_FACTORIES.equalsIgnoreCase(request)) {
+            return listProcessFactories();
         } else if (REQUEST_LIST_TASKS.equalsIgnoreCase(request)) {
-            return ListTasks();
+            return listTasks();
         } else if (REQUEST_GET_PROCESS_DESC.equalsIgnoreCase(request)) {
             return getProcessDescriptor(parameters);
         } else if (REQUEST_GET_TASK_PARAMS.equalsIgnoreCase(request)) {
@@ -910,7 +912,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Returns a list of all process available in the current factories.
      */
-    private StringList ListProcess(){
+    private StringList listProcess(){
         final List<Name> names = CstlScheduler.getInstance().listProcess();
         final StringList lst = new StringList();
         for(Name n : names){
@@ -920,9 +922,17 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     }
 
     /**
+     * Returns a list of all process available in the current factories.
+     */
+    private StringList listProcessFactories(){
+        final List<String> names = CstlScheduler.getInstance().listProcessFactory();
+        return new StringList(names);
+    }
+
+    /**
      * Returns a list of all tasks.
      */
-    private StringTreeNode ListTasks(){
+    private StringTreeNode listTasks(){
         final List<Task> tasks = CstlScheduler.getInstance().listTasks();
         final StringTreeNode node = new StringTreeNode();
         for(Task t : tasks){

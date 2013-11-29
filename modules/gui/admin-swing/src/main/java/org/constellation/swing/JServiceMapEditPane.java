@@ -22,14 +22,12 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.xml.namespace.QName;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.Instance;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ProviderReport;
@@ -48,23 +46,20 @@ import org.netbeans.swing.outline.RowModel;
  */
 public class JServiceMapEditPane extends JServiceEditionPane {
 
-    //icones
-    private static final ImageIcon ICON_EDIT = new ImageIcon(JServiceMapEditPane.class.getResource("/org/constellation/swing/edit.png"));
-    private static final ImageIcon ICON_DELETE = new ImageIcon(JServiceMapEditPane.class.getResource("/org/constellation/swing/edit_remove.png"));
-    
-    private ConstellationServer server;
-    private String serviceType;
-    private Instance serviceInstance;
-    private LayerContext configuration;
+    private final ConstellationServer server;
+    private final String serviceType;
+    private final LayerContext configuration;
     private List<LayerModel> layerModelList;
     
     /**
      * Creates new form JServiceMapEditPane
+     * @param server
+     * @param serviceType
+     * @param configuration
      */
-    public JServiceMapEditPane(final ConstellationServer server, final String serviceType, final Instance serviceInstance, final Object configuration) {
+    public JServiceMapEditPane(final ConstellationServer server, final String serviceType, final Object configuration) {
         this.server = server;
         this.serviceType = serviceType;
-        this.serviceInstance = serviceInstance;
         this.configuration = (configuration instanceof LayerContext) ? (LayerContext) configuration : null;
         initComponents();
         
@@ -78,7 +73,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
                 
                 if (value instanceof LayerModel) {
                     final LayerModel oldLayerModel = (LayerModel) value;
-                    final  LayerModel updateLayerModel = JEditLayerPane.showDialog(server, configuration, serviceType, oldLayerModel);
+                    final  LayerModel updateLayerModel = JEditLayerPane.showDialog(server, serviceType, oldLayerModel);
                     if (updateLayerModel != null) {
                         final int pos = layerModelList.indexOf(oldLayerModel);
                         layerModelList.remove(pos);
@@ -117,7 +112,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
      * Create a list of layer model based on service configuration.
      */
     private void initLayerList() {
-        layerModelList = new ArrayList<LayerModel>();
+        layerModelList = new ArrayList<>();
         final List<Source> sources = configuration.getLayers();
 
         for (final Source source : sources) {
@@ -200,7 +195,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
      * Update layer defined in configuration using layerModelList.
      */
     private void updateConfiguration() {
-        final List<Source> sources = new ArrayList<Source>();
+        final List<Source> sources = new ArrayList<>();
         
         for (final LayerModel layerModel : layerModelList) {
             final String providerId = layerModel.getProviderId();
@@ -303,7 +298,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
 
     private void guiAddLayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiAddLayerActionPerformed
         
-        final  LayerModel layerModel = JEditLayerPane.showDialog(server, configuration, serviceType, null);
+        final  LayerModel layerModel = JEditLayerPane.showDialog(server, serviceType, null);
         if (layerModel != null) {
             layerModelList.add(layerModel);
             updateLayerTableModel();

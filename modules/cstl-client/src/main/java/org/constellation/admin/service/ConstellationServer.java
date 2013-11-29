@@ -16,12 +16,6 @@
  */
 package org.constellation.admin.service;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
@@ -41,7 +35,6 @@ import org.constellation.configuration.StringTreeNode;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.dto.DataInformation;
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.client.ServerFactory;
@@ -63,7 +56,6 @@ import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
 
 import javax.swing.event.EventListenerList;
-import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -80,7 +72,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1118,6 +1109,29 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public StringList listProcess() {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_PROCESS;
+                final Object response = sendRequest(url, null);
+                if (response instanceof StringList) {
+                    return (StringList) response;
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return null;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return null;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+            return null;
+        }
+
+        /**
+         * Ask for a list of all available process factories.
+         * @return A list of process factories authority code.
+         */
+        public StringList listProcessFactories() {
+            try {
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_PROCESS_FACTORIES;
                 final Object response = sendRequest(url, null);
                 if (response instanceof StringList) {
                     return (StringList) response;

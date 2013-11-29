@@ -18,6 +18,7 @@ package org.constellation.swing;
 
 import java.awt.BorderLayout;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.apache.sis.util.logging.Logging;
 
@@ -28,6 +29,10 @@ import org.apache.sis.util.logging.Logging;
 public abstract class JServiceEditionPane extends JPanel {
 
     protected static final Logger LOGGER = Logging.getLogger(JServiceEditionPane.class);
+
+    //icones
+    protected static final ImageIcon ICON_EDIT = new ImageIcon(JServiceMapEditPane.class.getResource("/org/constellation/swing/edit.png"));
+    protected static final ImageIcon ICON_DELETE = new ImageIcon(JServiceMapEditPane.class.getResource("/org/constellation/swing/edit_remove.png"));
     
     public JServiceEditionPane() {
         setLayout(new BorderLayout());

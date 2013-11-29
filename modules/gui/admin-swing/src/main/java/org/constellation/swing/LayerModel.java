@@ -27,7 +27,7 @@ import org.constellation.configuration.Layer;
 public class LayerModel implements Serializable {
     
     private String providerId;
-    private Layer layer;
+    private final Layer layer;
 
     public LayerModel(final Layer layer, final String providerId) {
         this.providerId = providerId;

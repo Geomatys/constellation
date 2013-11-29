@@ -57,7 +57,7 @@ public final class CstlScheduler {
     private static final String TASK_FILE = "scheduler-tasks.xml";    
     private static CstlScheduler INSTANCE = null;
         
-    private final List<Task> tasks = new ArrayList<Task>();
+    private final List<Task> tasks = new ArrayList<>();
     private Scheduler quartzScheduler;
     
     private CstlScheduler(){
@@ -65,9 +65,7 @@ public final class CstlScheduler {
         LOGGER.log(Level.WARNING, "=== Starting Constellation Scheduler ===");
         try {
             loadTasks();
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "=== Failed to read tasks ===\n"+ex.getLocalizedMessage(), ex); 
-        } catch (XMLStreamException ex) {
+        } catch (IOException | XMLStreamException ex) {
             LOGGER.log(Level.SEVERE, "=== Failed to read tasks ===\n"+ex.getLocalizedMessage(), ex); 
         }
 
@@ -97,7 +95,7 @@ public final class CstlScheduler {
      * @return List of all available process.
      */
     public List<Name> listProcess(){
-        final List<Name> names = new ArrayList<Name>();
+        final List<Name> names = new ArrayList<>();
         
         final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
         while(ite.hasNext()){
@@ -112,6 +110,18 @@ public final class CstlScheduler {
         
         return names;
     }
+
+    public List<String> listProcessFactory(){
+        final List<String> names = new ArrayList<>();
+
+        final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
+        while(ite.hasNext()){
+            final ProcessingRegistry factory = ite.next();
+            names.add(factory.getIdentification().getCitation()
+                              .getIdentifiers().iterator().next().getCode());
+        }
+        return names;
+    }
     
     
     /**
@@ -119,7 +129,7 @@ public final class CstlScheduler {
      */
     public synchronized List<Task> listTasks(){
         //return a copy, since tasks object are mutable
-        final List<Task> copy = new ArrayList<Task>();
+        final List<Task> copy = new ArrayList<>();
         for(Task t : tasks){
             copy.add(new Task(t));
         }
@@ -137,6 +147,7 @@ public final class CstlScheduler {
     
     /**
      * Add a new task.
+     * @param task
      */
     public synchronized void addTask(Task task){
         
@@ -149,15 +160,14 @@ public final class CstlScheduler {
         
         try {
             saveTasks();
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "Failed to save tasks list", ex);
-        } catch (XMLStreamException ex) {
+        } catch (IOException | XMLStreamException ex) {
             LOGGER.log(Level.WARNING, "Failed to save tasks list", ex);
         }
     }
     
     /**
      * Update a task.
+     * @param task
      */
     public synchronized boolean updateTask(final Task task){
         if(removeTask(task)){
@@ -169,6 +179,7 @@ public final class CstlScheduler {
     
     /**
      * Remove a task.
+     * @param task
      */
     public synchronized boolean removeTask(Task task){
         return removeTask(task.getId());
@@ -176,6 +187,7 @@ public final class CstlScheduler {
     
     /**
      * Remove task for the given id.
+     * @param id
      */
     public synchronized boolean removeTask(final String id){
         
@@ -192,9 +204,7 @@ public final class CstlScheduler {
         if(task != null){
             try {
                 saveTasks();
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "Failed to save tasks list", ex);
-            } catch (XMLStreamException ex) {
+            } catch (IOException | XMLStreamException ex) {
                 LOGGER.log(Level.WARNING, "Failed to save tasks list", ex);
             }
             try {

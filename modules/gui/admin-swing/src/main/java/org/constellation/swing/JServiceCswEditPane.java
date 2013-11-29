@@ -23,8 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.swing.DefaultComboBoxModel;
@@ -60,6 +58,10 @@ public class JServiceCswEditPane extends JServiceEditionPane {
 
     /**
      * Creates new form JServiceMapEditPane
+     *
+     * @param server
+     * @param serviceInstance
+     * @param configuration
      */
     public JServiceCswEditPane(final ConstellationServer server, final Instance serviceInstance, final Object configuration) {
         this.server = server;

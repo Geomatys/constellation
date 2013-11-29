@@ -58,7 +58,7 @@ public class ProcessContext {
      */
     private String wmsInstanceName;
     
-    private final Map<String, String> customParameters = new HashMap<String, String>();
+    private final Map<String, String> customParameters = new HashMap<>();
 
     public ProcessContext() {
 
