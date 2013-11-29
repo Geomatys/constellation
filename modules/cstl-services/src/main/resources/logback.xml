@@ -38,7 +38,7 @@
         </rollingPolicy>
         <append>true</append>
         <encoder>
-          <pattern>%X{ogcServiceType} %X{ogcServiceName} %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+          <pattern>%X{ogcServiceLog} %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
       </appender>
     </sift>

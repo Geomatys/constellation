@@ -43,6 +43,11 @@ public class MDCFilter implements Filter {
 
     static final String OGC = "ogc";
 
+    private static final String ogcServiceLogKey = "ogcServiceLog";
+    
+    private static final String servicePathKey = "ogcServicePath";
+
+    
     private static final String DEFAULT_SERVLET_MAPPING = "/WS/";
 
     private static final String WS_MAPPING = "WSMapping";
@@ -84,9 +89,6 @@ public class MDCFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
-        final String serviceType = "ogcServiceType";
-        final String serviceName = "ogcServiceName";
-        final String servicePath = "ogcServicePath";
 
         if (request instanceof HttpServletRequest) {
             HttpServletRequest httpServletRequest = (HttpServletRequest) request;
@@ -97,16 +99,28 @@ public class MDCFilter implements Filter {
                 if (split.length > 1) {
                     try {
                         MDC.put(OGC, "true");
-                        MDC.put(serviceType, split[0]);
-                        MDC.put(serviceName, split[1]);
-                        MDC.put(servicePath, path);
+                        String serviceType = split[0];
+                        String serviceName = split[1];
+                        String log = serviceType;
+                        if("admin".equals(serviceName)) {
+                            //This is not a service call, but a admin console
+                            serviceName = httpServletRequest.getParameter("id");
+                            final String command = httpServletRequest.getParameter("request");
+                            log += " " + serviceName + " (" + command + ")";
+                            path = serviceType + "/" + serviceName;
+                        }else {
+                            log += " " + serviceName;
+                        }
+                        
+                        MDC.put(ogcServiceLogKey, log);
+                        MDC.put(servicePathKey, path);
                         chain.doFilter(request, response);
                         return;
                     } finally {
                         MDC.remove(OGC);
-                        MDC.remove(serviceType);
-                        MDC.remove(serviceName);
-                        MDC.remove(servicePath);
+                        MDC.remove(ogcServiceLogKey);
+                        
+                        MDC.remove(servicePathKey);
                     }
                 }
 
