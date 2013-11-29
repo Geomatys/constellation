@@ -68,6 +68,7 @@
  * javascript and css loaded
  */
 @Assets({@Asset("cstl-web-client.css"),
+        @Asset(id = "github",           value = "styles/github.css",                                                                            location = AssetLocation.SERVER),
         @Asset(id = "selectizecss",     value = "css/selectize.bootstrap2.css",                                                                 location = AssetLocation.SERVER),
         @Asset(id = "jquery",           value = "js/jquery-2.0.0.js",                                                                           location = AssetLocation.SERVER),
         @Asset(id = "json",             value = "js/jquery.json-2.4.js",                    depends = "jquery",                                 location = AssetLocation.SERVER),
@@ -100,6 +101,7 @@
         @Asset(id = "cstl.workflow",            value = "js/cstl.workflow.link.js",         depends = "cstl.dashboard", location = AssetLocation.SERVER),
         @Asset(id = "cstl.filemodal",           value = "js/cstl.filemodal.js",             depends = "jquery",         location = AssetLocation.SERVER),
         @Asset(id = "cstl.netcdf",              value = "js/cstl.netcdf.js",                depends = "openlayers",     location = AssetLocation.SERVER),
+        @Asset(id = "highlight",                value = "js/highlight.pack.js",                                         location = AssetLocation.SERVER),
 
         // Style
         @Asset(id = "style_edition",    value = "js/style_edition.js",  depends = "jquery"),

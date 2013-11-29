@@ -1,4 +1,20 @@
 /*
+ * Constellation - An open source and standard compliant SDI
+ *      http://www.constellation-sdi.org
+ *   (C) 2009-2013, Geomatys
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details..
+ */
+
+/*
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
@@ -39,11 +55,11 @@ CSTL.Services = {
         return CSTL.jzAjax('Controller.startService', {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
-            CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-start'));
-            $('[data-state="' + type + '-' + id + '"]').removeClass('stopped').addClass('started');
-        }).fail(function() {
-            CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-start'));
-        })
+                CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-start'));
+                $('[data-state="' + type + '-' + id + '"]').removeClass('stopped').addClass('started');
+            }).fail(function() {
+                CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-start'));
+            })
     },
 
     /**
@@ -57,11 +73,11 @@ CSTL.Services = {
         return CSTL.jzAjax('Controller.stopService', {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
-            CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-stop'));
-            $('[data-state="' + type + '-' + id + '"]').removeClass('started').addClass('stopped');
-        }).fail(function() {
-            CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-stop'));
-        })
+                CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-stop'));
+                $('[data-state="' + type + '-' + id + '"]').removeClass('started').addClass('stopped');
+            }).fail(function() {
+                CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-stop'));
+            })
     },
 
     /**
@@ -75,11 +91,11 @@ CSTL.Services = {
         return CSTL.jzAjax('Controller.restartService', {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
-            CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-restart'));
-            $('[data-state="' + type + '-' + id + '"]').removeClass('stopped').addClass('started');
-        }).fail(function() {
-            CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-restart'));
-        });
+                CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-restart'));
+                $('[data-state="' + type + '-' + id + '"]').removeClass('stopped').addClass('started');
+            }).fail(function() {
+                CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-restart'));
+            });
     },
 
     /**
@@ -93,11 +109,11 @@ CSTL.Services = {
         return CSTL.jzAjax('Controller.deleteService', {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
-            CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-delete'));
-            $('#' + type + '-' + id).remove();
-        }).fail(function() {
-            CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-delete'));
-        });
+                CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-delete'));
+                $('#' + type + '-' + id).remove();
+            }).fail(function() {
+                CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-delete'));
+            });
     },
 
     /**
@@ -117,10 +133,10 @@ CSTL.Services = {
             method: 'POST',
             data:   data
         }).done(function() {
-            CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-description'));
-        }).fail(function() {
-            CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-description'));
-        });
+                CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-description'));
+            }).fail(function() {
+                CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-description'));
+            });
     },
 
     /**
@@ -140,10 +156,10 @@ CSTL.Services = {
             method: 'POST',
             data:   data
         }).done(function() {
-            CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-metadata'));
-        }).fail(function() {
-            CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-metadata'));
-        });
+                CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-metadata'));
+            }).fail(function() {
+                CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-service-metadata'));
+            });
     }
 };
 
@@ -183,7 +199,16 @@ $(function() {
         return false;
     });
     $('[data-action="open-capabilities"]').click(function() {
-        window.open($(this).data('capabilities'));
+        $.ajax({
+            url: $(this).data('capabilities'),
+            dataType: "text",
+            success: function(data){
+                $("#capabilities-modal-pre code").empty();
+                $("#capabilities-modal-pre code").text(data);
+                $("#capabilities-modal-pre code").each(function(i, e) {hljs.highlightBlock(e)});
+                $("#getcapabilities-modal").modal();
+            }
+        });
         return false;
     });
     $('[data-action="open-service-url"]').click(function() {

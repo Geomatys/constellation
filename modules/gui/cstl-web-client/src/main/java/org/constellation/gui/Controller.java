@@ -48,10 +48,7 @@ import org.constellation.gui.util.LayerDataComparator;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -75,7 +72,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  * @since 0.9
  */
 public class Controller {
-
 
 
     private static final Logger LOGGER = Logger.getLogger(Controller.class.toString());
@@ -181,7 +177,7 @@ public class Controller {
         parameters.put("nbResults", nbResults);
         parameters.put("startIndex", 0);
         parameters.put("nbPerPage", 10);
-        parameters.put("selected",   null);
+        parameters.put("selected", null);
         return dataDashboard.ok(parameters).withMimeType("text/html");
     }
 
@@ -303,7 +299,7 @@ public class Controller {
     @Route("/providerList")
     public Response getAvailableData(List<String> dataTypes, final String start, final String count, final String orderBy,
                                      final String direction, final String filter) {
-        if(dataTypes==null){
+        if (dataTypes == null) {
             dataTypes = new ArrayList<>(0);
             dataTypes.add("vector");
             dataTypes.add("raster");
@@ -365,7 +361,7 @@ public class Controller {
 
         if (file != null) {
             DataInformation di;
-            try{
+            try {
                 File dataDirectory = ConfigDirectory.getDataDirectory();
                 final File newFile = new File(dataDirectory, file.getName());
                 Files.copy(file.getInputStream(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -377,7 +373,7 @@ public class Controller {
 
                 di = providerManager.loadData(file.getName(), metadataFile.getName(), dataType);
                 informationContainer.setInformation(di);
-            }catch (IOException ex){
+            } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
 
