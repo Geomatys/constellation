@@ -169,7 +169,6 @@ public class WPSWorker extends AbstractWorker {
      * Constructor.
      *
      * @param id
-     * @param configurationDirectory
      */
     public WPSWorker(final String id) {
         super(id, ServiceDef.Specification.WPS);
@@ -198,7 +197,7 @@ public class WPSWorker extends AbstractWorker {
 
         if (context != null && context.getWebdavDirectory() != null) {
             webdavFolderPath = context.getWebdavDirectory();
-            webdavName = getId();
+            webdavName = id;
             isTmpWebDav = false;
         } else {
             isTmpWebDav = true;
@@ -362,13 +361,7 @@ public class WPSWorker extends AbstractWorker {
         //Delete recursively temporary directory.
         if (isTmpWebDav) {
             FileUtilities.deleteDirectory(new File(webdavFolderPath));
-
-            final File configDir = ConfigDirectory.getConfigDirectory();
-            final File webDavDir = new File(configDir, "webdav");
-            final File webDavInstanceDir = new File(webDavDir, webdavName);
-            if (webDavInstanceDir.exists()) {
-                FileUtilities.deleteDirectory(webDavInstanceDir);
-            }
+            ConfigurationEngine.deleteConfiguration("webdav", webdavName);
         }
     }
 

@@ -17,6 +17,7 @@
 package org.constellation.swing;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -31,8 +32,10 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.LayoutStyle;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -46,6 +49,7 @@ import org.netbeans.swing.outline.DefaultOutlineModel;
 import org.netbeans.swing.outline.Outline;
 import org.netbeans.swing.outline.RenderDataProvider;
 import org.netbeans.swing.outline.RowModel;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -128,6 +132,9 @@ public class JServiceWpsPane extends JServiceEditionPane {
             }
             allProcessCheck.setSelected(false);
         }
+        guiTextFCProviderID.setText(configuration.getFileCoverageProviderId());
+        guiTextWMSInstance.setText(configuration.getWmsInstanceName());
+        guiTextWebavDir.setText(configuration.getWebdavDirectory());
     }
 
     /**
@@ -184,6 +191,12 @@ public class JServiceWpsPane extends JServiceEditionPane {
         guiLoadBar = new JToolBar();
         guiLoadLabel = new JLabel();
         guiAddLayer = new JButton();
+        jLabel1 = new JLabel();
+        guiTextWebavDir = new JTextField();
+        jLabel2 = new JLabel();
+        guiTextWMSInstance = new JTextField();
+        jLabel3 = new JLabel();
+        guiTextFCProviderID = new JTextField();
 
         ResourceBundle bundle = ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         allProcessCheck.setText(bundle.getString("loadAllProcess")); // NOI18N
@@ -208,6 +221,12 @@ public class JServiceWpsPane extends JServiceEditionPane {
             }
         });
 
+        jLabel1.setText(NbBundle.getMessage(JServiceWpsPane.class, "webdavDir")); // NOI18N
+
+        jLabel2.setText(NbBundle.getMessage(JServiceWpsPane.class, "wmsInstance")); // NOI18N
+
+        jLabel3.setText(NbBundle.getMessage(JServiceWpsPane.class, "fcProviderID")); // NOI18N
+
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -216,13 +235,37 @@ public class JServiceWpsPane extends JServiceEditionPane {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(guiAddLayer)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(guiLoadBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-                    .addComponent(allProcessCheck, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                    .addComponent(guiTextWebavDir, GroupLayout.PREFERRED_SIZE, 317, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(guiTextWMSInstance, GroupLayout.PREFERRED_SIZE, 317, GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(guiTextFCProviderID, GroupLayout.PREFERRED_SIZE, 317, GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(guiAddLayer)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(guiLoadBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addComponent(allProcessCheck, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
+
+        layout.linkSize(SwingConstants.HORIZONTAL, new Component[] {guiTextFCProviderID, guiTextWMSInstance, guiTextWebavDir});
+
+        layout.linkSize(SwingConstants.HORIZONTAL, new Component[] {jLabel1, jLabel2, jLabel3});
+
         layout.setVerticalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -234,7 +277,19 @@ public class JServiceWpsPane extends JServiceEditionPane {
                 .addComponent(allProcessCheck)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 227, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(guiTextWebavDir))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(guiTextWMSInstance))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(guiTextFCProviderID, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -263,6 +318,12 @@ public class JServiceWpsPane extends JServiceEditionPane {
     private JToolBar guiLoadBar;
     private JLabel guiLoadLabel;
     private Outline guiProcessFactoryTable;
+    private JTextField guiTextFCProviderID;
+    private JTextField guiTextWMSInstance;
+    private JTextField guiTextWebavDir;
+    private JLabel jLabel1;
+    private JLabel jLabel2;
+    private JLabel jLabel3;
     private JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 
@@ -287,6 +348,27 @@ public class JServiceWpsPane extends JServiceEditionPane {
         }
         //update configuration processes
         configuration.getProcesses().setFactory(factories);
+
+        final String wdDirectory = guiTextWebavDir.getText();
+        if (wdDirectory != null && !wdDirectory.isEmpty()) {
+            configuration.setWebdavDirectory(wdDirectory);
+        } else {
+            configuration.setWebdavDirectory(null);
+        }
+
+        final String fcProviderID = guiTextFCProviderID.getText();
+        if (fcProviderID != null && !fcProviderID.isEmpty()) {
+            configuration.setFileCoverageProviderId(fcProviderID);
+        } else {
+            configuration.setFileCoverageProviderId(null);
+        }
+
+        final String wmsInstance = guiTextWMSInstance.getText();
+        if (wmsInstance != null && !wmsInstance.isEmpty()) {
+            configuration.setWmsInstanceName(wmsInstance);
+        } else {
+            configuration.setWmsInstanceName(null);
+        }
     }
 
     /**

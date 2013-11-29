@@ -36,6 +36,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -46,12 +47,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.admin.service.ConstellationServer.Services;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceStatus;
-import org.constellation.security.DefaultRoleController;
 import org.constellation.security.RoleController;
 import static org.constellation.security.ActionPermissions.*;
 import org.constellation.swing.action.Action;
@@ -66,7 +67,9 @@ import org.jdesktop.swingx.JXTable;
  */
 public final class JServicesPane extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private final List<Action> actions = new ArrayList<Action>();
+    private static final Logger LOGGER = Logging.getLogger(JServicesPane.class);
+    
+    private final List<Action> actions = new ArrayList<>();
     private final JXTable guiTable = new JXTable();
     private final ConstellationServer cstl;
     private final FrameDisplayer displayer;
@@ -94,7 +97,7 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
         }
         final Services services = cstl.services;
         final Map<String,List<String>> listServices = services.getAvailableService();
-        final List<String> types = new ArrayList<String>(listServices.keySet());
+        final List<String> types = new ArrayList<>(listServices.keySet());
         Collections.sort(types);
 
         guiAll.addActionListener(this);
@@ -166,7 +169,7 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
         }
 
         //list all services
-        final List<Entry<Instance,String>> instances = new ArrayList<Entry<Instance, String>> ();
+        final List<Entry<Instance,String>> instances = new ArrayList<> ();
 
 
         final Map<String,List<String>> services = cstl.services.getAvailableService();
@@ -174,9 +177,13 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
 
             if("all".equals(action) || action.equalsIgnoreCase(service.getKey())){
                 final InstanceReport report = cstl.services.listInstance(service.getKey());
-                if(report.getInstances() == null) continue;
-                for(Instance instance : report.getInstances()){
-                    instances.add(new AbstractMap.SimpleImmutableEntry<Instance, String>(instance, service.getKey()));
+                if (report != null) {
+                    if (report.getInstances() == null) continue;
+                    for(Instance instance : report.getInstances()){
+                        instances.add(new AbstractMap.SimpleImmutableEntry<>(instance, service.getKey()));
+                    }
+                } else {
+                    LOGGER.warning("Unable to get the report for service: " + service.getKey());
                 }
             }
         }
