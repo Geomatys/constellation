@@ -1,6 +1,5 @@
 package org.constellation.webdav;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,8 +8,9 @@ import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.ResourceFactory;
 
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
 
 /**
  * A resource factory which provides access to files in a file system.
@@ -22,23 +22,16 @@ public final class WebdavService implements ResourceFactory {
 
     private static final Logger LOGGER = Logging.getLogger(WebdavService.class);
 
-    private final Map<String, WebdavWorker> workersMap;
+    private final Map<String, Worker> workersMap;
             
     private final String contextPath;
     
     public WebdavService() {
-
-        WSEngine.registerService("webdav", "REST", WebdavWorker.class, null);
-        
-        workersMap = new HashMap<>();
-        for (String instance : ConfigurationEngine.getServiceConfigurationIds("webdav")) {
-            final WebdavWorker newWorker = new WebdavWorker(instance);
-            workersMap.put(instance, newWorker);
-        }
+        workersMap = WSEngine.getWorkersMap(Specification.WEBDAV.name());
         
         // all worker MUST have the same contextPath
         if (!workersMap.isEmpty()) {
-            contextPath = workersMap.values().iterator().next().getContextPath();
+            contextPath = ((WebdavWorker)workersMap.values().iterator().next()).getContextPath();
         } else {
             contextPath = null;
         }
@@ -55,7 +48,7 @@ public final class WebdavService implements ResourceFactory {
         if (instanceName == null) {
             return null; 
         }
-        final WebdavWorker currentWorker = workersMap.get(instanceName);
+        final WebdavWorker currentWorker = (WebdavWorker) workersMap.get(instanceName);
         if (currentWorker != null) {
             return currentWorker.getResource(host, url);
         } else {

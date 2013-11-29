@@ -183,6 +183,7 @@
         <constellation.sensor.soap><![CDATA[<endpoint implementation="org.constellation.sos.ws.soap.SOService" name="SOService"  url-pattern="/WS-SOAP/sos/*"/>]]></constellation.sensor.soap>
         <constellation.wps>org.constellation.wps.ws.rs</constellation.wps>
         <constellation.wps.soap><![CDATA[<endpoint implementation="org.constellation.wps.ws.soap.WPSService" name="WPSService" url-pattern="/WS-SOAP/wps/*"/>]]></constellation.wps.soap>
+        <constellation.webdav>org.constellation.webdav</constellation.webdav>
         <constellation.services.packages>
             ${constellation.config};
             ${constellation.map};
@@ -193,7 +194,8 @@
             ${constellation.sensor};
             ${constellation.tile};
             ${constellation.metadata-provider};
-            ${constellation.wps}
+            ${constellation.wps};
+            ${constellation.webdav}
         </constellation.services.packages>
         <constellation.services.soap.packages>
             ${constellation.metadata.soap}
