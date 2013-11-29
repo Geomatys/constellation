@@ -46,7 +46,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
 
     private ConstellationServer server;
     private Instance serviceInstance;
-    private Automatic configuration; 
+    private Automatic configuration;
     private JServiceEditionPane specificPane;
     
     /**
