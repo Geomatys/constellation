@@ -134,6 +134,8 @@ public class WPSWorker extends AbstractWorker {
      * Path where output file will be saved.
      */
     private final String webdavFolderPath;
+    private final String webdavName;
+    private final boolean isTmpWebDav;
 
     /**
      * WebDav URL.
@@ -196,8 +198,23 @@ public class WPSWorker extends AbstractWorker {
 
         if (context != null && context.getWebdavDirectory() != null) {
             webdavFolderPath = context.getWebdavDirectory();
+            webdavName = getId();
+            isTmpWebDav = false;
         } else {
-            webdavFolderPath = WPSConstant.TEMP_FOLDER;
+            isTmpWebDav = true;
+            webdavName = "wps"+ System.currentTimeMillis();
+            final File tmpFolder = new File(System.getProperty("java.io.tmpdir"), webdavName);
+            if (!tmpFolder.isDirectory()) {
+                final boolean created = tmpFolder.mkdirs();
+                if (created) {
+                    tmpFolder.deleteOnExit();
+                } else {
+                    LOGGER.log(Level.WARNING, "Ressource folder for WPS services cannot be created. " +
+                            "It makes WPS unable to use reference parameters. You should restart server or create manually following directory : "
+                            + tmpFolder.getAbsolutePath());
+                }
+            }
+            webdavFolderPath = tmpFolder.getAbsolutePath();
         }
         
         //Configure the directory to store parameters schema into.
@@ -342,8 +359,17 @@ public class WPSWorker extends AbstractWorker {
     @Override
     public void destroy() {
         super.destroy();
-        //Delete recursuvly temporary directory.
-        FileUtilities.deleteDirectory(new File(webdavFolderPath));
+        //Delete recursively temporary directory.
+        if (isTmpWebDav) {
+            FileUtilities.deleteDirectory(new File(webdavFolderPath));
+
+            final File configDir = ConfigDirectory.getConfigDirectory();
+            final File webDavDir = new File(configDir, "webdav");
+            final File webDavInstanceDir = new File(webDavDir, webdavName);
+            if (webDavInstanceDir.exists()) {
+                FileUtilities.deleteDirectory(webDavInstanceDir);
+            }
+        }
     }
 
     /**
@@ -375,7 +401,7 @@ public class WPSWorker extends AbstractWorker {
                 if (webappURL.contains("/WS")) {
                     webappURL = webappURL.substring(0, webappURL.indexOf("/WS"));
                 }
-                this.webdavURL = webappURL + "/webdav/" + getId();
+                this.webdavURL = webappURL + "/webdav/" + webdavName;
             } else {
                 LOGGER.log(Level.WARNING, "Wrong service URL.");
             }
@@ -392,18 +418,18 @@ public class WPSWorker extends AbstractWorker {
      */
     private boolean createWebDav() {
         final File tmpDir = new File(webdavFolderPath);
-        if (!tmpDir.exists() || !tmpDir.isDirectory()) {
+        if (!tmpDir.isDirectory()) {
             tmpDir.mkdirs();
         }
-        final String webDavName = getId();
+
         //configure webdav if not exist
         try {
-            ConfigurationEngine.getConfiguration("webdav", webDavName);
+            ConfigurationEngine.getConfiguration("webdav", webdavName);
         } catch (FileNotFoundException | JAXBException e) {
             final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
-            webdavCtx.setId(webDavName);
+            webdavCtx.setId(webdavName);
             try {
-                ConfigurationEngine.storeConfiguration("webdav", webDavName, webdavCtx, null);
+                ConfigurationEngine.storeConfiguration("webdav", webdavName, webdavCtx, null);
             } catch (JAXBException | IOException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;
