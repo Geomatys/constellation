@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2012, Geomatys
+ *    (C) 2013, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,43 +14,39 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.configuration;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+package org.constellation.swing;
 
+import org.constellation.configuration.Process;
 /**
  *
  * @author Guilhem Legal (Geomatys)
- * @since 0.9
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-public class Process {
-    
-    @XmlAttribute
-    private String id;
+public class ProcessModel {
 
-    public Process() {
-        
-    }
-    
-    public Process(final String id) {
-        this.id = id;
-    }
-    
-    /**
-     * @return the id
-     */
-    public String getId() {
-        return id;
+    private final Process process;
+    private boolean selected;
+
+    public ProcessModel(final Process process, final boolean selected) {
+        this.process  = process;
+        this.selected = selected;
     }
 
     /**
-     * @param id the id to set
+     * @return the process
      */
-    public void setId(String id) {
-        this.id = id;
+    public Process getProcess() {
+        return process;
+    }
+
+    public boolean isSelected() {
+        return selected;
     }
     
+    /**
+     * @param selected the selected to set
+     */
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 }

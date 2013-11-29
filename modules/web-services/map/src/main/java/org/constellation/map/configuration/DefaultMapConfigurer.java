@@ -197,6 +197,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         //Tasks operations
         else if (REQUEST_LIST_PROCESS.equalsIgnoreCase(request)) {
             return listProcess();
+        } else if (REQUEST_LIST_PROCESS_FOR_FACTO.equalsIgnoreCase(request)) {
+            return listProcessForFactory(parameters);
         } else if (REQUEST_LIST_PROCESS_FACTORIES.equalsIgnoreCase(request)) {
             return listProcessFactories();
         } else if (REQUEST_LIST_TASKS.equalsIgnoreCase(request)) {
@@ -919,6 +921,14 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             lst.getList().add(DefaultName.toJCRExtendedForm(n));
         }
         return lst;
+    }
+
+    /**
+     * Returns a list of all process available for the specified factory.
+     */
+    private StringList listProcessForFactory(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String authorityCode = getParameter("authorityCode", true, parameters);
+        return new StringList(CstlScheduler.getInstance().listProcessForFactory(authorityCode));
     }
 
     /**

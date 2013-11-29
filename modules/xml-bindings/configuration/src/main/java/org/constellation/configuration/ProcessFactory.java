@@ -67,6 +67,9 @@ public class ProcessFactory {
      * @return the loadAll
      */
     public Boolean getLoadAll() {
+        if (loadAll == null) {
+            loadAll = false;
+        }
         return loadAll;
     }
 
@@ -81,6 +84,9 @@ public class ProcessFactory {
      * @return the include
      */
     public ProcessList getInclude() {
+        if (include == null) {
+            include = new ProcessList();
+        }
         return include;
     }
 
@@ -95,6 +101,9 @@ public class ProcessFactory {
      * @return the exclude
      */
     public ProcessList getExclude() {
+        if (exclude == null) {
+            exclude = new ProcessList();
+        }
         return exclude;
     }
 

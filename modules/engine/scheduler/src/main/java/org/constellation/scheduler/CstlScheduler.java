@@ -111,6 +111,30 @@ public final class CstlScheduler {
         return names;
     }
 
+    /**
+     * The returned list is a subset of what can be found with ProcessFinder.
+     * But only process with simple types arguments are preserved.
+     *
+     * @param authorityCode
+     * @return List of all available process.
+     */
+    public List<String> listProcessForFactory(final String authorityCode){
+        final List<String> names = new ArrayList<>();
+
+        final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
+        while(ite.hasNext()){
+            final ProcessingRegistry factory = ite.next();
+            final String currentAuthorityCode = factory.getIdentification().getCitation()
+                              .getIdentifiers().iterator().next().getCode();
+            if (currentAuthorityCode.equals(authorityCode)) {
+                for(String processCode : factory.getNames()){
+                    names.add(processCode);
+                }
+            }
+        }
+        return names;
+    }
+
     public List<String> listProcessFactory(){
         final List<String> names = new ArrayList<>();
 

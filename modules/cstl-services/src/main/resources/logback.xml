@@ -45,6 +45,7 @@
   </appender>
 
   <logger name="org.constellation" level="INFO" />
+  <logger name="org.geotoolkit" level="INFO" />
 
   <root level="WARN">
     <appender-ref ref="STDOUT" />

@@ -46,7 +46,7 @@ public class ProcessList {
      */
     public List<Process> getProcess() {
         if (process == null) {
-            process = new ArrayList<Process>();
+            process = new ArrayList<>();
         }
         return process;
     }
@@ -56,5 +56,14 @@ public class ProcessList {
      */
     public void setProcess(final List<Process> process) {
         this.process = process;
+    }
+
+    public boolean contains(final String id) {
+        for (Process p : getProcess()) {
+            if (p.getId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

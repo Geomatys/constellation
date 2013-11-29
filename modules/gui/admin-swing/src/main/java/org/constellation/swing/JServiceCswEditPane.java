@@ -80,6 +80,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
             } else {
                 LOGGER.log(Level.WARNING, "Unexpected CSW format:{0}", this.configuration.getFormat());
             }
+            guiDataSourceCombo.setSelectedItem(this.configuration.getFormat());
             if (this.configuration.getLogLevel() != null) {
                 this.logLevelCombo.setSelectedItem(this.configuration.getLogLevel().getName());
             }
@@ -123,7 +124,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         );
         centerPaneLayout.setVerticalGroup(
             centerPaneLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGap(0, 175, Short.MAX_VALUE)
+            .addGap(0, 271, Short.MAX_VALUE)
         );
 
         refreshIndexButton.setText(bundle.getString("refreshIndex")); // NOI18N
@@ -151,7 +152,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 564, Short.MAX_VALUE)
+                    .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 618, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -163,7 +164,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(guiDataSourceCombo, 0, 434, Short.MAX_VALUE)))
+                        .addComponent(guiDataSourceCombo, 0, 488, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -174,8 +175,8 @@ public class JServiceCswEditPane extends JServiceEditionPane {
                     .addComponent(jLabel1)
                     .addComponent(guiDataSourceCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(refreshIndexButton)
                     .addComponent(jLabel2)
@@ -198,6 +199,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         } else {
             LOGGER.log(Level.WARNING, "Unexpected CSW format:{0}", this.configuration.getFormat());
         }
+        validate();
         repaint();
     }//GEN-LAST:event_guiDataSourceComboItemStateChanged
 

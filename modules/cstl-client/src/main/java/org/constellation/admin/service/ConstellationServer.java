@@ -1126,6 +1126,31 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
 
         /**
+         * Ask for a list of all available process in the specified factory.
+         *
+         * @param authorityCode
+         * @return A list of process identifier.
+         */
+        public StringList listProcessForFactory(final String authorityCode) {
+            try {
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_PROCESS_FOR_FACTO + "&authorityCode=" + authorityCode;
+                final Object response = sendRequest(url, null);
+                if (response instanceof StringList) {
+                    return (StringList) response;
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return null;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return null;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+            return null;
+        }
+
+        /**
          * Ask for a list of all available process factories.
          * @return A list of process factories authority code.
          */
