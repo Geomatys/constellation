@@ -1,5 +1,3 @@
-
-
 #{decorate path=menu.gtmpl/}
 
 #{param name=datainformation/}
@@ -49,5 +47,5 @@
 
 <script type="text/javascript">
     $("#crsTab").addClass("active");
-    $("#crs").addClass("active")
+    $("#crs").addClass("active");
 </script>
