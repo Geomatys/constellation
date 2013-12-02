@@ -1219,7 +1219,7 @@ public class MetadataUnmarshallTest {
         
         String expResult = out.toString();
         XMLComparator comparator = new XMLComparator(expResult, result);
-        comparator.ignoredAttributes.add("xmlns:*");
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
         comparator.compare();
     }

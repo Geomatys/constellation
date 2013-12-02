@@ -6,7 +6,7 @@
                  xmlns:gmx="http://www.isotc211.org/2005/gmx"
                  xmlns:gts="http://www.isotc211.org/2005/gts"
                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                 xmlns:gml="http://www.opengis.net/gml">
+                 xmlns:gml="http://www.opengis.net/gml/3.2">
     <gmd:fileIdentifier>
         <gco:CharacterString>identifier-test</gco:CharacterString>
     </gmd:fileIdentifier>

@@ -92,6 +92,7 @@ public class WMTSWorkerTest {
         marshaller.marshal(result, sw);
         XMLComparator comparator = new XMLComparator(FileUtilities.getStringFromFile(
                 FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-cont.xml")), sw.toString());
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
         
         
@@ -102,6 +103,7 @@ public class WMTSWorkerTest {
         marshaller.marshal(result, sw);
         comparator = new XMLComparator(FileUtilities.getStringFromFile(
                 FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0.xml")), sw.toString());
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         acceptVersion = new AcceptVersionsType("2.3.0");
@@ -146,6 +148,7 @@ public class WMTSWorkerTest {
         marshaller.marshal(result, sw);
         comparator = new XMLComparator(FileUtilities.getStringFromFile(
                 FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-om.xml")), sw.toString());
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         acceptVersion = new AcceptVersionsType("1.0.0");
@@ -158,6 +161,7 @@ public class WMTSWorkerTest {
         marshaller.marshal(result, sw);
         comparator = new XMLComparator(FileUtilities.getStringFromFile(
                 FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-si.xml")), sw.toString());
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         acceptVersion = new AcceptVersionsType("1.0.0");
@@ -170,6 +174,7 @@ public class WMTSWorkerTest {
         marshaller.marshal(result, sw);
         comparator = new XMLComparator(FileUtilities.getStringFromFile(
                 FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-sp.xml")), sw.toString());
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
         pool.recycle(marshaller);
