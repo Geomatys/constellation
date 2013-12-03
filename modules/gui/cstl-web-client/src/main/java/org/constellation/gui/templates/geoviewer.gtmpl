@@ -1,0 +1,6 @@
+#{decorate path=menu.gtmpl/}
+
+<div id="geomap" class="map"></div>
+<script type="text/javascript">
+    CSTL.Viewer.init();
+</script>
