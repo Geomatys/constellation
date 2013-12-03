@@ -351,10 +351,10 @@
         </fes:Scalar_Capabilities>
         <fes:Spatial_Capabilities>
             <fes:GeometryOperands>
-                <fes:GeometryOperand name="ns11:Envelope" xmlns:ns11="http://www.opengis.net/gml/3.2"/>
-                <fes:GeometryOperand name="ns11:Point" xmlns:ns11="http://www.opengis.net/gml/3.2"/>
-                <fes:GeometryOperand name="ns11:LineString" xmlns:ns11="http://www.opengis.net/gml/3.2"/>
-                <fes:GeometryOperand name="ns11:Polygon" xmlns:ns11="http://www.opengis.net/gml/3.2"/>
+                <fes:GeometryOperand name="gml:Envelope"/>
+                <fes:GeometryOperand name="gml:Point"/>
+                <fes:GeometryOperand name="gml:LineString"/>
+                <fes:GeometryOperand name="gml:Polygon"/>
             </fes:GeometryOperands>
             <fes:SpatialOperators>
                 <fes:SpatialOperator name="Disjoint"/>

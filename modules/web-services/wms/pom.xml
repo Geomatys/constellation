@@ -145,6 +145,12 @@
         <type>test-jar</type>
         <scope>test</scope>
     </dependency>
+    <dependency>
+       <groupId>org.constellation.testing</groupId>
+       <artifactId>cstl-test-data</artifactId>
+       <version>${project.version}</version>
+       <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>

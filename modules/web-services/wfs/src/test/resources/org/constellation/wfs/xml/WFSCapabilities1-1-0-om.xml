@@ -88,10 +88,10 @@
     <ogc:Filter_Capabilities>
         <ogc:Spatial_Capabilities>
             <ogc:GeometryOperands>
-                <ogc:GeometryOperand>gml:Envelope</ogc:GeometryOperand>
-                <ogc:GeometryOperand>gml:Point</ogc:GeometryOperand>
-                <ogc:GeometryOperand>gml:LineString</ogc:GeometryOperand>
-                <ogc:GeometryOperand>gml:Polygon</ogc:GeometryOperand>
+                <ogc:GeometryOperand xmlns:ns9="http://www.opengis.net/gml">ns9:Envelope</ogc:GeometryOperand>
+                <ogc:GeometryOperand xmlns:ns9="http://www.opengis.net/gml">ns9:Point</ogc:GeometryOperand>
+                <ogc:GeometryOperand xmlns:ns9="http://www.opengis.net/gml">ns9:LineString</ogc:GeometryOperand>
+                <ogc:GeometryOperand xmlns:ns9="http://www.opengis.net/gml">ns9:Polygon</ogc:GeometryOperand>
             </ogc:GeometryOperands>
             <ogc:SpatialOperators>
                 <ogc:SpatialOperator name="Disjoint"/>

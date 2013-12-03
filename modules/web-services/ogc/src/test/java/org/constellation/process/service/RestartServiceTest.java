@@ -20,12 +20,15 @@ import java.util.List;
 import java.util.Set;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.test.utils.Order;
 import org.constellation.ws.WSEngine;
+import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
@@ -33,6 +36,7 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
+@RunWith(TestRunner.class)
 public abstract class RestartServiceTest extends ServiceProcessTest {
 
     public RestartServiceTest(final String serviceName, final Class workerClass) {
@@ -51,6 +55,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
     }
 
     @Test
+    @Order(order = 1)
     public void testRestartOneNoClose() throws NoSuchIdentifierException, ProcessException {
 
         LOGGER.info("TEST Restart One no close");
@@ -76,6 +81,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
     }
 
     @Test
+    @Order(order = 2)
     public void testRestartOneClose() throws NoSuchIdentifierException, ProcessException {
 
         LOGGER.info("TEST Restart One close");
@@ -102,6 +108,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
     }
 
     @Test
+    @Order(order = 3)
     public void testRestartAllNoClose() throws NoSuchIdentifierException, ProcessException, InterruptedException {
 
         LOGGER.info("TEST Restart all no close");
@@ -138,6 +145,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
     }
 
     @Test
+    @Order(order = 4)
     public void testRestartAllClose() throws NoSuchIdentifierException, ProcessException {
 
         LOGGER.info("TEST Restart all close");
@@ -173,6 +181,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
      * Restart an instance that exist but no started.
      */
     @Test
+    @Order(order = 5)
     public void testStart() throws NoSuchIdentifierException, ProcessException {
 
         LOGGER.info("TEST start");
@@ -201,6 +210,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
      * @throws ProcessException
      */
     @Test
+    @Order(order = 6)
     public void testFailRestart2() throws NoSuchIdentifierException, ProcessException {
         LOGGER.info("TEST fail Restart 2");
 
