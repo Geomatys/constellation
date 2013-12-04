@@ -116,7 +116,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     @BeforeClass
     public static void initLayerList() throws JAXBException {
         ConfigurationEngine.setupTestEnvironement("WCSRequestsTest");
-        
+
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null));
         final Layers layers = new Layers(sources);
         final LayerContext config = new LayerContext(layers);
@@ -124,7 +124,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
         ConfigurationEngine.storeConfiguration("WCS", "default", config);
         ConfigurationEngine.storeConfiguration("WCS", "test", config);
-        
+
         initServer(new String[] {
             "org.constellation.coverage.ws.rs",
             "org.constellation.configuration.ws.rs",
@@ -240,7 +240,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     @Test
     public void testWCSGetCoverage() throws Exception {
         waitForStart();
-        
+
         // Creates a valid GetCoverage url.
         final URL getCoverageUrl;
         try {
@@ -395,10 +395,4 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         // TODO: add more tests on returned XML doc
     }
 
-    /**
-     * Free some resources.
-     */
-    @AfterClass
-    public static void finish() {
-    }
 }

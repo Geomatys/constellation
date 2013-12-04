@@ -141,16 +141,14 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
 
         ConfigurationEngine.storeConfiguration("WMS", "default", config);
 
-        final List<Source> sources2 = Arrays.asList(new Source("coverageTestSrc", true, null, Arrays.asList(new Layer(new QName("SST_tests")))),
-                                                    new Source("shapeSrc", false, Arrays.asList(new Layer(new QName("http://www.opengis.net/gml","Lakes"))), null),
-                                                    new Source("postgisSrc", true, null, null));
+        final List<Source> sources2 = Arrays.asList(new Source("coverageTestSrc", true, null, Arrays.asList(new Layer(new QName("SST_tests")))));
         final Layers layers2 = new Layers(sources2);
         final LayerContext config2 = new LayerContext(layers2);
         config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
         config2.getCustomParameters().put("shiroAccessible", "false");
 
         ConfigurationEngine.storeConfiguration("WMS", "wms1", config2);
-        
+
         initServer(new String[] {
             "org.constellation.map.ws.rs",
             "org.constellation.configuration.ws.rs",
@@ -205,12 +203,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         }
 
         // Get the list of layers
-        try {
-            layers = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD);
-        } catch (RegisterException ex) {
-            layers = null;
-            assumeNoException(ex);
-        }
+        layers = LayerProviderProxy.getInstance().getAll();
     }
 
     /**

@@ -154,12 +154,12 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     @Deprecated
     public V get(final K key) {
         final List<V> candidates = new ArrayList<>();
-        
+
         for(final Provider<K,V> provider : getProviders()){
             final V layer = provider.get(key);
             if(layer != null) candidates.add(layer);
         }
-        
+
         if(candidates.size() == 1){
             return candidates.get(0);
         }else if(candidates.size()>1){
@@ -173,23 +173,33 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
                         return (V)ld;
                     }
                 }
-                
+
                 //we could not find one more accurate then another
                 return candidates.get(0);
             }else{
                 return candidates.get(0);
             }
         }
-        
+
         return null;
     }
-    
+
     public V get(final K key, final String providerID) {
         final Provider<K,V> provider = getProvider(providerID);
         if (provider == null) {
             return null;
         }
         return provider.get(key);
+    }
+
+    public List<V> getAll() {
+        final List<V> values = new ArrayList<>();
+        for(Provider<K,V> provider : getProviders()){
+            for(K key : provider.getKeys()){
+                values.add(provider.get(key));
+            }
+        }
+        return values;
     }
 
     public abstract Collection<? extends S> getServices();
@@ -248,7 +258,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc }
      */
