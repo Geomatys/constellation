@@ -188,7 +188,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         serviceFre.setServiceContact(ct);
         serviceFre.setVersions(Arrays.asList("1.1.1", "1.3.0"));
         ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceFre, "fre");
-    
+
 
         initServer(new String[] {
             "org.constellation.map.ws.rs",
@@ -223,17 +223,17 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
                         final File outputDir = initDataDirectory();
                         final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
                         getOrCreateValue(source, "id").setValue("shapeSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);    
-                        
+                        getOrCreateValue(source, "load_all").setValue(true);
+
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
                         final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
                         getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");        
-                        
+                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
+
                         final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
                         getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");     
-                        
+                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(),ex);
                     }
@@ -675,10 +675,4 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         assertEquals(LAYER_TEST, name);
     }
 
-    /**
-     * Free some resources.
-     */
-    @AfterClass
-    public static void finish() {
-    }
 }
