@@ -94,7 +94,7 @@
         @Asset(id = "cstl.data",                value = "js/cstl.data.js",                  depends = "cstl",           location = AssetLocation.SERVER),
         @Asset(id = "cstl.providers",           value = "js/cstl.providers.js",             depends = "cstl",           location = AssetLocation.SERVER),
         @Asset(id = "cstl.services",            value = "js/cstl.services.js",              depends = "cstl",           location = AssetLocation.SERVER),
-        @Asset(id = "cstl.viewer",              value = "js/cstl.viewer.js",                depends = "cstl",           location = AssetLocation.APPLICATION),
+        @Asset(id = "cstl.viewer",              value = "js/cstl.viewer.js",                depends = "cstl",           location = AssetLocation.SERVER),
         @Asset(id = "cstl.dashboard",           value = "js/cstl.dashboard.js",             depends = "cstl",           location = AssetLocation.SERVER),
         @Asset(id = "cstl.dashboard.map",       value = "js/cstl.dashboard.map.js",         depends = "cstl.dashboard", location = AssetLocation.SERVER),
         @Asset(id = "cstl.dashboard.data",      value = "js/cstl.dashboard.data.js",        depends = "cstl.dashboard", location = AssetLocation.SERVER),
