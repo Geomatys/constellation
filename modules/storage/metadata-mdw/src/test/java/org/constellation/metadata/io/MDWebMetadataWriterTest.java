@@ -128,7 +128,6 @@ public class MDWebMetadataWriterTest {
         if (ds != null) {
             ds.shutdown();
         }
-        Setup.shutdown();
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

@@ -307,7 +307,7 @@ public class CSWworkerTest {
         } else {
             fail("unexpected record type:" + obj);
         }
-        
+
         /*
          *  TEST 2 : getRecordById with the first metadata in DC mode (BRIEF).
          */
@@ -435,7 +435,7 @@ public class CSWworkerTest {
             RecordType recordResult2 = (RecordType) result.getAny().get(1);
             RecordType expRecordResult2 =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2FDC.xml"));
             assertEquals(expRecordResult2, recordResult2);
-            
+
         } else {
             Node resultNode = (Node) obj;
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1FDC.xml");
@@ -451,7 +451,7 @@ public class CSWworkerTest {
             comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
             comparator.compare();
         }
-       
+
 
         /*
          *  TEST 7 : getRecordById with the first metadata with no outputSchema.
@@ -761,16 +761,24 @@ public class CSWworkerTest {
             assertEquals(expRecordResult1, recordResult1);
             assertEquals(expRecordResult2, recordResult2);
         } else {
-            Node resultNode = (Node) obj;
+            Node resultNode1 = (Node) obj;
+            Node resultNode2 = (Node) result.getSearchResults().getAny().get(1);
+
+            final List<String> identifierValues = NodeUtilities.getValuesFromPath(resultNode1, "/csw:Record/dc:identifier");
+            if (!identifierValues.get(0).equals("42292_5p_19900609195600")) {
+                Node temp = resultNode1;
+                resultNode1   = resultNode2;
+                resultNode2   = temp;
+            }
+
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1FDC.xml");
-            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode1);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
             comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
             comparator.compare();
 
-            resultNode = (Node) result.getSearchResults().getAny().get(1);
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta2FDC.xml");
-            comparator = new XMLComparator(expResultNode, resultNode);
+            comparator = new XMLComparator(expResultNode, resultNode2);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
             comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
             comparator.compare();
@@ -839,16 +847,24 @@ public class CSWworkerTest {
             assertEquals(expBriefResult1, briefResult1);
             assertEquals(expBriefResult2, briefResult2);
         } else {
-            Node resultNode = (Node) obj;
+            Node resultNode1 = (Node) obj;
+            Node resultNode2 = (Node) result.getSearchResults().getAny().get(1);
+
+            final List<String> identifierValues = NodeUtilities.getValuesFromPath(resultNode1, "/csw:BriefRecord/dc:identifier");
+            if (!identifierValues.get(0).equals("42292_5p_19900609195600")) {
+                Node temp = resultNode1;
+                resultNode1   = resultNode2;
+                resultNode2   = temp;
+            }
+
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1BDC.xml");
-            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode1);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
             comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
             comparator.compare();
 
-            resultNode = (Node) result.getSearchResults().getAny().get(1);
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta2BDC.xml");
-            comparator = new XMLComparator(expResultNode, resultNode);
+            comparator = new XMLComparator(expResultNode, resultNode2);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
             comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
             comparator.compare();
@@ -883,7 +899,7 @@ public class CSWworkerTest {
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
-        
+
         if (obj instanceof RecordType) {
             RecordType customResult1 = (RecordType) obj;
 
@@ -907,16 +923,24 @@ public class CSWworkerTest {
             assertEquals(expCustomResult1, customResult1);
             assertEquals(expCustomResult2, customResult2);
         } else {
-            Node resultNode = (Node) obj;
+            Node resultNode1 = (Node) obj;
+            Node resultNode2 = (Node) result.getSearchResults().getAny().get(1);
+
+            final List<String> identifierValues = NodeUtilities.getValuesFromPath(resultNode1, "/csw:Record/dc:identifier");
+            if (!identifierValues.get(0).equals("42292_5p_19900609195600")) {
+                Node temp = resultNode1;
+                resultNode1   = resultNode2;
+                resultNode2   = temp;
+            }
+
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1CustomDC.xml");
-            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode1);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
             comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
             comparator.compare();
 
-            resultNode = (Node) result.getSearchResults().getAny().get(1);
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta2CustomDC.xml");
-            comparator = new XMLComparator(expResultNode, resultNode);
+            comparator = new XMLComparator(expResultNode, resultNode2);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
             comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
             comparator.compare();
@@ -949,7 +973,7 @@ public class CSWworkerTest {
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
         }
-        
+
         if (obj instanceof RecordType) {
             RecordType customResult1 = (RecordType) obj;
 
@@ -973,16 +997,24 @@ public class CSWworkerTest {
             assertEquals(expCustomResult1, customResult1);
             assertEquals(expCustomResult2, customResult2);
         } else {
-            Node resultNode = (Node) obj;
+            Node resultNode1 = (Node) obj;
+            Node resultNode2 = (Node) result.getSearchResults().getAny().get(1);
+
+            final List<String> identifierValues = NodeUtilities.getValuesFromPath(resultNode1, "/csw:Record/dc:identifier");
+            if (!identifierValues.get(0).equals("42292_5p_19900609195600")) {
+                Node temp = resultNode1;
+                resultNode1   = resultNode2;
+                resultNode2   = temp;
+            }
+
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1CustomDC2.xml");
-            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode1);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
             comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
             comparator.compare();
 
-            resultNode = (Node) result.getSearchResults().getAny().get(1);
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta2CustomDC2.xml");
-            comparator = new XMLComparator(expResultNode, resultNode);
+            comparator = new XMLComparator(expResultNode, resultNode2);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
             comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
             comparator.compare();
@@ -1131,8 +1163,8 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 0);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
-        
-        
+
+
         /*
          *  TEST 9 : getRecords with HITS - DC mode (FULL) - CQL text: DWITHIN(geometry, POINT(1 2), 10, kilometers)
          */
@@ -1226,7 +1258,7 @@ public class CSWworkerTest {
             Node recordResult = (Node) obj;
             assertEquals(NodeUtilities.getValuesFromPath(recordResult, "/csw:Record/dc:identifier").get(0), "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
         }
-        
+
         pool.recycle(unmarshaller);
     }
 
@@ -1995,7 +2027,7 @@ public class CSWworkerTest {
             fail("unexpected record type:" + obj);
         }
 
-        
+
         /*
          *  TEST 2 : we update the metadata 11325_158_19640418141800 by replacing a single Property
          *  we replace the property MD_Metadata.language from en to fr.
@@ -2869,11 +2901,11 @@ public class CSWworkerTest {
                 }
             }
             assertEquals(ext, extResult);
-            
+
         } else {
             fail("unexpected record type:" + obj);
         }
-        
+
         // TODO fix this test assertTrue(removed);
 
 
@@ -2912,7 +2944,7 @@ public class CSWworkerTest {
         } else {
             fail("unexpected record type:" + obj);
         }
-        
+
         // TEST 15 we update the metadata 42292_9s_1990061004100 by updating the datestamp.
 
 
@@ -2939,7 +2971,7 @@ public class CSWworkerTest {
         } else {
             fail("unexpected record type:" + obj);
         }
-        
+
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
         properties = new ArrayList<>();
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp/DateTime", "2009-01-18T13:00:00+01:00"));
@@ -3149,7 +3181,7 @@ public class CSWworkerTest {
      * used for debug
      * @param n
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     private static String getStringFromNode(final Node n) throws Exception {
         TransformerFactory tf = TransformerFactory.newInstance();
