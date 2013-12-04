@@ -25,7 +25,11 @@ CSTL.Viewer = {
 
     panel: undefined,
 
-    init: function () {
+    navigation:undefined,
+
+    getFeatureBtn:undefined,
+
+        init: function () {
         //add OSM default Layer on background
         CSTL.Viewer.layers = [new OpenLayers.Layer.OSM("Simple OSM Map")];
 
@@ -35,7 +39,13 @@ CSTL.Viewer = {
         CSTL.Viewer.buildMap();
     },
 
+    navigate: function(){
+        CSTL.Viewer.getFeatureBtn.deactivate();
+    },
+
     callGetFeatureInfo: function () {
+        CSTL.Viewer.navigation.deactivate();
+        CSTL.Viewer.getFeatureBtn.activate();
         alert("getFeature");
     },
 
@@ -45,17 +55,32 @@ CSTL.Viewer = {
 
     toggleFullScreen: function () {
         $("#geomap").toggleFullScreen();
+        var $fullscreenSpan = $("button[name|='fullscreen'] span");
+        var current = $fullscreenSpan.html();
+        $fullscreenSpan.empty();
+        if(current === "Z"){
+            $fullscreenSpan.html("/");
+        }else{
+            $fullscreenSpan.html("Z");
+        }
     },
 
     buildController: function () {
-        var navigation = new OpenLayers.Control.Navigation({
+        var toolListeners = {
+            "activate": CSTL.Viewer.navigate
+        };
+
+        CSTL.Viewer.navigation = new OpenLayers.Control.Navigation({
             title: "Navigate",
-            text: "3"
+            id: "navigate",
+            text: "3",
+            eventListeners : toolListeners
         });
 
-        var getFeatureBtn = new OpenLayers.Control.Button({
+        CSTL.Viewer.getFeatureBtn = new OpenLayers.Control.Button({
             title: "getFeature",
             text: "7",
+            id: "getFeature",
             trigger: CSTL.Viewer.callGetFeatureInfo
         });
 
@@ -68,10 +93,12 @@ CSTL.Viewer = {
         var toggleFullScreenbtn = new OpenLayers.Control.Button({
             title: "toggleFullScreen",
             text: "Z",
+            id: "fullscreen",
             trigger: CSTL.Viewer.toggleFullScreen
         });
 
-        var controls = [navigation,
+        var controls = [
+            CSTL.Viewer.navigation,
             new OpenLayers.Control.ZoomIn({
                 title: "Zoom In",
                 text: "1"
@@ -84,7 +111,7 @@ CSTL.Viewer = {
                 title: "Zoom to the max extent",
                 text: "4"
             }),
-            getFeatureBtn,
+            CSTL.Viewer.getFeatureBtn,
             saveMapContextBtn,
             toggleFullScreenbtn];
         return controls;
@@ -98,9 +125,11 @@ CSTL.Viewer = {
             createControlMarkup: function (control) {
                 var button = document.createElement('button'),
                     iconSpan = document.createElement('span');
-                $(button).addClass("mapButton");
                 $(iconSpan).addClass("font-icon");
                 iconSpan.innerHTML = control.text;
+
+                $(button).addClass("mapButton");
+                $(button).attr("name", control.id);
                 button.appendChild(iconSpan);
                 return button;
             }
