@@ -16,23 +16,19 @@
  */
 package org.constellation.gui.service;
 
-import org.apache.commons.fileupload.FileItem;
-import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.Instance;
-import org.constellation.configuration.InstanceReport;
-import org.constellation.dto.DataInformation;
-import org.constellation.dto.DataMetadata;
-import org.constellation.dto.Service;
-import org.constellation.dto.StyleListBean;
-import org.constellation.utils.GeotoolkitFileExtensionAvailable;
-
-import javax.inject.Inject;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.inject.Inject;
+
+import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.InstanceReport;
+import org.constellation.dto.Service;
+import org.constellation.dto.StyleListBean;
 
 /**
  * Juzu service to call constellation services server side
@@ -168,6 +164,8 @@ public class  ServicesManager {
 
             // Build service capabilities URL.
             String capabilitiesUrl = cstl.getUrl() + "WS/"+instance.getType().toLowerCase()+"/" + instance.getName() +"?REQUEST=GetCapabilities&SERVICE="+instance.getType().toUpperCase();
+            // Build service URL for logs.
+            String logsURL = cstl.getUrl() + "api/1/log/"+instance.getType().toLowerCase()+"/" + instance.getName();
 
 
             if (instance.getVersions()!= null && instance.getVersions().size()>0) {
@@ -185,7 +183,8 @@ public class  ServicesManager {
                 capabilitiesUrl += "&VERSION=" + selectedVersion;
             }
             instanceSum.setCapabilitiesUrl(capabilitiesUrl);
-
+            instanceSum.setLogsURL(logsURL);
+            
             instancesSummary.add(instanceSum);
         }
 

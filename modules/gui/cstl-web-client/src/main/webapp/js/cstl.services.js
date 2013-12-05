@@ -211,6 +211,18 @@ $(function() {
         });
         return false;
     });
+    $('[data-action="open-logs"]').click(function() {
+        $.ajax({
+            url: $(this).data('logs'),
+            dataType: "text",
+            success: function(data){
+                $("#logs-modal-pre code").empty();
+                $("#logs-modal-pre code").text(data);
+                $("#logs-modal").modal();
+            }
+        });
+        return false;
+    });
     $('[data-action="open-service-url"]').click(function() {
         var capabilities = $(this).data('capabilities');
         var beginQuery = capabilities.indexOf('?');
