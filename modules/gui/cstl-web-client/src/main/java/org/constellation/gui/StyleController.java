@@ -219,7 +219,7 @@ public final class StyleController {
             // Read edited JSON body.
             final Style style = readJson(styleJson, Style.class);
 
-            String stylePath = ConfigDirectory.getDataDirectory().getAbsolutePath()+"/styles/";
+            String stylePath = ConfigDirectory.getStyleDirectory().getPath();
             provider.createProvider("sld", "sld", stylePath, "sld", null, null);
 
             // Create the style.

@@ -89,6 +89,7 @@ public final class ConfigDirectory {
     public static String USER_DIRECTORY = null;
     public static String DATA_DIRECTORY = null;
     public static String METADATA_DIRECTORY = null;
+    public static String STYLE_DIRECTORY = null;
     /**
      * Specifies if the process is running on a Glassfish application server.
      */
@@ -160,6 +161,32 @@ public final class ConfigDirectory {
         }
 
         return constellationMetadataFolder;
+    }
+
+    /**
+     * Give Metadata directory {@link java.io.File} defined on constellaiton.properties or
+     * by default on .constellation-data/metadata from user home directory
+     *
+     * @return metadata directory as {@link java.io.File}
+     */
+    public static File getStyleDirectory() {
+        final File constellationStyleFolder;
+
+        if (STYLE_DIRECTORY != null && !STYLE_DIRECTORY.isEmpty()) {
+            constellationStyleFolder = new File(STYLE_DIRECTORY);
+            if (!constellationStyleFolder.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", STYLE_DIRECTORY);
+            } else if (!constellationStyleFolder.isDirectory()) {
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", STYLE_DIRECTORY);
+            }
+        } else {
+            constellationStyleFolder = new File(System.getProperty("user.home") + "/.constellation-data", "style");
+            if (!constellationStyleFolder.exists()) {
+                constellationStyleFolder.mkdir();
+            }
+        }
+
+        return constellationStyleFolder;
     }
 
     /**

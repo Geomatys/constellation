@@ -105,7 +105,7 @@ public class MapSetup implements SetupService {
             final ParameterValueGroup source = sourceDesc.createValue();
             source.parameter("id").setValue("sld");
             source.parameter("providerType").setValue("sld");
-            source.groups("sldFolder").get(0).parameter("path").setValue(ConfigDirectory.getDataDirectory().getPath() + "/styles");
+            source.groups("sldFolder").get(0).parameter("path").setValue(ConfigDirectory.getStyleDirectory().getPath());
 
             // Create SLD provider.
             try {
