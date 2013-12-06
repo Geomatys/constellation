@@ -39,21 +39,34 @@ import javax.ws.rs.core.StreamingOutput;
 import org.constellation.configuration.ConfigDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 /**
  * LogByService exposition.
  * 
- * @author olivier.nouguier@geomatys.com 
- *
+ * @author olivier.nouguier@geomatys.com
+ * 
  */
 @Path("/1/log/")
 public class Log {
 
+    /**
+     * File buffer size.
+     */
     private static final int BUFFER_1024 = 1024;
+
+    /**
+     * Size of log file to read.
+     */
     private static final int DEFAULT_LIMIT_4096 = 4096;
+
+    /**
+     * Slf4j logger.
+     */
     private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Return a stream of last log (
+     * 
      * @param serviceType
      * @param serviceId
      * @param offset
@@ -73,16 +86,16 @@ public class Log {
                 java.nio.file.Path logfileRelative = Paths.get("logs", "cstl", serviceType, serviceId + "-service.log");
                 java.nio.file.Path logFile = ConfigDirectory.getConfigDirectory().toPath().resolve(logfileRelative);
                 if (Files.exists(logFile)) {
-                    int toread = limit==null?DEFAULT_LIMIT_4096:limit;
-                    if(toread<BUFFER_1024)
-                        toread=1024;
+                    int toread = limit == null ? DEFAULT_LIMIT_4096 : limit;
+                    if (toread < BUFFER_1024)
+                        toread = 1024;
                     try (FileInputStream fileInputStream = new FileInputStream(logFile.toFile())) {
 
                         try (FileChannel fc = (FileChannel.open(logFile))) {
                             int nread;
 
                             long length = fc.size();
-                            if (offset != null ) {
+                            if (offset != null) {
                                 if (offset > 0 && offset < length)
                                     fc.position(offset);
                             } else if (length > toread) {
@@ -106,6 +119,7 @@ public class Log {
                         output.write(("No log file for " + serviceType + ", " + serviceId).getBytes());
                     }
                 } else {
+                    LOGGER.warn("No log file for " + serviceType + ", " + serviceId);
                     output.write(("No log file for " + serviceType + ", " + serviceId).getBytes());
                 }
             }
