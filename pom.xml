@@ -597,12 +597,7 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
-                <artifactId>geotk-go2</artifactId>
-                <version>${geotoolkit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotoolkit.pending</groupId>
-                <artifactId>geotk-go2-style-extension</artifactId>
+                <artifactId>geotk-render2d</artifactId>
                 <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>

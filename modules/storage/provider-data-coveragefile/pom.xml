@@ -59,7 +59,7 @@
 
     <dependency>
         <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-go2-style-extension</artifactId>
+        <artifactId>geotk-render2d</artifactId>
     </dependency>
     <dependency>
         <groupId>org.geotoolkit.pending</groupId>
