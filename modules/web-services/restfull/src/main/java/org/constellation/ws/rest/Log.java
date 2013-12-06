@@ -48,10 +48,12 @@ import org.slf4j.LoggerFactory;
 @Path("/1/log/")
 public class Log {
 
+    private static final int BUFFER_1024 = 1024;
+    private static final int DEFAULT_LIMIT_4096 = 4096;
     private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
-     * 
+     * Return a stream of last log (
      * @param serviceType
      * @param serviceId
      * @param offset
@@ -71,8 +73,8 @@ public class Log {
                 java.nio.file.Path logfileRelative = Paths.get("logs", "cstl", serviceType, serviceId + "-service.log");
                 java.nio.file.Path logFile = ConfigDirectory.getConfigDirectory().toPath().resolve(logfileRelative);
                 if (Files.exists(logFile)) {
-                    int toread = limit==null?4096:limit;
-                    if(toread<1024)
+                    int toread = limit==null?DEFAULT_LIMIT_4096:limit;
+                    if(toread<BUFFER_1024)
                         toread=1024;
                     try (FileInputStream fileInputStream = new FileInputStream(logFile.toFile())) {
 
