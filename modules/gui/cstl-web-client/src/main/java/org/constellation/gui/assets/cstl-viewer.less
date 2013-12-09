@@ -13,14 +13,20 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details..
  */
+@menuWidth : 407px;
+@iconWidth : 36px;
+
 .map {
   z-index: 0;
-  padding: 0 !important;
-  margin: 0 !important;
+  padding: 0;
+  margin: 0;
   cursor: default;
   width: 100%;
   height: 100%;
   border: 1px solid #ccc;
+  padding-left: @iconWidth;
+  box-sizing: border-box;
+  border-left-width: 0px;
 
   img{
     max-width: none;
@@ -85,4 +91,27 @@
   height: 36px;
   .transition("background-color 0.2s linear");
   .user-select("none");
+}
+
+.mapmenu{
+  position: fixed;
+  z-index: 999;
+  height: 100%;
+  top: 0;
+  padding-top: 40px;
+  box-sizing: border-box;
+  width: @menuWidth;
+  left: -(@menuWidth - @iconWidth);
+  background: rgba(0, 0, 0, 0.5);
+  border-right: 1px solid #333;
+}
+
+.moveIconContainer{
+  display: inline-block;
+  float: left;
+  margin-top: -7px;
+
+  .moveIcon{
+    display: block;
+  }
 }

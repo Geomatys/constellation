@@ -29,14 +29,48 @@ CSTL.Viewer = {
 
     getFeatureBtn:undefined,
 
-        init: function () {
+    init: function () {
         //add OSM default Layer on background
-        CSTL.Viewer.layers = [new OpenLayers.Layer.OSM("Simple OSM Map")];
+        var wmsExampleLayer = new OpenLayers.Layer.WMS("BRGM Geologie",
+            "http://geoservices.brgm.fr/geologie",
+            {layers: 'SCAN_F_GEOL250'},
+            {opacity: 0.5, singleTile: true, ratio: 1});
+
+        var wmsBlueMarbleLayer = new OpenLayers.Layer.WMS("BlueMarble Local",
+            "http://localhost:8080/constellation/WS/wms/default",
+            {layers: 'bluemarble', format:"image/png"},
+            {opacity: 1});
+
+
+        CSTL.Viewer.layers = [wmsBlueMarbleLayer, wmsExampleLayer];
+
 
         //build controllers
         var controls = this.buildController();
         CSTL.Viewer.buildToolPanel(controls);
         CSTL.Viewer.buildMap();
+
+        //TODO add layers on menuContainer
+        var $menuContainer = $("#menuContainer");
+        var $Layers = $(CSTL.Viewer.layers);
+        for (var i = 0; i < $Layers.length; i++) {
+            var $layer = $Layers[i];
+            var generatedDiv = "<div class='span4' style='margin-left: 10px'>" +
+                "<span class='moveIconContainer'>" +
+                "<span class='font-icon moveIcon'>,</span>" +
+                "<span class='font-icon moveIcon'>+</span>" +
+                "</span>" +
+                "<span class='font-icon' style='margin-left: 5px'>:</span>" +
+                "<span style='margin-left: 10px; margin-right: 70px'>"+$layer.name+"</span>" +
+                "<span style='float: right; margin-right: 10px'>" +
+                "<span class='font-icon'>`</span>" +
+                "<span class='font-icon'>F</span>" +
+                "<span class='font-icon'>Q</span>" +
+                "<span class='font-icon'>v</span>" +
+                "</span>" +
+                "</div>";
+            $menuContainer.append(generatedDiv);
+        }
     },
 
     navigate: function(){
@@ -152,17 +186,15 @@ CSTL.Viewer = {
             controls: [
                 new OpenLayers.Control.ScaleLine(),
                 CSTL.Viewer.panel
-            ]
+            ],
+            fractionalZoom:true,
+            projection: new OpenLayers.Projection("EPSG:4326"),
+            allOverlays: true,
+            maxExtent: new OpenLayers.Bounds("-5.140600", "41.333740", " 9.559320", "51.089062")
         });
         CSTL.Viewer.map.addLayers(CSTL.Viewer.layers);
-        //Center on Montpellier
-        CSTL.Viewer.map.setCenter(
-            new OpenLayers.LonLat(3.877222, 43.611944).transform(
-                new OpenLayers.Projection("EPSG:4326"),
-                CSTL.Viewer.map.getProjectionObject()
-            ), 12
-        );
-        CSTL.Viewer.map.zoomToMaxExtent();
-        CSTL.Viewer.map.updateSize()
+        //CSTL.Viewer.map.zoomToMaxExtent();
+        CSTL.Viewer.map.zoomToExtent(new OpenLayers.Bounds("-5.140600", "41.333740", " 9.559320", "51.089062"), true);
+        CSTL.Viewer.map.updateSize();
     }
 };

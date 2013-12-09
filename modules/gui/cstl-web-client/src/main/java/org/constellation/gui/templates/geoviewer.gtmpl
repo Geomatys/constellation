@@ -1,6 +1,49 @@
 #{decorate path=menu.gtmpl/}
-
+<div id="menu" class="mapmenu">
+    <button class="mapButton pull-right font-icon" id="hide" style="margin-right: 0px; height: 40px">)</button>
+    <div id="menuContainer" style="background-color:#ffffff; width:370px; height:100%;">
+        <div class="row">
+            <div class="span4 frame dashboard">
+                <div class="navbar">
+                    <div class="navbar-inner">
+                        <a class="brand" href="#">Layer list</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="span4">
+                <input type="text" name="search" id="search"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="span4 frame dashboard">
+                <div class="navbar">
+                    <div class="navbar-inner">
+                        <a class="brand" href="#">Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="geomap" class="map"></div>
 <script type="text/javascript">
     CSTL.Viewer.init();
+    $(function(){
+        $("#hide").on("click", function(){
+            var paddingLeft = $("#geomap").css("padding-left");
+            if(paddingLeft === "36px"){
+                $("#menu").animate({"left": "0px"}, "slow");
+                $("#geomap").animate({"padding-left": "407px"}, "slow");
+                $(this).empty();
+                $(this).html("*");
+            }else{
+                $("#menu").animate({"left": "-371px"}, "slow");
+                $("#geomap").animate({"padding-left": "36px"}, "slow");
+                $(this).empty();
+                $(this).html(")");
+            }
+        });
+    })
 </script>
