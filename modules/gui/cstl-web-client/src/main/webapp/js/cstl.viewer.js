@@ -31,10 +31,10 @@ CSTL.Viewer = {
 
     init: function () {
         //add OSM default Layer on background
-        var wmsExampleLayer = new OpenLayers.Layer.WMS("BRGM Geologie",
-            "http://geoservices.brgm.fr/geologie",
-            {layers: 'SCAN_F_GEOL250'},
-            {opacity: 0.5, singleTile: true, ratio: 1});
+//        var wmsExampleLayer = new OpenLayers.Layer.WMS("BRGM Geologie",
+//            "http://geoservices.brgm.fr/geologie",
+//            {layers: 'SCAN_F_GEOL250'},
+//            {opacity: 0.5, singleTile: true, ratio: 1});
 
         var wmsBlueMarbleLayer = new OpenLayers.Layer.WMS("BlueMarble Local",
             "http://localhost:8080/constellation/WS/wms/default",
