@@ -67,6 +67,7 @@ CSTL.DataDashboard = {
     onSelect: function($elt) {
         $('[data-role="selected"]').jzLoad('DataController.selectData()', {
             name:       $elt.data('name'),
+            namespace:  $elt.data('namespace'),
             providerId: $elt.data('provider')
         }, function() {
             var $selected = CSTL.DataDashboard.instance.$root.find('.selected-item');

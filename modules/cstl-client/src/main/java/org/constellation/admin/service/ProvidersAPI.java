@@ -17,6 +17,8 @@
 
 package org.constellation.admin.service;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.dto.DataInformation;
@@ -30,6 +32,7 @@ import org.constellation.dto.StyleListBean;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -246,8 +249,12 @@ public final class ProvidersAPI {
        client.post("crs/update", MediaType.APPLICATION_XML_TYPE, values);
     }
 
-    public DataBrief getDataSummary(final QName name, final String providerId) throws IOException {
-        return client.get("data/summary/"+providerId+"/"+name.getLocalPart()+"/"+name.getNamespaceURI(), MediaType.APPLICATION_XML_TYPE).getEntity(DataBrief.class);
+    public DataBrief getDataSummary(final String name, final String namespace, final String providerId) throws IOException {
+        final HashMap<String, String> values = new HashMap<>(0);
+        values.put("namespace", namespace);
+        values.put("name", name);
+        values.put("providerId", providerId);
+        return client.put("data/summary/", MediaType.APPLICATION_XML_TYPE, new ParameterValues(values)).getEntity(DataBrief.class);
     }
 
     public DataBrief getLayerSummary(final String layerAlias, final String providerId) throws IOException {

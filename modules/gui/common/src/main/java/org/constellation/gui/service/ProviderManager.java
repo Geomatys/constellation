@@ -174,9 +174,8 @@ public class ProviderManager {
                 if (providerTypes==null || providerTypes.contains(type)) {
                     for (DataBrief dataBrief : providerReport.getItems()) {
                         String name = dataBrief.getName();
-                        int rightBracket = name.indexOf('}') + 1;
-                        name = name.substring(rightBracket);
-                        LayerData layerData = new LayerData(providerReport.getId(), type, name, dataBrief.getDate(), dataBrief.getOwner());
+
+                        LayerData layerData = new LayerData(providerReport.getId(), type, name, dataBrief.getDate(), dataBrief.getOwner(), dataBrief.getNamespace());
                         layerDatas.add(layerData);
                     }
                 }
@@ -271,9 +270,9 @@ public class ProviderManager {
         }
     }
 
-    public DataBrief getDataSummary(final QName name, final String providerId) {
+    public DataBrief getDataSummary(final String name, final String namespace, final String providerId) {
         try {
-            return cstl.openClient().providers.getDataSummary(name, providerId);
+            return cstl.openClient().providers.getDataSummary(name, namespace, providerId);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when call web service to access to data summary", e);
         }

@@ -42,7 +42,8 @@
 <%} else {%>
     <div class="item-list">
         <% for (def provider : providers){%>
-            <div class="item ${provider.type.toLowerCase()}" data-provider="${provider.idProvider}" data-name="${provider.name}" data-providertype="${provider.type}">
+            <div class="item ${provider.type.toLowerCase()}" data-provider="${provider.idProvider}"
+                 data-name="${provider.name}" data-providertype="${provider.type}" data-namespace="${provider.namespace}">
                 <div class="top">
                     <span class="item-title">${provider.name}</span>
                 </div>

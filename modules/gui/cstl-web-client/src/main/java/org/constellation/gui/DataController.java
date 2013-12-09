@@ -66,9 +66,9 @@ public class DataController {
     @Ajax
     @Resource
     @Route("/selectData")
-    public Response selectData(final QName name, final String providerId) {
+    public Response selectData(final String name, final String namespace, final String providerId) {
         final Map<String, Object> parameters = new HashMap<>(0);
-        final DataBrief db = providerManager.getDataSummary(name, providerId);
+        final DataBrief db = providerManager.getDataSummary(name, namespace, providerId);
         parameters.put("selected", db);
         return dataSelected.with(parameters).ok().withMimeType("text/html");
     }

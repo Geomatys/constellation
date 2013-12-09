@@ -42,7 +42,7 @@ CSTL.Viewer = {
             {opacity: 1});
 
 
-        CSTL.Viewer.layers = [wmsBlueMarbleLayer, wmsExampleLayer];
+        CSTL.Viewer.layers = [wmsBlueMarbleLayer];
 
 
         //build controllers

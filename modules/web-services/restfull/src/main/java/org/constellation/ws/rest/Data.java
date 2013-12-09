@@ -47,6 +47,7 @@ import org.opengis.util.NoSuchIdentifierException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -354,13 +355,16 @@ public class Data {
         return Response.ok(value).build();
     }
 
-    @GET
-    @Path("summary/{providerid}/{name}/{namespace}")
+    @PUT
+    @Path("summary")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getDataSummary(@PathParam("providerid") String providerid, @PathParam("name") String name, @PathParam("namespace") String namespace) {
+    public Response getDataSummary(final ParameterValues pv) {
+        final String namespace = pv.get("namespace");
+        final String name = pv.get("name");
+        final String providerId = pv.get("providerId");
         final QName fullName = new QName(namespace, name);
-        final DataBrief db = ConfigurationEngine.getData(fullName, providerid);
+        final DataBrief db = ConfigurationEngine.getData(fullName, providerId);
         return Response.ok(db).build();
     }
 
