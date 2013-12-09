@@ -55,6 +55,7 @@ CSTL.Services = {
         return CSTL.jzAjax('Controller.startService', {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
+                enableActions();
                 CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-start'));
                 $('[data-state="' + type + '-' + id + '"]').removeClass('stopped').addClass('started');
             }).fail(function() {
@@ -73,6 +74,7 @@ CSTL.Services = {
         return CSTL.jzAjax('Controller.stopService', {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
+                desableAction();
                 CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-stop'));
                 $('[data-state="' + type + '-' + id + '"]').removeClass('started').addClass('stopped');
             }).fail(function() {
@@ -91,6 +93,10 @@ CSTL.Services = {
         return CSTL.jzAjax('Controller.restartService', {
             data: {serviceType:type,serviceId:id}
         }).done(function() {
+                $("[data-action='open-capabilities']").parent().removeClass("disabled");
+                $("[data-action='show-service']").parent().removeClass("disabled");
+                $("[data-action='delete-service']").parent().removeClass("disabled");
+                enableActions();
                 CSTL.growl('success', CSTL.i18n('success'), CSTL.i18n('success-service-restart'));
                 $('[data-state="' + type + '-' + id + '"]').removeClass('stopped').addClass('started');
             }).fail(function() {
@@ -163,6 +169,65 @@ CSTL.Services = {
     }
 };
 
+function enableActions() {
+    $("[data-action='open-capabilities']").parent().removeClass("disabled");
+    $("[data-action='show-service']").parent().removeClass("disabled");
+    $("[data-action='delete-service']").parent().removeClass("disabled");
+
+    $('[data-action="delete-service"]').click(function () {
+        var $this = $(this);
+        CSTL.Services.delete($this.data('service-type'), $this.data('service-id'));
+        return false;
+    });
+    $('[data-action="open-capabilities"]').click(function () {
+        $.ajax({
+            url: $(this).data('capabilities'),
+            dataType: "text",
+            success: function (data) {
+                $("#capabilities-modal-pre code").empty();
+                $("#capabilities-modal-pre code").text(data);
+                $("#capabilities-modal-pre code").each(function (i, e) {
+                    hljs.highlightBlock(e)
+                });
+                $("#getcapabilities-modal").modal();
+            }
+        });
+        return false;
+    });
+}
+
+function desableAction(){
+    $("[data-action='open-capabilities']").parent().addClass("disabled");
+    $("[data-action='show-service']").parent().addClass("disabled");
+    $("[data-action='delete-service']").parent().addClass("disabled");
+    $('[data-action="delete-service"]').unbind();
+    $('[data-action="open-capabilities"]').unbind();
+}
+
+function filter(type, tabSelected){
+    var $services = $("#main > .span6");
+
+    if(type==''){
+        $services.show();
+    }
+    else{
+        for (var i = 0; i < $services.length; i++) {
+            var $currentService = $services.eq(i);
+            var currentServiceId = $currentService.attr("id");
+            var currentServiceType = currentServiceId.split("-")[0];
+            if(type != ''){
+                if(currentServiceType != type){
+                    $currentService.hide();
+                }else{
+                    $currentService.show();
+                }
+            }
+        }
+    }
+    $(tabSelected).parent().parent().children().removeClass('active')
+    $(tabSelected).parent().addClass('active')
+}
+
 /**
  * Page load end listener used to attach automatically event listener on HTML element
  * with specific flags to perform generic action.
@@ -198,19 +263,6 @@ $(function() {
         CSTL.Services.setMetadata($this.data('service-type'), $this.data('service-id'), $('#' + $this.data('form')));
         return false;
     });
-    $('[data-action="open-capabilities"]').click(function() {
-        $.ajax({
-            url: $(this).data('capabilities'),
-            dataType: "text",
-            success: function(data){
-                $("#capabilities-modal-pre code").empty();
-                $("#capabilities-modal-pre code").text(data);
-                $("#capabilities-modal-pre code").each(function(i, e) {hljs.highlightBlock(e)});
-                $("#getcapabilities-modal").modal();
-            }
-        });
-        return false;
-    });
     $('[data-action="open-logs"]').click(function() {
         $.ajax({
             url: $(this).data('logs'),
@@ -232,9 +284,5 @@ $(function() {
         $("#url-modal").modal();
         return false;
     });
-    $('[data-action="delete-service"]').click(function() {
-        var $this = $(this);
-        CSTL.Services.delete($this.data('service-type'), $this.data('service-id'));
-        return false;
-    });
+    enableActions();
 });
