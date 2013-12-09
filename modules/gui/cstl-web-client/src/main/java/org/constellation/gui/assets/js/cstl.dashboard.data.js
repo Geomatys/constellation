@@ -57,11 +57,13 @@ CSTL.DataDashboard = {
         hideAll($first);
         $first.jzLoad("DataController.getDataFolders()",{"path":"root"}, function(){
             $("#first").find("a").on("click", {parent : $first}, updateChild);
+            $("#folderPart").show();
+            $("#nextbutton").show();
+            $("#serverFileModal").modal({
+                backdrop:true
+            });
         });
 
-        $("#serverFileModal").modal({
-            backdrop:true
-        });
     },
 
     onSelect: function($elt) {

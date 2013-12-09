@@ -1,3 +1,19 @@
+/*
+ * Constellation - An open source and standard compliant SDI
+ *      http://www.constellation-sdi.org
+ *   (C) 2009-2013, Geomatys
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 3 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details..
+ */
+
 function hideAll($Element){
     $Element.parent().children().hide();
     $Element.show();
@@ -108,6 +124,9 @@ function moverRight($clickedElement){
 }
 
 
+function SimpleValue(extension) {
+    this.value = extension;
+}
 /**
  * Set elements on panels
  * @param event
@@ -169,20 +188,30 @@ function updateChild(event){
         var length = pathSelected.length;
         var lastPointIndex = pathSelected.lastIndexOf(".");
         var extension = pathSelected.substring(lastPointIndex+1, length);
-        $.post(appURL+"/ajax/testExtension/", {"extension": extension}, function(data){
-            if(data.dataType!=""){
-                $("#typePart [value="+data.dataType+"]").prop("checked", true);
-                $("#nextbutton").hide();
-                $("#submitbutton").show();
-            } else {
-                $("#submitbutton").hide();
-                $("#nextbutton").show();
-            }
-
-            //Update file path to know file to load
-            $("#filePath").val(pathSelected);
+        var simplevalue = new SimpleValue(extension);
+        $("#filePath").val(pathSelected);
+        var serverURL  = window.location.protocol + "//" + window.location.host + "/"
+        $.ajax({
+            type  :   "POST",
+            url   :   serverURL + "constellation/api/1/data/testextension/",
+            success : serverFileSuccess,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(simplevalue)
         });
 
+    }
+}
+
+
+function serverFileSuccess(data){
+    if(data.dataType!=""){
+        $("#typePart [value="+data.dataType+"]").prop("checked", true);
+        $("#nextbutton").hide();
+        $("#submitbutton").show();
+    } else {
+        $("#submitbutton").hide();
+        $("#nextbutton").show();
     }
 }
 

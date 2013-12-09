@@ -91,17 +91,28 @@
         if(selectedFile != ""){
             var lastPointIndex = selectedFile.lastIndexOf(".");
             var extension = selectedFile.substring(lastPointIndex+1, selectedFile.length);
-            $.post(appURL+"/ajax/testExtension/", {"extension": extension}, function(data){
-                if(data.dataType!=""){
-                    $("#part2 [value="+data.dataType+"]").prop("checked", true);
-                    $("#nextButton").hide();
-                    $("#submitButton").show();
-                } else {
-                    $("#submitButton").hide();
-                    $("#nextButton").show();
-                }
-            })
+            var simplevalue = new SimpleValue(extension);
+            var serverURL  = window.location.protocol + "//" + window.location.host + "/"
+            $.ajax({
+                type  :   "POST",
+                url   :   serverURL + "constellation/api/1/data/testextension/",
+                success : localFileSuccess,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(simplevalue)
+            });
         }
     });
+
+    function localFileSuccess(data){
+        if(data.dataType!=""){
+            $("#part2 [value="+data.dataType+"]").prop("checked", true);
+            $("#nextButton").hide();
+            $("#submitButton").show();
+        } else {
+            $("#submitButton").hide();
+            $("#nextButton").show();
+        }
+    }
 
 </script>

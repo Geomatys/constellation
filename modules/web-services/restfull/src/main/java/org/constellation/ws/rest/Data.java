@@ -20,6 +20,7 @@ import org.constellation.dto.FileListBean;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
+import org.constellation.model.SelectedExtension;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
@@ -399,6 +400,24 @@ public class Data {
         final DataInformation information = MetadataUtilities.getRasterDataInformation(reader, metadata, dataType);
         information.setName(dataId);
         return Response.ok(information).build();
+    }
+
+    @POST
+    @Path("testextension")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public SelectedExtension testExtension(final SimpleValue extension) {
+        final Map<String, String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension();
+        final String type = extensions.get(extension.getValue().toLowerCase());
+        final SelectedExtension validate = new SelectedExtension();
+        validate.setExtension(extension.getValue());
+
+        if (type != null) {
+            validate.setDataType(type);
+        } else {
+            validate.setDataType("");
+        }
+        return validate;
     }
 }
 

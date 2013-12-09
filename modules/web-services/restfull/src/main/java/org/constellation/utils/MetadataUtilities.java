@@ -121,7 +121,11 @@ public final class MetadataUtilities {
                         shapeStore = new ShapefileFeatureStore(file.toURI().toURL());
                     }
 
-                    final String crsName = shapeStore.getFeatureType().getCoordinateReferenceSystem().getName().toString();
+                    String crsName = "";
+                    final CoordinateReferenceSystem crs = shapeStore.getFeatureType().getCoordinateReferenceSystem();
+                    if(crs!=null){
+                        crsName = crs.getName().toString();
+                    }
                     final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), file.getParent(), dataType, crsName);
                     final ArrayList<SimplyMetadataTreeNode> metadataList = getVectorDataInformation(templateMetadata);
                     information.setFileMetadata(metadataList);

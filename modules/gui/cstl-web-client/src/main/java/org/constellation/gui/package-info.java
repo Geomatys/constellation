@@ -97,11 +97,11 @@
         @Asset(id = "cstl.viewer",              value = "js/cstl.viewer.js",                depends = "cstl",           location = AssetLocation.SERVER),
         @Asset(id = "cstl.dashboard",           value = "js/cstl.dashboard.js",             depends = "cstl",           location = AssetLocation.SERVER),
         @Asset(id = "cstl.dashboard.map",       value = "js/cstl.dashboard.map.js",         depends = "cstl.dashboard", location = AssetLocation.SERVER),
-        @Asset(id = "cstl.dashboard.data",      value = "js/cstl.dashboard.data.js",        depends = "cstl.dashboard", location = AssetLocation.SERVER),
+        @Asset(id = "cstl.dashboard.data",      value = "js/cstl.dashboard.data.js",        depends = "cstl.dashboard", location = AssetLocation.APPLICATION),
         @Asset(id = "cstl.dashboard.style",     value = "js/cstl.dashboard.style.js",       depends = "cstl.dashboard", location = AssetLocation.SERVER),
         @Asset(id = "cstl.workflow.addlayer",   value = "js/cstl.workflow.addlayer.js",     depends = "cstl.dashboard", location = AssetLocation.SERVER),
         @Asset(id = "cstl.workflow",            value = "js/cstl.workflow.link.js",         depends = "cstl.dashboard", location = AssetLocation.SERVER),
-        @Asset(id = "cstl.filemodal",           value = "js/cstl.filemodal.js",             depends = "jquery",         location = AssetLocation.SERVER),
+        @Asset(id = "cstl.filemodal",           value = "js/cstl.filemodal.js",             depends = "jquery",         location = AssetLocation.APPLICATION),
         @Asset(id = "cstl.netcdf",              value = "js/cstl.netcdf.js",                depends = "openlayers",     location = AssetLocation.SERVER),
         @Asset(id = "highlight",                value = "js/highlight.pack.js",                                         location = AssetLocation.SERVER),
 
