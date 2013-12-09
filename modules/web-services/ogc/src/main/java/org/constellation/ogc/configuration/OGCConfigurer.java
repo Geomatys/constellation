@@ -308,7 +308,9 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         } catch (ConfigurationException ignore) {
             // Do nothing.
         }
+        instance.setIdentifier(identifier);
         if (metadata != null) {
+            instance.setName(metadata.getName());
             instance.set_abstract(metadata.getDescription());
             instance.setVersions(metadata.getVersions());
         } else {

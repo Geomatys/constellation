@@ -159,13 +159,14 @@ public class  ServicesManager {
             }
             instanceSum.setLayersNumber(instance.getLayersNumber() != null ? instance.getLayersNumber() : 0);
             instanceSum.setName(instance.getName());
+            instanceSum.setIdentifier(instance.getIdentifier());
             instanceSum.setStatus(instance.getStatus().toString());
             instanceSum.setType(instance.getType().toLowerCase());
 
             // Build service capabilities URL.
-            String capabilitiesUrl = cstl.getUrl() + "WS/"+instance.getType().toLowerCase()+"/" + instance.getName() +"?REQUEST=GetCapabilities&SERVICE="+instance.getType().toUpperCase();
+            String capabilitiesUrl = cstl.getUrl() + "WS/"+instance.getType().toLowerCase()+"/" + instance.getIdentifier() +"?REQUEST=GetCapabilities&SERVICE="+instance.getType().toUpperCase();
             // Build service URL for logs.
-            String logsURL = cstl.getUrl() + "api/1/log/"+instance.getType().toLowerCase()+"/" + instance.getName();
+            String logsURL = cstl.getUrl() + "api/1/log/"+instance.getType().toLowerCase()+"/" + instance.getIdentifier();
 
 
             if (instance.getVersions()!= null && instance.getVersions().size()>0) {

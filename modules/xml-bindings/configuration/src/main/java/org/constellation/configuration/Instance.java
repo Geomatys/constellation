@@ -36,6 +36,9 @@ public class Instance {
     private String name;
 
     @XmlAttribute
+    private String identifier;
+
+    @XmlAttribute
     private String type;
 
     @XmlAttribute
@@ -151,5 +154,13 @@ public class Instance {
 
     public List<String> getVersions() {
         return versions;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(final String identifier) {
+        this.identifier = identifier;
     }
 }
