@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.namespace.QName;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import java.util.Objects;
@@ -150,7 +149,7 @@ public class Layer {
         this.crs          = crs;
         this.dimensions   = dimensions;
         this.version      = version != null ? Long.valueOf(version.getTime()): null;
-        setAlias(alias);
+        this.alias        = alias;
     }
 
     /**
@@ -169,7 +168,7 @@ public class Layer {
 
     public List<DataReference> getStyles() {
         if (styles == null) {
-            styles = new ArrayList<DataReference>();
+            styles = new ArrayList<>();
         }
         return styles;
     }
@@ -202,9 +201,6 @@ public class Layer {
     }
 
     public final void setAlias(String alias) {
-        if (alias != null) {
-            alias =  alias.trim().replaceAll(" ", "_");
-        }
         this.alias = alias;
     }
 
@@ -242,7 +238,7 @@ public class Layer {
 
     public List<String> getKeywords() {
         if (keywords == null) {
-            keywords = new ArrayList<String>();
+            keywords = new ArrayList<>();
         }
         return keywords;
     }
@@ -317,7 +313,7 @@ public class Layer {
      */
     public List<String> getCrs() {
         if (crs == null) {
-            crs = new ArrayList<String>();
+            crs = new ArrayList<>();
         }
         return crs;
     }
@@ -331,7 +327,7 @@ public class Layer {
 
     public List<DimensionDefinition> getDimensions() {
         if (dimensions == null) {
-            dimensions = new ArrayList<DimensionDefinition>();
+            dimensions = new ArrayList<>();
         }
         return dimensions;
     }

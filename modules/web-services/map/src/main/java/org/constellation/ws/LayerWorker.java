@@ -270,7 +270,7 @@ public abstract class LayerWorker extends AbstractWorker {
             for (QName l : layerNames) {
                 final Layer layer = getConfigurationLayer(l, login);
                 if (layer.getAlias() != null && !layer.getAlias().isEmpty()) {
-                    final String alias = layer.getAlias().trim().replaceAll(" ", "_");
+                    final String alias = layer.getAlias();
                     if (alias.equals(name.getLocalPart())) {
                         Date version = null;
                         if (layer.getVersion() != null) {

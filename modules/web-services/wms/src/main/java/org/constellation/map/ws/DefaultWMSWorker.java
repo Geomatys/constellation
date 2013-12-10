@@ -548,7 +548,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
             //Use layer alias from config if exist.
             if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
-                layerName = configLayer.getAlias().trim().replaceAll(" ", "_");
+                layerName = configLayer.getAlias();
             } else {
 
                 if (fullLayerName.getNamespaceURI() != null && !fullLayerName.getNamespaceURI().isEmpty()) {
