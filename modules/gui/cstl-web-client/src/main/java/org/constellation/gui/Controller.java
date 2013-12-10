@@ -214,6 +214,7 @@ public class Controller {
 
         //set other object on service
         createdService.setServiceConstraints(serviceConstraint);
+        serviceContact.setFullname();
         createdService.setServiceContact(serviceContact);
 
         //call service
