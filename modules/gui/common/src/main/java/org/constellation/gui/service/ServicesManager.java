@@ -162,34 +162,38 @@ public class  ServicesManager {
             instanceSum.setIdentifier(instance.getIdentifier());
             instanceSum.setStatus(instance.getStatus().toString());
             instanceSum.setType(instance.getType().toLowerCase());
-
-            // Build service capabilities URL.
-            String capabilitiesUrl = cstl.getUrl() + "WS/"+instance.getType().toLowerCase()+"/" + instance.getIdentifier() +"?REQUEST=GetCapabilities&SERVICE="+instance.getType().toUpperCase();
-            // Build service URL for logs.
-            String logsURL = cstl.getUrl() + "api/1/log/"+instance.getType().toLowerCase()+"/" + instance.getIdentifier();
+            buildServiceUrl(instance.getType(), instance.getIdentifier(), instance.getVersions(), instanceSum);
 
 
-            if (instance.getVersions()!= null && instance.getVersions().size()>0) {
-                double version=0;
-                String selectedVersion = "";
-
-                for (String currentVersion : instance.getVersions()) {
-                    double testedVersion = Double.parseDouble(currentVersion.replace(".", ""));
-
-                    if(testedVersion>version){
-                        version= testedVersion;
-                        selectedVersion = currentVersion;
-                    }
-                }
-                capabilitiesUrl += "&VERSION=" + selectedVersion;
-            }
-            instanceSum.setCapabilitiesUrl(capabilitiesUrl);
-            instanceSum.setLogsURL(logsURL);
-            
             instancesSummary.add(instanceSum);
         }
 
         return instancesSummary;
+    }
+
+    public void buildServiceUrl(final String type, final String identifier, final List<String> versions, final InstanceSummary instanceSum) {
+        // Build service capabilities URL.
+        String capabilitiesUrl = cstl.getUrl() + "WS/"+type.toLowerCase()+"/" + identifier +"?REQUEST=GetCapabilities&SERVICE="+type.toUpperCase();
+        // Build service URL for logs.
+        String logsURL = cstl.getUrl() + "api/1/log/"+type.toLowerCase()+"/" + identifier;
+
+
+        if (versions!= null && versions.size()>0) {
+            double version=0;
+            String selectedVersion = "";
+
+            for (String currentVersion : versions) {
+                double testedVersion = Double.parseDouble(currentVersion.replace(".", ""));
+
+                if(testedVersion>version){
+                    version= testedVersion;
+                    selectedVersion = currentVersion;
+                }
+            }
+            capabilitiesUrl += "&VERSION=" + selectedVersion;
+        }
+        instanceSum.setCapabilitiesUrl(capabilitiesUrl);
+        instanceSum.setLogsURL(logsURL);
     }
 
     public StyleListBean getStyleList() {

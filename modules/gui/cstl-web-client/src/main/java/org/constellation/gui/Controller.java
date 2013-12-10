@@ -219,9 +219,9 @@ public class Controller {
         //call service
         try {
             servicesManager.createServices(createdService, Specification.WMS);
-            return Controller_.succeded(createdService, "WMS", versionList, "true");
+            return Controller_.succeded(createdService, createdService.getIdentifier(), "WMS", versionList, "true");
         } catch (IOException ex) {
-            return Controller_.succeded(createdService, "WMS", versionList, "false");
+            return Controller_.succeded(createdService, createdService.getIdentifier(), "WMS", versionList, "false");
         }
     }
 
@@ -236,9 +236,16 @@ public class Controller {
      */
     @View
     @Route("/succeded")
-    public Response succeded(Service createdService, String type, List<String> versionList, String created) {
+    public Response succeded(final Service createdService, final String identifier, final String type, final List<String> versionList, final String created) {
         Boolean create = Boolean.parseBoolean(created);
-        return success.with().service(createdService).type(type).versions(versionList).created(create).ok().withMimeType("text/html");
+        InstanceSummary is = new InstanceSummary();
+        is.setIdentifier(identifier);
+        is.setName(createdService.getName());
+        is.set_abstract(createdService.getDescription());
+        is.setType(type);
+        is.setStatus("WORKING");
+        servicesManager.buildServiceUrl(type, identifier, versionList, is);
+        return success.with().service(is).versions(versionList).created(create).ok().withMimeType("text/html");
     }
 
     /**

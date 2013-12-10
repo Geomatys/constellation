@@ -57,12 +57,12 @@
                                 <li><a href="edit/${service.type}/${service.identifier}">&{service.menu.edit.label}</a></li>
                                 <li><a href="#" data-action="open-logs" data-logs="${service.logsURL}?l=1000">&{service.menu.log.label}</a></li>
                                 <li><a href="#" data-action="open-service-url" data-capabilities="${service.capabilitiesUrl}">&{service.menu.url.label}</a></li>
-                                <li class="<%if(service.status.toString()!="WORKING"){%>disabled<%}%>"><a href="#" data-action="open-capabilities" data-capabilities="${service.capabilitiesUrl}">&{service.menu.getcapabilities.label}</a></li>
+                                <li><a href="#" data-action="delete-service" data-service-type="${service.type}" data-service-id="${service.identifier}">&{service.menu.delete.label}</a></li>
+                                <li><a href="#" data-action="open-capabilities" data-capabilities="${service.capabilitiesUrl}">&{service.menu.getcapabilities.label}</a></li>
                                 <li class="<%if(service.status.toString()!="WORKING"){%>disabled<%}%>" ><a href="#" data-action="show-service">&{service.menu.show.label}</a></li>
-                                <li class="<%if(service.status.toString()!="WORKING"){%>disabled<%}%>" ><a href="#" data-action="delete-service" data-service-type="${service.type}" data-service-id="${service.identifier}">&{service.menu.delete.label}</a></li>
                             </ul>
                         </div>
-                        <a class="btn btn-info" href="#" data-action="restart-service" data-service-type="${service.type}" data-service-id="${service.name}">
+                        <a class="btn btn-info" href="#" data-action="restart-service" data-service-type="${service.type}" data-service-id="${service.identifier}">
                             <i class="icon-refresh"></i>
                         </a>
                         <a class="btn <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" href="#" data-state="${service.type}-${service.identifier}" data-action="toggle-service" data-service-type="${service.type}" data-service-id="${service.identifier}">

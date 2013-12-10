@@ -170,38 +170,11 @@ CSTL.Services = {
 };
 
 function enableActions() {
-    $("[data-action='open-capabilities']").parent().removeClass("disabled");
     $("[data-action='show-service']").parent().removeClass("disabled");
-    $("[data-action='delete-service']").parent().removeClass("disabled");
-
-    $('[data-action="delete-service"]').click(function () {
-        var $this = $(this);
-        CSTL.Services.delete($this.data('service-type'), $this.data('service-id'));
-        return false;
-    });
-    $('[data-action="open-capabilities"]').click(function () {
-        $.ajax({
-            url: $(this).data('capabilities'),
-            dataType: "text",
-            success: function (data) {
-                $("#capabilities-modal-pre code").empty();
-                $("#capabilities-modal-pre code").text(data);
-                $("#capabilities-modal-pre code").each(function (i, e) {
-                    hljs.highlightBlock(e)
-                });
-                $("#getcapabilities-modal").modal();
-            }
-        });
-        return false;
-    });
 }
 
 function desableAction(){
-    $("[data-action='open-capabilities']").parent().addClass("disabled");
     $("[data-action='show-service']").parent().addClass("disabled");
-    $("[data-action='delete-service']").parent().addClass("disabled");
-    $('[data-action="delete-service"]').unbind();
-    $('[data-action="open-capabilities"]').unbind();
 }
 
 function filter(type, tabSelected){
@@ -271,6 +244,26 @@ $(function() {
                 $("#logs-modal-pre code").empty();
                 $("#logs-modal-pre code").text(data);
                 $("#logs-modal").modal();
+            }
+        });
+        return false;
+    });
+    $('[data-action="delete-service"]').click(function () {
+        var $this = $(this);
+        CSTL.Services.delete($this.data('service-type'), $this.data('service-id'));
+        return false;
+    });
+    $('[data-action="open-capabilities"]').click(function () {
+        $.ajax({
+            url: $(this).data('capabilities'),
+            dataType: "text",
+            success: function (data) {
+                $("#capabilities-modal-pre code").empty();
+                $("#capabilities-modal-pre code").text(data);
+                $("#capabilities-modal-pre code").each(function (i, e) {
+                    hljs.highlightBlock(e)
+                });
+                $("#getcapabilities-modal").modal();
             }
         });
         return false;
