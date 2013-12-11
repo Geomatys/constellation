@@ -90,7 +90,7 @@
         @Asset(id = "selectize",            value = "js/selectize.min.js",                      depends = {"jquery", "sifter", "microplugin"},      location = AssetLocation.SERVER),
 
         // Constellation
-        @Asset(id = "cstl",                     value = "js/cstl.js",                       depends = "jquery",         location = AssetLocation.SERVER),
+        @Asset(id = "cstl",                     value = "js/cstl.js",                       depends = "jquery",         location = AssetLocation.APPLICATION),
         @Asset(id = "cstl.data",                value = "js/cstl.data.js",                  depends = "cstl",           location = AssetLocation.SERVER),
         @Asset(id = "cstl.providers",           value = "js/cstl.providers.js",             depends = "cstl",           location = AssetLocation.SERVER),
         @Asset(id = "cstl.services",            value = "js/cstl.services.js",              depends = "cstl",           location = AssetLocation.APPLICATION),
