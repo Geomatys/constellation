@@ -4,7 +4,7 @@
 <!-- Header -->
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
-        <a href="@{index()}"><img src="images/constellation.png"/></a>
+        <a href="@{index()}"><img src="../images/constellation.png"/></a>
     </div>
 </div>
 
