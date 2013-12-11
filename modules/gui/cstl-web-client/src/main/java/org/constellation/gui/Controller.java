@@ -244,9 +244,8 @@ public class Controller {
         is.setName(createdService.getName());
         is.set_abstract(createdService.getDescription());
         is.setType(type);
-        is.setStatus("WORKING");
         servicesManager.buildServiceUrl(type, identifier, versionList, is);
-        return success.with().service(is).versions(versionList).created(create).ok().withMimeType("text/html");
+        return success.with().service(is).name(is.getName()).description(is.get_abstract()).versions(versionList).created(create).ok().withMimeType("text/html");
     }
 
     /**

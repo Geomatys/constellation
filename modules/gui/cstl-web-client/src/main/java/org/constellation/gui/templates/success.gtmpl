@@ -2,6 +2,8 @@
 
 <!-- params send from server -->
 #{param name=service/}
+#{param name=name/}
+#{param name=description/}
 #{param name=type/}
 #{param name=versions/}
 #{param name=created/}
@@ -46,7 +48,7 @@
                 &{service.create.end.success.alert.label}
             </div>
             <div class="span11">
-                <p class="lead"><span class="badge badge-success">&nbsp;</span> ${service.name}</p>
+                <p class="lead"><span class="badge badge-success">&nbsp;</span> ${name}</p>
             </div>
 
             <!-- service created description -->
@@ -89,7 +91,7 @@
                         <div class="span6">
                             <dl>
                                 <dt>&{service.create.end.description.label}</dt>
-                                <dd>${service._abstract}</dd>
+                                <dd>${description}</dd>
                             </dl>
                         </div>
                     </div>
@@ -98,7 +100,7 @@
 
             <!-- Button to add data on service -->
             <div class="offset1 span4">
-                <a class="btn btn-large" href="edit/${service.type}/${service.name}"><i class="icon-plus-sign"></i> &{service.create.end.addlayers.label}</a>
+                <a class="btn btn-large" href="edit/${service.type}/${service.identifier}"><i class="icon-plus-sign"></i> &{service.create.end.addlayers.label}</a>
             </div>
         <%}else{%>
             <!-- alert part -->
