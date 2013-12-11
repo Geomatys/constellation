@@ -11,7 +11,7 @@
             </button>
             <div class="nav-collapse collapse">
                 <a href="@{index()}" class="brand" style="padding-bottom: 5px; padding-top: 5px">
-                    <img id="brand" src="image/constellation.png" style="height: 30px;" alt="constellation-logo"/>
+                    <img id="brand" src="image/constellation-menu.png" style="height: 35px;" alt="constellation-logo"/>
                 </a>
                 <ul class="nav">
                     <li><a href="@{index()}">&{menu.homepage.label}</a></li>
@@ -66,5 +66,5 @@
     #{insert/}
 </div>
 <script>
-    $("#brand").attr("src", CSTL.URL_CONSTELLATION_PICTURE);
+    $("#brand").attr("src", CSTL.URL_CONSTELLATION_PICTURE_MENU);
 </script>
