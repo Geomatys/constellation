@@ -2,8 +2,6 @@
 
 <!-- params send from server -->
 #{param name=service/}
-#{param name=name/}
-#{param name=description/}
 #{param name=type/}
 #{param name=versions/}
 #{param name=created/}
@@ -48,7 +46,7 @@
                 &{service.create.end.success.alert.label}
             </div>
             <div class="span11">
-                <p class="lead"><span class="badge badge-success">&nbsp;</span> ${name}</p>
+                <p class="lead"><span class="badge badge-success">&nbsp;</span> ${service.name}</p>
             </div>
 
             <!-- service created description -->
@@ -91,7 +89,7 @@
                         <div class="span6">
                             <dl>
                                 <dt>&{service.create.end.description.label}</dt>
-                                <dd>${description}</dd>
+                                <dd>${service._abstract}</dd>
                             </dl>
                         </div>
                     </div>

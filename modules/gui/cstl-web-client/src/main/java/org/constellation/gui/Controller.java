@@ -220,16 +220,18 @@ public class Controller {
         //call service
         try {
             servicesManager.createServices(createdService, Specification.WMS);
-            return Controller_.succeded(createdService, createdService.getIdentifier(), "WMS", versionList, "true");
+            return Controller_.succeded(createdService.getName(), createdService.getDescription(), createdService.getIdentifier(), "WMS", versionList, "true");
         } catch (IOException ex) {
-            return Controller_.succeded(createdService, createdService.getIdentifier(), "WMS", versionList, "false");
+            return Controller_.succeded(createdService.getName(), createdService.getDescription(), createdService.getIdentifier(), "WMS", versionList, "false");
         }
     }
 
     /**
      * View after service creation
      *
-     * @param createdService {@link org.constellation.dto.Service} asked creation
+     * @param name
+     * @param description
+     * @param identifier
      * @param type           service type
      * @param versionList    service version available
      * @param created        {@link String} {@link boolean} mirror to no if service is created
@@ -237,15 +239,16 @@ public class Controller {
      */
     @View
     @Route("/succeded")
-    public Response succeded(final Service createdService, final String identifier, final String type, final List<String> versionList, final String created) {
+    public Response succeded(final String name, final String description, final String identifier, final String type, final List<String> versionList, final String created) {
         Boolean create = Boolean.parseBoolean(created);
         InstanceSummary is = new InstanceSummary();
         is.setIdentifier(identifier);
-        is.setName(createdService.getName());
-        is.set_abstract(createdService.getDescription());
+        is.setName(name);
+        is.set_abstract(description);
         is.setType(type);
         servicesManager.buildServiceUrl(type, identifier, versionList, is);
-        return success.with().service(is).name(is.getName()).description(is.get_abstract()).versions(versionList).created(create).ok().withMimeType("text/html");
+        System.out.println("test : "+ name);
+        return success.with().service(is).versions(versionList).created(create).ok().withMimeType("text/html");
     }
 
     /**
