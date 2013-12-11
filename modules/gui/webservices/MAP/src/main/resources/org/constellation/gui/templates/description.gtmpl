@@ -17,7 +17,7 @@
             <div class="control-group">
                 <label class="control-label" for="keywords">&{create.description.service.keywords.label}</label>
                 <div class="controls">
-                    <input type="text" id="keywords" name="keywords" value="<% service.keywords.each({keyword -> out.print(keyword+" ")})%>"/>
+                    <input type="text" id="keywords" name="keywords" value="${service.keywords.join(',')}"/>
                 </div>
             </div>
             <div class="control-group">
@@ -44,3 +44,16 @@
         <button class="btn btn-info" style="margin-left:20px;" type="button" data-action="service-description" data-form="serviceDescription" data-service-type="${instance.type}" data-service-id="${service.identifier}">&{create.save.label}</button>
     </div>
 </form>
+<script>
+    $('#keywords').selectize({
+        plugins: ['remove_button'],
+        delimiter: ',',
+        persist: false,
+        create: function (input) {
+            return {
+                value: input,
+                text: input
+            }
+        }
+    });
+</script>

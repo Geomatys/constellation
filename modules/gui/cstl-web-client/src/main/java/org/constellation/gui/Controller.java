@@ -208,7 +208,7 @@ public class Controller {
         createdService.setVersions(versionList);
 
         //build keyword list
-        String[] keywordsArray = keywords.split(" ");
+        String[] keywordsArray = keywords.split(",");
         List<String> keywordsList = Arrays.asList(keywordsArray);
         createdService.setKeywords(keywordsList);
 
