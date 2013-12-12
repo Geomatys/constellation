@@ -19,6 +19,7 @@
 
     <properties>
         <version.spring>3.2.4.RELEASE</version.spring>
+        <conf>dev</conf>
     </properties>
 
     <dependencies>
@@ -109,7 +110,15 @@
 
         <filters>
             <filter>src/main/filter/default.properties</filter>
+            <filter>src/main/filter/${conf}.properties</filter>
         </filters>
+        
+        <resources>
+         <resource>
+          <directory>src/main/resources</directory>
+          <filtering>true</filtering>
+         </resource>
+        </resources>
 
         <plugins>
             <plugin>
@@ -145,10 +154,7 @@
                             <finalName>${project.build.finalName}</finalName>
                             <descriptorRefs>
                                 <descriptorRef>tomcat</descriptorRef>
-                            </descriptorRefs>
-                            <filters>
-                                <filter>src/main/filter/default.properties</filter>
-                            </filters>
+                            </descriptorRefs>                         
                         </configuration>
                     </execution>
                 </executions>
