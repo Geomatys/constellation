@@ -47,6 +47,7 @@ CSTL = {
     URL_STYLE_PICTURE:"url("+appURL+"/images/style.png)",
     URL_STYLE_SELECTED_PICTURE:"url("+appURL+"/images/style-selected.png)",
     URL_CONSTELLATION_PICTURE:appURL+"/images/constellation.png",
+    URL_CONSTELLATION_PICTURE_MENU:appURL+"/images/constellation-menu.png",
 
 
     /**
