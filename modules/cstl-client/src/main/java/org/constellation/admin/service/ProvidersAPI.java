@@ -17,6 +17,7 @@
 
 package org.constellation.admin.service;
 
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.constellation.configuration.DataBrief;
@@ -104,7 +105,7 @@ public final class ProvidersAPI {
         ensureNonNull("styleName", styleName);
 
         final String path = "SP/" + providerId + "/style/" + styleName;
-        client.delete(path, MediaType.APPLICATION_XML_TYPE, null).ensure2xxStatus();
+        client.delete(path, MediaType.APPLICATION_XML_TYPE, new MultivaluedMapImpl()).ensure2xxStatus();
     }
 
     /**

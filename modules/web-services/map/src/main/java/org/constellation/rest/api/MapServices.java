@@ -32,10 +32,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+
+import java.io.UnsupportedEncodingException;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -72,7 +75,7 @@ public final class MapServices {
 
     @DELETE
     @Path("{id}/{layerid}")
-    public Response deleteLayer(final @PathParam("spec") String spec, @PathParam("id") String serviceId, @PathParam("layerid") String layerid, @PathParam("layernamespace") String layernmsp) throws NotRunningServiceException, JAXBException {
+    public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerid, @QueryParam("layernamespace") String layernmsp) throws NotRunningServiceException, JAXBException, UnsupportedEncodingException {
         getConfigurer(spec).removeLayer(serviceId, new QName(layernmsp, layerid));
         return Response.ok().build();
     }

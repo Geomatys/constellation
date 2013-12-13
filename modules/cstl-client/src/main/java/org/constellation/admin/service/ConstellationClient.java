@@ -31,6 +31,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
@@ -203,34 +204,26 @@ public final class ConstellationClient {
         }
     }
 
-    /**
-     * Submits a HTTP DELETE request and returns the response.
-     *
-     * @param path the request path
-     * @param type the submitted/expected media type
-     * @param body the request entity
-     * @return the response instance
-     * @throws IOException on HTTP communication problem like connection or read timeout
-     */
-    Response delete(final String path, final MediaType type, final Object body) throws IOException {
-        try {
-            return new Response(newRequest(path, type).delete(ClientResponse.class, body));
-        } catch (ClientHandlerException | UniformInterfaceException ex) {
-            throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
-        }
-    }
 
     /**
      * Submits a HTTP DELETE request and returns the response.
      *
+     *
      * @param path the request path
      * @param type the submitted/expected media type
+     * @param map
      * @return the response instance
      * @throws IOException on HTTP communication problem like connection or read timeout
      */
-    Response delete(final String path, final MediaType type) throws IOException {
+    Response delete(final String path, final MediaType type, final MultivaluedMap<String, String> map) throws IOException {
         try {
-            return new Response(newRequest(path, type).delete(ClientResponse.class));
+            final ClientResponse request = this.client
+                    .resource(url + "api/" + version + "/")
+                    .queryParams(map)
+                    .path(path)
+                    .type(type)
+                    .delete(ClientResponse.class);
+            return new Response(request);
         } catch (ClientHandlerException | UniformInterfaceException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
@@ -238,6 +231,7 @@ public final class ConstellationClient {
 
     /**
      * Creates a new request from the specified path and {@link MediaType}.
+     *
      *
      * @param path the request path
      * @param type the submitted/expected media type

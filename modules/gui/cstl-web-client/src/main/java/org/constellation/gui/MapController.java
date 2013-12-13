@@ -36,7 +36,6 @@ import org.constellation.gui.service.MapManager;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.service.ServicesManager;
 import org.constellation.gui.util.LayerComparator;
-import org.constellation.util.QnameLocalComparator;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -164,7 +163,7 @@ public class MapController {
         final String namespace;
         final int index = layerName.lastIndexOf('}');
         if (index != -1) {
-            namespace = layerName.substring(1, index - 1);
+            namespace = layerName.substring(1, index);
             name = layerName.substring(index+1);
         } else {
             namespace = null;

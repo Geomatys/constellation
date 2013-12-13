@@ -69,7 +69,13 @@ public class MetadataFeeder {
         addFileIdentifier(uuid);
 
         localeAndCountry = feeded.getLocaleData().split("_");
-        final Locale dataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
+        Locale dataLocale;
+        if(localeAndCountry.length==2){
+            dataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
+        }else{
+            dataLocale = new Locale(localeAndCountry[0]);
+        }
+
         addDataLanguage(dataLocale);
         addKeywords(feeded.getKeywords());
         addTopicCategory(feeded.getTopicCategory());

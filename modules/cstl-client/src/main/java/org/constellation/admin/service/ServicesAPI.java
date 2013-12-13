@@ -17,6 +17,7 @@
 
 package org.constellation.admin.service;
 
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
@@ -27,7 +28,10 @@ import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
@@ -217,7 +221,7 @@ public final class ServicesAPI {
         ensureNonNull("identifier",  identifier);
 
         final String path = "OGC/" + serviceType + "/" + identifier;
-        client.delete(path, MediaType.APPLICATION_XML_TYPE, null).ensure2xxStatus();
+        client.delete(path, MediaType.APPLICATION_XML_TYPE, new MultivaluedMapImpl()).ensure2xxStatus();
     }
 
     /**
@@ -259,13 +263,17 @@ public final class ServicesAPI {
     }
 
     /**
-     * dele te service layer
+     * delete service layer
      * @param serviceId service identifier
      * @param layerId data layer name
      * @param spec service specofication
      * @throws IOException
      */
     public void deleteLayer(final String serviceId, final String layerId, final String layerNamespace, final String spec) throws IOException {
-        client.delete("MAP/" + spec + "/" + serviceId + "/" + layerId + "/" + layerNamespace, MediaType.APPLICATION_XML_TYPE).ensure2xxStatus();
+        final MultivaluedMap value = new MultivaluedMapImpl();
+        List<String> valueList = new ArrayList<>(0);
+        valueList.add(layerNamespace);
+        value.put("layernamespace", valueList);
+        client.delete("MAP/" + spec + "/" + serviceId+"/"+layerId, MediaType.APPLICATION_XML_TYPE, value).ensure2xxStatus();
     }
 }

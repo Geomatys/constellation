@@ -155,8 +155,8 @@ public final class ConfigDirectory {
             }
         } else {
             constellationMetadataFolder = new File(System.getProperty("user.home") + "/.constellation-data", "metadata");
-            if (!constellationMetadataFolder.exists()) {
-                constellationMetadataFolder.mkdir();
+            if (constellationMetadataFolder.mkdir()){
+                LOGGER.log(Level.INFO, "metadata folder created");
             }
         }
 
@@ -181,8 +181,8 @@ public final class ConfigDirectory {
             }
         } else {
             constellationStyleFolder = new File(System.getProperty("user.home") + "/.constellation-data", "style");
-            if (!constellationStyleFolder.exists()) {
-                constellationStyleFolder.mkdir();
+            if(constellationStyleFolder.mkdirs()){
+                LOGGER.log(Level.INFO, "style folder created");
             }
         }
 
