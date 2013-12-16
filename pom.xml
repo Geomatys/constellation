@@ -168,6 +168,7 @@
         <juzu.version>0.7.0-beta22</juzu.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jersey.version>1.11</jersey.version>
+        <spring.version>4.0.0.RELEASE</spring.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
         <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>

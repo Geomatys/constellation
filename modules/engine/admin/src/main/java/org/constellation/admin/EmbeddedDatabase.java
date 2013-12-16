@@ -80,17 +80,16 @@ public final class EmbeddedDatabase extends Static {
      * @throws  SQLException if a database access error occurs
      */
     public static Session createSession() throws SQLException {
-        if (DATA_SOURCE == null) {
-            synchronized(EmbeddedDatabase.class) {
-                if (DATA_SOURCE == null) {
-                    setup();
-                }
-            }
-        }
+        getOrCreateDataSource();
         return new Session(DATA_SOURCE.getConnection(), USER_CACHE);
     }
 
-    public static SQLExecuter createSQLExecuter() throws SQLException {
+    /**
+     * Exposes dataSource (Spring artifact).
+     * @return
+     * @throws SQLException
+     */
+    public static DataSource getOrCreateDataSource() throws SQLException {
         if (DATA_SOURCE == null) {
             synchronized(EmbeddedDatabase.class) {
                 if (DATA_SOURCE == null) {
@@ -98,6 +97,11 @@ public final class EmbeddedDatabase extends Static {
                 }
             }
         }
+        return DATA_SOURCE;
+    }
+
+    public static SQLExecuter createSQLExecuter() throws SQLException {
+        getOrCreateDataSource();
         return new SQLExecuter(DATA_SOURCE.getConnection());
     }
 
