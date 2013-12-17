@@ -92,6 +92,7 @@ public class ProviderManager {
                         url = new URL("file:" + path);
                         ParameterValueGroup shapeFileParametersFolder = sources.groups("choice").get(0).addGroup("ShapeFileParametersFolder");
                         shapeFileParametersFolder.parameter("url").setValue(url);
+                        shapeFileParametersFolder.parameter("namespace").setValue("no namespace");
                     } catch (MalformedURLException e) {
                         LOGGER.log(Level.WARNING, "", e);
                     }
