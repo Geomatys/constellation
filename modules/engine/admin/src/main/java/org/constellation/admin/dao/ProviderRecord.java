@@ -48,7 +48,6 @@ public final class ProviderRecord implements Record {
     private ProviderType type;
     private String impl;
     private String owner;
-    private String metadata;
 
     ProviderRecord(final Session session, final int id, final String identifier, final ProviderType type,
                    final String impl, final String owner) {

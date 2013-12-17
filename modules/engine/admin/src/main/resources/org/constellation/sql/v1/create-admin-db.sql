@@ -69,7 +69,8 @@ CREATE TABLE "admin"."data"(
   "date"        BIGINT      NOT NULL,
   "title"       INTEGER     NOT NULL,
   "description" INTEGER     NOT NULL,
-  "owner"       VARCHAR(32)
+  "owner"       VARCHAR(32),
+  "metadata"  CLOB
 );
 
 ALTER TABLE "admin"."data" ADD CONSTRAINT data_pk          PRIMARY KEY ("id");

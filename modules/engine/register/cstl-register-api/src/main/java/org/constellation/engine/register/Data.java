@@ -46,6 +46,9 @@ public interface Data {
 
     public void setStyles(List<Style> styles);
 
+    public String getMetadata();
+
+    public void setMetadata(String metadata);
     
     
 }

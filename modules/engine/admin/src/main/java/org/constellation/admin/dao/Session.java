@@ -130,6 +130,7 @@ public final class Session implements Closeable {
 
     private static final String READ_DATA                   = "data.read";
     private static final String READ_DATA_NMSP              = "data.read.nmsp";
+    private static final String READ_DATA_METADATA              = "data.read.metadata";
     private static final String READ_DATA_FROM_ID           = "data.read.from.id";
     private static final String READ_DATA_FROM_LAYER        = "data.read.from.layer";
     private static final String LIST_DATA                   = "data.list";
@@ -137,6 +138,7 @@ public final class Session implements Closeable {
     private static final String LIST_DATA_FROM_PROVIDER     = "data.list.from.provider";
     private static final String WRITE_DATA                  = "data.write";
     private static final String UPDATE_DATA                 = "data.update";
+    private static final String UPDATE_DATA_METADATA                 = "data.update.metadata";
     private static final String DELETE_DATA                 = "data.delete";
     private static final String DELETE_DATA_NMSP            = "data.delete.nmsp";
 
@@ -772,6 +774,11 @@ public final class Session implements Closeable {
         return new Query(LIST_DATA_FROM_PROVIDER).with(provider.id).select().getAll(DataRecord.class);
     }
 
+    /* internal */ InputStream readDataMetadata(final int dataid) throws SQLException, IOException {
+        final InputStream stream = new Query(READ_PROVIDER_METADATA).with(dataid).select().getClob();
+        return stream;
+    }
+
     public DataRecord writeData(final QName name, final ProviderRecord provider, final DataType type, final UserRecord owner) throws SQLException {
         ensureNonNull("name",     name);
         ensureNonNull("provider", provider);
@@ -792,6 +799,10 @@ public final class Session implements Closeable {
 
     /* internal */ void updateData(final int generatedId, final String newName, final String newNamespace, final int newProvider, final DataType newType, final String newOwner) throws SQLException {
         new Query(UPDATE_DATA).with(newName, newNamespace, newProvider, newType.name(), newOwner, generatedId).update();
+    }
+
+    /* internal */ void updateDataMetadata(final int dataId, final StringReader metadata) throws SQLException {
+        new Query(UPDATE_DATA_METADATA).with(metadata, dataId).update();
     }
 
     public void deleteData(final QName name, final String providerId) throws SQLException {

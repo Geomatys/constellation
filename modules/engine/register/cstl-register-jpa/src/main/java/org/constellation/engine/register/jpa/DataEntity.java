@@ -54,6 +54,9 @@ public class DataEntity implements Data {
     @ManyToMany(mappedBy="datas", targetEntity=StyleEntity.class)
     private List<Style> styles;
 
+    @Column(name = "`metadata`")
+    private String metadata;
+
     public int getId() {
         return id;
     }
@@ -134,12 +137,18 @@ public class DataEntity implements Data {
         this.styles = styles;
     }
 
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(final String metadata) {
+        this.metadata = metadata;
+    }
+
     @Override
     public String toString() {
         return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", provider=" + provider + ", type="
                 + type + ", date=" + date + ", title=" + title + ", description=" + description + ", owner=" + owner
-                + ", styles=" + styles + "]";
+                + ", styles=" + styles + ", metadata="+metadata+"]";
     }
-    
-    
 }
