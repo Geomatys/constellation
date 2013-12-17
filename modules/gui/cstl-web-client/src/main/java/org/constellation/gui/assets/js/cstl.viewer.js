@@ -30,20 +30,19 @@ CSTL.Viewer = {
     getFeatureBtn:undefined,
 
     init: function () {
-        //add OSM default Layer on background
 //        var wmsExampleLayer = new OpenLayers.Layer.WMS("BRGM Geologie",
 //            "http://geoservices.brgm.fr/geologie",
 //            {layers: 'SCAN_F_GEOL250'},
 //            {opacity: 0.5, singleTile: true, ratio: 1});
 
-        var wmsBlueMarbleLayer = new OpenLayers.Layer.WMS("BlueMarble Local",
-            "http://localhost:8080/constellation/WS/wms/default",
-            {layers: 'bluemarble', format:"image/png"},
-            {opacity: 1});
+//        var wmsBlueMarbleLayer = new OpenLayers.Layer.WMS("BlueMarble Local",
+//            "http://localhost:8080/constellation/WS/wms/default",
+//            {layers: 'bluemarble', format:"image/png"},
+//            {opacity: 1});
+//        CSTL.Viewer.layers = [wmsBlueMarbleLayer];
 
-
-        CSTL.Viewer.layers = [wmsBlueMarbleLayer];
-
+        //add OSM default Layer on background
+        CSTL.Viewer.layers = [new OpenLayers.Layer.OSM("Simple OSM Map")];
 
         //build controllers
         var controls = this.buildController();
@@ -186,15 +185,17 @@ CSTL.Viewer = {
             controls: [
                 new OpenLayers.Control.ScaleLine(),
                 CSTL.Viewer.panel
-            ],
-            fractionalZoom:true,
-            projection: new OpenLayers.Projection("EPSG:4326"),
-            allOverlays: true,
-            maxExtent: new OpenLayers.Bounds("-5.140600", "41.333740", " 9.559320", "51.089062")
+            ]
         });
         CSTL.Viewer.map.addLayers(CSTL.Viewer.layers);
-        //CSTL.Viewer.map.zoomToMaxExtent();
-        CSTL.Viewer.map.zoomToExtent(new OpenLayers.Bounds("-5.140600", "41.333740", " 9.559320", "51.089062"), true);
-        CSTL.Viewer.map.updateSize();
+        //Center on Montpellier
+        CSTL.Viewer.map.setCenter(
+            new OpenLayers.LonLat(3.877222, 43.611944).transform(
+                new OpenLayers.Projection("EPSG:4326"),
+                CSTL.Viewer.map.getProjectionObject()
+            ), 12
+        );
+        CSTL.Viewer.map.zoomToMaxExtent();
+        CSTL.Viewer.map.updateSize()
     }
 };
