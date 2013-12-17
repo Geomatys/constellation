@@ -47,19 +47,15 @@
                         <label class="radio">
                             <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="images/icon/vector.png" class="img-rounded"> &{layer.listing.data.upload.vector.label}
                         </label>
+                    </div>
+                    <div class="span2">
                         <label class="radio">
                             <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="images/icon/raster.png" class="img-rounded"> &{layer.listing.data.upload.raster.label}
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
                         </label>
                     </div>
                     <div class="span2">
                         <label class="radio">
-                            <input type="radio" name="dataType" value="pyramid" style="margin-top:12px;"> <img src="images/icon/pyramid.png" class="img-rounded"> pyramid
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="dataType" value="virtual" style="margin-top:12px;"> <img src="images/icon/virtual-sensor.png" class="img-rounded"> virtual sensor
+                            <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
                         </label>
                     </div>
                 </div>

@@ -420,13 +420,16 @@ public class ConfigurationEngine {
      */
     public static DefaultMetadata loadMetadata(final String providerId, final MarshallerPool pool) {
         Session session = null;
+        DefaultMetadata metadata = null;
         try {
             session = EmbeddedDatabase.createSession();
             final ProviderRecord provider = session.readProvider(providerId);
             if (provider != null) {
                 final InputStream sr = provider.getMetadata();
                 final Unmarshaller m = pool.acquireUnmarshaller();
-                final DefaultMetadata metadata = (DefaultMetadata) m.unmarshal(sr);
+                if(sr!=null){
+                    metadata = (DefaultMetadata) m.unmarshal(sr);
+                }
                 pool.recycle(m);
                 return metadata;
             }

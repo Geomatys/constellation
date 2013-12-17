@@ -393,7 +393,7 @@ public class Controller {
                     aResponse = RasterController_.showRaster(returnURL, metadataUploaded + "", "true");
                     break;
                 case "vector":
-                    aResponse = VectorController_.showVector(returnURL, metadataUploaded + "");
+                    aResponse = VectorController_.showVector(returnURL, metadataUploaded + "", "true");
             }
             return aResponse;
         } else {

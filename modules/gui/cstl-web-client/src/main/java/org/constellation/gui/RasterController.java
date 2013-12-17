@@ -134,6 +134,7 @@ public class RasterController {
         metadataToSave.setDate(metadataDate);
 
 
+        metadataToSave.setDataName(information.getName());
         metadataToSave.setDataPath(information.getPath());
         metadataToSave.setType(information.getDataType());
 

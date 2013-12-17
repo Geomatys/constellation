@@ -18,6 +18,7 @@ import java.util.List;
 @XmlRootElement
 public class DataMetadata {
 
+    private String          dataName;
     private String          dataPath;
     private String          title;
     private String          anAbstract;
@@ -31,6 +32,14 @@ public class DataMetadata {
     private String          dateType;
     private String          localeData;
     private String          type;
+
+    public String getDataName() {
+        return dataName;
+    }
+
+    public void setDataName(final String dataName) {
+        this.dataName = dataName;
+    }
 
     public String getDataPath() {
         return dataPath;

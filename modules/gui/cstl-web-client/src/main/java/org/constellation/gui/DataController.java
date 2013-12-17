@@ -58,7 +58,7 @@ public class DataController {
                 aResponse =  RasterController_.showRaster(returnURL, "false", "true");
                 break;
             case "vector":
-                aResponse = VectorController_.showVector(returnURL, "false");
+                aResponse = VectorController_.showVector(returnURL, "false", "true");
         }
         return aResponse;
     }
@@ -78,6 +78,13 @@ public class DataController {
     public Response getMetadata(final String providerId, final String dataId, final String dataType, final String returnUrl){
         final DataInformation di = providerManager.getMetadata(providerId, dataId, dataType);
         DataInformationContainer.setInformation(di);
-        return RasterController_.showRaster(returnUrl, "true", "false");
+        switch (dataType){
+            case "VECTOR" :
+                return VectorController_.showVector(returnUrl, "false", "false");
+            case "COVERAGE" :
+                return RasterController_.showRaster(returnUrl, "false", "false");
+            default :
+                return Response.error("response not initialized");
+        }
     }
 }

@@ -1,8 +1,5 @@
 package org.constellation.ws.rest;
 
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.BodyPartEntity;
-import com.sun.jersey.multipart.MultiPart;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
@@ -25,10 +22,10 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
+import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
-import org.constellation.utils.UploadUtilities;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
@@ -55,9 +52,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -70,7 +66,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.namespace.QName;
 
 /**
  * Manage data sending
@@ -210,7 +205,7 @@ public class Data {
         final File choosingFile = new File(root, filePath);
 
         File choosingMetadataFile = null;
-        if(!metadataFilePath.isEmpty()){
+        if (!metadataFilePath.isEmpty()) {
             choosingMetadataFile = new File(root.getAbsolutePath() + "/metadata/" + metadataFilePath);
         }
 
@@ -237,7 +232,7 @@ public class Data {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveMetadata(final DataMetadata metadataToSave) {
         //Recover metadata
-        DefaultMetadata dm = null;
+        DefaultMetadata dm = new DefaultMetadata();
         switch (metadataToSave.getType()) {
             case "raster":
                 try {
@@ -261,10 +256,7 @@ public class Data {
 
 
         //Save metadata
-        final File dataFile = new File(metadataToSave.getDataPath());
-        int extensionStart = dataFile.getName().lastIndexOf(".");
-        String dataName = dataFile.getName().substring(0, extensionStart);
-        ConfigurationEngine.saveMetaData(dm, dataName, CSWMarshallerPool.getInstance());
+        ConfigurationEngine.saveMetaData(dm, metadataToSave.getDataName(), CSWMarshallerPool.getInstance());
         return Response.status(200).build();
     }
 
@@ -397,7 +389,19 @@ public class Data {
         //generate DataInformation
 
         final DefaultMetadata metadata = ConfigurationEngine.loadMetadata(providerId, CSWMarshallerPool.getInstance());
-        final DataInformation information = MetadataUtilities.getRasterDataInformation(reader, metadata, dataType);
+        DataInformation information = new DataInformation();
+        switch (dataType) {
+            case "VECTOR":
+                ArrayList<SimplyMetadataTreeNode> meta = MetadataUtilities.getVectorDataInformation(metadata);
+                information.setFileMetadata(meta);
+                break;
+            case "COVERAGE":
+                information = MetadataUtilities.getRasterDataInformation(reader, metadata, dataType);
+                break;
+            default:
+                LOGGER.log(Level.INFO, "Type unknown to found metadata");
+        }
+
         information.setName(dataId);
         return Response.ok(information).build();
     }

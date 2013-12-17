@@ -77,8 +77,14 @@
             <button type="button" class="btn btn-success span6">
                 <i class="icon-map-marker"></i> Show data
             </button>
+            <button type="button" id="deleteLayer" class="btn btn-danger span6">
+                <i class="icon-trash"></i> Delete layer
+            </button>
         </div>
     </div>
+    <form action="@{MapController.removeLayer()}" id="deleteForm">
+        <input type="hidden" name="dataId" id="deleteLayerId"/>
+    </form>
 
     <form action="@{DataController.getMetadata()}" id="metadataForm">
         <input type="hidden" name="providerId" id="providerId"/>

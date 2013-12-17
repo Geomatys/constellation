@@ -1,9 +1,16 @@
 #{decorate path=menu.gtmpl/}
 
 #{param name=datainformation/}
+#{param name=metadataUploaded/}
 #{param name=name/}
 #{param name=crs/}
 #{param name=returnURL/}
+#{param name=locales /}
+#{param name=roles /}
+#{param name=dateTypes /}
+#{param name=topics /}
+#{param name=userLocale /}
+#{param name=creationMode /}
 
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
@@ -22,30 +29,50 @@
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <div class="span12">
             <ul class="nav nav-tabs">
-                <% if(datainformation.fileMetadata != null) {%>
+                <% if(metadataUploaded.equalsIgnoreCase("false") && creationMode.equalsIgnoreCase("true")){%>
+                    <li id="requiredISO19115Tab"><a href="#requiredISO19115" data-toggle="tab">Missing metadata</a></li>
+                <%}%>
+                <% if(datainformation.crs != null) {%>
                     <li id="crsTab"><a href="#crs" data-toggle="tab">CRS</a></li>
                 <% } %>
-                <li id="descriptionTab"><a href="#description" data-toggle="tab">&{data.information.tab.title}</a></li>
+                <% if(datainformation.fileMetadata != null) { %>
+                    <li id="descriptionTab"><a href="#description" data-toggle="tab">&{data.information.tab.title}</a></li>
+                <% } %>
             </ul>
 
             <form action="@{VectorController.createProvider(returnURL = returnURL)}" method="POST">
                 <div class="tab-content">
+                    <% if(metadataUploaded.equalsIgnoreCase("false") && creationMode.equalsIgnoreCase("true")){%>
+                    <div class="tab-pane" id="requiredISO19115">
+                        #{include path=required_iso19115.gtmpl/}
+                    </div>
+                    <%}%>
+                    <% if(datainformation.crs != null) {%>
                     <div class="tab-pane" id="crs">
                         <input type="text" class="span3" name="crsSelected" value="${crs}"/>
                     </div>
-
+                    <%}%>
                     <% if(datainformation.fileMetadata != null) { %>
                         #{include path=vector_metadata.gtmpl/}
-                    <% } %>
+                    <%}%>
                 </div>
-
-                <button type="submit" class="btn btn-info pull-right"/>Open</button>
+                <input type="hidden" name="metadataUploaded" value="${metadataUploaded}">
+                <% if(creationMode.equalsIgnoreCase("true")){%>
+                    <button type="submit" class="btn btn-info pull-right" id="providerCreation"/>&{label.finish}</button>
+                <% } else { %>
+                    <button type="button" class="btn btn-info pull-right" id="goTo" onclick="document.location.assign('${returnURL}')"/>Return</button>
+                <% } %>
             </form>
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
-    $("#crsTab").addClass("active");
-    $("#crs").addClass("active");
+    <% if(creationMode.equalsIgnoreCase("true")){%>
+        $("#requiredISO19115Tab").addClass("active");
+        $("#requiredISO19115").addClass("active")
+    <%} else {%>
+        $("#descriptionTab").addClass("active");
+        $("#description").addClass("active")
+    <%}%>
 </script>

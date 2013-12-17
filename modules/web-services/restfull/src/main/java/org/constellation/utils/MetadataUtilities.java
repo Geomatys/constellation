@@ -29,6 +29,7 @@ import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -57,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
 
 
 /**
@@ -66,7 +66,6 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
  * @author bgarcia
  * @version 0.9
  * @since 0.9
- *
  */
 public final class MetadataUtilities {
 
@@ -75,10 +74,9 @@ public final class MetadataUtilities {
     /**
      * Generate {@link org.constellation.dto.DataInformation} for require file data
      *
-     *
-     * @param file     data {@link java.io.File}
+     * @param file         data {@link java.io.File}
      * @param metadataFile
-     *@param dataType  @return a {@link org.constellation.dto.DataInformation}
+     * @param dataType     @return a {@link org.constellation.dto.DataInformation}
      */
     public static DataInformation generateMetadatasInformation(final File file, final File metadataFile, final String dataType) {
 
@@ -87,7 +85,7 @@ public final class MetadataUtilities {
 
         try {
             xmlReader = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-            if(metadataFile!=null){
+            if (metadataFile != null) {
                 templateMetadata = (DefaultMetadata) xmlReader.unmarshal(metadataFile);
             }
         } catch (JAXBException e) {
@@ -109,24 +107,25 @@ public final class MetadataUtilities {
                 try {
                     //unzip file
                     String extension = Files.getFileExtension(file.getName());
+                    String fileName = Files.getNameWithoutExtension(file.getName());
+                    File parent = new File(file.getParent(), fileName);
                     ShapefileFeatureStore shapeStore = null;
-                    if(extension.equalsIgnoreCase("zip")){
-                        FileUtilities.unzip(file, file.getParentFile(), null);
+                    if (extension.equalsIgnoreCase("zip")) {
+                        parent.mkdirs();
+                        FileUtilities.unzip(file, parent, null);
                         final FileFilter shapeFilter = new SuffixFileFilter(".shp");
-                        final File[] files = file.getParentFile().listFiles(shapeFilter);
+                        final File[] files = parent.listFiles(shapeFilter);
                         if (files.length > 0) {
                             shapeStore = new ShapefileFeatureStore(files[0].toURI().toURL());
                         }
-                    }else{
-                        shapeStore = new ShapefileFeatureStore(file.toURI().toURL());
                     }
 
                     String crsName = "";
                     final CoordinateReferenceSystem crs = shapeStore.getFeatureType().getCoordinateReferenceSystem();
-                    if(crs!=null){
+                    if (crs != null) {
                         crsName = crs.getName().toString();
                     }
-                    final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), file.getParent(), dataType, crsName);
+                    final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), parent.getAbsolutePath(), dataType, crsName);
                     final ArrayList<SimplyMetadataTreeNode> metadataList = getVectorDataInformation(templateMetadata);
                     information.setFileMetadata(metadataList);
                     return information;
@@ -145,8 +144,6 @@ public final class MetadataUtilities {
 
 
     /**
-     *
-     *
      * @param metadata
      * @param dataType (raster, vector, ...)  @return a {@link org.constellation.dto.DataInformation} from data file
      * @throws CoverageStoreException
@@ -161,15 +158,14 @@ public final class MetadataUtilities {
             final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
             DefaultMetadata finalMetadata = null;
             //mergeTemplate(fileMetadata);
-            if(metadata!=null){
+            if (metadata != null) {
                 finalMetadata = (DefaultMetadata) mergeTemplate(fileMetadata, metadata);
             }
 
             final TreeTable.Node rootNode;
-            if(finalMetadata !=null){
+            if (finalMetadata != null) {
                 rootNode = finalMetadata.asTreeTable().getRoot();
-            }
-            else{
+            } else {
                 rootNode = fileMetadata.asTreeTable().getRoot();
             }
 
@@ -186,12 +182,11 @@ public final class MetadataUtilities {
     }
 
     /**
-     *
      * @param metadata
      * @return
      */
-    public static ArrayList<SimplyMetadataTreeNode> getVectorDataInformation(final DefaultMetadata metadata){
-        if(metadata!=null){
+    public static ArrayList<SimplyMetadataTreeNode> getVectorDataInformation(final DefaultMetadata metadata) {
+        if (metadata != null) {
             // get Metadata as a List
             final TreeTable.Node rootNode;
             rootNode = metadata.asTreeTable().getRoot();
@@ -204,8 +199,9 @@ public final class MetadataUtilities {
 
     /**
      * Update information param with coverage metadata
+     *
      * @param coverageReader Contains coverages which want to extract metadata
-     * @param information {@link org.constellation.dto.DataInformation} which be updated
+     * @param information    {@link org.constellation.dto.DataInformation} which be updated
      * @throws CoverageStoreException if we can't extract information from coverageReader
      */
     private static void addCoverageData(final GridCoverageReader coverageReader, final DataInformation information) throws CoverageStoreException {
@@ -217,7 +213,8 @@ public final class MetadataUtilities {
             //build metadata
             final GenericName name = coverageReader.getCoverageNames().get(i);
             final SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
-            if(sm!=null){
+            if (sm != null) {
+
                 final String rootNodeName = sm.getNativeMetadataFormatName();
                 final Node coverateRootNode = sm.getAsTree(rootNodeName);
 
@@ -235,7 +232,6 @@ public final class MetadataUtilities {
     }
 
     /**
-     *
      * @param metadataToSave
      * @return
      * @throws CoverageStoreException
@@ -260,7 +256,6 @@ public final class MetadataUtilities {
     public static Metadata mergeTemplate(final DefaultMetadata fileMetadata, final DefaultMetadata metadataToMerge) throws JAXBException, NoSuchIdentifierException, ProcessException {
         // unmarshall metadataFile Template
 
-
         // call Merge Process
         DefaultMetadata resultMetadata;
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(MetadataProcessingRegistry.NAME, MergeDescriptor.NAME);
@@ -270,8 +265,8 @@ public final class MetadataUtilities {
         final org.geotoolkit.process.Process mergeProcess = desc.createProcess(inputs);
         final ParameterValueGroup resultParameters = mergeProcess.call();
 
-        resultMetadata = (DefaultMetadata) resultParameters.parameter(MergeDescriptor.RESULT_OUT_NAME).getValue();;
+        resultMetadata = (DefaultMetadata) resultParameters.parameter(MergeDescriptor.RESULT_OUT_NAME).getValue();
+        ;
         return resultMetadata;
     }
-
 }
