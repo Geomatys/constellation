@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.UnavailableSecurityManagerException;
+import org.apache.shiro.subject.Subject;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.EmbeddedDatabase;
@@ -32,6 +36,7 @@ import org.constellation.admin.dao.ProviderRecord.ProviderType;
 import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.StyleRecord.StyleType;
+import org.constellation.admin.dao.UserRecord;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.style.MutableStyle;
@@ -66,10 +71,24 @@ public interface Configurator {
             final ParameterValueGroup params = service.getServiceDescriptor().createValue();
             final String serviceName = service.getName();
 
+            //get current user credential
+            Subject subject = null;
+            try {
+               subject = SecurityUtils.getSubject();
+            }catch (UnavailableSecurityManagerException ex){
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+            }
+
             // Update administration database.
             Session session = null;
             try {
                 session = EmbeddedDatabase.createSession();
+                UserRecord userRecord;
+                if(subject!=null){
+                    userRecord = session.readUser(subject.getPrincipal().toString());
+                }else{
+                    userRecord = session.readUser("admin");
+                }
 
                 // look for deleted providers
                 final List<ProviderRecord> records = session.readProviders(serviceName);
@@ -93,7 +112,7 @@ public interface Configurator {
                     final ProviderType type = provider.getProviderType();
                     ProviderRecord pr = session.readProvider(provider.getId());
                     if (pr == null) {
-                        pr = session.writeProvider(provider.getId(), type, serviceName, provider.getSource(), null);
+                        pr = session.writeProvider(provider.getId(), type, serviceName, provider.getSource(), userRecord);
                     } else {
                         // update
                         pr.setConfig(provider.getSource());
@@ -129,7 +148,7 @@ public interface Configurator {
                                 }
                             }
                             if (!found) {
-                                session.writeData(name, pr, provider.getDataType(), null);
+                                session.writeData(name, pr, provider.getDataType(), userRecord);
                             }
                         }
 
@@ -154,7 +173,7 @@ public interface Configurator {
                                 }
                             }
                             if (!found) {
-                                session.writeStyle((String)key, pr, StyleType.VECTOR, (MutableStyle)provider.get(key), null);
+                                session.writeStyle((String)key, pr, StyleType.VECTOR, (MutableStyle)provider.get(key), userRecord);
                             }
                         }
                     }

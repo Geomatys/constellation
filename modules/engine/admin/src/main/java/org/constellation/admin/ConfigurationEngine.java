@@ -18,22 +18,9 @@
 package org.constellation.admin;
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.UnavailableSecurityManagerException;
+import org.apache.shiro.subject.Subject;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
@@ -44,6 +31,7 @@ import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
+import org.constellation.admin.dao.UserRecord;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
@@ -160,6 +148,15 @@ public class ConfigurationEngine {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
+
+            //get current user credential
+            Subject subject = null;
+            try {
+                subject = SecurityUtils.getSubject();
+            }catch (UnavailableSecurityManagerException ex){
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+            }
+
             final StringReader sr;
             if (obj != null) {
                 final StringWriter sw = new StringWriter();
@@ -171,10 +168,13 @@ public class ConfigurationEngine {
             } else {
                 sr = null;
             }
+
+            UserRecord userRecord = session.readUser(subject.getPrincipal().toString());
             final ServiceRecord service = session.readService(serviceID, spec);
             if (service == null) {
                 if (fileName == null) {
-                    session.writeService(serviceID, spec, sr, null);
+
+                    session.writeService(serviceID, spec, sr, userRecord);
                 } else {
                     session.writeServiceExtraConfig(serviceID, spec, sr, fileName);
                 }
@@ -187,7 +187,7 @@ public class ConfigurationEngine {
                         for (Layer layer : source.getInclude()) {
                             final QName dataName = layer.getName();
                             final DataRecord data = session.readData(dataName, source.getId());
-                            session.writeLayer(dataName, layer.getAlias(), service, data, "", null);
+                            session.writeLayer(dataName, layer.getAlias(), service, data, "", userRecord);
                         }
                     }
                 }

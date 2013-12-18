@@ -50,5 +50,9 @@
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-xml-sld</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+        </dependency>
     </dependencies>
 </project>

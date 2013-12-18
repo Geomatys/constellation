@@ -1,5 +1,7 @@
 package org.constellation.ws.rest;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
@@ -279,8 +281,10 @@ public class Data {
             final File dataPyramidFolder = new File(pyramidFolder, providerId);
             final String pyramidPath = dataPyramidFolder.getAbsolutePath();
 
+            final Subject subject = SecurityUtils.getSubject();
+
             //create listener which save information on Database
-            final ProcessListener listener = new PyramidCoverageProcessListener();
+            final ProcessListener listener = new PyramidCoverageProcessListener(subject);
 
             Runnable pyramidRunnable = new Runnable() {
                 @Override

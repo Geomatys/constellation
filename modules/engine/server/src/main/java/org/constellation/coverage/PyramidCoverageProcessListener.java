@@ -1,8 +1,10 @@
 package org.constellation.coverage;
 
+import org.apache.shiro.subject.Subject;
 import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.TaskRecord;
+import org.constellation.admin.dao.UserRecord;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
 
@@ -17,7 +19,6 @@ import java.util.logging.Logger;
  * @author bgarcia
  * @version 0.9
  * @since 0.9
- *
  */
 public class PyramidCoverageProcessListener implements ProcessListener {
 
@@ -25,14 +26,22 @@ public class PyramidCoverageProcessListener implements ProcessListener {
 
     private String uuidTask;
 
+    private Subject subject;
+
+    public PyramidCoverageProcessListener(final Subject subject) {
+        this.subject = subject;
+    }
+
     @Override
     public void started(final ProcessEvent processEvent) {
         //Create task on database (state : pending)
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
+            final UserRecord user = session.readUser(subject.getPrincipal().toString());
+
             uuidTask = UUID.randomUUID().toString();
-            session.writeTask(uuidTask, "pyramid", null);
+            session.writeTask(uuidTask, "pyramid", user.getLogin());
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Unable to save task", e);
         } finally {
