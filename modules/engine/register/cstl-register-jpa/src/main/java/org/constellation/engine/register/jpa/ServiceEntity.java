@@ -1,15 +1,22 @@
 package org.constellation.engine.register.jpa;
 
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
 import org.constellation.engine.register.ServiceMetaData;
@@ -40,14 +47,17 @@ public class ServiceEntity implements Service {
     @Column(name = "`config`")
     private String config;
 
-    @ManyToOne(targetEntity=UserEntity.class)
+    @ManyToOne(targetEntity=UserEntity.class, fetch=FetchType.LAZY)
     @JoinColumn(name = "`owner`")
     private User owner;
     
-    @OneToOne(mappedBy="service", targetEntity=ServiceExtraConfigEntity.class)
-    private ServiceExtraConfig extraConfig;
+    @OneToMany(mappedBy="service", targetEntity=LayerEntity.class, fetch=FetchType.LAZY)
+    private Set<Layer> layers;
+    
+    @OneToMany(mappedBy="service", targetEntity=ServiceExtraConfigEntity.class, fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+    private Set<ServiceExtraConfig> extraConfig;
 
-    @OneToOne(mappedBy="service", targetEntity=ServiceMetaDataEntity.class)
+    @OneToOne(mappedBy="service", targetEntity=ServiceMetaDataEntity.class, fetch=FetchType.LAZY, cascade=CascadeType.ALL)
     private ServiceMetaData metaData;
 
     /* (non-Javadoc)
@@ -182,7 +192,7 @@ public class ServiceEntity implements Service {
      * @see org.constellation.engine.register.jpa.Service#getExtraConfig()
      */
     @Override
-    public ServiceExtraConfig getExtraConfig() {
+    public Set<ServiceExtraConfig> getExtraConfig() {
         return extraConfig;
     }
 
@@ -190,7 +200,7 @@ public class ServiceEntity implements Service {
      * @see org.constellation.engine.register.jpa.Service#setExtraConfig(org.constellation.engine.register.ServiceExtraConfig)
      */
     @Override
-    public void setExtraConfig(ServiceExtraConfig extraConfig) {
+    public void setExtraConfig(Set<ServiceExtraConfig> extraConfig) {
         this.extraConfig = extraConfig;
     }
 
@@ -209,5 +219,14 @@ public class ServiceEntity implements Service {
     public void setMetaData(ServiceMetaData metaData) {
         this.metaData = metaData;
     }
+
+    @Override
+    public String toString() {
+        return "ServiceEntity [id=" + id + ", identifier=" + identifier + ", type=" + type + ", date=" + date
+                + ", title=" + title + ", description=" + description + ", config=" + config + ", owner=" + owner
+                + ", layers=" + layers + ", extraConfig=" + extraConfig + ", metaData=" + metaData + "]";
+    }
+    
+    
 
 }

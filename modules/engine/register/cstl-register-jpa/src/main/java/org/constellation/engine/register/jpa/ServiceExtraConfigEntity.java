@@ -3,39 +3,37 @@ package org.constellation.engine.register.jpa;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
 
 @Entity
+@IdClass(ServiceExtraConfigEntityPk.class)
 @Table(schema = "`admin`", name = "`service_extra_config`")
 public class ServiceExtraConfigEntity implements ServiceExtraConfig {
-
     @Id
     @Column(name="`id`")
     private int id;
-
+    @Id
     @Column(name = "`filename`")
     private String filename;
 
     @Column(name = "`content`")
     private String content;
     
-    @OneToOne(targetEntity=ServiceEntity.class)
+    @ManyToOne(targetEntity=ServiceEntity.class)
     @JoinColumn(name="`id`")
     private Service service;
 
-    @Override
-    public int getId() {
-        return id;
-    }
 
     @Override
-    public void setId(int id) {
-        this.id = id;
+    public void setFilename(String filename) {
+        this.filename = filename;
+        
     }
 
     @Override
@@ -44,10 +42,15 @@ public class ServiceExtraConfigEntity implements ServiceExtraConfig {
     }
 
     @Override
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setId(int id) {
+        this.id = id;
     }
 
+    @Override
+    public int getId() {
+        return id;
+    }
+    
     @Override
     public String getContent() {
         return content;
@@ -68,4 +71,6 @@ public class ServiceExtraConfigEntity implements ServiceExtraConfig {
         this.service = service;
     }
 
+
+   
 }

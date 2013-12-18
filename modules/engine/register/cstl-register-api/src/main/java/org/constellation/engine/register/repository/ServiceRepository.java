@@ -8,4 +8,11 @@ public interface ServiceRepository {
 
     List<? extends Service> findAll();
     
+    List<? extends Service> findByDataId(int dataId);
+    
+    Service findByIdentifierAndType(String id, String type);
+
+    void delete(Integer id);
+
+    List<String> findIdentifiersByType(String type);
 }

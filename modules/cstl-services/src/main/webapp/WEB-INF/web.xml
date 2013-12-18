@@ -3,10 +3,6 @@
 
     <display-name>constellation</display-name>
 
-    <!-- constellation installer -->
-    <listener>
-        <listener-class>org.constellation.Installer</listener-class>
-    </listener>
 
     <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -16,6 +12,11 @@
       <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
     
+    <!-- constellation installer -->
+    <listener>
+        <listener-class>org.constellation.Installer</listener-class>
+    </listener>
+
     <!-- Shiro filter handling security access -->
     <filter>
         <filter-name>Shiro</filter-name>

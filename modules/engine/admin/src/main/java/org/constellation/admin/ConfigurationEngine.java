@@ -17,6 +17,24 @@
 
 package org.constellation.admin;
 
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
@@ -40,29 +58,12 @@ import org.constellation.configuration.ServiceProtocol;
 import org.constellation.configuration.Source;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.Service;
+import org.constellation.engine.register.ConfigurationService;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * @author Guilhem Legal (Geomatys)
@@ -71,8 +72,20 @@ public class ConfigurationEngine {
 
     private static final Logger LOGGER = Logging.getLogger(ConfigurationEngine.class);
 
-    public static ParameterValueGroup getProviderConfiguration(final String serviceName, final ParameterDescriptorGroup desc) {
+    private final static boolean JPA = Boolean.getBoolean("cstlJPA");
 
+    private static ConfigurationService configurationService;
+
+    public static void setConfigurationService(ConfigurationService configurationService) {
+        ConfigurationEngine.configurationService = configurationService;
+    }
+
+    public static ParameterValueGroup getProviderConfiguration(final String serviceName,
+            final ParameterDescriptorGroup desc) {
+
+        if(JPA)
+            return configurationService.getProviderConfiguration(serviceName, desc);
+        
         final ParameterValueGroup params = desc.createValue();
         Session session = null;
         try {
@@ -86,7 +99,8 @@ public class ConfigurationEngine {
         } catch (IOException | SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
         return null;
     }
@@ -95,19 +109,27 @@ public class ConfigurationEngine {
         // TODO move from Configurator
     }
 
-    public static Object getConfiguration(final String serviceType, final String serviceID) throws JAXBException, FileNotFoundException {
+    public static Object getConfiguration(final String serviceType, final String serviceID) throws JAXBException,
+            FileNotFoundException {
         return getConfiguration(serviceType, serviceID, null);
     }
 
-    public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName) throws JAXBException, FileNotFoundException {
+    public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName)
+            throws JAXBException, FileNotFoundException {
         return getConfiguration(serviceType, serviceID, fileName, GenericDatabaseMarshallerPool.getInstance());
     }
 
-    public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName, final MarshallerPool pool) throws JAXBException, FileNotFoundException {
+    public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName,
+            final MarshallerPool pool) throws JAXBException, FileNotFoundException {
+        if (JPA)
+            return configurationService.getConfiguration(serviceType, serviceID, fileName, pool);
+   
+        
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final ServiceRecord rec = session.readService(serviceID, ServiceDef.Specification.fromShortName(serviceType));
+            final ServiceRecord rec = session.readService(serviceID,
+                    ServiceDef.Specification.fromShortName(serviceType));
             if (rec != null) {
                 final InputStream is;
                 if (fileName == null) {
@@ -126,24 +148,29 @@ public class ConfigurationEngine {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
 
-        throw new FileNotFoundException("The configuration (" + fileName != null ? fileName : "default" + ") has not been found.");
+        throw new FileNotFoundException("The configuration (" + fileName != null ? fileName : "default"
+                + ") has not been found.");
     }
 
-    public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj, final Service metadata) throws JAXBException, IOException {
+    public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj,
+            final Service metadata) throws JAXBException, IOException {
         storeConfiguration(serviceType, serviceID, null, obj, GenericDatabaseMarshallerPool.getInstance());
         if (metadata != null) {
             writeServiceMetadata(serviceID, serviceType, metadata, null);
         }
     }
 
-    public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj) throws JAXBException {
+    public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj)
+            throws JAXBException {
         storeConfiguration(serviceType, serviceID, null, obj, GenericDatabaseMarshallerPool.getInstance());
     }
 
-    public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName, final Object obj, final MarshallerPool pool) throws JAXBException {
+    public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName,
+            final Object obj, final MarshallerPool pool) throws JAXBException {
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
         try {
@@ -181,7 +208,7 @@ public class ConfigurationEngine {
             } else {
                 if (obj instanceof LayerContext) {
                     session.deleteServiceLayer(service);
-                    //save Layers
+                    // save Layers
                     LayerContext context = (LayerContext) obj;
                     for (Source source : context.getLayers()) {
                         for (Layer layer : source.getInclude()) {
@@ -202,11 +229,15 @@ public class ConfigurationEngine {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
     public static List<String> getServiceConfigurationIds(final String serviceType) {
+        if(JPA)
+            return configurationService.getServiceIdentifiersByServiceType(ServiceDef.Specification.fromShortName(serviceType).name());
+        
         final List<String> results = new ArrayList<>();
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
@@ -220,12 +251,16 @@ public class ConfigurationEngine {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while get services in database", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
         return results;
     }
 
     public static boolean serviceConfigurationExist(final String serviceType, final String identifier) {
+        if(JPA)
+            return configurationService.isServiceConfigurationExist(ServiceDef.Specification.fromShortName(serviceType).name(), identifier);
+        
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
         try {
@@ -235,12 +270,17 @@ public class ConfigurationEngine {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while get services in database", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
         return false;
     }
 
     public static boolean deleteConfiguration(final String serviceType, final String identifier) {
+        if (JPA)
+            return configurationService.deleteService(identifier, ServiceDef.Specification.fromShortName(serviceType)
+                    .name());
+     
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
         try {
@@ -255,7 +295,8 @@ public class ConfigurationEngine {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while deleting service in database", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
         return false;
     }
@@ -272,11 +313,13 @@ public class ConfigurationEngine {
             LOGGER.log(Level.WARNING, "An error occurred while deleting service in database", ex);
             return false;
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
-    public static void writeServiceMetadata(final String identifier, final String serviceType, final Service metadata, String language) throws IOException, JAXBException {
+    public static void writeServiceMetadata(final String identifier, final String serviceType, final Service metadata,
+            String language) throws IOException, JAXBException {
         ensureNonNull("metadata", metadata);
 
         if (language == null) {
@@ -299,11 +342,13 @@ public class ConfigurationEngine {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
-    public static Service readServiceMetadata(final String identifier, final String serviceType, String language) throws IOException, JAXBException {
+    public static Service readServiceMetadata(final String identifier, final String serviceType, String language)
+            throws IOException, JAXBException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("serviceType", serviceType);
         if (language == null) {
@@ -312,7 +357,8 @@ public class ConfigurationEngine {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final ServiceRecord rec = session.readService(identifier, ServiceDef.Specification.fromShortName(serviceType));
+            final ServiceRecord rec = session.readService(identifier,
+                    ServiceDef.Specification.fromShortName(serviceType));
             if (rec != null) {
                 final InputStream is = rec.getMetadata(language);
                 if (is != null) {
@@ -321,7 +367,8 @@ public class ConfigurationEngine {
                     GenericDatabaseMarshallerPool.getInstance().recycle(u);
                     return config;
                 } else {
-                    final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType + "Capabilities.xml");
+                    final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType
+                            + "Capabilities.xml");
                     if (in != null) {
                         final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                         final Service metadata = (Service) u.unmarshal(in);
@@ -338,7 +385,8 @@ public class ConfigurationEngine {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
         return null;
     }
@@ -364,6 +412,9 @@ public class ConfigurationEngine {
     }
 
     public static String getConstellationProperty(final String key, final String defaultValue) {
+        if (JPA)
+            return configurationService.getProperty(key, defaultValue);
+
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -375,14 +426,15 @@ public class ConfigurationEngine {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred getting constellation property", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
         return defaultValue;
     }
 
     /**
      * Save metadata on specific folder
-     *
+     * 
      * @param fileMetadata
      * @param dataName
      * @param pool
@@ -390,7 +442,7 @@ public class ConfigurationEngine {
     public static void saveMetaData(final DefaultMetadata fileMetadata, final String dataName, final MarshallerPool pool) {
         ensureNonNull("metadata", fileMetadata);
 
-        //save in database
+        // save in database
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -407,13 +459,14 @@ public class ConfigurationEngine {
         } catch (SQLException | IOException | JAXBException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
     /**
      * Load a metadata for a provider.
-     *
+     * 
      * @param providerId
      * @param pool
      * @return
@@ -427,7 +480,7 @@ public class ConfigurationEngine {
             if (provider != null) {
                 final InputStream sr = provider.getMetadata();
                 final Unmarshaller m = pool.acquireUnmarshaller();
-                if(sr!=null){
+                if (sr != null) {
                     metadata = (DefaultMetadata) m.unmarshal(sr);
                 }
                 pool.recycle(m);
@@ -436,7 +489,8 @@ public class ConfigurationEngine {
         } catch (SQLException | IOException | JAXBException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
         return null;
     }
@@ -447,18 +501,27 @@ public class ConfigurationEngine {
      * @return
      */
 
-    public static DataBrief getData(QName name, String providerId){
+    public static DataBrief getData(QName name, String providerId) {
+        if (JPA)
+            return configurationService.getData(name, providerId);
+
+        return _getData(name, providerId);
+
+    }
+
+    private static DataBrief _getData(QName name, String providerId) {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
             final DataRecord record = session.readData(name, providerId);
             if (record != null) {
-                return getDataBrief(session, record);
+                return _getDataBrief(session, record);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error when try to read data", e);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
         return null;
     }
@@ -469,30 +532,40 @@ public class ConfigurationEngine {
      * @return
      */
     public static DataBrief getDataLayer(final String layerAlias, final String providerId) {
+        if (JPA)
+            return configurationService.getDataLayer(layerAlias, providerId);
+
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
             DataRecord record = session.readDatafromLayer(layerAlias, providerId);
             if (record != null) {
-                return getDataBrief(session, record);
+                return _getDataBrief(session, record);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Error on sql execution when search data layer", e);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
         return null;
     }
 
     /**
-     * create a {@link org.constellation.configuration.DataBrief} with style link and service link.
-     *
-     * @param session current {@link org.constellation.admin.dao.Session} used
-     * @param record  data found
-     * @return a {@link org.constellation.configuration.DataBrief} with all informations linked.
-     * @throws SQLException if they have an error when search style, service or provider.
+     * create a {@link org.constellation.configuration.DataBrief} with style
+     * link and service link.
+     * 
+     * @param session
+     *            current {@link org.constellation.admin.dao.Session} used
+     * @param record
+     *            data found
+     * @return a {@link org.constellation.configuration.DataBrief} with all
+     *         informations linked.
+     * @throws SQLException
+     *             if they have an error when search style, service or provider.
      */
-    private static DataBrief getDataBrief(final Session session, final DataRecord record) throws SQLException {
+
+    private static DataBrief _getDataBrief(final Session session, final DataRecord record) throws SQLException {
         final List<StyleRecord> styleRecords = session.readStyles(record);
         final List<ServiceRecord> serviceRecords = session.readDataServices(record);
 
@@ -528,7 +601,10 @@ public class ConfigurationEngine {
         return db;
     }
 
-    public static LayerRecord getLayer(final String identifier, final ServiceDef.Specification specification, final QName name) {
+    // FIXME LayerRecord should not be exposed!
+    public static LayerRecord getLayer(final String identifier, final ServiceDef.Specification specification,
+            final QName name) {
+
         Session session = null;
 
         try {
@@ -546,4 +622,5 @@ public class ConfigurationEngine {
         }
         return null;
     }
+
 }

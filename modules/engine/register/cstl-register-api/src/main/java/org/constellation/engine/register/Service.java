@@ -1,5 +1,8 @@
 package org.constellation.engine.register;
 
+import java.util.List;
+import java.util.Set;
+
 
 public interface Service {
 
@@ -35,9 +38,9 @@ public interface Service {
 
     public abstract void setOwner(User owner);
 
-    public abstract ServiceExtraConfig getExtraConfig();
+    public abstract Set<ServiceExtraConfig> getExtraConfig();
 
-    public abstract void setExtraConfig(ServiceExtraConfig extraConfig);
+    public abstract void setExtraConfig(Set<ServiceExtraConfig> extraConfig);
 
     public abstract ServiceMetaData getMetaData();
 

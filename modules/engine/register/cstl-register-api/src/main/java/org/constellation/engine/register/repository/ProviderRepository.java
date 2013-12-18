@@ -10,6 +10,8 @@ import org.constellation.engine.register.Provider;
 
     Provider findOne(Integer id);
 
+    List<? extends Provider> findByImpl(String serviceName);
+
 
     
 }

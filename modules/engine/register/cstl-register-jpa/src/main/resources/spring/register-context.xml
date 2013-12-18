@@ -21,5 +21,7 @@
 
   <jpa:repositories transaction-manager-ref="transactionManager" base-package="org.constellation.engine.register.jpa.repository" />
 
+  <context:component-scan base-package="org.constellation.engine.register.jpa.component" />
+
 </beans>
 

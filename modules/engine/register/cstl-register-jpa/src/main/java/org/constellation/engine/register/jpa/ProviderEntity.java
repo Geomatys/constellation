@@ -1,6 +1,8 @@
 package org.constellation.engine.register.jpa;
 
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,8 +10,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.User;
 
@@ -36,12 +40,15 @@ public class ProviderEntity implements Provider {
     @Column(name = "`config`")
     private String config;
 
+    @Column(name = "`metadata`")
+    private String metadata;
+
     @ManyToOne(targetEntity=UserEntity.class)
     @JoinColumn(name = "`owner`")
     private User owner;
 
-    @Column(name = "`metadata`")
-    private String metadata;
+    @OneToMany(mappedBy="provider", targetEntity=DataEntity.class)
+    private List<Data> datas;
 
     @Override
     public String toString() {

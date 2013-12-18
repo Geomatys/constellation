@@ -10,9 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.User;
@@ -54,6 +56,9 @@ public class DataEntity implements Data {
     @ManyToMany(mappedBy="datas", targetEntity=StyleEntity.class)
     private List<Style> styles;
 
+    @OneToMany(mappedBy="data", targetEntity=LayerEntity.class)
+    private List<Layer> layers;
+    
     @Column(name = "`metadata`")
     private String metadata;
 
