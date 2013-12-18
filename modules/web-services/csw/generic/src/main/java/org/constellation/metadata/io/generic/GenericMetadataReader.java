@@ -38,7 +38,7 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.constellation.metadata.io.MetadataType;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
+import org.w3c.dom.Node;
 
 /**
  * A database Reader using a generic configuration to request an unknown database.
@@ -61,8 +61,13 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
     /**
      * Load all the data for the specified Identifier from the database.
      * @param identifier
+     * @param mode
+     * @param type
+     * @param elementName
+     * @return
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
-    protected Values loadData(String identifier, MetadataType mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
+    protected Values loadData(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         LOGGER.log(Level.FINER, "loading data for {0}", identifier);
 
         final List<String> variables;
@@ -83,7 +88,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(String identifier, MetadataType mode) throws MetadataIoException {
+    public Node getMetadata(String identifier, MetadataType mode) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }
 
@@ -99,12 +104,12 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * @throws MetadataIoException
      */
     @Override
-    public Object getMetadata(String identifier, MetadataType mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
+    public Node getMetadata(String identifier, MetadataType mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
         
         //TODO we verify that the identifier exists
         final Values values = loadData(identifier, mode, type, elementName);
 
-        final Object result;
+        final Node result;
         if (mode == MetadataType.ISO_19115 || mode == MetadataType.NATIVE) {
             result = getISO(identifier, values);
             
@@ -127,7 +132,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      *
      * @return A Dublin-core representation of the metadata.
      */
-    protected abstract AbstractRecordType getDublinCore(String identifier, ElementSetType type, List<QName> elementName, Values values);
+    protected abstract Node getDublinCore(String identifier, ElementSetType type, List<QName> elementName, Values values);
     
     /**
      * return a metadata in ISO representation.
@@ -137,7 +142,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      *
      * @return An ISO 19139 representation of the metadata.
      */
-    protected abstract DefaultMetadata getISO(String identifier, Values values);
+    protected abstract Node getISO(String identifier, Values values);
     
     /**
      * Return a list of variables names used for the dublicore representation.

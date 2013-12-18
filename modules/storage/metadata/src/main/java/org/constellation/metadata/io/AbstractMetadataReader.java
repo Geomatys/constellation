@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.sis.util.logging.Logging;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -73,7 +74,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * {@inheritDoc}
      */
     @Override
-    public abstract Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException;
+    public abstract Node getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException;
     
     /**
      * {@inheritDoc}

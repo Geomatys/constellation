@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 // JAXB dependencies
 import java.util.logging.Logger;
@@ -102,6 +103,7 @@ import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
 import org.apache.sis.util.ComparisonMode;
+import org.apache.sis.xml.XML;
 import org.constellation.util.NodeUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -302,7 +304,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         } else {
             fail("unexpected record type:" + obj);
@@ -329,7 +331,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1BDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -356,7 +358,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1SDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -383,7 +385,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1FDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -410,7 +412,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta3FDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -441,14 +443,14 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1FDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
 
             resultNode = (Node)result.getAny().get(1);
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta2FDC.xml");
             comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -476,7 +478,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1SDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -503,7 +505,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1SDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -529,7 +531,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/ebrim1.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -556,7 +558,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/ebrim3.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -581,7 +583,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta13.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         } else {
             fail("unexpected record type:" + obj);
@@ -608,7 +610,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta13SDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         } else {
             fail("unexpected record type:" + obj);
@@ -774,13 +776,13 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1FDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode1);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
 
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta2FDC.xml");
             comparator = new XMLComparator(expResultNode, resultNode2);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -860,13 +862,13 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1BDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode1);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
 
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta2BDC.xml");
             comparator = new XMLComparator(expResultNode, resultNode2);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -936,13 +938,13 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1CustomDC.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode1);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
 
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta2CustomDC.xml");
             comparator = new XMLComparator(expResultNode, resultNode2);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -1010,13 +1012,13 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1CustomDC2.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode1);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
 
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta2CustomDC2.xml");
             comparator = new XMLComparator(expResultNode, resultNode2);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -1105,19 +1107,19 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta2CustomDC2.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, customResult2);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
 
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta3CustomDC.xml");
             comparator = new XMLComparator(expResultNode, customResult3);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
 
             expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta4CustomDC.xml");
             comparator = new XMLComparator(expResultNode, customResult4);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         }
 
@@ -1404,13 +1406,23 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
         Object obj = result.getSearchResults().getAny().get(0);
-        assertTrue(obj instanceof ExtrinsicObjectType);
 
-        ExtrinsicObjectType eoResult =  (ExtrinsicObjectType) obj;
-        ExtrinsicObjectType expEoResult =  ((JAXBElement<ExtrinsicObjectType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim2.xml"))).getValue();
+        if (obj instanceof Node) {
+             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/ebrim2.xml");
+             Node resultNode = (Node) obj;
 
-        assertEquals(eoResult, expEoResult);
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
+            comparator.compare();
 
+        } else {
+            assertTrue(obj instanceof ExtrinsicObjectType);
+            ExtrinsicObjectType eoResult =  (ExtrinsicObjectType) obj;
+            ExtrinsicObjectType expEoResult =  ((JAXBElement<ExtrinsicObjectType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim2.xml"))).getValue();
+            assertEquals(eoResult, expEoResult);
+        }
+        
         /*
          *  TEST 2 : getRecords with RESULTS- Ebrim mode (FULL) - Filter: rim:ExtrinsicObject/@minorVersion <= 1
          */
@@ -1860,7 +1872,7 @@ public class CSWworkerTest {
             Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta1.xml");
             XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         } else {
             fail("unexpected record type:" + obj);
@@ -1921,7 +1933,7 @@ public class CSWworkerTest {
             Node resultNode = (Node) obj;
             XMLComparator comparator = new XMLComparator(original, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         } else {
             fail("unexpected record type:" + obj);
@@ -2021,7 +2033,8 @@ public class CSWworkerTest {
             Node resultNode = (Node) obj;
             XMLComparator comparator = new XMLComparator(replacementOriginal, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
+            comparator.ignoredAttributes.add("codeList");
             comparator.compare();
         } else {
             fail("unexpected record type:" + obj);
@@ -2961,20 +2974,20 @@ public class CSWworkerTest {
         obj = response.getSearchResults().getAny().get(0);
         if (obj instanceof DefaultMetadata) {
             DefaultMetadata meta = (DefaultMetadata) obj;
-            assertEquals(TemporalUtilities.parseDateSafe("2009-01-26T12:00:00+01:00",true, true), meta.getDateStamp());
+            assertEquals(TemporalUtilities.parseDateSafe("2009-01-26T13:00:00+02:00",true, true), meta.getDateStamp());
         } else if (obj instanceof Node) {
            Node isoNode = (Node) obj;
             final List<Node> dateNodes = getNodes("dateStamp/DateTime", isoNode);
             assertEquals(1, dateNodes.size());
             Node n =  dateNodes.get(0);
-            assertEquals(n.getTextContent(), "2009-01-26T12:00:00+01:00");
+            assertEquals(n.getTextContent(), "2009-01-26T13:00:00+02:00");
         } else {
             fail("unexpected record type:" + obj);
         }
 
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
         properties = new ArrayList<>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp/DateTime", "2009-01-18T13:00:00+01:00"));
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp/DateTime", "2009-01-18T14:00:00+02:00"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -2992,13 +3005,13 @@ public class CSWworkerTest {
         obj = response.getSearchResults().getAny().get(0);
         if (obj instanceof DefaultMetadata) {
             DefaultMetadata meta = (DefaultMetadata) obj;
-            assertEquals(TemporalUtilities.parseDateSafe("2009-01-18T13:00:00+01:00",true, true), meta.getDateStamp());
+            assertEquals(TemporalUtilities.parseDateSafe("2009-01-18T14:00:00+02:00",true, true), meta.getDateStamp());
         } else if (obj instanceof Node) {
            Node isoNode = (Node) obj;
             final List<Node> dateNodes = getNodes("dateStamp/DateTime", isoNode);
             assertEquals(1, dateNodes.size());
             Node n =  dateNodes.get(0);
-            assertEquals(n.getTextContent(), "2009-01-18T13:00:00+01:00");
+            assertEquals(n.getTextContent(), "2009-01-18T14:00:00+02:00");
         } else {
             fail("unexpected record type:" + obj);
         }
@@ -3007,7 +3020,7 @@ public class CSWworkerTest {
 
         final DefaultMetadata newMeta = new DefaultMetadata();
         newMeta.setFileIdentifier("42292_9s_19900610041000");
-        newMeta.setDateStamp(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true));
+        newMeta.setDateStamp(TemporalUtilities.parseDateSafe("2012-01-01T15:00:00+02:00",true, true));
 
         final Node originalnewMeta = writeMetadataInDom(newMeta);
 
@@ -3029,7 +3042,7 @@ public class CSWworkerTest {
         obj = response.getSearchResults().getAny().get(0);
         if (obj instanceof DefaultMetadata) {
             DefaultMetadata meta = (DefaultMetadata) obj;
-            assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true), meta.getDateStamp());
+            assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T15:00:00+02:00",true, true), meta.getDateStamp());
             assertEquals(newMeta, meta);
 
         } else if (obj instanceof Node) {
@@ -3037,11 +3050,11 @@ public class CSWworkerTest {
             final List<Node> dateNodes = getNodes("dateStamp/DateTime", isoNode);
             assertEquals(1, dateNodes.size());
             Node n =  dateNodes.get(0);
-            assertEquals(n.getTextContent(), "2012-01-01T14:00:00+01:00");
+            assertEquals(n.getTextContent(), "2012-01-01T15:00:00+02:00");
 
             XMLComparator comparator = new XMLComparator(originalnewMeta, isoNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
 
         } else {
@@ -3055,14 +3068,14 @@ public class CSWworkerTest {
         if (obj instanceof DefaultMetadata) {
             DefaultMetadata meta = (DefaultMetadata) resp.getAny().get(0);
 
-            assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true), meta.getDateStamp());
+            assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T15:00:00+02:00",true, true), meta.getDateStamp());
             assertEquals(newMeta, meta);
         } else if (obj instanceof Node) {
             Node isoNode = (Node) obj;
             final List<Node> dateNodes = getNodes("dateStamp/DateTime", isoNode);
             assertEquals(1, dateNodes.size());
             Node n =  dateNodes.get(0);
-            assertEquals(n.getTextContent(), "2012-01-01T14:00:00+01:00");
+            assertEquals(n.getTextContent(), "2012-01-01T15:00:00+02:00");
         } else {
             fail("unexpected record type:" + obj);
         }
@@ -3114,7 +3127,7 @@ public class CSWworkerTest {
             Node resultNode = (Node) obj;
             XMLComparator comparator = new XMLComparator(replacementOriginal, resultNode);
             comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:xsi:schemaLocation");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
             comparator.compare();
         } else {
             fail("unexpected record type:" + obj);
@@ -3123,7 +3136,7 @@ public class CSWworkerTest {
         pool.recycle(unmarshaller);
     }
 
-    private Node getOriginalMetadata(final String fileName) throws Exception {
+    protected Node getOriginalMetadata(final String fileName) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
 
@@ -3140,7 +3153,9 @@ public class CSWworkerTest {
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
         Document document = docBuilder.newDocument();
         Marshaller m = pool.acquireMarshaller();
+        m.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
         m.marshal(meta, document);
+        pool.recycle(m);
         return document.getDocumentElement();
     }
 

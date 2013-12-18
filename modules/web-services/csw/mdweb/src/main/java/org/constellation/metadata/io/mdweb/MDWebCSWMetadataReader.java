@@ -60,6 +60,7 @@ import org.mdweb.io.sql.LocalThesaurusHandler;
 import org.mdweb.io.sql.ThesaurusDatabase;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.w3c.dom.Node;
 
 /**
  * A CSW Metadata reader specific for MDweb data source.
@@ -208,7 +209,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     }
 
     @Override
-    public Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         return getMetadata(identifier, mode, type, elementName);
     }
     
@@ -225,7 +226,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * @throws MetadataIoException
      */
     @Override
-    public Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
 
         try {
             alreadyRead.clear();
@@ -272,7 +273,11 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             } else {
                 throw new IllegalArgumentException("Unknow standard mode: " + mode);
             }
-            return result;
+            // marshall to DOM
+            if (result != null) {
+                return writeObjectInNode(result, mode);
+            }
+            return null;
 
         } catch (MD_IOException e) {
              throw new MetadataIoException("SQL exception while reading the metadata: " + identifier, e, NO_APPLICABLE_CODE, "id");

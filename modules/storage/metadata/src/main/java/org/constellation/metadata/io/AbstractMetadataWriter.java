@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.sis.util.logging.Logging;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -60,7 +61,7 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
      * @throws org.constellation.metadata.io.MetadataIoException
      */
     @Override
-    public abstract boolean storeMetadata(final Object obj) throws MetadataIoException;
+    public abstract boolean storeMetadata(final Node obj) throws MetadataIoException;
 
     /**
      * Delete an object in the metadata database.
@@ -82,7 +83,7 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
      * @throws org.constellation.metadata.io.MetadataIoException
      */
     @Override
-    public abstract boolean replaceMetadata(final String metadataID, final Object any) throws MetadataIoException;
+    public abstract boolean replaceMetadata(final String metadataID, final Node any) throws MetadataIoException;
 
     /**
      * Update an object in the metadata database.

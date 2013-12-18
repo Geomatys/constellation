@@ -64,6 +64,10 @@
        <artifactId>geotk-temporal</artifactId>
     </dependency>
     <dependency>
+       <groupId>org.geotoolkit.pending</groupId>
+       <artifactId>geotk-xml-ebrim</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.mdweb.metamodel</groupId>
       <artifactId>mdweb-metamodel-lib-model</artifactId>
     </dependency>
@@ -77,6 +81,11 @@
     <dependency>
        <groupId>org.mdweb.metamodel</groupId>
        <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.project</groupId>
+      <artifactId>geotk-test</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -1335,7 +1335,12 @@ public class CSWworker extends AbstractWorker {
             if (transaction instanceof Insert) {
                 final Insert insertRequest = (Insert)transaction;
 
-                for (Object record : insertRequest.getAny()) {
+                for (Object recordObj : insertRequest.getAny()) {
+
+                    if (!(recordObj instanceof Node)) {
+                        throw new CstlServiceException("Inserted object has been unmarshalled.");
+                    }
+                    final Node record = (Node)recordObj;
 
                     try {
                         mdWriter.storeMetadata(record);
@@ -1433,7 +1438,10 @@ public class CSWworker extends AbstractWorker {
                         for (String metadataID : results) {
                             boolean updated;
                             if (updateRequest.getAny() != null) {
-                                updated = mdWriter.replaceMetadata(metadataID, updateRequest.getAny());
+                                if (!(updateRequest.getAny() instanceof Node)) {
+                                    throw new CstlServiceException("Inserted update part object has been unmarshalled.");
+                                }
+                                updated = mdWriter.replaceMetadata(metadataID, (Node)updateRequest.getAny());
                             } else {
                                 updated = mdWriter.updateMetadata(metadataID, updateRequest.getRecordPropertyMap());
                             }

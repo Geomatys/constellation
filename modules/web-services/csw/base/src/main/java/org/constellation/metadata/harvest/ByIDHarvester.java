@@ -49,6 +49,7 @@ import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.w3c.dom.Node;
 
 /**
  * This catalogue harvester is a special tool used to harvest a CSW.
@@ -175,12 +176,14 @@ public class ByIDHarvester extends CatalogueHarvester {
                     final GetRecordByIdResponseType serviceResponse = (GetRecordByIdResponseType) harvested;
 
                     //we looking for any record type
-                    for (Object otherRecord: serviceResponse.getAny()) {
-                        if (otherRecord instanceof JAXBElement)
-                            otherRecord = ((JAXBElement)otherRecord).getValue();
+                    for (Object otherRecordObj: serviceResponse.getAny()) {
+                        if (!(otherRecordObj instanceof Node)){
+                            throw new CstlServiceException("object has been unmarshalled.");
+                        } else {
+                            LOGGER.log(Level.FINER, "record Type: {0}", otherRecordObj.getClass().getSimpleName());
+                        }
 
-                        LOGGER.log(Level.FINER, "record Type: {0}", otherRecord.getClass().getSimpleName());
-
+                        final Node otherRecord = (Node)otherRecordObj;
                         //Temporary ugly patch TODO handle update in CSW
                         try {
                             if (metadataWriter.storeMetadata(otherRecord)) {

@@ -74,7 +74,7 @@
         </gmd:CI_ResponsibleParty>
     </gmd:contact>
     <gmd:dateStamp>
-        <gco:DateTime>2009-01-26T12:00:00+01:00</gco:DateTime>
+        <gco:DateTime>2009-01-26T13:00:00+02:00</gco:DateTime>
     </gmd:dateStamp>
     <gmd:spatialRepresentationInfo>
         <gmd:MD_VectorSpatialRepresentation>

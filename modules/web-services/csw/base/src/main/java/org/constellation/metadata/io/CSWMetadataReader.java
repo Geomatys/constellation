@@ -18,15 +18,14 @@
 
 package org.constellation.metadata.io;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
 // geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -54,9 +53,10 @@ public interface CSWMetadataReader extends MetadataReader {
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
+    Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
-    Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
+    @Deprecated
+    Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
     /**
      * @return the list of QName for additional queryable element.

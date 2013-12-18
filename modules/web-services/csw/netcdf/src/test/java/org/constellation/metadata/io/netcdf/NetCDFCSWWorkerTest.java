@@ -35,6 +35,7 @@ import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.test.XMLComparator;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 
 import static org.constellation.test.utils.MetadataUtilities.*;
@@ -47,6 +48,7 @@ import org.constellation.test.utils.TestRunner;
 import static org.junit.Assert.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
+import org.w3c.dom.Node;
 
 
 /**
@@ -132,16 +134,28 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         assertTrue(result != null);
         assertTrue(result.getAny().size() == 1);
         Object obj = result.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetadata);
+
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata isoResult = (DefaultMetadata) obj;
+            DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/2005092200_sst_21-24.en.xml"));
+            metadataEquals(ExpResult1, isoResult, ComparisonMode.APPROXIMATIVE);
+        } else if (obj instanceof Node) {
+            Node resultNode = (Node) obj;
+            Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/2005092200_sst_21-24.en.xml");
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
+            comparator.compare();
+        } else {
+            fail("unexpected record type:" + obj);
+        }
+
+        
 
 /*        Marshaller marshaller = pool.acquireMarshaller();
         marshaller.marshal(obj, new File("test.xml"));*/
 
-        DefaultMetadata isoResult = (DefaultMetadata) obj;
-
-        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/2005092200_sst_21-24.en.xml"));
-
-        metadataEquals(ExpResult1, isoResult, ComparisonMode.APPROXIMATIVE);
+      
 
         /*
          *  TEST 2 : getRecordById with the first metadata in DC mode (BRIEF).

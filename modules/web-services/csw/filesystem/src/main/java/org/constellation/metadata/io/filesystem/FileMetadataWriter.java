@@ -96,11 +96,8 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean storeMetadata(final Object original) throws MetadataIoException {
+    public boolean storeMetadata(final Node original) throws MetadataIoException {
         try {
-            if (!(original instanceof Node)) {
-                throw new IllegalArgumentException("filesystem impelmentation wait for Nodes");
-            }
 
             final String identifier = Utils.findIdentifier(original);
             final File f;
@@ -116,7 +113,7 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
             Transformer transformer = tf.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             FileWriter writer = new FileWriter(f);
-            transformer.transform(new DOMSource((Node)original), new StreamResult(writer));
+            transformer.transform(new DOMSource(original), new StreamResult(writer));
             
             
             if (indexer != null) {
@@ -170,7 +167,7 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean replaceMetadata(final String metadataID, final Object any) throws MetadataIoException {
+    public boolean replaceMetadata(final String metadataID, final Node any) throws MetadataIoException {
         final boolean succeed = deleteMetadata(metadataID);
         if (!succeed) {
             return false;

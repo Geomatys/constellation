@@ -21,7 +21,6 @@ import java.text.DateFormat;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -141,7 +140,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException {
+    public Node getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }
 
@@ -149,12 +148,12 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         return getOriginalMetadata(identifier, mode, type, elementName);
     }
 
     @Override
-    public Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
         final MetadataType metadataMode;
         try {
@@ -502,10 +501,10 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 NodeUtilities.appendChilds(recRoot, languages);
                 NodeUtilities.appendChilds(recRoot, creators);
                 NodeUtilities.appendChilds(recRoot, modifieds);
-                NodeUtilities.appendChilds(recRoot, descriptions);
                 NodeUtilities.appendChilds(recRoot, dates);
                 NodeUtilities.appendChilds(recRoot, abstracts);
                 NodeUtilities.appendChilds(recRoot, distributors);
+                NodeUtilities.appendChilds(recRoot, descriptions);
                 NodeUtilities.appendChilds(recRoot, bboxes);
                 //NodeUtilities.appendChilds(recRoot, spatials);
                 //NodeUtilities.appendChilds(recRoot, references);

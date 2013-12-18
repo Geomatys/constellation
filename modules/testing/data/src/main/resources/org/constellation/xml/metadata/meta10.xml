@@ -69,7 +69,7 @@
                 <gmd:LanguageCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#LanguageCode" codeListValue="en">en</gmd:LanguageCode>
             </gmd:languageCode>
             <gmd:country>
-                <gmd:Country codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#Country" codeListValue="GB">GB</gmd:Country>
+                <gmd:Country codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#Country" codeListValue="GB">United Kingdom</gmd:Country>
             </gmd:country>
             <gmd:characterEncoding>
                 <gmd:MD_CharacterSetCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#MD_CharacterSetCode" codeListValue="8859part15">8859part15</gmd:MD_CharacterSetCode>

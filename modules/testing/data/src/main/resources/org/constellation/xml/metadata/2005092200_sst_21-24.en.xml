@@ -12,7 +12,7 @@
                 <gco:CharacterString>NOAA/NWS/NCEP</gco:CharacterString>
             </gmd:individualName>
             <gmd:role>
-                <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="PointOfContact">Point Of Contact</gmd:CI_RoleCode>
+                <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">Point of contact</gmd:CI_RoleCode>
             </gmd:role>
         </gmd:CI_ResponsibleParty>
     </gmd:contact>
@@ -117,7 +117,7 @@
                         <gco:CharacterString>NOAA/NWS/NCEP</gco:CharacterString>
                     </gmd:individualName>
                     <gmd:role>
-                        <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="PointOfContact">Point Of Contact</gmd:CI_RoleCode>
+                        <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">Point of contact</gmd:CI_RoleCode>
                     </gmd:role>
                 </gmd:CI_ResponsibleParty>
             </gmd:pointOfContact>
@@ -148,13 +148,6 @@
             <gmd:spatialRepresentationType>
                 <gmd:MD_SpatialRepresentationTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="grid">Grid</gmd:MD_SpatialRepresentationTypeCode>
             </gmd:spatialRepresentationType>
-            <!--gmd:spatialResolution>
-                <gmd:MD_Resolution>
-                    <gmd:distance>
-                        <gco:Distance uom="http://schemas.opengis.net/iso/19139/20070417/resources/uom/gmxUom.xml#xpointer(//*[@gml:id='m'])">2.5</gco:Distance>
-                    </gmd:distance>
-                </gmd:MD_Resolution>
-            </gmd:spatialResolution-->
             <gmd:extent>
                 <gmd:EX_Extent>
                     <gmd:geographicElement>
@@ -179,8 +172,8 @@
                     <gmd:temporalElement>
                         <gmd:EX_TemporalExtent>
                             <gmd:extent>
-                                <gml:TimeInstant gml:id="extent">
-                                    <gml:timePosition>2005-09-22T02:00:00.000+02:00</gml:timePosition>
+                                <gml:TimeInstant>
+                                    <gml:timePosition>2005-09-22T02:00:00+02:00</gml:timePosition>
                                 </gml:TimeInstant>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>
@@ -222,41 +215,10 @@
             </gmd:extent>
         </gmd:MD_DataIdentification>
     </gmd:identificationInfo>
-    <!--gmd:contentInfo>
-        <gmd:MD_CoverageDescription>
-            <gmd:dimension>
-                <gmd:MD_Band>
-                    <gmd:descriptor>
-                        <gco:CharacterString>grid_number</gco:CharacterString>
-                    </gmd:descriptor>
-                    <gmd:sequenceIdentifier>
-                        <gco:MemberName>
-                            <gco:aName>
-                                <gco:CharacterString>grid_number</gco:CharacterString>
-                            </gco:aName>
-                            <gco:attributeType>
-                                <gco:TypeName>
-                                    <gco:aName>
-                                        <gco:CharacterString>int[][]</gco:CharacterString>
-                                    </gco:aName>
-                                </gco:TypeName>
-                            </gco:attributeType>
-                        </gco:MemberName>
-                    </gmd:sequenceIdentifier>
-                    <gmd:descriptor>
-                        <gco:CharacterString>GRIB-1 catalogued grid numbers</gco:CharacterString>
-                    </gmd:descriptor>
-                </gmd:MD_Band>
-            </gmd:dimension>
-        </gmd:MD_CoverageDescription>
-    </gmd:contentInfo-->
     <gmd:contentInfo>
         <gmd:MD_CoverageDescription>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <gmd:descriptor>
-                        <gco:CharacterString>SST</gco:CharacterString>
-                    </gmd:descriptor>
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>

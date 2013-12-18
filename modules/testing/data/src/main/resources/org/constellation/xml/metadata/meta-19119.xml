@@ -58,7 +58,7 @@
         </gmd:CI_ResponsibleParty>
     </gmd:contact>
     <gmd:dateStamp>
-        <gco:DateTime>2009-07-01T00:00:00+01:00</gco:DateTime>
+        <gco:Date>2009-07-01</gco:Date>
     </gmd:dateStamp>
     <gmd:identificationInfo>
         <srv:SV_ServiceIdentification>
@@ -70,7 +70,7 @@
                     <gmd:date>
                         <gmd:CI_Date>
                             <gmd:date>
-                                <gco:DateTime>2005-01-01T00:00:00+01:00</gco:DateTime>
+                                <gco:Date>2005-01-01</gco:Date>
                             </gmd:date>
                             <gmd:dateType>
                                 <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#creation" codeListValue="creation"/>
@@ -195,8 +195,8 @@
                         <gmd:EX_TemporalExtent>
                             <gmd:extent>
                                 <gml:TimePeriod gml:id="extent">
-                                    <gml:beginPosition>1990-01-01T00:00:00.000+01:00</gml:beginPosition>
-                                    <gml:endPosition>2000-01-01T00:00:00.000+01:00</gml:endPosition>
+                                    <gml:beginPosition>1990-01-01</gml:beginPosition>
+                                    <gml:endPosition>2000-01-01</gml:endPosition>
                                 </gml:TimePeriod>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>

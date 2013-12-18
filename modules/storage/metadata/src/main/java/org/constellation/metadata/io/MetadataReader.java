@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -38,7 +39,7 @@ public interface MetadataReader {
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException;
+    Node getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException;
     
     /**
      * Return true if the metadata exist.

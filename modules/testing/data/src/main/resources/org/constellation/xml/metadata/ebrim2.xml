@@ -2,7 +2,7 @@
 <rim:ExtrinsicObject xmlns:rim="urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5" xmlns:gml="http://www.opengis.net/gml" id="urn:uuid:3e195454-42e8-11dd-8329-00e08157d076"
       home="http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi" objectType="Theme" status="Approved" majorVersion="1" minorVersion="0" stability="Static" isOpaque="false">
     <rim:Name>
-        <rim:LocalizedString lang='EN-US' charset='UTF-8' value="ebrim2Title"/>
+        <rim:LocalizedString rim:lang='en-US' charset='UTF-8' value="ebrim2Title"/>
     </rim:Name>
     <rim:Description>
         <rim:LocalizedString rim:lang="en-US" value="CubeSERV layers"/>
@@ -26,33 +26,13 @@
     <rim:Slot name="Envelope" slotType="geometry">
         <rim:ValueList>
             <rim:Value>test</rim:Value>
-                <!--gml:Envelope> marked in the binding as a string ??
-                    <gml:lowerCorner>-180 -90</gml:lowerCorner>
-                    <gml:upperCorner>180 90</gml:upperCorner>
-                </gml:Envelope>
-            </rim:Value-->
             <rim:Value>test2</rim:Value>
-                <!--gml:Envelope>
-                    <gml:lowerCorner>-90 -180</gml:lowerCorner>
-                    <gml:upperCorner>90 180</gml:upperCorner>
-                </gml:Envelope>
-            </rim:Value-->
         </rim:ValueList>
     </rim:Slot>
     <rim:Slot name="Footprint" slotType="geometry">
         <rim:ValueList>
             <rim:Value>test3</rim:Value>
-                <!--gml:Envelope>
-                    <gml:lowerCorner>-180 -90</gml:lowerCorner>
-                    <gml:upperCorner>180 90</gml:upperCorner>
-                </gml:Envelope>
-            </rim:Value-->
             <rim:Value>test4</rim:Value>
-                <!--gml:Envelope>
-                    <gml:lowerCorner>-90 -180</gml:lowerCorner>
-                    <gml:upperCorner>90 180</gml:upperCorner>
-                </gml:Envelope>
-            </rim:Value-->
         </rim:ValueList>
     </rim:Slot>
     <rim:Slot name="Queryable" slotType="integer">

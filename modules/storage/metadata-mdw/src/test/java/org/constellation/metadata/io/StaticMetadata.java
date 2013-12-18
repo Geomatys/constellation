@@ -338,6 +338,7 @@ public class StaticMetadata {
         "</gmd:MD_Metadata>";
 
         public static final String META_20 =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
         "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:srv=\"http://www.isotc211.org/2005/srv\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
         "   <gmd:fileIdentifier>" + '\n' +
         "       <gco:CharacterString>666-999-666</gco:CharacterString>" + '\n' +
@@ -364,6 +365,31 @@ public class StaticMetadata {
         "       <srv:SV_ServiceIdentification>" + '\n' +
         "           <srv:operatesOn xlink:href=\"http://test2.com\"/>" + '\n' +
         "       </srv:SV_ServiceIdentification>" + '\n' +
+        "    </gmd:identificationInfo>" + '\n' +
+        "</gmd:MD_Metadata>";
+
+        public static final String META_22 =
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:ns11=\"http://www.opengis.net/gml\" xmlns:srv=\"http://www.isotc211.org/2005/srv\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>777-444-852</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
+        "   <gmd:identificationInfo>" + '\n' +
+        "       <gmd:MD_DataIdentification>" + '\n' +
+        "           <gmd:extent>\n" +
+        "                <gmd:EX_Extent>\n" +
+        "                    <gmd:temporalElement>\n" +
+        "                        <gmd:EX_TemporalExtent>\n" +
+        "                            <gmd:extent>\n" +
+        "                                <ns11:TimePeriod ns11:id=\"testID\">\n" +
+        "                                    <ns11:beginPosition>2010-01-27T14:26:10+01:00</ns11:beginPosition>\n" +
+        "                                    <ns11:endPosition>2010-08-27T15:26:10+02:00</ns11:endPosition>\n" +
+        "                                </ns11:TimePeriod>\n" +
+        "                            </gmd:extent>\n" +
+        "                        </gmd:EX_TemporalExtent>\n" +
+        "                    </gmd:temporalElement>\n" +
+        "                </gmd:EX_Extent>\n" +
+        "            </gmd:extent>" + '\n' +
+        "       </gmd:MD_DataIdentification>" + '\n' +
         "    </gmd:identificationInfo>" + '\n' +
         "</gmd:MD_Metadata>";
 

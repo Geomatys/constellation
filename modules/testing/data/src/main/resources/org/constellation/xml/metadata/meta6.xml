@@ -4,18 +4,18 @@
                  xmlns:fra="http://www.cnig.gouv.fr/2005/fra"
                  xmlns:gmx="http://www.isotc211.org/2005/gmx"
                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                 xmlns:gml="http://www.opengis.net/gml">
+                 xmlns:gml="http://www.opengis.net/gml/3.2">
             <gmd:fileIdentifier>
                 <gco:CharacterString>CTDF02</gco:CharacterString>
             </gmd:fileIdentifier>
             <gmd:language>
-                <gmd:LanguageCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="eng">eng</gmd:LanguageCode>
+                <gmd:LanguageCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="eng">English</gmd:LanguageCode>
             </gmd:language>
             <gmd:characterSet>
-                <gmd:MD_CharacterSetCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#utf8" codeListValue="utf8"/>
+                <gmd:MD_CharacterSetCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">UTF-8</gmd:MD_CharacterSetCode>
             </gmd:characterSet>
             <gmd:hierarchyLevel>
-                <gmd:MD_ScopeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#series" codeListValue="series"/>
+                <gmd:MD_ScopeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_ScopeCode" codeListValue="series" codeSpace="eng">Series</gmd:MD_ScopeCode>
             </gmd:hierarchyLevel>
             <gmd:hierarchyLevelName>
                 <gmx:Anchor xlink:href="SDN:L231:3:EDMED">EDMED record</gmx:Anchor>
@@ -69,12 +69,12 @@
                         </gmd:CI_Contact>
                     </gmd:contactInfo>
                     <gmd:role>
-                        <gmd:CI_RoleCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#author" codeListValue="author"/>
+                        <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="author">Author</gmd:CI_RoleCode>
                     </gmd:role>
                 </gmd:CI_ResponsibleParty>
             </gmd:contact>
             <gmd:dateStamp>
-                <gco:DateTime>2009-02-10T00:00:00+01:00</gco:DateTime>
+                <gco:DateTime>2009-02-10T02:00:00+02:00</gco:DateTime>
             </gmd:dateStamp>
             <gmd:metadataExtensionInfo>
                 <gmd:MD_MetadataExtensionInformation>
@@ -87,7 +87,7 @@
                                 <gco:CharacterString>http://www.seadatanet.org/urnurl/</gco:CharacterString>
                             </gmd:definition>
                             <gmd:dataType>
-                                <gmd:MD_DatatypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#codelist" codeListValue="codelist"/>
+                                <gmd:MD_DatatypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_DatatypeCode" codeListValue="codelist">Codelist</gmd:MD_DatatypeCode>
                             </gmd:dataType>
                             <gmd:parentEntity>
                                 <gco:CharacterString>SeaDataNet</gco:CharacterString>
@@ -103,7 +103,7 @@
                                 <gco:CharacterString>http://www.seadatanet.org/urnurl/</gco:CharacterString>
                             </gmd:definition>
                             <gmd:dataType>
-                                <gmd:MD_DatatypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#codelist" codeListValue="codelist"/>
+                                <gmd:MD_DatatypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_DatatypeCode" codeListValue="codelist">Codelist</gmd:MD_DatatypeCode>
                             </gmd:dataType>
                             <gmd:parentEntity>
                                 <gco:CharacterString>SeaDataNet</gco:CharacterString>
@@ -119,7 +119,7 @@
                                 <gco:CharacterString>http://www.seadatanet.org/urnurl/</gco:CharacterString>
                             </gmd:definition>
                             <gmd:dataType>
-                                <gmd:MD_DatatypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#codelist" codeListValue="codelist"/>
+                                <gmd:MD_DatatypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_DatatypeCode" codeListValue="codelist">Codelist</gmd:MD_DatatypeCode>
                             </gmd:dataType>
                             <gmd:parentEntity>
                                 <gco:CharacterString>SeaDataNet</gco:CharacterString>
@@ -141,10 +141,10 @@
                             <gmd:date>
                                 <gmd:CI_Date>
                                     <gmd:date>
-                                        <gco:DateTime>2008-06-04T00:00:00+02:00</gco:DateTime>
+                                        <gco:Date>2008-06-04</gco:Date>
                                     </gmd:date>
                                     <gmd:dateType>
-                                        <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#revision" codeListValue="revision"/>
+                                        <gmd:CI_DateTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="eng">Revision</gmd:CI_DateTypeCode>
                                     </gmd:dateType>
                                 </gmd:CI_Date>
                             </gmd:date>
@@ -205,7 +205,7 @@
                                 </gmd:CI_Contact>
                             </gmd:contactInfo>
                             <gmd:role>
-                                <gmd:CI_RoleCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#custodian" codeListValue="custodian"/>
+                                <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="custodian">Custodian</gmd:CI_RoleCode>
                             </gmd:role>
                         </gmd:CI_ResponsibleParty>
                     </gmd:pointOfContact>
@@ -261,7 +261,7 @@
                                 </gmd:CI_Contact>
                             </gmd:contactInfo>
                             <gmd:role>
-                                <gmd:CI_RoleCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#pointOfContact" codeListValue="pointOfContact"/>
+                                <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">Point of contact</gmd:CI_RoleCode>
                             </gmd:role>
                         </gmd:CI_ResponsibleParty>
                     </gmd:pointOfContact>
@@ -271,7 +271,7 @@
                                 <gco:CharacterString>WORLD WIDE COVERAGE</gco:CharacterString>
                             </gmd:keyword>
                             <gmd:type>
-                                <gmd:MD_KeywordTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#place" codeListValue="place"/>
+                                <gmd:MD_KeywordTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="place">Place</gmd:MD_KeywordTypeCode>
                             </gmd:type>
                             <gmd:thesaurusName>
                                 <gmd:CI_Citation>
@@ -284,10 +284,10 @@
                                     <gmd:date>
                                         <gmd:CI_Date>
                                             <gmd:date>
-                                                <gco:DateTime>2008-07-02T00:00:00+02:00</gco:DateTime>
+                                                <gco:Date>2008-07-02</gco:Date>
                                             </gmd:date>
                                             <gmd:dateType>
-                                                <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#revision" codeListValue="revision"/>
+                                                <gmd:CI_DateTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="eng">Revision</gmd:CI_DateTypeCode>
                                             </gmd:dateType>
                                         </gmd:CI_Date>
                                     </gmd:date>
@@ -311,7 +311,7 @@
                                 <gco:CharacterString>Pressure, temperature, conductivity (or salinity), dissolved Oxygen, nephelometry, fluorescence</gco:CharacterString>
                             </gmd:keyword>
                             <gmd:type>
-                                <gmd:MD_KeywordTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#parameter" codeListValue="parameter"/>
+                                <gmd:MD_KeywordTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="parameter">Parameter</gmd:MD_KeywordTypeCode>
                             </gmd:type>
                             <gmd:thesaurusName>
                                 <gmd:CI_Citation>
@@ -324,10 +324,10 @@
                                     <gmd:date>
                                         <gmd:CI_Date>
                                             <gmd:date>
-                                                <gco:DateTime>2008-11-26T00:00:00+01:00</gco:DateTime>
+                                                <gco:Date>2008-11-26</gco:Date>
                                             </gmd:date>
                                             <gmd:dateType>
-                                                <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#revision" codeListValue="revision"/>
+                                                <gmd:CI_DateTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="eng">Revision</gmd:CI_DateTypeCode>
                                             </gmd:dateType>
                                         </gmd:CI_Date>
                                     </gmd:date>
@@ -351,7 +351,7 @@
                                 <gmx:Anchor xlink:href="SDN:EDMERP::9585">OCEANOGRAPHIC DATA CENTER</gmx:Anchor>
                             </gmd:keyword>
                             <gmd:type>
-                                <gmd:MD_KeywordTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#projects" codeListValue="projects"/>
+                                <gmd:MD_KeywordTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="projects">Projects</gmd:MD_KeywordTypeCode>
                             </gmd:type>
                             <gmd:thesaurusName>
                                 <gmd:CI_Citation>
@@ -363,9 +363,8 @@
                                     </gmd:alternateTitle>
                                     <gmd:date>
                                         <gmd:CI_Date>
-                                            <gmd:date/>
                                             <gmd:dateType>
-                                                <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#revision" codeListValue="revision"/>
+                                                <gmd:CI_DateTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="eng">Revision</gmd:CI_DateTypeCode>
                                             </gmd:dateType>
                                         </gmd:CI_Date>
                                     </gmd:date>
@@ -383,12 +382,12 @@
                     <gmd:resourceConstraints>
                         <gmd:MD_LegalConstraints>
                             <gmd:accessConstraints>
-                                <gmd:MD_RestrictionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#NoAccessRestriction" codeListValue="NoAccessRestriction"/>
+                                <gmd:MD_RestrictionCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode" codeListValue="NoAccessRestriction">No access restriction</gmd:MD_RestrictionCode>
                             </gmd:accessConstraints>
                         </gmd:MD_LegalConstraints>
                     </gmd:resourceConstraints>
                     <gmd:language>
-                        <gco:CharacterString>eng</gco:CharacterString>
+                        <gmd:LanguageCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="eng" codeSpace="eng">English</gmd:LanguageCode>
                     </gmd:language>
                     <gmd:topicCategory>
                         <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
@@ -402,8 +401,8 @@
                                 <gmd:EX_TemporalExtent>
                                     <gmd:extent>
                                         <gml:TimePeriod gml:id="extent">
-                                            <gml:beginPosition>1971-01-01T00:00:00</gml:beginPosition>
-                                            <gml:endPosition>2009-02-10T00:00:00</gml:endPosition>
+                                            <gml:beginPosition>1971-01-01T01:00:00+02:00</gml:beginPosition>
+                                            <gml:endPosition>2009-02-10T01:00:00+02:00</gml:endPosition>
                                         </gml:TimePeriod>
                                     </gmd:extent>
                                 </gmd:EX_TemporalExtent>
@@ -459,9 +458,8 @@
                         <gmd:CI_Citation>
                             <gmd:date>
                                 <gmd:CI_Date>
-                                    <gmd:date/>
                                     <gmd:dateType>
-                                        <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#publication" codeListValue="publication"/>
+                                        <gmd:CI_DateTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication" codeSpace="eng">Publication</gmd:CI_DateTypeCode>
                                     </gmd:dateType>
                                 </gmd:CI_Date>
                             </gmd:date>

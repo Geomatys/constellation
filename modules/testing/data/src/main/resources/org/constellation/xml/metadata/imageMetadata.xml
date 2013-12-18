@@ -408,8 +408,8 @@
                                  <!-- lost all temporal extent -->
                                 <gml:TimePeriod gml:id="boundingTemporalExtent">
                                     <gml:description>ground condition</gml:description>
-                                    <gml:beginPosition>2010-01-27T08:26:10-05:00</gml:beginPosition>
-                                    <gml:endPosition indeterminatePosition="now">2010-08-27T08:26:10-05:00</gml:endPosition>
+                                    <gml:beginPosition>2010-01-27T15:26:10+02:00</gml:beginPosition>
+                                    <gml:endPosition indeterminatePosition="now">2010-08-27T15:27:10+02:00</gml:endPosition>
                                 </gml:TimePeriod>
                             </gmd:extent>
                         </gmd:EX_TemporalExtent>
@@ -1419,8 +1419,8 @@
                                                 <gml:TimePeriod gml:id="sourceTemporalExtent">
                                                      <!-- lost the id and decription -->
                                                     <gml:description>ground condition</gml:description>
-                                                    <gml:beginPosition>2010-01-27T08:26:10-05:00</gml:beginPosition>
-                                                    <gml:endPosition indeterminatePosition="now">2010-08-27T08:26:10-05:00</gml:endPosition>
+                                                    <gml:beginPosition>2010-01-27T15:26:10+02:00</gml:beginPosition>
+                                                    <gml:endPosition indeterminatePosition="now">2010-08-27T15:26:10+02:00</gml:endPosition>
                                                 </gml:TimePeriod>
                                             </gmd:extent>
                                         </gmd:EX_TemporalExtent>
