@@ -147,7 +147,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     @BeforeClass
     public static void initLayerList() throws JAXBException, IOException {
 
-        ConfigurationEngine.setupTestEnvironement("AdminRequestTest");
+        ConfigurationEngine.setupTestEnvironement("WMSRequestTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
                                                    new Source("shapeSrc", true, null, null));
@@ -267,7 +267,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     @AfterClass
     public static void shutDown() throws JAXBException {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
-        ConfigurationEngine.shutdownTestEnvironement("AdminRequestTest");
+        ConfigurationEngine.shutdownTestEnvironement("WMSRequestTest");
         finish();
     }
 

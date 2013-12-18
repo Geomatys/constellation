@@ -131,7 +131,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
-        ConfigurationEngine.shutdownTestEnvironement("WMSAxesOrderTest");
+        ConfigurationEngine.setupTestEnvironement("WMSAxesOrderTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
                                                    new Source("shapeSrc", true, null, null));

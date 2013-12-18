@@ -38,7 +38,11 @@ import javax.xml.namespace.QName;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.SubjectThreadState;
+import org.apache.shiro.util.ThreadState;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
@@ -75,6 +79,8 @@ public class ConfigurationEngine {
     private final static boolean JPA = Boolean.getBoolean("cstlJPA");
 
     private static ConfigurationService configurationService;
+
+    private static String userTest = null;
 
     public static void setConfigurationService(ConfigurationService configurationService) {
         ConfigurationEngine.configurationService = configurationService;
@@ -177,11 +183,13 @@ public class ConfigurationEngine {
             session = EmbeddedDatabase.createSession();
 
             //get current user credential
-            Subject subject = null;
+            String subject = null;
             try {
-                subject = SecurityUtils.getSubject();
+                final Subject s = SecurityUtils.getSubject();
+                subject =  s.getPrincipal().toString();
             }catch (UnavailableSecurityManagerException ex){
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+                subject = userTest;
             }
 
             final StringReader sr;
@@ -196,7 +204,7 @@ public class ConfigurationEngine {
                 sr = null;
             }
 
-            UserRecord userRecord = session.readUser(subject.getPrincipal().toString());
+            UserRecord userRecord = session.readUser(subject);
             final ServiceRecord service = session.readService(serviceID, spec);
             if (service == null) {
                 if (fileName == null) {
@@ -405,6 +413,8 @@ public class ConfigurationEngine {
         }
         configDir.mkdir();
         ConfigDirectory.setConfigDirectory(configDir);
+
+        userTest = "admin";
         return configDir;
     }
 
@@ -412,6 +422,7 @@ public class ConfigurationEngine {
         FileUtilities.deleteDirectory(new File(directoryName));
         clearDatabase();
         ConfigDirectory.setConfigDirectory(null);
+        userTest = null;
     }
 
     public static String getConstellationProperty(final String key, final String defaultValue) {
