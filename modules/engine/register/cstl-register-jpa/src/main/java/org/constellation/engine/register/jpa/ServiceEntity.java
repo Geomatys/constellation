@@ -57,8 +57,8 @@ public class ServiceEntity implements Service {
     @OneToMany(mappedBy="service", targetEntity=ServiceExtraConfigEntity.class, fetch=FetchType.LAZY, cascade=CascadeType.ALL)
     private Set<ServiceExtraConfig> extraConfig;
 
-    @OneToOne(mappedBy="service", targetEntity=ServiceMetaDataEntity.class, fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-    private ServiceMetaData metaData;
+    @OneToMany(mappedBy="service", targetEntity=ServiceMetaDataEntity.class, fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+    private Set<ServiceMetaData> metaDatas;
 
     /* (non-Javadoc)
      * @see org.constellation.engine.register.jpa.Service#getId()
@@ -208,23 +208,23 @@ public class ServiceEntity implements Service {
      * @see org.constellation.engine.register.jpa.Service#getMetaData()
      */
     @Override
-    public ServiceMetaData getMetaData() {
-        return metaData;
+    public Set<ServiceMetaData> getMetaData() {
+        return metaDatas;
     }
 
     /* (non-Javadoc)
      * @see org.constellation.engine.register.jpa.Service#setMetaData(org.constellation.engine.register.ServiceMetaData)
      */
     @Override
-    public void setMetaData(ServiceMetaData metaData) {
-        this.metaData = metaData;
+    public void setMetaData(Set<ServiceMetaData> metaDatas) {
+        this.metaDatas = metaDatas;
     }
 
     @Override
     public String toString() {
         return "ServiceEntity [id=" + id + ", identifier=" + identifier + ", type=" + type + ", date=" + date
                 + ", title=" + title + ", description=" + description + ", config=" + config + ", owner=" + owner
-                + ", layers=" + layers + ", extraConfig=" + extraConfig + ", metaData=" + metaData + "]";
+                + ", layers=" + layers + ", extraConfig=" + extraConfig + ", metaData=" + metaDatas + "]";
     }
     
     

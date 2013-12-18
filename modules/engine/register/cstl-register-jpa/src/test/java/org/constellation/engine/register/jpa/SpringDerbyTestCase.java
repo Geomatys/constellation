@@ -102,7 +102,7 @@ public class SpringDerbyTestCase {
         userRepository.saveAndFlush(entity);
     }
     
-    @Test
+   
     @Transactional
     public void deleteUser() {
         userRepository.delete("zozo");

@@ -354,6 +354,9 @@ public class ConfigurationEngine {
         if (language == null) {
             language = "eng";
         }
+        if(JPA)
+            return configurationService.readServiceMetadata(identifier, ServiceDef.Specification.fromShortName(serviceType).name(), language);
+        
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();

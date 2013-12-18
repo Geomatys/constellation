@@ -2,13 +2,13 @@ package org.constellation.engine.register.jpa.component;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -18,9 +18,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.admin.dao.Session;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ServiceProtocol;
@@ -31,11 +28,14 @@ import org.constellation.engine.register.Property;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
+import org.constellation.engine.register.ServiceMetaData;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.util.Util;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -62,6 +62,8 @@ public class ConfigurationJpaService implements ConfigurationService {
     
     @Autowired
     private ProviderRepository providerRepository;
+    
+    
 
     @Override
     @Transactional
@@ -218,6 +220,32 @@ public class ConfigurationJpaService implements ConfigurationService {
     @Override
     public List<String> getServiceIdentifiersByServiceType(String name) {
         return serviceRepository.findIdentifiersByType(name);
+    }
+
+    @Override
+    public org.constellation.dto.Service readServiceMetadata(String identifier, String serviceType, String language) throws JAXBException, IOException {
+        ServiceMetaData serviceMetaData = serviceRepository.findMetaDataForLangByIdentifierAndType(identifier, serviceType, language);
+        if(serviceMetaData!=null) {
+            final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+            final org.constellation.dto.Service config = (org.constellation.dto.Service) u.unmarshal(new StringReader(serviceMetaData.getContent()));
+            GenericDatabaseMarshallerPool.getInstance().recycle(u);
+            return config;
+        } else {
+            final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType
+                    + "Capabilities.xml");
+            if (in != null) {
+                final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                final org.constellation.dto.Service metadata = (org.constellation.dto.Service) u.unmarshal(in);
+                GenericDatabaseMarshallerPool.getInstance().recycle(u);
+                in.close();
+                metadata.setIdentifier(identifier);
+                return metadata;
+            } else {
+                throw new IOException("Unable to find the capabilities skeleton from resource.");
+            }
+        }
+        
+
     }
 
 }

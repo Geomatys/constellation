@@ -3,8 +3,9 @@ package org.constellation.engine.register.jpa;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.constellation.engine.register.Service;
@@ -12,19 +13,21 @@ import org.constellation.engine.register.ServiceMetaData;
 
 @Entity
 @Table(schema = "`admin`", name = "`service_metadata`")
+@IdClass(ServiceMetaDataEntityPk.class)
 public class ServiceMetaDataEntity implements ServiceMetaData {
 
     @Id
     @Column(name="`id`")
     private int id;
 
+    @Id
     @Column(name = "`lang`")
     private String lang;
 
     @Column(name = "`content`")
     private String content;
 
-    @OneToOne(targetEntity=ServiceEntity.class)
+    @ManyToOne(targetEntity=ServiceEntity.class)
     @JoinColumn(name="`id`")
     private Service service;
 

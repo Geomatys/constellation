@@ -42,8 +42,8 @@ public interface Service {
 
     public abstract void setExtraConfig(Set<ServiceExtraConfig> extraConfig);
 
-    public abstract ServiceMetaData getMetaData();
+    public abstract Set<ServiceMetaData> getMetaData();
 
-    public abstract void setMetaData(ServiceMetaData metaData);
+    public abstract void setMetaData(Set<ServiceMetaData> metaDatas);
 
 }
