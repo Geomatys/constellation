@@ -34,7 +34,7 @@ import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.Source;
-import org.geotoolkit.gui.swing.misc.ActionCell;
+import org.geotoolkit.gui.swing.util.ActionCell;
 import org.geotoolkit.gui.swing.resource.IconBundle;
 import org.netbeans.swing.outline.DefaultOutlineModel;
 import org.netbeans.swing.outline.RenderDataProvider;

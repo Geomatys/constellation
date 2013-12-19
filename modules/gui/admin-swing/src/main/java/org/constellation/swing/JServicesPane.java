@@ -144,7 +144,7 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
                     final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
                     final BufferedImage img = JServicesPane.createImage(type, null, Color.WHITE,fontBig, bgColor);
                     lbl.setIcon(new ImageIcon(img));
-                    lbl.setText(inst.getName());
+                    lbl.setText(inst.getIdentifier());
                 }
 
                 return lbl;
@@ -193,7 +193,7 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
             public int compare(Entry<Instance, String> o1, Entry<Instance, String> o2) {
                 if(o1.getValue().equals(o2.getValue())){
                     //compare instance names
-                    return o1.getKey().getName().compareTo(o2.getKey().getName());
+                    return o1.getKey().getIdentifier().compareTo(o2.getKey().getIdentifier());
                 }else{
                     //compare types
                     return o1.getValue().compareTo(o2.getValue());

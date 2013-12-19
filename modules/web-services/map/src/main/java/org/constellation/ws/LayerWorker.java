@@ -150,7 +150,7 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     protected List<Layer> getConfigurationLayers(final String login, final List<Name> layerNames) {
-        final List<Layer> layerConfigs = new ArrayList<Layer>();
+        final List<Layer> layerConfigs = new ArrayList<>();
         for (Name layerName : layerNames) {
             Layer l = getConfigurationLayer(layerName, login);
             layerConfigs.add(l);
@@ -174,6 +174,12 @@ public abstract class LayerWorker extends AbstractWorker {
                     return layer;
                 }
             }
+            // we do a second round with missing namespace search
+            for (Layer layer : layers) {
+                if (layer.getName().getLocalPart().equals(layerName.getLocalPart())) {
+                    return layer;
+                }
+            }
         }
         return null;
     }
@@ -188,7 +194,8 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     /**
-     *
+     * @param login
+     * 
      * @return map of additional informations for each layer declared in the
      * layer context.
      */
@@ -199,6 +206,7 @@ public abstract class LayerWorker extends AbstractWorker {
     
     /**
      * Return all layers details in LayerProviders from there names.
+     * @param login
      * @param layerNames
      * @return a list of LayerDetails
      * @throws CstlServiceException
@@ -217,6 +225,7 @@ public abstract class LayerWorker extends AbstractWorker {
     
     /**
      * Search layer real name and return the LayerDetails from LayerProvider.
+     * @param login
      * @param layerName
      * @return a LayerDetails
      * @throws CstlServiceException
@@ -240,6 +249,7 @@ public abstract class LayerWorker extends AbstractWorker {
 
     /**
      * We can't use directly layers.containsKey because it may miss the namespace or the alias.
+     * @param login
      * @param name
      */
     protected NameInProvider layersContainsKey(final String login, final Name name) {
@@ -323,7 +333,7 @@ public abstract class LayerWorker extends AbstractWorker {
      * {@inheritDoc}
      */
     @Override
-    public boolean isAuthorized(String ip, String referer) {
+    public boolean isAuthorized(final String ip, final String referer) {
         return pdp.isAuthorized(ip, referer);
     }
 

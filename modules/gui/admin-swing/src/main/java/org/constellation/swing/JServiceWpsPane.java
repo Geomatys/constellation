@@ -43,7 +43,7 @@ import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
 import static org.constellation.swing.JServiceEditionPane.ICON_EDIT;
-import org.geotoolkit.gui.swing.misc.ActionCell;
+import org.geotoolkit.gui.swing.util.ActionCell;
 import org.geotoolkit.gui.swing.resource.IconBundle;
 import org.netbeans.swing.outline.DefaultOutlineModel;
 import org.netbeans.swing.outline.Outline;

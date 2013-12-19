@@ -63,6 +63,17 @@ public class Instance {
         this.status = status;
     }
 
+    public Instance(final String identifier, final String name, final String _abstract, final String type,
+            final List<String> versions, final Integer layerNumber, final ServiceStatus status) {
+        this.identifier   = identifier;
+        this.name         = name;
+        this._abstract    = _abstract;
+        this.type         = type;
+        this.versions     = versions;
+        this.layersNumber = layerNumber;
+        this.status       = status;
+    }
+
     /**
      * @return the name
      */
@@ -118,9 +129,13 @@ public class Instance {
         }
         if (obj instanceof Instance) {
             final Instance that = (Instance) obj;
-            return Objects.equals(this.name,   that.name) &&
-                   Objects.equals(this.type,   that.type) &&
-                   Objects.equals(this.status, that.status);
+            return Objects.equals(this.name,         that.name) &&
+                   Objects.equals(this.identifier,   that.identifier) &&
+                   Objects.equals(this.layersNumber, that.layersNumber) &&
+                   Objects.equals(this._abstract,    that._abstract) &&
+                   Objects.equals(this.versions,     that.versions) &&
+                   Objects.equals(this.type,         that.type) &&
+                   Objects.equals(this.status,       that.status);
         }
         return false;
     }
@@ -131,6 +146,10 @@ public class Instance {
         hash = 73 * hash + (this.name != null ? this.name.hashCode() : 0);
         hash = 73 * hash + (this.type != null ? this.type.hashCode() : 0);
         hash = 73 * hash + (this.status != null ? this.status.hashCode() : 0);
+        hash = 73 * hash + (this.layersNumber != null ? this.layersNumber.hashCode() : 0);
+        hash = 73 * hash + (this._abstract != null ? this._abstract.hashCode() : 0);
+        hash = 73 * hash + (this.identifier != null ? this.identifier.hashCode() : 0);
+        hash = 73 * hash + (this.versions != null ? this.versions.hashCode() : 0);
         return hash;
     }
 
@@ -139,8 +158,26 @@ public class Instance {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[Instance]\n");
+        if (identifier != null) {
+            sb.append("identifier:").append(identifier).append('\n');
+        }
         if (name != null) {
             sb.append("name:").append(name).append('\n');
+        }
+        if (_abstract != null) {
+            sb.append("_abstract:").append(_abstract).append('\n');
+        }
+        if (type != null) {
+            sb.append("type:").append(type).append('\n');
+        }
+        if (versions != null) {
+            sb.append("versions:\n");
+            for (String version : versions) {
+                sb.append("version:").append(version).append('\n');
+            }
+        }
+        if (layersNumber != null) {
+            sb.append("layersNumber:").append(layersNumber).append('\n');
         }
         if (status != null) {
             sb.append("status:").append(status).append('\n');

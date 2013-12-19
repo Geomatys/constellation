@@ -48,6 +48,8 @@ import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
 
 // Geotoolkit dependencies
@@ -75,6 +77,7 @@ import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
+import org.junit.runner.RunWith;
 
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -87,6 +90,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
+@RunWith(TestRunner.class)
 public class WMSRequestsTest extends AbstractGrizzlyServer {
 
     /**
@@ -276,6 +280,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * returned an error report for the user.
      */
     @Test
+    @Order(order=1)
     public void testWMSWrongRequest() throws Exception {
 
         waitForStart();
@@ -299,6 +304,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=2)
     public void testWMSGetMap() throws IOException {
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -323,6 +329,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=3)
     public void testWMSGetMapLakeGif() throws IOException {
                 // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -347,6 +354,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=4)
     public void testWMSGetMapLakeGifransparent() throws IOException {
                 // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -369,6 +377,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=5)
     public void testWMSGetMapLakePng() throws IOException {
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -393,6 +402,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=6)
     public void testWMSGetMapLakeBmp() throws IOException {
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -417,6 +427,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=7)
     public void testWMSGetMapLakePpm() throws IOException {
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -442,6 +453,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * document representing the server capabilities in the WMS version 1.1.1/ 1.3.0 standard.
      */
     @Test
+    @Order(order=8)
     public void testWMSGetCapabilities() throws JAXBException, IOException {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
@@ -518,6 +530,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=9)
     public void testWMSGetCapabilitiesLanguage() throws JAXBException, IOException {
          // Creates a valid GetMap url.
         URL getCapsUrl;
@@ -586,6 +599,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * testing layer produces the wanted result.
      */
     @Test
+    @Order(order=10)
     public void testWMSGetFeatureInfo() throws IOException {
         // Creates a valid GetFeatureInfo url.
         final URL gfi;
@@ -626,6 +640,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      *        postgrid implementation.
      */
     @Test
+    @Order(order=11)
     @Ignore
     public void testWMSGetLegendGraphic() throws IOException {
         // Creates a valid GetLegendGraphic url.
@@ -650,6 +665,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid DescribeLayer request produces a valid document.
      */
     @Test
+    @Order(order=12)
     public void testWMSDescribeLayer() throws JAXBException, IOException {
         // Creates a valid DescribeLayer url.
         final URL describeUrl;

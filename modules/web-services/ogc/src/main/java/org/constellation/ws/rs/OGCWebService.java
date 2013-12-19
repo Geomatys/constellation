@@ -53,6 +53,8 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ConfigurationEngine;
+import static org.constellation.api.QueryConstants.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.OWSExceptionCode;
@@ -67,7 +69,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // Apache SIS dependencies
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.util.iso.Types;
-import org.constellation.admin.ConfigurationEngine;
 
 // GeoAPI dependencies
 import org.opengis.parameter.ParameterValueGroup;
@@ -363,7 +364,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             /*
              * Get list of current service instances.
              */
-            } else if ("listInstance".equalsIgnoreCase(request)) {
+            } else if (REQUEST_LIST_INSTANCE.equalsIgnoreCase(request)) {
                 final InstanceReport report = new InstanceReport(configurer.getInstances());
                 return Response.ok(report).build();
 

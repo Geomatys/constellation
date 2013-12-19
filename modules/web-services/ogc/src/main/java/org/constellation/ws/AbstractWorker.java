@@ -263,7 +263,11 @@ public abstract class AbstractWorker implements Worker {
      */
     @Override
     public void setServiceUrl(final String serviceUrl) {
-        this.serviceUrl = serviceUrl + specification.toString().toLowerCase() + '/' + id + '?';
+        if (serviceUrl.endsWith("/")) {
+            this.serviceUrl = serviceUrl + specification.toString().toLowerCase() + '/' + id + '?';
+        } else {
+            this.serviceUrl = serviceUrl + '/' + specification.toString().toLowerCase() + '/' + id + '?';
+        }
     }
 
     /**

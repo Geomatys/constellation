@@ -82,7 +82,8 @@ public final class QueryConstants {
     public static final String REQUEST_CLEAR_CACHE           = "clearCache"; 
     
     //Service operations
-    public static final String REQUEST_UPDATE_CAPABILITIES   = "updateCapabilities"; 
+    public static final String REQUEST_UPDATE_CAPABILITIES   = "updateCapabilities";
+    public static final String REQUEST_LIST_INSTANCE         = "listInstance";
     
     //basic parameters
     public static final String REQUEST_PARAMETER = "REQUEST";
