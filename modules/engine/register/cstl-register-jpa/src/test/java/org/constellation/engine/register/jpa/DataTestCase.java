@@ -37,8 +37,15 @@ public class DataTestCase {
     @Transactional
     public void testFindByNameAndNamespaceAndProviderId() {
         Data data = dataRepository.findByNameAndNamespaceAndProviderId("repartition_albo_europe_2012", "http://geotoolkit.org", "1");
-        LOGGER.debug(data.toString());
+        dump(data);
     }    
+
+    private void dump(Object o) {
+        
+        if(o!=null)
+            LOGGER.debug(o.toString());
+        
+    }
 
     private void dump(List<?> findAll) {
         for (Object object : findAll) {
