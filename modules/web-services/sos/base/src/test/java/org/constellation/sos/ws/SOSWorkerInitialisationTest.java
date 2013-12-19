@@ -17,9 +17,13 @@
 
 package org.constellation.sos.ws;
 
-import java.io.File;
+import java.io.StringWriter;
+import java.sql.Statement;
 import javax.xml.bind.Marshaller;
-import org.constellation.configuration.ConfigDirectory;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.util.SQLExecuter;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -30,7 +34,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // JUnit dependencies
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -41,51 +44,17 @@ import static org.junit.Assert.*;
  */
 public class SOSWorkerInitialisationTest {
 
-    private static File constellationDirectory = new File("SOSWorkerInitialisationTest");
-    private static File instDirectory;
+    private static MarshallerPool pool;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        FileUtilities.deleteDirectory(constellationDirectory);
-        constellationDirectory.mkdir();
-        ConfigDirectory.setConfigDirectory(constellationDirectory);
+        ConfigurationEngine.setupTestEnvironement("SOSWorkerInitialisationTest");
+        pool = SOSMarshallerPool.getInstance();
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        FileUtilities.deleteDirectory(constellationDirectory);
-    }
-
-
-    @Before
-    public void setUp() throws Exception {
-        if (constellationDirectory.exists()) {
-
-            File SOSDirectory  = new File(constellationDirectory, "SOS");
-            SOSDirectory.mkdir();
-            instDirectory = new File(SOSDirectory, "default");
-            instDirectory.mkdir();
-
-            File dataDirectory = new File(instDirectory, "data");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            File indexDirectory = new File(instDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            File conf = new File(instDirectory, "config.xml");
-            conf.delete();
-
-            File map = new File(instDirectory, "mapping.properties");
-            map.delete();
-        }
+        ConfigurationEngine.shutdownTestEnvironement("SOSWorkerInitialisationTest");
     }
 
     @After
@@ -104,6 +73,7 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
+        ConfigurationEngine.storeConfiguration("SOS", "default", null);
         SOSworker worker = new SOSworker("default");
 
         boolean exceptionLaunched = false;
@@ -123,9 +93,10 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 2: An empty configuration file.
          */
-        File configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
+        final SQLExecuter executer = EmbeddedDatabase.createSQLExecuter();
+        final Statement stmt = executer.createStatement();
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"=''");
+        
         worker = new SOSworker("default");
 
         exceptionLaunched = false;
@@ -145,13 +116,12 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 3: A malformed configuration file (bad unrecognized type).
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
+        StringWriter sw = new StringWriter();
+        final Marshaller m = pool.acquireMarshaller();
+        m.marshal(request, sw);
+        pool.recycle(m);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
-        Marshaller marshaller = SOSMarshallerPool.getInstance().acquireMarshaller();
-        marshaller.marshal(request, configFile);
-        SOSMarshallerPool.getInstance().recycle(marshaller);
-        
         worker = new SOSworker("default");
 
         exceptionLaunched = false;
@@ -166,16 +136,13 @@ public class SOSWorkerInitialisationTest {
         }
         assertTrue(exceptionLaunched);
 
-        marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-
+        Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
         /**
          * Test 4: A malformed configuration file (bad unrecognized type).
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
-
-        marshaller.marshal(new BDD(), configFile);
+        sw = new StringWriter();
+        marshaller.marshal(new BDD(), sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new SOSworker("default");
 
@@ -195,12 +162,11 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 5: A configuration file with missing part.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
         SOSConfiguration configuration = new SOSConfiguration();
-        marshaller.marshal(configuration, configFile);
-
+        sw = new StringWriter();
+        marshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
         worker = new SOSworker("default");
 
         exceptionLaunched = false;
@@ -219,11 +185,10 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 6: A configuration file with missing part.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
         configuration = new SOSConfiguration(new Automatic(), null);
-        marshaller.marshal(configuration, configFile);
+        sw = new StringWriter();
+        marshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new SOSworker("default");
 
@@ -243,11 +208,10 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 7: A configuration file with two empty configuration object.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
         configuration = new SOSConfiguration(new Automatic(), new Automatic());
-        marshaller.marshal(configuration, configFile);
+        sw = new StringWriter();
+        marshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new SOSworker("default");
 
@@ -267,13 +231,13 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 8: A configuration file with two empty configuration object and a malformed template valid time.
          */
-        configFile = new File(instDirectory, "config.xml");
-        configFile.createNewFile();
-
         configuration = new SOSConfiguration(new Automatic(), new Automatic());
         configuration.setProfile("transactional");
         configuration.setTemplateValidTime("ff:oo");
-        marshaller.marshal(configuration, configFile);
+
+        sw = new StringWriter();
+        marshaller.marshal(configuration, sw);
+        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
 
         worker = new SOSworker("default");
 

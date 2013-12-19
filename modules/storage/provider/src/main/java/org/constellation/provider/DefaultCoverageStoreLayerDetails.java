@@ -49,9 +49,12 @@ import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
+import javax.measure.unit.SI;
+import javax.measure.unit.Unit;
+
 
 /**
- * Regroups information about a {@linkplain Layer layer}.
+ * Regroups information about a {@linkplain org.constellation.provider.LayerDetails layer}.
  *
  * @author Johann Sorel (Geomatys)
  */
@@ -79,12 +82,12 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
     public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension, final Double elevation,
                                       final Date time) throws DataStoreException, IOException
     {
-        final GridCoverageReader reader = ref.createReader();
+        final GridCoverageReader reader = ref.acquireReader();
 
         final GridCoverageReadParam param = new GridCoverageReadParam();
         param.setEnvelope(envelope);
         try {
-            return (GridCoverage2D) reader.read(0, param);
+            return (GridCoverage2D) reader.read(ref.getImageIndex(), param);
         } catch (CancellationException ex) {
             throw new IOException(ex.getMessage(),ex);
         }finally{
@@ -102,10 +105,9 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
             style = getDefaultStyle();
         }
 
-        final MapLayer layer = MapBuilder.createCoverageLayer(
-                    ref,
-                    style,
-                    getName().getLocalPart());
+        final MapLayer layer;
+
+            layer = MapBuilder.createCoverageLayer(ref, style);
 
         // EXTRA FILTER extra parameter ////////////////////////////////////////
         if (params != null && layer instanceof DefaultCoverageMapLayer) {
@@ -126,7 +128,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
                 }
                 if (filter != null) {
                     final DefaultCoverageMapLayer cml = (DefaultCoverageMapLayer) layer;
-                    cml.setQuery(QueryBuilder.filtered(cml.getCoverageName(), filter));
+                    cml.setQuery(QueryBuilder.filtered(cml.getCoverageReference().getName(), filter));
                 }
             }
         }
@@ -202,18 +204,22 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
         for (int i = 0; i < nbDim; i++) {
             final CoordinateSystemAxis axis = cs.getAxis(i);
             final AxisDirection direction = axis.getDirection();
-            
-            //ELEVATION AXIS
-            if (direction.equals(AxisDirection.DOWN) || direction.equals(AxisDirection.UP)) {
-                if (axis instanceof DiscreteCoordinateSystemAxis) {
-                    final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
-                    final int nbOrdinate = discretAxis.length();
-                    for (int j = 0; j < nbOrdinate; j++) {
-                        elevations.add((Number) discretAxis.getOrdinateAt(j));
+            final Unit unit = axis.getUnit();
+
+            //test if axis unit is a length unit
+            if (unit.isCompatible(SI.METRE)) {
+                //ELEVATION AXIS
+                if (direction.equals(AxisDirection.DOWN) || direction.equals(AxisDirection.UP)) {
+                    if (axis instanceof DiscreteCoordinateSystemAxis) {
+                        final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
+                        final int nbOrdinate = discretAxis.length();
+                        for (int j = 0; j < nbOrdinate; j++) {
+                            elevations.add((Number) discretAxis.getOrdinateAt(j));
+                        }
+                    } else {
+                        elevations.add(Double.valueOf(axis.getMinimumValue()));
+                        elevations.add(Double.valueOf(axis.getMaximumValue()));
                     }
-                } else {
-                    elevations.add(Double.valueOf(axis.getMinimumValue()));
-                    elevations.add(Double.valueOf(axis.getMaximumValue()));
                 }
             }
         }
@@ -233,7 +239,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
 
     @Override
     public Envelope getEnvelope() throws DataStoreException {
-        final GridCoverageReader reader = ref.createReader();
+        final GridCoverageReader reader = ref.acquireReader();
 
         try {
             final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
@@ -267,7 +273,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
 
     @Override
     public SpatialMetadata getSpatialMetadata() throws DataStoreException {
-        final GridCoverageReader reader = ref.createReader();
+        final GridCoverageReader reader = ref.acquireReader();
 
         try {
             return reader.getCoverageMetadata(0);

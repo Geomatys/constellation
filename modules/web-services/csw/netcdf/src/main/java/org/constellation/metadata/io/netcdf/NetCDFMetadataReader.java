@@ -25,13 +25,19 @@ import java.util.ArrayList;
 import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.HashMap;
-import java.net.URI;
 import java.util.Map;
 import java.io.File;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.TimeZone;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractMetadataReader;
@@ -56,6 +62,8 @@ import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.ImageCoverageReader;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.xml.XML;
+import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.metadata.io.MetadataType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
@@ -64,6 +72,7 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 
 import org.opengis.metadata.distribution.Distributor;
 import org.opengis.metadata.distribution.Distribution;
@@ -79,6 +88,8 @@ import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.identification.Identification;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -107,13 +118,14 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
 
     private final boolean usePathAsIdentifier;
 
+    private static final TimeZone tz = TimeZone.getTimeZone("GMT+2:00");
     /**
      * Build a new CSW NetCDF File Reader.
      *
      * @param configuration A generic configuration object containing a directory path
      * in the configuration.dataDirectory field.
      *
-     * @throws org.constellation.ws.MetadataIoException If the configuration object does
+     * @throws MetadataIoException If the configuration object does
      * not contains an existing directory path in the configuration.dataDirectory field.
      * If the creation of a MarshallerPool throw a JAXBException.
      */
@@ -160,7 +172,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * {@inheritDoc}
      */
     @Override
-    public Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         return getMetadata(identifier, mode, type, elementName);
     }
 
@@ -168,7 +180,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException {
+    public Node getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }
 
@@ -176,7 +188,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         Object obj = null;
         if (isCacheEnabled()) {
             obj = getFromCache(identifier);
@@ -189,7 +201,12 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         } else if (obj instanceof RecordType && mode == MetadataType.DUBLINCORE) {
             obj = applyElementSet((RecordType)obj, type, elementName);
         }
-        return obj;
+
+        // marshall to DOM
+        if (obj != null) {
+            return writeObjectInNode(obj, mode);
+        }
+        return null;
     }
 
     @Override
@@ -209,6 +226,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      *
      * @param identifier The metadata identifier.
      * @param directory The current directory to explore.
+     * @param ext file extension.
      * @return
      */
     public static File getFileFromIdentifier(final String identifier, final File directory, final String ext) {
@@ -245,6 +263,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      *
      * @param identifier The metadata identifier.
      * @param directory The current directory to explore.
+     * @param ext File extension.
      * @return
      */
     public static File getFileFromPathIdentifier(final String identifier, final File directory, final String ext) {
@@ -473,7 +492,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             }
 
 
-            List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+            List<SimpleLiteral> formats = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 for (Format f :identification.getResourceFormats()) {
                     if (f == null || f.getName() == null) {
@@ -801,11 +820,24 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         return new HashMap<>();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, URI> getConceptMap() {
-        return new HashMap<>();
+    protected Node writeObjectInNode(final Object obj, final MetadataType mode) throws MetadataIoException {
+        final boolean replace = mode == MetadataType.ISO_19115;
+        try {
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            final Document document = docBuilder.newDocument();
+            final Marshaller marshaller = EBRIMMarshallerPool.getInstance().acquireMarshaller();
+            final MarshallWarnings warnings = new MarshallWarnings();
+            marshaller.setProperty(XML.CONVERTER, warnings);
+            marshaller.setProperty(XML.TIMEZONE, tz);
+            marshaller.setProperty(LegacyNamespaces.APPLY_NAMESPACE_REPLACEMENTS, replace);
+            marshaller.setProperty(XML.GML_VERSION, LegacyNamespaces.VERSION_3_2_1);
+            marshaller.marshal(obj, document);
+
+            return document.getDocumentElement();
+        } catch (ParserConfigurationException | JAXBException ex) {
+            throw new MetadataIoException(ex);
+        }
     }
 }

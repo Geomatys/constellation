@@ -22,10 +22,13 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Bernard Fabien (Geomatys)
+ * @author Garcia Benjamin (Geomatys)
  * @version 0.9
  * @since 0.9
  */
@@ -35,6 +38,9 @@ public final class DataBrief implements Serializable {
 
     @XmlElement(name="Name")
     private String name;
+
+    @XmlElement(name="Namespace")
+    private String namespace;
 
     @XmlElement(name="Provider")
     private String provider;
@@ -51,6 +57,11 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="Owner")
     private String owner;
 
+    @XmlElement(name="TargetStyle")
+    private List<StyleBrief> targetStyle = new ArrayList<>(0);
+
+    @XmlElement(name="TargetService")
+    private List<ServiceProtocol> targetService = new ArrayList<>(0);
 
     public String getName() {
         return name;
@@ -58,6 +69,14 @@ public final class DataBrief implements Serializable {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(final String namespace) {
+        this.namespace = namespace;
     }
 
     public String getProvider() {
@@ -99,4 +118,35 @@ public final class DataBrief implements Serializable {
     public void setOwner(final String owner) {
         this.owner = owner;
     }
+
+    public List<StyleBrief> getTargetStyle() {
+        return targetStyle;
+    }
+
+    public void setTargetStyle(final List<StyleBrief> targetStyle) {
+        this.targetStyle = targetStyle;
+    }
+
+    public List<ServiceProtocol> getTargetService() {
+        return targetService;
+    }
+
+    public void setTargetService(final List<ServiceProtocol> targetService) {
+        this.targetService = targetService;
+    }
+
+    @Override
+    public String toString() {
+        return "DataBrief{" +
+                "name='" + name + '\'' +
+                ", namespace='" + namespace + '\'' +
+                ", provider='" + provider + '\'' +
+                ", title='" + title + '\'' +
+                ", date=" + date +
+                ", type='" + type + '\'' +
+                ", owner='" + owner + '\'' +
+                ", targetStyle=" + targetStyle +
+                '}';
+    }
+
 }

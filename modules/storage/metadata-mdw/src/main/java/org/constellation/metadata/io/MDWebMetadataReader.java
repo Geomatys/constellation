@@ -34,7 +34,13 @@ import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.sql.DataSource;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
 
 // Constellation Dependencies
 import org.apache.sis.metadata.iso.ISOMetadata;
@@ -68,11 +74,16 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.UnlimitedInteger;
 import org.apache.sis.xml.XLink;
+import org.apache.sis.xml.XML;
+import org.constellation.jaxb.MarshallWarnings;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 
 // GeoAPI dependencies
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
 import org.opengis.util.TypeName;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 
 /**
@@ -129,7 +140,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * A list of package containing the GML implementation (JAXB binding not referencing)
      */
-    private List<String> gmlPackage;
+    private List<String> gml32Package;
+    private List<String> gml31Package;
 
     /**
      * A list of package containing the ISO 19115-2 implementation
@@ -164,10 +176,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
     private boolean storeMapping = false;
 
+    private static final TimeZone tz = TimeZone.getTimeZone("GMT+2:00");
+    
     /**
      * Build a new metadata Reader.
      *
-     * @param MDReader a reader to the MDWeb database.
+     * @param configuration the configuration object conatining the database informations.
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     public MDWebMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(true, false);
@@ -240,7 +255,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * A constructor used in profile Test .
      *
-     * @param MDReader a reader to the MDWeb database.
+     * @param mdReader a reader to the MDWeb database.
      */
     public MDWebMetadataReader(final Reader mdReader) {
         super(true, false);
@@ -266,7 +281,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                                  "org.apache.sis.internal.profile.fra", "org.geotoolkit.util", "org.geotoolkit.xml");
         this.sensorMLPackage    = FileUtilities.searchSubPackage("org.geotoolkit.sml.xml.v100");
         this.swePackage         = FileUtilities.searchSubPackage("org.geotoolkit.swe.xml.v100");
-        this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311","org.geotoolkit.gml.xml");
+        this.gml31Package         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311","org.geotoolkit.gml.xml");
+        this.gml32Package         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v321","org.geotoolkit.gml.xml");
 
         this.opengisPackage     = FileUtilities.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                                "org.opengis.service", "org.opengis.feature.catalog");
@@ -334,10 +350,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @return A metadata Object (Dublin core Record / GeotoolKit metadata / EBrim registry object)
      *
-     * @throws java.sql.MetadataIoException
+     * @throws MetadataIoException
      */
     @Override
-    public Object getMetadata(String identifier, final MetadataType mode) throws MetadataIoException {
+    public Node getMetadata(String identifier, final MetadataType mode) throws MetadataIoException {
         try {
             alreadyRead.clear();
 
@@ -357,10 +373,35 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             } else {
                 LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
             }
-            return result;
 
+            // marshall to DOM
+            if (result != null) {
+                return writeObjectInNode(result, mode);
+            }
+            return null;
         } catch (MD_IOException e) {
              throw new MetadataIoException("MD_IO Exception while reading the metadata: " + identifier, e, null, "id");
+        }
+    }
+
+    protected Node writeObjectInNode(final Object obj, final MetadataType mode) throws MetadataIoException {
+        final boolean replace = mode == MetadataType.ISO_19115;
+        try {
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            final Document document = docBuilder.newDocument();
+            final Marshaller marshaller = EBRIMMarshallerPool.getInstance().acquireMarshaller();
+            final MarshallWarnings warnings = new MarshallWarnings();
+            marshaller.setProperty(XML.CONVERTER, warnings);
+            marshaller.setProperty(XML.TIMEZONE, tz);
+            marshaller.setProperty(LegacyNamespaces.APPLY_NAMESPACE_REPLACEMENTS, replace);
+            marshaller.setProperty(XML.GML_VERSION, LegacyNamespaces.VERSION_3_2_1);
+            marshaller.marshal(obj, document);
+
+            return document.getDocumentElement();
+        } catch (ParserConfigurationException | JAXBException ex) {
+            throw new MetadataIoException(ex);
         }
     }
 
@@ -482,7 +523,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 if (textValue == null || textValue.isEmpty()) {
                     return null;
                 }
-                return TemporalUtilities.parseDateSafe(textValue,true, true);
+                return TemporalUtilities.parseDateSafe(textValue,true, false);
 
             } else if (classe.equals(Boolean.class)) {
                 if (textValue == null || textValue.isEmpty() || textValue.equals("null")) {
@@ -807,6 +848,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             result.getIdentifierMap().putSpecialized(IdentifierSpace.ID, (String)param);
             return true;
         }
+        if ("xLink".equals(attribName)) {
+            result.getIdentifierMap().putSpecialized(IdentifierSpace.XLINK, (XLink)param);
+            return true;
+        }
         boolean tryAgain = true;
         int casee = 0;
         while (tryAgain) {
@@ -960,8 +1005,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else if ("Sensor Web Enablement".equals(standardName)) {
             packagesName.addAll(swePackage);
 
-        } else if ("ISO 19108".equals(standardName) && (mode == MetadataType.SENSORML || className.startsWith("Time"))) {
-            packagesName.addAll(gmlPackage);
+        } else if ("ISO 19108".equals(standardName) && (mode == MetadataType.SENSORML)) {
+            packagesName.addAll(gml31Package);
+
+        } else if ("ISO 19108".equals(standardName) && (mode != MetadataType.SENSORML && className.startsWith("Time"))) {
+            packagesName.addAll(gml32Package);
 
         } else if ("ISO 19115-2".equals(standardName)) {
             packagesName.addAll(geotkAcquisitionPackage);
@@ -975,7 +1023,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else {
             if (!className.contains("Code") && !"DCPList".equals(className) && !"SV_CouplingType".equals(className) && !"CS_AxisDirection".equals(className)) {
                 packagesName.addAll(geotoolkitPackage);
-                packagesName.addAll(gmlPackage);
+                packagesName.addAll(gml32Package);
             } else {
                 packagesName.addAll(opengisPackage);
             }
@@ -994,7 +1042,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         String className          = type.getName();
         final String standardName = type.getStandard().getName();
 
-        final String classNameSave = standardName + ':' + className;
+        final String classNameSave = mode.name() + '-' + standardName + ':' + className;
 
         Class result = classBinding.get(classNameSave);
         if (result == null) {
@@ -1201,7 +1249,17 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        final List<String> results = new ArrayList<>();
+        try {
+            final List<RecordSet> recordSets   = mdReader.getRecordSets();
+            final Collection<FullRecord> records = mdReader.getAllRecord(recordSets);
+            for (FullRecord f: records) {
+                results.add(f.getIdentifier());
+            }
+        } catch (MD_IOException ex) {
+            throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage());
+        }
+        return results;
     }
 
     /**
@@ -1216,5 +1274,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     public void clearCache() {
         super.clearCache();
         mdReader.clearStorageCache();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<MetadataType> getSupportedDataTypes() {
+        return Arrays.asList(MetadataType.ISO_19115, MetadataType.DUBLINCORE, MetadataType.EBRIM, MetadataType.SENSORML, MetadataType.ISO_19110);
     }
 }

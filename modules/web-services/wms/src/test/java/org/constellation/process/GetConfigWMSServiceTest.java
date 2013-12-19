@@ -28,5 +28,4 @@ public class GetConfigWMSServiceTest extends GetConfigMapServiceTest {
     public GetConfigWMSServiceTest() {
         super("WMS", DefaultWMSWorker.class);
     }
-
 }

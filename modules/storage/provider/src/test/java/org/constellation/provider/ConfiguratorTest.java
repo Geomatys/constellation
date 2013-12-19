@@ -18,12 +18,12 @@
 package org.constellation.provider;
 
 import java.util.Collection;
+import java.util.List;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.constellation.provider.configuration.Configurator;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.junit.Assert.*;
@@ -66,13 +66,12 @@ public class ConfiguratorTest {
         final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final String serviceName,
-                    final ParameterDescriptorGroup desc) {
-                return desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                return service.getServiceDescriptor().createValue();
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
@@ -90,10 +89,10 @@ public class ConfiguratorTest {
         final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final String serviceName, final ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if(serviceName.equals("mock")){
+                if(service.getName().equals("mock")){
                     ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
                     srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C");
@@ -104,7 +103,7 @@ public class ConfiguratorTest {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
@@ -124,10 +123,10 @@ public class ConfiguratorTest {
         final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if(serviceName.equals("mock")){
+                if(service.getName().equals("mock")){
                     ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
@@ -148,7 +147,7 @@ public class ConfiguratorTest {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
@@ -171,10 +170,10 @@ public class ConfiguratorTest {
 
         final Configurator config = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if(serviceName.equals("mock")){
+                if(service.getName().equals("mock")){
                     ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
@@ -196,7 +195,7 @@ public class ConfiguratorTest {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
@@ -219,10 +218,10 @@ public class ConfiguratorTest {
 
         final Configurator config = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if(serviceName.equals("mock")){
+                if(service.getName().equals("mock")){
                     ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
@@ -244,7 +243,7 @@ public class ConfiguratorTest {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
@@ -263,12 +262,12 @@ public class ConfiguratorTest {
         //set an empty configuration and verify nothing remains
         LayerProviderProxy.getInstance().setConfigurator(new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
                 return null;
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         });

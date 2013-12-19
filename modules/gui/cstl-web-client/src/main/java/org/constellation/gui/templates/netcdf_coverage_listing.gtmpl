@@ -1,0 +1,152 @@
+#{decorate path=menu.gtmpl/}
+
+#{param name=coveragesMap/}
+#{param name=providerId/}
+#{param name=returnURL/}
+
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <a href="@{index()}"><img src="../images/constellation.png"/></a>
+    </div>
+</div>
+<div class="row">
+    <div class="row" style="background-color:white;">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <a class="brand" href="#">&{data.information.page.title}</a>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+        <div class="span12">
+            <div class="row">
+                <div class="span4">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr><th>description</th></tr>
+                        </thead>
+                        <tbody>
+                            <% for (def identifier : coveragesMap.keySet()) {%>
+                            <tr><td><a class="coverage" href="#" data-value="<%=identifier%>"><%=coveragesMap.get(identifier)%></a></td></tr>
+                            <%}%>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="span8">
+                    <ul class="nav nav-tabs" id="coverageTabs">
+                        <li><a href="#visualisation" data-toggle="tab">Visualisation</a></li>
+                        <li><a href="#coveragecrs" data-toggle="tab">CRS</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane" id="visualisation">
+                            <div>
+                                <div class="title-row">
+                                    <span class="medium-title">&{edition.style.label.overview}: </span>
+                                    <span id="coverageName"></span>
+                                </div>
+                                <div id="map" style="height: 400px; width: 770px"></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="coveragecrs">
+                            <form class="form-horizontal">
+                                <div class="control-group">
+                                    <label class="control-label" for="horizontal">Horizontal</label>
+                                    <div class="controls">
+                                        <div class="input-append">
+                                            <input type="text" id="horizontal">
+                                            <button class="btn" type="button" onclick="CSTL.Netcdf.chooseHorizontal('none')"><i class="icon-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="vertical">Vertical</label>
+                                    <div class="controls">
+                                        <input type="text" id="vertical" readonly>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="temporal">Temporel</label>
+                                    <div class="controls">
+                                        <input type="text" id="temporal" readonly>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="span12">
+            <div class="row" style="padding-top: 15px;">
+                <form id="crsSubmition" method="post" action="@{RasterController.saveCRSModification(returnUrl = returnURL)}">
+                    <input type="hidden" name="providerId" value="${providerId}" />
+                    <button type="submit" class="btn btn-info pull-right" id="end">Terminer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div id="chooseHorizontal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <h3 id="myModalLabel">Choose CRS</h3>
+    </div>
+    <div class="modal-body" style="max-height: 500px; height: 500px;">
+        <div class="span5">
+            <input type="text" class="span5" id="CRSFilter">
+            <table class="table table-striped table-bordered">
+                <tbody id="epsgTable">
+                </tbody>
+            </table>
+            <div class="pull-right" id="nbElements"></div>
+            <ul class="pager">
+                <li><a href="#" id="previous">Previous</a></li>
+                <li><a href="#" id="next">Next</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#coverageTabs a:first').tab('show');
+    })
+
+    $("#CRSFilter").keyup(function(){
+        var value = $(this).val();
+        CSTL.Netcdf.index=0;
+        if(value.length>2){
+            CSTL.Netcdf.chooseHorizontal(value);
+        }else{
+            CSTL.Netcdf.chooseHorizontal("none");
+        }
+    });
+
+    $("#previous").on("click", function(){
+        if(!$(this).parent().hasClass("disabled")){
+            var value = $("#CRSFilter").val();
+            CSTL.Netcdf.chooseHorizontal(value, "previous");
+        }
+    })
+
+    $("#next").on("click", function(){
+        if(!$(this).parent().hasClass("disabled")){
+            var value = $("#CRSFilter").val();
+            CSTL.Netcdf.chooseHorizontal(value, "next");
+        }
+    })
+
+    $(".coverage").on("click", function(){
+        CSTL.Netcdf.changeLayer($(this), "${providerId}");
+    });
+
+    var map = new OpenLayers.Map('map', {
+        controls: [],
+        projection: new OpenLayers.Projection('EPSG:4326'),
+        maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
+        fractionalZoom: true
+    });
+
+</script>

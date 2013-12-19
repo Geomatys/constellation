@@ -124,7 +124,7 @@ public final class OGCServices {
      * @see OGCConfigurer#deleteInstance(String)
      */
     @DELETE
-    @Path("/")
+    @Path("{id}")
     public Response delete(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         getConfigurer(spec).deleteInstance(id);
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully deleted."));

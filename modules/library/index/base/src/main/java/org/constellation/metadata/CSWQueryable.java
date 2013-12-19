@@ -114,7 +114,9 @@ public final class CSWQueryable {
 
         paths = new ArrayList<>();
         paths.add("/gmd:MD_Metadata/gmd:dateStamp/gco:DateTime");
+        paths.add("/gmd:MD_Metadata/gmd:dateStamp/gco:Date");
         paths.add("/gmi:MI_Metadata/gmd:dateStamp/gco:DateTime");
+        paths.add("/gmi:MI_Metadata/gmd:dateStamp/gco:Date");
         ISO_QUERYABLE.put("Modified", paths);
 
         paths = new ArrayList<>();
@@ -175,7 +177,9 @@ public final class CSWQueryable {
 
         paths = new ArrayList<>();
         paths.add("/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date#gmd:dateType/gmd:CI_DateTypeCode/@codeListValue=revision/gmd:date/gco:Date");
+        paths.add("/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date#gmd:dateType/gmd:CI_DateTypeCode/@codeListValue=revision/gmd:date/gco:DateTime");
         paths.add("/gmi:MI_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date#gmd:dateType/gmd:CI_DateTypeCode/@codeListValue=revision/gmd:date/gco:Date");
+        paths.add("/gmi:MI_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date#gmd:dateType/gmd:CI_DateTypeCode/@codeListValue=revision/gmd:date/gco:DateTime");
         ISO_QUERYABLE.put("RevisionDate",  paths);
 
         paths = new ArrayList<>();
@@ -187,7 +191,9 @@ public final class CSWQueryable {
 
         paths = new ArrayList<>();
         paths.add("/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date#gmd:dateType/gmd:CI_DateTypeCode/@codeListValue=publication/gmd:date/gco:Date");
+        paths.add("/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date#gmd:dateType/gmd:CI_DateTypeCode/@codeListValue=publication/gmd:date/gco:DateTime");
         paths.add("/gmi:MI_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date#gmd:dateType/gmd:CI_DateTypeCode/@codeListValue=publication/gmd:date/gco:Date");
+        paths.add("/gmi:MI_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date#gmd:dateType/gmd:CI_DateTypeCode/@codeListValue=publication/gmd:date/gco:DateTime");
         ISO_QUERYABLE.put("PublicationDate",  paths);
 
         paths = new ArrayList<>();
@@ -436,7 +442,9 @@ public final class CSWQueryable {
 
         paths = new ArrayList<>();
         paths.add("/gmd:MD_Metadata/gmd:dateStamp/gco:DateTime");
+        paths.add("/gmd:MD_Metadata/gmd:dateStamp/gco:Date");
         paths.add("/gmi:MI_Metadata/gmd:dateStamp/gco:DateTime");
+        paths.add("/gmi:MI_Metadata/gmd:dateStamp/gco:Date");
         paths.add("/csw:Record/dc:date");
         DUBLIN_CORE_QUERYABLE.put("date", paths);
 
@@ -680,7 +688,9 @@ public final class CSWQueryable {
 
         paths = new ArrayList<>();
         paths.add("/gmd:MD_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/*/gmd:result/*/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date");
+        paths.add("/gmd:MD_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/*/gmd:result/*/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime");
         paths.add("/gmi:MI_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/*/gmd:result/*/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date");
+        paths.add("/gmi:MI_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/*/gmd:result/*/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime");
         INSPIRE_QUERYABLE.put("SpecificationDate", paths);
 
         paths = new ArrayList<>();

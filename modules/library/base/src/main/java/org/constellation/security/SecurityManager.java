@@ -22,9 +22,6 @@ package org.constellation.security;
  * @author Guilhem Legal (Geomatys)
  */
 public interface SecurityManager {
-    
-    
-    
 
     public String getCurrentUserLogin();
 

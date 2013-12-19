@@ -39,6 +39,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.admin.util.SQLExecuter;
 
 /**
  * Constellation embedded administration database class.
@@ -79,6 +80,16 @@ public final class EmbeddedDatabase extends Static {
      * @throws  SQLException if a database access error occurs
      */
     public static Session createSession() throws SQLException {
+        getOrCreateDataSource();
+        return new Session(DATA_SOURCE.getConnection(), USER_CACHE);
+    }
+
+    /**
+     * Exposes dataSource (Spring artifact).
+     * @return
+     * @throws SQLException
+     */
+    public static DataSource getOrCreateDataSource() throws SQLException {
         if (DATA_SOURCE == null) {
             synchronized(EmbeddedDatabase.class) {
                 if (DATA_SOURCE == null) {
@@ -86,7 +97,12 @@ public final class EmbeddedDatabase extends Static {
                 }
             }
         }
-        return new Session(DATA_SOURCE.getConnection(), USER_CACHE);
+        return DATA_SOURCE;
+    }
+
+    public static SQLExecuter createSQLExecuter() throws SQLException {
+        getOrCreateDataSource();
+        return new SQLExecuter(DATA_SOURCE.getConnection());
     }
 
     /**
@@ -170,5 +186,12 @@ public final class EmbeddedDatabase extends Static {
                 session.close();
             }
         }
+    }
+
+    public static void clear() {
+        if (DATA_SOURCE != null) {
+            DATA_SOURCE.shutdown();
+        }
+        DATA_SOURCE = null;
     }
 }

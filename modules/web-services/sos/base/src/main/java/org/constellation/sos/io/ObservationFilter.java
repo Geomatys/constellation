@@ -36,16 +36,21 @@ public interface ObservationFilter {
 
     /**
      * Initialize the query for a full observation request.
+     *
+     * @throws org.constellation.ws.CstlServiceException
      */
     void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) throws CstlServiceException;
 
     /**
      * Initialize the query for a restricted to the results request.
+     *
+     * @throws org.constellation.ws.CstlServiceException
      */
     void initFilterGetResult(final String procedure, final QName resultModel) throws CstlServiceException;
     
     /**
      * Initialize the query for a restricted to the results request.
+     * @throws org.constellation.ws.CstlServiceException
      */
     void initFilterGetFeatureOfInterest() throws CstlServiceException;
 
@@ -54,7 +59,8 @@ public interface ObservationFilter {
      * if the list of procedure ID is empty it add all the offering procedure.
      *
      * @param procedures
-     * @param off
+     * @param offerings
+     * @throws org.constellation.ws.CstlServiceException
      */
     void setProcedure(final List<String> procedures, final List<ObservationOffering> offerings) throws CstlServiceException;
 
@@ -62,15 +68,13 @@ public interface ObservationFilter {
      * Add some phenomenon filter to the request.
      *
      * @param phenomenon
-     * @param compositePhenomenon
      */
     void setObservedProperties(final List<String> phenomenon);
 
     /**
-     * Add some sampling point filter to the request.
+     * Add some feature of interest filter to the request.
      *
-     * @param phenomenon
-     * @param compositePhenomenon
+     * @param fois the feature of interest identifiers.
      */
     void setFeatureOfInterest(final List<String> fois);
 
@@ -109,7 +113,6 @@ public interface ObservationFilter {
     /**
      * Add a latest time filter to the current request.
      *
-     * @param time
      * @throws org.constellation.ws.CstlServiceException
      */
     void setTimeLatest() throws CstlServiceException;
@@ -117,7 +120,6 @@ public interface ObservationFilter {
     /**
      * Add a first time filter to the current request.
      *
-     * @param time
      * @throws org.constellation.ws.CstlServiceException
      */
     void setTimeFirst() throws CstlServiceException;
@@ -134,7 +136,7 @@ public interface ObservationFilter {
     /**
      * Set the offering for the current request
      *
-     * @param offering
+     * @param offerings
      * @throws org.constellation.ws.CstlServiceException
      */
     void setOfferings(final List<ObservationOffering> offerings) throws CstlServiceException;
@@ -144,6 +146,7 @@ public interface ObservationFilter {
      *
      * @param propertyName a property of the result.
      * @param value a literal value.
+     * @throws org.constellation.ws.CstlServiceException
      */
     void setResultEquals(String propertyName, String value) throws CstlServiceException;
 
@@ -184,6 +187,7 @@ public interface ObservationFilter {
 
     /**
      * Refresh the index if it need it.
+     * @throws org.constellation.ws.CstlServiceException
      */
     void refresh() throws CstlServiceException;
     

@@ -42,7 +42,8 @@
 <%} else {%>
     <div class="item-list">
         <% for (def provider : providers){%>
-            <div class="item ${provider.type.toLowerCase()}" data-provider="${provider.idProvider}" data-name="${provider.name}" data-providertype="${provider.type}">
+            <div class="item ${provider.type.toLowerCase()}" data-provider="${provider.idProvider}"
+                 data-name="${provider.name}" data-providertype="${provider.type}" data-namespace="${provider.namespace}">
                 <div class="top">
                     <span class="item-title">${provider.name}</span>
                 </div>
@@ -51,7 +52,7 @@
                         <i class="icon-calendar"></i>${provider.date}
                     </div>
                     <div class="block">
-                        <i class="icon-user"></i>Admin
+                        <i class="icon-user"></i><%if(provider.owner != null && provider.owner != ''){%>${provider.owner}<%}else{%>&{label.unknown}<%}%>
                     </div>
                     <div class="block">
                         <i class="icon-folder-close-alt"></i>${provider.type}

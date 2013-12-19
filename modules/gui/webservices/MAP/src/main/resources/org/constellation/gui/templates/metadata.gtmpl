@@ -7,9 +7,16 @@
                 <legend>&{create.contact.legend}</legend>
 
                 <div class="control-group">
-                    <label class="control-label" for="contactName">&{create.contact.name.label}</label>
+                    <label class="control-label" for="contactFirstName">&{create.contact.firstname.label}</label>
                     <div class="controls">
-                        <input type="text" id="contactName" name="contact.fullname" value="${service.serviceContact.fullname}"/>
+                        <input type="text" id="contactFirstName" name="contact.firstname" value="${service.serviceContact.firstname}" />
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="contactLastName">&{create.contact.lastname.label}</label>
+                    <div class="controls">
+                        <input type="text" id="contactLastName" name="contact.lastname" value="${service.serviceContact.lastname}" />
                     </div>
                 </div>
 

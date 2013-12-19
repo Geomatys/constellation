@@ -27,17 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.io.File;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.JAXBException;
 
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.Query;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.ws.CstlServiceException;
@@ -59,7 +55,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
     /**
      * A map of static variable to replace in the statements.
      */
-    protected HashMap<String, Object> staticParameters = new HashMap<String, Object>();
+    protected HashMap<String, Object> staticParameters = new HashMap<>();
     
     /**
      *  The current query built by the sos worker in the scope of a getObservation/getResult request.
@@ -115,28 +111,17 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
+        this.configurationQuery = configuration.getFilterQueries();
+        if (configurationQuery == null) {
+            throw new CstlServiceException("Unable to find the filter queries part", NO_APPLICABLE_CODE);
+        }
         try {
             this.dataSource = db.getDataSource();
-            final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-            final File affinage = new File(configuration.getConfigurationDirectory(), "affinage.xml");
-            if (affinage.exists()) {
-                final Object object = unmarshaller.unmarshal(affinage);
-                if (object instanceof Query) {
-                    this.configurationQuery = (Query) object;
-                    if (configurationQuery.getStatique() != null) {
-                        for (Query query : configurationQuery.getStatique().getQuery()) {
-                            processStatiqueQuery(query);
-                        }
-                    } 
-                } else {
-                    throw new CstlServiceException("Invalid content in affinage.xml", NO_APPLICABLE_CODE);
+            if (configurationQuery.getStatique() != null) {
+                for (Query query : configurationQuery.getStatique().getQuery()) {
+                    processStatiqueQuery(query);
                 }
-            } else {
-                throw new CstlServiceException("Unable to find affinage.xml", NO_APPLICABLE_CODE);
             }
-            GenericDatabaseMarshallerPool.getInstance().recycle(unmarshaller);
-        } catch (JAXBException ex) {
-            throw new CstlServiceException("JAXBException in Generic Observation Filter constructor", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the observation filter:" +'\n'+
                                            "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -160,7 +145,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
         final String textQuery      = query.buildSQLQuery(staticParameters);
         try {
             final ResultSet res = stmt.executeQuery(textQuery);
-            final Map<String, StringBuilder> parameterValue = new HashMap<String, StringBuilder>();
+            final Map<String, StringBuilder> parameterValue = new HashMap<>();
             for (String varName : varNames) {
                 parameterValue.put(varName, new StringBuilder());
             }
@@ -209,14 +194,14 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
      */
     @Override
     public List<String> supportedQueryableResultProperties() {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
      /**
      * {@inheritDoc}
      */
     @Override
-    public void setResultEquals(final String propertyName, final String value) throws CstlServiceException{
+    public void setResultEquals(final String propertyName, final String value) throws CstlServiceException {
         throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
     }
 

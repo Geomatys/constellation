@@ -16,8 +16,6 @@
  */
 package org.constellation.process.provider.style;
 
-import org.constellation.admin.dao.Session;
-import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
@@ -25,12 +23,8 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
-import java.sql.SQLException;
-import java.util.logging.Level;
-
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor.PROVIDER_ID;
-import static org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor.STYLE_ID;
+import static org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.value;
 
 /**
@@ -65,16 +59,5 @@ public class DeleteStyleToStyleProvider extends AbstractCstlProcess {
 
         // Remove style from provider.
         provider.remove(styleName);
-
-        // Remove style from administration database.
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            session.deleteStyle(styleName, providerID);
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating administration database after deleting the style named \"" + styleName + "\".", ex);
-        } finally {
-            if (session != null) session.close();
-        }
     }
 }

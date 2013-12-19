@@ -21,7 +21,6 @@ import java.text.DateFormat;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -109,7 +108,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * @param configuration A generic configuration object containing a directory path
      * in the configuration.dataDirectory field.
      *
-     * @throws org.constellation.ws.MetadataIoException If the configuration object does
+     * @throws MetadataIoException If the configuration object does
      * not contains an existing directory path in the configuration.dataDirectory field.
      * If the creation of a MarshallerPool throw a JAXBException.
      */
@@ -141,7 +140,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException {
+    public Node getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }
 
@@ -149,12 +148,12 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         return getOriginalMetadata(identifier, mode, type, elementName);
     }
 
     @Override
-    public Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+    public Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
         final MetadataType metadataMode;
         try {
@@ -246,25 +245,25 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             if (type.equals(ElementSetType.SUMMARY)) {
                 final Element sumRoot = document.createElementNS(Namespaces.CSW, "SummaryRecord");
                 final List<String> identifierValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:identifier");
-                final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues);
+                final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues, true);
                 NodeUtilities.appendChilds(sumRoot, identifiers);
                 final List<String> titleValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:title");
-                final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues);
+                final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues, true);
                 NodeUtilities.appendChilds(sumRoot, titles);
                 final List<String> typeValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:type");
-                final List<Node> types = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", typeValues);
+                final List<Node> types = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", typeValues, false);
                 NodeUtilities.appendChilds(sumRoot, types);
                 final List<String> subValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:subject");
-                final List<Node> subjects = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "subject", subValues);
+                final List<Node> subjects = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "subject", subValues, false);
                 NodeUtilities.appendChilds(sumRoot, subjects);
                 final List<String> formValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:format");
-                final List<Node> formats = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "format", formValues);
+                final List<Node> formats = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "format", formValues, false);
                 NodeUtilities.appendChilds(sumRoot, formats);
                 final List<String> modValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:modified");
-                final List<Node> modifieds = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "modified", modValues);
+                final List<Node> modifieds = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "modified", modValues, false);
                 NodeUtilities.appendChilds(sumRoot, modifieds);
                 final List<String> absValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:abstract");
-                final List<Node> abstracts = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "abstract", absValues);
+                final List<Node> abstracts = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "abstract", absValues, false);
                 NodeUtilities.appendChilds(sumRoot, abstracts);
                 final List<Node> origBboxes = NodeUtilities.getNodeFromPath(record, "/ows:BoundingBox");
                 for (Node origBbox : origBboxes) {
@@ -275,13 +274,13 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             } else if (type.equals(ElementSetType.BRIEF)) {
                 final Element briefRoot = document.createElementNS(Namespaces.CSW, "BriefRecord");
                 final List<String> identifierValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:identifier");
-                final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues);
+                final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues, true);
                 NodeUtilities.appendChilds(briefRoot, identifiers);
                 final List<String> titleValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:title");
-                final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues);
+                final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues, true);
                 NodeUtilities.appendChilds(briefRoot, titles);
                 final List<String> typeValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:type");
-                final List<Node> types = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", typeValues);
+                final List<Node> types = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", typeValues, false);
                 NodeUtilities.appendChilds(briefRoot, types);
                 final List<Node> origBboxes = NodeUtilities.getNodeFromPath(record, "/csw:Record/ows:BoundingBox");
                 for (Node origBbox : origBboxes) {
@@ -296,7 +295,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             final Element recRoot = document.createElementNS(Namespaces.CSW, "Record");
             for (QName qn : elementName) {
                 if (qn != null) {
-                    final List<Node> origs = NodeUtilities.getNodeFromPath(record, "/csw:Record/dc:" + qn.getLocalPart());
+                    final List<Node> origs = NodeUtilities.getNodeFromPath(record, "/dc:" + qn.getLocalPart());
                     for (Node orig : origs) {
                         Node n = document.importNode(orig, true);
                         NodeUtilities.appendChilds(recRoot, Arrays.asList(n));
@@ -309,6 +308,14 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         } else {
             throw new MetadataIoException("No ElementSet or Element name specified");
         }
+    }
+
+    private String getIdentifier(final Node metadata) throws MetadataIoException  {
+        final List<String> identifierValues = NodeUtilities.getValuesFromPaths(metadata, DUBLIN_CORE_QUERYABLE.get("Identifier"));
+        if (!identifierValues.isEmpty()) {
+            return identifierValues.get(0);
+        }
+        return null;
     }
 
     private Node translateISOtoDCNode(final Node metadata, final ElementSetType type, final List<QName> elementName) throws MetadataIoException  {
@@ -330,21 +337,21 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
              * BRIEF part
              */
             final List<String> identifierValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Identifier"));
-            final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues);
+            final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues, true);
             
             if (elementName != null && elementName.contains(_Identifier_QNAME)) {
                 NodeUtilities.appendChilds(root, identifiers);
             }
 
             final List<String> titleValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Title"));
-            final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues);
+            final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues, true);
 
             if (elementName != null && elementName.contains(_Title_QNAME)) {
                 NodeUtilities.appendChilds(root, titles);
             }
             
             final List<String> dataTypeValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Type"));
-            final List<Node> dataTypes = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", dataTypeValues);
+            final List<Node> dataTypes = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", dataTypeValues, false);
                 
             if (elementName != null && elementName.contains(_Type_QNAME)) {
                 NodeUtilities.appendChilds(root, dataTypes);
@@ -393,21 +400,21 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
              *  SUMMARY part
              */
             final List<String> abstractValues = NodeUtilities.getValuesFromPath(metadata, "/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:abstract/gco:CharacterString");
-            final List<Node> abstracts = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "abstract", abstractValues);
+            final List<Node> abstracts = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "abstract", abstractValues, false);
 
             if (elementName != null && elementName.contains(_Abstract_QNAME)) {
                 NodeUtilities.appendChilds(root, abstracts);
             }
 
             final List<String> kwValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Subject"));
-            final List<Node> subjects = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "subject", kwValues);
+            final List<Node> subjects = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "subject", kwValues, false);
 
             if (elementName != null && elementName.contains(_Subject_QNAME)) {
                 NodeUtilities.appendChilds(root, subjects);
             }
 
             final List<String> formValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Format"));
-            final List<Node> formats = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "format", formValues);
+            final List<Node> formats = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "format", formValues, false);
 
             if (elementName != null && elementName.contains(_Format_QNAME)) {
                  NodeUtilities.appendChilds(root, formats);
@@ -418,7 +425,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             for (String modValue : modValues) {
                 dateValues.add(formatDate(modValue));
             }
-            final List<Node> modifieds = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "modified", dateValues);
+            final List<Node> modifieds = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "modified", dateValues, false);
 
             if (elementName != null && elementName.contains(_Modified_QNAME)) {
                 NodeUtilities.appendChilds(root, modifieds);
@@ -437,21 +444,21 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 return sumRoot;
             }
 
-            final List<Node> dates = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "date", dateValues);
+            final List<Node> dates = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "date", dateValues, false);
 
             if (elementName != null && elementName.contains(_Date_QNAME)) {
                 NodeUtilities.appendChilds(root, dates);
             }
 
             final List<String> creaValues = NodeUtilities.getValuesFromPaths(metadata, DUBLIN_CORE_QUERYABLE.get("creator"));
-            final List<Node> creators = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "creator", creaValues);
+            final List<Node> creators = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "creator", creaValues, false);
 
             if (elementName != null && elementName.contains(_Creator_QNAME)) {
                 NodeUtilities.appendChilds(root, creators);
             }
 
             final List<String> desValues = NodeUtilities.getValuesFromPath(metadata, "/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:graphicOverview/gmd:MD_BrowseGraphic/gmd:fileName/gmx:FileName/@src");
-            final List<Node> descriptions = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "description", desValues);
+            final List<Node> descriptions = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "description", desValues, false);
 
             if (!descriptions.isEmpty() && elementName != null && elementName.contains(_Description_QNAME)) {
                 NodeUtilities.appendChilds(root, descriptions);
@@ -463,14 +470,14 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             paths.add("/gmi:MI_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
             paths.add("/gmi:MI_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact/gmd:CI_ResponsibleParty/gmd:organisationName/gmx:Anchor");
             final List<String> distValues = NodeUtilities.getValuesFromPaths(metadata, paths);
-            final List<Node> distributors = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "publisher", distValues);
+            final List<Node> distributors = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "publisher", distValues, false);
 
             if (elementName != null && elementName.contains(_Publisher_QNAME)) {
                 NodeUtilities.appendChilds(root, distributors);
             }
 
             final List<String> langValues = NodeUtilities.getValuesFromPaths(metadata, ISO_QUERYABLE.get("Language"));
-            final List<Node> languages = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "language", langValues);
+            final List<Node> languages = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "language", langValues, false);
            
             if (elementName != null && elementName.contains(_Language_QNAME)) {
                 NodeUtilities.appendChilds(root, languages);
@@ -494,10 +501,10 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 NodeUtilities.appendChilds(recRoot, languages);
                 NodeUtilities.appendChilds(recRoot, creators);
                 NodeUtilities.appendChilds(recRoot, modifieds);
-                NodeUtilities.appendChilds(recRoot, descriptions);
                 NodeUtilities.appendChilds(recRoot, dates);
                 NodeUtilities.appendChilds(recRoot, abstracts);
                 NodeUtilities.appendChilds(recRoot, distributors);
+                NodeUtilities.appendChilds(recRoot, descriptions);
                 NodeUtilities.appendChilds(recRoot, bboxes);
                 //NodeUtilities.appendChilds(recRoot, spatials);
                 //NodeUtilities.appendChilds(recRoot, references);
@@ -637,20 +644,28 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return getAllIdentifiers(dataDirectory);
     }
 
-    /**
-     * 
-     */
-    public List<String> getAllIdentifiers(final File directory) throws MetadataIoException {
+    
+    private List<String> getAllIdentifiers(final File directory) throws MetadataIoException {
         final List<String> results = new ArrayList<>();
-        for (File f : directory.listFiles()) {
-            final String fileName = f.getName();
-            if (fileName.endsWith(XML_EXT)) {
-                final String identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
-                results.add(identifier);
-            } else if (f.isDirectory()){
-                results.addAll(getAllIdentifiers(f));
-            } else {
-                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
+        if (directory != null) {
+            for (File f : directory.listFiles()) {
+                final String fileName = f.getName();
+                if (fileName.endsWith(XML_EXT)) {
+
+                    // for windows system the filename can be different from the real identifier (':' forbidden)
+                    final String identifier;
+                    if (System.getProperty("os.name", "").startsWith("Windows")) {
+                        final Node metadata = getNodeFromFile(f);
+                        identifier = getIdentifier(metadata);
+                    } else {
+                        identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
+                    }
+                    results.add(identifier);
+                } else if (f.isDirectory()){
+                    results.addAll(getAllIdentifiers(f));
+                } else {
+                    throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
+                }
             }
         }
         return results;
@@ -665,7 +680,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     }
 
     /**
-     * Return the list of Additional queryable element (0 in MDWeb).
+     * Return the list of Additional queryable element.
      */
     @Override
     public List<QName> getAdditionalQueryableQName() {
@@ -677,14 +692,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
-        return new HashMap<>();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, URI> getConceptMap() {
         return new HashMap<>();
     }
 }

@@ -17,6 +17,7 @@
 package org.constellation.wps.ws;
 
 import com.vividsolutions.jts.geom.Geometry;
+
 import org.constellation.ServiceDef;
 import org.constellation.configuration.*;
 import org.constellation.configuration.Process;
@@ -29,6 +30,15 @@ import org.constellation.wps.ws.rs.WPSService;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
+import org.constellation.dto.Service;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.SecurityManagerAdapter;
+import org.constellation.security.SecurityManagerHolder;
+import static org.constellation.wps.ws.WPSConstant.*;
+
+import static org.constellation.api.CommonConstants.DEFAULT_CRS;
+import static org.constellation.api.QueryConstants.*;
+
 import org.geotoolkit.geometry.isoonjts.GeometryUtils;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.ows.xml.v110.*;
@@ -46,19 +56,9 @@ import org.geotoolkit.wps.io.WPSMimeType;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
 import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 import org.apache.sis.xml.MarshallerPool;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.feature.ComplexAttribute;
-import org.opengis.feature.Feature;
-import org.opengis.feature.type.FeatureType;
-import org.opengis.geometry.Envelope;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.util.FactoryException;
-import org.opengis.util.NoSuchIdentifierException;
 
 import javax.measure.converter.UnitConverter;
 import javax.measure.unit.Unit;
@@ -82,13 +82,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
-import static org.constellation.api.CommonConstants.DEFAULT_CRS;
-import static org.constellation.api.QueryConstants.*;
-import org.constellation.dto.Service;
-import org.constellation.admin.ConfigurationEngine;
-import static org.constellation.wps.ws.WPSConstant.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.feature.ComplexAttribute;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.geometry.Envelope;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.FactoryException;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -134,6 +140,8 @@ public class WPSWorker extends AbstractWorker {
      * Path where output file will be saved.
      */
     private final String webdavFolderPath;
+    private final String webdavName;
+    private final boolean isTmpWebDav;
 
     /**
      * WebDav URL.
@@ -167,14 +175,13 @@ public class WPSWorker extends AbstractWorker {
      * Constructor.
      *
      * @param id
-     * @param configurationDirectory
      */
     public WPSWorker(final String id) {
         super(id, ServiceDef.Specification.WPS);
         setSupportedVersion(ServiceDef.WPS_1_0_0);
         ProcessContext candidate = null;
         try {
-            final Object obj = ConfigurationEngine.getConfiguration("WPS", id, "processContext.xml");
+            final Object obj = ConfigurationEngine.getConfiguration("WPS", id);
             if (obj instanceof ProcessContext) {
                 candidate = (ProcessContext) obj;
                 isStarted = true;
@@ -196,8 +203,23 @@ public class WPSWorker extends AbstractWorker {
 
         if (context != null && context.getWebdavDirectory() != null) {
             webdavFolderPath = context.getWebdavDirectory();
+            webdavName = id;
+            isTmpWebDav = false;
         } else {
-            webdavFolderPath = WPSConstant.TEMP_FOLDER;
+            isTmpWebDav = true;
+            webdavName = "wps"+ System.currentTimeMillis();
+            final File tmpFolder = new File(System.getProperty("java.io.tmpdir"), webdavName);
+            if (!tmpFolder.isDirectory()) {
+                final boolean created = tmpFolder.mkdirs();
+                if (created) {
+                    tmpFolder.deleteOnExit();
+                } else {
+                    LOGGER.log(Level.WARNING, "Ressource folder for WPS services cannot be created. " +
+                            "It makes WPS unable to use reference parameters. You should restart server or create manually following directory : "
+                            + tmpFolder.getAbsolutePath());
+                }
+            }
+            webdavFolderPath = tmpFolder.getAbsolutePath();
         }
         
         //Configure the directory to store parameters schema into.
@@ -342,8 +364,11 @@ public class WPSWorker extends AbstractWorker {
     @Override
     public void destroy() {
         super.destroy();
-        //Delete recursuvly temporary directory.
-        FileUtilities.deleteDirectory(new File(webdavFolderPath));
+        //Delete recursively temporary directory.
+        if (isTmpWebDav) {
+            FileUtilities.deleteDirectory(new File(webdavFolderPath));
+            ConfigurationEngine.deleteConfiguration("webdav", webdavName);
+        }
     }
 
     /**
@@ -375,7 +400,7 @@ public class WPSWorker extends AbstractWorker {
                 if (webappURL.contains("/WS")) {
                     webappURL = webappURL.substring(0, webappURL.indexOf("/WS"));
                 }
-                this.webdavURL = webappURL + "/webdav/" + getId();
+                this.webdavURL = webappURL + "/webdav/" + webdavName;
             } else {
                 LOGGER.log(Level.WARNING, "Wrong service URL.");
             }
@@ -392,18 +417,34 @@ public class WPSWorker extends AbstractWorker {
      */
     private boolean createWebDav() {
         final File tmpDir = new File(webdavFolderPath);
-        if (!tmpDir.exists() || !tmpDir.isDirectory()) {
+        if (!tmpDir.isDirectory()) {
             tmpDir.mkdirs();
         }
-        final String webDavName = getId();
+
         //configure webdav if not exist
         try {
-            ConfigurationEngine.getConfiguration("webdav", webDavName, "WebdavContext.xml");
+            ConfigurationEngine.getConfiguration("webdav", webdavName);
         } catch (FileNotFoundException | JAXBException e) {
             final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
-            webdavCtx.setId(webDavName);
+            webdavCtx.setId(webdavName);
             try {
-                ConfigurationEngine.createConfiguration("webdav", webDavName, "WebdavContext.xml", webdavCtx, null);
+                if (SecurityManagerHolder.getInstance().isAuthenticated()) {
+                    ConfigurationEngine.storeConfiguration("webdav", webdavName, webdavCtx, null);
+                } else {
+                    try {
+                        ConfigurationEngine.setSecurityManager(new SecurityManagerAdapter() {
+                            @Override
+                            public String getCurrentUserLogin() {
+                                return "admin";
+                            }
+                        });
+
+                        ConfigurationEngine.storeConfiguration("webdav", webdavName, webdavCtx, null);
+                    } finally {
+                        ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
+                    }
+                    
+                }
             } catch (JAXBException | IOException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;

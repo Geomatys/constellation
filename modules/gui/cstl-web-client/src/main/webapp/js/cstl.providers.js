@@ -93,4 +93,6 @@ CSTL.Providers = {
             CSTL.growl('error', CSTL.i18n('error'), CSTL.i18n('error-style-unlink-data'));
         });
     }
+
+//    linkDataToService: function(dataProvider, dataName, )
 };

@@ -29,8 +29,16 @@ import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 
 import org.constellation.ws.rs.WebService;
 import org.constellation.wfs.ws.rs.WFSService;
@@ -47,7 +55,6 @@ import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.util.FileUtilities;
 
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptorGroup;
 
 // JUnit dependencies
 import org.junit.*;
@@ -61,7 +68,6 @@ public class WFSServiceTest {
 
     private static WFSService service;
 
-
     private static DefaultDataSource ds = null;
 
     private static DefaultDataSource ds2 = null;
@@ -73,6 +79,19 @@ public class WFSServiceTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        ConfigurationEngine.setupTestEnvironement("WFSServiceTest");
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null),
+                                                   new Source("postgisSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+        config.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "default", config);
+        
         initFeatureSource();
         service = new WFSService();
 
@@ -89,6 +108,8 @@ public class WFSServiceTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        ConfigurationEngine.shutdownTestEnvironement("WFSServiceTest");
+        
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         if (ds != null) {
             ds.shutdown();
@@ -197,10 +218,10 @@ public class WFSServiceTest {
          final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("feature-store".equals(serviceName)){
+                if("feature-store".equals(service.getName())){
                     try{ 
                         
                         {//OBSERVATION
@@ -307,7 +328,7 @@ public class WFSServiceTest {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

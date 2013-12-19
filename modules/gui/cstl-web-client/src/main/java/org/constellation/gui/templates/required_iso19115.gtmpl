@@ -59,18 +59,6 @@
 
     <div class="span6">
         <div class="control-group">
-            <label class="control-label" for="localeMetadata">Locale metadata</label>
-
-            <div class="controls">
-                <select name="metadataToSave.localeMetadata" id="localeMetadata" required>
-                    <% for (def locale : locales.keySet()) { %>
-                    <option value="${locale}"/>${locales.get(locale)}</option>
-                    <% } %>
-                </select>
-            </div>
-        </div>
-
-        <div class="control-group">
             <label class="control-label" for="topicCategory">Topic category</label>
 
             <div class="controls">

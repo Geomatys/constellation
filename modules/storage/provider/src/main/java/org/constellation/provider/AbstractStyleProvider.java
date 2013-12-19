@@ -17,6 +17,8 @@
 
 package org.constellation.provider;
 
+import org.constellation.admin.dao.DataRecord.DataType;
+import org.constellation.admin.dao.ProviderRecord.ProviderType;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -53,7 +55,17 @@ public abstract class AbstractStyleProvider extends AbstractProvider<String,Muta
      * {@inheritDoc }
      */
     @Override
-    public MutableStyle getByIdentifier(String key) {
+    public MutableStyle getByIdentifier(final String key) {
         return get(key);
+    }
+
+    @Override
+    public ProviderType getProviderType() {
+        return ProviderType.STYLE;
+    }
+
+    @Override
+    public DataType getDataType() {
+        throw new UnsupportedOperationException("Not supported for style provider.");
     }
 }

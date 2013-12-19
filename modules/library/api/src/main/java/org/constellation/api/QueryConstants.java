@@ -60,13 +60,15 @@ public final class QueryConstants {
     public static final String REQUEST_DELETE_STYLE     = "deleteStyle";
     
     //Tasks operations
-    public static final String REQUEST_LIST_PROCESS     = "listProcess";
-    public static final String REQUEST_LIST_TASKS       = "listTasks"; 
-    public static final String REQUEST_GET_PROCESS_DESC = "getProcessDescriptor"; 
-    public static final String REQUEST_GET_TASK_PARAMS  = "getTaskConfiguration";
-    public static final String REQUEST_CREATE_TASK      = "createTask";
-    public static final String REQUEST_UPDATE_TASK      = "updateTask";
-    public static final String REQUEST_DELETE_TASK      = "deleteTask";
+    public static final String REQUEST_LIST_PROCESS            = "listProcess";
+    public static final String REQUEST_LIST_PROCESS_FOR_FACTO  = "listProcessForFactory";
+    public static final String REQUEST_LIST_PROCESS_FACTORIES  = "listProcessFactories";
+    public static final String REQUEST_LIST_TASKS              = "listTasks";
+    public static final String REQUEST_GET_PROCESS_DESC        = "getProcessDescriptor";
+    public static final String REQUEST_GET_TASK_PARAMS         = "getTaskConfiguration";
+    public static final String REQUEST_CREATE_TASK            = "createTask";
+    public static final String REQUEST_UPDATE_TASK            = "updateTask";
+    public static final String REQUEST_DELETE_TASK            = "deleteTask";
     
     //CSW operations
     public static final String REQUEST_REFRESH_INDEX         = "refreshIndex"; 
@@ -74,12 +76,14 @@ public final class QueryConstants {
     public static final String REQUEST_REMOVE_FROM_INDEX     = "RemoveFromIndex";
     public static final String REQUEST_IMPORT_RECORDS        = "importRecords"; 
     public static final String REQUEST_DELETE_RECORDS        = "deleteRecords";
+    public static final String REQUEST_DELETE_ALL_RECORDS    = "deleteAllRecords";
     public static final String REQUEST_METADATA_EXIST        = "metadataExist"; 
     public static final String REQUEST_AVAILABLE_SOURCE_TYPE = "getCSWDatasourceType"; 
     public static final String REQUEST_CLEAR_CACHE           = "clearCache"; 
     
     //Service operations
-    public static final String REQUEST_UPDATE_CAPABILITIES   = "updateCapabilities"; 
+    public static final String REQUEST_UPDATE_CAPABILITIES   = "updateCapabilities";
+    public static final String REQUEST_LIST_INSTANCE         = "listInstance";
     
     //basic parameters
     public static final String REQUEST_PARAMETER = "REQUEST";

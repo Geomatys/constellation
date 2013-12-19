@@ -9,7 +9,7 @@
 <!-- Head -->
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
-        <img src="images/constellation.png"/>
+        <a href="@{index()}"><img src="images/constellation.png"/></a>
     </div>
     <div class="span4 offset6">
         <div class="dropdown">
@@ -60,19 +60,24 @@
                                     <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="#">&{service.menu.edit.label}</a></li>
-                                    <li><a href="#">&{service.menu.getcapabilities.label}</a></li>
-                                    <li><a href="#">&{service.menu.log.label}</a></li>
-                                    <li><a href="#">&{service.menu.delete.label}</a></li>
+                                    <li><a href="edit/${service.type}/${service.identifier}">&{service.menu.edit.label}</a></li>
+                                    <li><a href="#" data-action="delete-service" data-service-type="${service.type}" data-service-id="${service.identifier}">&{service.menu.delete.label}</a></li>
+                                    <li><a href="#" data-action="open-logs" data-logs="${service.logsURL}?l=1000">&{service.menu.log.label}</a></li>
+                                    <li><a href="#" data-action="open-capabilities" data-capabilities="${service.capabilitiesUrl}">&{service.menu.getcapabilities.label}</a></li>
                                 </ul>
                             </div>
-                            <a class="btn btn-info" href="#"><i class="icon-refresh"></i></a>
-                            <a class="btn btn-danger" href="#"><i class="icon-stop"></i></a>
+                            <a class="btn btn-info" href="#" data-action="restart-service" data-service-type="${service.type}" data-service-id="${service.identifier}">
+                                <i class="icon-refresh"></i>
+                            </a>
+                            <a class="btn stopped" href="#" data-state="${service.type}-${service.identifier}" data-action="toggle-service" data-service-type="${service.type}" data-service-id="${service.identifier}">
+                                <i class="icon-play"></i>
+                                <i class="icon-stop"></i>
+                            </a>
                         </div>
                     </div>
                     <div class="row">
                         <div class="span3">
-                            <p><strong>&{service.create.end.type.label}</strong> &nbsp; ${type}</p>
+                            <p><strong>&{service.create.end.type.label}</strong> &nbsp; ${service.type}</p>
                             <p><strong>&{service.create.end.version.label}</strong> &nbsp;
                                 <% for (def version : versions) {%>
                                     ${version}
@@ -84,7 +89,7 @@
                         <div class="span6">
                             <dl>
                                 <dt>&{service.create.end.description.label}</dt>
-                                <dd>${service.description}</dd>
+                                <dd>${service._abstract}</dd>
                             </dl>
                         </div>
                     </div>
@@ -93,7 +98,7 @@
 
             <!-- Button to add data on service -->
             <div class="offset1 span4">
-                <a class="btn btn-large" href="edit/${type}/${service.name}"><i class="icon-plus-sign"></i> &{service.create.end.addlayers.label}</a>
+                <a class="btn btn-large" href="edit/${service.type}/${service.identifier}"><i class="icon-plus-sign"></i> &{service.create.end.addlayers.label}</a>
             </div>
         <%}else{%>
             <!-- alert part -->
@@ -104,3 +109,35 @@
         <%}%>
     </div>
 </div>
+
+<div class="modal hide fade" id="getcapabilities-modal" style="left:40%; width:910px">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>GetCapabilities</h3>
+    </div>
+    <div class="modal-body">
+        <pre id="capabilities-modal-pre" style="background-color: #f8f8ff"><code class="xml"></code></pre>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    </div>
+</div>
+
+<div class="modal hide fade" id="logs-modal" style="left:40%; width:910px">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Log</h3>
+    </div>
+    <div class="modal-body">
+        <pre id="logs-modal-pre" style="background-color: #f8f8ff"><code class="xml"></code></pre>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        enableActions();
+    });
+</script>

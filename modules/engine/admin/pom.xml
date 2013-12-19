@@ -20,6 +20,10 @@
     -->
     <dependencies>
         <dependency>
+            <groupId>org.mdweb.metamodel</groupId>
+            <artifactId>mdweb-metamodel-lib-auth</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.constellation.library</groupId>
             <artifactId>cstl-lib-base</artifactId>
             <version>${project.version}</version>
@@ -44,11 +48,19 @@
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-jaxp-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-xml-sld</artifactId>
         </dependency>
+
+        <dependency>
+          <groupId>org.constellation.engine.register</groupId>
+          <artifactId>cstl-register-api</artifactId>
+          <version>0.9-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

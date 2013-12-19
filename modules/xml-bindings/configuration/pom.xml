@@ -104,16 +104,8 @@
   -->
     <dependencies>
         <dependency>
-            <groupId>org.mdweb.metamodel</groupId>
-            <artifactId>mdweb-metamodel-lib-auth</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-utility-pending</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-utility-jdbc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
@@ -127,12 +119,8 @@
         <dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-core</artifactId>
-        </dependency>
-        <!-- dependency>
-            <groupId>ojdbc</groupId>
-            <artifactId>ojdbc</artifactId>
             <scope>provided</scope>
-        </dependency -->
+        </dependency>
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -140,12 +128,11 @@
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-go2-style-extension</artifactId>
+            <artifactId>geotk-render2d</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opengis</groupId>
             <artifactId>geoapi-conformance</artifactId>
-            <version>${geoapi.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -156,5 +143,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

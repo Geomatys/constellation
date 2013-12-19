@@ -23,10 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.logging.Level;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
@@ -37,19 +35,20 @@ import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.geotoolkit.util.FileUtilities;
+import org.apache.sis.test.XMLComparator;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 
 import static org.constellation.test.utils.MetadataUtilities.*;
 
 // JUnit dependencies
 import org.apache.sis.util.ComparisonMode;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import static org.junit.Assert.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
+import org.w3c.dom.Node;
 
 
 /**
@@ -59,40 +58,29 @@ import org.junit.runner.RunWith;
 @RunWith(TestRunner.class)
 public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
-     private static final File configDir =  new File("NCCSWWorkerTest");
-
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
 
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
-
-        if (!configDir.exists()) {
-            configDir.mkdir();
-
-            ConfigDirectory.setConfigDirectory(configDir);
+        final File configDir = ConfigurationEngine.setupTestEnvironement("NCCSWWorkerTest");
             
-            File CSWDirectory  = new File(configDir, "CSW");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
+        File CSWDirectory  = new File(configDir, "CSW");
+        CSWDirectory.mkdir();
+        final File instDirectory = new File(CSWDirectory, "default");
+        instDirectory.mkdir();
 
-            //we write the data files
-            File dataDirectory = new File(instDirectory, "data");
-            dataDirectory.mkdir();
-            writeDataFile(dataDirectory, "2005092200_sst_21-24.en.nc", "2005092200_sst_21-24.en");
+        //we write the data files
+        File dataDirectory = new File(instDirectory, "data");
+        dataDirectory.mkdir();
+        writeDataFile(dataDirectory, "2005092200_sst_21-24.en.nc", "2005092200_sst_21-24.en");
 
-            //we write the configuration file
-            File configFile = new File(instDirectory, "config.xml");
-            Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
-            configuration.putParameter("transactionSecurized", "false");
-            configuration.putParameter("shiroAccessible", "false");
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-        }
+        //we write the configuration file
+        File configFile = new File(instDirectory, "config.xml");
+        Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
+        configuration.putParameter("transactionSecurized", "false");
+        configuration.putParameter("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
 
         pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
@@ -114,7 +102,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        FileUtilities.deleteDirectory(configDir);
+        ConfigurationEngine.shutdownTestEnvironement("NCCSWWorkerTest");
     }
 
     @Before
@@ -146,16 +134,28 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         assertTrue(result != null);
         assertTrue(result.getAny().size() == 1);
         Object obj = result.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetadata);
+
+        if (obj instanceof DefaultMetadata) {
+            DefaultMetadata isoResult = (DefaultMetadata) obj;
+            DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/2005092200_sst_21-24.en.xml"));
+            metadataEquals(ExpResult1, isoResult, ComparisonMode.APPROXIMATIVE);
+        } else if (obj instanceof Node) {
+            Node resultNode = (Node) obj;
+            Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/2005092200_sst_21-24.en.xml");
+            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
+            comparator.compare();
+        } else {
+            fail("unexpected record type:" + obj);
+        }
+
+        
 
 /*        Marshaller marshaller = pool.acquireMarshaller();
         marshaller.marshal(obj, new File("test.xml"));*/
 
-        DefaultMetadata isoResult = (DefaultMetadata) obj;
-
-        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/2005092200_sst_21-24.en.xml"));
-
-        metadataEquals(ExpResult1, isoResult, ComparisonMode.APPROXIMATIVE);
+      
 
         /*
          *  TEST 2 : getRecordById with the first metadata in DC mode (BRIEF).

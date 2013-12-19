@@ -19,6 +19,8 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -32,7 +34,15 @@ import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
@@ -42,6 +52,7 @@ import org.constellation.util.ReflectionUtilities;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 
 // Apache dependencies
 import org.apache.sis.metadata.iso.extent.DefaultGeographicDescription;
@@ -50,6 +61,8 @@ import org.apache.sis.xml.IdentifiedObject;
 import org.apache.sis.xml.IdentifierSpace;
 import org.apache.sis.xml.XLink;
 import org.apache.sis.xml.XLink.Type;
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
+import org.apache.sis.xml.XML;
 
 // MDWeb dependencies
 import org.mdweb.model.profiles.Profile;
@@ -75,6 +88,7 @@ import org.mdweb.model.storage.RecordSet.EXPOSURE;
 // GeoAPI
 import org.opengis.annotation.UML;
 import org.opengis.metadata.Metadata;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -124,23 +138,27 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     private final Map<Standard, List<Standard>> standardMapping = new HashMap<>();
 
+    private static final TimeZone tz = TimeZone.getTimeZone("GMT+2:00");
+    
     /**
      * Record the date format in the metadata.
      */
     protected static final List<DateFormat> DATE_FORMAT = new ArrayList<>();
     static {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        df.setTimeZone(TimeZone.getDefault());
+        df.setTimeZone(tz);
         DATE_FORMAT.add(df);
 
         df = new SimpleDateFormat("yyyy-MM-dd");
-        df.setTimeZone(TimeZone.getDefault());
+        df.setTimeZone(tz);
         DATE_FORMAT.add(df);
     }
 
     /**
      * Build a new metadata writer.
      *
+     * @param configuration The configuration object.
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     public MDWebMetadataWriter(final Automatic configuration) throws MetadataIoException {
         super();
@@ -192,6 +210,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * Build a new metadata writer.
      *
+     * @param mdWriter
+     * @param defaultrecordSet
+     * @param userLogin
+     * 
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     public MDWebMetadataWriter(final Writer mdWriter, final String defaultrecordSet, final String userLogin) throws MetadataIoException {
         super();
@@ -352,6 +375,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      *
      * @param object The object to transform in record.
      * @return an MDWeb {@link FullRecord} representing the metadata object.
+     * @throws org.mdweb.io.MD_IOException
      */
     protected FullRecord getRecordFromObject(final Object object) throws MD_IOException {
         final String title = Utils.findTitle(object);
@@ -362,7 +386,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * Return an MDWeb {@link FullRecord} from an object.
      *
      * @param object The object to transform in record.
+     * @param title
+     *
      * @return an MDWeb {@link FullRecord} representing the metadata object.
+     * @throws org.mdweb.io.MD_IOException
      */
     protected FullRecord getRecordFromObject(final Object object, String title) throws MD_IOException {
         if (title == null) {
@@ -375,7 +402,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * Return an MDWeb {@link FullRecord} from an object.
      *
      * @param object The object to transform in record.
+     * @param user
+     * @param recordSet
+     * @param title
+     * @param profile
      * @return an MDWeb {@link FullRecord} representing the metadata object.
+     * @throws org.mdweb.io.MD_IOException
      */
     public FullRecord getRecordFromObject(final Object object, final User user, final RecordSet recordSet, Profile profile, String title) throws MD_IOException {
 
@@ -453,6 +485,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * Add a MDWeb value (and his children)to the specified record.
      *
      * @param record The created record.
+     * @param object
+     * @param path
+     * @param parentValue
+     * @param alreadyWrite
+     * @return
+     * @throws org.mdweb.io.MD_IOException
      *
      */
     protected List<Value> addValueFromObject(final FullRecord record, Object object, Path path, final Value parentValue, final Map<Object, Value> alreadyWrite) throws MD_IOException {
@@ -623,7 +661,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 c.setTime(d);
                 if (c.get(Calendar.HOUR) == 0 && c.get(Calendar.MINUTE) == 0 && c.get(Calendar.SECOND) == 0 && c.get(Calendar.MILLISECOND) == 0) {
                     synchronized (DATE_FORMAT) {
-                        value = DATE_FORMAT.get(1).format(object);
+                        value = DATE_FORMAT.get(1).format(object) + "T00:00:00" + tz.getDisplayName().substring(3);
                     }
                 } else {
                     synchronized (DATE_FORMAT) {
@@ -817,6 +855,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * Return an MDWeb {@link Classe} object for the specified java object.
      *
      * @param object the object to identify
+     * @return
      *
      * @throws org.mdweb.io.MD_IOException
      */
@@ -1025,19 +1064,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean storeMetadata(final Object obj) throws MetadataIoException {
+    public boolean storeMetadata(final Node obj) throws MetadataIoException {
         return storeMetadata(obj, null);
     }
 
-    public boolean storeMetadata(Object obj, final String title) throws MetadataIoException {
+    public boolean storeMetadata(final Node node, final String title) throws MetadataIoException {
         // profiling operation
         final long start = System.currentTimeMillis();
         long transTime   = 0;
         long writeTime   = 0;
 
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement)obj).getValue();
-        }
+        // unmarshall the objet
+        final Object obj = unmarshallObject(node);
 
         // we create a MDWeb record the object
         FullRecord record = null;
@@ -1054,7 +1092,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             record                = getRecordFromObject(obj, title);
             transTime             = System.currentTimeMillis() - startTrans;
 
-            if (mdWriter.isAlreadyUsedIdentifier(record.getIdentifier())) {
+            if (record != null && mdWriter.isAlreadyUsedIdentifier(record.getIdentifier())) {
                 throw new MD_IOException("The identifier " + record.getIdentifier() + " is already used");
             }
 
@@ -1164,7 +1202,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean replaceMetadata(final String metadataID, final Object any) throws MetadataIoException {
+    public boolean replaceMetadata(final String metadataID, final Node any) throws MetadataIoException {
         final boolean succeed = deleteMetadata(metadataID);
         if (!succeed) {
             return false;
@@ -1190,8 +1228,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @param xpath An XPath
      *
      * @return An MDWeb path
-     * @throws java.sql.SQLException
-     * @throws org.constellation.ws.MetadataIoException
+     * @throws org.mdweb.io.MD_IOException
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     protected MixedPath getMDWPathFromXPath(String xpath) throws MD_IOException, MetadataIoException {
         //we remove the first '/'
@@ -1245,7 +1283,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 }
             }
 
-            LOGGER.finer("propertyName:" + propertyName + " ordinal:" + ordinal);
+            LOGGER.log(Level.FINER, "propertyName:{0} ordinal:{1}", new Object[]{propertyName, ordinal});
             idValue.append(':').append(propertyName).append('.');
             if (ordinal == -1) {
                 idValue.append('*');
@@ -1292,7 +1330,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             } else {
                 idValue.append(ordinal);
             }
-            LOGGER.finer("last propertyName:" + xpath + " ordinal:" + ordinal);
+            LOGGER.log(Level.FINER, "last propertyName:{0} ordinal:{1}", new Object[]{xpath, ordinal});
             final Property property = getProperty(type, xpath);
             p = new Path(p, property);
         }
@@ -1321,6 +1359,62 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         return property;
     }
 
+
+    private Object unmarshallObject(final Node n) throws MetadataIoException {
+        final MetadataType mode;
+        switch (n.getLocalName()) {
+            case "MD_Metadata":
+            case "MI_Metadata":
+                mode = MetadataType.ISO_19115;
+                break;
+            case "Record":
+                mode = MetadataType.DUBLINCORE;
+                break;
+            case "SensorML":
+                mode = MetadataType.SENSORML;
+                break;
+            case "RegistryObject":
+            case "AdhocQuery":
+            case "Association":
+            case "RegistryPackage":
+            case "Registry":
+            case "ExtrinsicObject":
+            case "RegistryEntry":
+                mode = MetadataType.EBRIM;
+                break;
+            default:
+                mode = MetadataType.NATIVE;
+                break;
+        }
+        // TODO complete other metadata type
+
+        try {
+            final boolean replace = mode == MetadataType.ISO_19115;
+            final Unmarshaller um = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
+            um.setProperty(LegacyNamespaces.APPLY_NAMESPACE_REPLACEMENTS, replace);
+            um.setProperty(XML.TIMEZONE, tz);
+            final String xml = getStringFromNode(n);
+            Object obj = um.unmarshal(new StringReader(xml));
+            EBRIMMarshallerPool.getInstance().recycle(um);
+
+            if (obj instanceof JAXBElement) {
+                obj = ((JAXBElement)obj).getValue();
+            }
+            return obj;
+        } catch (JAXBException | TransformerException ex) {
+            throw new MetadataIoException(ex);
+        }
+    }
+
+    private static String getStringFromNode(final Node n) throws TransformerException  {
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(n), new StreamResult(writer));
+        String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
+        return output;
+    }
 
     /**
      * Must be overridden by subClasses

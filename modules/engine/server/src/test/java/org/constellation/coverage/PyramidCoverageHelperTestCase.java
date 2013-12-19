@@ -15,6 +15,7 @@ public class PyramidCoverageHelperTestCase {
                 .inputFormat("PNG").fromImage("path/to/a/geo.tiff")
                 .toMemoryStore().build();
         Assert.assertNotNull(helper);
+        PyramidCoverageHelper.builder("zozo").fromImage("");
 
     }
 

@@ -1,0 +1,117 @@
+#{param name=selected/}
+<% if (selected == null) { %>
+<div class="alert alert-info">
+    <h5>&{label.no.selected.data}</h5>
+    <p>&{msg.no.selected.data}</p>
+</div>
+<% } else { %>
+<div class="selected-item" data-name="${selected.name}" data-provider="${selected.provider}">
+    <div class="block-header">
+        <strong>${selected.name}</strong><i class="icon-chevron-up pull-right"></i>
+    </div>
+
+    <div class="block-content">
+        <h6>&{label.owner}</h6>
+        <span>
+            <% if (selected.owner != null && selected.owner != '') { %>
+            ${selected.owner}<% } else { %>&{label.unknown}
+            <% } %>
+        </span>
+
+        <div class="separator"></div>
+        <h6>&{label.date}</h6>
+        <span>${selected.date}</span>
+
+        <div class="separator"></div>
+        <h6>&{label.type}</h6>
+        <span>${selected.type}</span>
+
+        <div class="separator"></div>
+        <h6 style="margin-bottom:12px;">&{label.related.style}
+            <button type="button" onclick="styleFlow.start();"
+                    class="btn btn-small pull-right" title="&{msg.add.data.style.association}">
+                <i class="icon-plus"></i></button></h6>
+
+        <div id="linkedList">
+            <% if (selected.targetStyle == null || selected.targetStyle.isEmpty()) { %>
+            &{label.no.association}
+            <% } else { %>
+            <% for (def style : selected.targetStyle) { %>
+            <div class="style" data-name="${style.name}" data-provider="${style.provider}">
+                <button type="button" onclick="styleFlow.unlink('${style.name}', '${style.provider}', dataUnlink);"
+                        class="btn btn-small"><i class="icon-minus"></i></button>
+                ${style.name}
+            </div>
+            <% } %>
+            <% } %>
+        </div>
+        <div class="separator"></div>
+        <h6 style="margin-bottom:12px;">&{label.related.service}</h6>
+        <div id="linkedServiceList">
+            <% if (selected.targetService == null || selected.targetService.isEmpty()) { %>
+            &{label.no.association}
+            <% } else { %>
+            <% for (def service : selected.targetService) { %>
+            <div class="style" data-name="${service.name}" data-type="${service.protocol}" style="padding: 3px 0px;">
+                ${service.name}
+            </div>
+            <% } %>
+            <% } %>
+        </div>
+        <div class="separator"></div>
+        <h6 style="margin-bottom:12px;">&{label.related.mapcontext}</h6>
+        <div id="linkedMapContextList">
+            &{label.no.association}
+        </div>
+    </div>
+    <div class="block-action">
+        <div class="row-fluid" style="padding-bottom: 5px">
+            <button type="button" class="btn btn-info span6">
+                <i class="icon-download-alt"></i> Export
+            </button>
+            <button type="button" id="seeMetadata" class="btn btn-warning span6">
+                <i class="icon-file-alt"></i> See metadata
+            </button>
+        </div>
+        <div class="row-fluid">
+            <button type="button" class="btn btn-success span6">
+                <i class="icon-map-marker"></i> Show layer
+            </button>
+            <button type="button" id="deleteLayer" class="btn btn-danger span6">
+                <i class="icon-trash"></i> Delete layer
+            </button>
+        </div>
+    </div>
+
+
+    <form action="@{DataController.getMetadata()}" id="metadataForm">
+        <input type="hidden" name="providerId" id="providerId"/>
+        <input type="hidden" name="dataId" value="${selected.name}"/>
+        <input type="hidden" name="dataType" value="${selected.type}"/>
+        <input type="hidden" name="returnUrl" id="returnUrl"/>
+    </form>
+
+    <script type="text/javascript">
+        $("#deleteLayer").on("click", function(){
+            $("#deleteLayerId").val($(".selected").data("name"));
+            $("#deleteForm").submit();
+        });
+
+        $("#seeMetadata").on("click", function(){
+            $("#providerId").val($(".selected").data("provider"));
+            $("#returnUrl").val(document.URL);
+            $("#metadataForm").submit();
+        });
+
+        function dataUnlink(styleProvider, styleName, dataProvider, dataName){
+            return CSTL.Providers.unlinkStyleFromData(styleProvider,styleName,dataProvider,dataName);
+        }
+
+        function serviceUnlink(){
+            return true;
+        }
+
+        styleFlow.setSelected('${selected.name}','${selected.provider}');
+    </script>
+</div>
+<% } %>

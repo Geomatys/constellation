@@ -86,6 +86,7 @@ import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.Namespaces;
+import org.constellation.metadata.utils.CSWUtils;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -158,48 +159,52 @@ public class CSWService extends OGCWebService<CSWworker> {
             serviceDef = worker.getVersionFromNumber(request.getVersion());
 
             if (request instanceof GetCapabilities) {
-
-                return Response.ok(worker.getCapabilities((GetCapabilities)request), worker.getOutputFormat()).build();
+                final GetCapabilities gc = (GetCapabilities) request;
+                final String outputFormat  = MimeType.APPLICATION_XML; // TODO
+                return Response.ok(worker.getCapabilities(gc), outputFormat).build();
             }
 
             if (request instanceof GetRecordsRequest) {
 
                 final GetRecordsRequest gr = (GetRecordsRequest)request;
-
+                final String outputFormat  = CSWUtils.getOutputFormat(gr);
                 // we pass the serializer to the messageBodyWriter
                 final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecords(gr), getXMLSerializer());
-                return Response.ok(response, worker.getOutputFormat()).build();
-
+                return Response.ok(response, outputFormat).build();
             }
 
             if (request instanceof GetRecordById) {
 
                 final GetRecordById grbi = (GetRecordById)request;
-
+                final String outputFormat  = CSWUtils.getOutputFormat(grbi);
                 // we pass the serializer to the messageBodyWriter
                 final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecordById(grbi), getXMLSerializer());
-                return Response.ok(response, worker.getOutputFormat()).build();
-
+                return Response.ok(response, outputFormat).build();
             }
 
             if (request instanceof DescribeRecord) {
 
-                return Response.ok(worker.describeRecord((DescribeRecord)request), worker.getOutputFormat()).build();
+                final DescribeRecord dr = (DescribeRecord)request;
+                final String outputFormat  = CSWUtils.getOutputFormat(dr);
+                return Response.ok(worker.describeRecord(dr), outputFormat).build();
             }
 
             if (request instanceof GetDomain) {
-
-                return Response.ok(worker.getDomain((GetDomain)request), worker.getOutputFormat()).build();
+                final GetDomain gd = (GetDomain)request;
+                final String outputFormat  = CSWUtils.getOutputFormat(gd);
+                return Response.ok(worker.getDomain(gd), outputFormat).build();
             }
 
             if (request instanceof Transaction) {
-
-                return Response.ok(worker.transaction( (Transaction)request), worker.getOutputFormat()).build();
+                final Transaction tr = (Transaction)request;
+                final String outputFormat  = CSWUtils.getOutputFormat(tr);
+                return Response.ok(worker.transaction(tr), outputFormat).build();
             }
 
             if (request instanceof Harvest) {
-
-                return Response.ok(worker.harvest((Harvest)request), worker.getOutputFormat()).build();
+                final Harvest hv = (Harvest)request;
+                final String outputFormat  = CSWUtils.getOutputFormat(hv);
+                return Response.ok(worker.harvest(hv), outputFormat).build();
             }
 
             throw new CstlServiceException("The operation " +  request.getClass().getName() + " is not supported by the service",

@@ -17,12 +17,13 @@
 package org.constellation.provider;
 
 import java.util.*;
+import org.constellation.admin.dao.DataRecord;
+import org.constellation.admin.dao.ProviderRecord.ProviderType;
 
 import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.map.ElevationModel;
 
-import org.geotoolkit.util.Utilities;
 import org.opengis.feature.type.Name;
 
 /**
@@ -41,7 +42,7 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
     private static final Collection<LayerProviderService> SERVICES;
 
     static {
-        final List<LayerProviderService> cache = new ArrayList<LayerProviderService>();
+        final List<LayerProviderService> cache = new ArrayList<>();
         final ServiceLoader<LayerProviderService> loader = ServiceLoader.load(LayerProviderService.class);
         for(final LayerProviderService service : loader){
             cache.add(service);
@@ -66,7 +67,7 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
      * {@inheritDoc }
      */
     @Override
-    public ElevationModel getElevationModel(Name name) {
+    public ElevationModel getElevationModel(final Name name) {
         for(final LayerProvider provider : getProviders()){
             final ElevationModel model = provider.getElevationModel(name);
             if(model != null) return model;
@@ -75,8 +76,8 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
     }
 
     @Override
-    public LayerDetails get(Name key, Date version) {
-        final List<LayerDetails> candidates = new ArrayList<LayerDetails>();
+    public LayerDetails get(final Name key, final Date version) {
+        final List<LayerDetails> candidates = new ArrayList<>();
 
         for(final LayerProvider provider : getProviders()){
             final LayerDetails layer = provider.get(key, version);
@@ -109,7 +110,7 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
         return null;
     }
 
-    public LayerDetails get(Name key, final String providerID, Date version) {
+    public LayerDetails get(final Name key, final String providerID, final Date version) {
         final LayerProvider provider = getProvider(providerID);
         if (provider == null) {
             return null;
@@ -151,5 +152,15 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
      */
     public static LayerProviderProxy getInstance(){
         return INSTANCE;
+    }
+
+    @Override
+    public ProviderType getProviderType() {
+        return ProviderType.LAYER;
+    }
+
+    @Override
+    public DataRecord.DataType getDataType() {
+        throw new UnsupportedOperationException("Not supported on proxy instance.");
     }
 }

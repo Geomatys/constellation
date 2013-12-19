@@ -247,7 +247,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor implements GetFe
             return;
         }
 
-        final Name fullLayerName = coverage.getLayer().getCoverageName();
+        final Name fullLayerName = coverage.getLayer().getCoverageReference().getName();
         String layerName = fullLayerName.getLocalPart();
 
         List<String> strs = values.get(layerName);

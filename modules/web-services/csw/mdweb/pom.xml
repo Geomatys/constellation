@@ -93,8 +93,18 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+       <groupId>org.mdweb.metamodel</groupId>
+       <artifactId>mdweb-metamodel-lib-thesaurus-sql-data</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-sensorML</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.project</groupId>
+      <artifactId>geotk-test</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -85,7 +85,7 @@ public final class LaunchTests implements Runnable {
      * @throws IOException if the execution of the script fails.
      * @throws MojoFailureException if a regression is detected.
      */
-    public static void main(String[] args) throws IOException, MojoFailureException {
+    public static void main(String[] args) throws Exception {
         // Launch the server.
         GrizzlyServer.initServer();
 

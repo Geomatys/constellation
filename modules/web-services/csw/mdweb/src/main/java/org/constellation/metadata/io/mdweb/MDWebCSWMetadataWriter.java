@@ -73,16 +73,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter {
     }
 
     @Override
-    public boolean storeMetadata(Object obj) throws MetadataIoException {
-        if (obj instanceof Node) {
-            try {
-                final Unmarshaller u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-                obj = u.unmarshal((Node)obj);
-                CSWMarshallerPool.getInstance().recycle(u);
-            } catch (JAXBException ex) {
-                throw new MetadataIoException(ex);
-            }
-        }
+    public boolean storeMetadata(Node obj) throws MetadataIoException {
         return super.storeMetadata(obj); 
     }
 

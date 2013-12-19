@@ -28,6 +28,4 @@ public class AddLayerToWMSServiceTest extends AddLayerToMapServiceTest {
     public AddLayerToWMSServiceTest() {
         super("WMS", DefaultWMSWorker.class);
     }
-    
-    
 }

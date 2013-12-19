@@ -26,6 +26,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
@@ -113,6 +114,10 @@ public final class ConstellationClient {
         this.version    = version;
         this.services   = new ServicesAPI(this);
         this.providers  = new ProvidersAPI(this);
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     /**
@@ -208,12 +213,13 @@ public final class ConstellationClient {
      *
      * @param path the request path
      * @param type the submitted/expected media type
+     * @param map
      * @return the response instance
      * @throws IOException on HTTP communication problem like connection or read timeout
      */
-    Response delete(final String path, final MediaType type) throws IOException {
+    Response delete(final String path, final MediaType type, final MultivaluedMap<String, String> map) throws IOException {
         try {
-            return new Response(newRequest(path, type).delete(ClientResponse.class));
+            return new Response(newRequest(path, type).queryParams(map).delete(ClientResponse.class));
         } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }

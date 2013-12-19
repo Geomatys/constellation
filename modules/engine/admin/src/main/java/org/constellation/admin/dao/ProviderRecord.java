@@ -18,13 +18,16 @@
 package org.constellation.admin.dao;
 
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * @author Fabien Bernard (Geomatys).
@@ -91,7 +94,7 @@ public final class ProviderRecord implements Record {
         session.updateProvider(id, identifier, type, impl, owner);
     }
 
-    public GeneralParameterValue getConfig(final ParameterDescriptorGroup descriptor) throws SQLException, IOException {
+    public GeneralParameterValue getConfig(final GeneralParameterDescriptor descriptor) throws SQLException, IOException {
         return session.readProviderConfig(id, descriptor);
     }
 
@@ -112,6 +115,14 @@ public final class ProviderRecord implements Record {
         session.updateProvider(id, identifier, type, impl, owner.getLogin());
     }
 
+    public InputStream getMetadata() throws IOException, SQLException {
+        return session.readProviderMetadata(id);
+    }
+
+    public void setMetadata(final StringReader metadata) throws IOException, SQLException {
+        session.updateProviderMetadata(id, metadata);
+    }
+
     public List<StyleRecord> getStyles() throws SQLException {
         return session.readStyles(this);
     }
@@ -119,4 +130,6 @@ public final class ProviderRecord implements Record {
     public List<DataRecord> getData() throws SQLException {
         return session.readData(this);
     }
+
+
 }

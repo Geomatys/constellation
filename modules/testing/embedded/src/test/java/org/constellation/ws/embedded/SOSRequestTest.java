@@ -28,12 +28,21 @@ import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import java.net.URLConnection;
 import java.net.URL;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.DataSourceType;
+import org.constellation.configuration.SOSConfiguration;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
+import org.constellation.util.Util;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
@@ -66,7 +75,33 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
      */
     @BeforeClass
     public static void initPool() throws Exception {
-        final Map<String, Object> map = new HashMap<String, Object>();
+        final File configDirectory = ConfigurationEngine.setupTestEnvironement("SOSRequestTest");
+
+        final File dataDirectory = new File(configDirectory, "dataSos");
+        dataDirectory.mkdir();
+
+        writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-0014.4F01.0000.261A");
+        writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-0014.4F01.0000.2626");
+        writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-2");
+
+        final Automatic smlConfig = new Automatic(null, dataDirectory.getPath());
+        final Automatic omCOnfig = new Automatic(null, new BDD("org.postgresql.Driver", "jdbc:postgresql://flupke.geomatys.com:5432/observation", "test", "test"));
+        final SOSConfiguration sosconf = new SOSConfiguration(smlConfig, omCOnfig);
+        sosconf.setObservationFilterType(DataSourceType.POSTGRID);
+        sosconf.setObservationReaderType(DataSourceType.POSTGRID);
+        sosconf.setObservationWriterType(DataSourceType.POSTGRID);
+        sosconf.setSMLType(DataSourceType.FILESYSTEM);
+        sosconf.setProfile("transactional");
+        sosconf.setObservationIdBase("urn:ogc:object:observation:SunSpot:");
+        sosconf.setSensorIdBase("urn:ogc:object:sensor:SunSpot:");
+        sosconf.setPhenomenonIdBase("urn:phenomenon:");
+        sosconf.setObservationTemplateIdBase("urn:ogc:object:observationTemplate:SunSpot:");
+        sosconf.setVerifySynchronization(false);
+        
+        ConfigurationEngine.storeConfiguration("SOS", "default", sosconf);
+        ConfigurationEngine.storeConfiguration("SOS", "test", sosconf);
+
+        final Map<String, Object> map = new HashMap<>();
         map.put("sos", new SOService());
         initServer(null, map);
         // Get the list of layers
@@ -79,7 +114,8 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
         if (f.exists()) {
             f.delete();
         }
-        //finish();
+        ConfigurationEngine.shutdownTestEnvironement("SOSRequestTest");
+        finish();
     }
 
     @Test
@@ -302,5 +338,27 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
         obj = unmarshallResponse(getFoiUrl);
 
         assertTrue("expecting SamplingPointType but was: " + obj, obj instanceof SamplingPointType);
+    }
+
+    public static void writeDataFile(File dataDirectory, String resourceName) throws IOException {
+
+        final File dataFile;
+        if (System.getProperty("os.name", "").startsWith("Windows")) {
+            final String windowsIdentifier = resourceName.replace(':', '-');
+            dataFile = new File(dataDirectory, windowsIdentifier + ".xml");
+        } else {
+            dataFile = new File(dataDirectory, resourceName + ".xml");
+        }
+        FileWriter fw = new FileWriter(dataFile);
+        InputStream in = Util.getResourceAsStream("org/constellation/embedded/test/" + resourceName + ".xml");
+
+        byte[] buffer = new byte[1024];
+        int size;
+
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            fw.write(new String(buffer, 0, size));
+        }
+        in.close();
+        fw.close();
     }
 }

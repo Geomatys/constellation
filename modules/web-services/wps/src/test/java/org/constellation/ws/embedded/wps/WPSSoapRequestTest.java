@@ -20,9 +20,15 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.configuration.ProcessFactory;
+import org.constellation.configuration.Processes;
 import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
 import org.geotoolkit.util.StringUtilities;
@@ -39,7 +45,17 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
 
     @BeforeClass
     public static void initLayerList() throws Exception {
-        final Map<String, Object> map = new HashMap<String, Object>();
+        ConfigurationEngine.setupTestEnvironement("WPSSoapRequestTest");
+
+        final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
+        final Processes processes = new Processes(process);
+        final ProcessContext config = new ProcessContext(processes);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WPS", "default", config);
+        ConfigurationEngine.storeConfiguration("WPS", "test", config);
+        
+        final Map<String, Object> map = new HashMap<>();
         map.put("wps", new WPSService());
         initServer(new String[] {
             "org.constellation.wps.ws.rs",
@@ -48,7 +64,9 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutdown() {
+        ConfigurationEngine.shutdownTestEnvironement("WPSSoapRequestTest");
+        finish();
     }
 
     /**

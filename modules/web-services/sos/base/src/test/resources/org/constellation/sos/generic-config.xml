@@ -1,588 +1,654 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <automatic format="cdi" >
-   <bdd>
-      <className>org.apache.derby.jdbc.EmbeddedDriver</className>
-      <connectURL>??</connectURL>
-      <user></user>
-      <password></password>
-   </bdd>
-   <queries>
-      <!--main>
-         <query>
-            <select>
-               <col>
-                  <var>:$</var>
-                  <sql>TODO</sql>
-               </col>
-            </select>
-            <from>TODO</from>
-            <where></where>
-            <orderBy></orderBy>
-         </query>
-      </main-->
-      <queryList>
-	 <!-- new identifier query (not needed in discovery profile)-->
-         <query>
-            <select>
-               <col>
-                  <var>var05</var>
-                  <sql>count(*)</sql>
-               </col>
-            </select>
-            <from>"observation"."observations"</from>
-            <where>"name" LIKE '%:$%'</where>
-         </query>
-         <!-- Observation id already exist (not needed in discovery profile)-->
-         <query>
-            <select>
-               <col>
-                  <var>var44</var>
-                  <sql>"name"</sql>
-               </col>
-            </select>
-            <from>"observation"."observations"</from>
-            <where>"name"=:$</where>
-         </query>
-	 <!-- minimal time event for offering -->
-         <query>
-            <select>
-               <col>
-                  <var>var06</var>
-                  <sql>MIN("event_time_begin")</sql>
-               </col>
-            </select>
-            <from>"sos"."observation_offerings"</from>
-         </query>
-         <!-- verify that the offering exist -->
-         <query>
-            <select>
-               <col>
-                  <var>var46</var>
-                  <sql>"id"</sql>
-               </col>
-            </select>
-            <from>"sos"."observation_offerings"</from>
-            <where>"id"=:$</where>
-         </query>
-         <!-- time bound for an offering -->
-         <query>
-            <select>
-               <col>
-                  <var>var08</var>
-                  <sql>"event_time_begin"</sql>
-               </col>
-               <col>
-                  <var>var09</var>
-                  <sql>"event_time_end"</sql>
-               </col>
-            </select>
-            <from>"sos"."observation_offerings"</from>
-            <where>"id"=:$</where>
-         </query>
-         <!-- phenomenon exist? -->
-         <query>
-            <select>
-               <col>
-                  <var>var47</var>
-                  <sql>"id"</sql>
-               </col>
-            </select>
-            <from>"observation"."phenomenons"</from>
-            <where>"id"=:$</where>
-         </query>
-         <!-- composite phenomenon exist? -->
-         <query>
-            <select>
-               <col>
-                  <var>var68</var>
-                  <sql>"id"</sql>
-               </col>
-            </select>
-            <from>"observation"."composite_phenomenons"</from>
-            <where>"id"=:$</where>
-         </query>
-	 <!-- simple phenomenon -->
-         <query>
-            <select>
-               <col>
-                  <var>var13</var>
-                  <sql>"name"</sql>
-               </col>
-               <col>
-                  <var>var14</var>
-                  <sql>"description"</sql>
-               </col>
-            </select>
-            <from>"observation"."phenomenons"</from>
-            <where>"id"=:$</where>
-         </query>
-         <!-- composite phenomenon -->
-         <query>
-            <select>
-               <col>
-                  <var>var15</var>
-                  <sql>"name"</sql>
-               </col>
-               <col>
-                  <var>var16</var>
-                  <sql>"description"</sql>
-               </col>
-            </select>
-            <from>"observation"."composite_phenomenons"</from>
-            <where>"id"=:$</where>
-         </query>
-	 <!-- feature of interest (samplingPoint) exist-->
-         <query>
-            <select>
-               <col>
-                  <var>var48</var>
-                  <sql>"id"</sql>
-               </col>
-            </select>
-            <from>"observation"."sampling_points"</from>
-            <where>"id"=:$</where>
-         </query>
-         <!-- feature of interest (samplingPoint)-->
-         <query>
-            <select>
-               <col>
-                  <var>var19</var>
-                  <sql>"name"</sql>
-               </col>
-               <col>
-                  <var>var20</var>
-                  <sql>"description"</sql>
-               </col>
-               <col>
-                  <var>var21</var>
-                  <sql>"sampled_feature"</sql>
-               </col>
-               <col>
-                  <var>var22</var>
-                  <sql>"point_id"</sql>
-               </col>
-               <col>
-                  <var>var23</var>
-                  <sql>"point_srsname"</sql>
-               </col>
-               <col>
-                  <var>var24</var>
-                  <sql>"point_srsdimension"</sql>
-               </col>
-            </select>
-            <from>"observation"."sampling_points"</from>
-            <where>"id"=:$</where>
-         </query>
-          <!-- feature of interest (samplingCurve) exist-->
-         <query>
-            <select>
-               <col>
-                  <var>var51</var>
-                  <sql>"id"</sql>
-               </col>
-            </select>
-            <from>"observation"."sampling_curves"</from>
-            <where>"id"=:$</where>
-         </query>
-          <!-- feature of interest (samplingCurve)-->
-         <query>
-            <select>
-               <col>
-                  <var>var52</var>
-                  <sql>"description"</sql>
-               </col>
-               <col>
-                  <var>var53</var>
-                  <sql>"name"</sql>
-               </col>
-               <col>
-                  <var>var54</var>
-                  <sql>"srs_name"</sql>
-               </col>
-               <col>
-                  <var>var55</var>
-                  <sql>"lower_corner_x"</sql>
-               </col>
-               <col>
-                  <var>var56</var>
-                  <sql>"lower_corner_y"</sql>
-               </col>
-               <col>
-                  <var>var57</var>
-                  <sql>"upper_corner_x"</sql>
-               </col>
-               <col>
-                  <var>var58</var>
-                  <sql>"upper_corner_y"</sql>
-               </col>
-               <col>
-                  <var>var59</var>
-                  <sql>"sampled_feature"</sql>
-               </col>
-               <col>
-                  <var>var60</var>
-                  <sql>"length_uom"</sql>
-               </col>
-               <col>
-                  <var>var61</var>
-                  <sql>"length_value"</sql>
-               </col>
-               <col>
-                  <var>var62</var>
-                  <sql>"shape_id"</sql>
-               </col>
-               <col>
-                  <var>var63</var>
-                  <sql>"shape_srsname"</sql>
-               </col>
-               <col>
-                  <var>var82</var>
-                  <sql>env."id"</sql>
-               </col>
-            </select>
-            <from>"observation"."sampling_curves" sc, "sos"."envelopes" env</from>
-            <where>sc."id"=:$
-                AND sc."boundedby" = env."id"</where>
-         </query>
-	 <!-- observation -->
-         <query>
-            <select>
-               <col>
-                  <var>var26</var>
-                  <sql>"feature_of_interest_point"</sql>
-               </col>
-               <col>
-                  <var>var50</var>
-                  <sql>"feature_of_interest_curve"</sql>
-               </col>
-               <col>
-                  <var>var27</var>
-                  <sql>"observed_property"</sql>
-               </col>
-               <col>
-                  <var>var49</var>
-                  <sql>"observed_property_composite"</sql>
-               </col>
-               <col>
-                  <var>var28</var>
-                  <sql>"procedure"</sql>
-               </col>
-               <col>
-                  <var>var29</var>
-                  <sql>"sampling_time_begin"</sql>
-               </col>
-               <col>
-                  <var>var30</var>
-                  <sql>"sampling_time_end"</sql>
-               </col>
-               <col>
-                  <var>var31</var>
-                  <sql>"result"</sql>
-               </col>
-            </select>
-            <from>"observation"."observations"</from>
-            <where>"name"=:$</where>
-         </query>
-          <!-- measurement -->
-         <query>
-            <select>
-               <col>
-                  <var>var69</var>
-                  <sql>"feature_of_interest_point"</sql>
-               </col>
-               <col>
-                  <var>var70</var>
-                  <sql>"feature_of_interest_curve"</sql>
-               </col>
-               <col>
-                  <var>var71</var>
-                  <sql>"observed_property"</sql>
-               </col>
-               <col>
-                  <var>var72</var>
-                  <sql>"observed_property_composite"</sql>
-               </col>
-               <col>
-                  <var>var73</var>
-                  <sql>"procedure"</sql>
-               </col>
-               <col>
-                  <var>var74</var>
-                  <sql>"sampling_time_begin"</sql>
-               </col>
-               <col>
-                  <var>var75</var>
-                  <sql>"sampling_time_end"</sql>
-               </col>
-               <col>
-                  <var>var76</var>
-                  <sql>"result"</sql>
-               </col>
-            </select>
-            <from>"observation"."measurements"</from>
-            <where>"name"=:$</where>
-         </query>
-	 <!-- result -->
-         <query>
-            <select>
-               <col>
-                  <var>var32</var>
-                  <sql>"element_count"</sql>
-               </col>
-               <col>
-                  <var>var33</var>
-                  <sql>"values"</sql>
-               </col>
-	       <col>
-                  <var>var34</var>
-                  <sql>"id_encoding"</sql>
-               </col>
-               <col>
-                  <var>var35</var>
-                  <sql>"token_separator"</sql>
-               </col>
-               <col>
-                  <var>var36</var>
-                  <sql>"decimal_separator"</sql>
-               </col>
-               <col>
-                  <var>var37</var>
-                  <sql>"block_separator"</sql>
-               </col>
-               <col>
-                  <var>var38</var>
-                  <sql>r."definition"</sql>
-               </col>
-               <col>
-                  <var>var39</var>
-                  <sql>"elementType"</sql>
-               </col>
-            </select>
-            <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."text_block_encodings" e</from>
-            <where>r."definition" = d."id_array_definition" AND d."encoding"=e."id_encoding" AND r."id_result"=:$</where>
-         </query>
-         <!-- result measure -->
-         <query>
-            <select>
-               <col>
-                  <var>var77</var>
-                  <sql>"uom"</sql>
-               </col>
-               <col>
-                  <var>var78</var>
-                  <sql>"value"</sql>
-               </col>
-            </select>
-            <from>"observation"."measures"</from>
-            <where>"name" = :$</where>
-         </query>
-         <!--  unit of measure -->
-         <query>
-            <select>
-               <col>
-                  <var>var79</var>
-                  <sql>"name"</sql>
-               </col>
-               <col>
-                  <var>var80</var>
-                  <sql>"quantity_type"</sql>
-               </col>
-               <col>
-                  <var>var81</var>
-                  <sql>"unit_system"</sql>
-               </col>
-            </select>
-            <from>"observation"."unit_of_measures"</from>
-            <where>"id" = :$</where>
-         </query>
-          <!-- feature of interest curve lineString -->
-         <query>
-            <select>
-               <col>
-                  <var>var64</var>
-                  <sql>"x"</sql>
-               </col>
-               <col>
-                  <var>var65</var>
-                  <sql>"y"</sql>
-               </col>
-               <col>
-                  <var>var66</var>
-                  <sql>"z"</sql>
-               </col>
-            </select>
-            <from>"observation"."linestring"</from>
-            <where>"id"=:$</where>
-        </query>
-         <!-- feature of interest coordinates -->
-         <query>
-            <select>
-               <col>
-                  <var>var25</var>
-                  <sql>"x_value"</sql>
-               </col>
-            </select>
-            <from>"observation"."sampling_points"</from>
-            <where>"id"=:$</where>
-        </query>
-        <query>
-            <select>
-                <col>
-                    <var>var45</var>
-                    <sql>"y_value"</sql>
-                </col>
-            </select>
-            <from>"observation"."sampling_points"</from>
-            <where>"id"=:$</where>
-        </query>
-        <!-- all offering id-->
-        <query>
-            <select>
-               <col>
-                  <var>var01</var>
-                  <sql>"id"</sql>
-               </col>
-            </select>
-            <from>"sos"."observation_offerings"</from>
-         </query>
-	 <!-- all procedure id -->
-         <query>
-            <select>
-               <col>
-                  <var>var02</var>
-                  <sql>"name"</sql>
-               </col>
-            </select>
-            <from>"observation"."process"</from>
-         </query>
-         <!-- all phenomenon names-->
-         <query>
-            <select>
-               <col>
-                  <var>var03</var>
-                  <sql>"name"</sql>
-               </col>
-            </select>
-            <from>"observation"."phenomenons"</from>
-         </query>
-         <query>
-            <select>
-               <col>
-                  <var>var83</var>
-                  <sql>"name"</sql>
-               </col>
-            </select>
-            <from>"observation"."composite_phenomenons"</from>
-         </query>
-	<!-- all feature of interest name -->
-         <query>
-            <select>
-               <col>
-                  <var>var04</var>
-                  <sql>"id"</sql>
-               </col>
-            </select>
-            <from>"observation"."sampling_points"</from>
-         </query>
-         <query>
-            <select>
-               <col>
-                  <var>var67</var>
-                  <sql>"id"</sql>
-               </col>
-            </select>
-            <from>"observation"."sampling_curves"</from>
-        </query>
-         <!-- observation offering -->
-         <query>
-            <select>
-               <col>
-                  <var>var07</var>
-                  <sql>"srs_name"</sql>
-               </col>
-            </select>
-            <from>"sos"."observation_offerings"</from>
-            <where>"id"=:$</where>
-         </query>
-         <!-- procedure for an offering -->
-         <query>
-            <select>
-               <col>
-                  <var>var10</var>
-                  <sql>"href"</sql>
-               </col>
-            </select>
-            <from>"sos"."offering_procedures" p, "observation"."references" r</from>
-            <where>p."procedure"=r."id_reference" AND p."id_offering"=:$</where>
-         </query>
-	 <!-- simple phenomenon for an offering -->
-         <query>
-            <select>
-               <col>
-                  <var>var11</var>
-                  <sql>"phenomenon"</sql>
-               </col>
-            </select>
-            <from>"sos"."offering_phenomenons"</from>
-            <where>"id_offering"=:$</where>
-         </query>
-         <!-- composite phenomenon for an offering -->
-         <query>
-            <select>
-               <col>
-                  <var>var12</var>
-                  <sql>"composite_phenomenon"</sql>
-               </col>
-            </select>
-            <from>"sos"."offering_phenomenons"</from>
-            <where>"id_offering"=:$</where>
-         </query>
-         <!-- composite phenomenon for an offering -->
-         <query>
-            <select>
-               <col>
-                  <var>var18</var>
-                  <sql>"href"</sql>
-               </col>
-            </select>
-            <from>"sos"."offering_sampling_features" sp, "observation"."references" r</from>
-            <where>sp."sampling_feature"=r."id_reference" AND sp."id_offering"=:$</where>
-         </query>
-         <!-- component for a composite phenomenon -->
-         <query>
-            <select>
-               <col>
-                  <var>var17</var>
-                  <sql>"component"</sql>
-               </col>
-            </select>
-            <from>"observation"."components"</from>
-            <where>"composite_phenomenon"=:$</where>
-            <orderBy>"component" ASC</orderBy>
-         </query>
-         <!-- result -->
-         <query>
-            <select>
-               <col>
-                  <var>var40</var>
-                  <sql>a."name"</sql>
-               </col>
-               <col>
-                  <var>var41</var>
-                  <sql>a."definition"</sql>
-               </col>
-	       <col>
-                  <var>var42</var>
-                  <sql>a."type"</sql>
-               </col>
-               <col>
-                  <var>var43</var>
-                  <sql>a."uom_code"</sql>
-               </col>
-            </select>
-            <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."any_scalars" a</from>
-            <where>r."definition" = d."id_array_definition" AND r."definition"=a."id_datablock" AND r."id_result"=:$</where>
-         </query>
-      </queryList>
-   </queries>
+    <bdd>
+        <className>org.apache.derby.jdbc.EmbeddedDriver</className>
+        <connectURL>??</connectURL>
+        <user></user>
+        <password></password>
+    </bdd>
+    <queries>
+        <!--main>
+           <query>
+              <select>
+                 <col>
+                    <var>:$</var>
+                    <sql>TODO</sql>
+                 </col>
+              </select>
+              <from>TODO</from>
+              <where></where>
+              <orderBy></orderBy>
+           </query>
+        </main-->
+        <queryList>
+            <!-- new identifier query (not needed in discovery profile)-->
+            <query>
+                <select>
+                    <col>
+                        <var>var05</var>
+                        <sql>count(*)</sql>
+                    </col>
+                </select>
+                <from>"observation"."observations"</from>
+                <where>"name" LIKE '%:$%'</where>
+            </query>
+            <!-- Observation id already exist (not needed in discovery profile)-->
+            <query>
+                <select>
+                    <col>
+                        <var>var44</var>
+                        <sql>"name"</sql>
+                    </col>
+                </select>
+                <from>"observation"."observations"</from>
+                <where>"name"=:$</where>
+            </query>
+            <!-- minimal time event for offering -->
+            <query>
+                <select>
+                    <col>
+                        <var>var06</var>
+                        <sql>MIN("event_time_begin")</sql>
+                    </col>
+                </select>
+                <from>"sos"."observation_offerings"</from>
+            </query>
+            <!-- verify that the offering exist -->
+            <query>
+                <select>
+                    <col>
+                        <var>var46</var>
+                        <sql>"id"</sql>
+                    </col>
+                </select>
+                <from>"sos"."observation_offerings"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- time bound for an offering -->
+            <query>
+                <select>
+                    <col>
+                        <var>var08</var>
+                        <sql>"event_time_begin"</sql>
+                    </col>
+                    <col>
+                        <var>var09</var>
+                        <sql>"event_time_end"</sql>
+                    </col>
+                </select>
+                <from>"sos"."observation_offerings"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- phenomenon exist? -->
+            <query>
+                <select>
+                    <col>
+                        <var>var47</var>
+                        <sql>"id"</sql>
+                    </col>
+                </select>
+                <from>"observation"."phenomenons"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- composite phenomenon exist? -->
+            <query>
+                <select>
+                    <col>
+                        <var>var68</var>
+                        <sql>"id"</sql>
+                    </col>
+                </select>
+                <from>"observation"."composite_phenomenons"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- simple phenomenon -->
+            <query>
+                <select>
+                    <col>
+                        <var>var13</var>
+                        <sql>"name"</sql>
+                    </col>
+                    <col>
+                        <var>var14</var>
+                        <sql>"description"</sql>
+                    </col>
+                </select>
+                <from>"observation"."phenomenons"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- composite phenomenon -->
+            <query>
+                <select>
+                    <col>
+                        <var>var15</var>
+                        <sql>"name"</sql>
+                    </col>
+                    <col>
+                        <var>var16</var>
+                        <sql>"description"</sql>
+                    </col>
+                </select>
+                <from>"observation"."composite_phenomenons"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- feature of interest (samplingPoint) exist-->
+            <query>
+                <select>
+                    <col>
+                        <var>var48</var>
+                        <sql>"id"</sql>
+                    </col>
+                </select>
+                <from>"observation"."sampling_points"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- feature of interest (samplingPoint)-->
+            <query>
+                <select>
+                    <col>
+                        <var>var19</var>
+                        <sql>"name"</sql>
+                    </col>
+                    <col>
+                        <var>var20</var>
+                        <sql>"description"</sql>
+                    </col>
+                    <col>
+                        <var>var21</var>
+                        <sql>"sampled_feature"</sql>
+                    </col>
+                    <col>
+                        <var>var22</var>
+                        <sql>"point_id"</sql>
+                    </col>
+                    <col>
+                        <var>var23</var>
+                        <sql>"point_srsname"</sql>
+                    </col>
+                    <col>
+                        <var>var24</var>
+                        <sql>"point_srsdimension"</sql>
+                    </col>
+                </select>
+                <from>"observation"."sampling_points"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- feature of interest (samplingCurve) exist-->
+            <query>
+                <select>
+                    <col>
+                        <var>var51</var>
+                        <sql>"id"</sql>
+                    </col>
+                </select>
+                <from>"observation"."sampling_curves"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- feature of interest (samplingCurve)-->
+            <query>
+                <select>
+                    <col>
+                        <var>var52</var>
+                        <sql>"description"</sql>
+                    </col>
+                    <col>
+                        <var>var53</var>
+                        <sql>"name"</sql>
+                    </col>
+                    <col>
+                        <var>var54</var>
+                        <sql>"srs_name"</sql>
+                    </col>
+                    <col>
+                        <var>var55</var>
+                        <sql>"lower_corner_x"</sql>
+                    </col>
+                    <col>
+                        <var>var56</var>
+                        <sql>"lower_corner_y"</sql>
+                    </col>
+                    <col>
+                        <var>var57</var>
+                        <sql>"upper_corner_x"</sql>
+                    </col>
+                    <col>
+                        <var>var58</var>
+                        <sql>"upper_corner_y"</sql>
+                    </col>
+                    <col>
+                        <var>var59</var>
+                        <sql>"sampled_feature"</sql>
+                    </col>
+                    <col>
+                        <var>var60</var>
+                        <sql>"length_uom"</sql>
+                    </col>
+                    <col>
+                        <var>var61</var>
+                        <sql>"length_value"</sql>
+                    </col>
+                    <col>
+                        <var>var62</var>
+                        <sql>"shape_id"</sql>
+                    </col>
+                    <col>
+                        <var>var63</var>
+                        <sql>"shape_srsname"</sql>
+                    </col>
+                    <col>
+                        <var>var82</var>
+                        <sql>env."id"</sql>
+                    </col>
+                </select>
+                <from>"observation"."sampling_curves" sc, "sos"."envelopes" env</from>
+                <where>sc."id"=:$
+                    AND sc."boundedby" = env."id"</where>
+            </query>
+            <!-- observation -->
+            <query>
+                <select>
+                    <col>
+                        <var>var26</var>
+                        <sql>"feature_of_interest_point"</sql>
+                    </col>
+                    <col>
+                        <var>var50</var>
+                        <sql>"feature_of_interest_curve"</sql>
+                    </col>
+                    <col>
+                        <var>var27</var>
+                        <sql>"observed_property"</sql>
+                    </col>
+                    <col>
+                        <var>var49</var>
+                        <sql>"observed_property_composite"</sql>
+                    </col>
+                    <col>
+                        <var>var28</var>
+                        <sql>"procedure"</sql>
+                    </col>
+                    <col>
+                        <var>var29</var>
+                        <sql>"sampling_time_begin"</sql>
+                    </col>
+                    <col>
+                        <var>var30</var>
+                        <sql>"sampling_time_end"</sql>
+                    </col>
+                    <col>
+                        <var>var31</var>
+                        <sql>"result"</sql>
+                    </col>
+                </select>
+                <from>"observation"."observations"</from>
+                <where>"name"=:$</where>
+            </query>
+            <!-- measurement -->
+            <query>
+                <select>
+                    <col>
+                        <var>var69</var>
+                        <sql>"feature_of_interest_point"</sql>
+                    </col>
+                    <col>
+                        <var>var70</var>
+                        <sql>"feature_of_interest_curve"</sql>
+                    </col>
+                    <col>
+                        <var>var71</var>
+                        <sql>"observed_property"</sql>
+                    </col>
+                    <col>
+                        <var>var72</var>
+                        <sql>"observed_property_composite"</sql>
+                    </col>
+                    <col>
+                        <var>var73</var>
+                        <sql>"procedure"</sql>
+                    </col>
+                    <col>
+                        <var>var74</var>
+                        <sql>"sampling_time_begin"</sql>
+                    </col>
+                    <col>
+                        <var>var75</var>
+                        <sql>"sampling_time_end"</sql>
+                    </col>
+                    <col>
+                        <var>var76</var>
+                        <sql>"result"</sql>
+                    </col>
+                </select>
+                <from>"observation"."measurements"</from>
+                <where>"name"=:$</where>
+            </query>
+            <!-- result -->
+            <query>
+                <select>
+                    <col>
+                        <var>var32</var>
+                        <sql>"element_count"</sql>
+                    </col>
+                    <col>
+                        <var>var33</var>
+                        <sql>"values"</sql>
+                    </col>
+                    <col>
+                        <var>var34</var>
+                        <sql>"id_encoding"</sql>
+                    </col>
+                    <col>
+                        <var>var35</var>
+                        <sql>"token_separator"</sql>
+                    </col>
+                    <col>
+                        <var>var36</var>
+                        <sql>"decimal_separator"</sql>
+                    </col>
+                    <col>
+                        <var>var37</var>
+                        <sql>"block_separator"</sql>
+                    </col>
+                    <col>
+                        <var>var38</var>
+                        <sql>r."definition"</sql>
+                    </col>
+                    <col>
+                        <var>var39</var>
+                        <sql>"elementType"</sql>
+                    </col>
+                </select>
+                <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."text_block_encodings" e</from>
+                <where>r."definition" = d."id_array_definition" AND d."encoding"=e."id_encoding" AND r."id_result"=:$</where>
+            </query>
+            <!-- result measure -->
+            <query>
+                <select>
+                    <col>
+                        <var>var77</var>
+                        <sql>"uom"</sql>
+                    </col>
+                    <col>
+                        <var>var78</var>
+                        <sql>"value"</sql>
+                    </col>
+                </select>
+                <from>"observation"."measures"</from>
+                <where>"name" = :$</where>
+            </query>
+            <!--  unit of measure -->
+            <query>
+                <select>
+                    <col>
+                        <var>var79</var>
+                        <sql>"name"</sql>
+                    </col>
+                    <col>
+                        <var>var80</var>
+                        <sql>"quantity_type"</sql>
+                    </col>
+                    <col>
+                        <var>var81</var>
+                        <sql>"unit_system"</sql>
+                    </col>
+                </select>
+                <from>"observation"."unit_of_measures"</from>
+                <where>"id" = :$</where>
+            </query>
+            <!-- feature of interest curve lineString -->
+            <query>
+                <select>
+                    <col>
+                        <var>var64</var>
+                        <sql>"x"</sql>
+                    </col>
+                    <col>
+                        <var>var65</var>
+                        <sql>"y"</sql>
+                    </col>
+                    <col>
+                        <var>var66</var>
+                        <sql>"z"</sql>
+                    </col>
+                </select>
+                <from>"observation"."linestring"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- feature of interest coordinates -->
+            <query>
+                <select>
+                    <col>
+                        <var>var25</var>
+                        <sql>"x_value"</sql>
+                    </col>
+                </select>
+                <from>"observation"."sampling_points"</from>
+                <where>"id"=:$</where>
+            </query>
+            <query>
+                <select>
+                    <col>
+                        <var>var45</var>
+                        <sql>"y_value"</sql>
+                    </col>
+                </select>
+                <from>"observation"."sampling_points"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- all offering id-->
+            <query>
+                <select>
+                    <col>
+                        <var>var01</var>
+                        <sql>"id"</sql>
+                    </col>
+                </select>
+                <from>"sos"."observation_offerings"</from>
+            </query>
+            <!-- all procedure id -->
+            <query>
+                <select>
+                    <col>
+                        <var>var02</var>
+                        <sql>"name"</sql>
+                    </col>
+                </select>
+                <from>"observation"."process"</from>
+            </query>
+            <!-- all phenomenon names-->
+            <query>
+                <select>
+                    <col>
+                        <var>var03</var>
+                        <sql>"name"</sql>
+                    </col>
+                </select>
+                <from>"observation"."phenomenons"</from>
+            </query>
+            <query>
+                <select>
+                    <col>
+                        <var>var83</var>
+                        <sql>"name"</sql>
+                    </col>
+                </select>
+                <from>"observation"."composite_phenomenons"</from>
+            </query>
+            <!-- all feature of interest name -->
+            <query>
+                <select>
+                    <col>
+                        <var>var04</var>
+                        <sql>"id"</sql>
+                    </col>
+                </select>
+                <from>"observation"."sampling_points"</from>
+            </query>
+            <query>
+                <select>
+                    <col>
+                        <var>var67</var>
+                        <sql>"id"</sql>
+                    </col>
+                </select>
+                <from>"observation"."sampling_curves"</from>
+            </query>
+            <!-- observation offering -->
+            <query>
+                <select>
+                    <col>
+                        <var>var07</var>
+                        <sql>"srs_name"</sql>
+                    </col>
+                </select>
+                <from>"sos"."observation_offerings"</from>
+                <where>"id"=:$</where>
+            </query>
+            <!-- procedure for an offering -->
+            <query>
+                <select>
+                    <col>
+                        <var>var10</var>
+                        <sql>"href"</sql>
+                    </col>
+                </select>
+                <from>"sos"."offering_procedures" p, "observation"."references" r</from>
+                <where>p."procedure"=r."id_reference" AND p."id_offering"=:$</where>
+            </query>
+            <!-- simple phenomenon for an offering -->
+            <query>
+                <select>
+                    <col>
+                        <var>var11</var>
+                        <sql>"phenomenon"</sql>
+                    </col>
+                </select>
+                <from>"sos"."offering_phenomenons"</from>
+                <where>"id_offering"=:$</where>
+            </query>
+            <!-- composite phenomenon for an offering -->
+            <query>
+                <select>
+                    <col>
+                        <var>var12</var>
+                        <sql>"composite_phenomenon"</sql>
+                    </col>
+                </select>
+                <from>"sos"."offering_phenomenons"</from>
+                <where>"id_offering"=:$</where>
+            </query>
+            <!-- composite phenomenon for an offering -->
+            <query>
+                <select>
+                    <col>
+                        <var>var18</var>
+                        <sql>"href"</sql>
+                    </col>
+                </select>
+                <from>"sos"."offering_sampling_features" sp, "observation"."references" r</from>
+                <where>sp."sampling_feature"=r."id_reference" AND sp."id_offering"=:$</where>
+            </query>
+            <!-- component for a composite phenomenon -->
+            <query>
+                <select>
+                    <col>
+                        <var>var17</var>
+                        <sql>"component"</sql>
+                    </col>
+                </select>
+                <from>"observation"."components"</from>
+                <where>"composite_phenomenon"=:$</where>
+                <orderBy>"component" ASC</orderBy>
+            </query>
+            <!-- result -->
+            <query>
+                <select>
+                    <col>
+                        <var>var40</var>
+                        <sql>a."name"</sql>
+                    </col>
+                    <col>
+                        <var>var41</var>
+                        <sql>a."definition"</sql>
+                    </col>
+                    <col>
+                        <var>var42</var>
+                        <sql>a."type"</sql>
+                    </col>
+                    <col>
+                        <var>var43</var>
+                        <sql>a."uom_code"</sql>
+                    </col>
+                </select>
+                <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."any_scalars" a</from>
+                <where>r."definition" = d."id_array_definition" AND r."definition"=a."id_datablock" AND r."id_result"=:$</where>
+            </query>
+        </queryList>
+    </queries>
+    <filterQueries>
+
+        -- ===== SELECT =====
+
+        <select group="filterObservation">
+            <col>
+                <var>name</var>
+                <sql>"name"</sql>
+            </col>
+        </select>
+
+        <select group="filterResult">
+            <col>
+                <var>result</var>
+                <sql>"result"</sql>
+            </col>
+            <col>
+                <var>sampling_time_begin</var>
+                <sql>"sampling_time_begin"</sql>
+            </col>
+            <col>
+                <var>sampling_time_end</var>
+                <sql>"sampling_time_end"</sql>
+            </col>
+        </select>
+
+        -- ==== FROM ========
+
+        <from group="observations">"observation"."observations"</from>
+        <from group="measurements">"observation"."measurements"</from>
+
+        -- ==== WHERE =======
+
+        <where group="observationType">"name" LIKE '%:${observationIdBase}%'</where>
+
+        -- ==== PROCEDURE (capteur) =======
+
+        <where group="procedure">"procedure"=:${procedure}</where>
+
+        -- ==== PHENOMENON ===========
+
+        <where group="phenomenon">"observed_property"=:${phenomenon} OR "observed_property_composite"=:${phenomenon}</where>
+
+        -- ==== FEATURE OF INTEREST (station)=============
+
+        <where group="foi">"feature_of_interest_point"=:${foi} OR "feature_of_interest_curve"=:${foi}</where>
+
+        -- ==== TIME BEFORE ========
+        <where group="tbefore"><![CDATA["sampling_time_begin"<=:${time}]]></where>
+
+        -- ===== TIME AFTER ========
+        <where group="tafter"><![CDATA[("sampling_time_begin">=:${time}) OR ("sampling_time_begin"<=:${time} AND "sampling_time_end">=:${time})]]></where>
+
+
+        -- ===== TIME DURING ========
+        <where group="tduring"><![CDATA[("sampling_time_begin">=:${begin} AND "sampling_time_end"<= :${end}) OR ("sampling_time_begin">=:${begin} AND "sampling_time_begin"<=:${end} AND "sampling_time_end" IS NULL) OR   ("sampling_time_begin"<=:${begin} AND "sampling_time_end"<= :${end} AND "sampling_time_end">= :${begin}) OR ("sampling_time_begin">=:${begin} AND "sampling_time_end">= :${end} AND "sampling_time_begin"<= :${end}) OR
+("sampling_time_begin"<=:${begin} AND "sampling_time_end">= :${end})]]></where>
+
+
+        -- ===== TIME EQUALS TimePeriod========
+        <where group="tequalsTP"><![CDATA["sampling_time_begin"=:${begin} AND "sampling_time_end"=:${end}]]></where>
+
+        -- ===== TIME EQUALS TimeInstant========
+        <where group="tequalsTI"><![CDATA[("sampling_time_begin"=:${position} AND "sampling_time_end" IS NULL) OR ("sampling_time_begin"<=:${position} AND "sampling_time_end">=:${position})]]></where>
+       
+    </filterQueries>
 </automatic>

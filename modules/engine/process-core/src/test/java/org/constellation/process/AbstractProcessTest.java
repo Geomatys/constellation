@@ -16,6 +16,8 @@
  */
 package org.constellation.process;
 
+import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import static org.junit.Assert.assertNotNull;
@@ -27,9 +29,10 @@ import org.opengis.util.NoSuchIdentifierException;
  * @author Quentin Boileau (Geomatys)
  */
 public abstract class AbstractProcessTest {
-    
+
+    protected static final Logger LOGGER = Logging.getLogger(AbstractProcessTest.class);
     private static final String factory = ConstellationProcessFactory.NAME;
-    private String process;
+    private final String process;
 
 
     protected AbstractProcessTest(final String process){

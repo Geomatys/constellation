@@ -23,17 +23,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
-import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
 import org.junit.runner.RunWith;
 
@@ -44,49 +41,39 @@ import org.junit.runner.RunWith;
 @RunWith(TestRunner.class)
 public class FileSystemCSWworkerTest extends CSWworkerTest {
 
-    private static final File configDir =  new File("FSCSWWorkerTest");
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
 
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
+        final File configDir = ConfigurationEngine.setupTestEnvironement("FSCSWWorkerTest");
 
-        if (!configDir.exists()) {
-            configDir.mkdir();
-            ConfigDirectory.setConfigDirectory(configDir);
+        File CSWDirectory  = new File(configDir, "CSW");
+        CSWDirectory.mkdir();
+        final File instDirectory = new File(CSWDirectory, "default");
+        instDirectory.mkdir();
 
-            File CSWDirectory  = new File(configDir, "CSW");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
+        //we write the data files
+        File dataDirectory = new File(instDirectory, "data");
+        dataDirectory.mkdir();
+        writeDataFile(dataDirectory, "meta1.xml", "42292_5p_19900609195600");
+        writeDataFile(dataDirectory, "meta2.xml", "42292_9s_19900610041000");
+        writeDataFile(dataDirectory, "meta3.xml", "39727_22_19750113062500");
+        writeDataFile(dataDirectory, "meta4.xml", "11325_158_19640418141800");
+        writeDataFile(dataDirectory, "meta5.xml", "40510_145_19930221211500");
+        writeDataFile(dataDirectory, "meta-19119.xml", "mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
+        writeDataFile(dataDirectory, "imageMetadata.xml", "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        writeDataFile(dataDirectory, "ebrim1.xml", "000068C3-3B49-C671-89CF-10A39BB1B652");
+        writeDataFile(dataDirectory, "ebrim2.xml", "urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
+        writeDataFile(dataDirectory, "ebrim3.xml", "urn:motiive:csw-ebrim");
+        //writeDataFile(dataDirectory, "error-meta.xml", "urn:error:file");
+        writeDataFile(dataDirectory, "meta13.xml", "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
 
-            //we write the data files
-            File dataDirectory = new File(instDirectory, "data");
-            dataDirectory.mkdir();
-            writeDataFile(dataDirectory, "meta1.xml", "42292_5p_19900609195600");
-            writeDataFile(dataDirectory, "meta2.xml", "42292_9s_19900610041000");
-            writeDataFile(dataDirectory, "meta3.xml", "39727_22_19750113062500");
-            writeDataFile(dataDirectory, "meta4.xml", "11325_158_19640418141800");
-            writeDataFile(dataDirectory, "meta5.xml", "40510_145_19930221211500");
-            writeDataFile(dataDirectory, "meta-19119.xml", "mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
-            writeDataFile(dataDirectory, "imageMetadata.xml", "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-            writeDataFile(dataDirectory, "ebrim1.xml", "000068C3-3B49-C671-89CF-10A39BB1B652");
-            writeDataFile(dataDirectory, "ebrim2.xml", "urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
-            writeDataFile(dataDirectory, "ebrim3.xml", "urn:motiive:csw-ebrim");
-            //writeDataFile(dataDirectory, "error-meta.xml", "urn:error:file");
-            writeDataFile(dataDirectory, "meta13.xml", "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
+        //we write the configuration file
+        Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
+        configuration.putParameter("transactionSecurized", "false");
+        configuration.putParameter("shiroAccessible", "false");
 
-            //we write the configuration file
-            File configFile = new File(instDirectory, "config.xml");
-            Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
-            configuration.putParameter("transactionSecurized", "false");
-            configuration.putParameter("shiroAccessible", "false");
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-        }
+        ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
 
         pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
@@ -108,7 +95,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        FileUtilities.deleteDirectory(configDir);
+        ConfigurationEngine.shutdownTestEnvironement("FSCSWWorkerTest");
     }
 
     @Before

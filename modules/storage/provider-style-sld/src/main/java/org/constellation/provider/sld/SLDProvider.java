@@ -16,9 +16,6 @@
  */
 package org.constellation.provider.sld;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,12 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
 
-import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.admin.dao.Session;
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.dao.ProviderRecord.ProviderType;
-import org.constellation.admin.dao.StyleRecord;
-import org.constellation.admin.dao.StyleRecord.StyleType;
 import org.constellation.provider.AbstractStyleProvider;
 
 import org.geotoolkit.factory.FactoryFinder;
@@ -71,7 +62,7 @@ public class SLDProvider extends AbstractStyleProvider{
     private static final Logger LOGGER = Logging.getLogger("org.constellation.provider.sld");
     private static final MutableStyleFactory SF = (MutableStyleFactory)FactoryFinder.getStyleFactory(
                             new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
-    private static final Collection<String> MASKS = new ArrayList<String>();
+    private static final Collection<String> MASKS = new ArrayList<>();
 
     static{
         MASKS.add(".xml");
@@ -80,8 +71,8 @@ public class SLDProvider extends AbstractStyleProvider{
 
     private final StyleXmlIO sldParser = new StyleXmlIO();
     private File folder;
-    private final Map<String,File> index = new ConcurrentHashMap<String, File>();
-    private final Cache<String,MutableStyle> cache = new Cache<String, MutableStyle>(20, 20, true);
+    private final Map<String,File> index = new ConcurrentHashMap<>();
+    private final Cache<String,MutableStyle> cache = new Cache<>(20, 20, true);
 
 
     protected SLDProvider(final SLDProviderService service, final ParameterValueGroup source){
@@ -213,6 +204,7 @@ public class SLDProvider extends AbstractStyleProvider{
             util.writeStyle(f, style, StyledLayerDescriptor.V_1_1_0);
             index.put(key, f);
             cache.clear();
+            fireUpdateEvent();
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
@@ -240,6 +232,7 @@ public class SLDProvider extends AbstractStyleProvider{
         if(f != null){
             f.delete();
             reload();
+            fireUpdateEvent();
         }
     }
 
@@ -270,42 +263,6 @@ public class SLDProvider extends AbstractStyleProvider{
             }
 
             visit(folder);
-
-            // Update administration database.
-            Session session = null;
-            try {
-                session = EmbeddedDatabase.createSession();
-                ProviderRecord pr = session.readProvider(this.getId());
-                if (pr == null) {
-                    pr = session.writeProvider(this.getId(), ProviderType.STYLE, "sld", getSource(), null);
-                }
-                final List<StyleRecord> styles = pr.getStyles();
-
-                // Remove no longer existing style.
-                for (final StyleRecord style : styles) {
-                    if (index.get(style.getName()) == null) {
-                        session.deleteStyle(style.getName(), this.getId());
-                    }
-                }
-
-                // Add not registered new data.
-                for (final String key : index.keySet()) {
-                    boolean found = false;
-                    for (final StyleRecord style : styles) {
-                        if (key.equals(style.getName())) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        session.writeStyle(key, pr, StyleType.VECTOR, get(key), null);
-                    }
-                }
-            } catch (IOException | SQLException ex) {
-                LOGGER.log(Level.WARNING, "An error occurred while updating database on provider startup.", ex);
-            } finally {
-                if (session != null) session.close();
-            }
         }
     }
 

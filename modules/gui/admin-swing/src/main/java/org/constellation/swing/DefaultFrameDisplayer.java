@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
@@ -41,7 +42,7 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.session.Session;
 import org.geotoolkit.display2d.GO2Utilities;
-import org.geotoolkit.gui.swing.go2.JMap2DFrame;
+import org.geotoolkit.gui.swing.render2d.JMap2DFrame;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapBuilder;
@@ -93,18 +94,23 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
     @Override
     public void display(final ConstellationServer cstl, final String serviceType, final Instance service) {
         try {
-            final String url = cstl.services.getInstanceURL(serviceType, service.getName());
+            final String url = cstl.services.getInstanceURL(serviceType, service.getIdentifier());
             final ServerFactory factory = ServerFinder.getFactoryById(serviceType);
-            final ParameterValueGroup params = factory.getParametersDescriptor().createValue();
-            params.parameter("url").setValue(new URL(url));
-            params.parameter("security").setValue(cstl.getClientSecurity());
-            try {
-                params.parameter("post").setValue(true);
-            } catch(ParameterNotFoundException ex) {
-                // do nothing if the parameters does not exist
+            if (factory != null) {
+                final ParameterValueGroup params = factory.getParametersDescriptor().createValue();
+                params.parameter("url").setValue(new URL(url));
+                params.parameter("security").setValue(cstl.getClientSecurity());
+                try {
+                    params.parameter("post").setValue(true);
+                } catch(ParameterNotFoundException ex) {
+                    // do nothing if the parameters does not exist
+                }
+                final Server server = factory.open(params);
+                display(server);
+            } else {
+                JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("displayFactoryMissing") + serviceType,
+                        LayerRowModel.BUNDLE.getString("impossibleDisplay"), JOptionPane.ERROR_MESSAGE);
             }
-            final Server server = factory.open(params);
-            display(server);
         } catch (MalformedURLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(),ex);
         } catch (DataStoreException ex) {
@@ -151,7 +157,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
             if (cStore != null) {
                 MutableStyle style = new DefaultStyleFactory().style(StyleConstants.DEFAULT_RASTER_SYMBOLIZER);
                 for (Name name : cStore.getNames()) {
-                    final MapLayer layer = MapBuilder.createCoverageLayer(cStore.getCoverageReference(name), style, name.getLocalPart());
+                    final MapLayer layer = MapBuilder.createCoverageLayer(cStore.getCoverageReference(name), style);
                     result.layers().add(layer);
                 }
                 //datastore
@@ -189,7 +195,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
             for (Name n : cs.getNames()) {
                 final CoverageReference ref = cs.getCoverageReference(n);
                 final CoverageMapLayer layer = MapBuilder.createCoverageLayer(ref,
-                        GO2Utilities.STYLE_FACTORY.style(StyleConstants.DEFAULT_RASTER_SYMBOLIZER), ref.getName().toString());
+                        GO2Utilities.STYLE_FACTORY.style(StyleConstants.DEFAULT_RASTER_SYMBOLIZER));
                 layer.setVisible(false);
                 context.layers().add(layer);
             }

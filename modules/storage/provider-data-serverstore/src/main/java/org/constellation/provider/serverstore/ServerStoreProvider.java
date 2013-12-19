@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
+import org.constellation.admin.dao.DataRecord.DataType;
 
 /**
  *
@@ -158,5 +159,16 @@ public class ServerStoreProvider extends AbstractLayerProvider{
         }
 
         return null;
+    }
+
+    @Override
+    public DataType getDataType() {
+        if (server instanceof FeatureStore) {
+            return DataType.VECTOR;
+        } else if (server instanceof CoverageStore) {
+            return DataType.COVERAGE;
+        } else {
+            return null;
+        }
     }
 }

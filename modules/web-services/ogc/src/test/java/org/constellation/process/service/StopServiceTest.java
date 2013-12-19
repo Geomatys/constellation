@@ -16,9 +16,7 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.ServiceProcessTest;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -44,19 +42,21 @@ public abstract class StopServiceTest extends ServiceProcessTest {
         createInstance("stopInstance1");
         startInstance("stopInstance1");
 
-        final int initSize = WSEngine.getInstanceSize(serviceName);
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopServiceDescriptor.NAME);
+        try {
+            final int initSize = WSEngine.getInstanceSize(serviceName);
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopServiceDescriptor.NAME);
 
-        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StopServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue("stopInstance1");
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        proc.call();
+            final ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(StopServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue("stopInstance1");
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            proc.call();
 
-        assertTrue(WSEngine.getInstanceSize(serviceName) == initSize-1);
-        assertFalse(WSEngine.serviceInstanceExist(serviceName, "stopInstance1"));
-
-        deleteInstance("stopInstance1");
+            assertTrue(WSEngine.getInstanceSize(serviceName) == initSize-1);
+            assertFalse(WSEngine.serviceInstanceExist(serviceName, "stopInstance1"));
+        } finally {
+            deleteInstance("stopInstance1");
+        }
     }
 
     @Test
@@ -92,8 +92,8 @@ public abstract class StopServiceTest extends ServiceProcessTest {
             fail();
         } catch (ProcessException ex) {
             //do nothing
+        } finally {
+            deleteInstance("stopInstance3");
         }
-
-        deleteInstance("stopInstance3");
     }
 }

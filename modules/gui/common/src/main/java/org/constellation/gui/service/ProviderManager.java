@@ -19,6 +19,7 @@ package org.constellation.gui.service;
 
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
@@ -28,6 +29,7 @@ import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Database;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.MetadataLists;
+import org.constellation.dto.ParameterValues;
 import org.constellation.gui.service.bean.LayerData;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -38,9 +40,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 
 /**
  * Juzu service to call constellation services server side about providers
@@ -64,7 +69,7 @@ public class ProviderManager {
      * @param path
      * @param database
      */
-    public void createProvider(final String type, final String identifier, final String path, final String dataType, final Database database) {
+    public void createProvider(final String type, final String identifier, final String path, final String dataType, final Database database, final String subType) {
         final ConstellationServer cs = cstl.openServer(true);
 
         final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup) cs.providers.getServiceDescriptor(type);
@@ -75,10 +80,6 @@ public class ProviderManager {
         String folderPath;
 
         switch (type) {
-            case "coverage-file":
-                folderPath = path.substring(0, path.lastIndexOf('/'));
-                sources.groups("coveragefile").get(0).parameter("path").setValue(folderPath);
-                break;
             case "sld":
                 folderPath = path.substring(0, path.lastIndexOf('/'));
                 sources.groups("sldFolder").get(0).parameter("path").setValue(folderPath);
@@ -86,15 +87,16 @@ public class ProviderManager {
             case "feature-store":
                 final URL url;
 
-                if(path!=null){
+                if (path != null) {
                     try {
                         url = new URL("file:" + path);
                         ParameterValueGroup shapeFileParametersFolder = sources.groups("choice").get(0).addGroup("ShapeFileParametersFolder");
                         shapeFileParametersFolder.parameter("url").setValue(url);
+                        shapeFileParametersFolder.parameter("namespace").setValue("no namespace");
                     } catch (MalformedURLException e) {
                         LOGGER.log(Level.WARNING, "", e);
                     }
-                }else{
+                } else {
                     //database connection
                     ParameterValueGroup postGresParametersFolder = sources.groups("choice").get(0).addGroup("PostgresParameters");
                     int port = Integer.parseInt(database.getPort());
@@ -108,33 +110,47 @@ public class ProviderManager {
                 }
                 break;
             case "coverage-store":
-                if(path!=null){
-                    URL fileUrl = null;
-                    try {
-                        fileUrl = URI.create(path).toURL();
-                    } catch (MalformedURLException e) {
-                        LOGGER.log(Level.WARNING, "unnable to create url from path", e);
-                    }
+                URL fileUrl = null;
 
-                    ParameterValueGroup xmlCoverageStoreParameters = sources.groups("choice").get(0).addGroup("XMLCoverageStoreParameters");
-                    xmlCoverageStoreParameters.parameter("identifier").setValue("coverage-xml-pyramid");
-                    xmlCoverageStoreParameters.parameter("path").setValue(fileUrl);
-                    xmlCoverageStoreParameters.parameter("type").setValue("AUTO");
-                }
-                else{
-                    //database connection
-                    ParameterValueGroup postGresParametersFolder = sources.groups("choice").get(0).addGroup("PGRasterParameters");
-                    int port = Integer.parseInt(database.getPort());
+                switch (subType) {
+                    case "coverage-xml-pyramid":
+                        try {
+                            fileUrl = URI.create(path).toURL();
+                        } catch (MalformedURLException e) {
+                            LOGGER.log(Level.WARNING, "unnable to create url from path", e);
+                        }
+                        ParameterValueGroup xmlCoverageStoreParameters = sources.groups("choice").get(0).addGroup("XMLCoverageStoreParameters");
+                        xmlCoverageStoreParameters.parameter("identifier").setValue("coverage-xml-pyramid");
+                        xmlCoverageStoreParameters.parameter("path").setValue(fileUrl);
+                        xmlCoverageStoreParameters.parameter("type").setValue("AUTO");
+                        break;
+                    case "coverage-file":
+                        try {
+                            fileUrl = URI.create("file:"+path).toURL();
+                        } catch (MalformedURLException e) {
+                            LOGGER.log(Level.WARNING, "unnable to create url from path", e);
+                        }
 
-                    postGresParametersFolder.parameter("identifier").setValue("postgresql");
-                    postGresParametersFolder.parameter("host").setValue(database.getHost());
-                    postGresParametersFolder.parameter("port").setValue(port);
-                    postGresParametersFolder.parameter("user").setValue(database.getLogin());
-                    postGresParametersFolder.parameter("password").setValue(database.getPassword());
-                    postGresParametersFolder.parameter("database").setValue(database.getName());
-                    postGresParametersFolder.parameter("simple types").setValue(true);
+                        ParameterValueGroup fileCoverageStoreParameters = sources.groups("choice").get(0).addGroup("FileCoverageStoreParameters");
+                        fileCoverageStoreParameters.parameter("identifier").setValue("coverage-file");
+                        fileCoverageStoreParameters.parameter("path").setValue(fileUrl);
+                        fileCoverageStoreParameters.parameter("type").setValue("AUTO");
+                        break;
+                    case "pgraster":
+                        ParameterValueGroup postGresParametersFolder = sources.groups("choice").get(0).addGroup("PGRasterParameters");
+                        int port = Integer.parseInt(database.getPort());
+
+                        postGresParametersFolder.parameter("identifier").setValue("postgresql");
+                        postGresParametersFolder.parameter("host").setValue(database.getHost());
+                        postGresParametersFolder.parameter("port").setValue(port);
+                        postGresParametersFolder.parameter("user").setValue(database.getLogin());
+                        postGresParametersFolder.parameter("password").setValue(database.getPassword());
+                        postGresParametersFolder.parameter("database").setValue(database.getName());
+                        postGresParametersFolder.parameter("simple types").setValue(true);
+                        break;
+                    default:
+                        LOGGER.log(Level.WARNING, "error on subtype definition");
                 }
-                break;
             default:
                 if (LOGGER.isLoggable(Level.FINER)) {
                     LOGGER.log(Level.FINER, "Provider type not known");
@@ -156,11 +172,11 @@ public class ProviderManager {
             for (ProviderReport providerReport : providerServiceReport.getProviders()) {
                 String type = providerReport.getAbstractType();
 
-                if (providerTypes.contains(type)) {
-                    for (String name : providerReport.getItems()) {
-                        int rightBracket = name.indexOf('}') + 1;
-                        name = name.substring(rightBracket);
-                        LayerData layerData = new LayerData(providerReport.getId(), type, name, providerReport.getDate());
+                if (providerTypes==null || providerTypes.contains(type)) {
+                    for (DataBrief dataBrief : providerReport.getItems()) {
+                        String name = dataBrief.getName();
+
+                        LayerData layerData = new LayerData(providerReport.getId(), type, name, dataBrief.getDate(), dataBrief.getOwner(), dataBrief.getNamespace());
                         layerDatas.add(layerData);
                     }
                 }
@@ -193,20 +209,20 @@ public class ProviderManager {
         return new ArrayList<>(0);
     }
 
-    public DataInformation loadData(final String filePath, final String name, final String dataType) {
+    public DataInformation loadData(final String filePath, final String metadataFilePath, final String dataType) {
         try {
-            return cstl.openClient().providers.loadData(filePath, name, dataType);
+            return cstl.openClient().providers.loadData(filePath, metadataFilePath,  dataType);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when try to found data on file", e);
         }
         return new DataInformation();
     }
 
-    public MetadataLists getMetadataCodeLists(final String locale){
+    public MetadataLists getMetadataCodeLists(final String locale) {
         try {
             return cstl.openClient().providers.getMetadataCodeLists(locale);
         } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "MetadataCodeList service isn't accessible", e);
+            LOGGER.log(Level.WARNING, "MetadataCodeList service isn't accessible", e);
         }
         return null;
     }
@@ -232,6 +248,52 @@ public class ProviderManager {
             return cstl.openClient().providers.getPyramidPath(providerName);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error when call web service to know pyramid data path", e);
+        }
+        return null;
+    }
+
+    public ParameterValues getCoverageList(final String providerId) {
+        try {
+            return cstl.openClient().providers.getCoverageList(providerId);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to find coverage list", e);
+        }
+        return null;
+    }
+
+    public void saveCRSModifications(final Map<String, String> dataCRSModified, final String providerId) {
+        dataCRSModified.put("providerId", providerId);
+        final ParameterValues values = new ParameterValues(dataCRSModified);
+        try {
+            cstl.openClient().providers.saveCRSModification(values);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to save CRS modifications", e);
+        }
+    }
+
+    public DataBrief getDataSummary(final String name, final String namespace, final String providerId) {
+        try {
+            return cstl.openClient().providers.getDataSummary(name, namespace, providerId);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to access to data summary", e);
+        }
+        return null;
+    }
+
+    public DataBrief getLayerSummary(final String layerAlias, final String providerId) {
+        try {
+            return cstl.openClient().providers.getLayerSummary(layerAlias, providerId);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to access to data summary", e);
+        }
+        return null;
+    }
+
+    public DataInformation getMetadata(final String providerId, final String dataId, final String dataType) {
+        try {
+            return cstl.openClient().providers.getMetadata(providerId, dataId, dataType);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when call web service to get metadata from a layer", e);
         }
         return null;
     }

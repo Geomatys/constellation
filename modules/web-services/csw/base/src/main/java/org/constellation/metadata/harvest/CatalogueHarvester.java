@@ -43,6 +43,7 @@ import org.apache.sis.xml.Namespaces;
 import org.apache.sis.util.logging.Logging;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -113,13 +114,16 @@ public abstract class CatalogueHarvester {
            "http://www.isotc211.org/2005/gfc".equals(resourceType)) {
 
             final InputStream in      = getSingleMetadata(sourceURL);
-            final Object harvested    = unmarshaller.unmarshal(in);
+            final Object harvestedObj = unmarshaller.unmarshal(in);
             marshallerPool.recycle(unmarshaller);
 
-            if (harvested == null) {
+            if (harvestedObj == null) {
                 throw new CstlServiceException("The resource can not be parsed.",
                         INVALID_PARAMETER_VALUE, "Source");
+            } else if (!(harvestedObj instanceof Node))  {
+                throw new CstlServiceException("object has been unmarshalled.");
             }
+            final Node harvested = (Node) harvestedObj;
 
             LOGGER.log(Level.INFO, "Object Type of the harvested Resource: {0}", harvested.getClass().getName());
 

@@ -19,6 +19,11 @@ public class InstanceSummary {
     private String name;
 
     /**
+     * service name
+     */
+    private String identifier;
+
+    /**
      * service type
      */
     private String type;
@@ -38,10 +43,16 @@ public class InstanceSummary {
      */
     private int layersNumber;
 
-
+    /**
+     * GetCapabilities URL
+     */
     private String capabilitiesUrl;
 
-
+    /**
+     * Logs access URL.
+     */
+    private String logsURL;
+    
     public String getName() {
         return name;
     }
@@ -88,5 +99,21 @@ public class InstanceSummary {
 
     public void setCapabilitiesUrl(final String capabilitiesUrl) {
         this.capabilitiesUrl = capabilitiesUrl;
+    }
+    
+    public String getLogsURL() {
+        return logsURL;
+    }
+    
+    public void setLogsURL(String logsURL) {
+        this.logsURL = logsURL;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(final String identifier) {
+        this.identifier = identifier;
     }
 }

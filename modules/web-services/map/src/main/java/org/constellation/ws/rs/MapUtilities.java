@@ -16,13 +16,6 @@
  */
 package org.constellation.ws.rs;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
-import javax.xml.namespace.QName;
-
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
@@ -31,6 +24,12 @@ import org.constellation.map.security.LayerSecurityFilter;
 import org.constellation.provider.LayerProviderProxy;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
+
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * @author Guilhem Legal (Geomatys).
@@ -65,7 +64,9 @@ public class MapUtilities {
                         if (layer == null) {
                             layer = new Layer(qn);
                         }
-                        setLayerExtraProperties(layer, sourceID);
+                        final ParameterValueGroup provider = LayerProviderProxy.getInstance().getProvider(sourceID).getSource();
+                        layer.setProviderType((String) provider.parameter("providerType").getValue());
+                        layer.setProviderID(sourceID);
                         layers.add(layer);
                     }
                 /*
@@ -81,7 +82,9 @@ public class MapUtilities {
                     final List<Layer> allLayer = source.allIncludedLayer(qn);
                     if (!allLayer.isEmpty()) {
                         for (Layer layer : allLayer) {
-                            setLayerExtraProperties(layer, sourceID);
+                            layer.setProviderID(sourceID);
+                            final ParameterValueGroup provider = LayerProviderProxy.getInstance().getProvider(sourceID).getSource();
+                            layer.setProviderType((String) provider.parameter("providerType").getValue());
                             layers.add(layer);
                         }
                     }
@@ -89,23 +92,5 @@ public class MapUtilities {
             }
         }
         return layers;
-    }
-
-    /**
-     * Sets some {@link Layer} extra properties.
-     * <ul>
-     *     <li>ProvideID: the layer provider identifier</li>
-     *     <li>Date: the layer provider creation date</li>
-     *     <li>ProviderType: the layer provider type (vector, raster,...)</li>
-     * </ul>
-     *
-     * @param layer      the layer to be updated
-     * @param providerID the layer provider identifier
-     */
-    private static void setLayerExtraProperties(final Layer layer, final String providerID) {
-        final ParameterValueGroup source = LayerProviderProxy.getInstance().getProvider(providerID).getSource();
-        layer.setProviderID(providerID);
-        layer.setDate((Date) source.parameter("date").getValue());
-        layer.setProviderType((String) source.parameter("providerType").getValue());
     }
 }

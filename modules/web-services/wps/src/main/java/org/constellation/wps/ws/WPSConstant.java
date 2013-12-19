@@ -82,12 +82,8 @@ public final class WPSConstant {
      */
     public static final String PROCESS_PREFIX = "urn:ogc:cstl:wps:";
     
-    /**
-     * Temporary directory name used for store responses.
-     */
-    public static final String TEMP_FOLDER = "/tmp/wps" ;
-    
     public static final AbstractOperationsMetadata OPERATIONS_METADATA;
+
     static {
         final List<AbstractDCP> getAndPost = new ArrayList<>();
         getAndPost.add(OWSXmlFactory.buildDCP("1.1.0", "somURL", "someURL"));

@@ -24,18 +24,23 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.dao.LayerRecord;
+import org.constellation.admin.dao.ServiceRecord;
+import org.constellation.admin.dao.Session;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Source;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
-import org.constellation.dto.BandDescription;
-import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PropertyDescription;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.provider.LayerProvider;
@@ -49,9 +54,18 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} base for "map" services.
@@ -114,11 +128,12 @@ public class MapConfigurer extends OGCConfigurer {
 
         // Declare the style as "applicable" for the layer data.
         try {
+            final QName layerID = new QName(layerProviderReference.getLayerId().getNamespaceURI(), layerProviderReference.getLayerId().getLocalPart());
             StyleProviderConfig.linkToData(
                     styleProviderReference.getProviderId(),
                     styleProviderReference.getLayerId().getLocalPart(),
                     layerProviderReference.getProviderId(),
-                    layerProviderReference.getLayerId().getLocalPart());
+                    layerID);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, "Error when associating layer default style to the layer source data.", ex);
         }
@@ -153,7 +168,17 @@ public class MapConfigurer extends OGCConfigurer {
 
         // Extracts the layer list from service configuration.
         final LayerContext layerContext = (LayerContext) this.getInstanceConfiguration(identifier);
-        return MapUtilities.getConfigurationLayers(layerContext, null, null);
+        List<Layer> layers = MapUtilities.getConfigurationLayers(layerContext, null, null);;
+
+        for (Layer layer : layers) {
+            final LayerRecord record = ConfigurationEngine.getLayer(identifier, this.specification, layer.getName());
+            if (record != null) {
+                layer.setDate(record.getDate());
+                layer.setOwner(record.getOwnerLogin());
+            }
+         }
+
+        return layers;
     }
 
     /**
@@ -164,5 +189,50 @@ public class MapConfigurer extends OGCConfigurer {
         final Instance instance = super.getInstance(identifier);
         instance.setLayersNumber(getLayers(identifier).size());
         return instance;
+    }
+
+    public void removeLayer(final String serviceId, final QName layerid) throws JAXBException {
+        Session session = null;
+
+        try {
+            session = EmbeddedDatabase.createSession();
+            final ServiceRecord service = session.readService(serviceId, specification);
+            final InputStream config =  service.getConfig();
+            final Unmarshaller unmarshall = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+            final LayerContext layerContext = (LayerContext) unmarshall.unmarshal(config);
+            final List<Source> sources = layerContext.getLayers();
+            QName name = null;
+            boolean found = false;
+
+            for (Source source : sources) {
+                List<Layer> layers = source.getInclude();
+                for (Layer layer : layers) {
+                    if(layer.getName().equals(layerid)){
+                        name = layer.getName();
+                        layers.remove(layer);
+                        found = true;
+                        break;
+                    }
+                }
+                if(found){
+                    break;
+                }
+            }
+
+            if(found){
+                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                final StringWriter writer = new StringWriter();
+                marshaller.marshal(layerContext, writer);
+                final StringReader reader = new StringReader(writer.toString());
+                service.setConfig(reader);
+
+                session.deleteLayer(name, service);
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "", e);
+        } finally {
+            if(session!=null) session.close();
+        }
     }
 }

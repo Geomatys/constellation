@@ -28,8 +28,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import org.constellation.configuration.DataBrief;
 import org.constellation.provider.*;
 import org.quartz.TriggerBuilder;
 import org.quartz.SimpleScheduleBuilder;
@@ -194,9 +196,13 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         //Tasks operations
         else if (REQUEST_LIST_PROCESS.equalsIgnoreCase(request)) {
-            return ListProcess();
+            return listProcess();
+        } else if (REQUEST_LIST_PROCESS_FOR_FACTO.equalsIgnoreCase(request)) {
+            return listProcessForFactory(parameters);
+        } else if (REQUEST_LIST_PROCESS_FACTORIES.equalsIgnoreCase(request)) {
+            return listProcessFactories();
         } else if (REQUEST_LIST_TASKS.equalsIgnoreCase(request)) {
-            return ListTasks();
+            return listTasks();
         } else if (REQUEST_GET_PROCESS_DESC.equalsIgnoreCase(request)) {
             return getProcessDescriptor(parameters);
         } else if (REQUEST_GET_TASK_PARAMS.equalsIgnoreCase(request)) {
@@ -406,7 +412,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                                     // save new Configuration
                                     LOGGER.log(Level.INFO, "Updating service {0}-{1} for deleted provider", new Object[]{specification, w.getId()});
                                     try {
-                                        ConfigurationEngine.storeConfiguration(specification, w.getId(), "layerContext.xml", configuration);
+                                        ConfigurationEngine.storeConfiguration(specification, w.getId(), configuration);
                                     } catch (JAXBException ex) {
                                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                                     }
@@ -873,9 +879,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final List<ProviderReport> providerReports = new ArrayList<>();
             for (final LayerProvider p : layerProviders) {
                 if (p.getService().equals(service)) {
-                    final List<String> keys = new ArrayList<>();
+                    final List<DataBrief> keys = new ArrayList<>();
                     for(Name n : p.getKeys()){
-                        keys.add(DefaultName.toJCRExtendedForm(n));
+                        final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
+                        final DataBrief db = ConfigurationEngine.getData(name, p.getId());
+                        keys.add(db);
                     }
                     final Date date = (Date) p.getSource().parameter("date").getValue();
                     final String providerType = (String) p.getSource().parameter("providerType").getValue();
@@ -884,9 +892,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             }
             for (final StyleProvider p : styleProviders) {
                 if (p.getService().equals(service)) {
-                    final List<String> keys = new ArrayList<>();
+                    final List<DataBrief> keys = new ArrayList<>();
                     for(String n : p.getKeys()){
-                        keys.add(n);
+                        final DataBrief db = new DataBrief();
+                        db.setName(n);
+                        keys.add(db);
                     }
                     final Date date = (Date) p.getSource().parameter("date").getValue();
                     final String providerType = (String) p.getSource().parameter("providerType").getValue();
@@ -904,7 +914,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Returns a list of all process available in the current factories.
      */
-    private StringList ListProcess(){
+    private StringList listProcess(){
         final List<Name> names = CstlScheduler.getInstance().listProcess();
         final StringList lst = new StringList();
         for(Name n : names){
@@ -914,9 +924,25 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     }
 
     /**
+     * Returns a list of all process available for the specified factory.
+     */
+    private StringList listProcessForFactory(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String authorityCode = getParameter("authorityCode", true, parameters);
+        return new StringList(CstlScheduler.getInstance().listProcessForFactory(authorityCode));
+    }
+
+    /**
+     * Returns a list of all process available in the current factories.
+     */
+    private StringList listProcessFactories(){
+        final List<String> names = CstlScheduler.getInstance().listProcessFactory();
+        return new StringList(names);
+    }
+
+    /**
      * Returns a list of all tasks.
      */
-    private StringTreeNode ListTasks(){
+    private StringTreeNode listTasks(){
         final List<Task> tasks = CstlScheduler.getInstance().listTasks();
         final StringTreeNode node = new StringTreeNode();
         for(Task t : tasks){

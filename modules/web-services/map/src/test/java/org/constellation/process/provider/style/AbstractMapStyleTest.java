@@ -20,10 +20,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.provider.*;
-import org.geotoolkit.util.FileUtilities;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -56,18 +55,11 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
     @BeforeClass
     public static void initFolder() throws MalformedURLException {
 
-        configDirectory = new File("AbstractMapStyleTest");
+        configDirectory = ConfigurationEngine.setupTestEnvironement("AbstractMapStyleTest");
 
-        if (configDirectory.exists()) {
-            FileUtilities.deleteDirectory(configDirectory);
-        }
-
-        configDirectory.mkdir();
         File providerDirectory = new File(configDirectory, "provider");
         providerDirectory.mkdir();
         File sld = new File(providerDirectory, "sld.xml");
-        ConfigDirectory.setConfigDirectory(configDirectory);
-
         File csv = new File(configDirectory, "file.csv");
         EMPTY_CSV = csv.toURI().toURL();
 
@@ -75,8 +67,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
 
     @AfterClass
     public static void destroyFolder() {
-        FileUtilities.deleteDirectory(configDirectory);
-        ConfigDirectory.setConfigDirectory(null);
+        ConfigurationEngine.shutdownTestEnvironement("AbstractMapStyleTest");
     }
 
     /**

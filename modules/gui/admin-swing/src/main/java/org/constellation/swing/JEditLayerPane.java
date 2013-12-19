@@ -30,8 +30,8 @@ import javax.swing.JOptionPane;
 import javax.swing.ListCellRenderer;
 import javax.xml.namespace.QName;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
@@ -55,22 +55,23 @@ public class JEditLayerPane extends javax.swing.JPanel {
     
     private static final String EMPTY_ITEM = "empty";
     
-    private LayerContext context;
     private LayerModel layerModel;
 
     /**
      * Creates new form JEditLayerPane
+     * @param server
+     * @param serviceType
+     * @param layerModel
      */
-    public JEditLayerPane(final ConstellationServer server, final Object configuration, final String serviceType, final LayerModel layerModel) {
-        this.context = (LayerContext)configuration;
+    public JEditLayerPane(final ConstellationServer server, final String serviceType, final LayerModel layerModel) {
         this.layerModel = layerModel;
         initComponents();
         
         guiCQLError.getParent().setVisible(false);
         
         //create combobox items (dataReference string)
-        final List<String> providerList = new ArrayList<String>();
-        final List<DataReference> styleList = new ArrayList<DataReference>();
+        final List<String> providerList = new ArrayList<>();
+        final List<DataReference> styleList = new ArrayList<>();
         styleList.add(null);
         
         final ProvidersReport providersReport = server.providers.listProviders();
@@ -82,11 +83,16 @@ public class JEditLayerPane extends javax.swing.JPanel {
             for (final ProviderReport providerReport : providers) {
                 
                 final String providerID = providerReport.getId();
-                final List<String> layers = providerReport.getItems();
-                for (final String item : layers) {
-                    
+                final List<DataBrief> layers = providerReport.getItems();
+                for (final DataBrief item : layers) {
+                    final String fullName;
+                    if (item.getNamespace() != null) {
+                        fullName = '{' + item.getNamespace() + '}' + item.getName();
+                    } else {
+                        fullName = item.getName();
+                    }
                     if ("sld".equals(serviceProviderType)) {
-                        styleList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, providerID, item));
+                        styleList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, providerID, fullName));
                     } else {
                         boolean addProviderToList = false;
                         //WFS -> data-store
@@ -105,7 +111,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
                         }
                         
                         if (addProviderToList) {
-                            providerList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, providerID, item).getReference());
+                            providerList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, providerID, fullName).getReference());
                         }
                     }
                 }
@@ -324,12 +330,13 @@ public class JEditLayerPane extends javax.swing.JPanel {
     /**
      * 
      * @param server
-     * @param configuration 
+     * @param serviceType
+     * @param layer
      * @return 
      */
-    public static LayerModel showDialog(final ConstellationServer server, final Object configuration, final String serviceType, final LayerModel layer){
+    public static LayerModel showDialog(final ConstellationServer server, final String serviceType, final LayerModel layer){
         
-        final JEditLayerPane pane = new JEditLayerPane(server, configuration, serviceType, layer);
+        final JEditLayerPane pane = new JEditLayerPane(server, serviceType, layer);
                 
         int res = JOptionPane.showOptionDialog(null, new Object[]{pane}, 
                 LayerRowModel.BUNDLE.getString("createLayerMsg"), 

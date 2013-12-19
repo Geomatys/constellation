@@ -32,6 +32,12 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.apache.sis.geometry.GeneralDirectPosition;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
@@ -42,7 +48,6 @@ import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.ResultTypeType;
 
 import org.junit.*;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.junit.Assert.*;
@@ -65,6 +70,19 @@ public class WFSCIteWorkerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        ConfigurationEngine.setupTestEnvironement("WFSCIteWorkerTest");
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null),
+                                                   new Source("postgisSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+        config.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "default", config);
+
         initFeatureSource();
         worker = new DefaultWFSWorker("default");
         worker.setLogLevel(Level.FINER);
@@ -73,6 +91,7 @@ public class WFSCIteWorkerTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        ConfigurationEngine.shutdownTestEnvironement("WFSCIteWorkerTest");
     }
 
     @Before
@@ -163,10 +182,10 @@ public class WFSCIteWorkerTest {
         final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("feature-store".equals(serviceName)){
+                if("feature-store".equals(service.getName())){
                     // Defines a PostGis data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
@@ -187,7 +206,7 @@ public class WFSCIteWorkerTest {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

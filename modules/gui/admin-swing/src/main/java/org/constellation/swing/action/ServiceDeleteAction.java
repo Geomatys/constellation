@@ -79,7 +79,7 @@ public class ServiceDeleteAction extends Action {
                     ,getDisplayName(),JOptionPane.YES_NO_OPTION);
             
             if(res == JOptionPane.YES_OPTION){
-                server.services.deleteInstance(type, inst.getName());
+                server.services.deleteInstance(type, inst.getIdentifier());
                 SwingUtilities.invokeLater(new Runnable() {
                    @Override
                    public void run() {

@@ -45,9 +45,57 @@
 
             <!-- Modals -->
             #{include path=add_data.gtmpl/}
+
+            <div id="linkedModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h3 id="modalLabel">&{label.data.list}</h3>
+                </div>
+                <div class="modal-body">
+                    <div id="linkedList" class="dashboard">
+                        <div class="navbar sort-navbar">
+                            <div class="navbar-inner" style="border:1px solid #e3e3e3;padding-right:5px;">
+                                <ul class="nav">
+                                    <li><a href="#" data-order-by="title">&{label.title}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                                    <li class="divider-vertical"></li>
+                                    <li><a href="#" data-order-by="date">&{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i> </a></li>
+                                    <li class="divider-vertical"></li>
+                                    <li><a href="#" data-order-by="owner">&{label.owner}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                                    <li class="divider-vertical"></li>
+                                    <li><a href="#" data-order-by="type">&{label.type}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                                    <li class="divider-vertical"></li>
+                                </ul>
+                                <button type="button" data-role="reset" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                                <div class="pull-right">
+                                    <div style="position:relative;">
+                                        <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                                        <input type="text" data-role="search" class="search-query input-small" placeholder="&{label.search}..." />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-role="list"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">&{label.close}</button>
+                    <button id="associate" data-dismiss="modal" class="btn btn-info" type="button">&{label.validate}</button>
+                </div>
+            </div>
             <script type="text/javascript">
                 CSTL.AddLayerWorkflow.init();
+                function validateData(styleProvider, styleName, dataProvider, dataName){
+                    return CSTL.Providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName);
+                }
+
+                var styleFlow = CSTL.LinkWorkflow.init('StyleController.styleList()', validateData, CSTL.LinkWorkflow.styleTemplate);
             </script>
+
+            <form action="@{MapController.removeLayer()}" id="deleteForm">
+                <input type="hidden" name="serviceId" value="${service.identifier}"/>
+                <input type="hidden" name="serviceType" value="${instance.type}"/>
+                <input type="hidden" name="layerName" id="deleteLayerId"/>
+            </form>
 
             <form action="@{upload()}" enctype="multipart/form-data" method="post" style="margin:0;">
                 <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -91,5 +139,17 @@
                 </div>
             </form>
         </div>
+    </div>
+</div>
+<div class="modal hide fade" id="getcapabilities-modal" style="left:40%; width:910px">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>GetCapabilities</h3>
+    </div>
+    <div class="modal-body">
+        <pre id="capabilities-modal-pre" style="background-color: #f8f8ff"><code class="xml"></code></pre>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
     </div>
 </div>

@@ -31,6 +31,14 @@ public class Process {
     @XmlAttribute
     private String id;
 
+    public Process() {
+        
+    }
+    
+    public Process(final String id) {
+        this.id = id;
+    }
+    
     /**
      * @return the id
      */

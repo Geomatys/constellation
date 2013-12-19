@@ -17,6 +17,7 @@
 
 package org.constellation.admin.dao;
 
+import java.io.InputStream;
 import org.constellation.ServiceDef.Specification;
 
 import java.io.StringReader;
@@ -102,12 +103,38 @@ public final class ServiceRecord implements Record {
         session.updateI18n(description, locale, value);
     }
 
-    public Object getConfig() throws SQLException {
+    public InputStream getConfig() throws SQLException {
         return session.readServiceConfig(id);
     }
 
     public void setConfig(final StringReader config) throws SQLException {
         session.updateServiceConfig(id, config);
+    }
+
+    public InputStream getExtraFile(final String fileName) throws SQLException {
+        return session.readExtraServiceConfig(id, fileName);
+    }
+
+    public void setExtraFile(final String fileName, final StringReader config) throws SQLException {
+        final InputStream is = session.readExtraServiceConfig(id, fileName);
+        if (is == null) {
+            session.writeServiceExtraConfig(identifier, type, config, fileName);
+        } else {
+            session.updateServiceExtraConfig(id, fileName, config);
+        }
+    }
+
+    public InputStream getMetadata(final String lang) throws SQLException {
+        return session.readServiceMetadata(id, lang);
+    }
+
+    public void setMetadata(final String lang, final StringReader metadata) throws SQLException {
+        final InputStream is = session.readServiceMetadata(id, lang);
+        if (is == null) {
+            session.writeServiceMetadata(identifier, type, metadata, lang);
+        } else {
+            session.updateServiceMetadata(id, lang, metadata);
+        }
     }
 
     public String getOwnerLogin() {

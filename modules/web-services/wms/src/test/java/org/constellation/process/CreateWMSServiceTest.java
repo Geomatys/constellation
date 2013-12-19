@@ -28,5 +28,4 @@ public class CreateWMSServiceTest extends CreateMapServiceTest {
     public CreateWMSServiceTest() {
         super("WMS", DefaultWMSWorker.class);
     }
-
 }

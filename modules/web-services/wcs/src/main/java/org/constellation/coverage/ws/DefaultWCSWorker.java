@@ -387,7 +387,6 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      * @return a WCSCapabilities XML document describing the capabilities of this service.
      *
      * @throws CstlServiceException
-     * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
     @Override
     public GetCapabilitiesResponse getCapabilities(final GetCapabilities request) throws CstlServiceException {

@@ -6,7 +6,7 @@
                  xmlns:gmx="http://www.isotc211.org/2005/gmx"
                  xmlns:gts="http://www.isotc211.org/2005/gts"
                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                 xmlns:gml="http://www.opengis.net/gml">
+                 xmlns:gml="http://www.opengis.net/gml/3.2">
     <gmd:fileIdentifier>
         <gco:CharacterString>identifier-test</gco:CharacterString>
     </gmd:fileIdentifier>
@@ -76,7 +76,7 @@
         </gmd:CI_ResponsibleParty>
     </gmd:contact>
     <gmd:dateStamp>
-        <gco:DateTime>2009-01-01T06:00:00+01:00</gco:DateTime>
+        <gco:DateTime>2009-01-01T07:00:00+02:00</gco:DateTime>
     </gmd:dateStamp>
     <gmd:spatialRepresentationInfo>
         <gmd:MD_VectorSpatialRepresentation>
@@ -300,7 +300,7 @@
                             <gmd:date>
                                 <gmd:CI_Date>
                                     <gmd:date>
-                                        <gco:DateTime>2008-11-26T00:00:00+01:00</gco:DateTime>
+                                        <gco:Date>2008-11-26</gco:Date>
                                     </gmd:date>
                                     <gmd:dateType>
                                         <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#revision" codeListValue="revision"/>

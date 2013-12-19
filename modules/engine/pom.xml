@@ -130,6 +130,7 @@
     <module>process</module>
     <module>testing</module>
     <module>admin</module>
+    <module>register</module>
   </modules>
 
 </project>

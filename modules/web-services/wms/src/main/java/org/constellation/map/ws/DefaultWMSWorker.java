@@ -44,6 +44,7 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.spi.ServiceRegistry;
+import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
@@ -86,11 +87,11 @@ import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
 import org.geotoolkit.inspire.xml.vs.LanguageType;
 import org.geotoolkit.inspire.xml.vs.LanguagesType;
 import org.geotoolkit.map.FeatureMapLayer;
-import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
@@ -147,7 +148,6 @@ import org.opengis.sld.StyledLayerDescriptor;
 import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
 
-
 /**
  * A WMS worker for a local WMS service which handles requests from either REST
  * or SOAP facades and issues appropriate responses.
@@ -189,6 +189,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             "NORTH", "EAST", "SOUTH", "WEST",
             "UP", "DOWN",
             "FUTURE", "PAST"});
+
+    /**
+     * Only Elevation dimension.
+     */
+    private static final List<String> VERTICAL_DIM = UnmodifiableArrayList.wrap(new String[] {"UP", "DOWN"});
 
     private WMSPortrayal mapPortrayal;
 
@@ -412,7 +417,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
 
             /*
-             * Create dimentions using CRS of the layer native envelope
+             * Create dimensions using CRS of the layer native envelope
              */
             Envelope nativeEnv;
             try {
@@ -430,16 +435,28 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 for (int i = 0; i < nbDim; i++) {
                     final CoordinateSystemAxis axis = cs.getAxis(i);
                     final AxisDirection direction = axis.getDirection();
+                    final Unit axisUnit = axis.getUnit();
 
                     final String directionName = direction.name();
+
+                    boolean addDimension = false;
+
+                    //valid axis if a common dimensions
                     if (!COMMONS_DIM.contains(directionName)) {
+                        addDimension = true;
+
+                        //or a vertical direction without axis length unit.
+                    } else if (VERTICAL_DIM.contains(directionName) && axisUnit != null && !axisUnit.isCompatible(SI.METRE)) {
+                        addDimension = true;
+                    }
+
+                    if (addDimension) {
                         final org.opengis.metadata.Identifier axisName = axis.getName();
 
-                        final Unit<?> u = axis.getUnit();
-                        final String unit = (u != null) ? u.toString() : null;
+                        final String unit = (axisUnit != null) ? axisUnit.toString() : null;
                         String unitSymbol;
                         try {
-                            unitSymbol = UnitFormat.getInstance().format(u);
+                            unitSymbol = UnitFormat.getInstance().format(axisUnit);
                         } catch (IllegalArgumentException e) {
                             // Workaround for one more bug in javax.measure...
                             unitSymbol = unit;
@@ -480,43 +497,43 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final MapItem mi = layer.getMapLayer(null, null);
                     applyLayerFiltersAndDims(mi, userLogin);
 
-                    if(mi instanceof FeatureMapLayer){
-                        final FeatureMapLayer fml = (FeatureMapLayer) mi;
-                        for(FeatureMapLayer.DimensionDef ddef : fml.getExtraDimensions()){
-                            final Collection<Range> collRefs = fml.getDimensionRange(ddef);
-                            // Transform it to a set in order to filter same values
-                            final Set<Range> refs = new HashSet<>();
-                            for (Range ref : collRefs) {
-                                refs.add(ref);
-                            }
-
-                            final StringBuilder values = new StringBuilder();
-                            int index = 0;
-                            for (final Range val : refs) {
-                                values.append(val.getMinValue());
-                                if(val.getMinValue().compareTo(val.getMaxValue()) != 0){
-                                    values.append('-');
-                                    values.append(val.getMaxValue());
+                    if (mi instanceof MapContext) {
+                        final MapContext mc = (MapContext)mi;
+                        final List<AbstractDimension> dimensionsToAdd = new ArrayList<AbstractDimension>();
+                        for (final MapLayer candidateLayer : mc.layers()) {
+                            if (candidateLayer instanceof FeatureMapLayer) {
+                                final FeatureMapLayer fml = (FeatureMapLayer)candidateLayer;
+                                final List<AbstractDimension> extraDimsToAdd = getExtraDimensions(fml, queryVersion);
+                                for (AbstractDimension newExtraDim : extraDimsToAdd) {
+                                    boolean exist = false;
+                                    for (AbstractDimension oldExtraDim : dimensionsToAdd) {
+                                        if (oldExtraDim.getName().equalsIgnoreCase(newExtraDim.getName())) {
+                                            mergeValues(oldExtraDim, newExtraDim);
+                                            exist = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!exist) {
+                                        dimensionsToAdd.add(newExtraDim);
+                                    }
                                 }
-                                if (index++ < refs.size()-1) {
-                                    values.append(",");
-                                }
                             }
+                        }
 
-                            final boolean multipleValues = (refs.size() > 1);
-                            final String unitSymbol = ddef.getCrs().getCoordinateSystem().getAxis(0).getUnit().toString();
-                            final String unit = unitSymbol;
-                            final String axisName = ddef.getCrs().getCoordinateSystem().getAxis(0).getName().getCode();
-                            final String defaut = "";
-
-                            dim = createDimension(queryVersion, values.toString(), axisName, unit,
-                                    unitSymbol, defaut, multipleValues, null, null);
-
-                            dimensions.add(dim);
+                        if (!dimensionsToAdd.isEmpty()) {
+                            dimensions.addAll(dimensionsToAdd);
                         }
                     }
 
-                } catch (PortrayalException | DataStoreException ex) {
+                    if(mi instanceof FeatureMapLayer){
+                        final FeatureMapLayer fml = (FeatureMapLayer) mi;
+                        dimensions.addAll(getExtraDimensions(fml, queryVersion));
+                    }
+
+                } catch (PortrayalException ex) {
+                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
+                    break;
+                } catch (DataStoreException ex) {
                     Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
                     break;
                 }
@@ -531,7 +548,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
             //Use layer alias from config if exist.
             if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
-                layerName = configLayer.getAlias().trim().replaceAll(" ", "_");
+                layerName = configLayer.getAlias();
             } else {
 
                 if (fullLayerName.getNamespaceURI() != null && !fullLayerName.getNamespaceURI().isEmpty()) {
@@ -637,6 +654,133 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
         putCapabilitiesInCache(queryVersion, currentLanguage, inCapabilities);
         return inCapabilities;
+    }
+
+    private String sortValues(final String... vals) {
+        final List<String> finalVals = new ArrayList<String>();
+        for (final String s : vals) {
+            finalVals.add(s);
+        }
+
+        boolean isDoubleValues = false;
+        List<Double> finalValsDouble = null;
+        try {
+            Double.valueOf(finalVals.get(0));
+            // It is a double!
+            isDoubleValues = true;
+            finalValsDouble = new ArrayList<Double>();
+            for (String s : finalVals) {
+                finalValsDouble.add(Double.valueOf(s));
+            }
+        } catch (NumberFormatException ex) {
+        }
+
+        if (isDoubleValues) {
+            Collections.sort(finalValsDouble);
+            finalVals.clear();
+            for (Double d : finalValsDouble) {
+                finalVals.add(String.valueOf(d));
+            }
+        } else {
+            Collections.sort(finalVals);
+        }
+
+        final StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String val : finalVals) {
+            if (!first) {
+                sb.append(",");
+            }
+            sb.append(val);
+            first = false;
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Merge old and new values in the old dimension. Try to sort its values.
+     *
+     * @param oldExtraDim
+     * @param newExtraDim
+     */
+    private void mergeValues(final AbstractDimension oldExtraDim, final AbstractDimension newExtraDim) {
+        final Set<String> valsSet = new HashSet<String>();
+        final String oldVals = oldExtraDim.getValue();
+        final String[] oldValsSplit = oldVals.split(",");
+        for (final String o : oldValsSplit) {
+            valsSet.add(o);
+        }
+
+        final String newVals = newExtraDim.getValue();
+        final String[] newValsSplit = newVals.split(",");
+        for (final String n : newValsSplit) {
+            valsSet.add(n);
+        }
+
+        final List<String> finalVals = new ArrayList<String>();
+        finalVals.addAll(valsSet);
+
+        if (finalVals.isEmpty()) {
+            return;
+        }
+
+        final String finalValSorted = sortValues(finalVals.toArray(new String[0]));
+        oldExtraDim.setValue(finalValSorted);
+    }
+
+    /**
+     * Get extra dimensions from a {@link FeatureMapLayer}.
+     *
+     * @param fml {@link FeatureMapLayer}
+     * @param queryVersion Version of the request.
+     * @return A list of extra dimensions, never {@code null}
+     * @throws DataStoreException
+     */
+    private List<AbstractDimension> getExtraDimensions(final FeatureMapLayer fml, final String queryVersion) throws DataStoreException {
+        final List<AbstractDimension> dimensions = new ArrayList<AbstractDimension>();
+        for(FeatureMapLayer.DimensionDef ddef : fml.getExtraDimensions()){
+            final Collection<Range> collRefs = fml.getDimensionRange(ddef);
+            // Transform it to a set in order to filter same values
+            final Set<Range> refs = new HashSet<Range>();
+            for (Range ref : collRefs) {
+                refs.add(ref);
+            }
+
+            if (refs.isEmpty()) {
+                // Dimension applied on a layer which has no values: just skip this dimension
+                continue;
+            }
+
+            final StringBuilder values = new StringBuilder();
+            int index = 0;
+            for (final Range val : refs) {
+                values.append(val.getMinValue());
+                if(val.getMinValue().compareTo(val.getMaxValue()) != 0){
+                    values.append('-');
+                    values.append(val.getMaxValue());
+                }
+                if (index++ < refs.size()-1) {
+                    values.append(",");
+                }
+            }
+
+            final String sortedValues = sortValues(values.toString().split(","));
+            final boolean multipleValues = (refs.size() > 1);
+            final String unitSymbol = ddef.getCrs().getCoordinateSystem().getAxis(0).getUnit().toString();
+            final String unit = unitSymbol;
+            final String axisName = ddef.getCrs().getCoordinateSystem().getAxis(0).getName().getCode();
+            final String defaut = "";
+
+            final AbstractDimension dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+                new org.geotoolkit.wms.xml.v111.Dimension(sortedValues, axisName, unit,
+                    unitSymbol, defaut, multipleValues, null, null) :
+                new org.geotoolkit.wms.xml.v130.Dimension(sortedValues, axisName, unit,
+                    unitSymbol, defaut, multipleValues, null, null);
+
+            dimensions.add(dim);
+        }
+        return dimensions;
     }
 
     /**
@@ -791,7 +935,14 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         //       -- get the List of layer references
         final String userLogin             = getUserLogin();
         final List<Name> layerNames        = getFI.getQueryLayers();
-        final List<LayerDetails> layerRefs = getLayerReferences(userLogin, layerNames);
+        final List<LayerDetails> layerRefs;
+        final List<Layer> layerConfig;
+        try{
+            layerRefs = getLayerReferences(userLogin, layerNames);
+            layerConfig = getConfigurationLayers(userLogin, layerNames);
+        } catch (CstlServiceException ex) {
+            throw new CstlServiceException(ex, LAYER_NOT_DEFINED, KEY_LAYERS.toLowerCase());
+        }
 
         for (LayerDetails layer : layerRefs) {
             if (!layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) {
@@ -804,7 +955,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final List<String> styleNames   = getFI.getStyles();
         final StyledLayerDescriptor sld = getFI.getSld();
 
-        final List<MutableStyle> styles        = getStyles(layerRefs, sld, styleNames, userLogin);
+        final List<MutableStyle> styles        = getStyles(layerConfig, sld, styleNames, userLogin);
         //       -- create the rendering parameter Map
         final Double elevation                 = getFI.getElevation();
         final Date time                        = getFI.getTime();
@@ -1032,8 +1183,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         //       -- get the List of layer references
         final List<Name> layerNames = getMap.getLayers();
         final List<LayerDetails> layerRefs;
+        final List<Layer> layerConfig;
         try{
             layerRefs = getLayerReferences(userLogin, layerNames);
+            layerConfig = getConfigurationLayers(userLogin, layerNames);
         } catch (CstlServiceException ex) {
             return handleExceptions(getMap, errorInImage, errorBlank, ex, LAYER_NOT_DEFINED,  KEY_LAYERS.toLowerCase());
         }
@@ -1050,7 +1203,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         List<MutableStyle> styles;
         try {
-            styles = getStyles(layerRefs, sld, styleNames, userLogin);
+            styles = getStyles(layerConfig, sld, styleNames, userLogin);
         } catch (CstlServiceException ex) {
             return handleExceptions(getMap, errorInImage, errorBlank, ex, STYLE_NOT_DEFINED, null);
         }
@@ -1071,25 +1224,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         try {
-            final MapContext context = MapBuilder.createContext();
-
-            for (int i = 0; i < layerRefs.size(); i++) {
-                final LayerDetails layerRef = layerRefs.get(i);
-                final MutableStyle style = styles.get(i);
-
-                assert (null != layerRef);
-                //style can be null
-
-                final MapItem mapLayer = layerRef.getMapLayer(style, params);
-                if (mapLayer == null) {
-                    throw new PortrayalException("Could not create a mapLayer for layer: " + layerRef.getName());
-                }
-                if(mapLayer instanceof MapLayer){
-                    ((MapLayer)mapLayer).setSelectable(true);
-                }
-                mapLayer.setVisible(true);
-                context.items().add(mapLayer);
-            }
+            final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
             //apply layercontext filters
             applyLayerFiltersAndDims(context, userLogin);
 
@@ -1216,38 +1351,39 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         return null;
     }
 
-    private List<MutableStyle> getStyles(final List<LayerDetails> layerRefs, final StyledLayerDescriptor sld,
+    private List<MutableStyle> getStyles(final List<Layer> layerConfig, final StyledLayerDescriptor sld,
                                          final List<String> styleNames, final String userLogin) throws CstlServiceException {
         final List<MutableStyle> styles = new ArrayList<>();
-        for (int i=0; i<layerRefs.size(); i++) {
-            final Name layerName = layerRefs.get(i).getName();
-            final Layer layer = getConfigurationLayer(layerName, userLogin);
-            
-            final MutableStyle style;
-            if (sld != null) {
-                //try to use the provided SLD
-                style = extractStyle(layerName, layer, sld);
-            } else if (styleNames != null && styleNames.size() > i && styleNames.get(i) != null && !styleNames.get(i).isEmpty()) {
-                //try to grab the style if provided
-                //a style has been given for this layer, try to use it
-                final String namedStyle = styleNames.get(i);
-                final DataReference ref = layer.getStyle(namedStyle);
-                style = getStyle(ref);
-                if (style == null) {
-                    throw new CstlServiceException("Style provided: " + namedStyle + " not found.", STYLE_NOT_DEFINED);
-                }
-            } else {
-                //no defined styles, use the favorite one, let the layer get it himself.
+        for (int i=0; i<layerConfig.size(); i++) {
+            final Layer config = layerConfig.get(i);
+            if (config != null) {
+                final Name layerName = new DefaultName(config.getName());
 
-                final List<DataReference> defaultStyleRefs = layer.getStyles();
-                if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
-                    final DataReference styleRef = defaultStyleRefs.get(0);
-                    style = (styleRef.getLayerId() == null) ? null : getStyle(styleRef);
+                final MutableStyle style;
+                if (sld != null) {
+                    //try to use the provided SLD
+                    style = extractStyle(layerName, config, sld);
+                } else if (styleNames != null && styleNames.size() > i && styleNames.get(i) != null && !styleNames.get(i).isEmpty()) {
+                    //try to grab the style if provided
+                    //a style has been given for this layer, try to use it
+                    final String namedStyle = styleNames.get(i);
+                    style = getLayerStyle(namedStyle);
+                    if (style == null) {
+                        throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
+                    }
                 } else {
-                    style = null;
+                    //no defined styles, use the favorite one, let the layer get it himself.
+
+                    final List<DataReference> defaultStyleRefs = config.getStyles();
+                    if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
+                        final DataReference styleRef = defaultStyleRefs.get(0);
+                        style = (styleRef.getLayerId() == null) ? null : getStyle(styleRef);
+                    } else {
+                        style = null;
+                    }
                 }
+                styles.add(style);
             }
-            styles.add(style);
         }
         return styles;
     }
@@ -1291,7 +1427,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     fml.getExtraDimensions().add(fdef);
 
                 } catch (CQLException ex) {
-                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.WARNING, null, ex);
                 }
             }
 

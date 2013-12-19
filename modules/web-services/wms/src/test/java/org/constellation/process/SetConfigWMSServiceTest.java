@@ -28,5 +28,4 @@ public class SetConfigWMSServiceTest extends SetConfigMapServiceTest {
     public SetConfigWMSServiceTest() {
         super("WMS", DefaultWMSWorker.class);
     }
-
 }

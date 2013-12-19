@@ -28,6 +28,12 @@ import java.sql.Savepoint;
 import java.util.*;
 import java.util.logging.Level;
 import javax.sql.DataSource;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
@@ -40,12 +46,15 @@ import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 
 // MDWeb dependencies
 import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.AbstractReader;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -113,12 +122,29 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     public boolean writeSensor(final String id, final AbstractSensorML process) throws CstlServiceException {
 
         try {
-            return super.storeMetadata(process, id);
+            final Node n = marshallProcess(process);
+            return super.storeMetadata(n, id);
 
         } catch (MetadataIoException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(),
                                              NO_APPLICABLE_CODE);
+        }
+    }
+
+    private Node marshallProcess(final AbstractSensorML process) throws MetadataIoException {
+        try {
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            final Document document = docBuilder.newDocument();
+            Marshaller marshaller = SOSMarshallerPool.getInstance().acquireMarshaller();
+            marshaller.setProperty(LegacyNamespaces.APPLY_NAMESPACE_REPLACEMENTS, false);
+            marshaller.marshal(process, document);
+            SOSMarshallerPool.getInstance().recycle(marshaller);
+            return document.getDocumentElement();
+        } catch (ParserConfigurationException | JAXBException ex) {
+            throw new MetadataIoException(ex);
         }
     }
 

@@ -16,22 +16,19 @@
  */
 package org.constellation.gui.service;
 
-import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.Instance;
-import org.constellation.configuration.InstanceReport;
-import org.constellation.dto.DataInformation;
-import org.constellation.dto.DataMetadata;
-import org.constellation.dto.Service;
-import org.constellation.dto.StyleListBean;
-import org.constellation.utils.GeotoolkitFileExtensionAvailable;
-
-import javax.inject.Inject;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.inject.Inject;
+
+import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.InstanceReport;
+import org.constellation.dto.Service;
+import org.constellation.dto.StyleListBean;
 
 /**
  * Juzu service to call constellation services server side
@@ -162,28 +159,11 @@ public class  ServicesManager {
             }
             instanceSum.setLayersNumber(instance.getLayersNumber() != null ? instance.getLayersNumber() : 0);
             instanceSum.setName(instance.getName());
+            instanceSum.setIdentifier(instance.getIdentifier());
             instanceSum.setStatus(instance.getStatus().toString());
             instanceSum.setType(instance.getType().toLowerCase());
+            buildServiceUrl(instance.getType(), instance.getIdentifier(), instance.getVersions(), instanceSum);
 
-            // Build service capabilities URL.
-            String capabilitiesUrl = cstl.getUrl() + "WS/"+instance.getType().toLowerCase()+"/" + instance.getName() +"?REQUEST=GetCapabilities&SERVICE="+instance.getType().toUpperCase();
-
-
-            if (instance.getVersions()!= null && instance.getVersions().size()>0) {
-                double version=0;
-                String selectedVersion = "";
-
-                for (String currentVersion : instance.getVersions()) {
-                    double testedVersion = Double.parseDouble(currentVersion.replace(".", ""));
-
-                    if(testedVersion>version){
-                        version= testedVersion;
-                        selectedVersion = currentVersion;
-                    }
-                }
-                capabilitiesUrl += "&VERSION=" + selectedVersion;
-            }
-            instanceSum.setCapabilitiesUrl(capabilitiesUrl);
 
             instancesSummary.add(instanceSum);
         }
@@ -191,8 +171,29 @@ public class  ServicesManager {
         return instancesSummary;
     }
 
-    public DataInformation uploadToServer(File newFile, String dataType) {
-        return cstl.openServer().providers.uploadData(newFile, dataType);
+    public void buildServiceUrl(final String type, final String identifier, final List<String> versions, final InstanceSummary instanceSum) {
+        // Build service capabilities URL.
+        String capabilitiesUrl = cstl.getUrl() + "WS/"+type.toLowerCase()+"/" + identifier +"?REQUEST=GetCapabilities&SERVICE="+type.toUpperCase();
+        // Build service URL for logs.
+        String logsURL = cstl.getUrl() + "api/1/log/"+type.toLowerCase()+"/" + identifier;
+
+
+        if (versions!= null && versions.size()>0) {
+            double version=0;
+            String selectedVersion = "";
+
+            for (String currentVersion : versions) {
+                double testedVersion = Double.parseDouble(currentVersion.replace(".", ""));
+
+                if(testedVersion>version){
+                    version= testedVersion;
+                    selectedVersion = currentVersion;
+                }
+            }
+            capabilitiesUrl += "&VERSION=" + selectedVersion;
+        }
+        instanceSum.setCapabilitiesUrl(capabilitiesUrl);
+        instanceSum.setLogsURL(logsURL);
     }
 
     public StyleListBean getStyleList() {

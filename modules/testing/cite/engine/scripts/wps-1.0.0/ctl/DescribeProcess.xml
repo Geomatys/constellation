@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ctl:package 
+<ctl:package
     xmlns:describeProcess="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/DescribeProcess.xml"
     xmlns:wpsFunctions="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/functions.xml"
     xmlns:ctl="http://www.occamlab.com/ctl"
-    xmlns:html="http://www.w3.org/1999/xhtml" 	
-    xmlns:saxon="http://saxon.sf.net/" 
-    xmlns:tep="http://teamengine.sourceforge.net/parsers" 
-    xmlns:xi="http://www.w3.org/2001/XInclude" 
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:tep="http://teamengine.sourceforge.net/parsers"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:parsers="http://www.occamlab.com/te/parsers"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:ows="http://www.opengis.net/ows/1.1" 
-    xmlns:gml="http://www.opengis.net/gml" 
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:ows="http://www.opengis.net/ows/1.1"
+    xmlns:gml="http://www.opengis.net/gml"
     xmlns:wps="http://www.opengis.net/wps/1.0.0"
     xmlns:xml="http://www.w3.org/XML/1998/namespace">
 
-    <ctl:test name="describeProcess:core-WPS.DescribeProcess-POST-RequestInvalidLanguage.1">						
+    <ctl:test name="describeProcess:core-WPS.DescribeProcess-POST-RequestInvalidLanguage.1">
         <ctl:param name="exceptionReportSchema"/>
         <ctl:param name="postURL"/>
         <ctl:param name="describeProcessVersion"/>
-        <ctl:param name="identifier"/>							
+        <ctl:param name="identifier"/>
         <ctl:assertion>Supplying an invalid Language (not advertised in the capabilities document) produces a valid error report message. </ctl:assertion>
         <ctl:comment>Check that supplying an invalid Language (not advertised in the capabilities document) for the language parameter produces a valid error report message.  Pass if an invalid language produces a valid error report; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the server handles invalid language in the language parameter correctly.">ATS_URL#WPS.DescribeProcess-RequestInvalidLanguage</ctl:link>
-        <ctl:code>	
+        <ctl:code>
 
-	   <!--************************************  check for valid exception when language is invalid ******************************************-->				
+	   <!--************************************  check for valid exception when language is invalid ******************************************-->
             <xsl:variable name="invalidLanguage" select="'xx-XX'"/>
             <ctl:message></ctl:message>
-            <ctl:message select="concat('Making DescribeProcess request with an &quot;language&quot; parameter value that is not advertised in the capabilities document: ', $invalidLanguage, '...')"/>									
+            <ctl:message select="concat('Making DescribeProcess request with an &quot;language&quot; parameter value that is not advertised in the capabilities document: ', $invalidLanguage, '...')"/>
             <xsl:variable name="invalidLanguageRequest">
                 <ctl:request>
                     <ctl:url>
@@ -37,37 +37,37 @@
                     </ctl:url>
                     <ctl:method>post</ctl:method>
                     <ctl:body>
-                        <DescribeProcess 
-                            service="WPS" 
+                        <DescribeProcess
+                            service="WPS"
                             xmlns="http://www.opengis.net/wps/1.0.0">
                             <xsl:attribute name="version">
                                 <xsl:value-of select="$describeProcessVersion"/>
-                            </xsl:attribute>															
+                            </xsl:attribute>
                             <xsl:attribute name="language">
                                 <xsl:value-of select="$invalidLanguage"/>
-                            </xsl:attribute>														
+                            </xsl:attribute>
                             <ows:Identifier>
                                 <xsl:value-of select="$identifier"/>
                             </ows:Identifier>
                         </DescribeProcess>
-							
+
                     </ctl:body>
                     <ctl:call-function name="wpsFunctions:xmlValidatingParser">
-                        <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>						
-                    </ctl:call-function>						
-                </ctl:request>							 														
-            </xsl:variable>		
-		
+                        <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>
+                    </ctl:call-function>
+                </ctl:request>
+            </xsl:variable>
+
             <xsl:choose>
 		<!-- check for valid schema or missing response-->
-                <xsl:when test="not($invalidLanguageRequest/*)">							
+                <xsl:when test="not($invalidLanguageRequest/*)">
                     <ctl:message>Exception report failed schema validation, or no exception was produced.</ctl:message>
                     <ctl:message select="concat('Schema file: ', $exceptionReportSchema)"/>
                     <ctl:fail/>
                 </xsl:when>
 
-		<!-- check for correct exception code -->					
-                <xsl:when test="not(wpsFunctions:exceptionCode($invalidLanguageRequest) = 'InvalidParameterValue')">						
+		<!-- check for correct exception code -->
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($invalidLanguageRequest), 'InvalidParameterValue'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($invalidLanguageRequest))"/>
@@ -82,28 +82,28 @@
                     </ctl:message>
                     <ctl:message>Locator value should be: 'language'.</ctl:message>
                     <ctl:fail/>
-                </xsl:when>						
+                </xsl:when>
                 <xsl:otherwise>
                     <ctl:message>OK</ctl:message>
                 </xsl:otherwise>
-            </xsl:choose>					
+            </xsl:choose>
         </ctl:code>
     </ctl:test>
-    
-    <ctl:test name="describeProcess:core-WPS.DescribeProcess-GET-RequestInvalidLanguage.1">						
+
+    <ctl:test name="describeProcess:core-WPS.DescribeProcess-GET-RequestInvalidLanguage.1">
         <ctl:param name="exceptionReportSchema"/>
         <ctl:param name="getURL"/>
         <ctl:param name="describeProcessVersion"/>
-        <ctl:param name="identifier"/>							
+        <ctl:param name="identifier"/>
         <ctl:assertion>Supplying an invalid Language (not advertised in the capabilities document) produces a valid error report message. </ctl:assertion>
         <ctl:comment>Check that supplying an invalid Language (not advertised in the capabilities document) for the language parameter produces a valid error report message.  Pass if an invalid language produces a valid error report; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the server handles invalid language in the language parameter correctly.">ATS_URL#WPS.DescribeProcess-RequestInvalidLanguage</ctl:link>
-        <ctl:code>	
+        <ctl:code>
 
-	   <!--************************************  check for valid exception when language is invalid ******************************************-->				
+	   <!--************************************  check for valid exception when language is invalid ******************************************-->
             <xsl:variable name="invalidLanguage" select="'xx-XX'"/>
             <ctl:message></ctl:message>
-            <ctl:message select="concat('Making DescribeProcess request with an &quot;language&quot; parameter value that is not advertised in the capabilities document: ', $invalidLanguage, '...')"/>									
+            <ctl:message select="concat('Making DescribeProcess request with an &quot;language&quot; parameter value that is not advertised in the capabilities document: ', $invalidLanguage, '...')"/>
             <xsl:variable name="invalidLanguageRequest">
                 <ctl:request>
                     <ctl:url>
@@ -117,26 +117,26 @@
                     <ctl:param name="request">DescribeProcess</ctl:param>
                     <ctl:param name="language">
                         <xsl:value-of select="$invalidLanguage" />
-                    </ctl:param>															
+                    </ctl:param>
                     <ctl:param name="identifier">
                         <xsl:value-of select="$identifier"/>
-                    </ctl:param>      													
+                    </ctl:param>
                     <ctl:call-function name="wpsFunctions:xmlValidatingParser">
-                        <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>						
-                    </ctl:call-function>						
-                </ctl:request>							 														
-            </xsl:variable>		
-		
+                        <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>
+                    </ctl:call-function>
+                </ctl:request>
+            </xsl:variable>
+
             <xsl:choose>
 		<!-- check for valid schema or missing response-->
-                <xsl:when test="not($invalidLanguageRequest/*)">							
+                <xsl:when test="not($invalidLanguageRequest/*)">
                     <ctl:message>Exception report failed schema validation, or no exception was produced.</ctl:message>
                     <ctl:message select="concat('Schema file: ', $exceptionReportSchema)"/>
                     <ctl:fail/>
                 </xsl:when>
 
-		<!-- check for correct exception code -->					
-                <xsl:when test="not(wpsFunctions:exceptionCode($invalidLanguageRequest) = 'InvalidParameterValue')">						
+		<!-- check for correct exception code -->
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($invalidLanguageRequest), 'InvalidParameterValue'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($invalidLanguageRequest))"/>
@@ -151,27 +151,27 @@
                     </ctl:message>
                     <ctl:message>Locator value should be: 'language'.</ctl:message>
                     <ctl:fail/>
-                </xsl:when>						
+                </xsl:when>
                 <xsl:otherwise>
                     <ctl:message>OK</ctl:message>
                 </xsl:otherwise>
-            </xsl:choose>					
+            </xsl:choose>
         </ctl:code>
     </ctl:test>
-		
-<!--*****************************************************************************************************************************************************************************-->		
 
-		
-    <ctl:test name="describeProcess:core-WPS.DescribeProcess-POST-RequestInvalidIdentifier.1">			
+<!--*****************************************************************************************************************************************************************************-->
+
+
+    <ctl:test name="describeProcess:core-WPS.DescribeProcess-POST-RequestInvalidIdentifier.1">
         <ctl:param name="exceptionReportSchema"/>
         <ctl:param name="postURL"/>
         <ctl:param name="describeProcessVersion"/>
         <ctl:assertion>Supplying an invalid process identifier (not advertised in the capabilities document) or no process identifier for the Identifier parameter produces a valid error report message.</ctl:assertion>
         <ctl:comment>Check that supplying an invalid process identifier (not advertised in the capabilities document) or no process identifier for the Identifier parameter produces a valid error report message.  Pass if an invalid Process Identifier or no Process identifier produces a valid error report message; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the server handles an invalid process identifier in the request correctly.">ATS_URL#WPS.DescribeProcess-RequestInvalidProcess</ctl:link>
-        <ctl:code>	
-            <!--************************************  check for valid exception when process identifier is missing from request ******************************************-->				
-            <ctl:message select="'Making DescribeProcess request with no &quot;Identifier&quot; parameter...'"/>					
+        <ctl:code>
+            <!--************************************  check for valid exception when process identifier is missing from request ******************************************-->
+            <ctl:message select="'Making DescribeProcess request with no &quot;Identifier&quot; parameter...'"/>
             <xsl:variable name="noIdentifierRequest">
                 <ctl:request>
                     <ctl:url>
@@ -180,20 +180,20 @@
                     <ctl:method>post</ctl:method>
 
                     <ctl:body>
-                        <DescribeProcess 								
-                            service="WPS" 
-                            xmlns="http://www.opengis.net/wps/1.0.0">									
+                        <DescribeProcess
+                            service="WPS"
+                            xmlns="http://www.opengis.net/wps/1.0.0">
                             <xsl:attribute name="version">
                                 <xsl:value-of select="$describeProcessVersion"/>
-                            </xsl:attribute>															
-                        </DescribeProcess>														
+                            </xsl:attribute>
+                        </DescribeProcess>
                     </ctl:body>
-											 							
-                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">	
-                        <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>						
-                    </ctl:call-function>					
-                </ctl:request>	
-            </xsl:variable>										
+
+                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">
+                        <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>
+                    </ctl:call-function>
+                </ctl:request>
+            </xsl:variable>
 
             <xsl:choose>
 		<!-- check for valid schema or missing response-->
@@ -202,8 +202,8 @@
                     <ctl:message select="concat('Schema file: ', $exceptionReportSchema)"/>
                     <ctl:fail/>
                 </xsl:when>
-		<!-- check for correct exception code -->					
-                <xsl:when test="not(wpsFunctions:exceptionCode($noIdentifierRequest) = 'MissingParameterValue')">
+		<!-- check for correct exception code -->
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($noIdentifierRequest), 'MissingParameterValue'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($noIdentifierRequest))"/>
@@ -218,17 +218,17 @@
                     </ctl:message>
                     <ctl:message>Locator value should be: 'identifier'.</ctl:message>
                     <ctl:fail/>
-                </xsl:when>						
-					
+                </xsl:when>
+
 		<!-- looks good -->
                 <xsl:otherwise>
                     <ctl:message>OK</ctl:message>
                 </xsl:otherwise>
-            </xsl:choose>	
+            </xsl:choose>
 
 	    <!--************************************  check for valid exception when process identifier is invalid ******************************************-->
-            <xsl:variable name="invalidProcessIdentifier" select="'urn:ogc:object:process:CITE:NFL:AstroDome'"/>				
-            <ctl:message select="concat('Making DescribeProcess request with a identifier not advertised in the capabilities document: ', $invalidProcessIdentifier)"/>		
+            <xsl:variable name="invalidProcessIdentifier" select="'urn:ogc:object:process:CITE:NFL:AstroDome'"/>
+            <ctl:message select="concat('Making DescribeProcess request with a identifier not advertised in the capabilities document: ', $invalidProcessIdentifier)"/>
             <xsl:variable name="invalidProcessIdentifierRequest">
                 <ctl:request>
                     <ctl:url>
@@ -237,25 +237,25 @@
                     <ctl:method>post</ctl:method>
 
                     <ctl:body>
-                        <DescribeProcess 								
-                            service="WPS" 
+                        <DescribeProcess
+                            service="WPS"
                             xmlns="http://www.opengis.net/wps/1.0.0"
-                            xmlns:ows="http://www.opengis.net/ows/1.1"                            
+                            xmlns:ows="http://www.opengis.net/ows/1.1"
                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                             <xsl:attribute name="version">
                                 <xsl:value-of select="$describeProcessVersion"/>
-                            </xsl:attribute>															
+                            </xsl:attribute>
                             <ows:Identifier>
                                 <xsl:value-of select="$invalidProcessIdentifier"/>
                             </ows:Identifier>
-                        </DescribeProcess>							
-                    </ctl:body>												 							
-                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">			
+                        </DescribeProcess>
+                    </ctl:body>
+                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">
                         <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>
                     </ctl:call-function>
-                </ctl:request>	
-            </xsl:variable>										
-				
+                </ctl:request>
+            </xsl:variable>
+
             <xsl:choose>
 		<!-- check for valid schema or missing response-->
                 <xsl:when test="not($invalidProcessIdentifierRequest/*)">
@@ -263,8 +263,8 @@
                     <ctl:message select="concat('Schema file: ', $exceptionReportSchema)"/>
                     <ctl:fail/>
                 </xsl:when>
-		<!-- check for correct exception code -->					
-                <xsl:when test="not(wpsFunctions:exceptionCode($invalidProcessIdentifierRequest) = 'InvalidParameterValue')">
+		<!-- check for correct exception code -->
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($invalidProcessIdentifierRequest), 'InvalidParameterValue'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($invalidProcessIdentifierRequest))"/>
@@ -272,33 +272,33 @@
                     <ctl:message>Exception code should be: 'InvalidParameterValue'.</ctl:message>
                     <ctl:fail/>
                 </xsl:when>
-                <xsl:when test="not(contains(lower-case(wpsFunctions:exceptionCodeLocator($invalidProcessIdentifierRequest)), 'identifier'))">										
+                <xsl:when test="not(contains(lower-case(wpsFunctions:exceptionCodeLocator($invalidProcessIdentifierRequest)), 'identifier'))">
                     <ctl:message>Invalid locator.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Locator is: ', wpsFunctions:exceptionCodeLocator($invalidProcessIdentifierRequest))"/>
                     </ctl:message>
                     <ctl:message>Locator value should be: 'identifier'.</ctl:message>
                     <ctl:fail/>
-                </xsl:when>						
+                </xsl:when>
 		<!-- looks good -->
                 <xsl:otherwise>
                     <ctl:message>OK</ctl:message>
                 </xsl:otherwise>
-            </xsl:choose>					
+            </xsl:choose>
 
         </ctl:code>
     </ctl:test>
-    
-    <ctl:test name="describeProcess:core-WPS.DescribeProcess-GET-RequestInvalidIdentifier.1">			
+
+    <ctl:test name="describeProcess:core-WPS.DescribeProcess-GET-RequestInvalidIdentifier.1">
         <ctl:param name="exceptionReportSchema"/>
         <ctl:param name="getURL"/>
         <ctl:param name="describeProcessVersion"/>
         <ctl:assertion>Supplying an invalid process identifier (not advertised in the capabilities document) or no process identifier for the Identifier parameter produces a valid error report message.</ctl:assertion>
         <ctl:comment>Check that supplying an invalid process identifier (not advertised in the capabilities document) or no process identifier for the Identifier parameter produces a valid error report message.  Pass if an invalid Process Identifier or no Process identifier produces a valid error report message; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the server handles an invalid process identifier in the request correctly.">ATS_URL#WPS.DescribeProcess-RequestInvalidProcess</ctl:link>
-        <ctl:code>	
-            <!--************************************  check for valid exception when process identifier is missing from request ******************************************-->				
-            <ctl:message select="'Making DescribeProcess request with no &quot;Identifier&quot; parameter...'"/>					
+        <ctl:code>
+            <!--************************************  check for valid exception when process identifier is missing from request ******************************************-->
+            <ctl:message select="'Making DescribeProcess request with no &quot;Identifier&quot; parameter...'"/>
             <xsl:variable name="noIdentifierRequest">
                 <ctl:request>
                     <ctl:url>
@@ -311,10 +311,10 @@
                     </ctl:param>
                     <ctl:param name="request">DescribeProcess</ctl:param>
                     <ctl:call-function name="wpsFunctions:xmlValidatingParser">
-                        <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>						
-                    </ctl:call-function>						
-                </ctl:request>	
-            </xsl:variable>										
+                        <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>
+                    </ctl:call-function>
+                </ctl:request>
+            </xsl:variable>
 
             <xsl:choose>
 		<!-- check for valid schema or missing response-->
@@ -323,8 +323,8 @@
                     <ctl:message select="concat('Schema file: ', $exceptionReportSchema)"/>
                     <ctl:fail/>
                 </xsl:when>
-		<!-- check for correct exception code -->					
-                <xsl:when test="not(wpsFunctions:exceptionCode($noIdentifierRequest) = 'MissingParameterValue')">
+		<!-- check for correct exception code -->
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($noIdentifierRequest), 'MissingParameterValue'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($noIdentifierRequest))"/>
@@ -339,17 +339,17 @@
                     </ctl:message>
                     <ctl:message>Locator value should be: 'identifier'.</ctl:message>
                     <ctl:fail/>
-                </xsl:when>						
-					
+                </xsl:when>
+
 		<!-- looks good -->
                 <xsl:otherwise>
                     <ctl:message>OK</ctl:message>
                 </xsl:otherwise>
-            </xsl:choose>	
+            </xsl:choose>
 
 	    <!--************************************  check for valid exception when process identifier is invalid ******************************************-->
-            <xsl:variable name="invalidProcessIdentifier" select="'urn:ogc:object:process:CITE:NFL:AstroDome'"/>				
-            <ctl:message select="concat('Making DescribeProcess request with a identifier not advertised in the capabilities document: ', $invalidProcessIdentifier)"/>		
+            <xsl:variable name="invalidProcessIdentifier" select="'urn:ogc:object:process:CITE:NFL:AstroDome'"/>
+            <ctl:message select="concat('Making DescribeProcess request with a identifier not advertised in the capabilities document: ', $invalidProcessIdentifier)"/>
             <xsl:variable name="invalidProcessIdentifierRequest">
                <ctl:request>
                     <ctl:url>
@@ -363,13 +363,13 @@
                     <ctl:param name="request">DescribeProcess</ctl:param>
                     <ctl:param name="identifier">
                         <xsl:value-of select="$invalidProcessIdentifier"/>
-                    </ctl:param>      													
+                    </ctl:param>
                     <ctl:call-function name="wpsFunctions:xmlValidatingParser">
-                        <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>						
-                    </ctl:call-function>						
-                </ctl:request>	
-            </xsl:variable>										
-				
+                        <ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>
+                    </ctl:call-function>
+                </ctl:request>
+            </xsl:variable>
+
             <xsl:choose>
 		<!-- check for valid schema or missing response-->
                 <xsl:when test="not($invalidProcessIdentifierRequest/*)">
@@ -377,8 +377,8 @@
                     <ctl:message select="concat('Schema file: ', $exceptionReportSchema)"/>
                     <ctl:fail/>
                 </xsl:when>
-		<!-- check for correct exception code -->					
-                <xsl:when test="not(wpsFunctions:exceptionCode($invalidProcessIdentifierRequest) = 'InvalidParameterValue')">
+		<!-- check for correct exception code -->
+                <xsl:when test="not(contains(wpsFunctions:exceptionCode($invalidProcessIdentifierRequest), 'InvalidParameterValue'))">
                     <ctl:message>Invalid exception code.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Exception code is: ', wpsFunctions:exceptionCode($invalidProcessIdentifierRequest))"/>
@@ -386,25 +386,25 @@
                     <ctl:message>Exception code should be: 'InvalidParameterValue'.</ctl:message>
                     <ctl:fail/>
                 </xsl:when>
-                <xsl:when test="not(contains(lower-case(wpsFunctions:exceptionCodeLocator($invalidProcessIdentifierRequest)), 'identifier'))">										
+                <xsl:when test="not(contains(lower-case(wpsFunctions:exceptionCodeLocator($invalidProcessIdentifierRequest)), 'identifier'))">
                     <ctl:message>Invalid locator.</ctl:message>
                     <ctl:message>
                         <xsl:value-of select="concat('Locator is: ', wpsFunctions:exceptionCodeLocator($invalidProcessIdentifierRequest))"/>
                     </ctl:message>
                     <ctl:message>Locator value should be: 'identifier'.</ctl:message>
                     <ctl:fail/>
-                </xsl:when>						
+                </xsl:when>
 		<!-- looks good -->
                 <xsl:otherwise>
                     <ctl:message>OK</ctl:message>
                 </xsl:otherwise>
-            </xsl:choose>					
+            </xsl:choose>
 
         </ctl:code>
     </ctl:test>
-		
-   <!--*****************************************************************************************************************************************************************************-->		
-                
+
+   <!--*****************************************************************************************************************************************************************************-->
+
     <ctl:test name="describeProcess:core-WPS.DescribeProcess-POST-ResponseMatchingProcessIdentifier.1">
         <ctl:param name="capabilitiesDocument"/>
         <ctl:param name="postURL"/>
@@ -413,30 +413,30 @@
         <ctl:assertion>The unique identifier in the response document matches the process specified in the request.</ctl:assertion>
         <ctl:comment>Check that the unique identifier in the response document matches the Process identifier specified in the request.  Pass if assertion holds; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the unique identifier URN for the process in the returned document matches the Process identifier in the request">ATS_URL#WPS.DescribeProcess-ResponseMatchingProcessIdentifier</ctl:link>
-        <ctl:code>				
+        <ctl:code>
 
-            <xsl:for-each select="distinct-values($capabilitiesDocument//wps:Process//ows:Identifier)">			
+            <xsl:for-each select="distinct-values($capabilitiesDocument//wps:Process//ows:Identifier)">
                 <xsl:variable name="processIdentifier" select="."/>
                 <ctl:message select="concat('Process Identifier: &quot;',$processIdentifier, '&quot;')"/>
                 <xsl:variable name="response">
-                    <xsl:copy-of select="wpsFunctions:describeProcess($postURL, 
-								      $describeProcessVersion, 
+                    <xsl:copy-of select="wpsFunctions:describeProcess($postURL,
+								      $describeProcessVersion,
 								      $processIdentifier,
 								      $schemaFile)"/>
-                </xsl:variable>					
+                </xsl:variable>
 
                 <xsl:choose>
 		    <!-- check for valid schema or missing response-->
                     <xsl:when test="not($response/*)">
                         <ctl:message select="'Failure'"/>
-                        <ctl:message select="concat('The DescribeProcess response for ', $processIdentifier, ' was invalid according to the describeProcess_response schema.')"/>						
+                        <ctl:message select="concat('The DescribeProcess response for ', $processIdentifier, ' was invalid according to the describeProcess_response schema.')"/>
                         <ctl:message select="concat('Schema file: &quot;', $schemaFile)"/>
                         <ctl:fail/>
                     </xsl:when>
-						
+
                     <xsl:otherwise>
-                        <xsl:variable name="responseId" select="string($response//ProcessDescription/ows:Identifier)"/> 
-                        <ctl:message select="concat('Identifier URN from response: ',$responseId)"/>																		  
+                        <xsl:variable name="responseId" select="string($response//ProcessDescription/ows:Identifier)"/>
+                        <ctl:message select="concat('Identifier URN from response: ',$responseId)"/>
                         <xsl:choose>
                             <xsl:when test="$responseId = $processIdentifier">
                                 <ctl:message>OK</ctl:message>
@@ -448,10 +448,10 @@
                         </xsl:choose>
                     </xsl:otherwise>
                 </xsl:choose>
-            </xsl:for-each>				
+            </xsl:for-each>
         </ctl:code>
     </ctl:test>
-    
+
     <ctl:test name="describeProcess:core-WPS.DescribeProcess-GET-ResponseMatchingProcessIdentifier.1">
         <ctl:param name="capabilitiesDocument"/>
         <ctl:param name="getURL"/>
@@ -460,30 +460,30 @@
         <ctl:assertion>The unique identifier in the response document matches the process specified in the request.</ctl:assertion>
         <ctl:comment>Check that the unique identifier in the response document matches the Process identifier specified in the request.  Pass if assertion holds; fail otherwise.</ctl:comment>
         <ctl:link title="Verify that the unique identifier URN for the process in the returned document matches the Process identifier in the request">ATS_URL#WPS.DescribeProcess-ResponseMatchingProcessIdentifier</ctl:link>
-        <ctl:code>				
+        <ctl:code>
 
-            <xsl:for-each select="distinct-values($capabilitiesDocument//wps:Process//ows:Identifier)">			
+            <xsl:for-each select="distinct-values($capabilitiesDocument//wps:Process//ows:Identifier)">
                 <xsl:variable name="processIdentifier" select="."/>
                 <ctl:message select="concat('Process Identifier: &quot;',$processIdentifier, '&quot;')"/>
                 <xsl:variable name="response">
-                    <xsl:copy-of select="wpsFunctions:describeProcessGET($getURL, 
-								         $describeProcessVersion, 
+                    <xsl:copy-of select="wpsFunctions:describeProcessGET($getURL,
+								         $describeProcessVersion,
 								         $processIdentifier,
 								         $schemaFile)"/>
-                </xsl:variable>					
+                </xsl:variable>
 
                 <xsl:choose>
 		    <!-- check for valid schema or missing response-->
                     <xsl:when test="not($response/*)">
                         <ctl:message select="'Failure'"/>
-                        <ctl:message select="concat('The DescribeProcess response for ', $processIdentifier, ' was invalid according to the describeProcess_response schema.')"/>						
+                        <ctl:message select="concat('The DescribeProcess response for ', $processIdentifier, ' was invalid according to the describeProcess_response schema.')"/>
                         <ctl:message select="concat('Schema file: &quot;', $schemaFile)"/>
                         <ctl:fail/>
                     </xsl:when>
-						
+
                     <xsl:otherwise>
-                        <xsl:variable name="responseId" select="string($response//ProcessDescription/ows:Identifier)"/> 
-                        <ctl:message select="concat('Identifier URN from response: ',$responseId)"/>																		  
+                        <xsl:variable name="responseId" select="string($response//ProcessDescription/ows:Identifier)"/>
+                        <ctl:message select="concat('Identifier URN from response: ',$responseId)"/>
                         <xsl:choose>
                             <xsl:when test="$responseId = $processIdentifier">
                                 <ctl:message>OK</ctl:message>
@@ -495,8 +495,8 @@
                         </xsl:choose>
                     </xsl:otherwise>
                 </xsl:choose>
-            </xsl:for-each>				
+            </xsl:for-each>
         </ctl:code>
     </ctl:test>
-    
+
 </ctl:package>

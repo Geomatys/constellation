@@ -84,6 +84,18 @@ import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.ValueType;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
+import org.geotoolkit.wfs.xml.StoredQueries;
+import org.geotoolkit.wfs.xml.StoredQueryDescription;
+import org.geotoolkit.wfs.xml.v200.ObjectFactory;
+import org.geotoolkit.wfs.xml.v200.ParameterExpressionType;
+import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
+import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
@@ -91,7 +103,6 @@ import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 
@@ -115,9 +126,48 @@ public class WFSWorkerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        ConfigurationEngine.setupTestEnvironement("WFSWorkerTest");
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null),
+                                                   new Source("postgisSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+        config.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "default", config);
+        ConfigurationEngine.storeConfiguration("WFS", "test", config);
+
+        final List<Source> sources2 = Arrays.asList(new Source("shapeSrc", true, null, null),
+                                                   new Source("omSrc", true, null, null),
+                                                   new Source("smlSrc", true, null, null));
+        final Layers layers2 = new Layers(sources2);
+        final LayerContext config2 = new LayerContext(layers2);
+        config2.getCustomParameters().put("shiroAccessible", "false");
+        config2.getCustomParameters().put("transactionSecurized", "false");
+
+        ConfigurationEngine.storeConfiguration("WFS", "test1", config2);
+
+        pool = WFSMarshallerPool.getInstance();
+
+        final List<StoredQueryDescription> descriptions = new ArrayList<>();
+        final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
+        final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
+        final org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType pis = new org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType(new org.geotoolkit.ogc.xml.v200.LiteralType("$name"), "name", true);
+        final org.geotoolkit.ogc.xml.v200.FilterType filter = new org.geotoolkit.ogc.xml.v200.FilterType(pis);
+        final org.geotoolkit.wfs.xml.v200.QueryType query = new org.geotoolkit.wfs.xml.v200.QueryType(filter, types, "2.0.0");
+        final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
+        final ObjectFactory factory = new ObjectFactory();
+        queryEx.getContent().add(factory.createQuery(query));
+        final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
+        descriptions.add(des1);
+        final StoredQueries queries = new StoredQueries(descriptions);
+        ConfigurationEngine.storeConfiguration("WFS", "test1", "StoredQueries.xml", queries, pool);
+
         EPSG_VERSION = CRS.getVersion("EPSG").toString();
         initFeatureSource();
-        pool = WFSMarshallerPool.getInstance();
         worker = new DefaultWFSWorker("test1");
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
@@ -126,6 +176,7 @@ public class WFSWorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        ConfigurationEngine.shutdownTestEnvironement("WFSWorkerTest");
         if (ds != null) {
             ds.shutdown();
         }
@@ -1265,15 +1316,15 @@ public class WFSWorkerTest {
          final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("feature-store".equals(serviceName)){
+                if("feature-store".equals(service.getName())){
                     try{ 
                         
                         {//OBSERVATION
                         final String url = "jdbc:derby:memory:TestWFSWorkerOM";
-                        final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
+                        ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
                         sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
@@ -1375,7 +1426,7 @@ public class WFSWorkerTest {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

@@ -24,6 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.TransformerException;
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
@@ -46,6 +51,8 @@ import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.util.StringUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -105,7 +112,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
     /**
      * Return the specified sensor description from the specified ID.
      *
-     * @param sensorID The identifier of the sensor.
+     * @param sensorId The identifier of the sensor.
      *
      * @return the specified sensor description from the specified ID.
      * 
@@ -116,8 +123,14 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
     @Override
     public AbstractSensorML getSensor(final String sensorId) throws CstlServiceException {
         try {
-            final Object metadata   = getMetadata(sensorId, MetadataType.SENSORML);
-            
+            final Node node   = getMetadata(sensorId, MetadataType.SENSORML);
+            final Object metadata;
+            if (node != null) {
+                metadata = unmarshallObject(node);
+            } else {
+                metadata = null;
+            }
+
             if (metadata instanceof AbstractSensorML) {
                return (AbstractSensorML) metadata;
             
@@ -135,6 +148,23 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
         }
     }
 
+     private Object unmarshallObject(final Node n) throws MetadataIoException {
+        try {
+            final Unmarshaller um = SOSMarshallerPool.getInstance().acquireUnmarshaller();
+            um.setProperty(LegacyNamespaces.APPLY_NAMESPACE_REPLACEMENTS, false);
+            //final String xml = getStringFromNode(n);
+            //Object obj = um.unmarshal(new StringReader(xml));
+            Object obj = um.unmarshal(n);
+            SOSMarshallerPool.getInstance().recycle(um);
+
+            if (obj instanceof JAXBElement) {
+                obj = ((JAXBElement)obj).getValue();
+            }
+            return obj;
+        } catch (JAXBException ex) {
+            throw new MetadataIoException(ex);
+        }
+    }
     /**
      * {@inheritDoc}
      */

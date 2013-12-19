@@ -60,7 +60,6 @@ import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -99,6 +98,7 @@ import org.constellation.dto.Service;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.metadata.io.MetadataType;
+import org.constellation.metadata.utils.CSWUtils;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
@@ -122,8 +122,7 @@ import org.w3c.dom.Node;
  */
 public class CSWworker extends AbstractWorker {
 
-    
-        /**
+    /**
      * A Database reader.
      */
     private CSWMetadataReader mdReader;
@@ -132,11 +131,6 @@ public class CSWworker extends AbstractWorker {
      * An Database Writer.
      */
     private MetadataWriter mdWriter;
-
-    /**
-     * The current MIME type of return
-     */
-    private String outputFormat;
 
     /**
      * A lucene index searcher to make quick search on the metadatas.
@@ -179,18 +173,6 @@ public class CSWworker extends AbstractWorker {
     private final Map<QName, Object> schemas = new HashMap<>();
 
     /**
-     * A list of supported MIME type.
-     */
-    private static final List<String> ACCEPTED_OUTPUT_FORMATS;
-    static {
-        ACCEPTED_OUTPUT_FORMATS = new ArrayList<>();
-        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_XML);
-        ACCEPTED_OUTPUT_FORMATS.add(MimeType.APPLICATION_XML);
-        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_HTML);
-        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_PLAIN);
-    }
-
-    /**
      * A list of supported resource type.
      */
     private List<String> acceptedResourceType;
@@ -224,7 +206,7 @@ public class CSWworker extends AbstractWorker {
         isStarted = true;
         try {
             //we look if the configuration have been specified
-            final Object obj = ConfigurationEngine.getConfiguration(CSW, getId(), "config.xml");
+            final Object obj = ConfigurationEngine.getConfiguration(CSW, getId());
             if (obj instanceof Automatic) {
                 configuration = (Automatic) obj;
             } else {
@@ -253,11 +235,7 @@ public class CSWworker extends AbstractWorker {
             startError = " Unable to find a CSW Factory";
             LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}", startError);
             isStarted = false;
-        } catch (MetadataIoException e) {
-            startError = e.getMessage();
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", startError);
-            isStarted = false;
-        } catch (IndexingException e) {
+        } catch (MetadataIoException | IndexingException e) {
             startError = e.getMessage();
             LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", startError);
             isStarted = false;
@@ -472,6 +450,9 @@ public class CSWworker extends AbstractWorker {
      *
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
+     * 
+     * @return the capabilities document
+     * @throws CstlServiceException
      */
     public AbstractCapabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
@@ -673,6 +654,8 @@ public class CSWworker extends AbstractWorker {
      *
      * @return A GetRecordsResponseType containing the result of the request or
      *         an AcknowledgementType if the resultType is set to VALIDATE.
+     * 
+     * @throws CstlServiceException
      */
     public Object getRecords(final GetRecordsRequest request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetRecords request processing\n");
@@ -683,8 +666,8 @@ public class CSWworker extends AbstractWorker {
         final String id        = request.getRequestId();
         final String userLogin = getUserLogin();
 
-        // we initialize the output format of the response
-        initializeOutputFormat(request);
+        // verify the output format of the response
+        CSWUtils.getOutputFormat(request);
 
         //we get the output schema and verify that we handle it
         final String outputSchema;
@@ -887,14 +870,20 @@ public class CSWworker extends AbstractWorker {
         LOGGER.log(Level.FINER, "local max = " + max + " distributed max = " + maxDistributed);
 
         final MetadataType mode;
-        if (outputSchema.equals(Namespaces.GMD) || outputSchema.equals(Namespaces.GFC)) {
-            mode = MetadataType.ISO_19115;
-        } else if (outputSchema.equals(EBRIM_30) || outputSchema.equals(EBRIM_25)) {
-            mode = MetadataType.EBRIM;
-        } else if (outputSchema.equals(Namespaces.CSW)) {
-            mode = MetadataType.DUBLINCORE;
-        } else {
-            throw new IllegalArgumentException("undefined outputSchema");
+        switch (outputSchema) {
+            case Namespaces.GMD:
+            case Namespaces.GFC:
+                mode = MetadataType.ISO_19115;
+                break;
+            case EBRIM_30:
+            case EBRIM_25:
+                mode = MetadataType.EBRIM;
+                break;
+            case Namespaces.CSW:
+                mode = MetadataType.DUBLINCORE;
+                break;
+            default:
+                throw new IllegalArgumentException("undefined outputSchema");
         }
 
         // we return only the number of result matching
@@ -1006,6 +995,7 @@ public class CSWworker extends AbstractWorker {
      * @param request
      *
      * @return A GetRecordByIdResponse containing a list of records.
+     * @throws CstlServiceException
      */
     public GetRecordByIdResponse getRecordById(final GetRecordById request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetRecordById request processing\n");
@@ -1014,10 +1004,10 @@ public class CSWworker extends AbstractWorker {
 
         final String version   = request.getVersion().toString();
         final String userLogin = getUserLogin();
-        
-        // we initialize the output format of the response
-        initializeOutputFormat(request);
 
+        // verify the output format of the response
+        CSWUtils.getOutputFormat(request);
+        
         // we get the level of the record to return (Brief, summary, full)
         ElementSetType set = ElementSetType.SUMMARY;
         if (request.getElementSetName() != null && request.getElementSetName().getValue() != null) {
@@ -1151,6 +1141,7 @@ public class CSWworker extends AbstractWorker {
      *
      * @param request
      * @return
+     * @throws CstlServiceException
      */
     public DescribeRecordResponse describeRecord(final DescribeRecord request) throws CstlServiceException{
         LOGGER.log(logLevel, "DescribeRecords request processing\n");
@@ -1158,9 +1149,9 @@ public class CSWworker extends AbstractWorker {
 
         verifyBaseRequest(request);
 
-        // we initialize the output format of the response
-        initializeOutputFormat(request);
-
+        // verify the output format of the response
+        CSWUtils.getOutputFormat(request);
+        
         final String version = request.getVersion().toString();
         
         // we initialize the type names
@@ -1228,6 +1219,7 @@ public class CSWworker extends AbstractWorker {
      *
      * @param request
      * @return
+     * @throws CstlServiceException
      */
     public GetDomainResponse getDomain(final GetDomain request) throws CstlServiceException{
         LOGGER.log(logLevel, "GetDomain request processing\n");
@@ -1315,6 +1307,7 @@ public class CSWworker extends AbstractWorker {
      *
      * @param request
      * @return
+     * @throws CstlServiceException
      */
     public TransactionResponse transaction(final Transaction request) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
@@ -1342,7 +1335,12 @@ public class CSWworker extends AbstractWorker {
             if (transaction instanceof Insert) {
                 final Insert insertRequest = (Insert)transaction;
 
-                for (Object record : insertRequest.getAny()) {
+                for (Object recordObj : insertRequest.getAny()) {
+
+                    if (!(recordObj instanceof Node)) {
+                        throw new CstlServiceException("Inserted object has been unmarshalled.");
+                    }
+                    final Node record = (Node)recordObj;
 
                     try {
                         mdWriter.storeMetadata(record);
@@ -1440,7 +1438,10 @@ public class CSWworker extends AbstractWorker {
                         for (String metadataID : results) {
                             boolean updated;
                             if (updateRequest.getAny() != null) {
-                                updated = mdWriter.replaceMetadata(metadataID, updateRequest.getAny());
+                                if (!(updateRequest.getAny() instanceof Node)) {
+                                    throw new CstlServiceException("Inserted update part object has been unmarshalled.");
+                                }
+                                updated = mdWriter.replaceMetadata(metadataID, (Node)updateRequest.getAny());
                             } else {
                                 updated = mdWriter.updateMetadata(metadataID, updateRequest.getRecordPropertyMap());
                             }
@@ -1493,6 +1494,7 @@ public class CSWworker extends AbstractWorker {
      *
      * @param request
      * @return
+     * @throws CstlServiceException
      */
     public HarvestResponse harvest(final Harvest request) throws CstlServiceException {
         LOGGER.log(logLevel, "Harvest request processing\n");
@@ -1587,32 +1589,16 @@ public class CSWworker extends AbstractWorker {
                                               MISSING_PARAMETER_VALUE, SOURCE);
         }
 
+        try {
+            indexSearcher.refresh();
+            mdReader.clearCache();
+        } catch (IndexingException ex) {
+            throw new CstlServiceException("The service does not succeed to refresh the index after deleting documents:" + ex.getMessage(),
+                    NO_APPLICABLE_CODE);
+        }
+
         LOGGER.log(logLevel, "Harvest operation finished");
         return response;
-    }
-
-
-
-    /**
-     * Return the current output format (default: application/xml)
-     *
-     * @deprecated Thread unsafe todo replace.
-     */
-    @Deprecated
-    public String getOutputFormat() {
-        if (outputFormat == null) {
-            return MimeType.APPLICATION_XML;
-        }
-        return outputFormat;
-    }
-
-    /**
-     * Return true if the MIME type is supported.
-     *
-     * @param format a MIME type represented by a String.
-     */
-    private boolean isSupportedFormat(final String format) {
-        return ACCEPTED_OUTPUT_FORMATS.contains(format);
     }
 
     /**
@@ -1663,30 +1649,6 @@ public class CSWworker extends AbstractWorker {
             result.append(qn.getPrefix()).append(qn.getLocalPart()).append('\n');
         }
         return result.toString();
-    }
-
-    /**
-     * Initialize the outputFormat (MIME type) of the response.
-     * if the format is not supported it throws a WebService Exception.
-     *
-     * @param request
-     * @throws org.constellation.ws.CstlServiceException
-     */
-    private void initializeOutputFormat(final AbstractCswRequest request) throws CstlServiceException {
-
-        // we initialize the output format of the response
-        final String format = request.getOutputFormat();
-        if (format != null && isSupportedFormat(format)) {
-            outputFormat = format;
-        } else if (format != null && !isSupportedFormat(format)) {
-            final StringBuilder supportedFormat = new StringBuilder();
-            for (String s: ACCEPTED_OUTPUT_FORMATS) {
-                supportedFormat.append(s).append('\n');
-            }
-            throw new CstlServiceException("The server does not support this output format: " + format + '\n' +
-                                             " supported ones are: " + '\n' + supportedFormat.toString(),
-                                             INVALID_PARAMETER_VALUE, "outputFormat");
-        }
     }
 
     /**

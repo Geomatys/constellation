@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -264,7 +263,11 @@ public abstract class AbstractWorker implements Worker {
      */
     @Override
     public void setServiceUrl(final String serviceUrl) {
-        this.serviceUrl = serviceUrl + specification.toString().toLowerCase() + '/' + id + '?';
+        if (serviceUrl.endsWith("/")) {
+            this.serviceUrl = serviceUrl + specification.toString().toLowerCase() + '/' + id + '?';
+        } else {
+            this.serviceUrl = serviceUrl + '/' + specification.toString().toLowerCase() + '/' + id + '?';
+        }
     }
 
     /**
@@ -302,11 +305,11 @@ public abstract class AbstractWorker implements Worker {
      * This method has a cache system, the object will be read from the file system only one time.
      *
      * @param service The service type identifier. example "WMS"
-     * @param version The version of the GetCapabilities.
+     * @param language The language of the metadata.
      *
      * @return The capabilities Object, or {@code null} if none.
      *
-     * @throws JAXBException if an error occurs during the unmarshall of the document.
+     * @throws CstlServiceException if an error occurs during the unmarshall of the document.
      */
     protected Service getStaticCapabilitiesObject(final String service, final String language) throws CstlServiceException {
         final String key;
@@ -318,9 +321,9 @@ public abstract class AbstractWorker implements Worker {
         Service metadata = capabilities.get(key);
         if (metadata == null) {
             try {
-                metadata = ConfigurationEngine.readMetadata(getId(), service, language);
+                metadata = ConfigurationEngine.readServiceMetadata(getId(), service, language);
                 capabilities.put(key, metadata);
-            } catch (IOException ex) {
+            } catch (JAXBException | IOException ex) {
                 LOGGER.log(Level.WARNING, "An error occurred when trying to read the service metadata. Returning default capabilities.", ex);
             }
         }

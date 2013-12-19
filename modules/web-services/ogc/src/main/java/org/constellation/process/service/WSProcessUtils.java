@@ -25,5 +25,5 @@ import org.apache.sis.internal.util.UnmodifiableArrayList;
  */
 final class WSProcessUtils {
 
-    public static final List<String> SUPPORTED_SERVICE_TYPE = UnmodifiableArrayList.wrap(new String[] {"WMS", "WFS", "WMTS", "WCS", "CSW", "SOS", "WPS"});
+    public static final List<String> SUPPORTED_SERVICE_TYPE = UnmodifiableArrayList.wrap(new String[] {"WMS", "WFS", "WMTS", "WCS", "CSW", "SOS", "WPS", "WEBDAV"});
 }

@@ -74,7 +74,7 @@ public final class CSVGraphicVisitor extends TextGraphicVisitor {
             return;
         }
 
-        final String layerName = coverage.getLayer().getCoverageName().getLocalPart();
+        final String layerName = coverage.getLayer().getName();
         List<String> strs = values.get(layerName);
         if (strs == null) {
             strs = new ArrayList<String>();

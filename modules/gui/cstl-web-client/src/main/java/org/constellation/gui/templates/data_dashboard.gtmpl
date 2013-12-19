@@ -20,12 +20,9 @@
     <div class="span3">
         <div class="well nav-frame">
             <ul id="dataTypesNav" class="nav nav-list">
-                <li class="nav-header">&{label.data.raw}</li>
                 <li class="active"><a href="#" data-type="vector">&{label.vector}</a></li>
                 <li><a href="#" data-type="raster">&{label.raster}</a></li>
                 <li><a href="#" data-type="sensor">&{label.sensor}</a></li>
-                <li class="nav-header">&{label.data.processed}</li>
-                <li><a href="#" data-type="pyramid">&{label.data.pyramidal}</a></li>
                 <li><a href="#" data-type="virtual">&{label.data.virtual.sensor}</a>
                 </li>
             </ul>
@@ -70,10 +67,7 @@
             </div>
             <div class="pull-left" style="width: 40%;">
                 <div id="selection" data-role="selected">
-                    <div class="alert alert-info">
-                        <h5>&{label.no.selected.data}</h5>
-                        <p>&{msg.no.selected.data}</p>
-                    </div>
+                    #{include path=data_selected.gtmpl/}
                 </div>
             </div>
         </div>
@@ -86,4 +80,49 @@
 </div>
 <script type="text/javascript">
     CSTL.DataDashboard.init();
+</script>
+
+
+<div id="linkedModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="modalLabel">&{label.data.list}</h3>
+    </div>
+    <div class="modal-body">
+        <div id="linkedList" class="dashboard">
+            <div class="navbar sort-navbar">
+                <div class="navbar-inner" style="border:1px solid #e3e3e3;padding-right:5px;">
+                    <ul class="nav">
+                        <li><a href="#" data-order-by="title">&{label.title}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="date">&{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i> </a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="owner">&{label.owner}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="type">&{label.type}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                    </ul>
+                    <button type="button" data-role="reset" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                    <div class="pull-right">
+                        <div style="position:relative;">
+                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                            <input type="text" data-role="search" class="search-query input-small" placeholder="&{label.search}..." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div data-role="list"></div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">&{label.close}</button>
+        <button id="associate" data-dismiss="modal" class="btn btn-info" type="button">&{label.validate}</button>
+    </div>
+</div>
+<script type="text/javascript">
+        function validateData(styleProvider, styleName, dataProvider, dataName){
+            return CSTL.Providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName);
+        }
+
+        var styleFlow = CSTL.LinkWorkflow.init('StyleController.styleList()', validateData, CSTL.LinkWorkflow.styleTemplate);
 </script>

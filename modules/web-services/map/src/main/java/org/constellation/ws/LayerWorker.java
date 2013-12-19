@@ -70,7 +70,7 @@ public abstract class LayerWorker extends AbstractWorker {
         LayerContext candidate          = null;
         
         try {
-            final Object obj = ConfigurationEngine.getConfiguration(specification.name(), id, "layerContext.xml");
+            final Object obj = ConfigurationEngine.getConfiguration(specification.name(), id);
             if (obj instanceof LayerContext) {
                 candidate = (LayerContext) obj;
                 final String sec = candidate.getSecurity();
@@ -105,7 +105,7 @@ public abstract class LayerWorker extends AbstractWorker {
                 LOGGER.log(Level.WARNING, startError);
             }
         } catch (JAXBException ex) {
-            startError = "JAXBExeception while unmarshalling the layer context File";
+            startError = "JAXBException while unmarshalling the layer context File";
             isStarted  = false;
             LOGGER.log(Level.WARNING, startError, ex);
         } catch (FactoryNotFoundException ex) {
@@ -115,7 +115,7 @@ public abstract class LayerWorker extends AbstractWorker {
         } catch (FileNotFoundException ex) {
             startError = "The configuration file layerContext.xml has not been found";
             isStarted = false;
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: ", id);
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         }
         
 
@@ -148,6 +148,15 @@ public abstract class LayerWorker extends AbstractWorker {
         }
         throw new FactoryNotFoundException("No Map factory has been found for type:" + type);
     }
+
+    protected List<Layer> getConfigurationLayers(final String login, final List<Name> layerNames) {
+        final List<Layer> layerConfigs = new ArrayList<>();
+        for (Name layerName : layerNames) {
+            Layer l = getConfigurationLayer(layerName, login);
+            layerConfigs.add(l);
+        }
+        return layerConfigs;
+    }
     
     protected Layer getConfigurationLayer(final Name layerName, final String login) {
         if (layerName != null && layerName.getLocalPart() != null) {
@@ -165,6 +174,12 @@ public abstract class LayerWorker extends AbstractWorker {
                     return layer;
                 }
             }
+            // we do a second round with missing namespace search
+            for (Layer layer : layers) {
+                if (layer.getName().getLocalPart().equals(layerName.getLocalPart())) {
+                    return layer;
+                }
+            }
         }
         return null;
     }
@@ -179,7 +194,8 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     /**
-     *
+     * @param login
+     * 
      * @return map of additional informations for each layer declared in the
      * layer context.
      */
@@ -190,6 +206,7 @@ public abstract class LayerWorker extends AbstractWorker {
     
     /**
      * Return all layers details in LayerProviders from there names.
+     * @param login
      * @param layerNames
      * @return a list of LayerDetails
      * @throws CstlServiceException
@@ -208,6 +225,7 @@ public abstract class LayerWorker extends AbstractWorker {
     
     /**
      * Search layer real name and return the LayerDetails from LayerProvider.
+     * @param login
      * @param layerName
      * @return a LayerDetails
      * @throws CstlServiceException
@@ -231,6 +249,7 @@ public abstract class LayerWorker extends AbstractWorker {
 
     /**
      * We can't use directly layers.containsKey because it may miss the namespace or the alias.
+     * @param login
      * @param name
      */
     protected NameInProvider layersContainsKey(final String login, final Name name) {
@@ -261,7 +280,7 @@ public abstract class LayerWorker extends AbstractWorker {
             for (QName l : layerNames) {
                 final Layer layer = getConfigurationLayer(l, login);
                 if (layer.getAlias() != null && !layer.getAlias().isEmpty()) {
-                    final String alias = layer.getAlias().trim().replaceAll(" ", "_");
+                    final String alias = layer.getAlias();
                     if (alias.equals(name.getLocalPart())) {
                         Date version = null;
                         if (layer.getVersion() != null) {
@@ -298,7 +317,11 @@ public abstract class LayerWorker extends AbstractWorker {
         }
         return style;
     }
-    
+
+    protected MutableStyle getLayerStyle(final String styleName) {
+        return StyleProviderProxy.getInstance().get(styleName);
+    }
+
     protected Layer getMainLayer() {
         if (layerContext == null) {
             return null;
@@ -310,7 +333,7 @@ public abstract class LayerWorker extends AbstractWorker {
      * {@inheritDoc}
      */
     @Override
-    public boolean isAuthorized(String ip, String referer) {
+    public boolean isAuthorized(final String ip, final String referer) {
         return pdp.isAuthorized(ip, referer);
     }
 

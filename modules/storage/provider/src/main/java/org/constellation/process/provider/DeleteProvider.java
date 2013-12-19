@@ -16,8 +16,6 @@
  */
 package org.constellation.process.provider;
 
-import org.constellation.admin.dao.Session;
-import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
@@ -28,11 +26,7 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
-import java.sql.SQLException;
-import java.util.logging.Level;
-
-import static org.constellation.process.provider.DeleteProviderDescriptor.DELETE_DATA;
-import static org.constellation.process.provider.DeleteProviderDescriptor.PROVIDER_ID;
+import static org.constellation.process.provider.DeleteProviderDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.value;
 
 /**
@@ -72,17 +66,6 @@ public final class DeleteProvider extends AbstractCstlProcess{
             LayerProviderProxy.getInstance().removeProvider((LayerProvider) provider);
         } else {
             StyleProviderProxy.getInstance().removeProvider((StyleProvider) provider);
-        }
-
-        // Remove provider from administration database.
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            session.deleteProvider(providerID);
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating administration database after deleting the provider with id \"" + providerID + "\".", ex);
-        } finally {
-            if (session != null) session.close();
         }
     }
 

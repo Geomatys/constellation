@@ -36,41 +36,73 @@ import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.session.Session;
-import org.geotoolkit.display.canvas.control.NeverFailMonitor;
 import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.display.canvas.control.NeverFailMonitor;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
+import org.geotoolkit.process.coverage.copy.StatisticOp;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sld.xml.Specification;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.style.function.InterpolationPoint;
+import org.geotoolkit.style.function.Method;
+import org.geotoolkit.style.function.Mode;
+import org.opengis.coverage.Coverage;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.style.ChannelSelection;
+import org.opengis.style.ColorMap;
+import org.opengis.style.ContrastEnhancement;
+import org.opengis.style.ContrastMethod;
+import org.opengis.style.Description;
+import org.opengis.style.OverlapBehavior;
+import org.opengis.style.RasterSymbolizer;
+import org.opengis.style.ShadedRelief;
+import org.opengis.style.Symbolizer;
 import org.opengis.util.FactoryException;
 
+import javax.measure.unit.NonSI;
+import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
-import java.awt.Dimension;
-import java.awt.RenderingHints;
+import java.awt.*;
+import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensurePositive;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
+import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
 
 /**
  * Utility class for layer provider management/configuration.
@@ -90,13 +122,17 @@ public final class LayerProviders extends Static {
             RenderingHints.KEY_INTERPOLATION,
             RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
+    public static final MutableStyleFactory SF = (MutableStyleFactory) FactoryFinder.getStyleFactory(
+            new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
+
+
     /**
      * Gives a {@link DataDescription} instance describing the layer data source.
-     * <p>
+     * <p/>
      * {@link DataDescription} has two distinct implementations:
      * <ui>
-     *     <li>{@link FeatureDataDescription} for feature layers.</li>
-     *     <li>{@link CoverageDataDescription} for coverage layers.</li>
+     * <li>{@link FeatureDataDescription} for feature layers.</li>
+     * <li>{@link CoverageDataDescription} for coverage layers.</li>
      * </ui>
      *
      * @param providerId the layer provider id
@@ -106,7 +142,7 @@ public final class LayerProviders extends Static {
      */
     public static DataDescription getDataDescription(final String providerId, final String layerName) throws CstlServiceException {
         ensureNonNull("providerId", providerId);
-        ensureNonNull("layerName",  layerName);
+        ensureNonNull("layerName", layerName);
 
         // Get the layer.
         final LayerDetails layer = getLayer(providerId, layerName);
@@ -127,7 +163,7 @@ public final class LayerProviders extends Static {
 
     /**
      * Produces a {@link PortrayalResponse} from the specified {@link PortrayalContext}.
-     * <p>
+     * <p/>
      * This method allow to perform data rendering without WMS layer.
      *
      * @param context the context for portraying
@@ -163,15 +199,15 @@ public final class LayerProviders extends Static {
             }
 
             // Map context.
-            final MapContext mapContext     = MapBuilder.createContext();
+            final MapContext mapContext = MapBuilder.createContext();
             final LayerDetails layerDetails = getLayer(context.getProviderId(), context.getDataName());
-            final MapItem mapItem           = layerDetails.getMapLayer(style, null);
+            final MapItem mapItem = layerDetails.getMapLayer(style, null);
             mapContext.items().add(mapItem);
 
             // Inputs.
-            final SceneDef sceneDef   = new SceneDef(mapContext, DEFAULT_HINTS);
+            final SceneDef sceneDef = new SceneDef(mapContext, DEFAULT_HINTS);
             final CanvasDef canvasDef = new CanvasDef(dimension, null);
-            final ViewDef viewDef     = new ViewDef(envelope, 0, DEFAULT_MONITOR);
+            final ViewDef viewDef = new ViewDef(envelope, 0, DEFAULT_MONITOR);
             final OutputDef outputDef = new OutputDef(context.getFormat(), new Object());
             if (context.isLonFirstOutput()) {
                 viewDef.setLongitudeFirst();
@@ -180,6 +216,73 @@ public final class LayerProviders extends Static {
             // Portray.
             return new PortrayalResponse(canvasDef, sceneDef, viewDef, outputDef);
         } catch (FactoryException | JAXBException | PortrayalException | TransformException ex) {
+            throw new CstlServiceException(ex.getLocalizedMessage());
+        }
+    }
+
+
+    public static PortrayalResponse portrayBand(final String providerId, final String layerName, final int width, final int height)
+            throws CstlServiceException {
+        try {
+            final LayerDetails layer = getLayer(providerId, layerName);
+
+            // Envelope
+            final Envelope envelope = layer.getEnvelope();
+
+            // Dimension
+            final Dimension dimension = new Dimension(width, height);
+
+            final CoverageDataDescription coverage = getCoverageDataDescription(layer);
+            double min = coverage.getBands().get(0).getMinValue();
+            double max = coverage.getBands().get(0).getMaxValue();
+
+
+            // Style.
+            double average = min + ((max - min) / 2);
+            final List<InterpolationPoint> values = new ArrayList<>();
+            values.add(SF.interpolationPoint(Float.NaN, SF.literal(new Color(0, 0, 0, 0))));
+            values.add(SF.interpolationPoint(min, SF.literal(new Color(0, 0, 255, 255))));
+            values.add(SF.interpolationPoint(average, SF.literal(new Color(0, 255, 0, 255))));
+            values.add(SF.interpolationPoint(max, SF.literal(new Color(255, 0, 0, 255))));
+            final Expression lookup = DEFAULT_CATEGORIZE_LOOKUP;
+            final Literal fallback = DEFAULT_FALLBACK;
+            final Function function = SF.interpolateFunction(
+                    lookup, values, Method.COLOR, Mode.LINEAR, fallback);
+
+            final ChannelSelection selection = SF.channelSelection(SF.selectedChannelType(layer.getName().toString(), (ContrastEnhancement) null));
+            final Expression opacity = LITERAL_ONE_FLOAT;
+            final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
+            final ColorMap colorMap = SF.colorMap(function);
+            final ContrastEnhancement enchance = SF.contrastEnhancement(LITERAL_ONE_FLOAT, ContrastMethod.NONE);
+            final ShadedRelief relief = SF.shadedRelief(LITERAL_ONE_FLOAT);
+            final Symbolizer outline = null;
+            final Unit uom = NonSI.PIXEL;
+            final String geom = DEFAULT_GEOM;
+            final String name = "raster symbol name";
+            final Description desc = DEFAULT_DESCRIPTION;
+
+            final RasterSymbolizer symbol = SF.rasterSymbolizer(
+                    name, geom, desc, uom, opacity, selection, overlap, colorMap, enchance, relief, outline);
+            final MutableStyle style = SF.style(symbol);
+
+            style.setDefaultSpecification(symbol);
+
+
+            // Map context.ti
+            final MapContext mapContext = MapBuilder.createContext();
+            final LayerDetails layerDetails = getLayer(providerId, layerName);
+            final MapItem mapItem = layerDetails.getMapLayer(style, null);
+            mapContext.items().add(mapItem);
+
+            // Inputs.
+            final SceneDef sceneDef = new SceneDef(mapContext, DEFAULT_HINTS);
+            final CanvasDef canvasDef = new CanvasDef(dimension, null);
+            final ViewDef viewDef = new ViewDef(envelope, 0, DEFAULT_MONITOR);
+            final OutputDef outputDef = new OutputDef("image/png", new Object());
+
+            // Portray.
+            return new PortrayalResponse(canvasDef, sceneDef, viewDef, outputDef);
+        } catch (PortrayalException | DataStoreException | IOException ex) {
             throw new CstlServiceException(ex.getLocalizedMessage());
         }
     }
@@ -196,7 +299,7 @@ public final class LayerProviders extends Static {
      */
     public static Object[] getPropertyValues(final String providerId, final String layerName, final String property) throws CstlServiceException {
         ensureNonNull("providerId", providerId);
-        ensureNonNull("layerName",  layerName);
+        ensureNonNull("layerName", layerName);
         ensureNonNull("property", property);
 
         // Get the layer.
@@ -241,7 +344,7 @@ public final class LayerProviders extends Static {
      */
     public static double[] getBandValues(final String providerId, final String layerName, final int bandIndex) throws CstlServiceException {
         ensureNonNull("providerId", providerId);
-        ensureNonNull("layerName",  layerName);
+        ensureNonNull("layerName", layerName);
         ensurePositive("bandIndex", bandIndex);
 
         // Get the layer.
@@ -286,8 +389,8 @@ public final class LayerProviders extends Static {
     /**
      * Gets a {@link LayerDetails} instance from its layer provider and its name.
      *
-     * @param provider the layer provider
-     * @param layerName  the layer name
+     * @param provider  the layer provider
+     * @param layerName the layer name
      * @return the {@link LayerDetails} instance
      * @throws CstlServiceException if the layer does not exists
      */
@@ -318,22 +421,26 @@ public final class LayerProviders extends Static {
      *
      * @param layer the layer to visit
      * @return the {@link CoverageDataDescription} instance
-     * @throws IOException if an error occurred while trying to read the coverage
+     * @throws IOException        if an error occurred while trying to read the coverage
      * @throws DataStoreException if an error occurred during coverage store operations
      */
     private static CoverageDataDescription getCoverageDataDescription(final LayerDetails layer) throws IOException, DataStoreException {
         final CoverageDataDescription description = new CoverageDataDescription();
 
         // Acquire coverage data.
-        final GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
+        GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
+
+        coverage = coverage.view(ViewType.GEOPHYSICS);
+        RenderedImage ri = coverage.getRenderedImage();
+
+        Map<String, Object> map = StatisticOp.analyze(ri);
+        double[] min = (double[]) map.get("min");
+        double[] max = (double[]) map.get("max");
 
         // Bands description.
         final GridSampleDimension[] dims = coverage.getSampleDimensions();
-        for (final GridSampleDimension dim : dims) {
-            description.getBands().add(new BandDescription(
-                    dim.getMinimumValue(),
-                    dim.getMaximumValue(),
-                    dim.getNoDataValues()));
+        for (int i = 0; i < dims.length; i++) {
+            description.getBands().add(new BandDescription(min[i], max[i], dims[i].getNoDataValues()));
         }
 
         // Geographic extent description.
@@ -347,7 +454,7 @@ public final class LayerProviders extends Static {
      * Gives a {@link CoverageDataDescription} instance describing the coverage layer
      * data source.
      *
-     * @param layer the layer to visit
+     * @param layer the layer to visitmvncis
      * @return the {@link FeatureDataDescription} instance
      * @throws DataStoreException if an error occurred during feature store operations
      */
@@ -395,8 +502,36 @@ public final class LayerProviders extends Static {
             upper = envelope.getUpperCorner().getCoordinate();
         } catch (Exception ignore) {
             lower = new double[]{-180, -90};
-            upper = new double[]{ 180,  90};
+            upper = new double[]{180, 90};
         }
         description.setBoundingBox(new double[]{lower[0], lower[1], upper[0], upper[1]});
+    }
+
+    /**
+     *
+     * @param providerId
+     * @param layerName
+     * @return
+     * @throws CstlServiceException
+     * @throws IOException
+     * @throws DataStoreException
+     */
+    public static List<String> getCrs(final String providerId, final String layerName) throws CstlServiceException, IOException, DataStoreException {
+        final List<String> crsListString = new ArrayList<>(0);
+        final LayerDetails layer = getLayer(getProvider(providerId), layerName);
+
+        // Acquire coverage data.
+        GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
+        CoordinateReferenceSystem coverageCRS = coverage.getCoordinateReferenceSystem();
+
+        // decompose crs to found all components
+        final List<CoordinateReferenceSystem> crsList = ReferencingUtilities.decompose(coverageCRS);
+
+        //create list
+        for (CoordinateReferenceSystem referenceSystem : crsList) {
+            crsListString.add(referenceSystem.getName().toString());
+        }
+
+        return crsListString;
     }
 }

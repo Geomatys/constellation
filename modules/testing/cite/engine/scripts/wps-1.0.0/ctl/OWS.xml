@@ -7,13 +7,13 @@
     xmlns:p="http://teamengine.sourceforge.net/parsers"
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:ows="http://www.opengis.net/ows/1.1"
-    xmlns:xlink="http://www.w3.org/1999/xlink" 
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:sos="http://www.opengis.net/sos/1.0"	
+    xmlns:sos="http://www.opengis.net/sos/1.0"
     xmlns:owsTests="https://www.cite.opengeospatial.org/ows-1.0/tests"
     xmlns:owsFunctions="https://www.cite.opengeospatial.org/ows-1.0/functions">
- 
+
     <!--The main test that should be called by your ETS in order to execute the OWS Common tests.-->
     <ctl:test name="owsTests:ows-main">
         <param name="serviceURL">The URL of the service being tested</param>
@@ -49,7 +49,7 @@
             </ctl:call-test>
         </ctl:code>
     </ctl:test>
-    
+
     <!--GetCapabilities request-->
     <test name="owsTests:ows-OWS.GetCapabilities.1">
         <param name="serviceURL"/>
@@ -82,7 +82,7 @@
                         <xsl:value-of select="$serviceVersion" />
                     </param>
                     <param name="request">GetCapabilities</param>
-                    <parsers:XMLValidatingParser>						
+                    <parsers:XMLValidatingParser>
                         <parsers:schemas>
                             <parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>
                             <parsers:schema>
@@ -116,7 +116,7 @@
                                 <xsl:copy-of select="$request1" />
                             </xsl:variable>
                             <!--Content-type-->
-							
+
                             <ctl:message>**********************************************************************</ctl:message>
                             <ctl:message select="''"/>
                             <ctl:call-test name="owsTests:ows-OWS.ContentType.1">
@@ -179,7 +179,7 @@
                                     <ctl:with-param name="exceptionReportSchemaType" select="$exceptionReportSchemaType" />
                                     <ctl:with-param name="updatesequenceHigh" select="$updatesequenceHigh"/>
                                 </ctl:call-test>
-                            </xsl:if>		
+                            </xsl:if>
                             <!--An error occurs that prevents successful request processing-->
                             <ctl:message>**********************************************************************</ctl:message>
                             <ctl:message select="''"/>
@@ -241,7 +241,7 @@
                                     <ctl:with-param name="serviceVersion" select="$serviceVersion" />
                                     <ctl:with-param name="responseSchemaLocation" select="$capabilitiesResponseSchemaLocation"/>
                                     <ctl:with-param name="responseSchemaType" select="$capabilitiesResponseSchemaType"/>
-                                    <ctl:with-param name="rootElementName" select="$capabilitiesRootElementName"/> 
+                                    <ctl:with-param name="rootElementName" select="$capabilitiesRootElementName"/>
                                     <ctl:with-param name="updatesequenceCurrent" select="string($capabilitiesDocument//@updateSequence)"/>
                                 </ctl:call-test>
                             </xsl:if>
@@ -249,10 +249,10 @@
                     </xsl:choose>
                 </xsl:otherwise>
             </xsl:choose>
-            
+
         </code>
     </test>
-    
+
     <!--Case Insensitive KVP Names-->
     <test name="owsTests:ows-OWS.CaseInsensitiveKvpNames.1">
         <param name="serviceURL"/>
@@ -265,7 +265,7 @@
         <comment>GetCapabilities with the KVP parameter names in all uppercase.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root element matches the provided root element.</comment>
         <link>ows-1.0.0-common-atc1</link>
         <link>OGC 05-008c1, 11.5.2, p.56</link>
-        <code>		
+        <code>
             <ctl:message>GetCapabilities with the KVP parameter names in all uppercase.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root element matches the provided root element.</ctl:message>
             <!--Request with all caps parameter keys-->
             <ctl:message>Executing a GetCapabilities request with upper-case parameter names...</ctl:message>
@@ -295,7 +295,7 @@
                     </parsers:XMLValidatingParser>
                 </request>
             </xsl:variable>
-			
+
             <!--Request with mixed case parameter keys-->
             <ctl:message>Executing a GetCapabilities request with mixed-case parameter names...</ctl:message>
             <xsl:variable name="request2">
@@ -324,7 +324,7 @@
                     </parsers:XMLValidatingParser>
                 </request>
             </xsl:variable>
-            
+
             <!--Request with lower case parameter keys-->
             <ctl:message>Executing a GetCapabilities request with lower-case parameter names...</ctl:message>
             <xsl:variable name="request3">
@@ -353,7 +353,7 @@
                     </parsers:XMLValidatingParser>
                 </request>
             </xsl:variable>
-            
+
             <xsl:choose>
                 <xsl:when test="not($request1/*) or not($request2/*) or not($request3/*)">
                     <ctl:message>FAILURE: Missing or invalid response entity in one or more of the preceding GetCapabilities requests.</ctl:message>
@@ -370,8 +370,8 @@
                         <ctl:fail />
                     </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>			
-            
+            </xsl:choose>
+
         </code>
     </test>
 
@@ -385,7 +385,7 @@
         <comment>Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document matches the root element name; (3) the response Content-Type header must be $expectedContentType for XML entities.</comment>
         <link>ows-1.0.0-common-atc2</link>
         <link>OGC 05-008c1, 11.7, p.61</link>
-        <code>		
+        <code>
             <ctl:message select="concat('Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document matches the root element name; (3) the response Content-Type header must be &quot;', $expectedContentType, '&quot; for XML entities.')"/>
             <xsl:variable name="request1">
                 <request>
@@ -436,11 +436,11 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:otherwise>
-            </xsl:choose>			
-				
+            </xsl:choose>
+
         </code>
     </test>
-	
+
     <test name="owsTests:ows-OWS.GetCapabilities-AcceptVersions.1">
         <param name="serviceURL"/>
         <param name="serviceType" />
@@ -460,7 +460,7 @@
                         <xsl:value-of select="$serviceURL"/>
                     </url>
                     <method>get</method>
-                    <param name="request">GetCapabilities</param>				   
+                    <param name="request">GetCapabilities</param>
                     <param name="service">
                         <xsl:value-of select="$serviceType" />
                     </param>
@@ -476,7 +476,7 @@
                         </parsers:schemas>
                     </parsers:XMLValidatingParser>
                 </request>
-            </xsl:variable>			
+            </xsl:variable>
 
             <xsl:choose>
                 <xsl:when test="not($request1/*)">
@@ -503,11 +503,11 @@
                         <ctl:fail />
                     </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>		
-				
+            </xsl:choose>
+
         </code>
     </test>
-	
+
     <test name="owsTests:ows-OWS.GetCapabilities-AcceptVersions.2">
         <param name="serviceURL"/>
         <param name="serviceType" />
@@ -528,7 +528,7 @@
                         <xsl:value-of select="$serviceURL"/>
                     </url>
                     <method>get</method>
-                    <param name="request">GetCapabilities</param>				   
+                    <param name="request">GetCapabilities</param>
                     <param name="service">
                         <xsl:value-of select="$serviceType" />
                     </param>
@@ -547,7 +547,7 @@
                         </parsers:schemas>
                     </parsers:XMLValidatingParser>
                 </request>
-            </xsl:variable>	
+            </xsl:variable>
 
             <xsl:choose>
                 <xsl:when test="not($request1/*)">
@@ -574,11 +574,11 @@
                         <ctl:fail />
                     </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>		
-			
+            </xsl:choose>
+
         </code>
     </test>
-	
+
     <test name="owsTests:ows-OWS.GetCapabilities-AcceptVersions.3">
         <param name="serviceURL"/>
         <param name="serviceType" />
@@ -597,7 +597,7 @@
                         <xsl:value-of select="$serviceURL"/>
                     </url>
                     <method>get</method>
-                    <param name="request">GetCapabilities</param>				   
+                    <param name="request">GetCapabilities</param>
                     <param name="service">
                         <xsl:value-of select="$serviceType" />
                     </param>
@@ -610,12 +610,12 @@
                                     <xsl:value-of select="$exceptionReportSchemaType" />
                                 </xsl:attribute>
                                 <xsl:value-of select="$exceptionReportSchemaLocation" />
-                            </parsers:schema>							
+                            </parsers:schema>
                         </parsers:schemas>
                     </parsers:XMLValidatingParser>
                 </request>
-            </xsl:variable>	
-				
+            </xsl:variable>
+
             <xsl:choose>
                 <xsl:when test="not($request1/*)">
                     <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
@@ -633,13 +633,13 @@
                         <ctl:message>FAILURE: The returned exception report was expected to contain an exceptionCode of "VersionNegotiationFailed".</ctl:message>
                         <ctl:message select="concat('Returned exception code was: &quot;', owsFunctions:exceptionCode($request1), '&quot;')"/>
                         <ctl:fail/>
-                    </xsl:if>					
+                    </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>						
-				
+            </xsl:choose>
+
         </code>
     </test>
-    
+
     <test name="owsTests:ows-OWS.GetCapabilities-Exceptions.1">
         <param name="serviceURL"/>
         <param name="serviceVersion" />
@@ -674,7 +674,7 @@
                         </parsers:schemas>
                     </parsers:XMLValidatingParser>
                 </request>
-            </xsl:variable>		
+            </xsl:variable>
 
             <xsl:choose>
                 <xsl:when test="not($response/*)">
@@ -692,15 +692,15 @@
                     <xsl:if test="not(xsd:boolean($isValid))">
                         <ctl:message>FAILURE: The returned exception report was expected to contain an exceptionCode of "MissingParameterValue" and a locator value of "service".</ctl:message>
                         <ctl:message select="concat('Returned exception code was: &quot;', owsFunctions:exceptionCode($response), '&quot;')"/>
-                        <ctl:message select="concat('Returned locator was: &quot;', owsFunctions:exceptionCodeLocator($response), '&quot;')"/>						
+                        <ctl:message select="concat('Returned locator was: &quot;', owsFunctions:exceptionCodeLocator($response), '&quot;')"/>
                         <ctl:fail/>
                     </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>		
-				
+            </xsl:choose>
+
         </code>
     </test>
-	
+
     <test name="owsTests:ows-OWS.GetCapabilities-Exceptions.2">
         <param name="serviceURL"/>
         <param name="serviceVersion" />
@@ -737,8 +737,8 @@
                         </parsers:schemas>
                     </parsers:XMLValidatingParser>
                 </request>
-            </xsl:variable>		
-<!--<ctl:message select="concat('*******', $response)"/>-->			
+            </xsl:variable>
+<!--<ctl:message select="concat('*******', $response)"/>-->
 
             <xsl:choose>
                 <xsl:when test="not($response/*)">
@@ -756,7 +756,7 @@
                     <xsl:if test="not(xsd:boolean($isValid))">
                         <ctl:message>FAILURE: The returned exception report was expected to contain an exceptionCode of "InvalidParameterValue" and a locator value of "service".</ctl:message>
                         <ctl:message select="concat('Returned exception code was: &quot;', owsFunctions:exceptionCode($response), '&quot;')"/>
-                        <ctl:message select="concat('Returned locator was: &quot;', owsFunctions:exceptionCodeLocator($response), '&quot;')"/>						
+                        <ctl:message select="concat('Returned locator was: &quot;', owsFunctions:exceptionCodeLocator($response), '&quot;')"/>
 
                         <ctl:fail/>
                     </xsl:if>
@@ -764,7 +764,7 @@
             </xsl:choose>
         </code>
     </test>
-	
+
     <test name="owsTests:ows-OWS.GetCapabilities-Exceptions.3">
         <param name="serviceURL"/>
         <param name="serviceType"/>
@@ -779,7 +779,7 @@
             <ctl:message select="concat('Service parameter: ', $serviceType)"/>
             <ctl:message select="concat('Version parameter: ', $serviceVersion)"/>
             <ctl:message select="concat('AcceptVersions parameter: ', '2000-01-01')"/>
-			
+
             <xsl:variable name="request1">
                 <request>
                     <url>
@@ -803,7 +803,7 @@
                         </parsers:schemas>
                     </parsers:XMLValidatingParser>
                 </request>
-            </xsl:variable>				
+            </xsl:variable>
 <!--<ctl:message select="concat('*******', $request1)"/>-->
             <xsl:choose>
                 <xsl:when test="not($request1/*)">
@@ -822,13 +822,13 @@
                         <ctl:message>FAILURE: The returned exception report was expected to contain an exceptionCode of "VersionNegotiationFailed".</ctl:message>
                         <ctl:message select="concat('Returned exception code was: &quot;', owsFunctions:exceptionCode($request1), '&quot;')"/>
                         <ctl:fail/>
-                    </xsl:if>			
+                    </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>		
-				
+            </xsl:choose>
+
         </code>
-    </test>	
-	
+    </test>
+
     <test name="owsTests:ows-OWS.GetCapabilities-Exceptions.4">
         <param name="serviceURL"/>
         <param name="serviceType" />
@@ -873,7 +873,7 @@
                         </parsers:schemas>
                     </parsers:XMLValidatingParser>
                 </request>
-            </xsl:variable>			
+            </xsl:variable>
 <!--<ctl:message select="concat('*******', $request1)"/>-->
             <xsl:choose>
                 <xsl:when test="not($request1/*)">
@@ -892,13 +892,13 @@
                         <ctl:message>FAILURE: The returned exception report was expected to contain an exceptionCode of "InvalidUpdateSequence".</ctl:message>
                         <ctl:message select="concat('Returned exception code was: &quot;', owsFunctions:exceptionCode($request1), '&quot;')"/>
                         <ctl:fail/>
-                    </xsl:if>			
+                    </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>		
-				
+            </xsl:choose>
+
         </code>
     </test>
-	
+
     <test name="owsTests:ows-OWS.GetCapabilities-Exceptions.5">
         <param name="serviceURL"/>
         <param name="serviceType" />
@@ -956,15 +956,15 @@
                     <xsl:if test="not(xsd:boolean($isValid1) or xsd:boolean($isValid2))">
                         <ctl:message>FAILURE: The returned exception report was expected to contain an exceptionCode of "MissingParameterValue" and a locator value of "service" or "request".</ctl:message>
                         <ctl:message select="concat('Returned exception code was: &quot;', owsFunctions:exceptionCode($request1), '&quot;')"/>
-                        <ctl:message select="concat('Returned locator was: &quot;', owsFunctions:exceptionCodeLocator($request1), '&quot;')"/>						
+                        <ctl:message select="concat('Returned locator was: &quot;', owsFunctions:exceptionCodeLocator($request1), '&quot;')"/>
                         <ctl:fail/>
-                    </xsl:if>							
+                    </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>				
-				
+            </xsl:choose>
+
         </code>
     </test>
-    
+
     <test name="owsTests:ows-OWS.GetCapabilities-UpdateSequence.1">
       <param name="serviceURL"/>
       <param name="serviceType" />
@@ -984,7 +984,7 @@
                         <xsl:value-of select="$serviceURL"/>
                     </url>
                     <method>get</method>
-                    <param name="request">GetCapabilities</param>				   
+                    <param name="request">GetCapabilities</param>
                     <param name="service">
                         <xsl:value-of select="$serviceType" />
                     </param>
@@ -1003,8 +1003,8 @@
                         </parsers:schemas>
                     </parsers:XMLValidatingParser>
                 </request>
-            </xsl:variable>	
-            
+            </xsl:variable>
+
          <xsl:choose>
                 <xsl:when test="not($request1/*)">
                     <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
@@ -1030,10 +1030,10 @@
                         <ctl:fail />
                     </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>	
+            </xsl:choose>
       </code>
    </test>
-   
+
     <test name="owsTests:ows-OWS.GetCapabilities-UpdateSequence.2">
       <param name="serviceURL"/>
       <param name="serviceType" />
@@ -1053,7 +1053,7 @@
                         <xsl:value-of select="$serviceURL"/>
                     </url>
                     <method>get</method>
-                    <param name="request">GetCapabilities</param>				   
+                    <param name="request">GetCapabilities</param>
                     <param name="service">
                         <xsl:value-of select="$serviceType" />
                     </param>
@@ -1061,8 +1061,8 @@
                         <xsl:value-of select="$updatesequenceCurrent" />
                     </param>
                 </request>
-            </xsl:variable>	
-            
+            </xsl:variable>
+
          <xsl:choose>
                 <xsl:when test="not($request1/*)">
                     <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
@@ -1106,15 +1106,15 @@
                         <ctl:fail />
                     </xsl:if>
                </xsl:otherwise>
-            </xsl:choose>	
-				
+            </xsl:choose>
+
       </code>
    </test>
-   
+
     <!--=========-->
     <!-- PARSERS -->
     <!--=========-->
-    
+
     <ctl:test name="ctl:SchematronValidatingParser">
         <ctl:param name="doc"/>
         <ctl:param name="schema"/>
@@ -1134,17 +1134,17 @@
             </xsl:variable>
             <xsl:if test="$isValid='false'">
                 <ctl:fail/>
-            </xsl:if>	
+            </xsl:if>
         </ctl:code>
     </ctl:test>
-    
+
     <ctl:function name="ctl:CallSchematronValidatingParser">
         <ctl:param name="doc"/>
         <ctl:param name="schema"/>
         <ctl:param name="phase"/>
         <ctl:description>Invokes the Schematon validator.</ctl:description>
-        <ctl:java class="com.occamlab.te.parsers.SchematronValidatingParser" 
-                          method="checkSchematronRules" 
+        <ctl:java class="com.occamlab.te.parsers.SchematronValidatingParser"
+                          method="checkSchematronRules"
                           initialized="true"/>
     </ctl:function>
 
@@ -1159,18 +1159,18 @@
 
             <xsl:variable name="exceptionElement" select="owsFunctions:exceptionElement($exceptionReport)" />
             <xsl:variable name="exceptionCodeValue" select="owsFunctions:exceptionCode($exceptionReport)" />
-            <xsl:variable name="locatorValue" select="owsFunctions:exceptionCodeLocator($exceptionReport)" />		
+            <xsl:variable name="locatorValue" select="owsFunctions:exceptionCodeLocator($exceptionReport)" />
 
             <xsl:choose>
                 <xsl:when test="$locatorToCheck='*'">
-                    <xsl:value-of select="($exceptionCodeToCheck=string($exceptionCodeValue))" />
+                    <xsl:value-of select="(contains(string($exceptionCodeValue), $exceptionCodeToCheck))" />
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="($exceptionCodeToCheck=string($exceptionCodeValue)) and (contains(lower-case(string($locatorToCheck)), lower-case($locatorValue)))" />
+                    <xsl:value-of select="(contains(string($exceptionCodeValue), $exceptionCodeToCheck)) and (contains(lower-case(string($locatorToCheck)), lower-case($locatorValue)))" />
                 </xsl:otherwise>
             </xsl:choose>
         </ctl:code>
-    </ctl:function>	
+    </ctl:function>
 
     <ctl:function name="owsFunctions:testExceptionFunctions">
         <ctl:param name="exceptionReport">The exception report to check</ctl:param>
@@ -1184,15 +1184,15 @@
 
             <xsl:value-of select="concat($exceptionCodeValue, $locatorValue)"/>
         </ctl:code>
-    </ctl:function>	
-    
+    </ctl:function>
+
     <ctl:function name="owsFunctions:exceptionElement">
         <ctl:param name="exceptionResponse">The exception repsonse</ctl:param>
         <ctl:code>
             <xsl:copy-of select="$exceptionResponse//ows:ExceptionReport/ows:Exception" />
         </ctl:code>
     </ctl:function>
-	
+
     <ctl:function name="owsFunctions:exceptionCode">
         <ctl:param name="exceptionResponse">The exception repsonse</ctl:param>
         <ctl:code>
@@ -1208,13 +1208,13 @@
             <xsl:value-of select="$exceptionElement/@locator" />
         </ctl:code>
     </ctl:function>
-	
+
     <ctl:function name="owsFunctions:isValidMIMETypeFormat">
         <ctl:param name="responseFormat">The respsonseFormat to validate</ctl:param>
         <ctl:return>True/False depending on whether the input is a valid MIME type based on ows:owsCommon.xsd</ctl:return>
         <ctl:description>Determines if a definition URN is valid</ctl:description>
-        <ctl:code>		
+        <ctl:code>
             <xsl:value-of select="(matches($responseFormat,'^(application|audio|image|text|video|message|multipart|model)/.+(;\s*.+=.+)*','i'))"/>
         </ctl:code>
-    </ctl:function>	
+    </ctl:function>
 </ctl:package>

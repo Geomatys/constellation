@@ -30,6 +30,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
 import org.constellation.admin.service.ConstellationServer;
@@ -45,7 +46,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
 
     private ConstellationServer server;
     private Instance serviceInstance;
-    private Automatic configuration; 
+    private Automatic configuration;
     private JServiceEditionPane specificPane;
     
     /**
@@ -57,6 +58,10 @@ public class JServiceCswEditPane extends JServiceEditionPane {
 
     /**
      * Creates new form JServiceMapEditPane
+     *
+     * @param server
+     * @param serviceInstance
+     * @param configuration
      */
     public JServiceCswEditPane(final ConstellationServer server, final Instance serviceInstance, final Object configuration) {
         this.server = server;
@@ -75,6 +80,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
             } else {
                 LOGGER.log(Level.WARNING, "Unexpected CSW format:{0}", this.configuration.getFormat());
             }
+            guiDataSourceCombo.setSelectedItem(this.configuration.getFormat());
             if (this.configuration.getLogLevel() != null) {
                 this.logLevelCombo.setSelectedItem(this.configuration.getLogLevel().getName());
             }
@@ -96,6 +102,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         refreshIndexButton = new JButton();
         jLabel2 = new JLabel();
         logLevelCombo = new JComboBox();
+        purgeDbButton = new JButton();
 
         ResourceBundle bundle = ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("sourceType")); // NOI18N
@@ -117,7 +124,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         );
         centerPaneLayout.setVerticalGroup(
             centerPaneLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGap(0, 182, Short.MAX_VALUE)
+            .addGap(0, 271, Short.MAX_VALUE)
         );
 
         refreshIndexButton.setText(bundle.getString("refreshIndex")); // NOI18N
@@ -131,6 +138,13 @@ public class JServiceCswEditPane extends JServiceEditionPane {
 
         logLevelCombo.setModel(new DefaultComboBoxModel(new String[] { "INFO", "FINE", "FINER" }));
 
+        purgeDbButton.setText(bundle.getString("purgeDb")); // NOI18N
+        purgeDbButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                purgeDbButtonActionPerformed(evt);
+            }
+        });
+
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -138,17 +152,19 @@ public class JServiceCswEditPane extends JServiceEditionPane {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
+                    .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 618, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(logLevelCombo, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
+                        .addComponent(purgeDbButton)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(refreshIndexButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(guiDataSourceCombo, 0, 315, Short.MAX_VALUE)))
+                        .addComponent(guiDataSourceCombo, 0, 488, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -159,12 +175,13 @@ public class JServiceCswEditPane extends JServiceEditionPane {
                     .addComponent(jLabel1)
                     .addComponent(guiDataSourceCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(refreshIndexButton)
                     .addComponent(jLabel2)
-                    .addComponent(logLevelCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addComponent(logLevelCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(purgeDbButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -182,12 +199,29 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         } else {
             LOGGER.log(Level.WARNING, "Unexpected CSW format:{0}", this.configuration.getFormat());
         }
+        validate();
         repaint();
     }//GEN-LAST:event_guiDataSourceComboItemStateChanged
 
     private void refreshIndexButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_refreshIndexButtonActionPerformed
-        server.csws.refreshIndex(serviceInstance.getName(), false);
+        server.csws.refreshIndex(serviceInstance.getIdentifier(), false);
     }//GEN-LAST:event_refreshIndexButtonActionPerformed
+
+    private void purgeDbButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_purgeDbButtonActionPerformed
+        final ResourceBundle bundle = ResourceBundle.getBundle("org/constellation/swing/Bundle");
+        final String message = bundle.getString("purgeWarning");
+        final String title = bundle.getString("purgeWarningTitle");
+        final int result = JOptionPane.showConfirmDialog(this, message, title, JOptionPane.OK_CANCEL_OPTION);
+        
+        switch (result) {
+            case JOptionPane.OK_OPTION:
+                server.csws.deleteAllMetadata(serviceInstance.getIdentifier());
+                server.csws.refreshIndex(serviceInstance.getIdentifier(), false);
+                break;
+            case JOptionPane.CANCEL_OPTION:
+                break;
+        }
+    }//GEN-LAST:event_purgeDbButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel centerPane;
@@ -195,6 +229,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
     private JLabel jLabel1;
     private JLabel jLabel2;
     private JComboBox logLevelCombo;
+    private JButton purgeDbButton;
     private JButton refreshIndexButton;
     // End of variables declaration//GEN-END:variables
 

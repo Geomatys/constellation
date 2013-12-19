@@ -1247,9 +1247,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     }
                 } catch (IllegalArgumentException ex) {
                     throw new CstlServiceException(ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
-                } catch (IOException ex) {
-                    throw new CstlServiceException(ex);
-                } catch (XMLStreamException ex) {
+                } catch (IOException | XMLStreamException ex) {
                     throw new CstlServiceException(ex);
                 }
                 final Name typeName;
@@ -1488,6 +1486,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             filter = (Filter) filter.accept(new UnprefixerFilterVisitor(ft), null);
             filter = (Filter) filter.accept(new DefaultGeomPropertyVisitor(ft), null);
             filter = (Filter) filter.accept(new GMLNamespaceVisitor(), null);
+            filter = (Filter) filter.accept(new BooleanVisitor(ft), null);
             
             if (!CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)) {
                 filter = (Filter) filter.accept(FillCrsVisitor.VISITOR, exposedCrs);

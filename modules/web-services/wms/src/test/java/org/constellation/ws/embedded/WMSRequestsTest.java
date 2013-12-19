@@ -27,15 +27,29 @@ import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.Language;
+import org.constellation.configuration.Languages;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.configuration.WMSPortrayal;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
+import org.constellation.dto.Service;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
 
 // Geotoolkit dependencies
@@ -54,7 +68,6 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
-import org.geotoolkit.parameter.Parameters;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
@@ -64,8 +77,8 @@ import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
+import org.junit.runner.RunWith;
 
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 
@@ -77,6 +90,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
+@RunWith(TestRunner.class)
 public class WMSRequestsTest extends AbstractGrizzlyServer {
 
     /**
@@ -135,7 +149,51 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
-    public static void initLayerList() throws JAXBException {
+    public static void initLayerList() throws JAXBException, IOException {
+
+        ConfigurationEngine.setupTestEnvironement("WMSRequestTest");
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WMS", "default", config);
+
+        final List<Source> sources2 = Arrays.asList(new Source("coverageTestSrc", true, null, Arrays.asList(new org.constellation.configuration.Layer(new QName("SST_tests")))),
+                                                    new Source("shapeSrc", false, Arrays.asList(new org.constellation.configuration.Layer(new QName("http://www.opengis.net/gml","Lakes"))), null),
+                                                    new Source("postgisSrc", true, null, null));
+        final Layers layers2 = new Layers(sources2);
+        final LayerContext config2 = new LayerContext(layers2);
+        config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
+        config2.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WMS", "wms1", config2);
+        final Service serviceEng = new Service();
+        serviceEng.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
+        serviceEng.setIdentifier("wms1");
+        serviceEng.setKeywords(Arrays.asList("WMS"));
+        serviceEng.setName("this is the default english capabilities");
+        final AccessConstraint cstr = new AccessConstraint("NONE", "NONE", 20, 1024, 1024);
+        serviceEng.setServiceConstraints(cstr);
+        final Contact ct = new Contact();
+        serviceEng.setServiceContact(ct);
+        serviceEng.setVersions(Arrays.asList("1.1.1", "1.3.0"));
+
+        ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceEng, "eng");
+
+        final Service serviceFre = new Service();
+        serviceFre.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
+        serviceFre.setIdentifier("wms1");
+        serviceFre.setKeywords(Arrays.asList("WMS"));
+        serviceFre.setName("Ceci est le document capabilities français");
+        serviceFre.setServiceConstraints(cstr);
+        serviceFre.setServiceContact(ct);
+        serviceFre.setVersions(Arrays.asList("1.1.1", "1.3.0"));
+        ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceFre, "fre");
+
+
         initServer(new String[] {
             "org.constellation.map.ws.rs",
             "org.constellation.configuration.ws.rs",
@@ -144,13 +202,13 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
         pool = WMSMarshallerPool.getInstance();
 
-        final Configurator config = new Configurator() {
+        final Configurator configurator = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
 
-                final ParameterValueGroup config = desc.createValue();
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("coverage-sql".equals(serviceName)){
+                if("coverage-sql".equals(service.getName())){
                     // Defines a PostGrid data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
@@ -164,22 +222,22 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
 
-                }else if("feature-store".equals(serviceName)){
+                }else if("feature-store".equals(service.getName())){
                     try{
                         final File outputDir = initDataDirectory();
                         final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
                         getOrCreateValue(source, "id").setValue("shapeSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);    
-                        
+                        getOrCreateValue(source, "load_all").setValue(true);
+
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
                         final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
                         getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");        
-                        
+                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
+
                         final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
                         getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");     
-                        
+                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(),ex);
                     }
@@ -189,12 +247,12 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        LayerProviderProxy.getInstance().setConfigurator(configurator);
 
         WorldFileImageReader.Spi.registerDefaults(null);
         WMSPortrayal.setEmptyExtension(true);
@@ -213,7 +271,8 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     @AfterClass
     public static void shutDown() throws JAXBException {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
-        //finish();
+        ConfigurationEngine.shutdownTestEnvironement("WMSRequestTest");
+        finish();
     }
 
     /**
@@ -221,6 +280,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * returned an error report for the user.
      */
     @Test
+    @Order(order=1)
     public void testWMSWrongRequest() throws Exception {
 
         waitForStart();
@@ -244,6 +304,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=2)
     public void testWMSGetMap() throws IOException {
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -268,6 +329,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=3)
     public void testWMSGetMapLakeGif() throws IOException {
                 // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -292,6 +354,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=4)
     public void testWMSGetMapLakeGifransparent() throws IOException {
                 // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -314,6 +377,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=5)
     public void testWMSGetMapLakePng() throws IOException {
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -338,6 +402,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=6)
     public void testWMSGetMapLakeBmp() throws IOException {
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -362,6 +427,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=7)
     public void testWMSGetMapLakePpm() throws IOException {
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -387,6 +453,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * document representing the server capabilities in the WMS version 1.1.1/ 1.3.0 standard.
      */
     @Test
+    @Order(order=8)
     public void testWMSGetCapabilities() throws JAXBException, IOException {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
@@ -463,6 +530,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=9)
     public void testWMSGetCapabilitiesLanguage() throws JAXBException, IOException {
          // Creates a valid GetMap url.
         URL getCapsUrl;
@@ -531,6 +599,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * testing layer produces the wanted result.
      */
     @Test
+    @Order(order=10)
     public void testWMSGetFeatureInfo() throws IOException {
         // Creates a valid GetFeatureInfo url.
         final URL gfi;
@@ -571,6 +640,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      *        postgrid implementation.
      */
     @Test
+    @Order(order=11)
     @Ignore
     public void testWMSGetLegendGraphic() throws IOException {
         // Creates a valid GetLegendGraphic url.
@@ -595,6 +665,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid DescribeLayer request produces a valid document.
      */
     @Test
+    @Order(order=12)
     public void testWMSDescribeLayer() throws JAXBException, IOException {
         // Creates a valid DescribeLayer url.
         final URL describeUrl;
@@ -620,10 +691,4 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         assertEquals(LAYER_TEST, name);
     }
 
-    /**
-     * Free some resources.
-     */
-    @AfterClass
-    public static void finish() {
-    }
 }

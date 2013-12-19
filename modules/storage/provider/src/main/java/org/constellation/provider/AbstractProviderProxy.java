@@ -31,9 +31,7 @@ import java.util.logging.Level;
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.apache.sis.util.NullArgumentException;
-import org.geotoolkit.util.Utilities;
 import org.opengis.feature.type.Name;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -117,15 +115,15 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
      * Save configuration for the given provider service
      */
     private void saveConfiguration(final S service){
-        getLogger().log(Level.INFO, "Saving configuration for service : " + service.getName());
+        getLogger().log(Level.INFO, "Saving configuration for service : {0}", service.getName());
         //save configuration
-        final ParameterValueGroup config = service.getServiceDescriptor().createValue();
+        final List<Provider> providers = new ArrayList<>();
         for(P candidate : PROVIDERS){
             if(candidate.getService().equals(service)){
-                config.values().add(candidate.getSource());
+                providers.add(candidate);
             }
         }
-        getConfigurator().saveConfiguration(service.getName(), config);
+        getConfigurator().saveConfiguration(service, providers);
     }
 
     /**
@@ -140,8 +138,8 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
      * {@inheritDoc }
      */
     @Override
-    public Set<K> getKeys(String sourceId) {
-        final Set<K> keys = new HashSet<K>();
+    public Set<K> getKeys(final String sourceId) {
+        final Set<K> keys = new HashSet<>();
         for(final Provider<K,V> provider : getProviders()){
             keys.addAll(provider.getKeys(sourceId));
         }
@@ -154,14 +152,14 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
      */
     @Override
     @Deprecated
-    public V get(K key) {
-        final List<V> candidates = new ArrayList<V>();
-        
+    public V get(final K key) {
+        final List<V> candidates = new ArrayList<>();
+
         for(final Provider<K,V> provider : getProviders()){
             final V layer = provider.get(key);
             if(layer != null) candidates.add(layer);
         }
-        
+
         if(candidates.size() == 1){
             return candidates.get(0);
         }else if(candidates.size()>1){
@@ -175,23 +173,33 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
                         return (V)ld;
                     }
                 }
-                
+
                 //we could not find one more accurate then another
                 return candidates.get(0);
             }else{
                 return candidates.get(0);
             }
         }
-        
+
         return null;
     }
-    
-    public V get(K key, final String providerID) {
+
+    public V get(final K key, final String providerID) {
         final Provider<K,V> provider = getProvider(providerID);
         if (provider == null) {
             return null;
         }
         return provider.get(key);
+    }
+
+    public List<V> getAll() {
+        final List<V> values = new ArrayList<>();
+        for(Provider<K,V> provider : getProviders()){
+            for(K key : provider.getKeys()){
+                values.add(provider.get(key));
+            }
+        }
+        return values;
     }
 
     public abstract Collection<? extends S> getServices();
@@ -202,14 +210,13 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         }
 
         final Configurator configs = getConfigurator();
-        final List<P> cache = new ArrayList<P>();
+        final List<P> cache = new ArrayList<>();
         for(final ProviderService factory : getServices()){
             final String serviceName = factory.getName();
-            final ParameterDescriptorGroup desc = factory.getServiceDescriptor();
 
             //load configurable sources
             try{
-                final ParameterValueGroup config = configs.getConfiguration(serviceName,desc);
+                final ParameterValueGroup config = configs.getConfiguration(factory);
                 if(config != null){
                     for(final ParameterValueGroup src : ProviderParameters.getSources(config)){
                         try{
@@ -251,7 +258,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc }
      */

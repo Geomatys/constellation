@@ -388,6 +388,8 @@ public class DataReference implements CharSequence, Comparable<DataReference>{
 
 	@Override
 	public int compareTo(DataReference o) {
+	    if(o==null)
+	        return -1;
 		return getReference().compareTo(o.getReference());
 	}
 

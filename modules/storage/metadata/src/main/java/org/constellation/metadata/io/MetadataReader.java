@@ -18,7 +18,11 @@
 
 package org.constellation.metadata.io;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -35,7 +39,7 @@ public interface MetadataReader {
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException;
+    Node getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException;
     
     /**
      * Return true if the metadata exist.
@@ -48,12 +52,15 @@ public interface MetadataReader {
     boolean existMetadata(final String identifier) throws MetadataIoException;
     
     /**
-     * Return all the entries from the database
+     * @return all the entries from the database
+     * @throws MetadataIoException
      */
     List<? extends Object> getAllEntries() throws MetadataIoException;
 
      /**
-     * Return all the entries identifiers from the database
+     * @return all the entries identifiers from the database
+     * 
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     List<String> getAllIdentifiers() throws MetadataIoException;
     
@@ -76,12 +83,28 @@ public interface MetadataReader {
     
     
     /**
-     * Return true is the cache mecanism is enabled.
+     * @return true is the cache mecanism is enabled.
      */
     boolean isCacheEnabled();
 
     /**
-     * Return true is the cache mecanism is enabled.
+     * @return true is the cache mecanism is enabled.
      */
     boolean isThreadEnabled();
+
+    /**
+     * @return the list of supported data types.
+     */
+    List<MetadataType> getSupportedDataTypes();
+
+    /**
+     * @return A map of label / Skos concept URI.
+     */
+    Map<String, URI> getConceptMap();
+
+    /**
+     * Set the global level of log for information message of this reader.
+     * @param logLevel
+     */
+    void setLogLevel(Level logLevel);
 }

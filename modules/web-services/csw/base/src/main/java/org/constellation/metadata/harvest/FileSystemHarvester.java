@@ -37,6 +37,7 @@ import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -98,16 +99,12 @@ public class FileSystemHarvester extends CatalogueHarvester {
                 if (!dataFile.isDirectory()) {
                     Object harvested = unmarshaller.unmarshal(dataFile);
 
-                    if (harvested instanceof JAXBElement) {
-                        harvested = ((JAXBElement) harvested).getValue();
-                    }
-
                     // if the file is storable
-                    if (harvested instanceof DefaultMetadata || harvested instanceof AbstractRecordType) {
+                    if (harvested instanceof Node) {
 
                         //Temporary ugly patch TODO handle update in CSW
                         try {
-                            if (metadataWriter.storeMetadata(harvested)) {
+                            if (metadataWriter.storeMetadata((Node)harvested)) {
                                 nbRecordInserted++;
                             } else {
                                 LOGGER.log(Level.INFO, "The file:{0} has not been recorded", dataFile.getPath());

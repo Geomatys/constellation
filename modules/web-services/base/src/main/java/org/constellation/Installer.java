@@ -38,7 +38,7 @@ public final class Installer implements ServletContextListener{
     @Override
     public synchronized void contextInitialized(ServletContextEvent sce) {
 
-        LOGGER.log(Level.WARNING, "=== Starting GeotoolKit ===");
+        LOGGER.log(Level.INFO, "=== Starting GeotoolKit ===");
 
         try{
             Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
@@ -54,7 +54,7 @@ public final class Installer implements ServletContextListener{
                 LOGGER.log(Level.SEVERE, "JAI librairies are not in the classpath. Please install it.\n "
                         + ex.getLocalizedMessage(), ex);
             }
-            LOGGER.log(Level.WARNING, "=== GeotoolKit sucessfully started ===");
+            LOGGER.log(Level.INFO, "=== GeotoolKit sucessfully started ===");
         } catch(Exception ex) {
             LOGGER.log(Level.WARNING, "=== GeotoolKit failed to start ===\n"+ex.getLocalizedMessage(), ex);
         }
@@ -63,12 +63,12 @@ public final class Installer implements ServletContextListener{
     @Override
     public synchronized void contextDestroyed(ServletContextEvent sce) {
 
-        LOGGER.log(Level.WARNING, "=== Stopping GeotoolKit ===");
+        LOGGER.log(Level.INFO, "=== Stopping GeotoolKit ===");
         try{
             Setup.shutdown();
             //wait for threads to die
             wait(2000);
-            LOGGER.log(Level.WARNING, "=== GeotoolKit sucessfully stopped ===");
+            LOGGER.log(Level.INFO, "=== GeotoolKit sucessfully stopped ===");
         }catch(Exception ex){
             LOGGER.log(Level.WARNING, "=== GeotoolKit failed to stop ===\n"+ex.getLocalizedMessage(), ex);
         }

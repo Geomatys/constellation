@@ -17,14 +17,21 @@
 package org.constellation.coverage.ws;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
@@ -55,13 +62,23 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        final Configurator config = new Configurator() {
+        ConfigurationEngine.setupTestEnvironement("WCSWorkerInit");
+        
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WCS", "default", config);
+        ConfigurationEngine.storeConfiguration("WCS", "test", config);
+
+        final Configurator configurator = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-                final ParameterValueGroup config = desc.createValue();
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("coverage-sql".equals(serviceName)){
+                if("coverage-sql".equals(service.getName())){
                     // Defines a PostGrid data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
@@ -80,11 +97,11 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        LayerProviderProxy.getInstance().setConfigurator(configurator);
 
 
         WORKER = new DefaultWCSWorker("default");
@@ -95,6 +112,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        ConfigurationEngine.shutdownTestEnvironement("WCSWorkerInit");
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {

@@ -21,16 +21,23 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
@@ -55,7 +62,6 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -109,6 +115,16 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
+        ConfigurationEngine.setupTestEnvironement("WCSRequestsTest");
+
+        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext config = new LayerContext(layers);
+        config.getCustomParameters().put("shiroAccessible", "false");
+
+        ConfigurationEngine.storeConfiguration("WCS", "default", config);
+        ConfigurationEngine.storeConfiguration("WCS", "test", config);
+
         initServer(new String[] {
             "org.constellation.coverage.ws.rs",
             "org.constellation.configuration.ws.rs",
@@ -117,13 +133,13 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
         pool = WCSMarshallerPool.getInstance();
 
-        final Configurator config = new Configurator() {
+        final Configurator configurator = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+            public ParameterValueGroup getConfiguration(final ProviderService service) {
 
-                final ParameterValueGroup config = desc.createValue();
+                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("coverage-sql".equals(serviceName)){
+                if("coverage-sql".equals(service.getName())){
                     // Defines a PostGrid data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
@@ -144,12 +160,12 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             }
 
             @Override
-            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+            public void saveConfiguration(ProviderService service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        LayerProviderProxy.getInstance().setConfigurator(configurator);
 
         WorldFileImageReader.Spi.registerDefaults(null);
 
@@ -167,7 +183,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     @AfterClass
     public static void shutDown() throws JAXBException {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
-        //finish();
+        ConfigurationEngine.shutdownTestEnvironement("WCSRequestsTest");
+        finish();
     }
 
     /**
@@ -223,7 +240,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     @Test
     public void testWCSGetCoverage() throws Exception {
         waitForStart();
-        
+
         // Creates a valid GetCoverage url.
         final URL getCoverageUrl;
         try {
@@ -378,10 +395,4 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         // TODO: add more tests on returned XML doc
     }
 
-    /**
-     * Free some resources.
-     */
-    @AfterClass
-    public static void finish() {
-    }
 }

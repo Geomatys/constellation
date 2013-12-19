@@ -29,6 +29,7 @@ import juzu.template.Template;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AccessConstraint;
@@ -47,9 +48,9 @@ import org.constellation.gui.util.LayerDataComparator;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -123,12 +124,15 @@ public class Controller {
     @Inject
     @Path("success.gtmpl")
     org.constellation.gui.templates.success success;
+
     @Inject
     @Path("add_data_alias.gtmpl")
     Template addDataAlias;
+
     @Inject
     @Path("layer.gtmpl")
     Template dataElement;
+
 
     /**
      * Generate homepage
@@ -173,6 +177,7 @@ public class Controller {
         parameters.put("nbResults", nbResults);
         parameters.put("startIndex", 0);
         parameters.put("nbPerPage", 10);
+        parameters.put("selected", null);
         return dataDashboard.ok(parameters).withMimeType("text/html");
     }
 
@@ -203,27 +208,30 @@ public class Controller {
         createdService.setVersions(versionList);
 
         //build keyword list
-        String[] keywordsArray = keywords.split(" ");
+        String[] keywordsArray = keywords.split(",");
         List<String> keywordsList = Arrays.asList(keywordsArray);
         createdService.setKeywords(keywordsList);
 
         //set other object on service
         createdService.setServiceConstraints(serviceConstraint);
+        serviceContact.setFullname();
         createdService.setServiceContact(serviceContact);
 
         //call service
         try {
             servicesManager.createServices(createdService, Specification.WMS);
-            return Controller_.succeded(createdService, "WMS", versionList, "true");
+            return Controller_.succeded(createdService.getName(), createdService.getDescription(), createdService.getIdentifier(), "WMS", versionList, "true");
         } catch (IOException ex) {
-            return Controller_.succeded(createdService, "WMS", versionList, "false");
+            return Controller_.succeded(createdService.getName(), createdService.getDescription(), createdService.getIdentifier(), "WMS", versionList, "false");
         }
     }
 
     /**
      * View after service creation
      *
-     * @param createdService {@link org.constellation.dto.Service} asked creation
+     * @param name
+     * @param description
+     * @param identifier
      * @param type           service type
      * @param versionList    service version available
      * @param created        {@link String} {@link boolean} mirror to no if service is created
@@ -231,9 +239,16 @@ public class Controller {
      */
     @View
     @Route("/succeded")
-    public Response succeded(Service createdService, String type, List<String> versionList, String created) {
+    public Response succeded(final String name, final String description, final String identifier, final String type, final List<String> versionList, final String created) {
         Boolean create = Boolean.parseBoolean(created);
-        return success.with().service(createdService).type(type).versions(versionList).created(create).ok().withMimeType("text/html");
+        InstanceSummary is = new InstanceSummary();
+        is.setIdentifier(identifier);
+        is.setName(name);
+        is.set_abstract(description);
+        is.setType(type);
+        servicesManager.buildServiceUrl(type, identifier, versionList, is);
+        System.out.println("test : "+ name);
+        return success.with().service(is).versions(versionList).created(create).ok().withMimeType("text/html");
     }
 
     /**
@@ -292,8 +307,14 @@ public class Controller {
     @Ajax
     @Resource
     @Route("/providerList")
-    public Response getAvailableData(final List<String> dataTypes, final String start, final String count, final String orderBy,
+    public Response getAvailableData(List<String> dataTypes, final String start, final String count, final String orderBy,
                                      final String direction, final String filter) {
+        if (dataTypes == null) {
+            dataTypes = new ArrayList<>(0);
+            dataTypes.add("vector");
+            dataTypes.add("raster");
+
+        }
         final List<LayerData> list = providerManager.getDataListing(dataTypes);
 
         // Search layers by name.
@@ -341,39 +362,38 @@ public class Controller {
      */
     @Resource
     @Route("/upload")
-    public Response upload(final FileItem file, final String dataType, final String returnURL) {
+    public Response upload(final FileItem file, final FileItem metadataFile, final String dataType, final String returnURL) {
+        boolean metadataUploaded = false;
+        if (!metadataFile.getName().isEmpty()) {
+            metadataUploaded = true;
+        }
+
+
         if (file != null) {
             DataInformation di;
-            // Create file on temporary folder
-            String tempDir = System.getProperty("java.io.tmpdir");
-            final File newFile = new File(tempDir + "/" + file.getName());
-
             try {
-                //open stream on file
-                final InputStream stream = file.getInputStream();
+                File dataDirectory = ConfigDirectory.getDataDirectory();
+                final File newFile = new File(dataDirectory, file.getName());
+                Files.copy(file.getInputStream(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-
-                // write on file
-                final FileOutputStream fos = new FileOutputStream(newFile);
-                int intVal = stream.read();
-                while (intVal != -1) {
-                    fos.write(intVal);
-                    intVal = stream.read();
+                if (metadataUploaded) {
+                    File newMetadataFile = new File(dataDirectory.getAbsolutePath() + "/metadata/" + metadataFile.getName());
+                    Files.copy(metadataFile.getInputStream(), newMetadataFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "error when saving file on server", e);
-                return Response.error("error when saving file on server");
+
+                di = providerManager.loadData(file.getName(), metadataFile.getName(), dataType);
+                informationContainer.setInformation(di);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
 
-            di = servicesManager.uploadToServer(newFile, dataType);
-            informationContainer.setInformation(di);
             Response aResponse = Response.error("response not initialized");
             switch (dataType) {
                 case "raster":
-                    aResponse = RasterController_.showRaster(returnURL);
+                    aResponse = RasterController_.showRaster(returnURL, metadataUploaded + "", "true");
                     break;
                 case "vector":
-                    aResponse = VectorController_.showVector(returnURL);
+                    aResponse = VectorController_.showVector(returnURL, metadataUploaded + "", "true");
             }
             return aResponse;
         } else {

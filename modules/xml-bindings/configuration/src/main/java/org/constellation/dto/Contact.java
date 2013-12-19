@@ -31,6 +31,10 @@ import juzu.Mapped;
 @Mapped
 public class Contact {
 
+    private String firstname;
+
+    private String lastname;
+
     private String fullname;
 
     private String organisation;
@@ -62,7 +66,7 @@ public class Contact {
     public Contact() {
     }
 
-    public Contact(final String fullname, final String organisation, final String position,
+    public Contact(final String firstname, final String lastname, final String organisation, final String position,
             final String phone, final String fax, final String email, final String address,
             final String city, final String state, final String zipCode, final String country,
             final String url, final String hoursOfService, final String contactInstructions) {
@@ -71,7 +75,9 @@ public class Contact {
         this.country = country;
         this.email = email;
         this.fax = fax;
-        this.fullname = fullname;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.fullname = firstname+ " "+ lastname;
         this.organisation = organisation;
         this.phone = phone;
         this.position = position;
@@ -82,12 +88,32 @@ public class Contact {
         this.contactInstructions = contactInstructions;
     }
 
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(final String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(final String lastname) {
+        this.lastname = lastname;
+    }
+
     public String getFullname() {
         return fullname;
     }
 
     public void setFullname(String fullname) {
         this.fullname = fullname;
+    }
+
+    public void setFullname() {
+        this.fullname = firstname+ " "+lastname;
     }
 
     public String getOrganisation() {

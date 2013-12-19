@@ -16,38 +16,19 @@
  */
 package org.constellation.process;
 
-import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.LayerContext;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.process.service.StartServiceTest;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
-import org.geotoolkit.util.FileUtilities;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 /**
  *
  * @author Quentin Boileau (Geomatys)
  */
 public class StartWMTSServiceTest extends StartServiceTest {
-
-    @BeforeClass
-    public static void createConfig () {
-        final File configDir = new File("WMTSConfigTest");
-        configDir.mkdir();
-        final File wmts = new File(configDir, "WMTS");
-        wmts.mkdir();
-
-        ConfigDirectory.setConfigDirectory(configDir);
-    }
-
-    @AfterClass
-    public static void deleteConfig () {
-        FileUtilities.deleteDirectory(configDirectory);
-    }
 
     public StartWMTSServiceTest() {
         super("WMTS", DefaultWMTSWorker.class);
@@ -56,32 +37,17 @@ public class StartWMTSServiceTest extends StartServiceTest {
     /** {@inheritDoc} */
     @Override
     protected void createInstance(final String identifier) {
-        final File wms = new File(configDirectory, serviceName);
-        final File instance = new File(wms, identifier);
-        instance.mkdir();
-
-        final File configFile = new File(instance, "layerContext.xml");
-        final LayerContext configuration = new LayerContext();
         try {
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-
-        } catch (JAXBException ex) {
-            //
+            final LayerContext configuration = new LayerContext();
+            ConfigurationEngine.storeConfiguration(serviceName, identifier, configuration, null);
+        } catch (JAXBException | IOException ex) {
+            LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
     }
 
     /** {@inheritDoc} */
     @Override
     protected boolean checkInstanceExist(final String identifier) {
-
-        final File instanceDir = new File(configDirectory.getAbsolutePath() + "/" + serviceName, identifier);
-        if (instanceDir.exists() && instanceDir.isDirectory()) {
-            final File configFile = new File(instanceDir, "layerContext.xml");
-            return configFile.exists();
-        } else {
-            return false;
-        }
+        return ConfigurationEngine.getServiceConfigurationIds(serviceName).contains(identifier);
     }
 }

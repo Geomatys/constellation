@@ -256,7 +256,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
 
         //init
         final LayerContext inputContext = new LayerContext();
-        final List<Layer> layers = new ArrayList<Layer>();
+        final List<Layer> layers = new ArrayList<>();
         layers.add(new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), COUNTRIES_DATA_REF.getLayerId().getLocalPart())));
         layers.add(new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), "city")));
         inputContext.getLayers().add(new Source(COUNTRIES_DATA_REF.getProviderOrServiceId(), true, null, layers));

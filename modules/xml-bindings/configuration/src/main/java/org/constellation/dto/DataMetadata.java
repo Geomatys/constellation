@@ -18,19 +18,28 @@ import java.util.List;
 @XmlRootElement
 public class DataMetadata {
 
-    private String dataPath;
-    private String title;
-    private String anAbstract;
-    private List<String> keywords;
-    private String username;
-    private String organisationName;
-    private String role;
-    private String localeMetadata;
-    private String topicCategory;
-    private Date date;
-    private String dateType;
-    private String localeData;
-    private String type;
+    private String          dataName;
+    private String          dataPath;
+    private String          title;
+    private String          anAbstract;
+    private List<String>    keywords;
+    private String          username;
+    private String          organisationName;
+    private String          role;
+    private String          localeMetadata;
+    private String          topicCategory;
+    private Date            date;
+    private String          dateType;
+    private String          localeData;
+    private String          type;
+
+    public String getDataName() {
+        return dataName;
+    }
+
+    public void setDataName(final String dataName) {
+        this.dataName = dataName;
+    }
 
     public String getDataPath() {
         return dataPath;

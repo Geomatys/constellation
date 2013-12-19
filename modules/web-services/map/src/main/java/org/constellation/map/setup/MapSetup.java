@@ -61,7 +61,7 @@ public class MapSetup implements SetupService {
     @Override
     public void initialize(Properties properties, boolean reinit) {
         
-        LOGGER.log(Level.WARNING, "=== Activating Native Codec ===");
+        LOGGER.log(Level.INFO, "=== Activating Native Codec ===");
         
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){
@@ -103,7 +103,7 @@ public class MapSetup implements SetupService {
             final ParameterValueGroup source = sourceDesc.createValue();
             source.parameter("id").setValue("sld");
             source.parameter("providerType").setValue("sld");
-            source.groups("sldFolder").get(0).parameter("path").setValue(ConfigDirectory.getDataDirectory().getPath() + "/styles");
+            source.groups("sldFolder").get(0).parameter("path").setValue(ConfigDirectory.getStyleDirectory().getPath());
 
             // Create SLD provider.
             try {

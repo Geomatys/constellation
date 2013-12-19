@@ -50,7 +50,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.AbstractCSWMetadataWriter;
+import org.constellation.metadata.io.AbstractMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.NodeUtilities;
@@ -64,7 +64,12 @@ import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileMetadataWriter extends AbstractCSWMetadataWriter {
+public class FileMetadataWriter extends AbstractMetadataWriter {
+
+    /**
+     * An indexer lucene to add object into the index.
+     */
+    private final AbstractIndexer indexer;
 
     /**
      * A directory in witch the metadata files are stored.
@@ -74,19 +79,14 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     /**
      * Build a new File metadata writer, with the specified indexer.
      *
-     * @param index A lucene indexer.
+     * @param indexer A lucene indexer.
      * @param configuration An object containing all the dataSource informations (in this case the data directory).
      *
      * @throws org.constellation.metadata.io.MetadataIoException
      */
-    public FileMetadataWriter(final Automatic configuration, final AbstractIndexer index) throws MetadataIoException {
-        super(index);
-        File dataDir = configuration.getDataDirectory();
-        if (!dataDir.exists()) {
-            final File configDir = configuration.getConfigurationDirectory();
-            dataDir = new File(configDir, dataDir.getName());
-        }
-        dataDirectory = dataDir;
+    public FileMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
+        this.indexer = indexer;
+        dataDirectory = configuration.getDataDirectory();
         if (dataDirectory == null || !dataDirectory.isDirectory()) {
             throw new MetadataIoException("Unable to find the data directory", NO_APPLICABLE_CODE);
         }
@@ -96,11 +96,8 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean storeMetadata(final Object original) throws MetadataIoException {
+    public boolean storeMetadata(final Node original) throws MetadataIoException {
         try {
-            if (!(original instanceof Node)) {
-                throw new IllegalArgumentException("filesystem impelmentation wait for Nodes");
-            }
 
             final String identifier = Utils.findIdentifier(original);
             final File f;
@@ -116,7 +113,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             Transformer transformer = tf.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             FileWriter writer = new FileWriter(f);
-            transformer.transform(new DOMSource((Node)original), new StreamResult(writer));
+            transformer.transform(new DOMSource(original), new StreamResult(writer));
             
             
             if (indexer != null) {
@@ -170,7 +167,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean replaceMetadata(final String metadataID, final Object any) throws MetadataIoException {
+    public boolean replaceMetadata(final String metadataID, final Node any) throws MetadataIoException {
         final boolean succeed = deleteMetadata(metadataID);
         if (!succeed) {
             return false;
@@ -329,5 +326,15 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             }
         }
         return null;
+    }
+
+    /**
+     * Destoy all the resource and close connection.
+     */
+    @Override
+    public void destroy() {
+        if (indexer != null) {
+            indexer.destroy();
+        }
     }
 }

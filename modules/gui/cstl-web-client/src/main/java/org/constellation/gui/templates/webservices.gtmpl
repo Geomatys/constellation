@@ -1,10 +1,9 @@
 #{decorate path=menu.gtmpl/}
 
 #{param name=services/}
-
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
-        <img src="images/constellation.png"/>
+        <a href="@{index()}"><img src="images/constellation.png"/></a>
     </div>
     <!-- Menu to create services -->
     <div class="span3 offset6 pull-right">
@@ -16,7 +15,10 @@
             </a>
             <ul class="dropdown-menu">
                 <li><a href="create/wms" id="wmschoice">&{webservicepage.button.dropdown.wms.label}</a></li>
-                <li><a href="create/wcs" id="wcschoice">&{webservicepage.button.dropdown.wcs.label}Coverage</a></li>
+                <li><a href="create/wmts" id="wmtschoice">&{webservicepage.button.dropdown.wmts.label}</a></li>
+                <li><a href="create/wfs" id="wfschoice">&{webservicepage.button.dropdown.wfs.label}</a></li>
+                <li><a href="create/wcs" id="wcschoice">&{webservicepage.button.dropdown.wcs.label}</a></li>
+                <li><a href="create/wps" id="wpschoice">&{webservicepage.button.dropdown.wps.label}</a></li>
             </ul>
         </div>
     </div>
@@ -41,9 +43,9 @@
     </div>
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;" id="main">
         <% for (def service : services) {%>
-          <div class="span6" id="${service.type}-${service.name}">
-            <a href="edit/${service.type}/${service.name}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
-            <div class="well <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${service.type}-${service.name}">
+          <div class="span6" id="${service.type}-${service.identifier}">
+            <a href="edit/${service.type}/${service.identifier}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
+            <div class="well <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${service.type}-${service.identifier}">
                 <div class="row">
                     <div class="pull-right">
                         <div class="btn-group">
@@ -52,18 +54,18 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="edit/${service.type}/${service.name}">&{service.menu.edit.label}</a></li>
-                                <li><a href="#" data-action="open-capabilities" data-capabilities="${service.capabilitiesUrl}">&{service.menu.getcapabilities.label}</a></li>
-                                <li><a href="#" data-action="open-logs">&{service.menu.log.label}</a></li>
-                                <li><a href="#" data-action="show-service-url">&{service.menu.show.label}</a></li>
+                                <li><a href="edit/${service.type}/${service.identifier}">&{service.menu.edit.label}</a></li>
+                                <li><a href="#" data-action="open-logs" data-logs="${service.logsURL}?l=1000">&{service.menu.log.label}</a></li>
                                 <li><a href="#" data-action="open-service-url" data-capabilities="${service.capabilitiesUrl}">&{service.menu.url.label}</a></li>
-                                <li><a href="#" data-action="delete-service" data-service-type="${service.type}" data-service-id="${service.name}">&{service.menu.delete.label}</a></li>
+                                <li><a href="#" data-action="delete-service" data-service-type="${service.type}" data-service-id="${service.identifier}">&{service.menu.delete.label}</a></li>
+                                <li><a href="#" data-action="open-capabilities" data-capabilities="${service.capabilitiesUrl}">&{service.menu.getcapabilities.label}</a></li>
+                                <li class="<%if(service.status.toString()!="WORKING"){%>disabled<%}%>" ><a href="#" data-action="show-service">&{service.menu.show.label}</a></li>
                             </ul>
                         </div>
-                        <a class="btn btn-info" href="#" data-action="restart-service" data-service-type="${service.type}" data-service-id="${service.name}">
+                        <a class="btn btn-info" href="#" data-action="restart-service" data-service-type="${service.type}" data-service-id="${service.identifier}">
                             <i class="icon-refresh"></i>
                         </a>
-                        <a class="btn <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" href="#" data-state="${service.type}-${service.name}" data-action="toggle-service" data-service-type="${service.type}" data-service-id="${service.name}">
+                        <a class="btn <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" href="#" data-state="${service.type}-${service.identifier}" data-action="toggle-service" data-service-type="${service.type}" data-service-id="${service.identifier}">
                             <i class="icon-play"></i>
                             <i class="icon-stop"></i>
                         </a>
@@ -94,29 +96,28 @@
         <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
     </div>
 </div>
+<div class="modal hide fade" id="getcapabilities-modal" style="left:40%; width:910px">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>GetCapabilities</h3>
+    </div>
+    <div class="modal-body">
+        <pre id="capabilities-modal-pre" style="background-color: #f8f8ff"><code class="xml"></code></pre>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    </div>
+</div>
 
-<script type="text/javascript" language="JavaScript">
-    function filter(type, tabSelected){
-    var $services = $("#main > .span6");
-
-        if(type==''){
-            $services.show();
-        }
-        else{
-            for (var i = 0; i < $services.length; i++) {
-                var $currentService = $services.eq(i);
-                var currentServiceId = $currentService.attr("id");
-                var currentServiceType = currentServiceId.split("-")[0];
-                if(type != ''){
-                    if(currentServiceType != type){
-                        $currentService.hide();
-                    }else{
-                        $currentService.show();
-                    }
-                }
-            }
-        }
-        $(tabSelected).parent().parent().children().removeClass('active')
-        $(tabSelected).parent().addClass('active')
-    }
-</script>
+<div class="modal hide fade" id="logs-modal" style="left:40%; width:910px">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Log</h3>
+    </div>
+    <div class="modal-body">
+        <pre id="logs-modal-pre" style="background-color: #f8f8ff"><code class="xml"></code></pre>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    </div>
+</div>

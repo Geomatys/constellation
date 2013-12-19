@@ -16,36 +16,29 @@
  */
 package org.constellation.provider.coveragesgroup;
 
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.provider.AbstractLayerProvider;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.ProviderService;
-import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.map.CoverageMapLayer;
-import org.geotoolkit.map.FeatureMapLayer;
-import org.geotoolkit.map.MapContext;
-import org.geotoolkit.map.MapItem;
-import org.geotoolkit.style.MutableStyle;
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.FileFilter;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+import java.util.logging.Level;
+
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
+import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.map.MapContext;
+import org.geotoolkit.util.FileUtilities;
 
-import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.FOLDER_DESCRIPTOR;
-import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.MAP_CONTEXT_DESCRIPTOR;
-import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.SOURCE_CONFIG_DESCRIPTOR;
+import org.constellation.provider.AbstractLayerProvider;
+import org.constellation.provider.LayerDetails;
+import org.constellation.provider.ProviderService;
+import org.constellation.provider.coveragesgroup.util.MapContextIO;
+import org.constellation.admin.dao.DataRecord.DataType;
+
+import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.*;
 
 /**
  *
@@ -54,16 +47,15 @@ import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderSe
  */
 public class CoveragesGroupProvider extends AbstractLayerProvider {
 
-    public static final String KEY_FOLDER_PATH = "path";
-    public static final String KEY_MAP_CONTEXT = "mapContext";
+    public static final String KEY_PATH = "path";
 
-    private final Map<Name,File> index = new HashMap<Name,File>();
-
-    private File folder;
+    private Map<Name,File> index = null;
+    private boolean visited;
+    private File path;
 
     public CoveragesGroupProvider(final ProviderService service, final ParameterValueGroup param) {
         super(service,param);
-        visit();
+        this.visited = false;
     }
 
     /**
@@ -71,6 +63,9 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      */
     @Override
     public Set<Name> getKeys() {
+        if (index == null) {
+            visit();
+        }
         return index.keySet();
     }
 
@@ -79,7 +74,7 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      */
     @Override
     public LayerDetails get(final Name key) {
-       return get(key, null);
+        return get(key, null);
     }
 
     /**
@@ -94,6 +89,9 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      * hacked method to pass the login/pass to WebMapServer
      */
     public LayerDetails get(final Name key, final String login, final String password) {
+        if (index == null) {
+            visit();
+        }
         final File mapContextFile = index.get(key);
         if (mapContextFile != null) {
             return new CoveragesGroupLayerDetails(key, mapContextFile, login, password);
@@ -110,89 +108,14 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
     }
 
     /**
-     * Write a Geotk {@link MapContext} in an xml file.
-     *
-     * @param key file key, where to store the xml.
-     * @param mapContext A map context to parse.
-     * @throws JAXBException
-     */
-    public void write(final Name key, final MapContext mapContext) throws JAXBException {
-        final File mapContextFile = index.get(key);
-
-        final org.geotoolkit.providers.xml.MapItem finalMapItem = new org.geotoolkit.providers.xml.MapItem(null);
-        final org.geotoolkit.providers.xml.MapContext finalMapContext = new org.geotoolkit.providers.xml.MapContext(finalMapItem);
-        if (mapContextFile != null) {
-            for (final MapItem mapItem : mapContext.items()) {
-                if (mapItem instanceof FeatureMapLayer) {
-                    final FeatureMapLayer fml = (FeatureMapLayer) mapItem;
-                    final String id = fml.getCollection().getID();
-                    final MutableStyle ms = fml.getSelectionStyle();
-                    final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
-                            new org.geotoolkit.providers.xml.StyleReference(ms.getName());
-                    final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                            new org.geotoolkit.providers.xml.DataReference(id), styleRef);
-                    ml.setOpacity(fml.getOpacity());
-                    finalMapItem.getMapItems().add(ml);
-                } else if (mapItem instanceof CoverageMapLayer) {
-                    final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
-                    final String id = cml.getCoverageReference().getName().getLocalPart();
-                    final MutableStyle ms = cml.getSelectionStyle();
-                    final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
-                            new org.geotoolkit.providers.xml.StyleReference(ms.getName());
-                    final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                            new org.geotoolkit.providers.xml.DataReference(id), styleRef);
-                    ml.setOpacity(cml.getOpacity());
-                    finalMapItem.getMapItems().add(ml);
-                } else {
-                    visitMapItem(mapItem, finalMapItem);
-                }
-            }
-        }
-
-        // write finalMapContext
-        if (mapContextFile != null) {
-            final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance(org.geotoolkit.providers.xml.MapContext.class, org.apache.sis.internal.jaxb.geometry.ObjectFactory.class), null);
-            final Marshaller marshaller = pool.acquireMarshaller();
-            marshaller.marshal(finalMapContext, mapContextFile);
-            pool.recycle(marshaller);
-        }
-    }
-
-    private void visitMapItem(final MapItem mapItemOrig, final org.geotoolkit.providers.xml.MapItem finalMapItem) {
-        for (final MapItem mapItem : mapItemOrig.items()) {
-            if (mapItem instanceof FeatureMapLayer) {
-                final FeatureMapLayer fml = (FeatureMapLayer) mapItem;
-                final String id = fml.getCollection().getID();
-                final MutableStyle ms = fml.getSelectionStyle();
-                    final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
-                            new org.geotoolkit.providers.xml.StyleReference(ms.getName());
-                    final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                            new org.geotoolkit.providers.xml.DataReference(id), styleRef);
-                    finalMapItem.getMapItems().add(ml);
-            } else if (mapItem instanceof CoverageMapLayer) {
-                final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
-                final String id = cml.getCoverageReference().getName().getLocalPart();
-                final MutableStyle ms = cml.getSelectionStyle();
-                final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
-                        new org.geotoolkit.providers.xml.StyleReference(ms.getName());
-                final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                            new org.geotoolkit.providers.xml.DataReference(id), styleRef);
-                    finalMapItem.getMapItems().add(ml);
-            } else {
-                final org.geotoolkit.providers.xml.MapItem finalMapItemChild = new org.geotoolkit.providers.xml.MapItem(null);
-                finalMapItem.getMapItems().add(finalMapItemChild);
-                visitMapItem(mapItem, finalMapItemChild);
-            }
-        }
-    }
-
-    /**
      * {@inheritDoc }
      */
     @Override
     public void reload() {
         synchronized(this){
-            index.clear();
+            if (index != null) {
+                index.clear();
+            }
             visit();
         }
     }
@@ -203,7 +126,9 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
     @Override
     public void dispose() {
         synchronized(this){
-            index.clear();
+            if (index != null) {
+                index.clear();
+            }
         }
     }
 
@@ -212,88 +137,57 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      */
     @Override
     protected void visit() {
-        final ParameterValue<URL> paramFolder = (ParameterValue<URL>) getSourceConfiguration(getSource()).parameter(FOLDER_DESCRIPTOR.getName().getCode());
+        final ParameterValue<URL> paramUrl = (ParameterValue<URL>) getSourceConfiguration(getSource()).parameter(URL.getName().getCode());
 
-        if(paramFolder == null){
+        if(paramUrl == null || paramUrl.getValue() == null){
             getLogger().log(Level.WARNING,"Provided File path is not defined.");
             return;
         }
 
-        final URL path = paramFolder.getValue();
-
-        if (path == null) {
-            getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");
-            return;
-        }
+        final URL urlPath = paramUrl.getValue();
 
         try {
-            folder = new File(path.toURI());
+            path = new File(urlPath.toURI());
         } catch (URISyntaxException e) {
             getLogger().log(Level.INFO,"Fails to convert path url to file.");
-            folder = new File(path.getPath());
+            path = new File(urlPath.getPath());
         }
 
-        if (folder == null || !folder.exists() || !folder.isDirectory()) {
-            getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");
-            return;
+        List<File> candidates = new ArrayList<File>() ;
+
+        if (path.isDirectory()) {
+            candidates.addAll(FileUtilities.scanDirectory(path, new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    final String fullName = pathname.getName();
+                    final int idx = fullName.lastIndexOf('.');
+                    final String extension = fullName.substring(idx + 1);
+                    return extension.equalsIgnoreCase("xml");
+                }
+            }));
+        } else {
+            candidates.add(path);
         }
 
-        visit(folder);
-
-        final ParameterValue<MapContext> paramMapContext = (ParameterValue<MapContext>) getSourceConfiguration(getSource()).parameter(MAP_CONTEXT_DESCRIPTOR.getName().getCode());
-        if (paramMapContext != null) {
-            final MapContext mapContext = paramMapContext.getValue();
-            if (mapContext != null) {
-                final DefaultName name = new DefaultName(mapContext.getName());
-                File tempFile = index.get(name);
-                if (tempFile == null) {
-                    tempFile = new File(folder, mapContext.getName() + ".xml");
-                    index.put(name, tempFile);
+        index = new HashMap<Name, File>();
+        for (final File candidate : candidates) {
+            try {
+                final MapContext mapContext = MapContextIO.readMapContextFile(candidate, "", "");
+                if (mapContext != null) {
+                    final DefaultName name = new DefaultName(mapContext.getName());
+                    index.put(name, candidate);
                 }
-                try {
-                    write(name, mapContext);
-                } catch (JAXBException e) {
-                    getLogger().log(Level.WARNING, "Unable to do the marshalling of the map context object", e);
-                }
+            } catch (JAXBException e) {
+                getLogger().log(Level.WARNING, "Candidate MapContext file can't be read : "+candidate.getAbsolutePath(), e);
             }
         }
 
         super.visit();
     }
 
-    /**
-     * Visit all files and directories contained in the directory specified, and add
-     * all XML files in {@link #index}.
-     *
-     * @param file The starting file or folder.
-     */
-    private void visit(final File file) {
-
-        if (file.isDirectory()) {
-            final File[] list = file.listFiles();
-            if (list != null) {
-                for (int i = 0; i < list.length; i++) {
-                    visit(list[i]);
-                }
-            }
-        } else {
-            test(file);
-        }
-    }
-
-    /**
-     * Keep only XML files.
-     *
-     * @param candidate Candidate to be a map context file.
-     */
-    private void test(final File candidate) {
-        final String fullName = candidate.getName();
-        final int idx = fullName.lastIndexOf('.');
-        final String extension = fullName.substring(idx + 1);
-        if (extension.equalsIgnoreCase("xml")) {
-            final String name = fullName.substring(0, idx);
-            index.put(new DefaultName(name), candidate);
-        }
+    @Override
+    public DataType getDataType() {
+        return DataType.COVERAGE;
     }
 
 }

@@ -52,6 +52,7 @@ import org.opengis.filter.capability.Operator;
 import org.opengis.filter.capability.SpatialOperator;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 
 /**
@@ -85,6 +86,18 @@ public abstract class CSWConstants {
     public static final String EBRIM_25 = "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
     public static final String EBRIM_30 = "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
 
+    /**
+     * A list of supported MIME type.
+     */
+    public static final List<String> ACCEPTED_OUTPUT_FORMATS;
+    static {
+        ACCEPTED_OUTPUT_FORMATS = new ArrayList<>();
+        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_XML);
+        ACCEPTED_OUTPUT_FORMATS.add(MimeType.APPLICATION_XML);
+        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_HTML);
+        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_PLAIN);
+    }
+    
     /**
      * Error message
      */

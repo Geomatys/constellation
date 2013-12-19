@@ -213,8 +213,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
         }
 
         final String identifier = metadata.getIdentifier();
-        doc.add(new Field("id",        identifier,           Field.Store.YES, Field.Index.NOT_ANALYZED));
-        //doc.add(new Field("Title",     metadata.getTitle(),  Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("id", identifier, ftna));
+        //doc.add(new Field("Title",     metadata.getTitle(),  ft));
     }
 
     /**

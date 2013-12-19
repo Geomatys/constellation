@@ -41,19 +41,21 @@ public abstract class DeleteServiceTest extends ServiceProcessTest {
         createInstance("deleteInstance1");
         createInstance("deleteInstance2");
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteServiceDescriptor.NAME);
+        try {
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteServiceDescriptor.NAME);
 
-        ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue("deleteInstance1");
+            ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue("deleteInstance1");
 
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        proc.call();
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            proc.call();
 
-        assertFalse(checkInstanceExist("deleteInstance1"));
-        assertTrue(checkInstanceExist("deleteInstance2"));
-
-        deleteInstance("deleteInstance2");
+            assertFalse(checkInstanceExist("deleteInstance1"));
+            assertTrue(checkInstanceExist("deleteInstance2"));
+        } finally {
+            deleteInstance("deleteInstance2");
+        }
     }
 
     @Test

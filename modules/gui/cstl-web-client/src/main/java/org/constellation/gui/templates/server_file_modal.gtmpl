@@ -1,29 +1,25 @@
 <form action="@{DataController.loadingFileData()}" method="post" id="serverFileModalForm">
     <div id="serverFileModal" class="modal hide fade" tabindex="-1" style="width: 735px;"  role="dialog" aria-labelledby="serverFileModalLabel" aria-hidden="true">
         <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <button type="button" class="close closeAddDataModal" data-dismiss="modal" aria-hidden="true">×</button>
             <h3 id="serverFileModalLabel">Choisir un fichier sur le serveur</h3>
         </div>
         <div class="modal-body">
             <div id="typePart">
-                <div class="span5">
+                <div class="span7">
                     <div class="span2">
                         <label class="radio">
                             <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="images/icon/vector.png" class="img-rounded"> &{layer.listing.data.upload.vector.label}
                         </label>
+                    </div>
+                    <div class="span2">
                         <label class="radio">
                             <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="images/icon/raster.png" class="img-rounded"> &{layer.listing.data.upload.raster.label}
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
                         </label>
                     </div>
                     <div class="span2">
                         <label class="radio">
-                            <input type="radio" name="dataType" value="pyramid" style="margin-top:12px;"> <img src="images/icon/pyramid.png" class="img-rounded"> pyramid
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="dataType" value="virtual" style="margin-top:12px;"> <img src="images/icon/virtual-sensor.png" class="img-rounded"> virtual sensor
+                            <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
                         </label>
                     </div>
                 </div>
@@ -45,15 +41,23 @@
             <input type="hidden" value="@{dataDashboard()}" name="returnURL"/>
         </div>
         <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">&{layer.listing.data.upload.close.button}</button>
+            <button class="btn closeAddDataModal" data-dismiss="modal" aria-hidden="true" >&{layer.listing.data.upload.close.button}</button>
             <button class="btn btn-info" type="button" onclick="gotoNext();" id="nextbutton">next</button>
             <button class="btn btn-info" type="submit" id="submitbutton">create</button>
         </div>
     </div>
 </form>
 <script type="text/javascript">
-    $("#endbutton").hide();
-    $("#submitbutton").hide();
-    $("#typePart").hide();
-    updateBreadcrumb("");
+    $(function(){
+        $(".closeAddDataModal").on("click", function(){
+            $("#endbutton").hide();
+            $("#submitbutton").hide();
+            $("#typePart").hide();
+            updateBreadcrumb("");
+        });
+        $("#endbutton").hide();
+        $("#submitbutton").hide();
+        $("#typePart").hide();
+        updateBreadcrumb("");
+    })
 </script>

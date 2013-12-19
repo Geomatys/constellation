@@ -2,7 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
     <context:property-placeholder location="classpath:/constellation.properties"/>
 
@@ -10,7 +10,7 @@
 
     <!-- Constellation service configuration -->
     <bean class="java.net.URL" id="cstlUrl">
-        <constructor-arg type="java.lang.String" value="http://demo7.geomatys.com/constellation/" />
+        <constructor-arg type="java.lang.String" value="${constellation.url}" />
     </bean>
     <bean class="java.lang.String" id="cstlApiVersion">
         <constructor-arg type="java.lang.String" value="1" />
@@ -31,13 +31,13 @@
     </bean>
     
     <!-- Configuration service beans by type/target -->
-    <bean class="org.constellation.gui.service.ServicesManager" id="servicesManager"    scope="session" >
+    <bean class="org.constellation.gui.service.ServicesManager" id="servicesManager"    scope="singleton" >
     </bean>
-    <bean class="org.constellation.gui.service.MapManager"      id="mapManager"         scope="session" >
+    <bean class="org.constellation.gui.service.MapManager"      id="mapManager"         scope="singleton" >
     </bean>
-    <bean class="org.constellation.gui.service.ProviderManager" id="providerManager"    scope="session" >
+    <bean class="org.constellation.gui.service.ProviderManager" id="providerManager"    scope="singleton" >
     </bean>
-    <bean class="org.constellation.gui.service.StyleService"    id="styleService"       scope="session" >
+    <bean class="org.constellation.gui.service.StyleService"    id="styleService"       scope="singleton" >
     </bean>
     <!--<bean class="org.constellation.gui.DataInformationContainer" id="informationContainer" scope="session" />-->
 </beans>

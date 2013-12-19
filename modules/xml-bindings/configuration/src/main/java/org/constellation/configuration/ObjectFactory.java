@@ -47,6 +47,10 @@ public class ObjectFactory {
     public ObjectFactory() {
     }
 
+    public MailingProperties createMailingProperties() {
+        return new MailingProperties();
+    }
+    
     /**
      * Create an instance of {@link AcknowlegementType }
      * 
@@ -169,17 +173,17 @@ public class ObjectFactory {
     
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "source")
     public JAXBElement<Object> createSource(Object value) {
-        return new JAXBElement<Object>(SOURCE_QNAME, Object.class, null, value);
+        return new JAXBElement<>(SOURCE_QNAME, Object.class, null, value);
     }
             
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "Layer")
     public JAXBElement<Object> createLayer(Object value) {
-        return new JAXBElement<Object>(LAYER_QNAME, Object.class, null, value);
+        return new JAXBElement<>(LAYER_QNAME, Object.class, null, value);
     }
     
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "input")
     public JAXBElement<Object> createInput(Object value) {
-        return new JAXBElement<Object>(LAYER_QNAME, Object.class, null, value);
+        return new JAXBElement<>(LAYER_QNAME, Object.class, null, value);
     }
     
 }

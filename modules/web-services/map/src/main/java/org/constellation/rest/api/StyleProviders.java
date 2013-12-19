@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.util.Locale;
+import javax.xml.namespace.QName;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -124,8 +125,8 @@ public final class StyleProviders {
     @POST
     @Path("{id}/style/{styleId}/linkData")
     public Response linkToData(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final ParameterValues values) throws Exception {
-        StyleProviderConfig.linkToData(id, styleId, values.getValues().get("dataProvider"), values.getValues().get("dataId"));
-        return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully linked to data named \"" + values.getValues().get("dataId") + "\"."));
+        StyleProviderConfig.linkToData(id, styleId, values.get("dataProvider"), new QName(values.get("dataNamespace"), values.get("dataId")));
+        return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully linked to data named \"" + values.get("dataId") + "\"."));
     }
 
     /**
@@ -134,7 +135,7 @@ public final class StyleProviders {
     @POST
     @Path("{id}/style/{styleId}/unlinkData")
     public Response unlinkFromData(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final ParameterValues values) throws Exception {
-        StyleProviderConfig.unlinkFromData(id, styleId, values.getValues().get("dataProvider"), values.getValues().get("dataId"));
-        return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully unlinked from data named \"" + values.getValues().get("dataId") + "\"."));
+        StyleProviderConfig.unlinkFromData(id, styleId, values.get("dataProvider"), new QName(values.get("dataNamespace"), values.get("dataId")));
+        return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully unlinked from data named \"" + values.get("dataId") + "\"."));
     }
 }

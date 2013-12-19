@@ -31,7 +31,6 @@ import org.constellation.filter.FilterParser;
 import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.SQLFilterParser;
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.filesystem.FileMetadataReader;
 import org.constellation.metadata.io.filesystem.FileMetadataWriter;

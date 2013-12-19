@@ -21,21 +21,18 @@ package org.constellation.sos.ws;
 import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.generic.database.Query;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.admin.ConfigurationEngine;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -56,66 +53,38 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
         ds = new DefaultDataSource(url);
 
         Connection con = ds.getConnection();
-
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
         sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
 
+        ConfigurationEngine.setupTestEnvironement("GPGSOSWorkerTest");
 
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
-        Marshaller marshaller =  pool.acquireMarshaller();
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
+        //we write the configuration file
+        Automatic SMLConfiguration = new Automatic();
+        SMLConfiguration.setFormat("nosml");
 
+        Automatic OMConfiguration = (Automatic) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/generic-config.xml"));
+        pool.recycle(unmarshaller);
 
+        OMConfiguration.getBdd().setConnectURL(url);
 
-        final File configDir = new File("GPGSOSWorkerTest");
-        if (configDir.exists()) {
-            FileUtilities.deleteDirectory(configDir);
-        }
+        SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
+        configuration.setObservationReaderType(DataSourceType.GENERIC);
+        configuration.setObservationWriterType(DataSourceType.NONE);
+        configuration.setSMLType(DataSourceType.NONE);
+        configuration.setObservationFilterType(DataSourceType.GENERIC);
+        configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
+        configuration.setProfile("discovery");
+        configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+        configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+        configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+        configuration.getParameters().put("transactionSecurized", "false");
 
-        if (!configDir.exists()) {
-            configDir.mkdir();
+        ConfigurationEngine.storeConfiguration("SOS", "default", configuration);
 
-            ConfigDirectory.setConfigDirectory(configDir);
-
-            File CSWDirectory  = new File(configDir, "SOS");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
-
-            Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-
-            //we write the configuration file
-            File filterFile = new File(instDirectory, "affinage.xml");
-            Query query = (Query) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/affinage.xml"));
-            marshaller.marshal(query, filterFile);
-
-            //we write the configuration file
-            File configFile = new File(instDirectory, "config.xml");
-            Automatic SMLConfiguration = new Automatic();
-            SMLConfiguration.setFormat("nosml");
-
-            Automatic OMConfiguration = (Automatic) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/generic-config.xml"));
-            pool.recycle(unmarshaller);
-
-            OMConfiguration.getBdd().setConnectURL(url);
-
-
-            SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
-            configuration.setObservationReaderType(DataSourceType.GENERIC);
-            configuration.setObservationWriterType(DataSourceType.NONE);
-            configuration.setSMLType(DataSourceType.NONE);
-            configuration.setObservationFilterType(DataSourceType.GENERIC);
-            configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
-            configuration.setProfile("discovery");
-            configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
-            configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
-            configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
-            configuration.getParameters().put("transactionSecurized", "false");
-            marshaller.marshal(configuration, configFile);
-
-        }
-        pool.recycle(marshaller);
         init();
         worker = new SOSworker("default");
         worker.setServiceUrl(URL);
@@ -134,8 +103,6 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
         if (worker != null) {
             worker.destroy();
         }
-
-        FileUtilities.deleteDirectory(new File("GPGSOSWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();
@@ -147,6 +114,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
         if (ds != null) {
             ds.shutdown();
         }
+        ConfigurationEngine.shutdownTestEnvironement("GPGSOSWorkerTest");
     }
 
 

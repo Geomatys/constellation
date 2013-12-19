@@ -18,13 +18,15 @@
 package org.constellation.ws.rest;
 
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.ws.CstlServiceException;
 import org.constellation.dto.PortrayalContext;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -43,10 +45,20 @@ public final class Portrayal {
      * @see LayerProviders#portray(PortrayalContext);
      */
     @POST
-    @Path("portray")
+    @Path("/portray")
     public Response portray(final PortrayalContext context) {
         try {
             return Response.ok(LayerProviders.portray(context)).build();
+        } catch (CstlServiceException ex) {
+            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+        }
+    }
+
+    @GET
+    @Path("/portray")
+    public Response portray2(@QueryParam("PROVIDER") final String providerId, @QueryParam("LAYERS") final String bandId, @QueryParam("WIDTH") final int width, @QueryParam("HEIGHT") final int height) {
+        try {
+            return Response.ok(LayerProviders.portrayBand(providerId, bandId, width, height)).build();
         } catch (CstlServiceException ex) {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }

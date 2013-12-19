@@ -39,6 +39,12 @@ public class ParameterValues {
         this.values = new HashMap<>(values);
     }
 
+    public String get(final String key) {
+        if (values != null) {
+            return values.get(key);
+        }
+        return null;
+    }
     /**
      * @return the values
      */

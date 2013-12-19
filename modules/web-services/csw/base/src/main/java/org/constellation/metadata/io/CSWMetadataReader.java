@@ -18,15 +18,14 @@
 
 package org.constellation.metadata.io;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
 // geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -36,7 +35,10 @@ public interface CSWMetadataReader extends MetadataReader {
 
 
     /**
-     * Return a list of values for each specific fields specified as a coma separated String.
+     * @param propertyNames A comma speparated list of property to retrieve.
+     * 
+     * @return a list of values for each specific fields specified as a coma separated String.
+     * @throws MetadataIoException
      */
     List<DomainValues> getFieldDomainofValues(final String propertyNames) throws MetadataIoException;
 
@@ -51,42 +53,28 @@ public interface CSWMetadataReader extends MetadataReader {
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    Object getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
+    Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
-    Object getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
-
-    /**
-     * Return the list of supported data types.
-     */
-    List<MetadataType> getSupportedDataTypes();
+    @Deprecated
+    Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
     /**
-     * Return the list of QName for additional queryable element.
+     * @return the list of QName for additional queryable element.
      */
     List<QName> getAdditionalQueryableQName();
 
     /**
-     * Return the list of path for the additional queryable element.
+     * @return the list of path for the additional queryable element.
      */
     Map<String, List<String>> getAdditionalQueryablePathMap();
 
     /**
-     * Return the list of Additional queryable element.
-     */
-    Map<String, URI> getConceptMap();
-
-    /**
      * Execute a SQL query and return the result as a List of identifier;
      *
-     * @param query
+     * @param sqlQuery
      * @return
      * @throws MetadataIoException
      */
     String[] executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException;
 
-    /**
-     * Set the global level of log for information message.
-     * @param logLevel
-     */
-    void setLogLevel(Level logLevel);
 }

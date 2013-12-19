@@ -28,6 +28,4 @@ public class AddLayerToWFSServiceTest extends AddLayerToMapServiceTest {
     public AddLayerToWFSServiceTest() {
         super("WFS", DefaultWFSWorker.class);
     }
-    
-    
 }

@@ -38,22 +38,22 @@ public interface WFSWorker extends Worker {
     /**
      * Describe the capabilities and the layers available of this service.
      *
-     * @param getCapab       The {@linkplain GetCapabilities get capabilities} request.
+     * @param request The {@linkplain GetCapabilities get capabilities} request.
      * @return a WFSCapabilities XML document describing the capabilities of the service.
      *
      * @throws CstlServiceException
      */
-    WFSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException;
+    WFSCapabilities getCapabilities(final GetCapabilities request) throws CstlServiceException;
 
     /**
      * describe the structure of any feature type it can service.
      *
-     * @param model A desribeFeatureType request contains typeNames.
+     * @param request A desribeFeatureType request contains typeNames.
      *
      * @return A marshallable object representing a xsd.
      * @throws CstlServiceException
      */
-    Schema describeFeatureType(final DescribeFeatureType model) throws CstlServiceException;
+    Schema describeFeatureType(final DescribeFeatureType request) throws CstlServiceException;
 
     /**
      * Allows retrieval of features from a web feature service.
@@ -91,11 +91,11 @@ public interface WFSWorker extends Worker {
     /**
      * Allow to insert, update, or remove feature instances.
      *
-     * @param t A request containing feature to insert and filters identifying which feature have to be update/delete
+     * @param request A request containing feature to insert and filters identifying which feature have to be update/delete
      * @return
      * @throws CstlServiceException
      */
-    TransactionResponse transaction(final Transaction t) throws CstlServiceException;
+    TransactionResponse transaction(final Transaction request) throws CstlServiceException;
 
     Object getPropertyValue(final GetPropertyValue request) throws CstlServiceException;
 

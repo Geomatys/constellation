@@ -22,18 +22,23 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.LayerList;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
-import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.map.configuration.MapConfigurer;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+
+import java.io.UnsupportedEncodingException;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -68,6 +73,13 @@ public final class MapServices {
         return ok(AcknowlegementType.success("Layer \"" + layer.getLayerId() + "\" successfully added to " + spec + " service \"" + id + "\"."));
     }
 
+    @DELETE
+    @Path("{id}/{layerid}")
+    public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerid, @QueryParam("layernamespace") String layernmsp) throws NotRunningServiceException, JAXBException, UnsupportedEncodingException {
+        getConfigurer(spec).removeLayer(serviceId, new QName(layernmsp, layerid));
+        return Response.ok().build();
+    }
+
     /**
      * Returns the {@link MapConfigurer} instance from its {@link Specification}.
      *
@@ -81,4 +93,6 @@ public final class MapServices {
         }
         return (MapConfigurer) ServiceConfigurer.newInstance(spec);
     }
+
+
 }

@@ -196,8 +196,8 @@
     <ctl:test name="wps:general-WPS.General-InvalidRequest.1">
       <ctl:param name="serviceURL" />
 	  <ctl:param name="exceptionReportSchema" />
-      <ctl:assertion>Sending a request that is non-conformant to a schema associated with an WPS operation causes the server to return a valid error report message with an exceptionCode value of InvalidRequest.</ctl:assertion>
-      <ctl:comment>Send several test documents that are invalid according to the schemas associated with some of the WPS operations (i.e. the mandatory operations). Pass if the service returns a valid exception message with an exceptionCode value of InvalidRequest; fail otherwise.</ctl:comment>
+      <ctl:assertion>Sending a request that is non-conformant to a schema associated with an WPS operation causes the server to return a valid error report message.</ctl:assertion>
+      <ctl:comment>Send several test documents that are invalid according to the schemas associated with some of the WPS operations (i.e. the mandatory operations). Pass if the service returns a valid exception message; fail otherwise.</ctl:comment>
       <ctl:link title="Verify that an invalid request produces an appropriate response from the server.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.General-InvalidRequest</ctl:link>
       <ctl:code>
         <!--
@@ -225,7 +225,7 @@
 				<ctl:message select="concat('Schema file: ', $exceptionReportSchema)"/>
                 <ctl:fail />
             </xsl:when>
-            <xsl:otherwise>
+            <!--xsl:otherwise>
                 <ctl:message>The response was <xsl:value-of select="wpsFunctions:getExceptionInfo($invalidRequestResponse)" /></ctl:message>
                 <ctl:message>Checking the validity of the response to an invalid request.</ctl:message>
                 <xsl:variable name="isCorrect">
@@ -242,7 +242,7 @@
 					<ctl:message select="'Expected exception code was: &quot;InvalidRequest&quot;'"/>
                     <ctl:fail />
                 </xsl:if>
-            </xsl:otherwise>
+            </xsl:otherwise-->
         </xsl:choose>
       </ctl:code>
     </ctl:test>

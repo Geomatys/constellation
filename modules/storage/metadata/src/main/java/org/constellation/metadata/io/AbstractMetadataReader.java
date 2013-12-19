@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.sis.util.logging.Logging;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -72,7 +74,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * {@inheritDoc}
      */
     @Override
-    public abstract Object getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException;
+    public abstract Node getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException;
     
     /**
      * {@inheritDoc}
@@ -150,8 +152,9 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     }
 
     /**
-     * @param LogLevel the LogLevel to set
+     * @param logLevel the LogLevel to set
      */
+    @Override
     public void setLogLevel(final Level logLevel) {
         this.logLevel = logLevel;
     }
@@ -168,5 +171,13 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      */
     public void setIsThreadEnabled(final boolean isThreadEnabled) {
         this.threadEnabled = isThreadEnabled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, URI> getConceptMap() {
+        return new HashMap<>();
     }
 }

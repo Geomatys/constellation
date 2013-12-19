@@ -8,6 +8,7 @@
             <div id="part1">
                 <!-- Upload part -->
                 <div class="fileupload fileupload-new" data-provides="fileupload">
+                    <label for="file">Donnée</label>
                     <div class="input-append">
                         <div class="uneditable-input span3">
                             <i class="icon-file fileupload-exists"></i>
@@ -21,6 +22,22 @@
                         <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">&{layer.listing.data.upload.remove.label}</a>
                     </div>
                 </div>
+
+                <div class="fileupload fileupload-new" data-provides="fileupload">
+                    <label for="metadataFile">Metadata</label>
+                    <div class="input-append">
+                        <div class="uneditable-input span3">
+                            <i class="icon-file fileupload-exists"></i>
+                            <span class="fileupload-preview"></span>
+                        </div>
+                        <span class="btn btn-file">
+                            <span class="fileupload-new">&{layer.listing.data.upload.select.label}</span>
+                            <span class="fileupload-exists">&{layer.listing.data.upload.change.label}</span>
+                            <input type="file" name="metadataFile" id="metadataFile"/>
+                        </span>
+                        <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">&{layer.listing.data.upload.remove.label}</a>
+                    </div>
+                </div>
             </div>
 
             <div id="part2">
@@ -30,19 +47,15 @@
                         <label class="radio">
                             <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="images/icon/vector.png" class="img-rounded"> &{layer.listing.data.upload.vector.label}
                         </label>
+                    </div>
+                    <div class="span2">
                         <label class="radio">
                             <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="images/icon/raster.png" class="img-rounded"> &{layer.listing.data.upload.raster.label}
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
                         </label>
                     </div>
                     <div class="span2">
                         <label class="radio">
-                            <input type="radio" name="dataType" value="pyramid" style="margin-top:12px;"> <img src="images/icon/pyramid.png" class="img-rounded"> pyramid
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="dataType" value="virtual" style="margin-top:12px;"> <img src="images/icon/virtual-sensor.png" class="img-rounded"> virtual sensor
+                            <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
                         </label>
                     </div>
                 </div>
@@ -74,17 +87,28 @@
         if(selectedFile != ""){
             var lastPointIndex = selectedFile.lastIndexOf(".");
             var extension = selectedFile.substring(lastPointIndex+1, selectedFile.length);
-            $.post(appURL+"/ajax/testExtension/", {"extension": extension}, function(data){
-                if(data.dataType!=""){
-                    $("#part2 [value="+data.dataType+"]").prop("checked", true);
-                    $("#nextButton").hide();
-                    $("#submitButton").show();
-                } else {
-                    $("#submitButton").hide();
-                    $("#nextButton").show();
-                }
-            })
+            var simplevalue = new SimpleValue(extension);
+            var serverURL  = window.location.protocol + "//" + window.location.host + "/"
+            $.ajax({
+                type  :   "POST",
+                url   :   serverURL + "constellation/api/1/data/testextension/",
+                success : localFileSuccess,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(simplevalue)
+            });
         }
     });
+
+    function localFileSuccess(data){
+        if(data.dataType!=""){
+            $("#part2 [value="+data.dataType+"]").prop("checked", true);
+            $("#nextButton").hide();
+            $("#submitButton").show();
+        } else {
+            $("#submitButton").hide();
+            $("#nextButton").show();
+        }
+    }
 
 </script>

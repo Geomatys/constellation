@@ -3,11 +3,20 @@
 
     <display-name>constellation</display-name>
 
+
+    <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <listener>
+      <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+    
     <!-- constellation installer -->
     <listener>
         <listener-class>org.constellation.Installer</listener-class>
     </listener>
-    
+
     <!-- Shiro filter handling security access -->
     <filter>
         <filter-name>Shiro</filter-name>
@@ -17,16 +26,28 @@
         <filter-name>Shiro</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <filter>
+      <description>Filter that exposes ogcServiceType and ogcServiceName to logging appender.</description>
+      <display-name>MDC Log4j filter</display-name>
+      <filter-name>MDCFilter</filter-name>
+      <filter-class>org.constellation.service.logger.MDCFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>MDCFilter</filter-name>
+      <url-pattern>/WS/*</url-pattern>
+    </filter-mapping>
+    
+  
 
     <!-- Filter to allow AJAX cross-origin requests -->
-    <!--filter>
+    <filter>
         <filter-name>CorsFilter</filter-name>
-        <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+        <filter-class>org.constellation.filter.CorsFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>CorsFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping-->
+    </filter-mapping>
 
     <!-- REST Servlet for constellation web service -->
     <servlet>
@@ -61,6 +82,18 @@
         <servlet-name>newREST</servlet-name>
         <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
+
+   <servlet>
+     <servlet-name>spring</servlet-name>
+     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+     <load-on-startup>1</load-on-startup>
+   </servlet>
+
+   <servlet-mapping>
+     <servlet-name>spring</servlet-name>
+     <url-pattern>/spring/*</url-pattern>
+   </servlet-mapping>
+
 
     <!--  SOAP enabling
 

@@ -80,6 +80,7 @@ import org.geotoolkit.util.StringUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.metadata.CSWConstants.*;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -287,11 +288,12 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                     final List<Object> records               = results.getAny();
 
                     //we looking for CSW record
-                    for (Object record: records) {
-                        if (record instanceof JAXBElement) {
-                            record = ((JAXBElement)record).getValue();
+                    for (Object recordObj: records) {
+                        if (!(recordObj instanceof Node)) {
+                            throw new CstlServiceException("object has been unmarshalled.");
                         }
 
+                        final Node record = (Node)recordObj;
                         final String metadataID = Utils.findIdentifier(record);
                         try {
                             if (!metadataWriter.isAlreadyUsedIdentifier(metadataID)) {

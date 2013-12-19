@@ -308,7 +308,7 @@ public class SOSworker extends AbstractWorker {
         // Database configuration
         try {
                 
-            final Object object = ConfigurationEngine.getConfiguration("SOS", id, "config.xml");
+            final Object object = ConfigurationEngine.getConfiguration("SOS", id);
             if (object instanceof SOSConfiguration) {
                 configuration = (SOSConfiguration) object;
             } else {
@@ -607,7 +607,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * Web service operation describing the service and its capabilities.
      *
-     * @param requestCapabilities A document specifying the section you would obtain like :
+     * @param request A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
     public Capabilities getCapabilities(final GetCapabilities request) throws CstlServiceException {
@@ -1905,7 +1905,7 @@ public class SOSworker extends AbstractWorker {
      * Web service operation which register a Sensor in the SensorML database,
      * and initialize its observation by adding an observation template in the O&M database.
      *
-     * @param requestRegSensor A request containing a SensorML File describing a Sensor,
+     * @param request A request containing a SensorML File describing a Sensor,
      *                         and an observation template for this sensor.
      */
     public InsertSensorResponse registerSensor(final InsertSensor request) throws CstlServiceException {
@@ -2044,7 +2044,8 @@ public class SOSworker extends AbstractWorker {
      * Web service operation which insert a new Observation for the specified sensor
      * in the O&M database.
      *
-     * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.
+     * @param request an InsertObservation request containing an O&M object and a Sensor id.
+     * @throws CstlServiceException
      */
     public InsertObservationResponse insertObservation(final InsertObservation request) throws CstlServiceException {
         if (profile == DISCOVERY) {

@@ -1,5 +1,7 @@
 package org.constellation.ws.rest;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.BodyPartEntity;
 import org.glassfish.jersey.media.multipart.MultiPart;
@@ -10,7 +12,10 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.CoverageMetadataBean;
@@ -21,25 +26,24 @@ import org.constellation.dto.FileListBean;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.util.MetadataMapBuilder;
+import org.constellation.model.SelectedExtension;
+import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerProvider;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
-import org.geotoolkit.coverage.io.CoverageIO;
+import org.constellation.utils.MetadataUtilities;
+import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
-import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
-import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessListener;
-import org.geotoolkit.process.metadata.MetadataProcessingRegistry;
-import org.geotoolkit.process.metadata.merge.MergeDescriptor;
-import org.geotoolkit.util.FileUtilities;
-import org.opengis.metadata.Metadata;
+import org.opengis.feature.type.Name;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.identification.TopicCategory;
@@ -55,14 +59,14 @@ import org.w3c.dom.Node;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -70,7 +74,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -93,63 +97,10 @@ public class Data {
 
     private static final Logger LOGGER = Logging.getLogger(Data.class);
 
-    /**
-     * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
-     *
-     * @param multi {@link MultiPart} with the file
-     * @return A {@link Response} with 200 code if upload work, 500 if not work.
-     */
-    @POST
-    @Path("upload")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadFile(final MultiPart multi) {
-
-
-        String dataType = "";
-        String fileName = "";
-        int extensionPoint = 0;
-        InputStream uploadedInputStream = null;
-
-        for (BodyPart bodyPart : multi.getBodyParts()) {
-
-            Map<String, String> cdParameter = bodyPart.getContentDisposition().getParameters();
-            String name = cdParameter.get("name");
-            switch (name) {
-                case "file":
-                    BodyPartEntity bpe = (BodyPartEntity) bodyPart.getEntity();
-                    uploadedInputStream = bpe.getInputStream();
-                    fileName = bodyPart.getContentDisposition().getFileName();
-                    extensionPoint = fileName.lastIndexOf('.');
-                    break;
-                case "type":
-                    dataType = bodyPart.getEntityAs(String.class);
-                    break;
-                default:
-                    LOGGER.log(Level.INFO, "property not use");
-            }
-        }
-
-
-        String dataName = fileName.substring(0, extensionPoint);
-        String uploadedFileLocation = ConfigDirectory.getDataDirectory().getAbsolutePath() + "/" + dataName;
-        String uploadedFileName = uploadedFileLocation + "/" + fileName;
-        DataInformation information;
-
-        // save it
-        try {
-            File file = writeToFile(uploadedInputStream, uploadedFileLocation, uploadedFileName);
-            information = generateMetadatasInformation(file, dataType);
-            information.setName(dataName);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Error when saving file", e);
-            return Response.status(500).entity("upload file " + uploadedFileLocation + " is not saved").build();
-        }
-
-        return Response.status(200).entity(information).build();
-    }
 
     /**
      * Give metadata CodeList (example {@link org.opengis.metadata.citation.Role} codes
+     *
      * @param pLocale locale to found right translation
      * @return a {@link javax.ws.rs.core.Response} which contain codelists
      */
@@ -206,6 +157,7 @@ public class Data {
 
     /**
      * Give subfolder list from a server file path
+     *
      * @param path server file path
      * @return a {@link javax.ws.rs.core.Response} which contain file list
      */
@@ -255,6 +207,7 @@ public class Data {
 
     /**
      * Load data from file selected
+     *
      * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
      * @return a {@link javax.ws.rs.core.Response} with a {@link org.constellation.dto.DataInformation}
      */
@@ -263,13 +216,24 @@ public class Data {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response loadData(final ParameterValues values) {
-        String filePath = values.getValues().get("filePath");
-        String dataType = values.getValues().get("dataType");
+        final String filePath = values.getValues().get("filePath");
+        final String metadataFilePath = values.getValues().get("metadataFilePath");
+        final String dataType = values.getValues().get("dataType");
 
         final File root = ConfigDirectory.getDataDirectory();
         final File choosingFile = new File(root, filePath);
+
+        File choosingMetadataFile = null;
+        if (!metadataFilePath.isEmpty()) {
+            choosingMetadataFile = new File(root.getAbsolutePath() + "/metadata/" + metadataFilePath);
+        }
+
         if (choosingFile.exists()) {
-            DataInformation information = generateMetadatasInformation(choosingFile, dataType);
+            DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, choosingMetadataFile, dataType);
+            int extensionPoint = filePath.lastIndexOf('.');
+            int lastSlash = filePath.lastIndexOf("/");
+            String dataName = filePath.substring(lastSlash + 1, extensionPoint);
+            information.setName(dataName);
             return Response.status(200).entity(information).build();
         }
         return Response.status(418).build();
@@ -287,11 +251,11 @@ public class Data {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveMetadata(final DataMetadata metadataToSave) {
         //Recover metadata
-        DefaultMetadata dm = null;
+        DefaultMetadata dm = new DefaultMetadata();
         switch (metadataToSave.getType()) {
             case "raster":
                 try {
-                    dm = getRasterMetadata(metadataToSave);
+                    dm = MetadataUtilities.getRasterMetadata(metadataToSave);
                 } catch (CoverageStoreException e) {
                     LOGGER.log(Level.WARNING, "Error when try to access to metadata from data file", e);
                 }
@@ -309,9 +273,9 @@ public class Data {
         MetadataFeeder mf = new MetadataFeeder(dm);
         mf.feed(metadataToSave);
 
+
         //Save metadata
-        final File dataFile = new File(metadataToSave.getDataPath());
-        saveMetaData(dm, dataFile.getName());
+        ConfigurationEngine.saveMetaData(dm, metadataToSave.getDataName(), CSWMarshallerPool.getInstance());
         return Response.status(200).build();
     }
 
@@ -319,23 +283,25 @@ public class Data {
     @Path("pyramid/{id}/")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response pyramidData(@PathParam("id") final String providerId, final SimpleValue path){
+    public Response pyramidData(@PathParam("id") final String providerId, final SimpleValue path) {
 
-        if(path.getValue()!=null){
+        if (path.getValue() != null) {
             final File dataFile = new File(path.getValue());
 
             // create folder to save pyramid
             File dataDirectory = ConfigDirectory.getDataDirectory();
             File pyramidFolder = new File(dataDirectory, "pyramid");
-            if(!pyramidFolder.exists()){
+            if (!pyramidFolder.exists()) {
                 pyramidFolder.mkdir();
             }
 
             final File dataPyramidFolder = new File(pyramidFolder, providerId);
             final String pyramidPath = dataPyramidFolder.getAbsolutePath();
 
+            final Subject subject = SecurityUtils.getSubject();
+
             //create listener which save information on Database
-            final ProcessListener listener = new PyramidCoverageProcessListener();
+            final ProcessListener listener = new PyramidCoverageProcessListener(subject);
 
             Runnable pyramidRunnable = new Runnable() {
                 @Override
@@ -345,7 +311,7 @@ public class Data {
                                 inputFormat("AUTO").withDeeps(new double[]{1}).
                                 fromImage(path.getValue()).toFileStore(pyramidPath).build();
                         pyramidHelper.buildPyramid(listener);
-                    } catch (MalformedURLException | DataStoreException | TransformException | FactoryException exception ) {
+                    } catch (MalformedURLException | DataStoreException | TransformException | FactoryException exception) {
                         LOGGER.log(Level.WARNING, "Error on pyramid building", exception);
                     }
                 }
@@ -357,15 +323,44 @@ public class Data {
         return Response.status(200).build();
     }
 
+
+    /**
+     * Send an ArrayList which contains coverage list from a file
+     *
+     * @param value
+     * @return an {@link java.util.ArrayList}
+     */
+    @POST
+    @Path("coverage/list/")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getCoverageList(final SimpleValue value) {
+
+        CoverageStoreProvider provider = (CoverageStoreProvider) LayerProviderProxy.getInstance().getProvider(value.getValue());
+        Set<Name> nameSet = provider.getKeys();
+
+        //Search on Metadata to found description
+        final HashMap<String, String> coveragesDescription = new HashMap<>(0);
+        for (Name name : nameSet) {
+            String exist = name.getLocalPart();
+            coveragesDescription.put(exist, exist);
+        }
+
+        //Send String Map via REST
+        ParameterValues pv = new ParameterValues(coveragesDescription);
+        return Response.ok(pv).build();
+    }
+
+
     @GET
     @Path("pyramid/{id}/folder/")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getPyramidFolder(@PathParam("id") final String providerId){
+    public Response getPyramidFolder(@PathParam("id") final String providerId) {
         // create folder to save pyramid
         File dataDirectory = ConfigDirectory.getDataDirectory();
         File pyramidFolder = new File(dataDirectory, "pyramid");
-        if(!pyramidFolder.exists()){
+        if (!pyramidFolder.exists()) {
             pyramidFolder.mkdir();
         }
         final File dataPyramidFolder = new File(pyramidFolder, providerId);
@@ -374,175 +369,83 @@ public class Data {
         return Response.ok(value).build();
     }
 
-    /**
-     * Save metadata on specific folder
-     * @param fileMetadata
-     * @param dataName
-     */
-    private void saveMetaData(final DefaultMetadata fileMetadata, final String dataName) {
-        try {
-
-            //Get metadata folder
-            final File metadataFolder = ConfigDirectory.getMetadataDirectory();
-            final Marshaller m = CSWMarshallerPool.getInstance().acquireMarshaller();
-            final File metadataFile = new File(metadataFolder, dataName + ".xml");
-            m.marshal(fileMetadata, metadataFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(m);
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "metadata not saved", ex);
-        }
+    @PUT
+    @Path("summary")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getDataSummary(final ParameterValues pv) {
+        final String namespace = pv.get("namespace");
+        final String name = pv.get("name");
+        final String providerId = pv.get("providerId");
+        final QName fullName = new QName(namespace, name);
+        final DataBrief db = ConfigurationEngine.getData(fullName, providerId);
+        return Response.ok(db).build();
     }
 
-    private DefaultMetadata getRasterMetadata(final DataMetadata metadataToSave) throws CoverageStoreException {
-
-        final File dataFile = new File(metadataToSave.getDataPath());
-        GridCoverageReader coverageReader = CoverageIO.createSimpleReader(dataFile);
-        if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
-            return (DefaultMetadata) coverageReader.getMetadata();
-        }
-        return null;
+    @GET
+    @Path("layer/summary/{providerid}/{layerAlias}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getLayerSummary(@PathParam("providerid") String providerid, @PathParam("layerAlias") String layerAlias) {
+        final DataBrief db = ConfigurationEngine.getDataLayer(layerAlias, providerid);
+        return Response.ok(db).build();
     }
 
-    /**
-     * Write file with http input stream reveived
-     *
-     * @param uploadedInputStream  stream from client
-     * @param uploadedFileLocation folder path to save file
-     * @param uploadedFileName     file name
-     * @return {@link File} saved
-     * @throws IOException
-     */
-    private File writeToFile(final InputStream uploadedInputStream,
-                             final String uploadedFileLocation, String uploadedFileName) throws IOException {
+    @GET
+    @Path("metadata/{providerId}/{dataId}/{dataType}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("dataType") String dataType) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+
+        //get reader
+        GridCoverageReader reader = null;
+        final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(providerId);
+        final LayerDetails layer = provider.get(new DefaultName(dataId));
+        final Object origin = layer.getOrigin();
+        if (origin instanceof CoverageReference) {
+            final CoverageReference fcr = (CoverageReference) origin;
+            reader = fcr.acquireReader();
+        }
+
+        //generate DataInformation
 
         if (uploadedInputStream != null) {
 
-            // create spécific directory for data
-            File folder = new File(uploadedFileLocation);
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-
-            int read;
-            byte[] bytes = new byte[4096];
-
-            File file = new File(uploadedFileName);
-            final OutputStream out = new FileOutputStream(file);
-            while ((read = uploadedInputStream.read(bytes)) != -1) {
-                out.write(bytes, 0, read);
-            }
-            out.flush();
-            out.close();
-
-            return file;
-        }
-        return null;
-    }
-
-    /**
-     * Generate {@link DataInformation} for require file data
-     *
-     * @param file     data {@link java.io.File}
-     * @param dataType
-     * @return a {@link DataInformation}
-     */
-    private DataInformation generateMetadatasInformation(final File file, final String dataType) {
+        final DefaultMetadata metadata = ConfigurationEngine.loadMetadata(providerId, CSWMarshallerPool.getInstance());
+        DataInformation information = new DataInformation();
         switch (dataType) {
-            case "raster":
-                try {
-                    return getRasterDataInformation(file, dataType);
-                } catch (CoverageStoreException e) {
-                    LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-                }
+            case "VECTOR":
+                ArrayList<SimplyMetadataTreeNode> meta = MetadataUtilities.getVectorDataInformation(metadata);
+                information.setFileMetadata(meta);
                 break;
-            case "vector":
-                try {
-                    //unzip file
-                    FileUtilities.unzip(file, file.getParentFile(), null);
-                    final FileFilter shapeFilter = new SuffixFileFilter(".shp");
-                    final File[] files = file.getParentFile().listFiles(shapeFilter);
-                    if (files.length > 0) {
-                        final ShapefileFeatureStore shapeStore = new ShapefileFeatureStore(files[0].toURL());
-                        final String crsName = shapeStore.getFeatureType().getCoordinateReferenceSystem().getName().toString();
-                        final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), file.getParent(),
-                                dataType, crsName);
-                        return information;
-                    }
-
-                    //create feature store
-                } catch (MalformedURLException e) {
-                    LOGGER.log(Level.WARNING, "error on file URL", e);
-                } catch (DataStoreException e) {
-                    LOGGER.log(Level.WARNING, "error on data store creation", e);
-                } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "error on un zip", e);
-                }
+            case "COVERAGE":
+                information = MetadataUtilities.getRasterDataInformation(reader, metadata, dataType);
                 break;
+            default:
+                LOGGER.log(Level.INFO, "Type unknown to found metadata");
         }
-        return null;
+
+        information.setName(dataId);
+        return Response.ok(information).build();
     }
 
-    private DataInformation getRasterDataInformation(final File file, final String dataType) throws CoverageStoreException {
-        GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
-        if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
+    @POST
+    @Path("testextension")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public SelectedExtension testExtension(final SimpleValue extension) {
+        final Map<String, String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension();
+        final String type = extensions.get(extension.getValue().toLowerCase());
+        final SelectedExtension validate = new SelectedExtension();
+        validate.setExtension(extension.getValue());
 
-            // get Metadata as a List
-            final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
-            //merge from template
-            //mergeTemplate(fileMetadata);
-
-            final TreeTable.Node rootNode = fileMetadata.asTreeTable().getRoot();
-
-            MetadataMapBuilder.setCounter(0);
-            final ArrayList<SimplyMetadataTreeNode> metadataList = MetadataMapBuilder.createMetadataList(rootNode, null, 11);
-
-            final DataInformation information = new DataInformation(file.getPath(), dataType, metadataList);
-
-            //coverage data
-            final HashMap<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
-            for (int i = 0; i < coverageReader.getCoverageNames().size(); i++) {
-                final GenericName name = coverageReader.getCoverageNames().get(i);
-                final SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
-                final String rootNodeName = sm.getNativeMetadataFormatName();
-                final Node coverateRootNode = sm.getAsTree(rootNodeName);
-
-                MetadataMapBuilder.setCounter(0);
-                final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11, i);
-
-                final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
-                nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
-            }
-            information.setCoveragesMetadata(nameSpatialMetadataMap);
-            return information;
+        if (type != null) {
+            validate.setDataType(type);
         } else {
-            return new DataInformation();
+            validate.setDataType("");
         }
+        return validate;
     }
-
-    /**
-     * Merge file metadata with defined template from user
-     *
-     * @param fileMetadata
-     */
-    private Metadata mergeTemplate(final DefaultMetadata fileMetadata) throws JAXBException, NoSuchIdentifierException, ProcessException {
-        // unmarshall metadataFile Template
-        final Unmarshaller xmlReader = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-        final File aFile = new File(ConfigDirectory.getConfigDirectory(), "template.xml");
-        final DefaultMetadata templateMetadata = (DefaultMetadata) xmlReader.unmarshal(aFile);
-
-        // call Merge Process
-        DefaultMetadata resultMetadata = new DefaultMetadata();
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(MetadataProcessingRegistry.NAME, MergeDescriptor.NAME);
-        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-        final ParameterValueGroup output = desc.getOutputDescriptor().createValue();
-        inputs.parameter(MergeDescriptor.FIRST_IN_NAME).setValue(fileMetadata);
-        inputs.parameter(MergeDescriptor.SECOND_IN_NAME).setValue(templateMetadata);
-        output.parameter(MergeDescriptor.RESULT_OUT_NAME).setValue(resultMetadata);
-        final org.geotoolkit.process.Process mergeProcess = desc.createProcess(inputs);
-        mergeProcess.call();
-        return resultMetadata;
-    }
-
 }
 
 

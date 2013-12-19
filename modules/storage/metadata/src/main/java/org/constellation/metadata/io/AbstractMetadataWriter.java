@@ -18,10 +18,12 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.sis.util.logging.Logging;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -46,7 +48,7 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
     /**
      * Build a new metadata writer.
      * 
-     * @param MDReader an MDWeb database reader.
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     public AbstractMetadataWriter() throws MetadataIoException {
     }
@@ -56,14 +58,16 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
      * 
      * @param obj The object to store in the dataSource.
      * @return true if the storage succeed, false else.
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     @Override
-    public abstract boolean storeMetadata(final Object obj) throws MetadataIoException;
+    public abstract boolean storeMetadata(final Node obj) throws MetadataIoException;
 
     /**
      * Delete an object in the metadata database.
      * @param metadataID The identifier of the metadata to delete.
      * @return true if the delete succeed, false else.
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     @Override
     public abstract boolean deleteMetadata(final String metadataID) throws MetadataIoException;
@@ -74,18 +78,33 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
      *
      * @param metadataID The identifier of the metadata to Replace.
      * @param any The object to replace the matching metadata.
+     * @return true if the replacing succeed.
+     * 
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     @Override
-    public abstract boolean replaceMetadata(final String metadataID, final Object any) throws MetadataIoException;
+    public abstract boolean replaceMetadata(final String metadataID, final Node any) throws MetadataIoException;
 
     /**
-     * Return true if the Writer supports the delete mecanism.
+     * Update an object in the metadata database.
+     *
+     * @param metadataID The identifier of the metadata to Replace.
+     * @param properties A List of property-value to replace in the specified metadata.
+     * @return true if the update succeed.
+     * 
+     * @throws org.constellation.metadata.io.MetadataIoException
+     */
+    @Override
+    public abstract boolean updateMetadata(final String metadataID, final Map<String , Object> properties) throws MetadataIoException;
+    
+    /**
+     * @return true if the Writer supports the delete mecanism.
      */
     @Override
     public abstract boolean deleteSupported();
 
     /**
-     * Return true if the Writer supports the update mecanism.
+     * @return true if the Writer supports the update mecanism.
      */
     @Override
     public abstract boolean updateSupported();
@@ -97,8 +116,9 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
     public abstract void destroy();
 
     /**
-     * @param LogLevel the LogLevel to set
+     * @param logLevel the LogLevel to set
      */
+    @Override
     public void setLogLevel(final Level logLevel) {
         this.logLevel = logLevel;
     }

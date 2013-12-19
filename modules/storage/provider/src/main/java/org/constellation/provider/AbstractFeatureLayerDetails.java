@@ -47,9 +47,12 @@ import org.geotoolkit.style.MutableStyle;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -159,19 +162,28 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
                 Filter filter = null;
                 for (String key : extras.keySet()) {
                     if (key.equalsIgnoreCase("cql_filter")) {
-                        final String cqlFilter = ((List)extras.get(key)).get(0).toString();
-                        if (cqlFilter != null){
+                        final String cqlFilter = ((List) extras.get(key)).get(0).toString();
+                        if (cqlFilter != null) {
                             filter = buildCQLFilter(cqlFilter, filter);
                         }
-                    } else if (key.startsWith("dim_") || key.startsWith("DIM_")){
-                        final String dimValue = ((List)extras.get(key)).get(0).toString();
-                        final String dimName  = key.substring(4);
+                    } else if (key.startsWith("dim_") || key.startsWith("DIM_")) {
+                        final String dimValue = ((List) extras.get(key)).get(0).toString();
+                        final String dimName = key.substring(4);
                         filter = buildDimFilter(dimName, dimValue, filter);
                     }
                 }
                 if (filter != null) {
                     final FeatureMapLayer fml = (FeatureMapLayer) layer;
-                    fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filter));
+                    final FeatureType type = fml.getCollection().getFeatureType();
+                    if (filter instanceof PropertyIsEqualTo) {
+                        final String propName = ((PropertyName)((PropertyIsEqualTo)filter).getExpression1()).getPropertyName();
+                        for (PropertyDescriptor desc : type.getDescriptors()) {
+                            if (desc.getName().getLocalPart().equalsIgnoreCase(propName)) {
+                                fml.setQuery(QueryBuilder.filtered(type.getName(), filter));
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }

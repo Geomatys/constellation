@@ -122,7 +122,7 @@ public class Source {
      */
     public List<Layer> getInclude() {
         if (include == null) {
-            include = new LayerList();
+            include = new LayerList(new ArrayList<Layer>());
             return include.getLayer();
         } else {
             return include.getLayer();
@@ -141,7 +141,7 @@ public class Source {
      */
     public List<Layer> getExclude() {
         if (exclude == null) {
-            exclude = new LayerList();
+            exclude = new LayerList(new ArrayList<Layer>());
             return exclude.getLayer();
         } else {
             return exclude.getLayer();
@@ -210,7 +210,7 @@ public class Source {
      * @return
      */
     public List<Layer> allIncludedLayer(final QName name) {
-        final List<Layer> layers = new ArrayList<Layer>();
+        final List<Layer> layers = new ArrayList<>();
         for (Layer layer : getInclude()) {
             final QName layerName = layer.getName();
             /*
@@ -242,7 +242,7 @@ public class Source {
     public String toString() {
         final StringBuilder sb = new StringBuilder("Source ");
         sb.append(" id=").append(id);
-        sb.append(" LoadAll=").append(loadAll);
+        sb.append(" LoadAll=").append(loadAll).append('\n');
         if (include != null) {
             sb.append("include:\n").append(include);
         }

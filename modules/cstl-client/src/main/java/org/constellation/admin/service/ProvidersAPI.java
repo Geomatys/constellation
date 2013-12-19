@@ -17,6 +17,10 @@
 
 package org.constellation.admin.service;
 
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
@@ -29,8 +33,11 @@ import org.constellation.dto.StyleListBean;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
@@ -98,7 +105,7 @@ public final class ProvidersAPI {
         ensureNonNull("styleName", styleName);
 
         final String path = "SP/" + providerId + "/style/" + styleName;
-        client.delete(path, MediaType.APPLICATION_XML_TYPE).ensure2xxStatus();
+        client.delete(path, MediaType.APPLICATION_XML_TYPE, new MultivaluedMapImpl()).ensure2xxStatus();
     }
 
     /**
@@ -176,11 +183,11 @@ public final class ProvidersAPI {
         return list.getList();
     }
 
-    public DataInformation loadData(final String filePath, final String name, final String dataType) throws IOException {
+    public DataInformation loadData(final String filePath, final String metadataFilePath, final String dataType) throws IOException {
         ParameterValues pv = new ParameterValues();
         HashMap<String, String> parameters = new HashMap<>(0);
         parameters.put("filePath", filePath);
-        parameters.put("name", name);
+        parameters.put("metadataFilePath", metadataFilePath);
         parameters.put("dataType", dataType);
         pv.setValues(parameters);
 
@@ -227,5 +234,35 @@ public final class ProvidersAPI {
     public String getPyramidPath(final String providerName) throws IOException {
         SimpleValue sentValue = client.get("data/pyramid/"+providerName+"/folder", MediaType.APPLICATION_XML_TYPE).getEntity(SimpleValue.class);
         return sentValue.getValue();
+    }
+
+    public ParameterValues getCoverageList(final String providerId) throws IOException {
+        SimpleValue value = new SimpleValue(providerId);
+        ParameterValues coverageList = client.post("data/coverage/list/", MediaType.APPLICATION_XML_TYPE, value).getEntity(ParameterValues.class);
+        return coverageList;
+    }
+
+    /**
+     *
+     * @param values
+     */
+    public void saveCRSModification(final ParameterValues values) throws IOException {
+       client.post("crs/update", MediaType.APPLICATION_XML_TYPE, values);
+    }
+
+    public DataBrief getDataSummary(final String name, final String namespace, final String providerId) throws IOException {
+        final HashMap<String, String> values = new HashMap<>(0);
+        values.put("namespace", namespace);
+        values.put("name", name);
+        values.put("providerId", providerId);
+        return client.put("data/summary/", MediaType.APPLICATION_XML_TYPE, new ParameterValues(values)).getEntity(DataBrief.class);
+    }
+
+    public DataBrief getLayerSummary(final String layerAlias, final String providerId) throws IOException {
+        return client.get("data/layer/summary/"+providerId+"/"+layerAlias, MediaType.APPLICATION_XML_TYPE).getEntity(DataBrief.class);
+    }
+
+    public DataInformation getMetadata(final String providerId, final String dataId, final String dataType) throws IOException {
+        return client.get("data/metadata/"+providerId+"/"+dataId+"/"+dataType, MediaType.APPLICATION_XML_TYPE).getEntity(DataInformation.class);
     }
 }

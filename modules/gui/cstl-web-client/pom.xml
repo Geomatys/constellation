@@ -18,33 +18,29 @@
     <name>Constellation web client</name>
 
     <properties>
-        <slf4j.version>1.6.4</slf4j.version>
         <version.spring>3.2.4.RELEASE</version.spring>
+        <conf>dev</conf>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <!-- <version>${slf4j.version}</version> -->
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <!-- <version>1.2.17</version> -->
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -87,11 +83,26 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>data</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
 
+        <dependency>
+          <groupId>org.juzu</groupId>
+          <artifactId>juzu-bom-core</artifactId>
+          <exclusions>
+            <exclusion>
+              <artifactId>slf4j-simple</artifactId>
+              <groupId>org.slf4j</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
     </dependencies>
 
     <build>
@@ -99,7 +110,15 @@
 
         <filters>
             <filter>src/main/filter/default.properties</filter>
+            <filter>src/main/filter/${conf}.properties</filter>
         </filters>
+        
+        <resources>
+         <resource>
+          <directory>src/main/resources</directory>
+          <filtering>true</filtering>
+         </resource>
+        </resources>
 
         <plugins>
             <plugin>
@@ -135,10 +154,7 @@
                             <finalName>${project.build.finalName}</finalName>
                             <descriptorRefs>
                                 <descriptorRef>tomcat</descriptorRef>
-                            </descriptorRefs>
-                            <filters>
-                                <filter>src/main/filter/default.properties</filter>
-                            </filters>
+                            </descriptorRefs>                         
                         </configuration>
                     </execution>
                 </executions>

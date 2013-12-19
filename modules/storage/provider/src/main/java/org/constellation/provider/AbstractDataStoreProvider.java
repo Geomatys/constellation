@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.dao.DataRecord.DataType;
 
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
@@ -32,7 +33,6 @@ import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
-import org.geotoolkit.data.AbstractFeatureStore;
 import org.geotoolkit.data.AbstractFeatureStoreFactory;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
@@ -48,7 +48,7 @@ import org.opengis.parameter.ParameterValue;
 public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
 
 
-    private final Set<Name> index = new LinkedHashSet<Name>();
+    private final Set<Name> index = new LinkedHashSet<>();
     private ExtendedFeatureStore store;
 
     public AbstractDataStoreProvider(final ProviderService service,
@@ -139,21 +139,20 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         final ParameterValueGroup source = getSource();
 
         FeatureStore candidate = createBaseFeatureStore();
-        String namespace = null;
-        ParameterValue paramns = candidate.getConfiguration().parameter(AbstractFeatureStoreFactory.NAMESPACE.getName().getCode());
-        if(paramns == null || paramns.getValue() == null){
-            namespace = null;
-        }else if("no namespace".equalsIgnoreCase(String.valueOf(paramns.getValue()))){
-            namespace = null;
-        }else{
-            namespace = paramns.stringValue();
-        }
-
         if (candidate == null) {
             //final StringBuilder sb = new StringBuilder("Could not create featurestore : "+this.getClass().getSimpleName()+" id="+getId());
 
             //use an empty datastore
             candidate = new MemoryFeatureStore();
+        }
+        final String namespace;
+        ParameterValue paramns = candidate.getConfiguration().parameter(AbstractFeatureStoreFactory.NAMESPACE.getName().getCode());
+        if (paramns == null || paramns.getValue() == null) {
+            namespace = null;
+        } else if("no namespace".equalsIgnoreCase(String.valueOf(paramns.getValue()))){
+            namespace = null;
+        } else {
+            namespace = paramns.stringValue();
         }
         store = new ExtendedFeatureStore(candidate);
 
@@ -200,4 +199,11 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
             getLogger().log(Level.INFO, "Unable to remove "+ key.toString() +" from provider.", ex);
         }
     }
+
+    @Override
+    public DataType getDataType() {
+        return DataType.VECTOR;
+    }
+
+
 }

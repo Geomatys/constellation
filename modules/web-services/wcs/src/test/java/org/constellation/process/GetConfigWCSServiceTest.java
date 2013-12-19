@@ -28,5 +28,4 @@ public class GetConfigWCSServiceTest extends GetConfigMapServiceTest {
     public GetConfigWCSServiceTest() {
         super("WCS", DefaultWCSWorker.class);
     }
-
 }

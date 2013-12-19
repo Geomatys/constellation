@@ -24,7 +24,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.swing.JServicesPane;
-import org.geotoolkit.gui.swing.misc.ActionCell;
+import org.geotoolkit.gui.swing.util.ActionCell;
 
 /**
  *

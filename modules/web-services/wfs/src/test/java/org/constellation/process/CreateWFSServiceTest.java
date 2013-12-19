@@ -27,5 +27,4 @@ public class CreateWFSServiceTest extends CreateMapServiceTest {
     public CreateWFSServiceTest() {
         super("WFS", org.constellation.wfs.ws.DefaultWFSWorker.class);
     }
-
 }

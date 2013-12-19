@@ -19,6 +19,7 @@ package org.constellation.metadata.io;
 
 import java.util.Map;
 import java.util.logging.Level;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -31,18 +32,23 @@ public interface MetadataWriter {
      * 
      * @param obj The object to store in the datasource.
      * @return true if the storage succeed, false else.
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
-    boolean storeMetadata(final Object obj) throws MetadataIoException;
+    boolean storeMetadata(final Node obj) throws MetadataIoException;
 
     /**
      * Delete an object in the metadata database.
      * @param metadataID The identifier of the metadata to delete.
      * @return true if the delete succeed, false else.
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     boolean deleteMetadata(final String metadataID) throws MetadataIoException;
 
     /**
      * Return true if the specified id is already used in the database.
+     * @param metadataID
+     * @return
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     boolean isAlreadyUsedIdentifier(final String metadataID) throws MetadataIoException;
 
@@ -51,16 +57,20 @@ public interface MetadataWriter {
      *
      * @param metadataID The identifier of the metadata to Replace.
      * @param any The object to replace the matching metadata.
+     * @return
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
-     boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException;
+     boolean replaceMetadata(String metadataID, Node any) throws MetadataIoException;
 
     /**
      * Return true if the Writer supports the delete mecanism.
+     * @return
      */
     boolean deleteSupported();
 
     /**
      * Return true if the Writer supports the update mecanism.
+     * @return
      */
     boolean updateSupported();
 
@@ -74,6 +84,8 @@ public interface MetadataWriter {
      *
      * @param metadataID The identifier of the metadata to Replace.
      * @param properties A List of property-value to replace in the specified metadata.
+     * @return
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     boolean updateMetadata(String metadataID, Map<String, Object> properties) throws MetadataIoException;
 

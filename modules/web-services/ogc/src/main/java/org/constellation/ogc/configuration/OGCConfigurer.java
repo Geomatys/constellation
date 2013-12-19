@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.bind.JAXBException;
 import org.constellation.admin.ConfigurationEngine;
 
 /**
@@ -85,7 +86,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(configuration);
         inputs.parameter(CreateServiceDescriptor.SERVICE_METADATA_NAME).setValue(metadata);
         inputs.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
-        inputs.parameter(CreateServiceDescriptor.FILENAME_NAME).setValue(configFileName);
         try {
             desc.createProcess(inputs).call();
         } catch (ProcessException ex) {
@@ -215,7 +215,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(configuration);
         inputs.parameter(SetConfigServiceDescriptor.SERVICE_METADATA_NAME).setValue(metadata);
         inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
-        inputs.parameter(SetConfigServiceDescriptor.FILENAME_NAME).setValue(configFileName);
         try {
             desc.createProcess(inputs).call();
         } catch (ProcessException ex) {
@@ -241,7 +240,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         inputs.parameter(GetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
         inputs.parameter(GetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
         inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
-        inputs.parameter(GetConfigServiceDescriptor.FILENAME_NAME).setValue(configFileName);
         try {
             final ParameterValueGroup outputs = desc.createProcess(inputs).call();
             return outputs.parameter(GetConfigServiceDescriptor.CONFIG_NAME).getValue();
@@ -276,8 +274,8 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         this.ensureExistingInstance(identifier);
         try {
             // todo add language parameter
-            return ConfigurationEngine.readMetadata(identifier, specification.name(), null);
-        } catch (IOException ex) {
+            return ConfigurationEngine.readServiceMetadata(identifier, specification.name(), null);
+        } catch (JAXBException | IOException ex) {
             throw new ConfigurationException("The serviceMetadata.xml file can't be read.", ex);
         }
     }
@@ -310,7 +308,9 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         } catch (ConfigurationException ignore) {
             // Do nothing.
         }
+        instance.setIdentifier(identifier);
         if (metadata != null) {
+            instance.setName(metadata.getName());
             instance.set_abstract(metadata.getDescription());
             instance.setVersions(metadata.getVersions());
         } else {
@@ -386,6 +386,21 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
             return ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, name);
         } catch (NoSuchIdentifierException ex) { // unexpected
             throw new IllegalStateException("Unexpected error has occurred", ex);
+        }
+    }
+
+    /**
+     * Ensure that a service instance really exists.
+     *
+     * @param identifier the service identifier
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     */
+    protected void ensureExistingInstance(final String identifier) throws TargetNotFoundException {
+        if (!WSEngine.serviceInstanceExist(specification.name(), identifier)) {
+            if (!ConfigurationEngine.serviceConfigurationExist(specification.name(), identifier)) {
+                throw new TargetNotFoundException(specification + " service instance with identifier \"" + identifier +
+                        "\" not found. There is not configuration in the database.");
+            }
         }
     }
 }

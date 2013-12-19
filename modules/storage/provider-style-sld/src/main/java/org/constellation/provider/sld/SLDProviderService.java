@@ -43,6 +43,10 @@ import static org.geotoolkit.parameter.Parameters.*;
 public class SLDProviderService extends AbstractProviderService
         <String,MutableStyle,StyleProvider> implements StyleProviderService {
 
+    /**
+     * Service name
+     */
+    private static final String NAME = "sld";
     private static final String ERROR_MSG = "[PROVIDER]> Invalid SLD provider config";
 
     public static final ParameterDescriptor<String> FOLDER_DESCRIPTOR =
@@ -67,7 +71,7 @@ public class SLDProviderService extends AbstractProviderService
     }
 
     public SLDProviderService(){
-        super("sld");
+        super(NAME);
     }
 
     @Override

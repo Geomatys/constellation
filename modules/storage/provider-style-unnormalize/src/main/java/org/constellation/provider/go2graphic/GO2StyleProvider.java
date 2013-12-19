@@ -40,7 +40,7 @@ import org.opengis.style.Symbolizer;
  */
 public class GO2StyleProvider extends AbstractStyleProvider{
     
-    private final Map<String,MutableStyle> index = new HashMap<String,MutableStyle>();
+    private final Map<String,MutableStyle> index = new HashMap<>();
     
     
     protected GO2StyleProvider(final GO2StyleProviderService service,ParameterValueGroup desc){
@@ -60,7 +60,7 @@ public class GO2StyleProvider extends AbstractStyleProvider{
      * {@inheritDoc }
      */
     @Override
-    public MutableStyle get(String key) {
+    public MutableStyle get(final String key) {
         return index.get(key);
     }
 

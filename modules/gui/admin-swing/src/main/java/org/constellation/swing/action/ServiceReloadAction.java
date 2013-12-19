@@ -74,7 +74,7 @@ public class ServiceReloadAction extends Action {
         if(target instanceof Map.Entry){
             final Instance inst = (Instance) ((Map.Entry)target).getKey();
             final String type = (String) ((Map.Entry)target).getValue();
-             server.services.restartInstance(type, inst.getName());
+             server.services.restartInstance(type, inst.getIdentifier());
              SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {

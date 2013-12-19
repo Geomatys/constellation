@@ -34,6 +34,7 @@ import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 
+import org.geotoolkit.coverage.DefaultCoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -88,7 +89,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
      * @param elevationModel The elevation model to apply.
      * @param name           The name of the layer.
      */
-    CoverageSQLLayerDetails(final LayerCoverageReader reader, final List<String> favorites, 
+    CoverageSQLLayerDetails(final LayerCoverageReader reader, final List<String> favorites,
             final Name elevationModel, final Name name) {
         super(name,favorites);
 
@@ -147,7 +148,8 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
                             //a dim range is define, it replace any given style.
                             final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
                             style = STYLE_FACTORY.style(symbol);
-                            return MapBuilder.createCoverageLayer(reader, 0, style, getName().getLocalPart());
+                            final DefaultCoverageReference reference = new DefaultCoverageReference(reader, getName());
+                            return MapBuilder.createCoverageLayer(reference, style);
                         }
                         break;
                     }
@@ -169,7 +171,8 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
         }
 
         final String title = getName().getLocalPart();
-        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, 0, style, title);
+        final DefaultCoverageReference reference = new DefaultCoverageReference(reader, getName());
+        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reference, style);
         mapLayer.setDescription(STYLE_FACTORY.description(title,title));
 
         //search if we need an elevationmodel for style

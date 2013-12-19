@@ -44,6 +44,7 @@
         </developer>
     </developers>
     <dependencies>
+        <!--CONSTELLATION  -->
         <dependency>
             <groupId>org.constellation.xml-bindings</groupId>
             <artifactId>cstl-xml-configuration</artifactId>
@@ -75,6 +76,13 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-data-coveragestore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Geomatys external project -->
+        <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-shapefile</artifactId>
         </dependency>
@@ -86,11 +94,7 @@
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-processing-metadata</artifactId>
         </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
+        
 
 
 
@@ -102,12 +106,21 @@
 
         <!-- External dependencies -->
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>14.0</version>
         </dependency>
     </dependencies>
 </project>

@@ -10,13 +10,16 @@
                 <span class="icon-bar"></span>
             </button>
             <div class="nav-collapse collapse">
+                <a href="@{index()}" class="brand" style="padding-bottom: 5px; padding-top: 5px">
+                    <img id="brand" src="image/constellation-menu.png" style="height: 33px;" alt="constellation-logo"/>
+                </a>
                 <ul class="nav">
                     <li><a href="@{index()}">&{menu.homepage.label}</a></li>
                     <li><a href="@{webservices()}">&{menu.webservices.label}</a></li>
                     <li><a href="@{dataDashboard()}">&{menu.data.label}</a></li>
                     <li><a href="@{StyleController.dashboard()}">&{menu.style.label}</a></li>
                     <li><a href="#">&{menu.mapcontext.label}</a></li>
-                    <li><a href="#">&{menu.geoviewer.label}</a></li>
+                    <li><a href="@{GeoviewerController.geoviewer()}">&{menu.geoviewer.label}</a></li>
                     <li><a href="@{AdministrationController.getAdministration()}">&{menu.administration.label}</a></li>
                 </ul>
             </div>
@@ -59,6 +62,9 @@
      data-success-service-stop="&{growl.success.service.stop}"></div>
 
 <!-- main page part -->
-<div class="container" style="margin-top:40px;">
+<div class="container" style="padding-top:40px;box-sizing: border-box">
     #{insert/}
 </div>
+<script>
+    $("#brand").attr("src", CSTL.URL_CONSTELLATION_PICTURE_MENU);
+</script>

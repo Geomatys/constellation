@@ -41,19 +41,21 @@ public abstract class StartServiceTest extends ServiceProcessTest {
     public void testStart() throws NoSuchIdentifierException, ProcessException {
 
         createInstance("startInstance1");
-        final int initSize = WSEngine.getInstanceSize(serviceName);
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
+        try {
+            final int initSize = WSEngine.getInstanceSize(serviceName);
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
 
-        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue("startInstance1");
-        org.geotoolkit.process.Process proc = desc.createProcess(in);
-        proc.call();
+            final ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+            in.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue("startInstance1");
+            org.geotoolkit.process.Process proc = desc.createProcess(in);
+            proc.call();
 
-        assertTrue(WSEngine.getInstanceSize(serviceName) == initSize+1);
-        assertTrue(WSEngine.serviceInstanceExist(serviceName, "startInstance1"));
-
-        deleteInstance("startInstance1");
+            assertTrue(WSEngine.getInstanceSize(serviceName) == initSize+1);
+            assertTrue(WSEngine.serviceInstanceExist(serviceName, "startInstance1"));
+        } finally {
+            deleteInstance("startInstance1");
+        }
     }
 
     @Test

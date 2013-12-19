@@ -72,11 +72,10 @@ public final class ConfigDirectory {
         if (propertiesFile.exists()) {
             try {
                 Properties prop = FileUtilities.getPropertiesFromFile(propertiesFile);
-                CSTL_PROPERTIES = prop;
 
-                USER_DIRECTORY = prop.getProperty("configuration_directory");
-                DATA_DIRECTORY = prop.getProperty("data_directory");
-                METADATA_DIRECTORY=prop.getProperty("metadata_directory");
+                USER_DIRECTORY    = prop.getProperty("configuration_directory");
+                DATA_DIRECTORY    = prop.getProperty("data_directory");
+                METADATA_DIRECTORY= prop.getProperty("metadata_directory");
             } catch (IOException ex) {
                 LOGGER.warning("IOException while reading the constellation properties file");
             }
@@ -90,7 +89,7 @@ public final class ConfigDirectory {
     public static String USER_DIRECTORY = null;
     public static String DATA_DIRECTORY = null;
     public static String METADATA_DIRECTORY = null;
-    public static Properties CSTL_PROPERTIES = null;
+    public static String STYLE_DIRECTORY = null;
     /**
      * Specifies if the process is running on a Glassfish application server.
      */
@@ -156,12 +155,38 @@ public final class ConfigDirectory {
             }
         } else {
             constellationMetadataFolder = new File(System.getProperty("user.home") + "/.constellation-data", "metadata");
-            if (!constellationMetadataFolder.exists()) {
-                constellationMetadataFolder.mkdir();
+            if (constellationMetadataFolder.mkdir()){
+                LOGGER.log(Level.INFO, "metadata folder created");
             }
         }
 
         return constellationMetadataFolder;
+    }
+
+    /**
+     * Give Metadata directory {@link java.io.File} defined on constellaiton.properties or
+     * by default on .constellation-data/metadata from user home directory
+     *
+     * @return metadata directory as {@link java.io.File}
+     */
+    public static File getStyleDirectory() {
+        final File constellationStyleFolder;
+
+        if (STYLE_DIRECTORY != null && !STYLE_DIRECTORY.isEmpty()) {
+            constellationStyleFolder = new File(STYLE_DIRECTORY);
+            if (!constellationStyleFolder.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", STYLE_DIRECTORY);
+            } else if (!constellationStyleFolder.isDirectory()) {
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", STYLE_DIRECTORY);
+            }
+        } else {
+            constellationStyleFolder = new File(System.getProperty("user.home") + "/.constellation-data", "style");
+            if(constellationStyleFolder.mkdirs()){
+                LOGGER.log(Level.INFO, "style folder created");
+            }
+        }
+
+        return constellationStyleFolder;
     }
 
     /**
@@ -237,6 +262,35 @@ public final class ConfigDirectory {
                 pathValue = USER_DIRECTORY;
             }
             prop.put("configuration_directory", pathValue);
+            FileUtilities.storeProperties(prop, propertiesFile);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "IOException while writing the constellation properties file", ex);
+        }
+
+    }
+
+    public static void setDataDirectory(final File directory) {
+        DATA_DIRECTORY = null;
+        if (directory != null && directory.isDirectory()) {
+            if (!directory.getPath().equals(getConstellationDirectory().getPath())) {
+                DATA_DIRECTORY = directory.getPath();
+            }
+        }
+        //store the configuration properties file
+        final File webInfDirectory = getWebInfDiretory();
+        final File propertiesFile = new File(webInfDirectory, "constellation.properties");
+        try {
+            if (!propertiesFile.exists()) {
+                propertiesFile.createNewFile();
+            }
+            final Properties prop = new Properties();
+            final String pathValue;
+            if (DATA_DIRECTORY == null) {
+                pathValue = "";
+            } else {
+                pathValue = DATA_DIRECTORY;
+            }
+            prop.put("data_directory", pathValue);
             FileUtilities.storeProperties(prop, propertiesFile);
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, "IOException while writing the constellation properties file", ex);

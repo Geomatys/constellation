@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.constellation.admin.dao.DataRecord.DataType;
 
 /**
  *
@@ -41,11 +42,11 @@ public class MockLayerProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
     public static final ParameterDescriptor<String> LAYERS =
-             new DefaultParameterDescriptor<String>("layers","", String.class, null, false);
+             new DefaultParameterDescriptor<>("layers","", String.class, null, false);
     public static final ParameterDescriptor<Boolean> CRASH_CREATE =
-             new DefaultParameterDescriptor<Boolean>("crashOnCreate","", Boolean.class, false, false);
+             new DefaultParameterDescriptor<>("crashOnCreate","", Boolean.class, false, false);
     public static final ParameterDescriptor<Boolean> CRASH_DISPOSE =
-             new DefaultParameterDescriptor<Boolean>("crashOnDispose","", Boolean.class, false, false);
+             new DefaultParameterDescriptor<>("crashOnDispose","", Boolean.class, false, false);
     public static final ParameterDescriptorGroup PARAMETERS_DESCRIPTOR =
             new DefaultParameterDescriptorGroup("MockParameters",LAYERS,CRASH_CREATE,CRASH_DISPOSE);
     private static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
@@ -99,7 +100,7 @@ public class MockLayerProviderService extends AbstractProviderService
             }
 
             final String[] str = ctr.split(",");
-            final Set<Name> names = new HashSet<Name>();
+            final Set<Name> names = new HashSet<>();
             for(final String st : str){
                 names.add(DefaultName.valueOf(st));
             }
@@ -129,6 +130,11 @@ public class MockLayerProviderService extends AbstractProviderService
             if(Boolean.TRUE.equals(Parameters.value(CRASH_DISPOSE, getSource()))){
                 throw new RuntimeException("Some error while dispose.");
             }
+        }
+
+        @Override
+        public DataType getDataType() {
+            throw new UnsupportedOperationException("Not supported.");
         }
     }
 }

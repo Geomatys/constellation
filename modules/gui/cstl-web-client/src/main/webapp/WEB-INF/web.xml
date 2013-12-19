@@ -22,16 +22,6 @@
     </context-param>
 
     <servlet>
-        <servlet-name>AssetServlet</servlet-name>
-        <servlet-class>juzu.impl.asset.AssetServlet</servlet-class>
-        <load-on-startup>0</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AssetServlet</servlet-name>
-        <url-pattern>/assets/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
         <servlet-name>Overview Servlet</servlet-name>
         <servlet-class>org.constellation.gui.servlet.OverviewServlet</servlet-class>
         <load-on-startup>0</load-on-startup>
@@ -40,23 +30,6 @@
         <servlet-name>Overview Servlet</servlet-name>
         <url-pattern>/overview/*</url-pattern>
     </servlet-mapping>
-
-    <servlet>
-        <servlet-name>Spring</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <init-param>
-            <param-name>contextConfigLocation</param-name>
-            <param-value>classpath:/spring/spring-mvc.xml
-            </param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Spring</servlet-name>
-        <url-pattern>/ajax/*</url-pattern>
-    </servlet-mapping>
-
-
     <session-config>
         <session-timeout>10</session-timeout>
     </session-config>
@@ -64,11 +37,6 @@
     <listener>
         <listener-class>
             org.springframework.web.context.ContextLoaderListener
-        </listener-class>
-    </listener>
-    <listener>
-        <listener-class>
-            org.springframework.web.context.request.RequestContextListener
         </listener-class>
     </listener>
 </web-app>

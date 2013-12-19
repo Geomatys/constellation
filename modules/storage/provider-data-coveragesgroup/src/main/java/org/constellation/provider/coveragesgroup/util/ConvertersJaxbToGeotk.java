@@ -32,6 +32,7 @@ import org.geotoolkit.coverage.AbstractCoverageReference;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
+import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.io.GridCoverageWriter;
 import org.apache.sis.storage.DataStoreException;
@@ -114,7 +115,7 @@ public final class ConvertersJaxbToGeotk {
             return layer;
 
         } else if (obj instanceof CoverageReference) {
-            final CoverageMapLayer layer = MapBuilder.createCoverageLayer((CoverageReference) obj, style, "");
+            final CoverageMapLayer layer = MapBuilder.createCoverageLayer((CoverageReference) obj, style);
             layer.setOpacity(opacity);
             return layer;
         }
@@ -442,37 +443,28 @@ public final class ConvertersJaxbToGeotk {
      */
     private static class CoverageReferenceWrapper extends AbstractCoverageReference {
 
-        private CoverageReference reference;
-        private String name;
+        private final CoverageReference reference;
+        private final String name;
 
         public CoverageReferenceWrapper(final String name, final CoverageReference ref) {
+            super(ref.getStore(), new DefaultName(null, name));
             this.name = name;
             this.reference = ref;
         }
 
         @Override
-        public Name getName() {
-            return new DefaultName(null, name);
+        public GridCoverageReader acquireReader() throws CoverageStoreException {
+            return reference.acquireReader();
         }
 
         @Override
-        public CoverageStore getStore() {
-            return reference.getStore();
-        }
-
-        @Override
-        public GridCoverageReader createReader() throws DataStoreException {
-            return reference.createReader();
+        public GridCoverageWriter acquireWriter() throws CoverageStoreException {
+            return reference.acquireWriter();
         }
 
         @Override
         public boolean isWritable() throws DataStoreException {
             return reference.isWritable();
-        }
-
-        @Override
-        public GridCoverageWriter createWriter() throws DataStoreException {
-            return reference.createWriter();
         }
 
         @Override

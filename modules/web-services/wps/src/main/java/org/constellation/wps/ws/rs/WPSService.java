@@ -115,7 +115,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         final UriInfo uriContext = getUriContext();
 
         ServiceDef version = null;
-
+        String requestName = null;
         try {
             // Handle an empty request by sending a basic web page.
             if ((null == objectRequest) && (0 == uriContext.getQueryParameters().size())) {
@@ -127,13 +127,13 @@ public class WPSService extends OGCWebService<WPSWorker> {
             if (objectRequest == null) {
                 //build objectRequest from parameters
                 version = worker.getVersionFromNumber(getParameter(VERSION_PARAMETER, false)); // needed if exception is launch before request build
-                final String requestName = getParameter(REQUEST_PARAMETER, true);
+                requestName = getParameter(REQUEST_PARAMETER, true);
                 request = adaptQuery(requestName, worker);
             } else if (objectRequest instanceof RequestBase) {
                 request = (RequestBase) objectRequest;
             } else {
                 throw new CstlServiceException("The operation " + objectRequest.getClass().getName() + " is not supported by the service",
-                        INVALID_PARAMETER_VALUE, "request");
+                        OPERATION_NOT_SUPPORTED, objectRequest.getClass().getName());
             }
 
             version = worker.getVersionFromNumber(request.getVersion());
@@ -186,7 +186,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
             }
 
             throw new CstlServiceException("This service can not handle the requested operation: " + request.getClass().getName() + ".",
-                    OPERATION_NOT_SUPPORTED, REQUEST_PARAMETER.toLowerCase());
+                    OPERATION_NOT_SUPPORTED, requestName);
 
         } catch (CstlServiceException ex) {
             /*
@@ -233,7 +233,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
             return adaptKvpExecuteRequest();
         }
         throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                INVALID_PARAMETER_VALUE, REQUEST_PARAMETER.toLowerCase());
+                OPERATION_NOT_SUPPORTED, request);
     }
 
     /**

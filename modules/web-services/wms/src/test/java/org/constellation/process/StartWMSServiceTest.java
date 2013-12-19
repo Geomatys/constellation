@@ -16,11 +16,11 @@
  */
 package org.constellation.process;
 
-import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.LayerContext;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.process.service.StartServiceTest;
 
@@ -30,39 +30,24 @@ import org.constellation.process.service.StartServiceTest;
  */
 public class StartWMSServiceTest extends StartServiceTest {
 
-    public StartWMSServiceTest() {
+   public StartWMSServiceTest() {
           super("WMS", DefaultWMSWorker.class);
     }
 
     /** {@inheritDoc} */
     @Override
     protected void createInstance(final String identifier) {
-        final File wms = new File(configDirectory, serviceName);
-        final File instance = new File(wms, identifier);
-        instance.mkdir();
-
-        final File configFile = new File(instance, "layerContext.xml");
-        final LayerContext configuration = new LayerContext();
         try {
-            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(configuration, configFile);
-            GenericDatabaseMarshallerPool.getInstance().recycle(marshaller);
-
-        } catch (JAXBException ex) {
-            //
+            final LayerContext configuration = new LayerContext();
+            ConfigurationEngine.storeConfiguration(serviceName, identifier, configuration, null);
+        } catch (JAXBException | IOException ex) {
+            LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
     }
 
     /** {@inheritDoc} */
     @Override
     protected boolean checkInstanceExist(final String identifier) {
-
-        final File instanceDir = new File(configDirectory.getAbsolutePath() + "/" + serviceName, identifier);
-        if (instanceDir.exists() && instanceDir.isDirectory()) {
-            final File configFile = new File(instanceDir, "layerContext.xml");
-            return configFile.exists();
-        } else {
-            return false;
-        }
+        return ConfigurationEngine.getServiceConfigurationIds(serviceName).contains(identifier);
     }
 }

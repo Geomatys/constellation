@@ -17,6 +17,9 @@
 
 package org.constellation.admin.dao;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
@@ -29,15 +32,16 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
-import javax.swing.plaf.nimbus.State;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.StringReader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -51,8 +55,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * Session for administration database operations
@@ -61,7 +67,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @version 0.9
  * @since 0.9
  */
-public final class Session {
+public final class Session implements Closeable {
 
     /**
      * Logger used for debugging and event notification.
@@ -86,78 +92,105 @@ public final class Session {
         }
     }
 
-    private static final String READ_NEXT_I18N_ID         = "i18n_id.read.next";
+    private static final String READ_NEXT_I18N_ID           = "i18n_id.read.next";
 
-    private static final String READ_I18N                 = "i18n.read";
-    private static final String WRITE_I18N                = "i18n.write";
-    private static final String UPDATE_I18N               = "i18n.update";
-    private static final String DELETE_I18N               = "i18n.delete";
+    private static final String READ_I18N                   = "i18n.read";
+    private static final String WRITE_I18N                  = "i18n.write";
+    private static final String UPDATE_I18N                 = "i18n.update";
+    private static final String DELETE_I18N                 = "i18n.delete";
 
-    private static final String READ_USER                 = "user.read";
-    private static final String LIST_USERS                = "user.list";
-    private static final String WRITE_USER                = "user.write";
-    private static final String UPDATE_USER               = "user.update";
+    private static final String READ_USER                   = "user.read";
+    private static final String LIST_USERS                  = "user.list";
+    private static final String WRITE_USER                  = "user.write";
+    private static final String UPDATE_USER                 = "user.update";
 
-    private static final String READ_PROVIDER             = "provider.read";
-    private static final String READ_PROVIDER_FROM_ID     = "provider.read.from.id";
-    private static final String READ_PROVIDER_CONFIG      = "provider.read.config";
-    private static final String LIST_PROVIDERS            = "provider.list";
-    private static final String LIST_PROVIDERS_FROM_TYPE  = "provider.list.from.type";
-    private static final String WRITE_PROVIDER            = "provider.write";
-    private static final String UPDATE_PROVIDER           = "provider.update";
-    private static final String UPDATE_PROVIDER_CONFIG    = "provider.update.config";
-    private static final String DELETE_PROVIDER           = "provider.delete";
+    private static final String READ_PROVIDER               = "provider.read";
+    private static final String READ_PROVIDER_FROM_ID       = "provider.read.from.id";
+    private static final String READ_PROVIDER_CONFIG        = "provider.read.config";
+    private static final String READ_PROVIDER_METADATA      = "provider.read.metadata";
+    private static final String LIST_PROVIDERS              = "provider.list";
+    private static final String LIST_PROVIDERS_FROM_TYPE    = "provider.list.from.type";
+    private static final String LIST_PROVIDERS_FROM_IMPL    = "provider.list.from.impl";
+    private static final String WRITE_PROVIDER              = "provider.write";
+    private static final String UPDATE_PROVIDER             = "provider.update";
+    private static final String UPDATE_PROVIDER_CONFIG      = "provider.update.config";
+    private static final String UPDATE_PROVIDER_METADATA    = "provider.update.metadata";
+    private static final String DELETE_PROVIDER             = "provider.delete";
 
-    private static final String READ_STYLE                = "style.read";
-    private static final String READ_STYLE_FROM_ID        = "style.read";
-    private static final String READ_STYLE_BODY           = "style.read.body";
-    private static final String LIST_STYLES               = "style.list";
-    private static final String LIST_STYLES_FROM_DATA     = "style.list.from.data";
-    private static final String LIST_STYLES_FROM_PROVIDER = "style.list.from.provider";
-    private static final String WRITE_STYLE               = "style.write";
-    private static final String UPDATE_STYLE              = "style.update";
-    private static final String UPDATE_STYLE_BODY         = "style.update.body";
-    private static final String DELETE_STYLE              = "style.delete";
+    private static final String READ_STYLE                  = "style.read";
+    private static final String READ_STYLE_FROM_ID          = "style.read";
+    private static final String READ_STYLE_BODY             = "style.read.body";
+    private static final String LIST_STYLES                 = "style.list";
+    private static final String LIST_STYLES_FROM_DATA       = "style.list.from.data";
+    private static final String LIST_STYLES_FROM_PROVIDER   = "style.list.from.provider";
+    private static final String WRITE_STYLE                 = "style.write";
+    private static final String UPDATE_STYLE                = "style.update";
+    private static final String UPDATE_STYLE_BODY           = "style.update.body";
+    private static final String DELETE_STYLE                = "style.delete";
 
-    private static final String READ_DATA                 = "data.read";
-    private static final String READ_DATA_FROM_ID         = "data.read.from.id";
-    private static final String LIST_DATA                 = "data.list";
-    private static final String LIST_DATA_FROM_STYLE      = "data.list.from.style";
-    private static final String LIST_DATA_FROM_PROVIDER   = "data.list.from.provider";
-    private static final String WRITE_DATA                = "data.write";
-    private static final String UPDATE_DATA               = "data.update";
-    private static final String DELETE_DATA               = "data.delete";
+    private static final String READ_DATA                   = "data.read";
+    private static final String READ_DATA_NMSP              = "data.read.nmsp";
+    private static final String READ_DATA_METADATA              = "data.read.metadata";
+    private static final String READ_DATA_FROM_ID           = "data.read.from.id";
+    private static final String READ_DATA_FROM_LAYER        = "data.read.from.layer";
+    private static final String LIST_DATA                   = "data.list";
+    private static final String LIST_DATA_FROM_STYLE        = "data.list.from.style";
+    private static final String LIST_DATA_FROM_PROVIDER     = "data.list.from.provider";
+    private static final String WRITE_DATA                  = "data.write";
+    private static final String UPDATE_DATA                 = "data.update";
+    private static final String UPDATE_DATA_METADATA                 = "data.update.metadata";
+    private static final String DELETE_DATA                 = "data.delete";
+    private static final String DELETE_DATA_NMSP            = "data.delete.nmsp";
 
-    private static final String WRITE_STYLED_DATA         = "styled_data.write";
-    private static final String DELETE_STYLED_DATA        = "styled_data.delete";
+    private static final String WRITE_STYLED_DATA           = "styled_data.write";
+    private static final String DELETE_STYLED_DATA          = "styled_data.delete";
 
-    private static final String READ_SERVICE              = "service.read";
-    private static final String READ_SERVICE_FROM_ID      = "service.read.from.id";
-    private static final String READ_SERVICES_CONFIG      = "service.read.config";
-    private static final String LIST_SERVICES             = "service.list";
-    private static final String LIST_SERVICES_FROM_TYPE   = "service.list.from.type";
-    private static final String WRITE_SERVICE             = "service.write";
-    private static final String UPDATE_SERVICE            = "service.update";
-    private static final String UPDATE_SERVICE_CONFIG     = "service.update.config";
-    private static final String DELETE_SERVICE            = "service.delete";
+    private static final String READ_SERVICE                = "service.read";
+    private static final String READ_SERVICE_FROM_ID        = "service.read.from.id";
+    private static final String READ_SERVICES_CONFIG        = "service.read.config";
+    private static final String READ_SERVICES_EXTRA_CONFIG  = "service.read.extra.config";
+    private static final String READ_SERVICES_METADATA      = "service.read.metadata";
+    private static final String LIST_SERVICES               = "service.list";
+    private static final String LIST_SERVICES_FROM_TYPE     = "service.list.from.type";
+    private static final String LIST_SERVICES_FROM_DATA     = "service.list.from.data";
+    private static final String WRITE_SERVICE               = "service.write";
+    private static final String WRITE_SERVICE_EXTRA_CONFIG  = "service.write.extra.config";
+    private static final String WRITE_SERVICE_METADATA      = "service.write.metadata";
+    private static final String UPDATE_SERVICE              = "service.update";
+    private static final String UPDATE_SERVICE_CONFIG       = "service.update.config";
+    private static final String UPDATE_SERVICE_EXTRA_CONFIG = "service.update.extra.config";
+    private static final String UPDATE_SERVICE_METADATA     = "service.update.metadata";
+    private static final String DELETE_SERVICE              = "service.delete";
+    private static final String DELETE_SERVICE_METADATA     = "service.delete.metadata";
+    private static final String DELETE_SERVICE_EXTRA_CONFIG = "service.delete.extra.config";
 
-    private static final String READ_LAYER                = "layer.read";
-    private static final String READ_LAYER_FROM_ID        = "layer.read.from.id";
-    private static final String READ_LAYER_CONFIG         = "layer.read.config";
-    private static final String LIST_LAYERS               = "layer.list";
-    private static final String LIST_LAYERS_FROM_SERVICE  = "layer.list.from.service";
-    private static final String WRITE_LAYER               = "layer.write";
-    private static final String UPDATE_LAYER              = "layer.update";
-    private static final String UPDATE_LAYER_CONFIG       = "layer.update.config";
-    private static final String DELETE_LAYER              = "layer.delete";
+    private static final String READ_LAYER                  = "layer.read";
+    private static final String READ_LAYER_FROM_ID          = "layer.read.from.id";
+    private static final String READ_LAYER_CONFIG           = "layer.read.config";
+    private static final String LIST_LAYERS                 = "layer.list";
+    private static final String LIST_LAYERS_FROM_SERVICE    = "layer.list.from.service";
+    private static final String WRITE_LAYER                 = "layer.write";
+    private static final String UPDATE_LAYER                = "layer.update";
+    private static final String UPDATE_LAYER_CONFIG         = "layer.update.config";
+    private static final String DELETE_LAYER                = "layer.delete";
+    private static final String DELETE_LAYER_NMSP           = "layer.delete.nmsp";
+    private static final String DELETE_SERVICE_LAYER        = "layer.service.delete";
 
-    private static final String READ_TASK                 = "task.read";
-    private static final String LIST_TASKS                = "task.list";
-    private static final String LIST_TASKS_FROM_STATE     = "task.list.from.state";
-    private static final String WRITE_TASK                = "task.write";
-    private static final String UPDATE_TASK               = "task.update";
-    private static final String DELETE_TASK               = "task.delete";
+    private static final String READ_TASK                   = "task.read";
+    private static final String LIST_TASKS                  = "task.list";
+    private static final String LIST_TASKS_FROM_STATE       = "task.list.from.state";
+    private static final String WRITE_TASK                  = "task.write";
+    private static final String UPDATE_TASK                 = "task.update";
+    private static final String DELETE_TASK                 = "task.delete";
 
+    private static final String READ_PROPERTY               = "properties.read";
+    private static final String WRITE_PROPERTY              = "properties.write";
+
+    private static final String READ_CRS                    = "crs.read";
+    private static final String LIST_CRS                    = "crs.list";
+    private static final String WRITE_CRS                   = "crs.write";
+    private static final String UPDATE_CRS                  = "crs.update";
+    private static final String DELETE_CRS                  = "crs.delete";
 
     /**
      * Wrapper database {@link Connection} instance.
@@ -183,6 +216,7 @@ public final class Session {
     /**
      * Close the session. {@link Session} instance should not be used after this.
      */
+    @Override
     public void close() {
         try {
             connect.close();
@@ -258,7 +292,7 @@ public final class Session {
     /* internal */ String readI18n(final int id, final Locale locale) throws SQLException {
         ensureNonNull("locale", locale);
         try {
-            final InputStream stream = new Query(READ_I18N).with(id, locale.getLanguage()).select().getClob();
+            final InputStream stream = new Query(READ_I18N).with(id, locale.toString()).select().getClob();
             if (stream != null) {
                 return IOUtilities.readString(stream);
             }
@@ -279,7 +313,8 @@ public final class Session {
      */
     /* internal */ void writeI18n(final int id, final Locale locale, final String value) throws SQLException {
         ensureNonNull("locale", locale);
-        new Query(WRITE_I18N).with(id, locale.getLanguage(), new StringReader(value)).update();
+
+        new Query(WRITE_I18N).with(id, locale.toString(), new StringReader(value)).update();
     }
 
     /**
@@ -293,7 +328,7 @@ public final class Session {
      */
     /* internal */ void updateI18n(final int id, final Locale locale, final String newValue) throws SQLException {
         ensureNonNull("locale", locale);
-        new Query(UPDATE_I18N).with(new StringReader(newValue), id, locale.getLanguage()).update();
+        new Query(UPDATE_I18N).with(new StringReader(newValue), id, locale.toString()).update();
     }
 
     /**
@@ -418,9 +453,21 @@ public final class Session {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the configuration cannot be read
      */
-    /* internal */ GeneralParameterValue readProviderConfig(final int generatedId, final ParameterDescriptorGroup descriptor) throws SQLException, IOException {
+    /* internal */ GeneralParameterValue readProviderConfig(final int generatedId, final GeneralParameterDescriptor descriptor) throws SQLException, IOException {
         final InputStream stream = new Query(READ_PROVIDER_CONFIG).with(generatedId).select().getClob();
         return IOUtilities.readParameter(stream, descriptor);
+    }
+    /**
+     * Queries the configuration of the provider with the specified {@code generatedId}.
+     *
+     * @param generatedId the provider auto-generated id
+     * @return the {@link ParameterValueGroup} instance
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be read
+     */
+    /* internal */ InputStream readProviderMetadata(final int generatedId) throws SQLException, IOException {
+        final InputStream stream = new Query(READ_PROVIDER_METADATA).with(generatedId).select().getClob();
+        return stream;
     }
 
     /**
@@ -443,6 +490,18 @@ public final class Session {
     public List<ProviderRecord> readProviders(final ProviderType type) throws SQLException {
         ensureNonNull("type", type);
         return new Query(LIST_PROVIDERS_FROM_TYPE).with(type.name()).select().getAll(ProviderRecord.class);
+    }
+
+    /**
+     * Queries the list of registered providers for the specified implementation.
+     *
+     * @param implementation the provider implementation to query
+     * @return a {@link List} of {@link ProviderRecord}s
+     * @throws SQLException if a database access error occurs
+     */
+    public List<ProviderRecord> readProviders(final String implementation) throws SQLException {
+        ensureNonNull("implementation", implementation);
+        return new Query(LIST_PROVIDERS_FROM_IMPL).with(implementation).select().getAll(ProviderRecord.class);
     }
 
     /**
@@ -500,6 +559,20 @@ public final class Session {
         final StringReader reader = new StringReader(IOUtilities.writeParameter(newConfig));
         new Query(UPDATE_PROVIDER_CONFIG).with(reader, generatedId).update();
     }
+
+    /**
+     * Updates provider metadata with the specified {@code generatedId}.
+     *
+     * @param generatedId the provider auto-generated id
+     * @param metadata   the metadata provider
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be written
+     */
+    /* internal */ void updateProviderMetadata(final int generatedId, final StringReader metadata) throws SQLException, IOException {
+        new Query(UPDATE_PROVIDER_METADATA).with(metadata, generatedId).update();
+    }
+
+
 
     /**
      * Deletes the provider with the specified {@code identifier}.
@@ -671,10 +744,20 @@ public final class Session {
         return new Query(READ_DATA_FROM_ID).with(generatedId).select().getFirst(DataRecord.class);
     }
 
-    public DataRecord readData(final String name, final String providerId) throws SQLException {
+    public DataRecord readDatafromLayer(final String layerAlias, final String providerId) throws SQLException {
+        ensureNonNull("layerAlias", layerAlias);
+        ensureNonNull("providerId", providerId);
+        return new Query(READ_DATA_FROM_LAYER).with(layerAlias, providerId).select().getFirst(DataRecord.class);
+    }
+
+    public DataRecord readData(final QName name, final String providerId) throws SQLException {
         ensureNonNull("name",       name);
         ensureNonNull("providerId", providerId);
-        return new Query(READ_DATA).with(name, providerId).select().getFirst(DataRecord.class);
+        if (name.getNamespaceURI() != null) {
+            return new Query(READ_DATA_NMSP).with(name.getLocalPart(), name.getNamespaceURI(), providerId).select().getFirst(DataRecord.class);
+        } else {
+            return new Query(READ_DATA).with(name.getLocalPart(), providerId).select().getFirst(DataRecord.class);
+        }
     }
 
     public List<DataRecord> readData() throws SQLException {
@@ -691,7 +774,12 @@ public final class Session {
         return new Query(LIST_DATA_FROM_PROVIDER).with(provider.id).select().getAll(DataRecord.class);
     }
 
-    public DataRecord writeData(final String name, final ProviderRecord provider, final DataType type, final UserRecord owner) throws SQLException {
+    /* internal */ InputStream readDataMetadata(final int dataid) throws SQLException, IOException {
+        final InputStream stream = new Query(READ_PROVIDER_METADATA).with(dataid).select().getClob();
+        return stream;
+    }
+
+    public DataRecord writeData(final QName name, final ProviderRecord provider, final DataType type, final UserRecord owner) throws SQLException {
         ensureNonNull("name",     name);
         ensureNonNull("provider", provider);
         ensureNonNull("type",     type);
@@ -703,22 +791,58 @@ public final class Session {
         final String login        = owner != null ? owner.getLogin() : null;
 
         // Proceed to insertion.
-        final int id = new Query(WRITE_DATA).with(name, provider.id, type.name(), date.getTime(), title, description, login).insert();
+        final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), title, description, login).insert();
 
         // Return inserted line.
-        return new DataRecord(this, id, name, provider.id, type, date, title, description, login);
+        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, date, title, description, login);
     }
 
-    /* internal */ void updateData(final int generatedId, final String newName, final int newProvider, final DataType newType, final String newOwner) throws SQLException {
-        new Query(UPDATE_DATA).with(newName, newProvider, newType.name(), newOwner, generatedId).update();
+    /* internal */ void updateData(final int generatedId, final String newName, final String newNamespace, final int newProvider, final DataType newType, final String newOwner) throws SQLException {
+        new Query(UPDATE_DATA).with(newName, newNamespace, newProvider, newType.name(), newOwner, generatedId).update();
     }
 
-    public void deleteData(final String name, final String providerId) throws SQLException {
+    /* internal */ void updateDataMetadata(final int dataId, final StringReader metadata) throws SQLException {
+        new Query(UPDATE_DATA_METADATA).with(metadata, dataId).update();
+    }
+
+    public void deleteData(final QName name, final String providerId) throws SQLException {
         ensureNonNull("name",       name);
         ensureNonNull("providerId", providerId);
-        new Query(DELETE_DATA).with(name, providerId).update();
+        if (name.getNamespaceURI() != null) {
+            new Query(DELETE_DATA_NMSP).with(name.getLocalPart(), name.getNamespaceURI(), providerId).update();
+        } else {
+            new Query(DELETE_DATA).with(name.getLocalPart(), providerId).update();
+        }
     }
 
+
+    /**************************************************************************
+     *                      crs-data table queries                            *
+     **************************************************************************/
+    public void writeCRSData(final DataRecord record, final String crsCode) throws SQLException {
+        ensureNonNull("crscode", crsCode);
+        ensureNonNull("data",  record);
+        new Query(WRITE_CRS).with(record.id, crsCode).update();
+    }
+
+    public void updateCRSData(final DataRecord record) throws SQLException {
+        ensureNonNull("data",  record);
+        new Query(UPDATE_CRS).with(record.id).update();
+    }
+
+    public void deleteCRSData(final DataRecord record) throws SQLException {
+        ensureNonNull("data",  record);
+        new Query(DELETE_CRS).with(record.id).update();
+    }
+
+    public CRSRecord readCRSData(final DataRecord record) throws SQLException{
+        ensureNonNull("data",  record);
+        return new Query(READ_CRS).with(record.id).select().getFirst(CRSRecord.class);
+    }
+
+    public List<CRSRecord> listCRSData()  throws SQLException{
+        return new Query(LIST_CRS).select().getAll(CRSRecord.class);
+    }
 
     /**************************************************************************
      *                      styled-data table queries                         *
@@ -755,6 +879,14 @@ public final class Session {
         return new Query(READ_SERVICES_CONFIG).with(generatedId).select().getClob();
     }
 
+    /* internal */ InputStream readExtraServiceConfig(final int generatedId, final String fileName) throws SQLException {
+        return new Query(READ_SERVICES_EXTRA_CONFIG).with(generatedId, fileName).select().getClob();
+    }
+
+    /* internal */ InputStream readServiceMetadata(final int generatedId, final String lang) throws SQLException {
+        return new Query(READ_SERVICES_METADATA).with(generatedId, lang).select().getClob();
+    }
+
     public List<ServiceRecord> readServices() throws SQLException {
         return new Query(LIST_SERVICES).select().getAll(ServiceRecord.class);
     }
@@ -763,7 +895,11 @@ public final class Session {
         return new Query(LIST_SERVICES_FROM_TYPE).with(spec.name()).select().getAll(ServiceRecord.class);
     }
 
-    public ServiceRecord writeService(final String identifier, final Specification spec, final Object config, final UserRecord owner) throws SQLException {
+    public List<ServiceRecord> readDataServices(final DataRecord record) throws SQLException {
+        return new Query(LIST_SERVICES_FROM_DATA).with(record.id).select().getAll(ServiceRecord.class);
+    }
+
+    public ServiceRecord writeService(final String identifier, final Specification spec, final StringReader config, final UserRecord owner) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
 
@@ -780,6 +916,26 @@ public final class Session {
         return new ServiceRecord(this, id, identifier, spec, date, title, description, login);
     }
 
+    public void writeServiceExtraConfig(final String identifier, final Specification spec, final StringReader config, final String fileName) throws SQLException {
+        ensureNonNull("identifier", identifier);
+        ensureNonNull("spec",       spec);
+
+        final ServiceRecord record = readService(identifier, spec);
+
+        // Proceed to insertion.
+        new Query(WRITE_SERVICE_EXTRA_CONFIG).with(record.id, fileName, config).insert();
+    }
+
+    public void writeServiceMetadata(final String identifier, final Specification spec, final StringReader metadata, final String lang) throws SQLException {
+        ensureNonNull("identifier", identifier);
+        ensureNonNull("spec",       spec);
+
+        final ServiceRecord record = readService(identifier, spec);
+
+        // Proceed to insertion.
+        new Query(WRITE_SERVICE_METADATA).with(record.id, lang, metadata).insert();
+    }
+
     /* internal */ void updateService(final int generatedId, final String newIdentifier, final Specification newType, final String newOwner) throws SQLException {
         new Query(UPDATE_SERVICE).with(newIdentifier, newType.name(), newOwner, generatedId).update();
     }
@@ -788,10 +944,23 @@ public final class Session {
         new Query(UPDATE_SERVICE_CONFIG).with(newConfig, generatedId).update();
     }
 
+    /* internal */ void updateServiceExtraConfig(final int generatedId, final String fileName, final StringReader newConfig) throws SQLException {
+        new Query(UPDATE_SERVICE_EXTRA_CONFIG).with(newConfig, generatedId, fileName).update();
+    }
+
+    /* internal */ void updateServiceMetadata(final int generatedId, final String lang, final StringReader newMetadata) throws SQLException {
+        new Query(UPDATE_SERVICE_METADATA).with(newMetadata, generatedId, lang).update();
+    }
+
     public void deleteService(final String identifier, final Specification spec) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
-        new Query(DELETE_SERVICE).with(identifier, spec.name()).update();
+        final ServiceRecord record = readService(identifier, spec);
+        if (record != null) {
+            new Query(DELETE_SERVICE_METADATA).with(record.id).update();
+            new Query(DELETE_SERVICE_EXTRA_CONFIG).with(record.id).update();
+            new Query(DELETE_SERVICE).with(identifier, spec.name()).update();
+        }
     }
 
 
@@ -803,10 +972,10 @@ public final class Session {
         return new Query(READ_LAYER_FROM_ID).with(generatedId).select().getFirst(LayerRecord.class);
     }
 
-    public LayerRecord readLayer(final String alias, final ServiceRecord service) throws SQLException {
-        ensureNonNull("alias",   alias);
+    public LayerRecord readLayer(final String name, final ServiceRecord service) throws SQLException {
+        ensureNonNull("name",   name);
         ensureNonNull("service", service);
-        return new Query(READ_LAYER).with(alias, service.id).select().getFirst(LayerRecord.class);
+        return new Query(READ_LAYER).with(name, service.id).select().getFirst(LayerRecord.class);
     }
 
     /* internal */ InputStream readLayerConfig(final int generatedId) throws SQLException {
@@ -822,8 +991,8 @@ public final class Session {
         return new Query(LIST_LAYERS_FROM_SERVICE).with(service.id).select().getAll(LayerRecord.class);
     }
 
-    public LayerRecord writeLayer(final String alias, final ServiceRecord service, final DataRecord data, final Object config, final UserRecord owner) throws SQLException {
-        ensureNonNull("alias",   alias);
+    public LayerRecord writeLayer(final QName name, final String alias, final ServiceRecord service, final DataRecord data, final Object config, final UserRecord owner) throws SQLException {
+        ensureNonNull("name",   name);
         ensureNonNull("service", service);
         ensureNonNull("data",    data);
 
@@ -834,26 +1003,34 @@ public final class Session {
         final String login        = owner != null ? owner.getLogin() : null;
 
         // Proceed to insertion.
-        final int id = new Query(WRITE_LAYER).with(alias, service.id, data.id, date.getTime(), title, description, config, login).insert();
+        final int id = new Query(WRITE_LAYER).with(name.getLocalPart(), name.getNamespaceURI(), alias, service.id, data.id, date.getTime(), title, description, config, login).insert();
 
         // Return inserted line.
-        return new LayerRecord(this, id, alias, service.id, data.id, date, title, description, login);
+        return new LayerRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), alias, service.id, data.id, date, title, description, login);
     }
 
-    /* internal */ void updateLayer(final int generatedId, final String newAlias, final int newService, final int newData, final String newOwner) throws SQLException {
-        new Query(UPDATE_LAYER).with(newAlias, newService, newData, newOwner, generatedId).update();
+    /* internal */ void updateLayer(final int generatedId, final String newName, final String newNamespace, final String newAlias, final int newService, final int newData, final String newOwner) throws SQLException {
+        new Query(UPDATE_LAYER).with(newName, newNamespace, newAlias, newService, newData, newOwner, generatedId).update();
     }
 
     /* internal */ void updateLayerConfig(final int generatedId, final StringReader newConfig) throws SQLException {
         new Query(UPDATE_LAYER_CONFIG).with(newConfig).update();
     }
 
-    public void deleteLayer(final String alias, final ServiceRecord service) throws SQLException {
-        ensureNonNull("alias",   alias);
+    public void deleteLayer(final QName name, final ServiceRecord service) throws SQLException {
+        ensureNonNull("name",   name);
         ensureNonNull("service", service);
-        new Query(DELETE_LAYER).with(alias, service.id).update();
+        if (name.getNamespaceURI() != null) {
+            new Query(DELETE_LAYER_NMSP).with(name.getLocalPart(), name.getNamespaceURI(), service.id).update();
+        } else {
+            new Query(DELETE_LAYER).with(name.getLocalPart(), service.id).update();
+        }
     }
 
+    public void deleteServiceLayer(final ServiceRecord service) throws SQLException {
+        ensureNonNull("service", service);
+        new Query(DELETE_SERVICE_LAYER).with(service.id).update();
+    }
 
     /**************************************************************************
      *                          task table queries                            *
@@ -897,6 +1074,22 @@ public final class Session {
     public void deleteTask(final String identifier) throws SQLException {
         ensureNonNull("identifier", identifier);
         new Query(DELETE_TASK).with(identifier).update();
+    }
+
+    /**************************************************************************
+     *                          properties table queries                            *
+     **************************************************************************/
+
+    public String readProperty(final String key) throws SQLException {
+        ensureNonNull("key", key);
+        return new Query(READ_PROPERTY).with(key).select().getFirstAt(1, String.class);
+    }
+
+    public void writeProperty(final String key, final String value) throws SQLException {
+        ensureNonNull("key", key);
+
+        // Proceed to insertion.
+        new Query(WRITE_PROPERTY).with(key, value).insert();
     }
 
 
@@ -1021,8 +1214,24 @@ public final class Session {
         InputStream getClob() throws SQLException {
             try {
                 if (rs.next()) {
-                    return rs.getClob(1).getAsciiStream();
+                    final Clob clob = rs.getClob(1);
+                    if (clob != null) {
+                        final Reader stream = clob.getCharacterStream();
+                        // copy the stream into a new one
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        OutputStreamWriter osw = new OutputStreamWriter(baos, "UTF-8");
+                        char[] buffer = new char[1024];
+                        int len;
+                        while ((len = stream.read(buffer)) > -1 ) {
+                            osw.append(new String(buffer), 0, len);
+                        }
+                        osw.flush();
+                        baos.flush();
+                        return new ByteArrayInputStream(baos.toByteArray());
+                    }
                 }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Error while copying clob into new Stream", ex);
             } finally {
                 rs.close();
                 stmt.close();

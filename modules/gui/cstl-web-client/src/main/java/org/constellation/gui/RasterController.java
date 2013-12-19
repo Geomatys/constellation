@@ -6,21 +6,26 @@ import juzu.Response;
 import juzu.Route;
 import juzu.View;
 import juzu.impl.request.Request;
+import juzu.request.RequestParameter;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
 import org.constellation.dto.MetadataLists;
+import org.constellation.dto.ParameterValues;
 import org.constellation.gui.service.ProviderManager;
-import org.constellation.gui.templates.raster_description;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +36,9 @@ import java.util.logging.Logger;
 public class RasterController {
 
     private static final Logger LOGGER = Logging.getLogger(RasterController.class);
+
+        private static final String[] SUFFIXES = new String[] {"nc", "ncml", "cdf", "grib", "grib1", "grib2", "grb", "grb1", "grb2", "grd"};
+
     /**
      * Manager used to call constellation server side.
      */
@@ -39,7 +47,11 @@ public class RasterController {
 
     @Inject
     @Path("raster_description.gtmpl")
-    raster_description rasterDescription;
+    org.constellation.gui.templates.raster_description rasterDescription;
+
+    @Inject
+    @Path("netcdf_coverage_listing.gtmpl")
+    org.constellation.gui.templates.netcdf_coverage_listing netcdf_coverageListing;
 
 //    @Inject
     public DataInformationContainer informationContainer;
@@ -47,7 +59,7 @@ public class RasterController {
 
     @View
     @Route("/raster/description")
-    public Response showRaster(final String returnURL) throws IOException {
+    public Response showRaster(final String returnURL, final String metadataUploaded, final String creationMode) throws IOException {
         final Locale userLocale = Request.getCurrent().getUserContext().getLocale();
         final MetadataLists codeLists = providerManager.getMetadataCodeLists(userLocale.toString());
 
@@ -58,27 +70,71 @@ public class RasterController {
                 .roles(codeLists.getRoles())
                 .topics(codeLists.getCategories())
                 .userLocale(userLocale.getLanguage())
+                .metadataUploaded(metadataUploaded)
+                .creationMode(creationMode)
                 .ok().withMimeType("text/html");
     }
 
     @Action
     @Route("/raster/create")
-    public Response createProvider(String returnURL, DataMetadata metadataToSave, String date, String keywords) {
+    public Response createProvider(String returnURL, DataMetadata metadataToSave, String date, String keywords, String metadataUploaded) {
+
+        DataInformation information = informationContainer.getInformation();
+        String extension = FilenameUtils.getExtension(information.getPath());
+        Response rep;
+
+
+        final List<String> suffixes = new ArrayList<>(0);
+        Collections.addAll(suffixes, SUFFIXES);
+
+        //if it's netCDF, we don't pyramid data
+        if(suffixes.contains(extension)){
+            providerManager.createProvider("coverage-store", information.getName(), information.getPath(), information.getDataType(), null, "coverage-file");
+            rep = RasterController_.getNetCDFListing(returnURL, information.getName());
+        }else{
+            providerManager.pyramidData(information.getName(), information.getPath());
+            final String pyramidPath = providerManager.getPyramidPath(information.getName())+"/tiles";
+            providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null, "coverage-xml-pyramid");
+            rep = Response.redirect(returnURL);
+        }
+
+        boolean metadataUpload = Boolean.parseBoolean(metadataUploaded);
+        if(!metadataUpload){
+            saveEditedMetadata(metadataToSave, date, keywords, information);
+        }
+
+        return rep;
+    }
+
+    @View
+    @Route("/netcdf/listing")
+    public Response getNetCDFListing(final String returnUrl, final String providerId){
+        ParameterValues coveragesPV = providerManager.getCoverageList(providerId);
+        Map<String, String> coveragesMap = coveragesPV.getValues();
+        return netcdf_coverageListing.with().returnURL(returnUrl).coveragesMap(coveragesMap).providerId(providerId).ok().withMimeType("text/html");
+    }
+
+    /**
+     * Save Metadata if it was edited (not given by user)
+     * @param metadataToSave {@link org.constellation.dto.DataMetadata} which define global metadata except date and keywords
+     * @param date data date
+     * @param keywords data keywords
+     * @param information information receive from server.
+     */
+    private void saveEditedMetadata(final DataMetadata metadataToSave, final String date, final String keywords, final DataInformation information) {
         final Locale userLocale = Request.getCurrent().getUserContext().getLocale();
         DateFormat formatDate = DateFormat.getDateInstance(DateFormat.SHORT, userLocale);
         Date metadataDate = null;
         try {
             metadataDate = formatDate.parse(date);
         } catch (ParseException e) {
-            LOGGER.log(Level.WARNING, "", e);
+            LOGGER.log(Level.WARNING, "can't parse data", e);
         }
+        metadataToSave.setLocaleMetadata(userLocale.toString());
         metadataToSave.setDate(metadataDate);
-        DataInformation information = informationContainer.getInformation();
 
-        String path = information.getPath();
-        int lastPointIndex = path.lastIndexOf('.');
-        String extension = path.substring(lastPointIndex+1, path.length());
 
+        metadataToSave.setDataName(information.getName());
         metadataToSave.setDataPath(information.getPath());
         metadataToSave.setType(information.getDataType());
 
@@ -93,16 +149,25 @@ public class RasterController {
 
         //create pyramid, provider and metadata
         providerManager.saveISO19115Metadata(metadataToSave);
+    }
 
-        //if it's netCDF, we don't pyramid data
-        if("nc".equalsIgnoreCase(extension)){
-            providerManager.createProvider("coverage-file", information.getName(), information.getPath(), information.getDataType(), null);
-        }else{
-            providerManager.pyramidData(information.getName(), information.getPath());
-            final String pyramidPath = providerManager.getPyramidPath(information.getName());
-            providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null);
+    @Action
+    @Route("/netcdf/save")
+    public Response saveCRSModification(final String returnUrl, final String providerId){
+        final Map<String, RequestParameter> parameters = Request.getCurrent().getParameters();
+
+        final Map<String, String> dataCRSModified = new HashMap<>(0);
+
+        ///remove url & providerId from parameters to loop without test
+        parameters.remove("returnUrl");
+        parameters.remove("providerId");
+        if (parameters.size()>0){
+            for (String key : parameters.keySet()) {
+                dataCRSModified.put(key, parameters.get(key).getValue());
+            }
         }
 
-        return Response.redirect(returnURL);
+        providerManager.saveCRSModifications(dataCRSModified, providerId);
+        return Response.redirect(returnUrl);
     }
 }

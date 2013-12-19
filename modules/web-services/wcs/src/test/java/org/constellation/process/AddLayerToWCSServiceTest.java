@@ -28,6 +28,4 @@ public class AddLayerToWCSServiceTest extends AddLayerToMapServiceTest {
     public AddLayerToWCSServiceTest() {
         super("WCS", DefaultWCSWorker.class);
     }
-    
-    
 }

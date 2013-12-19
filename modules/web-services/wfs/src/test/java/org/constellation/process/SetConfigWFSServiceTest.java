@@ -28,5 +28,4 @@ public class SetConfigWFSServiceTest extends SetConfigMapServiceTest {
     public SetConfigWFSServiceTest() {
         super("WFS", DefaultWFSWorker.class);
     }
-
 }

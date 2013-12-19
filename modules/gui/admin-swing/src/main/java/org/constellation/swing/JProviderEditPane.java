@@ -21,10 +21,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import javax.swing.ImageIcon;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -32,9 +30,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderReport;
-import org.geotoolkit.gui.swing.misc.ActionCell;
-import org.geotoolkit.gui.swing.misc.JOptionDialog;
+import org.geotoolkit.gui.swing.util.ActionCell;
+import org.geotoolkit.gui.swing.util.JOptionDialog;
 import org.geotoolkit.gui.swing.propertyedit.JFeatureOutLine;
 import org.geotoolkit.gui.swing.propertyedit.LayerStylePropertyPanel;
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JAdvancedStylePanel;
@@ -127,7 +126,23 @@ public class JProviderEditPane extends javax.swing.JPanel {
         final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("",
                 ICON_DELETE, Color.WHITE, fontNormal, Color.DARK_GRAY));
 
-        guiData.setModel(new DataModel(providerReport.getItems(),styleType));
+        final List<DataBrief> layers = providerReport.getItems();
+
+        Collections.sort(layers, new Comparator<DataBrief>() {
+            @Override
+            public int compare(DataBrief o1, DataBrief o2) {
+                String l1 = o1.getName();
+                String l2 = o2.getName();
+                return l1.toLowerCase().compareTo(l2.toLowerCase());
+            }
+        });
+
+        final List<String> itemNames = new ArrayList<>(0);
+        for (DataBrief dataBrief : layers) {
+            itemNames.add(dataBrief.getName());
+        }
+
+        guiData.setModel(new DataModel(itemNames,styleType));
 
         if(styleType){
             guiData.getColumn(1).setCellRenderer(new ActionCell.Renderer(editIcon));

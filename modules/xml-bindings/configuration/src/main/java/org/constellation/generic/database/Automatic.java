@@ -188,6 +188,12 @@ public class Automatic {
     private Queries queries;
 
     /**
+     * In the case of a generic Obervation filter,
+     * this object contains the SQL request to filter the observations.
+     */
+    private Query filterQueries;
+    
+    /**
      * Constructor used by JAXB
      */
     public Automatic() {
@@ -369,7 +375,7 @@ public class Automatic {
     }
 
     /**
-     * @param Thesaurus the Thesaurus to set
+     * @param thesaurus the Thesaurus to set
      */
     public void setThesaurus(final List<BDD> thesaurus) {
         this.thesaurus = thesaurus;
@@ -414,7 +420,7 @@ public class Automatic {
     }
 
     /**
-     * @param enablecache the enableCache flag to set
+     * @param enableCache the enableCache flag to set
      * @deprecated use putParameter("enableCache", boolean)
      */
     public void setEnablecache(final String enableCache) {
@@ -475,7 +481,7 @@ public class Automatic {
     }
 
     /**
-     * @param byIdHarvester the byIdHarvester to set
+     * @param harvester the Harvester type to use.
      */
     public void setHarvester(final String harvester) {
         this.harvester = harvester;
@@ -636,6 +642,20 @@ public class Automatic {
         this.customparameters = customparameters;
     }
 
+    /**
+     * @return the filterQueries
+     */
+    public Query getFilterQueries() {
+        return filterQueries;
+    }
+
+    /**
+     * @param filterQueries the filterQueries to set
+     */
+    public void setFilterQueries(Query filterQueries) {
+        this.filterQueries = filterQueries;
+    }
+
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[Automatic]");
@@ -657,6 +677,21 @@ public class Automatic {
         if (configurationDirectory != null) {
             s.append("configurationDirectory:").append(configurationDirectory).append('\n');
         }
+        if (profile != null) {
+            s.append("profile:").append(profile).append('\n');
+        }
+        if (logLevel != null) {
+            s.append("logLevel: ").append(logLevel).append('\n');
+        }
+        if (filterQueries != null) {
+            s.append("Filter queries:").append(filterQueries).append('\n');
+        }
+        if (customparameters != null) {
+            s.append("custom parameters:\n");
+            for (Entry entry : customparameters.entrySet()) {
+                s.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
+            }
+        }
         if (defaultRecordSet != null) {
             s.append("defaultRecordSet:").append(defaultRecordSet).append('\n');
         }
@@ -665,9 +700,6 @@ public class Automatic {
         }
         if (enableThread != null) {
             s.append("enableThread:").append(enableThread).append('\n');
-        }
-        if (profile != null) {
-            s.append("profile:").append(profile).append('\n');
         }
         if (storeMapping != null) {
             s.append("storeMapping:").append(storeMapping).append('\n');
@@ -681,20 +713,12 @@ public class Automatic {
         if (identifierDirectory != null) {
             s.append("identifierDirectory: ").append(identifierDirectory).append('\n');
         }
-        if (logLevel != null) {
-            s.append("logLevel: ").append(logLevel).append('\n');
-        }
-        if (customparameters != null) {
-            s.append("custom parameters:\n");
-            for (Entry entry : customparameters.entrySet()) {
-                s.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
-            }
-        }
         return s.toString();
     }
 
     /**
      * Verify if this entry is identical to the specified object.
+     * @param object The object to compare with.
      */
     @Override
     public boolean equals(final Object object) {
@@ -719,6 +743,7 @@ public class Automatic {
                    Objects.equals(this.noIndexation,     that.noIndexation)     &&
                    Objects.equals(this.logLevel,         that.logLevel)         &&
                    Objects.equals(this.customparameters, that.customparameters) &&
+                   Objects.equals(this.filterQueries,    that.filterQueries)    &&
                    Objects.equals(this.queries,          that.queries);
         }
         return false;
@@ -740,6 +765,7 @@ public class Automatic {
         hash = 37 * hash + (this.defaultRecordSet != null ? this.defaultRecordSet.hashCode() : 0);
         hash = 37 * hash + (this.noIndexation != null ? this.noIndexation.hashCode() : 0);
         hash = 37 * hash + (this.harvester != null ? this.harvester.hashCode() : 0);
+        hash = 37 * hash + (this.filterQueries != null ? this.filterQueries.hashCode() : 0);
         return hash;
     }
 

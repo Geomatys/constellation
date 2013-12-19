@@ -3,7 +3,7 @@
 <!-- Head -->
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span4">
-        <img src="images/constellation.png"/>
+        <a href="@{index()}"><img src="images/constellation.png"/></a>
     </div>
     <div class="span6 offset1">
         <h2>&{homepage.title}</h2>
