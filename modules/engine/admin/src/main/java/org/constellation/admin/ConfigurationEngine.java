@@ -64,6 +64,7 @@ import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.security.SecurityManager;
 import org.constellation.util.Util;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -78,12 +79,19 @@ public class ConfigurationEngine {
 
     private final static boolean JPA = Boolean.getBoolean("cstlJPA");
 
+    private static SecurityManager securityManager; 
+    
     private static ConfigurationService configurationService;
 
     private static String userTest = null;
 
     public static void setConfigurationService(ConfigurationService configurationService) {
         ConfigurationEngine.configurationService = configurationService;
+    }
+    
+    
+    public static void setSecurityManager(SecurityManager securityManager) {
+        ConfigurationEngine.securityManager = securityManager;
     }
 
     public static ParameterValueGroup getProviderConfiguration(final String serviceName,
@@ -182,15 +190,6 @@ public class ConfigurationEngine {
         try {
             session = EmbeddedDatabase.createSession();
 
-            //get current user credential
-            String subject = null;
-            try {
-                final Subject s = SecurityUtils.getSubject();
-                subject =  s.getPrincipal().toString();
-            }catch (UnavailableSecurityManagerException ex){
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
-                subject = userTest;
-            }
 
             final StringReader sr;
             if (obj != null) {
@@ -204,7 +203,7 @@ public class ConfigurationEngine {
                 sr = null;
             }
 
-            UserRecord userRecord = session.readUser(subject);
+            UserRecord userRecord = session.readUser(securityManager.getCurrentUserLogin());
             final ServiceRecord service = session.readService(serviceID, spec);
             if (service == null) {
                 if (fileName == null) {
