@@ -204,7 +204,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
     }//GEN-LAST:event_guiDataSourceComboItemStateChanged
 
     private void refreshIndexButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_refreshIndexButtonActionPerformed
-        server.csws.refreshIndex(serviceInstance.getName(), false);
+        server.csws.refreshIndex(serviceInstance.getIdentifier(), false);
     }//GEN-LAST:event_refreshIndexButtonActionPerformed
 
     private void purgeDbButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_purgeDbButtonActionPerformed
@@ -215,8 +215,8 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         
         switch (result) {
             case JOptionPane.OK_OPTION:
-                server.csws.deleteAllMetadata(serviceInstance.getName());
-                server.csws.refreshIndex(serviceInstance.getName(), false);
+                server.csws.deleteAllMetadata(serviceInstance.getIdentifier());
+                server.csws.refreshIndex(serviceInstance.getIdentifier(), false);
                 break;
             case JOptionPane.CANCEL_OPTION:
                 break;

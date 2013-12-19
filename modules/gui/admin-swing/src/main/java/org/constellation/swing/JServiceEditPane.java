@@ -37,9 +37,9 @@ public class JServiceEditPane extends javax.swing.JPanel {
         this.server = server;
         this.serviceType = serviceType;
         this.serviceInstance = serviceInstance;
-        Object configuration = server.services.getInstanceconfiguration(serviceType, serviceInstance.getName());
+        Object configuration = server.services.getInstanceconfiguration(serviceType, serviceInstance.getIdentifier());
         initComponents();
-        guiName.setText(serviceInstance.getName());
+        guiName.setText(serviceInstance.getIdentifier());
         if ("WMS".equals(serviceType) || "WMTS".equals(serviceType) || "WCS".equals(serviceType) || "WFS".equals(serviceType)) {
             serviceEditionPanel =  new JServiceMapEditPane(server, serviceType, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
@@ -155,17 +155,17 @@ public class JServiceEditPane extends javax.swing.JPanel {
 
     private void guiSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiSaveActionPerformed
         correctName();
-        server.services.renameInstance(serviceType, serviceInstance.getName(), guiName.getText());
+        server.services.renameInstance(serviceType, serviceInstance.getIdentifier(), guiName.getText());
         serviceInstance.setName(guiName.getText());
         if (serviceEditionPanel != null) {
-            server.services.configureInstance(serviceType, serviceInstance.getName(), serviceEditionPanel.getConfiguration());
+            server.services.configureInstance(serviceType, serviceInstance.getIdentifier(), serviceEditionPanel.getConfiguration());
         }
-        server.services.startInstance(serviceType, serviceInstance.getName());
+        server.services.startInstance(serviceType, serviceInstance.getIdentifier());
         firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiSaveActionPerformed
 
     private void guiDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiDeleteActionPerformed
-        server.services.deleteInstance(serviceType, serviceInstance.getName());
+        server.services.deleteInstance(serviceType, serviceInstance.getIdentifier());
         firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiDeleteActionPerformed
 

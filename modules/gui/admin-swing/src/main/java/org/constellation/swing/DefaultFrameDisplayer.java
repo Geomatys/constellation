@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
@@ -93,18 +94,23 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
     @Override
     public void display(final ConstellationServer cstl, final String serviceType, final Instance service) {
         try {
-            final String url = cstl.services.getInstanceURL(serviceType, service.getName());
+            final String url = cstl.services.getInstanceURL(serviceType, service.getIdentifier());
             final ServerFactory factory = ServerFinder.getFactoryById(serviceType);
-            final ParameterValueGroup params = factory.getParametersDescriptor().createValue();
-            params.parameter("url").setValue(new URL(url));
-            params.parameter("security").setValue(cstl.getClientSecurity());
-            try {
-                params.parameter("post").setValue(true);
-            } catch(ParameterNotFoundException ex) {
-                // do nothing if the parameters does not exist
+            if (factory != null) {
+                final ParameterValueGroup params = factory.getParametersDescriptor().createValue();
+                params.parameter("url").setValue(new URL(url));
+                params.parameter("security").setValue(cstl.getClientSecurity());
+                try {
+                    params.parameter("post").setValue(true);
+                } catch(ParameterNotFoundException ex) {
+                    // do nothing if the parameters does not exist
+                }
+                final Server server = factory.open(params);
+                display(server);
+            } else {
+                JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("displayFactoryMissing") + serviceType,
+                        LayerRowModel.BUNDLE.getString("impossibleDisplay"), JOptionPane.ERROR_MESSAGE);
             }
-            final Server server = factory.open(params);
-            display(server);
         } catch (MalformedURLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(),ex);
         } catch (DataStoreException ex) {

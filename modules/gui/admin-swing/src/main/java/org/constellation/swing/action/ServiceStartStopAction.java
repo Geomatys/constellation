@@ -102,9 +102,9 @@ public class ServiceStartStopAction extends Action {
             final String type = (String) ((Map.Entry)target).getValue();
 
             if(ServiceStatus.WORKING.equals(inst.getStatus())){
-                server.services.stopInstance(type, inst.getName());
+                server.services.stopInstance(type, inst.getIdentifier());
             }else{
-                server.services.startInstance(type, inst.getName());
+                server.services.startInstance(type, inst.getIdentifier());
             }
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
