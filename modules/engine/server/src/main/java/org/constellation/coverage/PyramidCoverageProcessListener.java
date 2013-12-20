@@ -83,7 +83,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
             pyramidTask.setState(TaskRecord.TaskState.SUCCEED);
 
             //update provider
-            updateProvider();
+//            updateProvider();
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Unable to save task", e);
         } finally {
