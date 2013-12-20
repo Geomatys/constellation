@@ -243,15 +243,6 @@ public class ProviderManager {
         }
     }
 
-    public String getPyramidPath(final String providerName) {
-        try {
-            return cstl.openClient().providers.getPyramidPath(providerName);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Error when call web service to know pyramid data path", e);
-        }
-        return null;
-    }
-
     public ParameterValues getCoverageList(final String providerId) {
         try {
             return cstl.openClient().providers.getCoverageList(providerId);
