@@ -59,7 +59,8 @@
      data-success-style-link-data="&{growl.success.style.link.data}"
      data-success-style-unlink-data="&{growl.success.style.unlink.data}"
      data-success-style-delete="&{growl.success.style.delete}"
-     data-success-service-stop="&{growl.success.service.stop}"></div>
+     data-success-service-stop="&{growl.success.service.stop}"
+     data-error-data-import-no-geographic="&{growl.error.data.import.no.geographic}"></div>
 
 <!-- main page part -->
 <div class="container" style="padding-top:40px;box-sizing: border-box">

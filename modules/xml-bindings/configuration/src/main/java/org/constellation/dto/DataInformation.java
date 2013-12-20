@@ -32,7 +32,13 @@ public class DataInformation {
 
     private String crs;
 
+    private String errorInformation;
+
     public DataInformation() {
+    }
+
+    public DataInformation(final String errorInformation) {
+        this.errorInformation = errorInformation;
     }
 
     public DataInformation(String path, String dataType, ArrayList<SimplyMetadataTreeNode> fileMetadata) {
@@ -94,5 +100,13 @@ public class DataInformation {
 
     public void setCrs(final String crs) {
         this.crs = crs;
+    }
+
+    public String getErrorInformation() {
+        return errorInformation;
+    }
+
+    public void setErrorInformation(final String errorInformation) {
+        this.errorInformation = errorInformation;
     }
 }

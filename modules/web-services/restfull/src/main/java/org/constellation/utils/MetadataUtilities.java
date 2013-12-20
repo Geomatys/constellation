@@ -178,7 +178,7 @@ public final class MetadataUtilities {
 
             return information;
         } else {
-            return new DataInformation();
+            return new DataInformation("error-data-import-no-geographic");
         }
     }
 
