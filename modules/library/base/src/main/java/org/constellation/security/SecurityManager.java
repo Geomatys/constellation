@@ -23,7 +23,13 @@ package org.constellation.security;
  */
 public interface SecurityManager {
 
-    public String getCurrentUserLogin();
+
+    /**
+     * Access to current user login
+     * @return login as {@link String}
+     * @throws NoSecurityManagerException if it don't exist SecurityManager (it's a {@link java.lang.RuntimeException})
+     */
+    public String getCurrentUserLogin() throws NoSecurityManagerException;
 
     public boolean isAuthenticated();
     

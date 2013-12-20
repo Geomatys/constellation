@@ -19,6 +19,7 @@ package org.constellation.security.spring;
 import java.util.Collection;
 
 import org.constellation.security.IncorrectCredentialsException;
+import org.constellation.security.NoSecurityManagerException;
 import org.constellation.security.SecurityManager;
 import org.constellation.security.UnknownAccountException;
 import org.springframework.security.core.Authentication;
@@ -32,7 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 public class SpringSecurityManager implements SecurityManager {
 
-    public String getCurrentUserLogin() {
+    public String getCurrentUserLogin() throws NoSecurityManagerException {
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
         if (authentication == null) {

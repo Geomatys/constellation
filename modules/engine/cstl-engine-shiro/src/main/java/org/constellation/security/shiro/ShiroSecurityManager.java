@@ -22,6 +22,7 @@ import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.constellation.security.NoSecurityManagerException;
 import org.constellation.security.SecurityManager;
 
 /**
@@ -31,9 +32,13 @@ import org.constellation.security.SecurityManager;
  */
 public class ShiroSecurityManager implements SecurityManager {
 
-    public String getCurrentUserLogin() {
-        final Subject currentUser = SecurityUtils.getSubject();
-        return (String) currentUser.getPrincipal();
+    public String getCurrentUserLogin() throws NoSecurityManagerException {
+        try{
+            final Subject currentUser = SecurityUtils.getSubject();
+            return (String) currentUser.getPrincipal();
+        } catch (UnavailableSecurityManagerException ex){
+            throw new NoSecurityManagerException(ex.getMessage(), ex);
+        }
     }
 
     public boolean isAuthenticated() {
