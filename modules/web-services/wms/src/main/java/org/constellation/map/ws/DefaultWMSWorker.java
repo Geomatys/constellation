@@ -17,6 +17,35 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+import static org.constellation.api.CommonConstants.DEFAULT_CRS;
+import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_BLANK;
+import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_INIMAGE;
+import static org.constellation.map.ws.WMSConstant.EXCEPTION_130_BLANK;
+import static org.constellation.map.ws.WMSConstant.EXCEPTION_130_INIMAGE;
+import static org.constellation.query.Query.GML;
+import static org.constellation.query.Query.XML;
+import static org.constellation.query.wms.WMSQuery.KEY_BBOX;
+import static org.constellation.query.wms.WMSQuery.KEY_INFO_FORMAT;
+import static org.constellation.query.wms.WMSQuery.KEY_LAYER;
+import static org.constellation.query.wms.WMSQuery.KEY_LAYERS;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.CURRENT_UPDATE_SEQUENCE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_FORMAT;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_UPDATE_SEQUENCE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_DEFINED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_QUERYABLE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
+import static org.geotoolkit.wms.xml.WmsXmlFactory.createBoundingBox;
+import static org.geotoolkit.wms.xml.WmsXmlFactory.createDimension;
+import static org.geotoolkit.wms.xml.WmsXmlFactory.createGeographicBoundingBox;
+import static org.geotoolkit.wms.xml.WmsXmlFactory.createLayer;
+import static org.geotoolkit.wms.xml.WmsXmlFactory.createLegendURL;
+import static org.geotoolkit.wms.xml.WmsXmlFactory.createLogoURL;
+import static org.geotoolkit.wms.xml.WmsXmlFactory.createOnlineResource;
+import static org.geotoolkit.wms.xml.WmsXmlFactory.createStyle;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -27,8 +56,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -43,19 +72,32 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.imageio.spi.ServiceRegistry;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
 
+import org.apache.sis.internal.util.UnmodifiableArrayList;
+import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.measure.Range;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.xml.MarshallerPool;
 //Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.AttributionType;
-import org.constellation.configuration.Layer;
+import org.constellation.configuration.DimensionDefinition;
 import org.constellation.configuration.FormatURL;
+import org.constellation.configuration.Layer;
 import org.constellation.configuration.Reference;
+import org.constellation.configuration.WMSPortrayal;
 import org.constellation.converter.DataReferenceConverter;
 import org.constellation.dto.Service;
 import org.constellation.map.visitor.GetFeatureInfoVisitor;
@@ -65,16 +107,11 @@ import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.query.wms.WMSQuery;
+import org.constellation.security.SecurityManager;
 import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
-import org.constellation.configuration.DimensionDefinition;
-import org.constellation.configuration.WMSPortrayal;
-import static org.constellation.api.CommonConstants.*;
-import static org.constellation.query.wms.WMSQuery.*;
-import static org.constellation.map.ws.WMSConstant.*;
-
 //Geotoolkit dependencies
 import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
@@ -96,27 +133,6 @@ import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
-import org.geotoolkit.se.xml.v110.OnlineResourceType;
-import org.geotoolkit.sld.MutableLayer;
-import org.geotoolkit.sld.MutableLayerStyle;
-import org.geotoolkit.sld.MutableNamedLayer;
-import org.geotoolkit.sld.MutableNamedStyle;
-import org.geotoolkit.sld.MutableStyledLayerDescriptor;
-import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
-import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
-import org.geotoolkit.sld.xml.v110.TypeNameType;
-import org.geotoolkit.sld.xml.GetLegendGraphic;
-import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.style.StyleUtilities;
-import org.apache.sis.measure.MeasurementRange;
-import org.geotoolkit.util.PeriodUtilities;
-import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.wms.xml.*;
-import org.geotoolkit.wms.xml.v130.Capability;
-import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
-import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.referencing.crs.AbstractSingleCRS;
 import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
@@ -125,14 +141,38 @@ import org.geotoolkit.referencing.cs.AbstractCS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.referencing.datum.AbstractDatum;
-import org.apache.sis.measure.Range;
-import org.apache.sis.internal.util.UnmodifiableArrayList;
-import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.ConfigurationEngine;
-
-import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
+import org.geotoolkit.se.xml.v110.OnlineResourceType;
+import org.geotoolkit.sld.MutableLayer;
+import org.geotoolkit.sld.MutableLayerStyle;
+import org.geotoolkit.sld.MutableNamedLayer;
+import org.geotoolkit.sld.MutableNamedStyle;
+import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.xml.GetLegendGraphic;
+import org.geotoolkit.sld.xml.StyleXmlIO;
+import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
+import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
+import org.geotoolkit.sld.xml.v110.TypeNameType;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.StyleUtilities;
+import org.geotoolkit.util.PeriodUtilities;
+import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.util.converter.NonconvertibleObjectException;
+import org.geotoolkit.wms.xml.AbstractBoundingBox;
+import org.geotoolkit.wms.xml.AbstractDimension;
+import org.geotoolkit.wms.xml.AbstractGeographicBoundingBox;
+import org.geotoolkit.wms.xml.AbstractLayer;
+import org.geotoolkit.wms.xml.AbstractLegendURL;
+import org.geotoolkit.wms.xml.AbstractLogoURL;
+import org.geotoolkit.wms.xml.AbstractOnlineResource;
+import org.geotoolkit.wms.xml.AbstractRequest;
+import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
+import org.geotoolkit.wms.xml.DescribeLayer;
+import org.geotoolkit.wms.xml.GetCapabilities;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
+import org.geotoolkit.wms.xml.GetMap;
+import org.geotoolkit.wms.xml.WMSMarshallerPool;
+import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
+import org.geotoolkit.wms.xml.v130.Capability;
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -147,6 +187,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.StyledLayerDescriptor;
 import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
+import org.springframework.context.annotation.Scope;
 
 /**
  * A WMS worker for a local WMS service which handles requests from either REST
@@ -164,6 +205,9 @@ import org.opengis.util.FactoryException;
  * @author Guilhem Legall (Geomatys)
  * @since 0.3
  */
+
+@Named
+@Scope("prototype")
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     private static final WMSVisitorFactory[] VISITOR_FACTORIES;
@@ -181,7 +225,25 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         VISITOR_FACTORIES = factories.toArray(new WMSVisitorFactory[factories.size()]);
     }
+    
+    @PostConstruct
+    public void init() {
+        System.out.println("DefaultWMSWorker.init()");
+    }
+    
+    @PreDestroy
+    public void destroy() {
+        System.out.println("DefaultWMSWorker.destroy()");
+        super.destroy();
+    }
+    
+    private SecurityManager securityManager;
 
+    @Inject
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+    
     /**
      * AxisDirection name for Lat/Long, Elevation, temporal dimensions.
      */
@@ -196,6 +258,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     private static final List<String> VERTICAL_DIM = UnmodifiableArrayList.wrap(new String[] {"UP", "DOWN"});
 
     private WMSPortrayal mapPortrayal;
+    
+    public static class Factory {
+        public static DefaultWMSWorker create(String id) {
+            return new DefaultWMSWorker(id);
+        }
+    }
 
     public DefaultWMSWorker(final String id) {
         super(id, ServiceDef.Specification.WMS);

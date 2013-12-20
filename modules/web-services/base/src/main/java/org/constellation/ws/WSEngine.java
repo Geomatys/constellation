@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.util.ReflectionUtilities;
@@ -29,10 +30,21 @@ import org.constellation.util.ReflectionUtilities;
  * @author Guilhem Legal (Geomatys)
  */
 public final class WSEngine {
+    
+    private static final Logger LOGGER = Logging.getLogger(WSEngine.class);
 
+    private static DIEnhancer workerFactory = new DIEnhancer() {
+
+        @Override
+        public Worker enhance(Class<? extends Worker> workerClass, String identifier) {
+            return (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
+        }
+        
+        
+    };
+    
     private WSEngine() {}
 
-    private static final Logger LOGGER = Logging.getLogger(WSEngine.class);
 
     /**
      * A map of service worker.
@@ -57,6 +69,11 @@ public final class WSEngine {
     @Deprecated
     private static final List<String> TO_RESTART = new ArrayList<>();
 
+    
+    public static void setWorkerFactory(DIEnhancer workerFactory) {
+        WSEngine.workerFactory = workerFactory;
+    }
+    
     public static Map<String, Worker> getWorkersMap(final String specification) {
         return WORKERS_MAP.get(specification);
     }
@@ -207,7 +224,7 @@ public final class WSEngine {
      * @param serviceType The OGC service type (WMS, CSW, WFS, ...).
      * @return the worker class of a registered service or null if service not registered.
      */
-    private static Class getServiceWorkerClass(final String serviceType) {
+    private static Class<? extends Worker> getServiceWorkerClass(final String serviceType) {
         if (SERVICE_WORKER_CLASS.containsKey(serviceType)) {
             return SERVICE_WORKER_CLASS.get(serviceType);
         }
@@ -223,8 +240,8 @@ public final class WSEngine {
      * @return The new instancied {@link Worker}.
      */
     public static Worker buildWorker(final String serviceType, final String identifier) {
-        final Class workerClass = getServiceWorkerClass(serviceType);
-        return (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
+        final Class<? extends Worker> workerClass = getServiceWorkerClass(serviceType);
+        return workerFactory.enhance(workerClass, identifier);
     }
 
     /**
