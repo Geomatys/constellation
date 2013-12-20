@@ -57,10 +57,5 @@
           <version>0.9-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-core</artifactId>
-        </dependency>
-
     </dependencies>
 </project>
