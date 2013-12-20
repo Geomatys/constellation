@@ -51,14 +51,19 @@ public class DataController {
     @Route("/loadingFileData")
     public Response loadingFileData(final String filePath, final String returnURL, final String dataType){
         DataInformation di = providerManager.loadData(filePath, "", dataType);
-        DataInformationContainer.setInformation(di);
         Response aResponse = Response.error("response not initialized");
-        switch(dataType){
-            case "raster":
-                aResponse =  RasterController_.showRaster(returnURL, "false", "true");
-                break;
-            case "vector":
-                aResponse = VectorController_.showVector(returnURL, "false", "true");
+        if(di.getErrorInformation() == null){
+            DataInformationContainer.setInformation(di);
+            switch(dataType){
+                case "raster":
+                    aResponse =  RasterController_.showRaster(returnURL, "false", "true");
+                    break;
+                case "vector":
+                    aResponse = VectorController_.showVector(returnURL, "false", "true");
+            }
+        }
+        else{
+            aResponse =  Controller_.dataDashboard(di.getErrorInformation());
         }
         return aResponse;
     }

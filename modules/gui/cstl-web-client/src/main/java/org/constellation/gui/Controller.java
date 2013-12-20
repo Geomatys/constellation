@@ -159,7 +159,7 @@ public class Controller {
 
     @View
     @Route("/data")
-    public Response dataDashboard() {
+    public Response dataDashboard(final String errorInformation) {
         final List<LayerData> list = providerManager.getDataListing(Arrays.asList("vector"));
         final int nbResults = list.size();
 
@@ -178,6 +178,7 @@ public class Controller {
         parameters.put("startIndex", 0);
         parameters.put("nbPerPage", 10);
         parameters.put("selected", null);
+        parameters.put("errorInformation", errorInformation);
         return dataDashboard.ok(parameters).withMimeType("text/html");
     }
 

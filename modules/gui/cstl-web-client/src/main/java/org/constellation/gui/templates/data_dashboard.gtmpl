@@ -1,5 +1,7 @@
 #{decorate path=menu.gtmpl/}
 
+#{param name=errorInformation /}
+
 <div class="logo-wrapper">
     <a href="@{index()}"><img src="images/constellation.png"></a>
     <div class="dropdown pull-right">
@@ -125,4 +127,8 @@
         }
 
         var styleFlow = CSTL.LinkWorkflow.init('StyleController.styleList()', validateData, CSTL.LinkWorkflow.styleTemplate);
+
+        <%if(errorInformation !=null){%>
+            CSTL.growl('error',  CSTL.i18n('error'), CSTL.i18n('${errorInformation}'));
+        <%}%>
 </script>

@@ -53,17 +53,12 @@ public class RasterController {
     @Path("netcdf_coverage_listing.gtmpl")
     org.constellation.gui.templates.netcdf_coverage_listing netcdf_coverageListing;
 
-//    @Inject
-    public DataInformationContainer informationContainer;
-
-
     @View
     @Route("/raster/description")
     public Response showRaster(final String returnURL, final String metadataUploaded, final String creationMode) throws IOException {
         final Locale userLocale = Request.getCurrent().getUserContext().getLocale();
         final MetadataLists codeLists = providerManager.getMetadataCodeLists(userLocale.toString());
-
-        return rasterDescription.with().datainformation(informationContainer.getInformation())
+        return rasterDescription.with().datainformation(DataInformationContainer.getInformation())
                 .returnURL(returnURL)
                 .dateTypes(codeLists.getDateTypes())
                 .locales(codeLists.getLocales())
@@ -78,7 +73,7 @@ public class RasterController {
     @Action
     @Route("/raster/create")
     public Response createProvider(String returnURL, DataMetadata metadataToSave, String date, String keywords, String metadataUploaded) {
-        final DataInformation information = informationContainer.getInformation();
+        final DataInformation information = DataInformationContainer.getInformation();
         final String extension = FilenameUtils.getExtension(information.getPath());
         final List<String> suffixes = new ArrayList<>(0);
 
