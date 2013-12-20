@@ -1,13 +1,17 @@
 package org.constellation.coverage;
 
-import org.apache.shiro.subject.Subject;
 import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.TaskRecord;
 import org.constellation.admin.dao.UserRecord;
+import org.constellation.provider.LayerProviderProxy;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
+import org.opengis.parameter.ParameterValueGroup;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -26,10 +30,14 @@ public class PyramidCoverageProcessListener implements ProcessListener {
 
     private String uuidTask;
 
-    private Subject subject;
+    private String login;
+    private String path;
+    private String identifier;
 
-    public PyramidCoverageProcessListener(final Subject subject) {
-        this.subject = subject;
+    public PyramidCoverageProcessListener(final String login, final String path, final String identifier) {
+        this.login = login;
+        this.path = path;
+        this.identifier = identifier;
     }
 
     @Override
@@ -38,7 +46,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final UserRecord user = session.readUser(subject.getPrincipal().toString());
+            final UserRecord user = session.readUser(login);
 
             uuidTask = UUID.randomUUID().toString();
             session.writeTask(uuidTask, "pyramid", user.getLogin());
@@ -66,17 +74,40 @@ public class PyramidCoverageProcessListener implements ProcessListener {
 
     @Override
     public void completed(final ProcessEvent processEvent) {
-        //Update state (pass to completed) on database
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
+
+            //Update state (pass to completed) on database
             final TaskRecord pyramidTask = session.readTask(uuidTask);
             pyramidTask.setState(TaskRecord.TaskState.SUCCEED);
+
+            //update provider
+            updateProvider();
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Unable to save task", e);
         } finally {
             if (session != null) session.close();
         }
+    }
+
+    /**
+     *
+     */
+    private void updateProvider() {
+        final ParameterValueGroup sources = LayerProviderProxy.getInstance().getProvider(identifier).getSource();
+        URL fileUrl = null;
+        try {
+            fileUrl = URI.create("file:"+path+"/tiles").toURL();
+        } catch (MalformedURLException e) {
+            LOGGER.log(Level.WARNING, "unable to create url from path", e);
+        }
+        ParameterValueGroup xmlCoverageStoreParameters = sources.groups("choice").get(0).
+                addGroup("XMLCoverageStoreParameters");
+        xmlCoverageStoreParameters.parameter("identifier").setValue("coverage-xml-pyramid");
+        xmlCoverageStoreParameters.parameter("path").setValue(fileUrl);
+        xmlCoverageStoreParameters.parameter("type").setValue("AUTO");
+        LayerProviderProxy.getInstance().getProvider(identifier).updateSource(xmlCoverageStoreParameters);
     }
 
     @Override

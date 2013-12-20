@@ -17,17 +17,8 @@
 
 package org.constellation.provider.configuration;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.namespace.QName;
-
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.UnavailableSecurityManagerException;
-import org.apache.shiro.subject.Subject;
 import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.dao.DataRecord;
@@ -37,29 +28,53 @@ import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.StyleRecord.StyleType;
 import org.constellation.admin.dao.UserRecord;
+import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.provider.LayerDetails;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
+import org.constellation.security.NoSecurityManagerException;
+import org.constellation.security.SecurityManagerHolder;
+import org.constellation.util.MetadataMapBuilder;
+import org.constellation.util.SimplyMetadataTreeNode;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
+import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- *
  * @author Johann Sorel (Geomatys)
  */
 public interface Configurator {
 
     public static final Logger LOGGER = Logging.getLogger(Configurator.class);
-    
+
     public static final Configurator DEFAULT = new DefaultConfigurator();
 
     ParameterValueGroup getConfiguration(final ProviderService service);
 
     void saveConfiguration(final ProviderService service, final List<Provider> providers);
 
-    static final class DefaultConfigurator implements Configurator{
+    static final class DefaultConfigurator implements Configurator {
 
-        private DefaultConfigurator(){}
+        private DefaultConfigurator() {
+        }
 
         @Override
         public ParameterValueGroup getConfiguration(final ProviderService service) {
@@ -71,22 +86,22 @@ public interface Configurator {
             final ParameterValueGroup params = service.getServiceDescriptor().createValue();
             final String serviceName = service.getName();
 
-            //get current user credential
-            Subject subject = null;
-            try {
-               subject = SecurityUtils.getSubject();
-            }catch (UnavailableSecurityManagerException ex){
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
-            }
 
             // Update administration database.
             Session session = null;
             try {
                 session = EmbeddedDatabase.createSession();
-                UserRecord userRecord;
-                if(subject!=null){
-                    userRecord = session.readUser(subject.getPrincipal().toString());
-                }else{
+                final UserRecord userRecord;
+                String login = null;
+                try {
+                    login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
+                } catch (NoSecurityManagerException ex) {
+                    LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+                }
+
+                if (login != null) {
+                    userRecord = session.readUser(login);
+                } else {
                     userRecord = session.readUser("admin");
                 }
 
@@ -148,7 +163,37 @@ public interface Configurator {
                                 }
                             }
                             if (!found) {
-                                session.writeData(name, pr, provider.getDataType(), userRecord);
+                                DataRecord record = session.writeData(name, pr, provider.getDataType(), userRecord);
+                                final LayerDetails layer = (LayerDetails) provider.get(new DefaultName(name));
+                                final Object origin = layer.getOrigin();
+
+                                if (origin instanceof CoverageReference) {
+                                    final CoverageReference fcr = (CoverageReference) origin;
+                                    try {
+                                        int i = fcr.getImageIndex();
+                                        final GridCoverageReader reader = fcr.acquireReader();
+                                        final SpatialMetadata sm = reader.getCoverageMetadata(i);
+
+                                        if (sm != null) {
+                                            final String rootNodeName = sm.getNativeMetadataFormatName();
+                                            final Node coverageRootNode = sm.getAsTree(rootNodeName);
+
+                                            MetadataMapBuilder.setCounter(0);
+                                            final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverageRootNode, null, 11, i);
+
+                                            final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
+                                            final MarshallerPool mp = GenericDatabaseMarshallerPool.getInstance();
+                                            final Marshaller marshaller = mp.acquireMarshaller();
+                                            final StringWriter sw = new StringWriter();
+                                            marshaller.marshal(coverageMetadataBean, sw);
+                                            mp.recycle(marshaller);
+                                            final StringReader sr = new StringReader(sw.toString());
+                                            record.setMetadata(sr);
+                                        }
+                                    } catch (CoverageStoreException | JAXBException e) {
+                                        LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+                                    }
+                                }
                             }
                         }
 
@@ -173,7 +218,7 @@ public interface Configurator {
                                 }
                             }
                             if (!found) {
-                                session.writeStyle((String)key, pr, StyleType.VECTOR, (MutableStyle)provider.get(key), userRecord);
+                                session.writeStyle((String) key, pr, StyleType.VECTOR, (MutableStyle) provider.get(key), userRecord);
                             }
                         }
                     }

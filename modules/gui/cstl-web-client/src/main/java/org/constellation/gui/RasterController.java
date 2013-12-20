@@ -78,23 +78,20 @@ public class RasterController {
     @Action
     @Route("/raster/create")
     public Response createProvider(String returnURL, DataMetadata metadataToSave, String date, String keywords, String metadataUploaded) {
-
-        DataInformation information = informationContainer.getInformation();
-        String extension = FilenameUtils.getExtension(information.getPath());
-        Response rep;
-
-
+        final DataInformation information = informationContainer.getInformation();
+        final String extension = FilenameUtils.getExtension(information.getPath());
         final List<String> suffixes = new ArrayList<>(0);
+
+        Response rep;
         Collections.addAll(suffixes, SUFFIXES);
 
-        //if it's netCDF, we don't pyramid data
+        providerManager.createProvider("coverage-store", information.getName(), information.getPath(), information.getDataType(), null, "coverage-file");
+
+        //if it's netCDF, we don't pyramid data and go on a specific page.
         if(suffixes.contains(extension)){
-            providerManager.createProvider("coverage-store", information.getName(), information.getPath(), information.getDataType(), null, "coverage-file");
             rep = RasterController_.getNetCDFListing(returnURL, information.getName());
         }else{
             providerManager.pyramidData(information.getName(), information.getPath());
-            final String pyramidPath = providerManager.getPyramidPath(information.getName())+"/tiles";
-            providerManager.createProvider("coverage-store", information.getName(), pyramidPath, information.getDataType(), null, "coverage-xml-pyramid");
             rep = Response.redirect(returnURL);
         }
 

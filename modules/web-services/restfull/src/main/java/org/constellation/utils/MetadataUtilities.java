@@ -98,6 +98,7 @@ public final class MetadataUtilities {
                     final GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
                     final DataInformation di = getRasterDataInformation(coverageReader, templateMetadata, dataType);
                     di.setPath(file.getPath());
+                    coverageReader.dispose();
                     return di;
                 } catch (CoverageStoreException | NoSuchIdentifierException | ProcessException | JAXBException e) {
                     LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
@@ -214,17 +215,15 @@ public final class MetadataUtilities {
             final GenericName name = coverageReader.getCoverageNames().get(i);
             final SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
             if (sm != null) {
-
                 final String rootNodeName = sm.getNativeMetadataFormatName();
-                final Node coverateRootNode = sm.getAsTree(rootNodeName);
+                final Node coverageRootNode = sm.getAsTree(rootNodeName);
 
                 MetadataMapBuilder.setCounter(0);
-                final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverateRootNode, null, 11, i);
+                final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverageRootNode, null, 11, i);
 
                 final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
                 nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
             }
-
         }
 
         //update DataInformation
@@ -243,6 +242,7 @@ public final class MetadataUtilities {
         if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
             return (DefaultMetadata) coverageReader.getMetadata();
         }
+        coverageReader.dispose();
         return null;
     }
 

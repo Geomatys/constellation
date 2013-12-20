@@ -775,7 +775,7 @@ public final class Session implements Closeable {
     }
 
     /* internal */ InputStream readDataMetadata(final int dataid) throws SQLException, IOException {
-        final InputStream stream = new Query(READ_PROVIDER_METADATA).with(dataid).select().getClob();
+        final InputStream stream = new Query(READ_DATA_METADATA).with(dataid).select().getClob();
         return stream;
     }
 

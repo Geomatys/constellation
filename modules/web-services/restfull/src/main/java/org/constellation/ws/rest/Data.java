@@ -1,7 +1,5 @@
 package org.constellation.ws.rest;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
@@ -12,6 +10,7 @@ import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
+import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
 import org.constellation.dto.FileBean;
@@ -19,11 +18,13 @@ import org.constellation.dto.FileListBean;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
+import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
@@ -233,7 +234,7 @@ public class Data {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveMetadata(final DataMetadata metadataToSave) {
-        //Recover metadata
+        //Recover metadatapyram
         DefaultMetadata dm = new DefaultMetadata();
         switch (metadataToSave.getType()) {
             case "raster":
@@ -269,8 +270,6 @@ public class Data {
     public Response pyramidData(@PathParam("id") final String providerId, final SimpleValue path) {
 
         if (path.getValue() != null) {
-            final File dataFile = new File(path.getValue());
-
             // create folder to save pyramid
             File dataDirectory = ConfigDirectory.getDataDirectory();
             File pyramidFolder = new File(dataDirectory, "pyramid");
@@ -281,10 +280,10 @@ public class Data {
             final File dataPyramidFolder = new File(pyramidFolder, providerId);
             final String pyramidPath = dataPyramidFolder.getAbsolutePath();
 
-            final Subject subject = SecurityUtils.getSubject();
+            String login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
 
             //create listener which save information on Database
-            final ProcessListener listener = new PyramidCoverageProcessListener(subject);
+            final ProcessListener listener = new PyramidCoverageProcessListener(login, pyramidPath, providerId);
 
             Runnable pyramidRunnable = new Runnable() {
                 @Override
@@ -334,24 +333,6 @@ public class Data {
         return Response.ok(pv).build();
     }
 
-
-    @GET
-    @Path("pyramid/{id}/folder/")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getPyramidFolder(@PathParam("id") final String providerId) {
-        // create folder to save pyramid
-        File dataDirectory = ConfigDirectory.getDataDirectory();
-        File pyramidFolder = new File(dataDirectory, "pyramid");
-        if (!pyramidFolder.exists()) {
-            pyramidFolder.mkdir();
-        }
-        final File dataPyramidFolder = new File(pyramidFolder, providerId);
-        final SimpleValue value = new SimpleValue(dataPyramidFolder.toURI().toString());
-
-        return Response.ok(value).build();
-    }
-
     @PUT
     @Path("summary")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -381,18 +362,12 @@ public class Data {
     public Response getMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("dataType") String dataType) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
 
         //get reader
-        GridCoverageReader reader = null;
         final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(providerId);
         final LayerDetails layer = provider.get(new DefaultName(dataId));
         final Object origin = layer.getOrigin();
-        if (origin instanceof CoverageReference) {
-            final CoverageReference fcr = (CoverageReference) origin;
-            reader = fcr.acquireReader();
-        }
-
         //generate DataInformation
 
-        final DefaultMetadata metadata = ConfigurationEngine.loadMetadata(providerId, CSWMarshallerPool.getInstance());
+        final DefaultMetadata metadata = ConfigurationEngine.loadProviderMetadata(providerId, CSWMarshallerPool.getInstance());
         DataInformation information = new DataInformation();
         switch (dataType) {
             case "VECTOR":
@@ -400,7 +375,15 @@ public class Data {
                 information.setFileMetadata(meta);
                 break;
             case "COVERAGE":
+                final Map<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
+                final CoverageReference fcr = (CoverageReference) origin;
+                final GridCoverageReader reader = fcr.acquireReader();
                 information = MetadataUtilities.getRasterDataInformation(reader, metadata, dataType);
+                QName name = new QName(layer.getName().getNamespaceURI(), layer.getName().getLocalPart());
+                final CoverageMetadataBean cmb = ConfigurationEngine.loadDataMetadata(providerId, name, GenericDatabaseMarshallerPool.getInstance());
+                nameSpatialMetadataMap.put(dataId, cmb);
+                information.setCoveragesMetadata(nameSpatialMetadataMap);
+                fcr.recycle(reader);
                 break;
             default:
                 LOGGER.log(Level.INFO, "Type unknown to found metadata");

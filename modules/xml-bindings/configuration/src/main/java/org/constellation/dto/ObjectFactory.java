@@ -18,8 +18,13 @@ public class ObjectFactory {
         return new Service();
     }
 
+
     public CoverageDataDescription createCoverageDataDescription(){
         return new CoverageDataDescription();
+    }
+
+    public CoverageMetadataBean createCoverageMetadataBean(){
+        return new CoverageMetadataBean();
     }
 
     public FeatureDataDescription createFeatureDataDescription(){

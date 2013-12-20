@@ -54,6 +54,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ServiceProtocol;
 import org.constellation.configuration.Source;
 import org.constellation.configuration.StyleBrief;
+import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -75,6 +76,8 @@ public class ConfigurationEngine {
     private static SecurityManager securityManager; 
     
     private static ConfigurationService configurationService;
+
+    private static String userTest = null;
 
     public static void setConfigurationService(ConfigurationService configurationService) {
         ConfigurationEngine.configurationService = configurationService;
@@ -475,7 +478,7 @@ public class ConfigurationEngine {
      * @param pool
      * @return
      */
-    public static DefaultMetadata loadMetadata(final String providerId, final MarshallerPool pool) {
+    public static DefaultMetadata loadProviderMetadata(final String providerId, final MarshallerPool pool) {
         Session session = null;
         DefaultMetadata metadata = null;
         try {
@@ -486,6 +489,38 @@ public class ConfigurationEngine {
                 final Unmarshaller m = pool.acquireUnmarshaller();
                 if (sr != null) {
                     metadata = (DefaultMetadata) m.unmarshal(sr);
+                }
+                pool.recycle(m);
+                return metadata;
+            }
+        } catch (SQLException | IOException | JAXBException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
+    }
+
+    /**
+     * Load a metadata for a provider.
+     *
+     *
+     * @param pool
+     * @param name
+     * @return
+     */
+    public static CoverageMetadataBean loadDataMetadata(final String providerId, final QName name, final MarshallerPool pool) {
+        Session session = null;
+        CoverageMetadataBean metadata = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final DataRecord data = session.readData(name, providerId);
+            if (data != null) {
+                final InputStream sr = data.getMetadata();
+                final Unmarshaller m = pool.acquireUnmarshaller();
+                if (sr != null) {
+                    metadata = (CoverageMetadataBean) m.unmarshal(sr);
                 }
                 pool.recycle(m);
                 return metadata;
