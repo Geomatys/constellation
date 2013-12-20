@@ -76,6 +76,11 @@
           <scope>runtime</scope>
         </dependency>
         <dependency>
+          <groupId>org.glassfish.jersey.containers</groupId>
+          <artifactId>jersey-container-servlet</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
           <groupId>org.constellation.web-services</groupId>
           <artifactId>cstl-web-sos-mdw</artifactId>
           <version>${project.version}</version>
