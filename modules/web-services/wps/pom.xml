@@ -92,11 +92,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.constellation.engine</groupId>
-            <artifactId>cstl-engine-shiro</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.constellation.storage</groupId>
             <artifactId>cstl-store-data-coveragestore</artifactId>
             <version>${project.version}</version>
@@ -119,7 +114,12 @@
         </dependency>
 
         <!-- test dependencies -->
-
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-shiro</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
            <groupId>org.constellation.testing</groupId>
            <artifactId>cstl-test-embedded</artifactId>
