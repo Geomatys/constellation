@@ -35,7 +35,7 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
             @Override
             public Worker enhance(Class<? extends Worker> workerClass, String identifier) {
                 String[] beanNames = applicationContext.getBeanNamesForType(workerClass);
-                if(beanNames==null) {
+                if(beanNames==null || beanNames.length == 0) {
                     LOGGER.warn(workerClass.getName() + " is not managed by spring" );
                     return (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
                 }
