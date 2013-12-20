@@ -43,12 +43,13 @@ import org.geotoolkit.csw.xml.CSWResponse;
 import org.apache.sis.util.logging.Logging;
 
 /**
+ * Note: replace <T extends CSWResponse> by <T extends Object> because an strange bug arrive with DescribeRecordResponse not passing in this Provider.
  *
  * @author Guilhem Legal (Geomatys)
  */
 @Provider
-@Produces("application/xml,text/xml,*/*")
-public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWriter<T>  {
+@Produces({"application/xml" , "text/xml" , "*/*"})
+public class CSWResponseWriter<T extends Object> implements MessageBodyWriter<T>  {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.ws.rs");
 

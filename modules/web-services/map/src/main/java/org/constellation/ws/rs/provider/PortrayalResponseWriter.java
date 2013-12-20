@@ -89,20 +89,24 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
         r.setBuffer(result);
         return result.length;
     }
-    
+
+    /**
+     * This method is ignored by new API
+     */
     @Override
     public long getSize(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt) {
-        try {
+        /*try {
             return prepare(r, c, t, as, mt);
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-        }
+        }*/
         return -1;
     }
 
     @Override
     public void writeTo(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt,
             final MultivaluedMap<String, Object> h, OutputStream out) throws IOException, WebApplicationException {
+        prepare(r, c, t, as, mt);
         out.write(r.getBuffer());
     }
 

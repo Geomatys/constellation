@@ -41,7 +41,7 @@ import org.apache.sis.util.logging.Logging;
  * @author Guilhem Legal (Geomatys)
  */
 @Provider
-@Produces("application/xml,text/xml,*/*")
+@Produces({"application/xml" , "text/xml" , "*/*"})
 public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWriter<T> {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.sos.ws.rs");
@@ -64,8 +64,9 @@ public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWrit
     @Override
     public void writeTo(final T t, Class<?> type, final Type type1, Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         try {
+            final SOSResponse response = (SOSResponse) t;
             Marshaller m = SOSMarshallerPool.getInstance().acquireMarshaller();
-            if ("2.0.0".equals(t.getSpecificationVersion())) {
+            if ("2.0.0".equals(response.getSpecificationVersion())) {
                 m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, SCHEMA_LOCATION_V200);
             } else {
                 m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, SCHEMA_LOCATION_V100);

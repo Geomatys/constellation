@@ -42,6 +42,8 @@ import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
@@ -61,6 +63,7 @@ import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
+import org.junit.runner.RunWith;
 
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -72,6 +75,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
+@RunWith(TestRunner.class)
 public class WCSRequestsTest extends AbstractGrizzlyServer {
 
     /**
@@ -192,6 +196,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * returned an error report for the user.
      */
     @Test
+    @Order(order=1)
     public void testWCSWrongRequest() throws Exception {
         waitForStart();
 
@@ -238,8 +243,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetCoverage request returns indeed a {@link BufferedImage}.
      */
     @Test
+    @Order(order=2)
     public void testWCSGetCoverage() throws Exception {
-        waitForStart();
 
         // Creates a valid GetCoverage url.
         final URL getCoverageUrl;
@@ -270,6 +275,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * @TODO: do this test when moving of Geotools' version
      */
     @Ignore
+    @Order(order=3)
     public void testWCSGetCoverageMatrixFormat() throws IOException {
 
         // Creates a valid GetCoverage url.
@@ -290,6 +296,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * document representing the server capabilities in the WCS version 1.0.0 standard.
      */
     @Test
+    @Order(order=4)
     public void testWCSGetCapabilities() throws JAXBException, IOException {
 
         // Creates a valid GetCapabilities url.
@@ -371,6 +378,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid DescribeCoverage request returns indeed a valid document.
      */
     @Test
+    @Order(order=5)
     public void testWCSDescribeCoverage() throws JAXBException, IOException {
 
         // Creates a valid DescribeCoverage url.

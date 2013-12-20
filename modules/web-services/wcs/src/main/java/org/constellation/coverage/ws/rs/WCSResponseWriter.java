@@ -41,7 +41,7 @@ import org.geotoolkit.wcs.xml.WCSResponse;
  */
 @Provider
 @Produces("application/xml,text/xml,*/*")
-public class WCSResponseWriter<T extends WCSResponse> implements MessageBodyWriter<T>  {
+public class WCSResponseWriter<T extends Object> implements MessageBodyWriter<T>  {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.coverage.ws.rs");
 

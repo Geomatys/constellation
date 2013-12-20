@@ -270,7 +270,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
     @Test
     @Order(order=1)
-    public void testWFSGetCapabilities() throws JAXBException, IOException {
+    public void testWFSGetCapabilities() throws Exception {
+        waitForStart();
 
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETCAPABILITIES_URL);
@@ -394,6 +395,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
+    @Order(order=5)
     public void testWFSGetFeatureGET2() throws Exception {
         final URL getfeatsUrl;
         try {
@@ -421,7 +423,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
-    @Order(order=5)
+    @Order(order=6)
     public void testWFSGetFeatureGETStoredQuery() throws Exception {
         final URL getfeatsUrl;
         try {
@@ -445,7 +447,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
-    @Order(order=6)
+    @Order(order=7)
     public void testWFSDescribeFeatureGET() throws Exception {
         URL getfeatsUrl;
         try {
@@ -481,7 +483,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
-    @Order(order=7)
+    @Order(order=8)
     public void testWFSTransactionInsert() throws Exception {
 
         // Creates a valid GetCapabilities url.
@@ -614,7 +616,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
 
     @Test
-    @Order(order=8)
+    @Order(order=9)
     public void testWFSTransactionUpdate() throws Exception {
 
         // Creates a valid GetCapabilities url.
@@ -660,7 +662,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
-    @Order(order=9)
+    @Order(order=10)
     public void testWFSListStoredQueries() throws Exception {
 
         // Creates a valid GetCapabilities url.
@@ -678,7 +680,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
-    @Order(order=10)
+    @Order(order=11)
     public void testWFSDescribeStoredQueries() throws Exception {
 
         // Creates a valid GetCapabilities url.
@@ -696,7 +698,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     }
     
     @Test
-    @Order(order=11)
+    @Order(order=12)
     public void testWFSGetPropertyValue() throws Exception {
 
         // Creates a valid GetCapabilities url.

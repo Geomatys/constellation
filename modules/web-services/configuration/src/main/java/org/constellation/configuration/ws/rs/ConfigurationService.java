@@ -33,7 +33,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MultivaluedMap;
-import com.sun.jersey.spi.resource.Singleton;
+import javax.inject.Singleton;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBException;

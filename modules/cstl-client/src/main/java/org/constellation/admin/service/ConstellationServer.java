@@ -16,6 +16,15 @@
  */
 package org.constellation.admin.service;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import org.glassfish.jersey.client.ClientResponse;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.MultiPart;
+
 import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
@@ -33,8 +42,10 @@ import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringTreeNode;
 import org.constellation.dto.DataDescription;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.dto.DataInformation;
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.client.ServerFactory;
@@ -56,6 +67,7 @@ import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
 
 import javax.swing.event.EventListenerList;
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -72,6 +84,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -81,6 +94,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.constellation.api.QueryConstants.*;
+
 
 
 /**
@@ -1072,6 +1086,44 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
+        }
+
+        /**
+         * Send file on constellation server
+         *
+         * @param file file to sent
+         * @param name future data name
+         * @param dataType data type (raster, vector or sensor)
+         * @return true if file sent without problem
+         */
+        public DataInformation uploadData(File file, String dataType){
+            //create form body part
+            FormDataBodyPart fileBody = new FormDataBodyPart(file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+            FormDataBodyPart dataTypeBody = new FormDataBodyPart(dataType, MediaType.TEXT_PLAIN_TYPE);
+
+
+            try {
+                // create content disposition do give file name on server
+                FormDataContentDisposition cdFile = new FormDataContentDisposition("form-data; name=\"file\"; filename=\""+file.getName()+"\"");
+                fileBody.setContentDisposition(cdFile);
+                FormDataContentDisposition cdDataType = new FormDataContentDisposition("form-data; name=\"type\"");
+                dataTypeBody.setContentDisposition(cdDataType);
+            } catch (ParseException e) {
+                LOGGER.log(Level.WARNING, "error on cd building", e);
+                return null;
+            }
+
+            MultiPart multi = new MultiPart();
+            multi.bodyPart(fileBody);
+            multi.bodyPart(dataTypeBody);
+
+            // generate jersey client to send file
+            Client c = ClientBuilder.newClient();
+            WebTarget service = c.target(getURLWithEndSlash());
+            ClientResponse response = service.path("data/upload").request(MediaType.MULTIPART_FORM_DATA).post(Entity.entity(multi, MediaType.MULTIPART_FORM_DATA), ClientResponse.class);
+
+            DataInformation information = response.readEntity(DataInformation.class);
+            return information;
         }
 
         public DataDescription getLayerDataDescription(String providerId, String layerName) {

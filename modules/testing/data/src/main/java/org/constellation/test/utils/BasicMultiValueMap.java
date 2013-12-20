@@ -18,6 +18,7 @@
 package org.constellation.test.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
@@ -30,7 +31,7 @@ public class BasicMultiValueMap<K,V> extends HashMap<K, List<V>> implements Mult
 
     @Override
     public void putSingle(K k, V v) {
-        final List<V> values = new ArrayList<V>();
+        final List<V> values = new ArrayList<>();
         values.add(v);
         put(k, values);
     }
@@ -53,6 +54,31 @@ public class BasicMultiValueMap<K,V> extends HashMap<K, List<V>> implements Mult
         }else{
             return values.get(0);
         }
+    }
+
+    @Override
+    public void addAll(K k, V... vs) {
+        put(k,Arrays.asList(vs));
+    }
+
+    @Override
+    public void addAll(K k, List<V> list) {
+        put(k, list);
+    }
+
+    @Override
+    public void addFirst(K k, V v) {
+        List<V> values = get(k);
+        if (values == null) {
+            values = new ArrayList<>();
+        }
+        values.add(0, v);
+        put(k, values);
+    }
+
+    @Override
+    public boolean equalsIgnoreValueOrder(MultivaluedMap<K, V> mm) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

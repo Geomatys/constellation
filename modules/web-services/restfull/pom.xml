@@ -94,6 +94,11 @@
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-processing-metadata</artifactId>
         </dependency>
+        
+
+
+
+        <!-- Geomatys external project -->
         <dependency>
             <groupId>org.mdweb.metamodel</groupId>
             <artifactId>mdweb-metamodel-lib-auth</artifactId>
@@ -105,12 +110,12 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-multipart</artifactId>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

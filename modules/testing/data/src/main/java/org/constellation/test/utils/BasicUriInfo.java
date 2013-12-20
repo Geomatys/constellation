@@ -134,4 +134,14 @@ public class BasicUriInfo implements UriInfo{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public URI resolve(URI uri) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public URI relativize(URI uri) {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
 }

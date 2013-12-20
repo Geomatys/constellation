@@ -16,7 +16,7 @@
  */
 package org.constellation.wmts.ws.rs;
 
-import com.sun.jersey.spi.resource.Singleton;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;

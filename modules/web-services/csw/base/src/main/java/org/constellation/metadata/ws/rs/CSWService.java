@@ -33,7 +33,7 @@ import java.util.logging.Level;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import com.sun.jersey.spi.resource.Singleton;
+import javax.inject.Singleton;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;

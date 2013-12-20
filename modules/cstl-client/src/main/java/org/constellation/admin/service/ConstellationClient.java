@@ -17,12 +17,7 @@
 
 package org.constellation.admin.service;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.AcknowlegementType;
@@ -38,9 +33,18 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
+import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.client.ClientResponse;
+import org.glassfish.jersey.client.filter.HttpBasicAuthFilter;
 
 /**
  * Constellation RESTful API client.
@@ -102,7 +106,7 @@ public final class ConstellationClient {
         ensureNonNull("version", version);
 
         // Initialize Jersey client.
-        this.client = Client.create();
+        this.client = ClientBuilder.newClient();
         connectTimeout(5000);
         readTimeout(20000);
 
@@ -126,7 +130,7 @@ public final class ConstellationClient {
     public ConstellationClient auth(final String login, final String password) {
         ensureNonNull("login",    login);
         ensureNonNull("password", password);
-        this.client.addFilter(new HTTPBasicAuthFilter(login, password));
+        this.client.register(new HttpBasicAuthFilter(login, password));
         return this;
     }
 
@@ -138,7 +142,7 @@ public final class ConstellationClient {
      */
     public ConstellationClient readTimeout(final int timeout) {
         ensureStrictlyPositive("timeout", timeout);
-        this.client.setReadTimeout(timeout);
+        this.client.property(ClientProperties.READ_TIMEOUT, timeout);
         return this;
     }
 
@@ -150,7 +154,7 @@ public final class ConstellationClient {
      */
     public ConstellationClient connectTimeout(final int timeout) {
         ensureStrictlyPositive("timeout", timeout);
-        this.client.setConnectTimeout(timeout);
+        this.client.property(ClientProperties.CONNECT_TIMEOUT, timeout);
         return this;
     }
 
@@ -165,7 +169,7 @@ public final class ConstellationClient {
     Response get(final String path, final MediaType type) throws IOException {
         try {
             return new Response(newRequest(path, type).get(ClientResponse.class));
-        } catch (ClientHandlerException | UniformInterfaceException ex) {
+        } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
     }
@@ -181,8 +185,8 @@ public final class ConstellationClient {
      */
     Response post(final String path, final MediaType type, final Object body) throws IOException {
         try {
-            return new Response(newRequest(path, type).post(ClientResponse.class, body));
-        } catch (ClientHandlerException | UniformInterfaceException ex) {
+            return new Response(newRequest(path, type).post(Entity.entity(body, type), ClientResponse.class));
+        } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
     }
@@ -198,16 +202,14 @@ public final class ConstellationClient {
      */
     Response put(final String path, final MediaType type, final Object body) throws IOException {
         try {
-            return new Response(newRequest(path, type).put(ClientResponse.class, body));
-        } catch (ClientHandlerException | UniformInterfaceException ex) {
+            return new Response(newRequest(path, type).put(Entity.entity(body, type), ClientResponse.class));
+        } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
     }
 
-
     /**
      * Submits a HTTP DELETE request and returns the response.
-     *
      *
      * @param path the request path
      * @param type the submitted/expected media type
@@ -215,16 +217,22 @@ public final class ConstellationClient {
      * @return the response instance
      * @throws IOException on HTTP communication problem like connection or read timeout
      */
-    Response delete(final String path, final MediaType type, final MultivaluedMap<String, String> map) throws IOException {
+    Response delete(final String path, final MediaType type) throws IOException {
         try {
-            final ClientResponse request = this.client
-                    .resource(url + "api/" + version + "/")
-                    .queryParams(map)
-                    .path(path)
-                    .type(type)
-                    .delete(ClientResponse.class);
-            return new Response(request);
-        } catch (ClientHandlerException | UniformInterfaceException ex) {
+            return new Response(newRequest(path, type).delete(ClientResponse.class));
+        } catch (ProcessingException | WebApplicationException ex) {
+            throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
+        }
+    }
+
+    /**
+     * TODO remove
+     */
+    @Deprecated
+    Response delete(final String path, final MediaType type, String paramName, String paramValue) throws IOException {
+        try {
+            return new Response(newRequest(path, type, paramName, paramValue).delete(ClientResponse.class));
+        } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
     }
@@ -232,13 +240,16 @@ public final class ConstellationClient {
     /**
      * Creates a new request from the specified path and {@link MediaType}.
      *
-     *
      * @param path the request path
      * @param type the submitted/expected media type
      * @return the response instance
      */
-    private WebResource.Builder newRequest(final String path, final MediaType type) {
-        return this.client.resource(url + "api/" + version + "/").path(path).type(type);
+    private Invocation.Builder newRequest(final String path, final MediaType type) {
+        return this.client.target(url + "api/" + version + "/").path(path).request(type);
+    }
+
+    private Invocation.Builder newRequest(final String path, final MediaType type, String paramName, String paramValue) {
+        return this.client.target(url + "api/" + version + "/").queryParam(paramName, paramValue).path(path).request(type);
     }
 
     /**
@@ -278,8 +289,8 @@ public final class ConstellationClient {
             ensure2xxStatus();
             ensureNonEmptyContent();
             try {
-                return response.getEntity(c);
-            } catch (ClientHandlerException | UniformInterfaceException ex) {
+                return response.readEntity(c);
+            } catch (ProcessingException | WebApplicationException ex) {
                 throw new IOException("Response entity processing has failed.", ex);
             } finally {
                 response.close();
@@ -301,7 +312,7 @@ public final class ConstellationClient {
             ensureNonEmptyContent();
             try {
                 final ParameterValueReader reader = new ParameterValueReader(descriptor);
-                reader.setInput(response.getEntityInputStream());
+                reader.setInput(response.getEntityStream());
                 return reader.read();
             } catch (XMLStreamException ex) {
                 throw new IOException("GeneralParameterValue entity parsing has failed.", ex);
@@ -324,7 +335,7 @@ public final class ConstellationClient {
             ensureNonEmptyContent();
             try {
                 final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(response.getEntityInputStream());
+                final Object obj = unmarshaller.unmarshal(response.getEntityStream());
                 pool.recycle(unmarshaller);
                 return obj;
             } catch (JAXBException ex) {
@@ -343,12 +354,12 @@ public final class ConstellationClient {
         public void ensure2xxStatus() throws HttpResponseException, IOException  {
             if (response.getStatus() / 100 != 2) {
                 final String message;
-                if (MediaType.TEXT_PLAIN_TYPE.equals(response.getType())) {
-                    message = response.getEntity(String.class);
-                } else if (MediaType.TEXT_XML_TYPE.equals(response.getType())
-                        || MediaType.APPLICATION_XML_TYPE.equals(response.getType())
-                        || MediaType.APPLICATION_JSON_TYPE.equals(response.getType())) {
-                    message = response.getEntity(AcknowlegementType.class).getMessage();
+                if (MediaType.TEXT_PLAIN_TYPE.equals(response.getMediaType())) {
+                    message = response.readEntity(String.class);
+                } else if (MediaType.TEXT_XML_TYPE.equals(response.getMediaType())
+                        || MediaType.APPLICATION_XML_TYPE.equals(response.getMediaType())
+                        || MediaType.APPLICATION_JSON_TYPE.equals(response.getMediaType())) {
+                    message = response.readEntity(AcknowlegementType.class).getMessage();
                 } else {
                     message = response.toString();
                 }
@@ -382,6 +393,6 @@ public final class ConstellationClient {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        this.client.destroy();
+        this.client.close();
     }
 }

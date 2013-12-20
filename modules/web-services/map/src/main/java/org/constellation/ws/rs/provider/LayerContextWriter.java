@@ -30,14 +30,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import com.sun.jersey.json.impl.JSONMarshallerImpl;
+import org.glassfish.jersey.jettison.JettisonConfig;
+import org.glassfish.jersey.jettison.JettisonJaxbContext;
+import org.glassfish.jersey.jettison.JettisonMarshaller;
+
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.LayerList;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -79,19 +78,19 @@ public final class LayerContextWriter implements MessageBodyWriter {
             // if it's a json POST, create a JSonMarshaller.
             if (mt.equals(MediaType.APPLICATION_JSON_TYPE)) {
                 //transform xlm namespace to json namespace
-                Map<String, String> nSMap = new HashMap<String, String>(0);
+                Map<String, String> nSMap = new HashMap<>(0);
                 nSMap.put("http://www.constellation.org/config", "constellation-config");
 
                 // create json marshaller configuration and context
-                JSONConfiguration config = JSONConfiguration.mappedJettison().xml2JsonNs(nSMap).build();
-                JAXBContext cxtx = new JSONJAXBContext("org.constellation.configuration:" +
+                JettisonConfig config = JettisonConfig.mappedJettison().xml2JsonNs(nSMap).build();
+                JettisonJaxbContext cxtx = new JettisonJaxbContext(config, "org.constellation.configuration:" +
                         "org.constellation.generic.database:" +
                         "org.geotoolkit.ogc.xml.v110:" +
                         "org.apache.sis.internal.jaxb.geometry:" +
                         "org.geotoolkit.gml.xml.v311");
 
                 // create marshaller
-                JSONMarshaller jsonMarshaller = new JSONMarshallerImpl(cxtx, config);
+                JettisonMarshaller jsonMarshaller = cxtx.createJsonMarshaller();
 
                 // Marshall object
                 jsonMarshaller.marshallToJSON(r, out);

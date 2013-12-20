@@ -18,6 +18,7 @@
 package org.constellation.metadata.io.filesystem;
 
 import java.io.File;
+import org.apache.sis.util.logging.Logging;
 import static org.constellation.metadata.CSWConstants.XML_EXT;
 
 /**
@@ -35,6 +36,11 @@ public class FileMetadataUtils {
      * @return
      */
     public static File getFileFromIdentifier(final String identifier, final File directory) {
+        if (directory == null) {
+            return null;
+        } else if (!directory.isDirectory()) {
+            Logging.getLogger(FileMetadataUtils.class).warning(directory.getPath() + " is not a valid directory");
+        }
         // 1) try to find the file in the current directory
         File metadataFile = new File (directory,  identifier + XML_EXT);
         // 2) trying without the extension

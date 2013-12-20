@@ -16,7 +16,7 @@
  */
 package org.constellation.wps.ws.rs;
 
-import com.sun.jersey.spi.resource.Singleton;
+import javax.inject.Singleton;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.wps.configuration.WPSConfigurer;

@@ -52,22 +52,14 @@
     <!-- REST Servlet for constellation web service -->
     <servlet>
         <servlet-name>ServletAdaptor</servlet-name>
-        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
-          <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
-          <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>${constellation.services.packages}</param-value>
         </init-param>
         <init-param>
-          <param-name>com.sun.jersey.config.property.packages</param-name>
-             <!-- To enable configuration  service add packageName: org.constellation.configuration.ws                           -->
-             <!-- To enable CSW            service add packageName: org.constellation.metadata.ws.rs                             -->
-             <!-- To enable SOS            service add packageName: org.constellation.sos.ws.rs                                  -->
-             <!-- To enable WMS            service add packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
-             <!-- To enable WCS            service add packageName: org.constellation.coverage.ws.rs                             -->
-             <!-- To enable WPS            service add packageName: org.constellation.wps.ws.rs                                  -->
-             <!-- To enable WFS            service add packageName: org.constellation.wfs.ws.rs                                  -->
-             <!-- To enable WMTS           service add packageName: org.constellation.wmts.ws.rs                                 -->
-          <param-value>${constellation.services.packages}</param-value>
+          <param-name>javax.ws.rs.Application</param-name>
+          <param-value>org.constellation.ws.rs.CstlApplication</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -77,13 +69,9 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>newREST</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
-            <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
-            <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
-        </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>org.constellation.rest.api;
                          org.constellation.ws.rest;
                          org.constellation.ws.rs.provider</param-value>

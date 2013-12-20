@@ -152,7 +152,6 @@ public class WMSService extends GridWebService<WMSWorker> {
 
     public static boolean writeDTD = true;
 
-    
     /**
      * Build a new instance of the webService and initialize the JAXB context.
      */

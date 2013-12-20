@@ -92,6 +92,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-shiro</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.constellation.storage</groupId>
             <artifactId>cstl-store-data-coveragestore</artifactId>
             <version>${project.version}</version>
@@ -121,6 +126,10 @@
            <version>${project.version}</version>
            <scope>test</scope>
         </dependency>
-
+	<dependency>
+           <groupId>javax.servlet</groupId>
+           <artifactId>javax.servlet-api</artifactId>
+           <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
