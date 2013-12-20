@@ -1122,7 +1122,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             WebTarget service = c.target(getURLWithEndSlash());
             ClientResponse response = service.path("data/upload").request(MediaType.MULTIPART_FORM_DATA).post(Entity.entity(multi, MediaType.MULTIPART_FORM_DATA), ClientResponse.class);
 
-            DataInformation information = response.readEntity(DataInformation.class, null);
+            DataInformation information = response.readEntity(DataInformation.class);
             return information;
         }
 

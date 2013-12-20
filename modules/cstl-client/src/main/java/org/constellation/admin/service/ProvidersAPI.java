@@ -17,9 +17,6 @@
 
 package org.constellation.admin.service;
 
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.dto.DataInformation;
@@ -33,11 +30,8 @@ import org.constellation.dto.StyleListBean;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
@@ -105,7 +99,7 @@ public final class ProvidersAPI {
         ensureNonNull("styleName", styleName);
 
         final String path = "SP/" + providerId + "/style/" + styleName;
-        client.delete(path, MediaType.APPLICATION_XML_TYPE, new MultivaluedMapImpl()).ensure2xxStatus();
+        client.delete(path, MediaType.APPLICATION_XML_TYPE).ensure2xxStatus();
     }
 
     /**

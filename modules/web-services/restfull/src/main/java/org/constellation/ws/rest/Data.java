@@ -2,14 +2,8 @@ package org.constellation.ws.rest;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.glassfish.jersey.media.multipart.BodyPart;
-import org.glassfish.jersey.media.multipart.BodyPartEntity;
-import org.glassfish.jersey.media.multipart.MultiPart;
-
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.collection.TreeTable;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
@@ -18,7 +12,6 @@ import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
-import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
 import org.constellation.dto.FileBean;
@@ -41,20 +34,15 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessListener;
 import org.opengis.feature.type.Name;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.identification.TopicCategory;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
-import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.NoSuchIdentifierException;
-import org.w3c.dom.Node;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -68,11 +56,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -408,8 +391,6 @@ public class Data {
         }
 
         //generate DataInformation
-
-        if (uploadedInputStream != null) {
 
         final DefaultMetadata metadata = ConfigurationEngine.loadMetadata(providerId, CSWMarshallerPool.getInstance());
         DataInformation information = new DataInformation();

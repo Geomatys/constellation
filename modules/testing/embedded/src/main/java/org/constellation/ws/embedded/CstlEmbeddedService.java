@@ -28,16 +28,19 @@ import java.util.logging.Level;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.ws.Endpoint;
-import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
 import java.util.*;
 import java.util.Map.Entry;
+import javax.ws.rs.ProcessingException;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import org.geotoolkit.console.CommandLine;
 import org.geotoolkit.console.Option;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.ws.rs.CstlApplication;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ApplicationHandler;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
-import org.glassfish.jersey.servlet.ServletContainer;
 
 /**
  * An Abstract class to run the web service in an embedded container.
@@ -128,7 +131,7 @@ public class CstlEmbeddedService extends CommandLine {
     //      map.put("com.sun.jersey.config.property.packages", "org.constellation.coverage.ws.rs");
     //      map.put(TODO: get providers line from Cedric);
     //  below we add in one of the properties needed by all services.
-    protected Map<String, String> grizzlyWebContainerProperties = new HashMap<>();
+    protected Map<String, Object> grizzlyWebContainerProperties = new HashMap<>();
     //FOR SOAP, DEFINE THIS REFERENCE:
     public final Map<String, Object> serviceInstanceSOAP = new HashMap<>();
 
@@ -216,12 +219,12 @@ public class CstlEmbeddedService extends CommandLine {
         while (!working) {
             working = true;
             try {
-                if (grizzlyWebContainerProperties.isEmpty()) {
-                    threadSelector = GrizzlyWebContainerFactory.create(currentUri, ServletContainer.class);
-                } else {
-                    threadSelector = GrizzlyWebContainerFactory.create(currentUri, ServletContainer.class, grizzlyWebContainerProperties);
-                }
-            } catch (IOException e) {
+                final ResourceConfig config = ResourceConfig.forApplication(new CstlApplication());
+                config.addProperties(grizzlyWebContainerProperties);
+                ApplicationHandler handler = new ApplicationHandler(config);
+                threadSelector = GrizzlyHttpServerFactory.createHttpServer(currentUri, handler, true);
+                
+            } catch (ProcessingException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 if (findAvailablePort) {
                     working = false;

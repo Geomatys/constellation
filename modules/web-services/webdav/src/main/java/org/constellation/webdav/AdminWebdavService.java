@@ -16,7 +16,7 @@
  */
 package org.constellation.webdav;
 
-import com.sun.jersey.spi.resource.Singleton;
+import javax.inject.Singleton;
 import java.util.logging.Level;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;

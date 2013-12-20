@@ -149,6 +149,8 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
 
     @Test
     public void testWFSDescribeFeatureGET() throws Exception {
+        waitForStart();
+        
         final URL getfeatsUrl;
         try {
             getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" +WFS_DESCRIBE_FEATURE_TYPE_URL);

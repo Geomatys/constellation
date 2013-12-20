@@ -217,9 +217,21 @@ public final class ConstellationClient {
      * @return the response instance
      * @throws IOException on HTTP communication problem like connection or read timeout
      */
-    Response delete(final String path, final MediaType type, final MultivaluedMap<String, String> map) throws IOException {
+    Response delete(final String path, final MediaType type) throws IOException {
         try {
-            return new Response(newRequest(path, type).queryParams(map).delete(ClientResponse.class));
+            return new Response(newRequest(path, type).delete(ClientResponse.class));
+        } catch (ProcessingException | WebApplicationException ex) {
+            throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
+        }
+    }
+
+    /**
+     * TODO remove
+     */
+    @Deprecated
+    Response delete(final String path, final MediaType type, String paramName, String paramValue) throws IOException {
+        try {
+            return new Response(newRequest(path, type, paramName, paramValue).delete(ClientResponse.class));
         } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
@@ -234,6 +246,10 @@ public final class ConstellationClient {
      */
     private Invocation.Builder newRequest(final String path, final MediaType type) {
         return this.client.target(url + "api/" + version + "/").path(path).request(type);
+    }
+
+    private Invocation.Builder newRequest(final String path, final MediaType type, String paramName, String paramValue) {
+        return this.client.target(url + "api/" + version + "/").queryParam(paramName, paramValue).path(path).request(type);
     }
 
     /**
@@ -273,7 +289,7 @@ public final class ConstellationClient {
             ensure2xxStatus();
             ensureNonEmptyContent();
             try {
-                return response.readEntity(c, null);
+                return response.readEntity(c);
             } catch (ProcessingException | WebApplicationException ex) {
                 throw new IOException("Response entity processing has failed.", ex);
             } finally {
@@ -339,11 +355,11 @@ public final class ConstellationClient {
             if (response.getStatus() / 100 != 2) {
                 final String message;
                 if (MediaType.TEXT_PLAIN_TYPE.equals(response.getMediaType())) {
-                    message = response.readEntity(String.class, null);
+                    message = response.readEntity(String.class);
                 } else if (MediaType.TEXT_XML_TYPE.equals(response.getMediaType())
                         || MediaType.APPLICATION_XML_TYPE.equals(response.getMediaType())
                         || MediaType.APPLICATION_JSON_TYPE.equals(response.getMediaType())) {
-                    message = response.readEntity(AcknowlegementType.class, null).getMessage();
+                    message = response.readEntity(AcknowlegementType.class).getMessage();
                 } else {
                     message = response.toString();
                 }

@@ -482,7 +482,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         assertTrue(result.getAvailableServices().containsKey("SOS"));
         assertTrue(result.getAvailableServices().containsKey("CSW"));
 
-        assertEquals(result.getAvailableServices().toString(), 2, result.getAvailableServices().size());
+        assertEquals(result.getAvailableServices().toString(), 3, result.getAvailableServices().size());
 
 
     }
