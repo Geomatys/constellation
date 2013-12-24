@@ -35,7 +35,7 @@ CSTL = {
      */
     $dictionary: null,
 
-
+    URL_CONSTELLATION_PROXY: appURL + "/constellation",
     URL_VECTOR_PICTURE:"url("+appURL+"/images/vector.png)",
     URL_VECTOR_SELECTED_PICTURE:"url("+appURL+"/images/vector-selected.png)",
     URL_RASTER_PICTURE:"url("+appURL+"/images/raster.png)",

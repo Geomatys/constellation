@@ -193,7 +193,7 @@ function updateChild(event){
         var serverURL  = window.location.protocol + "//" + window.location.host + "/"
         $.ajax({
             type  :   "POST",
-            url   :   serverURL + "constellation/api/1/data/testextension/",
+            url   :   CSTL.URL_CONSTELLATION_PROXY + "/api/1/data/testextension/",
             success : serverFileSuccess,
             dataType: "json",
             contentType: "application/json; charset=utf-8",
