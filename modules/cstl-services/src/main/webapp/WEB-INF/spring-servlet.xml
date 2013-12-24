@@ -2,20 +2,28 @@
 <beans default-lazy-init="default" xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
   xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:p="http://www.springframework.org/schema/p"
   xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
-  <tx:annotation-driven proxy-target-class="true"  transaction-manager="transactionManager" />
+  <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager" />
+
+  <bean id="xml.xstream.marshaller" class="org.springframework.oxm.xstream.XStreamMarshaller" />
+
+
 
   <mvc:annotation-driven>
     <mvc:message-converters>
-      <!-- Use the HibernateAware mapper instead of the default -->
       <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
         <property name="objectMapper">
           <bean class="org.constellation.web.HibernateAwareObjectMapper" />
         </property>
+      </bean>
+      <bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+        <property name="marshaller" ref="xml.xstream.marshaller" />
+        <property name="unmarshaller" ref="xml.xstream.marshaller" />
       </bean>
     </mvc:message-converters>
   </mvc:annotation-driven>
