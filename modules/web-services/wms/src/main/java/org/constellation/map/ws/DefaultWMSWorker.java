@@ -73,10 +73,7 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.imageio.spi.ServiceRegistry;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
@@ -107,7 +104,6 @@ import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.query.wms.WMSQuery;
-import org.constellation.security.SecurityManager;
 import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
@@ -225,24 +221,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         VISITOR_FACTORIES = factories.toArray(new WMSVisitorFactory[factories.size()]);
     }
-    
-    @PostConstruct
-    public void init() {
-        System.out.println("DefaultWMSWorker.init()");
-    }
-    
-    @PreDestroy
-    public void destroy() {
-        System.out.println("DefaultWMSWorker.destroy()");
-        super.destroy();
-    }
-    
-    private SecurityManager securityManager;
-
-    @Inject
-    public void setSecurityManager(SecurityManager securityManager) {
-        this.securityManager = securityManager;
-    }
+   
     
     /**
      * AxisDirection name for Lat/Long, Elevation, temporal dimensions.
