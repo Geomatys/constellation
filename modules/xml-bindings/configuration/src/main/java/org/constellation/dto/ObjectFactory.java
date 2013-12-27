@@ -18,6 +18,9 @@ public class ObjectFactory {
         return new Service();
     }
 
+    public MetadataLists createMetadataLists() {
+        return new MetadataLists();
+    }
 
     public CoverageDataDescription createCoverageDataDescription(){
         return new CoverageDataDescription();
