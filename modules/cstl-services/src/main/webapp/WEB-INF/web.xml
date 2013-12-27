@@ -81,6 +81,10 @@
                          org.constellation.ws.rest;
                          org.constellation.ws.rs.provider</param-value>
         </init-param>
+        <init-param>
+          <param-name>javax.ws.rs.Application</param-name>
+          <param-value>org.constellation.ws.rs.RestApplication</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>

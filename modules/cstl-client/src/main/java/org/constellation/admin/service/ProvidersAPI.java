@@ -28,7 +28,15 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.dto.StyleListBean;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -186,7 +194,14 @@ public final class ProvidersAPI {
         pv.setValues(parameters);
 
 
-        return client.post("data/load", MediaType.APPLICATION_XML_TYPE, pv).getEntity(DataInformation.class);
+        GenericType<JAXBElement<DataInformation>> planetType = new GenericType<JAXBElement<DataInformation>>() {
+        };
+       
+        
+        
+        return client.target().path("api/1/data/load").request().accept(MediaType.APPLICATION_XML_TYPE).post(Entity.entity(pv, MediaType.APPLICATION_XML_TYPE),planetType).getValue();
+
+        //return client.post("data/load", MediaType.APPLICATION_XML_TYPE, pv).getEntity(DataInformation.class);
     }
 
     /**
@@ -196,7 +211,17 @@ public final class ProvidersAPI {
      * @throws IOException
      */
     public MetadataLists getMetadataCodeLists(final String locale) throws IOException {
-        return client.get("data/metadataCodeLists/" + locale, MediaType.APPLICATION_XML_TYPE).getEntity(MetadataLists.class);
+    
+        GenericType<JAXBElement<MetadataLists>> planetType = new GenericType<JAXBElement<MetadataLists>>() {
+        };
+        
+        WebTarget target = client.target();
+        return (MetadataLists) target.path("api/1/data/metadataCodeLists/fr").request()
+                .accept(MediaType.APPLICATION_XML_TYPE).get(planetType).getValue();
+        
+        //return client.get("data/metadataCodeLists/" + locale, MediaType.APPLICATION_XML_TYPE).getEntity(MetadataLists.class);
+    
+    
     }
 
     /**

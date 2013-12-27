@@ -30,18 +30,22 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
+
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
+
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.client.filter.HttpBasicAuthFilter;
@@ -157,6 +161,10 @@ public final class ConstellationClient {
         this.client.property(ClientProperties.CONNECT_TIMEOUT, timeout);
         return this;
     }
+    
+    
+    
+    
 
     /**
      * Submits a HTTP GET request and returns the response.
@@ -394,5 +402,9 @@ public final class ConstellationClient {
     protected void finalize() throws Throwable {
         super.finalize();
         this.client.close();
+    }
+
+    public WebTarget target() {
+        return client.target(url);
     }
 }

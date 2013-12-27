@@ -22,11 +22,15 @@ import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.dto.AddLayer;
+import org.constellation.dto.DataInformation;
 import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
+
 import java.io.IOException;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
@@ -68,8 +72,11 @@ public final class ServicesAPI {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("identifier",  identifier);
 
-        final String path = "OGC/" + serviceType + "/" + identifier;
-        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(Instance.class);
+        GenericType<JAXBElement<Instance>> planetType = new GenericType<JAXBElement<Instance>>() {
+        };
+        
+        final String path = "api/1/OGC/" + serviceType + "/" + identifier;
+        return client.target().path(path).request().accept(MediaType.APPLICATION_XML_TYPE).get(planetType).getValue();
     }
 
     /**
