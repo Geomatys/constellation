@@ -174,11 +174,6 @@
           </exclusions>
         </dependency>
         <dependency>
-          <groupId>org.constellation.web-services-rest</groupId>
-          <artifactId>cstl-web-restfull</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
           <groupId>org.constellation.storage</groupId>
           <artifactId>cstl-store-data-coveragefile</artifactId>
           <version>${project.version}</version>
@@ -290,7 +285,7 @@
       <dependencies>
         <dependency>
           <groupId>org.constellation.web-services</groupId>
-          <artifactId>cstl-web-wtms</artifactId>
+          <artifactId>cstl-web-wmts</artifactId>
           <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -456,11 +451,6 @@
       <dependencies>
         <dependency>
           <groupId>org.constellation.web-services</groupId>
-          <artifactId>cstl-web-sos-mdweb</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.constellation.web-services</groupId>
           <artifactId>cstl-web-sos-filesystem</artifactId>
           <version>${project.version}</version>
         </dependency>
@@ -537,6 +527,11 @@
   <!-- Dependencies required only for compilation. These dependencies will be included in the JARs' list for which Maven 
     will move into "target/binaries". -->
   <dependencies>
+      <dependency>
+          <groupId>org.constellation.web-services-rest</groupId>
+          <artifactId>cstl-web-restfull</artifactId>
+          <version>${project.version}</version>
+      </dependency>
     <!-- Log dependencies -->
     <dependency>
       <groupId>org.slf4j</groupId>
