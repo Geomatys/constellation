@@ -53,4 +53,11 @@ public class MetadataLists {
     public void setDateTypes(final HashMap<String, String> dateTypes) {
         this.dateTypes = dateTypes;
     }
+
+	@Override
+	public String toString() {
+		return "MetadataLists [roles=" + roles + ", locales=" + locales
+				+ ", categories=" + categories + ", dateTypes=" + dateTypes
+				+ "]";
+	}
 }

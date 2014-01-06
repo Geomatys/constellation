@@ -5,14 +5,17 @@ import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.TaskRecord;
 import org.constellation.admin.dao.UserRecord;
 import org.constellation.provider.LayerProviderProxy;
+import org.geotoolkit.parameter.ParameterGroup;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,7 +86,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
             pyramidTask.setState(TaskRecord.TaskState.SUCCEED);
 
             //update provider
-//            updateProvider();
+            updateProvider();
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Unable to save task", e);
         } finally {
@@ -95,19 +98,25 @@ public class PyramidCoverageProcessListener implements ProcessListener {
      *
      */
     private void updateProvider() {
-        final ParameterValueGroup sources = LayerProviderProxy.getInstance().getProvider(identifier).getSource();
+    	final ParameterValueGroup oldSource = LayerProviderProxy.getInstance().getProvider(identifier).getSource();
+        final ParameterDescriptorGroup descriptor = oldSource.getDescriptor();
         URL fileUrl = null;
         try {
             fileUrl = URI.create("file:"+path+"/tiles").toURL();
         } catch (MalformedURLException e) {
             LOGGER.log(Level.WARNING, "unable to create url from path", e);
         }
-        ParameterValueGroup xmlCoverageStoreParameters = sources.groups("choice").get(0).
+        final ParameterValueGroup newSources = new ParameterGroup(descriptor);
+        newSources.parameter("id").setValue(oldSource.parameter("id").getValue());
+        newSources.parameter("providerType").setValue(oldSource.parameter("providerType").getValue());
+        newSources.parameter("date").setValue(new Date());
+        
+        ParameterValueGroup xmlCoverageStoreParameters = newSources.groups("choice").get(0).
                 addGroup("XMLCoverageStoreParameters");
         xmlCoverageStoreParameters.parameter("identifier").setValue("coverage-xml-pyramid");
         xmlCoverageStoreParameters.parameter("path").setValue(fileUrl);
         xmlCoverageStoreParameters.parameter("type").setValue("AUTO");
-        LayerProviderProxy.getInstance().getProvider(identifier).updateSource(xmlCoverageStoreParameters);
+        LayerProviderProxy.getInstance().getProvider(identifier).updateSource(newSources);
     }
 
     @Override

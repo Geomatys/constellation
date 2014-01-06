@@ -124,7 +124,7 @@ public class MapController {
 
         // Truncate and sort the list.
         final List<Layer> layers;
-        if (!layerList.getLayer().isEmpty()) {
+        if (layerList !=null && !layerList.getLayer().isEmpty()) {
             final int endIndex = Math.min(layerList.getLayer().size(), 10);
             layers = layerList.getLayer().subList(0, endIndex);
         } else {

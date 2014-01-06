@@ -18,30 +18,25 @@
 package org.constellation.admin.service;
 
 
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.configuration.AcknowlegementType;
-import org.geotoolkit.xml.parameter.ParameterValueReader;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.AcknowlegementType;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.client.filter.HttpBasicAuthFilter;
@@ -157,6 +152,10 @@ public final class ConstellationClient {
         this.client.property(ClientProperties.CONNECT_TIMEOUT, timeout);
         return this;
     }
+    
+    
+    
+    
 
     /**
      * Submits a HTTP GET request and returns the response.
@@ -166,9 +165,9 @@ public final class ConstellationClient {
      * @return the response instance
      * @throws IOException on HTTP communication problem like connection or read timeout
      */
-    Response get(final String path, final MediaType type) throws IOException {
+    ResponseContainer get(final String path, final MediaType type) throws IOException {
         try {
-            return new Response(newRequest(path, type).get(ClientResponse.class));
+            return new ResponseContainer(newRequest(path, type).get(Response.class));
         } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
@@ -183,9 +182,9 @@ public final class ConstellationClient {
      * @return the response instance
      * @throws IOException on HTTP communication problem like connection or read timeout
      */
-    Response post(final String path, final MediaType type, final Object body) throws IOException {
+    ResponseContainer post(final String path, final MediaType type, final Object body) throws IOException {
         try {
-            return new Response(newRequest(path, type).post(Entity.entity(body, type), ClientResponse.class));
+            return new ResponseContainer(newRequest(path, type).post(Entity.entity(body, type), Response.class));
         } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
@@ -200,9 +199,9 @@ public final class ConstellationClient {
      * @return the response instance
      * @throws IOException on HTTP communication problem like connection or read timeout
      */
-    Response put(final String path, final MediaType type, final Object body) throws IOException {
+    ResponseContainer put(final String path, final MediaType type, final Object body) throws IOException {
         try {
-            return new Response(newRequest(path, type).put(Entity.entity(body, type), ClientResponse.class));
+            return new ResponseContainer(newRequest(path, type).put(Entity.entity(body, type), Response.class));
         } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
@@ -213,25 +212,30 @@ public final class ConstellationClient {
      *
      * @param path the request path
      * @param type the submitted/expected media type
-     * @param map
      * @return the response instance
      * @throws IOException on HTTP communication problem like connection or read timeout
      */
-    Response delete(final String path, final MediaType type) throws IOException {
+    ResponseContainer delete(final String path, final MediaType type) throws IOException {
         try {
-            return new Response(newRequest(path, type).delete(ClientResponse.class));
+            return new ResponseContainer(newRequest(path, type).delete(Response.class));
         } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
     }
 
     /**
-     * TODO remove
+     * Submits a HTTP DELETE request and returns the response.
+     * 
+     * @param path the request path
+     * @param type the submitted/expected media type
+     * @param paramName parameter send name
+     * @param paramValue parameter send
+     * @return the response instance
+     * @throws IOException on HTTP communication problem like connection or read timeout
      */
-    @Deprecated
-    Response delete(final String path, final MediaType type, String paramName, String paramValue) throws IOException {
+    ResponseContainer delete(final String path, final MediaType type, String paramName, String paramValue) throws IOException {
         try {
-            return new Response(newRequest(path, type, paramName, paramValue).delete(ClientResponse.class));
+            return new ResponseContainer(newRequest(path, type, paramName, paramValue).delete(Response.class));
         } catch (ProcessingException | WebApplicationException ex) {
             throw new IOException("An error occurred during HTTP communication with the Constellation server.", ex);
         }
@@ -253,21 +257,21 @@ public final class ConstellationClient {
     }
 
     /**
-     * {@link ClientResponse} wrapper class for specific response handling.
+     * {@link Response} wrapper class for specific response handling.
      */
-    final static class Response {
+    final static class ResponseContainer {
 
         /**
-         * Wrapped {@link ClientResponse} instance.
+         * Wrapped {@link Response} instance.
          */
-        private final ClientResponse response;
+        private final Response response;
 
         /**
-         * Creates a {@link ClientResponse} wrapper instance.
+         * Creates a {@link Response} wrapper instance.
          *
          * @param response the response to wrap
          */
-        private Response(final ClientResponse response) {
+        private ResponseContainer(final Response response) {
             ensureNonNull("response", response);
             if (LOGGER.isLoggable(Level.FINE)) {
                 LOGGER.fine(response.toString());
@@ -276,7 +280,7 @@ public final class ConstellationClient {
         }
 
         /**
-         * @see ClientResponse#getEntity(Class)
+         * @see ClientResponse#getEntity()
          *
          * @param <T> the type of the response
          * @param c   the type of the entity
@@ -286,8 +290,6 @@ public final class ConstellationClient {
          */
         public <T> T getEntity(final Class<T> c) throws HttpResponseException, IOException {
             ensureNonNull("c", c);
-            ensure2xxStatus();
-            ensureNonEmptyContent();
             try {
                 return response.readEntity(c);
             } catch (ProcessingException | WebApplicationException ex) {
@@ -297,53 +299,7 @@ public final class ConstellationClient {
             }
         }
 
-        /**
-         * Handles and parses the XML response using a {@link ParameterValueReader} in
-         * accordance with the specified {@link ParameterDescriptorGroup}.
-         *
-         * @param descriptor the parameter value descriptor
-         * @return a {@link GeneralParameterValue} instance
-         * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-         * @throws IOException if the response entity parsing has failed
-         */
-        public GeneralParameterValue getEntity(final ParameterDescriptorGroup descriptor) throws HttpResponseException, IOException {
-            ensureNonNull("descriptor", descriptor);
-            ensure2xxStatus();
-            ensureNonEmptyContent();
-            try {
-                final ParameterValueReader reader = new ParameterValueReader(descriptor);
-                reader.setInput(response.getEntityStream());
-                return reader.read();
-            } catch (XMLStreamException ex) {
-                throw new IOException("GeneralParameterValue entity parsing has failed.", ex);
-            } finally {
-                response.close();
-            }
-        }
 
-        /**
-         * Handles and parses the XML response using a specific {@link MarshallerPool}.
-         *
-         * @param pool the marshaller pool
-         * @return a response binding object instance
-         * @throws HttpResponseException if the response does not have a {@code 2xx} status code
-         * @throws IOException if the response entity parsing has failed
-         */
-        public Object getEntity(final MarshallerPool pool) throws HttpResponseException, IOException  {
-            ensureNonNull("pool", pool);
-            ensure2xxStatus();
-            ensureNonEmptyContent();
-            try {
-                final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(response.getEntityStream());
-                pool.recycle(unmarshaller);
-                return obj;
-            } catch (JAXBException ex) {
-                throw new IOException("XML entity unmarshalling has failed.", ex);
-            } finally {
-                response.close();
-            }
-        }
 
         /**
          * Ensures that the response has a "success" status code {@code 2xx}.
@@ -368,17 +324,6 @@ public final class ConstellationClient {
         }
 
         /**
-         * Ensures that the response has a non empty entity.
-         *
-         * @throws IOException if the response does not have a {@code 200} status code
-         */
-        private void ensureNonEmptyContent() throws IOException {
-            if (response.getStatus() == 204) {
-                throw new IOException("Empty response entity.");
-            }
-        }
-
-        /**
          * {@inheritDoc}
          */
         @Override
@@ -394,5 +339,9 @@ public final class ConstellationClient {
     protected void finalize() throws Throwable {
         super.finalize();
         this.client.close();
+    }
+
+    public WebTarget target() {
+        return client.target(url);
     }
 }
