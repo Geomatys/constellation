@@ -95,9 +95,12 @@
 
             <div class="controls">
                 <select name="metadataToSave.localeData" id="localeData" required>
-                    <% for (def locale : locales.keySet()) { %>
-                    <option value="${locale}"/>${locales.get(locale)}</option>
-                    <% } %>
+                    <% for (def locale : locales.keySet()) { 
+                    	if(locale==userLocale){%>
+		                    <option value="${locale}" selected/>${locales.get(locale)}</option>
+                   		<%}else{%>
+                    		<option value="${locale}"/>${locales.get(locale)}</option>
+                    <% } } %>
                 </select>
             </div>
         </div>
