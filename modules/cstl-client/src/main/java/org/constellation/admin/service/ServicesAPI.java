@@ -243,7 +243,7 @@ public final class ServicesAPI {
         ensureNonNull("identifier",  identifier);
 
         final String path = "MAP/" + serviceType + "/" + identifier + "/layer/all";
-        return (LayerList) client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(GenericDatabaseMarshallerPool.getInstance());
+        return (LayerList) client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(LayerList.class);
     }
 
     /**

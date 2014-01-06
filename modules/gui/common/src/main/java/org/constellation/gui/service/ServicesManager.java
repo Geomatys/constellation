@@ -173,9 +173,9 @@ public class  ServicesManager {
 
     public void buildServiceUrl(final String type, final String identifier, final List<String> versions, final InstanceSummary instanceSum) {
         // Build service capabilities URL.
-        String capabilitiesUrl = cstl.getUrl() + "WS/"+type.toLowerCase()+"/" + identifier +"?REQUEST=GetCapabilities&SERVICE="+type.toUpperCase();
+        String capabilitiesUrl = cstl.getUrl() + "/WS/"+type.toLowerCase()+"/" + identifier +"?REQUEST=GetCapabilities&SERVICE="+type.toUpperCase();
         // Build service URL for logs.
-        String logsURL = cstl.getUrl() + "api/1/log/"+type.toLowerCase()+"/" + identifier;
+        String logsURL = cstl.getUrl() + "/api/1/log/"+type.toLowerCase()+"/" + identifier;
 
 
         if (versions!= null && versions.size()>0) {
