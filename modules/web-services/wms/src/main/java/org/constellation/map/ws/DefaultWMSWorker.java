@@ -79,13 +79,23 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
+import org.apache.sis.internal.referencing.VerticalDatumTypes;
 
+// SIS dependencies
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.measure.Range;
+import org.apache.sis.referencing.IdentifiedObjects;
+import org.apache.sis.referencing.datum.AbstractDatum;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
-//Constellation dependencies
+import org.apache.sis.referencing.crs.DefaultVerticalCRS;
+import org.apache.sis.referencing.cs.AbstractCS;
+import org.apache.sis.referencing.cs.DefaultVerticalCS;
+import org.apache.sis.referencing.datum.DefaultVerticalDatum;
+import org.apache.sis.util.resources.Vocabulary;
+
+// Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.admin.ConfigurationEngine;
@@ -108,6 +118,7 @@ import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
+
 //Geotoolkit dependencies
 import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
@@ -132,11 +143,8 @@ import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.referencing.crs.AbstractSingleCRS;
 import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
-import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
-import org.geotoolkit.referencing.cs.AbstractCS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
-import org.geotoolkit.referencing.datum.AbstractDatum;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
@@ -169,6 +177,7 @@ import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v130.Capability;
+
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -183,6 +192,10 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.StyledLayerDescriptor;
 import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
+import org.opengis.util.InternationalString;
+import static org.opengis.referencing.IdentifiedObject.NAME_KEY;
+import static org.opengis.referencing.IdentifiedObject.ALIAS_KEY;
+
 import org.springframework.context.annotation.Scope;
 
 /**
@@ -206,6 +219,27 @@ import org.springframework.context.annotation.Scope;
 @Scope("prototype")
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
+
+    /*
+     * temporary constant missing in SIS
+     */
+    static Map<String,Object> name(final short key) {
+        final Map<String,Object> properties = new HashMap<>(4);
+        final InternationalString name = Vocabulary.formatInternational(key);
+        properties.put(NAME_KEY,  name.toString(null)); // "null" required for unlocalized version.
+        properties.put(ALIAS_KEY, name);
+        return properties;
+    }
+    private static final DefaultVerticalCS ELLIPSOIDAL_HEIGHT_CS = new DefaultVerticalCS(null, DefaultCoordinateSystemAxis.ELLIPSOIDAL_HEIGHT);
+    private static final DefaultVerticalDatum ELLIPSOIDAL = new DefaultVerticalDatum(name(Vocabulary.Keys.Ellipsoidal), VerticalDatumTypes.ELLIPSOIDAL);
+    private static final DefaultVerticalCRS ELLIPSOIDAL_HEIGHT = new DefaultVerticalCRS(
+            IdentifiedObjects.getProperties(ELLIPSOIDAL_HEIGHT_CS),
+            ELLIPSOIDAL, ELLIPSOIDAL_HEIGHT_CS);
+
+    /*
+     * END temporary patch block
+     */
+    
     private static final WMSVisitorFactory[] VISITOR_FACTORIES;
     private static final List<String> GFI_MIME_TYPES = new ArrayList<>();
 
@@ -546,7 +580,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
                     if (mi instanceof MapContext) {
                         final MapContext mc = (MapContext)mi;
-                        final List<AbstractDimension> dimensionsToAdd = new ArrayList<AbstractDimension>();
+                        final List<AbstractDimension> dimensionsToAdd = new ArrayList<>();
                         for (final MapLayer candidateLayer : mc.layers()) {
                             if (candidateLayer instanceof FeatureMapLayer) {
                                 final FeatureMapLayer fml = (FeatureMapLayer)candidateLayer;
@@ -577,10 +611,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         dimensions.addAll(getExtraDimensions(fml, queryVersion));
                     }
 
-                } catch (PortrayalException ex) {
-                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
-                    break;
-                } catch (DataStoreException ex) {
+                } catch (PortrayalException | DataStoreException ex) {
                     Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
                     break;
                 }
@@ -1460,7 +1491,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final CoordinateReferenceSystem crs;
 
                     if("elevation".equalsIgnoreCase(crsname)){
-                        crs = DefaultVerticalCRS.ELLIPSOIDAL_HEIGHT;
+                        crs = ELLIPSOIDAL_HEIGHT;
                     }else if("temporal".equalsIgnoreCase(crsname)){
                         crs = DefaultTemporalCRS.JAVA;
                     }else{
