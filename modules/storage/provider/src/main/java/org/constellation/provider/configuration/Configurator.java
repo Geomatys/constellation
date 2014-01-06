@@ -17,6 +17,7 @@
 
 package org.constellation.provider.configuration;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
@@ -51,10 +52,13 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -136,6 +140,8 @@ public interface Configurator {
 
                     if (type == ProviderType.LAYER) {
                         // Remove no longer existing layer.
+                        final Map<String, InputStream> metadata = new HashMap<>(0);
+
                         for (final DataRecord data : list) {
                             boolean found = false;
                             for (final Object keyObj : provider.getKeys()) {
@@ -143,6 +149,9 @@ public interface Configurator {
                                 if (data.getName().equals(key.getLocalPart())) {
                                     found = true;
                                     break;
+                                } else if (key.getLocalPart().contains(data.getName()) && data.getProvider().getIdentifier().equalsIgnoreCase(provider.getId())) {
+                                    //save metadata
+                                    metadata.put(key.getLocalPart(), data.getMetadata());
                                 }
                             }
                             if (!found) {
@@ -164,34 +173,44 @@ public interface Configurator {
                             }
                             if (!found) {
                                 DataRecord record = session.writeData(name, pr, provider.getDataType(), userRecord);
-                                final LayerDetails layer = (LayerDetails) provider.get(new DefaultName(name));
-                                final Object origin = layer.getOrigin();
+                                final InputStream currentMetadata = metadata.get(record.getName());
+                                if (currentMetadata != null) {
+                                    StringWriter writer = new StringWriter();
+                                    IOUtils.copy(currentMetadata, writer);
+                                    StringReader reader = new StringReader(writer.toString());
+                                    record.setMetadata(reader);
+                                } else {
 
-                                if (origin instanceof CoverageReference) {
-                                    final CoverageReference fcr = (CoverageReference) origin;
-                                    try {
-                                        int i = fcr.getImageIndex();
-                                        final GridCoverageReader reader = fcr.acquireReader();
-                                        final SpatialMetadata sm = reader.getCoverageMetadata(i);
+                                    final LayerDetails layer = (LayerDetails) provider.get(new DefaultName(name));
+                                    final Object origin = layer.getOrigin();
 
-                                        if (sm != null) {
-                                            final String rootNodeName = sm.getNativeMetadataFormatName();
-                                            final Node coverageRootNode = sm.getAsTree(rootNodeName);
 
-                                            MetadataMapBuilder.setCounter(0);
-                                            final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverageRootNode, null, 11, i);
+                                    if (origin instanceof CoverageReference) {
+                                        final CoverageReference fcr = (CoverageReference) origin;
+                                        try {
+                                            int i = fcr.getImageIndex();
+                                            final GridCoverageReader reader = fcr.acquireReader();
+                                            final SpatialMetadata sm = reader.getCoverageMetadata(i);
 
-                                            final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
-                                            final MarshallerPool mp = GenericDatabaseMarshallerPool.getInstance();
-                                            final Marshaller marshaller = mp.acquireMarshaller();
-                                            final StringWriter sw = new StringWriter();
-                                            marshaller.marshal(coverageMetadataBean, sw);
-                                            mp.recycle(marshaller);
-                                            final StringReader sr = new StringReader(sw.toString());
-                                            record.setMetadata(sr);
+                                            if (sm != null) {
+                                                final String rootNodeName = sm.getNativeMetadataFormatName();
+                                                final Node coverageRootNode = sm.getAsTree(rootNodeName);
+
+                                                MetadataMapBuilder.setCounter(0);
+                                                final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverageRootNode, null, 11, i);
+
+                                                final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
+                                                final MarshallerPool mp = GenericDatabaseMarshallerPool.getInstance();
+                                                final Marshaller marshaller = mp.acquireMarshaller();
+                                                final StringWriter sw = new StringWriter();
+                                                marshaller.marshal(coverageMetadataBean, sw);
+                                                mp.recycle(marshaller);
+                                                final StringReader sr = new StringReader(sw.toString());
+                                                record.setMetadata(sr);
+                                            }
+                                        } catch (CoverageStoreException | JAXBException e) {
+                                            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
                                         }
-                                    } catch (CoverageStoreException | JAXBException e) {
-                                        LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
                                     }
                                 }
                             }
