@@ -15,143 +15,150 @@
         </div>
     </div>
 
-    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
-        <div class="span6">
-            <!-- contact part -->
-            <fieldset>
-                <legend>&{create.contact.legend}</legend>
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px; margin-top: 10px;">
+        <div class="span12">
+            <div class="row-fluid">
+                <div class="span6">
+                    <!-- contact part -->
+                    <fieldset>
+                        <legend>&{create.contact.legend}</legend>
 
-                <div class="control-group">
-                    <label class="control-label" for="contactFirstName">&{create.contact.firstname.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactFirstName" name="serviceContact.firstname"/>
-                    </div>
+                        <div class="control-group">
+                            <label class="control-label" for="contactFirstName">&{create.contact.firstname.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactFirstName" name="serviceContact.firstname"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="contactLastName">&{create.contact.lastname.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactLastName" name="serviceContact.lastname"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="contactOrganisation">&{create.contact.organisation.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactOrganisation" name="serviceContact.organisation"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="contactPosition">&{create.contact.position.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactPosition" name="serviceContact.position"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="contactPhone">&{create.contact.phone.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactPhone" name="serviceContact.phone"/>
+                            </div>
+                        </div>
+                        <div class="control-group" id="faxDiv">
+                            <label class="control-label" for="contactFax">&{create.contact.fax.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactFax" name="serviceContact.fax"/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="contactemail">&{create.contact.email.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactEmail" name="serviceContact.email"/>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="span6">
+                    <!-- address part -->
+                    <fieldset>
+                        <legend>&{create.contact.address.legend}</legend>
+
+                        <div class="control-group">
+                            <label class="control-label" for="contactAddress">&{create.contact.address.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactAddress" name="serviceContact.address"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="contactCity">&{create.contact.address.city.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactCity" name="serviceContact.city"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="contactState">&{create.contact.address.state.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactState" name="serviceContact.state"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="contactPostcode">&{create.contact.address.postcode.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactPostcode" name="serviceContact.zipCode"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="contactCountry">&{create.contact.address.country.label}</label>
+                            <div class="controls">
+                                <input type="text" id="contactCountry" name="serviceContact.country"/>
+                            </div>
+                        </div>
+                    </fieldset>
                 </div>
 
-                <div class="control-group">
-                    <label class="control-label" for="contactLastName">&{create.contact.lastname.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactLastName" name="serviceContact.lastname"/>
-                    </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    <!-- access constraints part -->
+                    <fieldset>
+                        <legend>&{create.accessconstraint.legend}</legend>
+
+                        <div class="control-group">
+                            <label class="control-label" for="fees">&{create.accessconstraint.fees.label}</label>
+                            <div class="controls">
+                                <input id="fees" type="text" name="serviceConstraint.fees"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="accessConstraints">&{create.accessconstraint.label}</label>
+                            <div class="controls">
+                                <textarea id="accessConstraints" name="serviceConstraint.accessConstraint"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="control-group" data-toggle="tooltip" title="&{create.accessconstraint.layerlimit.tooltip}" id="layerlimitGroup">
+                            <label class="control-label" for="layerLimit">&{create.accessconstraint.layerlimit.label}</label>
+                            <div class="controls">
+                                <input type="text" id="layerLimit" name="serviceConstraint.layerLimit"/>
+                            </div>
+
+                        </div>
+
+                        <div class="control-group" data-toggle="tooltip" title="&{create.accessconstraint.maxwidth.tooltip}" id="maxWidthGroup">
+                            <label class="control-label" for="maxWidth">&{create.accessconstraint.maxwidth.label}</label>
+                            <div class="controls" >
+                                <input type="text" id="maxWidth" name="serviceConstraint.maxWidth"/>
+                            </div>
+                        </div>
+
+
+                        <div class="control-group" data-toggle="tooltip" title="&{create.accessconstraint.maxheight.tooltip}" id="maxHeightGroup">
+                            <label class="control-label" for="maxHeight">&{create.accessconstraint.maxheight.label}</label>
+                            <div class="controls">
+                                <input type="text" id="maxHeight" name="serviceConstraint.maxHeight"/>
+                            </div>
+                        </div>
+                    </fieldset>
                 </div>
-
-                <div class="control-group">
-                    <label class="control-label" for="contactOrganisation">&{create.contact.organisation.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactOrganisation" name="serviceContact.organisation"/>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <label class="control-label" for="contactPosition">&{create.contact.position.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactPosition" name="serviceContact.position"/>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <label class="control-label" for="contactPhone">&{create.contact.phone.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactPhone" name="serviceContact.phone"/>
-                    </div>
-                </div>
-                <div class="control-group" id="faxDiv">
-                    <label class="control-label" for="contactFax">&{create.contact.fax.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactFax" name="serviceContact.fax"/>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="contactemail">&{create.contact.email.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactEmail" name="serviceContact.email"/>
-                    </div>
-                </div>
-            </fieldset>
-
-            <!-- address part -->
-            <fieldset>
-                <legend>&{create.contact.address.legend}</legend>
-
-                <div class="control-group">
-                    <label class="control-label" for="contactAddress">&{create.contact.address.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactAddress" name="serviceContact.address"/>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <label class="control-label" for="contactCity">&{create.contact.address.city.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactCity" name="serviceContact.city"/>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <label class="control-label" for="contactState">&{create.contact.address.state.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactState" name="serviceContact.state"/>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <label class="control-label" for="contactPostcode">&{create.contact.address.postcode.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactPostcode" name="serviceContact.zipCode"/>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <label class="control-label" for="contactCountry">&{create.contact.address.country.label}</label>
-                    <div class="controls">
-                        <input type="text" id="contactCountry" name="serviceContact.country"/>
-                    </div>
-                </div>
-            </fieldset>
-        </div>
-
-        <div class="span6">
-            <!-- access constraints part -->
-            <fieldset>
-                <legend>&{create.accessconstraint.legend}</legend>
-
-                <div class="control-group">
-                    <label class="control-label" for="fees">&{create.accessconstraint.fees.label}</label>
-                    <div class="controls">
-                        <input id="fees" type="text" name="serviceConstraint.fees"/>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <label class="control-label" for="accessConstraints">&{create.accessconstraint.label}</label>
-                    <div class="controls">
-                        <textarea id="accessConstraints" name="serviceConstraint.accessConstraint"></textarea>
-                    </div>
-                </div>
-
-                <div class="control-group" data-toggle="tooltip" title="&{create.accessconstraint.layerlimit.tooltip}" id="layerlimitGroup">
-                    <label class="control-label" for="layerLimit">&{create.accessconstraint.layerlimit.label}</label>
-                    <div class="controls">
-                        <input type="text" id="layerLimit" name="serviceConstraint.layerLimit"/>
-                    </div>
-
-                </div>
-
-                <div class="control-group" data-toggle="tooltip" title="&{create.accessconstraint.maxwidth.tooltip}" id="maxWidthGroup">
-                    <label class="control-label" for="maxWidth">&{create.accessconstraint.maxwidth.label}</label>
-                    <div class="controls" >
-                        <input type="text" id="maxWidth" name="serviceConstraint.maxWidth"/>
-                    </div>
-                </div>
-
-
-                <div class="control-group" data-toggle="tooltip" title="&{create.accessconstraint.maxheight.tooltip}" id="maxHeightGroup">
-                    <label class="control-label" for="maxHeight">&{create.accessconstraint.maxheight.label}</label>
-                    <div class="controls">
-                        <input type="text" id="maxHeight" name="serviceConstraint.maxHeight"/>
-                    </div>
-                </div>
-            </fieldset>
+            </div>
         </div>
 
         <!-- button part to manage pagination -->
