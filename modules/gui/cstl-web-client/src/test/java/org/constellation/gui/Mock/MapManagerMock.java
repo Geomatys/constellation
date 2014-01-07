@@ -1,5 +1,6 @@
 package org.constellation.gui.Mock;
 
+import org.constellation.ServiceDef;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
 import org.constellation.gui.service.MapManager;
@@ -21,11 +22,13 @@ public class MapManagerMock extends MapManager {
 
 
     /**
+     *
      * @param serviceName
+     * @param specification
      * @return
      */
     @Override
-    public LayerList getLayers(String serviceName) {
+    public LayerList getLayers(String serviceName, final ServiceDef.Specification specification) {
         return new LayerList(new ArrayList<Layer>(0));
     }
 }

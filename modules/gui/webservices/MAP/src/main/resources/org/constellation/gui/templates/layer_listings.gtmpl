@@ -40,7 +40,7 @@
     </div>
 </div>
 <script type="text/javascript">
-    CSTL.MapDashboard.init('${service.identifier}');
+    CSTL.MapDashboard.init('${service.identifier}', '${instance.type}');
 
 
 </script>

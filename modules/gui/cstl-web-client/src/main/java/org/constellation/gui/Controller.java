@@ -273,9 +273,9 @@ public class Controller {
     @Ajax
     @Resource
     @Route("/dataList")
-    public Response generateDataList(final String serviceId, final String start, final String count, final String orderBy,
+    public Response generateDataList(final String serviceId, final String serviceType, final String start, final String count, final String orderBy,
                                      final String direction, final String filter) throws IOException {
-        final LayerList listBean = mapManager.getLayers(serviceId);
+        final LayerList listBean = mapManager.getLayers(serviceId, Specification.fromShortName(serviceType));
 
         // Search layers by name.
         if (!isBlank(filter)) {

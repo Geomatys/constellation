@@ -17,6 +17,7 @@
 
 package org.constellation.gui.service;
 
+import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.LayerList;
 
@@ -44,12 +45,14 @@ public class MapManager {
     /**
      * Loads a service layer list.
      *
+     *
      * @param serviceId   the service identifier
+     * @param specification
      * @return the {@link org.constellation.configuration.LayerList} instance
      * @throws java.io.IOException on communication error with Constellation server
      */
-    public LayerList getLayers(final String serviceId) throws IOException {
-        return cstl.openClient().services.getLayers(Specification.WMS, serviceId);
+    public LayerList getLayers(final String serviceId, final Specification specification) throws IOException {
+        return cstl.openClient().services.getLayers(specification, serviceId);
     }
 
     public void removeLayer(final String layerName, final String layerNamespace, final String serviceId, final String spec) {

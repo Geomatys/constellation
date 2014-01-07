@@ -114,7 +114,7 @@ public class MapController {
     public Response dashboard(final String serviceId, final String serviceType) throws IOException {
         final Service metadata    = servicesManager.getMetadata(serviceId, Specification.fromShortName(serviceType));
         final Instance instance   = servicesManager.getInstance(serviceId, Specification.fromShortName(serviceType));
-        final LayerList layerList = mapManager.getLayers(serviceId);
+        final LayerList layerList = mapManager.getLayers(serviceId, Specification.fromShortName(serviceType));
 
         // Build service capabilities URL.
         String capabilitiesUrl = cstl.getUrl() + "WS/" + serviceType + "/" + serviceId + "?REQUEST=GetCapabilities&SERVICE=" + serviceType;

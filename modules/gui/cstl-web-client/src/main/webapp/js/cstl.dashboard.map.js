@@ -30,11 +30,11 @@ CSTL.MapDashboard = {
 
     instance: null,
 
-    init: function(identifier) {
+    init: function(identifier, type) {
         this.instance = new Dashboard({
             $root:    $('#mapDashboard'),
             loadFunc: 'Controller.generateDataList()',
-            params:   {serviceId: identifier},
+            params:   {serviceId: identifier, serviceType: type},
             onSelect:  $.proxy(this.onSelect, this)
         });
     },
