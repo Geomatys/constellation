@@ -36,7 +36,7 @@
                 &{adddata.popup.informations.subtitle.label}
             </div>
             <div>
-                <form class="form-horizontal" id="addLayerForm" action="@{addLayer(serviceId = service.identifier)}" method="post">
+                <form class="form-horizontal" id="addLayerForm" action="@{addLayer(serviceId = service.identifier, serviceType = instance.type)}" method="post">
                     <input type="hidden" name="dataName" />
                     <input type="hidden" name="dataProvider" />
                     <input type="hidden" name="styleName" />

@@ -412,10 +412,10 @@ public class Controller {
 
     @Action
     @Route("layer/add")
-    public Response addLayer(final String layerAlias, final String dataName, final String dataProvider, final String serviceId) {
-        AddLayer toAddLayer = new AddLayer(layerAlias, "WMS", serviceId, dataProvider, dataName);
+    public Response addLayer(final String layerAlias, final String dataName, final String dataProvider, final String serviceId, final String serviceType) {
+        AddLayer toAddLayer = new AddLayer(layerAlias, serviceType, serviceId, dataProvider, dataName);
         providerManager.addLayer(toAddLayer);
-        return MapController_.dashboard(serviceId, "wms");
+        return MapController_.dashboard(serviceId, serviceType);
     }
 
     /**
