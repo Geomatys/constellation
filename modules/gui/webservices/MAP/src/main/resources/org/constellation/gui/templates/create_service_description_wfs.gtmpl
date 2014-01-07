@@ -1,0 +1,22 @@
+<div class="control-group">
+    <label class="control-label">&{create.description.transactional}</label>
+    <div class="controls">
+        <label class="checkbox inline" for="transactional">
+            <input type="checkbox" value="transactional" id="transactional" name="transactional">
+        </label>
+    </div>
+</div>
+<div class="control-group">
+    <label class="control-label">&{create.description.version.title}</label>
+    <div id="versionsCheck" class="controls">
+        <label class="checkbox inline" for="v100">
+            <input type="checkbox" value="1.0.0" id="v100" name="v100" checked="yes"> 1.0.0
+        </label>
+        <label class="checkbox inline" for="v110">
+            <input type="checkbox" value="1.1.0" id="v110" name="v110"> 1.1.0
+        </label>
+        <label class="checkbox inline" for="v200">
+            <input type="checkbox" value="2.0.0" id="v200" name="v200"> 2.0.0
+        </label>
+    </div>
+</div>

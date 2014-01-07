@@ -41,17 +41,24 @@
                         <textarea cols="50" id="inputDescription" name="createdService.description" class="input-xxlarge"></textarea>
                     </div>
                 </div>
-                <div class="control-group">
-                    <label class="control-label">&{create.description.version.title}</label>
-                    <div class="controls">
-                        <label class="checkbox inline" for="v111">
-                            <input type="checkbox" value="1.1.1" id="v111" name="v111"> 1.1.1
-                        </label>
-                        <label class="checkbox inline" for="v130">
-                            <input type="checkbox" value="1.3.0" id="v130" name="v130"> 1.3.0
-                        </label>
-                    </div>
-                </div>
+
+                <% if (serviceType.equalsIgnoreCase("WMS")) {%>
+                #{include path=create_service_description_wms.gtmpl/}
+                <% } else if (serviceType.equalsIgnoreCase("WFS")) {%>
+                #{include path=create_service_description_wfs.gtmpl/}
+                <% } else if (serviceType.equalsIgnoreCase("WMTS")) {%>
+                #{include path=create_service_description_wmts.gtmpl/}
+                <% } else if (serviceType.equalsIgnoreCase("WCS")) {%>
+                #{include path=create_service_description_wcs.gtmpl/}
+                <% } else if (serviceType.equalsIgnoreCase("WPS")) {%>
+                #{include path=create_service_description_wps.gtmpl/}
+                <% } else if (serviceType.equalsIgnoreCase("SOS")) {%>
+                #{include path=create_service_description_sos.gtmpl/}
+                <% } else if (serviceType.equalsIgnoreCase("CSW")) {%>
+                #{include path=create_service_description_csw.gtmpl/}
+                <% } %>
+
+                <input type="hidden" id="versions" name="versions" />
             </fieldset>
         </div>
 
@@ -60,7 +67,7 @@
             <div class="span2 offset10">
             </br>
                 <a href="@{webservices()}">&{create.cancel.label}</a>
-                <a class="btn btn-primary" onclick="goToMetadata();" type="button" id="nextButton">&{create.next.label}</a>
+                <a class="btn btn-primary" onclick="updateVersions();goToMetadata();" type="button" id="nextButton">&{create.next.label}</a>
             </div>
         </div>
     </div>
@@ -77,4 +84,16 @@
             }
         }
     });
+
+    function updateVersions(){
+        var versionsChecked = $("#versionsCheck input:checked");
+        var valcheck = "";
+        for (var i = 0; i<versionsChecked.length; i++) {
+            if (i != 0) {
+                valcheck += ",";
+            }
+            valcheck += versionsChecked[i].value;
+        }
+        $("#versions").val(valcheck);
+    };
 </script>
