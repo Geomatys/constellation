@@ -10,8 +10,28 @@
     <!-- main part -->
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <div class="span2 well">
-            <p><h4>&{create.description.title.label}</h4></p>
-            <p>&{create.description.text}</p>
+            <% if (serviceType.equalsIgnoreCase("WMS")) {%>
+                <p><h4>&{create.description.title.label.wms}</h4></p>
+                <p>&{create.description.text.wms}</p>
+            <% } else if (serviceType.equalsIgnoreCase("WFS")) {%>
+                <p><h4>&{create.description.title.label.wfs}</h4></p>
+                <p>&{create.description.text.wfs}</p>
+            <% } else if (serviceType.equalsIgnoreCase("WMTS")) {%>
+                <p><h4>&{create.description.title.label.wmts}</h4></p>
+                <p>&{create.description.text.wmts}</p>
+            <% } else if (serviceType.equalsIgnoreCase("WCS")) {%>
+                <p><h4>&{create.description.title.label.wcs}</h4></p>
+                <p>&{create.description.text.wcs}</p>
+            <% } else if (serviceType.equalsIgnoreCase("WPS")) {%>
+                <p><h4>&{create.description.title.label.wps}</h4></p>
+                <p>&{create.description.text.wps}</p>
+            <% } else if (serviceType.equalsIgnoreCase("SOS")) {%>
+                <p><h4>&{create.description.title.label.sos}</h4></p>
+                <p>&{create.description.text.sos}</p>
+            <% } else if (serviceType.equalsIgnoreCase("CSW")) {%>
+                <p><h4>&{create.description.title.label.csw}</h4></p>
+                <p>&{create.description.text.csw}</p>
+            <% } %>
         </div>
         <div class="span9">
             <fieldset>
