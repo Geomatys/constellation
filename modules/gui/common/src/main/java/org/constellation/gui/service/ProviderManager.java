@@ -172,7 +172,7 @@ public class ProviderManager {
             for (ProviderReport providerReport : providerServiceReport.getProviders()) {
                 String type = providerReport.getAbstractType();
 
-                if (providerTypes==null || providerTypes.contains(type)) {
+                if (providerTypes!=null && providerTypes.contains(type)) {
                     for (DataBrief dataBrief : providerReport.getItems()) {
                         String name = dataBrief.getName();
 

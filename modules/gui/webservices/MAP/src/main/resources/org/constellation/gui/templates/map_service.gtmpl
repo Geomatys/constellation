@@ -83,7 +83,34 @@
                 </div>
             </div>
             <script type="text/javascript">
-                CSTL.AddLayerWorkflow.init();
+                var param;
+                switch ("${instance.type}"){
+                    case "CSW":
+                        param={'dataTypes':['metadata']};
+                        break;
+                    case "SOS":
+                        param={'dataTypes':['sensor']};
+                        break;
+                    case "WCS":
+                        param={'dataTypes':['raster']};
+                        break;
+                    case "WFS":
+                        param={'dataTypes':['vector']};
+                        break;
+                    case "WMS":
+                        param={'dataTypes':['raster','vector']};
+                        break;
+                    case "WMTS":
+                        param={'dataTypes':['raster']};
+                        break;
+                    case "WPS":
+                        param={'dataTypes':['process']};
+                        break;
+                    default:
+                        param={'dataTypes':['raster','vector']};
+                }
+
+                CSTL.AddLayerWorkflow.init(param);
                 function validateData(styleProvider, styleName, dataProvider, dataName){
                     return CSTL.Providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName);
                 }

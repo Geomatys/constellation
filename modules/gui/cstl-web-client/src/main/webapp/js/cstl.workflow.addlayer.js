@@ -36,7 +36,7 @@ CSTL.AddLayerWorkflow = {
 
     dataList:    null,
 
-    init: function() {
+    init: function(param) {
         // Select persistent HTML element.
         this.$form      = $('#addLayerForm');
         this.$dataList  = $('#dataList');
@@ -50,7 +50,7 @@ CSTL.AddLayerWorkflow = {
         this.dataList = new Dashboard({
             $root:    this.$dataList,
             loadFunc: 'Controller.getAvailableData()',
-            params:   {'dataTypes':['raster','vector']},
+            params:   param,
             onLoad:   $.proxy(this.onDataLoaded, this),
             onSelect: $.proxy(this.onDataSelect, this)
         });

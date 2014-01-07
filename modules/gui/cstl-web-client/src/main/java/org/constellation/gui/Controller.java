@@ -318,12 +318,7 @@ public class Controller {
     @Route("/providerList")
     public Response getAvailableData(List<String> dataTypes, final String start, final String count, final String orderBy,
                                      final String direction, final String filter) {
-        if (dataTypes == null) {
-            dataTypes = new ArrayList<>(0);
-            dataTypes.add("vector");
-            dataTypes.add("raster");
 
-        }
         final List<LayerData> list = providerManager.getDataListing(dataTypes);
 
         // Search layers by name.
