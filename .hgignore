@@ -17,3 +17,6 @@ modules/testing/cite/engine/components/*
 \.ipr$
 \.iws$
 \.idea$
+syntax: glob
+modules/cstl-admin/node_modules
+modules/cstl-admin/.tmp
