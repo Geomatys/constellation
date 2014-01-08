@@ -28,6 +28,7 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +40,7 @@ import javax.xml.namespace.QName;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.LayerRecord;
@@ -446,7 +448,7 @@ public class ConfigurationEngine {
      * @param dataName
      * @param pool
      */
-    public static void saveMetaData(final DefaultMetadata fileMetadata, final String dataName, final MarshallerPool pool) {
+    public static void saveMetaData(final Object fileMetadata, final String dataName, final MarshallerPool pool) {
         ensureNonNull("metadata", fileMetadata);
 
         // save in database
@@ -455,6 +457,7 @@ public class ConfigurationEngine {
             session = EmbeddedDatabase.createSession();
             final StringWriter sw = new StringWriter();
             final Marshaller m = pool.acquireMarshaller();
+            m.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
             m.marshal(fileMetadata, sw);
             pool.recycle(m);
             final StringReader sr = new StringReader(sw.toString());
@@ -500,6 +503,41 @@ public class ConfigurationEngine {
                 session.close();
         }
         return null;
+    }
+
+    public static InputStream loadProviderMetadata(final String providerId) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final ProviderRecord provider = session.readProvider(providerId);
+            if (provider != null) {
+                return provider.getMetadata();
+            }
+        } catch (SQLException | IOException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
+    }
+
+    public static List<String> getProviderIds() {
+        final List<String> results = new ArrayList<>();
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final List<ProviderRecord> providers = session.readProviders();
+            for (ProviderRecord record : providers) {
+                results.add(record.getIdentifier());
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return results;
     }
 
     /**

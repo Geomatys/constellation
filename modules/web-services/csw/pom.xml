@@ -66,6 +66,7 @@
     <module>generic</module>
     <module>filesystem</module>
     <module>netcdf</module>
+    <module>internal</module>
   </modules>
 
 </project>

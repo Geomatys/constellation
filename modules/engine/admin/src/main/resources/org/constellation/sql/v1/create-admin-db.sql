@@ -30,7 +30,7 @@ ALTER TABLE "admin"."user" ADD CONSTRAINT user_pk PRIMARY KEY ("login");
 
 CREATE TABLE "admin"."provider"(
   "id"          INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
-  "identifier"  VARCHAR(64) NOT NULL UNIQUE,
+  "identifier"  VARCHAR(128) NOT NULL UNIQUE,
   "type"        VARCHAR(8)  NOT NULL,
   "impl"        VARCHAR(32) NOT NULL,
   "config"      CLOB        NOT NULL,

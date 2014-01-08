@@ -126,6 +126,15 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
         return SERVICES;
     }
 
+    public LayerProviderService getService(final String serviceID) {
+        for (LayerProviderService serv : SERVICES) {
+            if (serv.getName().equals(serviceID)) {
+                return serv;
+            }
+        }
+        return null;
+    }
+
     @Override
     public LayerDetails getByIdentifier(Name key) {
         LayerDetails result = null;

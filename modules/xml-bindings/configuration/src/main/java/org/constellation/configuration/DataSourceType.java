@@ -33,7 +33,9 @@ import java.util.Objects;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DataSourceType {
 
-    private static final List<DataSourceType> VALUES = new ArrayList<DataSourceType>();
+    private static final List<DataSourceType> VALUES = new ArrayList<>();
+
+    public static final DataSourceType INTERNAL = new DataSourceType("internal");
 
     public static final DataSourceType FILESYSTEM = new DataSourceType("filesystem");
 
@@ -100,6 +102,7 @@ public class DataSourceType {
         return false;
     }
 
+    @Override
     public String toString() {
         return name;
     }
