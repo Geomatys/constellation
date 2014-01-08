@@ -272,8 +272,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.apache.sis.metadata.iso",
                                                                  "org.geotoolkit.metadata.iso",
-                                                                 "org.geotoolkit.referencing",
                                                                  "org.apache.sis.referencing",
+                                                                 "org.geotoolkit.referencing",
                                                                  "org.geotoolkit.service",
                                                                  "org.apache.sis.util.iso",
                                                                  "org.geotoolkit.naming",
@@ -804,6 +804,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         attribName = "abbreviation";
                     } else if (attribName.equalsIgnoreCase("uom")) {
                         attribName = "unit";
+                    } else if (attribName.equalsIgnoreCase("axis")) {
+                        attribName = "axes";
                     }
                 }
 
@@ -899,7 +901,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     private void setFieldToValue(final Field field, final String attribName, final Object result, final Object param) {
         field.setAccessible(true);
         try {
-            if ("axis".equals(attribName)) {
+            if ("axes".equals(attribName)) {
                 final CoordinateSystemAxis[] params = new CoordinateSystemAxis[1];
                 params[0] = (CoordinateSystemAxis) param;
                 field.set(result, params);

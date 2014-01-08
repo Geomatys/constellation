@@ -70,6 +70,7 @@ import org.opengis.metadata.spatial.Georectified;
 import org.opengis.metadata.spatial.SpatialRepresentation;
 
 import static org.junit.Assert.*;
+import org.opengis.referencing.ReferenceIdentifier;
 
 /**
  *
@@ -394,7 +395,6 @@ public final class MetadataUtilities {
                         assertEquals(expId.getDescriptiveKeywords().iterator().next().getKeywords(), resId.getDescriptiveKeywords().iterator().next().getKeywords());
                         if (resId.getDescriptiveKeywords().iterator().next().getThesaurusName() != null) {
                             if (resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().hasNext()) {
-                                assertEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getClass(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getClass());
                                 assertEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getCode(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getCode());
                                 assertEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next());
                             }
@@ -475,7 +475,12 @@ public final class MetadataUtilities {
         if (expResult.getReferenceSystemInfo().iterator().hasNext()) {
             if (expResult.getReferenceSystemInfo().iterator().next() != null) {
                 if (expResult.getReferenceSystemInfo().iterator().next().getName() != null && result.getReferenceSystemInfo().iterator().next().getName() != null) {
-                    assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getAuthority(), result.getReferenceSystemInfo().iterator().next().getName().getAuthority());
+                    final Citation resAuthority = result.getReferenceSystemInfo().iterator().next().getName().getAuthority();
+                    final Citation expAuthority = expResult.getReferenceSystemInfo().iterator().next().getName().getAuthority();
+                    if (resAuthority != null && expAuthority != null) {
+                        citationEquals(expAuthority, resAuthority);
+                    }
+                    assertEquals(expAuthority, resAuthority);
                     assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getCodeSpace(), result.getReferenceSystemInfo().iterator().next().getName().getCodeSpace());
                 }
                 assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName(), result.getReferenceSystemInfo().iterator().next().getName());
@@ -546,11 +551,14 @@ public final class MetadataUtilities {
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
+                        final ReferenceIdentifier expName = expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName();
+                        final ReferenceIdentifier resName = resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName();
+                        assertEquals(expName, resName);
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
+                        assertEquals(expVEx.getVerticalCRS().getDatum().getName(), resVEx.getVerticalCRS().getDatum().getName());
+                        assertEquals(expVEx.getVerticalCRS().getDatum().getVerticalDatumType(), resVEx.getVerticalCRS().getDatum().getVerticalDatumType());
                         assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
                         assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());
                     }

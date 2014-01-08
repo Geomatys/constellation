@@ -187,13 +187,13 @@
                                 <gco:Real>0.0</gco:Real>
                             </gmd:maximumValue>
                             <gmd:verticalCRS>
-                                <gml:VerticalCRS gml:id="Gravity-related height">
+                                <gml:VerticalCRS gml:id="Gravityrelatedheight">
                                     <gml:name>Gravity-related height</gml:name>
                                     <gml:verticalCS>
-                                        <gml:VerticalCS gml:id="Gravity-related height">
+                                        <gml:VerticalCS gml:id="Gravityrelatedheight">
                                             <gml:name>Gravity-related height</gml:name>
                                             <gml:axis>
-                                                <gml:CoordinateSystemAxis uom="m" gml:id="Gravity-related height">
+                                                <gml:CoordinateSystemAxis uom="urn:ogc:def:uom:EPSG::9001" gml:id="Gravityrelatedheight">
                                                     <gml:name>Gravity-related height</gml:name>
                                                     <gml:axisAbbrev>H</gml:axisAbbrev>
                                                     <gml:axisDirection codeSpace="EPSG">up</gml:axisDirection>
@@ -204,7 +204,6 @@
                                     <gml:verticalDatum>
                                         <gml:VerticalDatum gml:id="Geoidal">
                                             <gml:name>Geoidal</gml:name>
-                                            <gml:realizationEpoch/>
                                         </gml:VerticalDatum>
                                     </gml:verticalDatum>
                                 </gml:VerticalCRS>

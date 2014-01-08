@@ -102,6 +102,12 @@
 
     <!-- Test dependencies -->
     <dependency>
+       <groupId>org.constellation.engine</groupId>
+       <artifactId>cstl-engine-shiro</artifactId>
+       <version>${project.version}</version>
+       <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-jaxp-core</artifactId>
       <scope>test</scope>
@@ -110,12 +116,6 @@
     <dependency>
       <groupId>org.geotoolkit.project</groupId>
       <artifactId>geotk-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.testing</groupId>
-      <artifactId>cstl-test-data</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

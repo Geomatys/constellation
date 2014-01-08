@@ -274,6 +274,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * TODO: Is this broken?
      *
      * @param descLayer The {@linkplain DescribeLayer describe layer} request.
+     * @return a description of layers specified in the user's request.
      *
      * @throws CstlServiceException
      */
@@ -546,7 +547,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
                     if (mi instanceof MapContext) {
                         final MapContext mc = (MapContext)mi;
-                        final List<AbstractDimension> dimensionsToAdd = new ArrayList<AbstractDimension>();
+                        final List<AbstractDimension> dimensionsToAdd = new ArrayList<>();
                         for (final MapLayer candidateLayer : mc.layers()) {
                             if (candidateLayer instanceof FeatureMapLayer) {
                                 final FeatureMapLayer fml = (FeatureMapLayer)candidateLayer;
@@ -577,10 +578,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         dimensions.addAll(getExtraDimensions(fml, queryVersion));
                     }
 
-                } catch (PortrayalException ex) {
-                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
-                    break;
-                } catch (DataStoreException ex) {
+                } catch (PortrayalException | DataStoreException ex) {
                     Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
                     break;
                 }
@@ -704,7 +702,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     }
 
     private String sortValues(final String... vals) {
-        final List<String> finalVals = new ArrayList<String>();
+        final List<String> finalVals = new ArrayList<>();
         for (final String s : vals) {
             finalVals.add(s);
         }
@@ -715,7 +713,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             Double.valueOf(finalVals.get(0));
             // It is a double!
             isDoubleValues = true;
-            finalValsDouble = new ArrayList<Double>();
+            finalValsDouble = new ArrayList<>();
             for (String s : finalVals) {
                 finalValsDouble.add(Double.valueOf(s));
             }
@@ -752,7 +750,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @param newExtraDim
      */
     private void mergeValues(final AbstractDimension oldExtraDim, final AbstractDimension newExtraDim) {
-        final Set<String> valsSet = new HashSet<String>();
+        final Set<String> valsSet = new HashSet<>();
         final String oldVals = oldExtraDim.getValue();
         final String[] oldValsSplit = oldVals.split(",");
         for (final String o : oldValsSplit) {
@@ -765,7 +763,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             valsSet.add(n);
         }
 
-        final List<String> finalVals = new ArrayList<String>();
+        final List<String> finalVals = new ArrayList<>();
         finalVals.addAll(valsSet);
 
         if (finalVals.isEmpty()) {
@@ -785,11 +783,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @throws DataStoreException
      */
     private List<AbstractDimension> getExtraDimensions(final FeatureMapLayer fml, final String queryVersion) throws DataStoreException {
-        final List<AbstractDimension> dimensions = new ArrayList<AbstractDimension>();
+        final List<AbstractDimension> dimensions = new ArrayList<>();
         for(FeatureMapLayer.DimensionDef ddef : fml.getExtraDimensions()){
             final Collection<Range> collRefs = fml.getDimensionRange(ddef);
             // Transform it to a set in order to filter same values
-            final Set<Range> refs = new HashSet<Range>();
+            final Set<Range> refs = new HashSet<>();
             for (Range ref : collRefs) {
                 refs.add(ref);
             }

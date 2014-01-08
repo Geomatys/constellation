@@ -843,6 +843,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                                          && !objectClass.getSimpleName().equals("TimeRange")
                                                          && !objectClass.getSimpleName().equals("TimeType")) {
             propName = "unit";
+        } else if (attributeName.equalsIgnoreCase("verticalDatum") && objectClass.getSimpleName().equals("DefaultVerticalCRS")) {
+            propName = "datum";
         } else {
             propName = attributeName;
         }

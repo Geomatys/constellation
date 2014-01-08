@@ -42,7 +42,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // Junit dependencies
-import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -54,10 +53,10 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.apache.sis.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.apache.sis.internal.jaxb.gmx.Anchor;
-import org.geotoolkit.internal.referencing.VerticalDatumTypes;
 import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.DefaultMetadataExtensionInformation;
+import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultAddress;
 import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
@@ -81,11 +80,12 @@ import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.metadata.iso.spatial.DefaultGeometricObjects;
 import org.apache.sis.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
+import org.apache.sis.referencing.AbstractIdentifiedObject;
+import org.apache.sis.referencing.crs.DefaultVerticalCRS;
+import org.apache.sis.referencing.cs.DefaultCoordinateSystemAxis;
+import org.apache.sis.referencing.cs.DefaultVerticalCS;
+import org.apache.sis.referencing.datum.DefaultVerticalDatum;
 import org.apache.sis.test.XMLComparator;
-import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
-import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
-import org.geotoolkit.referencing.cs.DefaultVerticalCS;
-import org.geotoolkit.referencing.datum.DefaultVerticalDatum;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.apache.sis.util.iso.SimpleInternationalString;
 
@@ -483,15 +483,15 @@ public class MetadataUnmarshallTest {
 
         Map<String, Object> prop = new HashMap<>();
         prop.put(DefaultVerticalDatum.NAME_KEY, datumID);
-        prop.put(DefaultVerticalDatum.SCOPE_KEY, null);
-        DefaultVerticalDatum datum = new DefaultVerticalDatum(prop, VerticalDatumTypes.ELLIPSOIDAL);
+        DefaultVerticalDatum datum = new DefaultVerticalDatum(prop, VerticalDatumType.OTHER_SURFACE);
 
 
         // vertical coordinate system  TODO var 32 uom?
         HashMap<String, Object> propCoo = new HashMap<>();
 
 
-        propCoo.put(DefaultCoordinateSystemAxis.NAME_KEY, new ImmutableIdentifier(null, null, "meters"));
+        ImmutableIdentifier m = new ImmutableIdentifier(null, null, "meters");
+        propCoo.put(DefaultCoordinateSystemAxis.NAME_KEY, m);
 //        propCoo.put(DefaultCoordinateSystemAxis.ALIAS_KEY, "");
         DefaultCoordinateSystemAxis axis = new DefaultCoordinateSystemAxis(propCoo, "meters", AxisDirection.DOWN, Unit.valueOf("m"));
 
@@ -1097,8 +1097,13 @@ public class MetadataUnmarshallTest {
 
 
         // vertical coordinate system  TODO var 32 uom?
-        DefaultCoordinateSystemAxis axis = new DefaultCoordinateSystemAxis("meters", AxisDirection.DOWN, Unit.valueOf("m"));
-        DefaultVerticalCS cs = new DefaultVerticalCS(axis);
+        final Map<String, Object> axisMap = new HashMap<>();
+        axisMap.put(AbstractIdentifiedObject.NAME_KEY, "meters");
+        DefaultCoordinateSystemAxis axis = new DefaultCoordinateSystemAxis(axisMap, "meters", AxisDirection.DOWN, Unit.valueOf("m"));
+
+        final Map<String, Object> csMap = new HashMap<>();
+        csMap.put(AbstractIdentifiedObject.NAME_KEY, "meters");
+        DefaultVerticalCS cs = new DefaultVerticalCS(csMap, axis);
 
         prop = new HashMap<>();
         prop.put(DefaultVerticalCRS.NAME_KEY, "idvertCRS");
