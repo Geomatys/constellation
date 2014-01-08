@@ -1,0 +1,120 @@
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <a href="http://localhost:8080/cstl-web-client/"><img src="images/constellation.png"/></a>
+    </div>
+    <!-- Menu to create services -->
+    <div class="span3 offset6 pull-right">
+        <div class="dropdown">
+            <a id="createservice" data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle">
+                <span class="icon-plus icon-white" style="margin-top: 0px;"></span>
+                   Créer un nouveau service
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="create/wms" id="wmschoice">Cartes (WMS)</a></li>
+                <li><a href="create/wmts" id="wmtschoice">Cartes tuilées (WMTS)</a></li>
+                <li><a href="create/wfs" id="wfschoice">Données vectorielles (WFS)</a></li>
+                <li><a href="create/wcs" id="wcschoice">Grille de données (WCS)</a></li>
+                <li><a href="create/wps" id="wpschoice">Géotraitements (WPS)</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="row" >
+        <div class="navbar" style="margin-bottom: 0px;">
+            <div class="navbar-inner">
+                <a class="brand" href="#">Services disponibles</a>
+                <ul class="nav pull-right">
+                    <li class="active"><a href="#" onclick="filter('', this)">Tous</a></li>
+                    <li><a href="#" onclick="filter('csw', this)">CSW</a></li>
+                    <li><a href="#" onclick="filter('wms', this)">WMS</a></li>
+                    <li><a href="#" onclick="filter('wmts', this)">WMTS</a></li>
+                    <li><a href="#" onclick="filter('wfs', this)">WFS</a></li>
+                    <li><a href="#" onclick="filter('wcs', this)">WCS</a></li>
+                    <li><a href="#" onclick="filter('sos', this)">SOS</a></li>
+                    <li><a href="#" onclick="filter('wps', this)">WPS</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;" id="main" ng-repeat="service in services.instance">
+          <div class="span6" id="wms-test">
+            <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}"><h3 class="text-info">{{service.name}} ({{service.type.toLocaleLowerCase()}})</h3></a>
+            <div class="well started" data-state="wms-test">
+                <div class="row">
+                    <div class="pull-right">
+                        <div class="btn-group">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="icon-wrench"></i>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="edit/wms/test">Editer</a></li>
+                                <li><a href="#" data-action="open-logs" data-logs="http://localhost:8080/constellation/api/1/log/wms/test?l=1000">Log du service</a></li>
+                                <li><a href="#" data-action="open-service-url" data-capabilities="http://localhost:8080/constellation/WS/wms/test?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.3.0">URL du service</a></li>
+                                <li><a href="#" data-action="delete-service" data-service-type="wms" data-service-id="test">Supprimer le service</a></li>
+                                <li><a href="#" data-action="open-capabilities" data-capabilities="http://localhost:8080/constellation/WS/wms/test?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.3.0">GetCapabilities</a></li>
+                                <li class="" ><a href="#" data-action="show-service">Visualiser</a></li>
+                            </ul>
+                        </div>
+                        <a class="btn btn-info" href="#" data-action="restart-service" data-service-type="wms" data-service-id="test">
+                            <i class="icon-refresh"></i>
+                        </a>
+                        <a class="btn started" href="#" data-state="wms-test" data-action="toggle-service" data-service-type="wms" data-service-id="test">
+                            <i class="icon-play"></i>
+                            <i class="icon-stop"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="span4">
+                        <p><strong>Description du service</strong></p>
+                        <p>test</p>
+                        <p><strong>Données publiées sur le service</strong></p>
+                        <p>0</p>
+                    </div>
+                </div>
+            </div>
+          </div>
+        
+    </div>
+</div>
+<div class="modal hide fade" id="url-modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>URL</h3>
+    </div>
+    <div class="modal-body">
+        <pre id="url-modal-pre"></pre>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    </div>
+</div>
+<div class="modal hide fade" id="getcapabilities-modal" style="left:40%; width:910px">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>GetCapabilities</h3>
+    </div>
+    <div class="modal-body">
+        <pre id="capabilities-modal-pre" style="background-color: #f8f8ff"><code class="xml"></code></pre>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    </div>
+</div>
+
+<div class="modal hide fade" id="logs-modal" style="left:40%; width:910px">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Log</h3>
+    </div>
+    <div class="modal-body">
+        <pre id="logs-modal-pre" style="background-color: #f8f8ff"><code class="xml"></code></pre>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    </div>
+</div>
