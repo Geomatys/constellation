@@ -50,13 +50,14 @@ public class Service {
 
     private AccessConstraint serviceConstraints;
 
+    private boolean transactional;
 
     public Service() {
     }
 
     public Service(final String name, final String identifier, final List<String> keywords,
-            final String description, final List<String> versions, final Contact serviceContact,
-            final AccessConstraint serviceConstraints) {
+                   final String description, final List<String> versions, final Contact serviceContact,
+                   final AccessConstraint serviceConstraints, final boolean transactionnal) {
         this.description = description;
         this.identifier  = identifier;
         this.keywords    = keywords;
@@ -64,6 +65,7 @@ public class Service {
         this.serviceConstraints = serviceConstraints;
         this.serviceContact = serviceContact;
         this.versions = versions;
+        this.transactional = transactionnal;
     }
 
     public String getName() {
@@ -120,5 +122,13 @@ public class Service {
 
     public void setVersions(List<String> versions) {
         this.versions = versions;
+    }
+
+    public boolean isTransactional() {
+        return transactional;
+    }
+
+    public void setTransactional(final boolean transactional) {
+        this.transactional = transactional;
     }
 }

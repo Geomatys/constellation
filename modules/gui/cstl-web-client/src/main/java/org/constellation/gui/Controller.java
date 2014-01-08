@@ -225,11 +225,14 @@ public class Controller {
         createdService.setServiceConstraints(serviceConstraint);
         serviceContact.setFullname();
         createdService.setServiceContact(serviceContact);
+        if(transactional!=null && !transactional.isEmpty()){
+            createdService.setTransactional(true);
+        }
 
         //call service
         try {
             servicesManager.createServices(createdService, Specification.fromShortName(serviceType));
-            return Controller_.succeeded(createdService.getName(), createdService.getDescription(), createdService.getIdentifier(), serviceType, versionsList, "true");
+                return Controller_.succeeded(createdService.getName(), createdService.getDescription(), createdService.getIdentifier(), serviceType, versionsList, "true");
         } catch (IOException ex) {
             return Controller_.succeeded(createdService.getName(), createdService.getDescription(), createdService.getIdentifier(), serviceType, versionsList, "false");
         }

@@ -550,7 +550,7 @@ public class GenericConfigurationXMLBindingTest {
 
         final Contact ctc = new Contact("firstname", "lastname", "org1", "pos1", "0600", "0800", "test@jj.com", "adr1", "city1", "state1", "34000", "france", "url1", null, null);
         final AccessConstraint cstr = new AccessConstraint("fees1", "constraint1", 5, 200, 300);
-        final Service service = new Service("name1", "id1", Arrays.asList("kw1", "kw2"), "desc1", Arrays.asList("1.0.0", "2.0.0"), ctc, cstr);
+        final Service service = new Service("name1", "id1", Arrays.asList("kw1", "kw2"), "desc1", Arrays.asList("1.0.0", "2.0.0"), ctc, cstr, false);
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(service, sw);
@@ -587,6 +587,7 @@ public class GenericConfigurationXMLBindingTest {
         "    <ns2:url>url1</ns2:url>\n" +
         "    <ns2:zipCode>34000</ns2:zipCode>\n" +
         "  </ns2:serviceContact>\n" +
+        "  <ns2:transactional>false</ns2:transactional>\n" +
         "  <ns2:versions>1.0.0</ns2:versions>\n" +
         "  <ns2:versions>2.0.0</ns2:versions>\n" +
         "</ns2:service>" + '\n';
