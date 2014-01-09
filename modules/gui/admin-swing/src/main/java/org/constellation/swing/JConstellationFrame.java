@@ -21,6 +21,7 @@ import java.net.URL;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import org.constellation.admin.service.ConstellationClient;
 
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.admin.service.ConstellationServerFactory;
@@ -43,10 +44,11 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public final class JConstellationFrame extends JFrame{
     
-    public JConstellationFrame(ConstellationServer server){
+    public JConstellationFrame(final ConstellationServer server, final ConstellationClient serverV2){
         final JTabbedPane pane = new JTabbedPane();
         pane.add("Services", new JServicesPane(
                 server,
+                serverV2,
                 (FrameDisplayer)null,
                 (RoleController)null,
                 new ServiceViewAction(),
@@ -56,6 +58,7 @@ public final class JConstellationFrame extends JFrame{
                 new ServiceDeleteAction()));
         pane.add("Providers", new JProvidersPane(
                 server,
+                serverV2,
                 (FrameDisplayer)null,
                 (RoleController)null,
                 new ProviderViewAction(),
@@ -84,10 +87,18 @@ public final class JConstellationFrame extends JFrame{
         Parameters.getOrCreate(ConstellationServerFactory.URL, param).setValue(new URL(url));
         Parameters.getOrCreate(ConstellationServerFactory.USER, param).setValue(login);
         Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, param).setValue(password);
-                
-        final ConstellationServer server = new ConstellationServer(param);
+
+        // old API
+        final ConstellationServer server   = new ConstellationServer(param);
+        // new API
+        if (url.endsWith("/")) {
+            url = url.substring(0, url.length() - 3);
+        } else  {
+            url = url.substring(0, url.length() - 2);
+        }
+        final ConstellationClient serverV2 = new ConstellationClient(url).auth(login, password);
         
-        final JConstellationFrame frame = new JConstellationFrame(server);
+        final JConstellationFrame frame = new JConstellationFrame(server, serverV2);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
@@ -95,9 +106,8 @@ public final class JConstellationFrame extends JFrame{
     }
     
     public static void main(String[] args) throws MalformedURLException {
-    	String url = args.length==1?args[0]:"http://localhost:8084/constellation/WS/";
-        
-		JConstellationFrame.show("admin", "admin", url, true);
+    	String url = args.length==1?args[0]:"http://localhost:8080/constellation/WS/";
+        JConstellationFrame.show("admin", "admin", url, true);
     }
     
 }

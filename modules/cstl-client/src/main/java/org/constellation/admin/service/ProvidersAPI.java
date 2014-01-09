@@ -28,18 +28,16 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.dto.StyleListBean;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
@@ -272,5 +270,13 @@ public final class ProvidersAPI {
 
     public DataInformation getMetadata(final String providerId, final String dataId, final String dataType) throws IOException {
         return client.get("data/metadata/"+providerId+"/"+dataId+"/"+dataType, MediaType.APPLICATION_XML_TYPE).getEntity(DataInformation.class);
+    }
+
+    public DefaultMetadata getMetadata(final String providerId) throws IOException {
+        return client.get("provider/metadata/"+providerId, MediaType.APPLICATION_XML_TYPE).getEntity(DefaultMetadata.class);
+    }
+
+    public void saveMetadata(final String providerId, final DefaultMetadata metadata) throws IOException {
+        client.post("provider/metadata/"+providerId, MediaType.APPLICATION_XML_TYPE, metadata);
     }
 }

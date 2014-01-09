@@ -36,6 +36,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -48,6 +49,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.admin.service.ConstellationServer.Services;
 import org.constellation.configuration.Instance;
@@ -72,13 +74,14 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
     private final List<Action> actions = new ArrayList<>();
     private final JXTable guiTable = new JXTable();
     private final ConstellationServer cstl;
+    private final ConstellationClient cstlV2;
     private final FrameDisplayer displayer;
 
-    public JServicesPane(final ConstellationServer cstl, final FrameDisplayer displayer) {
-        this(cstl, displayer, null);
+    public JServicesPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer) {
+        this(cstl, cstlV2, displayer, null);
     }
 
-    public JServicesPane(final ConstellationServer cstl, final FrameDisplayer displayer,
+    public JServicesPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer,
             RoleController roleController, Action ... actions) {
         initComponents();
 
@@ -89,7 +92,8 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
             }
         }
 
-        this.cstl = cstl;
+        this.cstl   = cstl;
+        this.cstlV2 = cstlV2;
         if (displayer == null) {
             this.displayer = new DefaultFrameDisplayer();
         } else {
@@ -111,8 +115,8 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
 
         guiNew.setVisible(roleController == null || roleController.hasPermission(NEW_SERVICE));
 
-        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl));
-        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl));
+        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl, cstlV2));
+        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl, cstlV2));
 
         guiTable.setDefaultRenderer(Entry.class, new DefaultTableCellRenderer(){
 
@@ -183,7 +187,7 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
                         instances.add(new AbstractMap.SimpleImmutableEntry<>(instance, service.getKey()));
                     }
                 } else {
-                    LOGGER.warning("Unable to get the report for service: " + service.getKey());
+                    LOGGER.log(Level.WARNING, "Unable to get the report for service: {0}", service.getKey());
                 }
             }
         }

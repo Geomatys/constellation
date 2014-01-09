@@ -41,6 +41,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
@@ -68,16 +69,16 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
     };
 
 
-    private final List<Action> actions = new ArrayList<Action>();
+    private final List<Action> actions = new ArrayList<>();
     private final JXTable guiTable = new JXTable();
     private final ConstellationServer cstl;
     private final FrameDisplayer displayer;
 
-    public JProvidersPane(final ConstellationServer cstl, final FrameDisplayer displayer) {
-        this(cstl, displayer, null);
+    public JProvidersPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer) {
+        this(cstl, cstlV2, displayer, null);
     }
 
-    public JProvidersPane(final ConstellationServer cstl, final FrameDisplayer displayer,
+    public JProvidersPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer,
             RoleController roleController, final Action ... actions) {
         initComponents();
 
@@ -115,8 +116,8 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
 
         final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
-        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl));
-        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl));
+        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl, cstlV2));
+        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl, cstlV2));
         guiTable.setDefaultRenderer(Entry.class, new DefaultTableCellRenderer(){
 
             @Override
@@ -165,7 +166,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
         final ProvidersReport providersReport = cstl.providers.listProviders();
         if (providersReport != null) {
             final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
-            final List<Entry<String,ProviderReport>> instances = new ArrayList<Entry<String,ProviderReport>> ();
+            final List<Entry<String,ProviderReport>> instances = new ArrayList<> ();
 
             for (final ProviderServiceReport serviceReport : servicesReport) {
                 final String type = serviceReport.getType();
@@ -173,7 +174,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
                     final List<ProviderReport> providers = serviceReport.getProviders();
 
                     for(ProviderReport report : providers){
-                        instances.add(new AbstractMap.SimpleEntry<String,ProviderReport>(type,report));
+                        instances.add(new AbstractMap.SimpleEntry<>(type,report));
                     }
                 }
             }

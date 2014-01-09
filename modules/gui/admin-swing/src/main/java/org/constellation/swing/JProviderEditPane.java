@@ -21,14 +21,19 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.*;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderReport;
@@ -68,6 +73,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/constellation/swing/Bundle");
 
     private final ConstellationServer server;
+    private final ConstellationClient serverV2;
     private final String providerType;
     private ProviderReport providerReport;
     private final ParameterDescriptorGroup configDesc;
@@ -79,9 +85,10 @@ public class JProviderEditPane extends javax.swing.JPanel {
     private ParameterValueGroup subdataParam;
     private final JFeatureOutLine guiParameterEditor = new JFeatureOutLine();
 
-    public JProviderEditPane(final ConstellationServer server, final String serviceType, final ProviderReport providerReport) {
-        this.server = server;
-        this.providerType = serviceType;
+    public JProviderEditPane(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final ProviderReport providerReport) {
+        this.server         = server;
+        this.serverV2       = serverV2;
+        this.providerType   = serviceType;
         this.providerReport = providerReport;
 
         configDesc = (ParameterDescriptorGroup) server.providers.getServiceDescriptor(providerType);
@@ -94,7 +101,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
         if("choice".equalsIgnoreCase(dataDesc.getName().getCode())){
             for(GeneralParameterValue sub : dataParam.values()){
                 subdataParam = (ParameterValueGroup) sub;
-                subdataDesc = subdataParam.getDescriptor();
+                subdataDesc  = subdataParam.getDescriptor();
             }
         }
 
@@ -264,15 +271,15 @@ public class JProviderEditPane extends javax.swing.JPanel {
         style = layer.getStyle();
         style.setName(textField.getText());
 
-        if(isNew){
+        if (isNew) {
             //ensure name does not exist
             final String baseName = styleName;
             int i=0;
-            while(providerReport.getItems().contains(styleName)){
+            while (providerReport.getItems().contains(styleName)) {
                 styleName = baseName + i++;
             }
-        }else{
-            if(providerReport.getItems().contains(oldName)){
+        } else {
+            if (providerReport.getItems().contains(oldName)) {
                 //delete previous if it existed
                 server.providers.deleteStyle(providerReport.getId(), oldName);
             }
@@ -305,6 +312,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
         guiAdd = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         guiData = new org.jdesktop.swingx.JXTable();
+        metadataButton = new javax.swing.JButton();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("id")); // NOI18N
@@ -391,6 +399,13 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
         jSplitPane1.setRightComponent(jPanel2);
 
+        metadataButton.setText(org.openide.util.NbBundle.getMessage(JProviderEditPane.class, "metadata")); // NOI18N
+        metadataButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                metadataButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -402,6 +417,8 @@ public class JProviderEditPane extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(guiDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(metadataButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(guiSave))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
@@ -424,7 +441,8 @@ public class JProviderEditPane extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(guiDelete)
-                    .addComponent(guiSave))
+                    .addComponent(guiSave)
+                    .addComponent(metadataButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -472,6 +490,27 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
     }//GEN-LAST:event_guiAddActionPerformed
 
+    private void metadataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metadataButtonActionPerformed
+        final JComponent edit = new JProviderMetadataPane(serverV2, providerReport.getId());
+        final JDialog dialog = new JDialog();
+        dialog.setModal(true);
+        dialog.setContentPane(edit);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setTitle(providerReport.getId());
+
+        final PropertyChangeListener cl = new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("update".equals(evt.getPropertyName())) {
+                    dialog.dispose();
+                }
+            }
+        };
+        edit.addPropertyChangeListener(cl);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_metadataButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton guiAdd;
     private org.jdesktop.swingx.JXTable guiData;
@@ -486,6 +525,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JButton metadataButton;
     // End of variables declaration//GEN-END:variables
 
     private class DataModel extends  AbstractTableModel{

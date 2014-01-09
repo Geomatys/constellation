@@ -17,17 +17,27 @@
 
 package org.constellation.ws.rest;
 
+import java.sql.SQLException;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.NotRunningServiceException;
+import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.process.ProcessException;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * RestFull API for provider management/operations.
@@ -83,5 +93,23 @@ public final class Provider {
         } catch (CstlServiceException ex) {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
+    }
+
+    @GET
+    @Path("metadata/{providerId}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getMetadata(final @PathParam("providerId") String providerId) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+        final DefaultMetadata metadata = ConfigurationEngine.loadProviderMetadata(providerId, CSWMarshallerPool.getInstance());
+        return Response.ok(metadata).build();
+    }
+
+    @POST
+    @Path("metadata/{providerId}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response setMetadata(final @PathParam("providerId") String providerId, final DefaultMetadata metadata) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+        ConfigurationEngine.saveMetaData(metadata, providerId, CSWMarshallerPool.getInstance());
+        return Response.status(200).build();
     }
 }
