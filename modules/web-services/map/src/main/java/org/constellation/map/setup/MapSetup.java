@@ -16,6 +16,9 @@
  */
 package org.constellation.map.setup;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +32,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.map.configuration.StyleProviderConfig;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.CreateProviderDescriptor;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.StyleProvider;
@@ -42,27 +46,32 @@ import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.Symbolizer;
 import org.opengis.util.NoSuchIdentifierException;
 
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_DESCRIPTOR_NAME;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import static org.geotoolkit.style.StyleConstants.*;
 
 /**
- * specific setup for map service 
- * 
+ * specific setup for map service
+ *
  * @author Guilhem Legal (Geomatys)
  */
 public class MapSetup implements SetupService {
 
     private static final Logger LOGGER = Logging.getLogger(MapSetup.class);
-    
+
     @Override
     public void initialize(Properties properties, boolean reinit) {
-        
+
         LOGGER.log(Level.INFO, "=== Activating Native Codec ===");
-        
+
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
@@ -71,16 +80,25 @@ public class MapSetup implements SetupService {
         for(String jn : ImageIO.getReaderFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
         }
-        
+
         //reset values, only allow pure java writers
         for(String jn : ImageIO.getWriterFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
         }
-        
+
         for(String jn : ImageIO.getWriterFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
         }
 
+        initializeDefaultStyles();
+
+        initializeDefaultData();
+    }
+
+    /**
+     * Initialize default styles for generic data.
+     */
+    private void initializeDefaultStyles() {
         // Create default SLD provider containing default styles.
         StyleProvider provider = StyleProviderProxy.getInstance().getProvider("sld");
         if (provider == null) {
@@ -152,6 +170,69 @@ public class MapSetup implements SetupService {
             }
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, "An error occurred when creating default styles for default SLD provider.", ex);
+        }
+    }
+
+    /**
+     * Initialize default data for displaying generic features in data editors.
+     */
+    private void initializeDefaultData() {
+        final File dst = new File(ConfigDirectory.getDataDirectory(), "shapes");
+        try {
+            if (dst.exists()) {
+                if (!dst.isDirectory() || (dst.isDirectory() && dst.listFiles().length == 0)) {
+                    final File src = FileUtilities.getDirectoryFromResource("org/constellation/map/setup/shapes");
+                    FileUtilities.copy(src, dst);
+                }
+            } else {
+                dst.mkdir();
+                final File src = FileUtilities.getDirectoryFromResource("org/constellation/map/setup/shapes");
+                FileUtilities.copy(src, dst);
+            }
+
+            final String featureStoreStr = "feature-store";
+            final String shpProvName = "generic_shp";
+            LayerProvider shpProvider = LayerProviderProxy.getInstance().getProvider(shpProvName);
+            if (shpProvider == null) {
+                // Acquire SHP provider service instance.
+                ProviderService shpService = null;
+                for (final ProviderService service : LayerProviderProxy.getInstance().getServices()) {
+                    if (service.getName().equals(featureStoreStr)) {
+                        shpService = service;
+                        break;
+                    }
+                }
+                if (shpService == null) {
+                    LOGGER.log(Level.WARNING, "SHP provider service not found.");
+                    return;
+                }
+
+                final ParameterValueGroup config = shpService.getServiceDescriptor().createValue();
+                final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                getOrCreateValue(source, "id").setValue(shpProvName);
+                getOrCreateValue(source, "load_all").setValue(true);
+                getOrCreateValue(source, "providerType").setValue("vector");
+
+                final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                final ParameterValueGroup shpConfig = createGroup(choice, "ShapefileParametersFolder");
+                getOrCreateValue(shpConfig, "url").setValue(new URL("file:"+ dst.getAbsolutePath()));
+                getOrCreateValue(shpConfig, "namespace").setValue("no namespace");
+
+                // Create SHP Folder provider.
+                try {
+                    final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);
+                    final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                    inputs.parameter(CreateProviderDescriptor.PROVIDER_TYPE_NAME).setValue(featureStoreStr);
+                    inputs.parameter(CreateProviderDescriptor.SOURCE_NAME).setValue(source);
+                    desc.createProcess(inputs).call();
+                } catch (NoSuchIdentifierException ignore) { // should never happen
+                } catch (ProcessException ex) {
+                    LOGGER.log(Level.WARNING, "An error occurred when creating default SHP provider.", ex);
+                    return;
+                }
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
     }
 
