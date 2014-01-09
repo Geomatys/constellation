@@ -80,6 +80,7 @@ public final class Session implements Closeable {
     private static final Properties QUERIES = new Properties();
     static {
         final ClassLoader loader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+            @Override
             public ClassLoader run() {
                 return Thread.currentThread().getContextClassLoader();
             }
@@ -108,6 +109,7 @@ public final class Session implements Closeable {
     private static final String READ_PROVIDER_FROM_ID       = "provider.read.from.id";
     private static final String READ_PROVIDER_CONFIG        = "provider.read.config";
     private static final String READ_PROVIDER_METADATA      = "provider.read.metadata";
+    private static final String EXIST_PROVIDER_METADATA     = "provider.exist.metadata";
     private static final String LIST_PROVIDERS              = "provider.list";
     private static final String LIST_PROVIDERS_FROM_TYPE    = "provider.list.from.type";
     private static final String LIST_PROVIDERS_FROM_IMPL    = "provider.list.from.impl";
@@ -458,7 +460,7 @@ public final class Session implements Closeable {
         return IOUtilities.readParameter(stream, descriptor);
     }
     /**
-     * Queries the configuration of the provider with the specified {@code generatedId}.
+     * Queries the metadata of the provider with the specified {@code generatedId}.
      *
      * @param generatedId the provider auto-generated id
      * @return the {@link ParameterValueGroup} instance
@@ -470,6 +472,17 @@ public final class Session implements Closeable {
         return stream;
     }
 
+    /**
+     * look for existence of the provider metadata with the specified {@code generatedId}.
+     *
+     * @param generatedId the provider auto-generated id
+     * @return the {@link ParameterValueGroup} instance
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be read
+     */
+    /* internal */ boolean hasProviderMetadata(final int generatedId) throws SQLException, IOException {
+        return new Query(EXIST_PROVIDER_METADATA).with(generatedId).select().hasNext();
+    }
     /**
      * Queries the complete list of registered providers.
      *
@@ -1237,6 +1250,15 @@ public final class Session implements Closeable {
                 stmt.close();
             }
             return null;
+        }
+
+        boolean hasNext() throws SQLException {
+            try {
+                return rs.next();
+            } finally {
+                rs.close();
+                stmt.close();
+            }
         }
     }
 

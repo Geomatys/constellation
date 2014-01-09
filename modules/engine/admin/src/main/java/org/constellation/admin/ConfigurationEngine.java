@@ -522,16 +522,43 @@ public class ConfigurationEngine {
         return null;
     }
 
+    public static boolean providerHasMetadata(final String providerID) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final ProviderRecord data = session.readProvider(providerID);
+            if (data != null) {
+                return data.hasMetadata();
+            }
+        } catch (SQLException | IOException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while looking for provider metadata existance", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return false;
+    }
+
     public static List<String> getProviderIds() {
+        return getProviderIds(false);
+    }
+
+    public static List<String> getProviderIds(final boolean hasMetadata) {
         final List<String> results = new ArrayList<>();
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
             final List<ProviderRecord> providers = session.readProviders();
             for (ProviderRecord record : providers) {
-                results.add(record.getIdentifier());
+                if (hasMetadata) {
+                    if (record.hasMetadata()) {
+                        results.add(record.getIdentifier());
+                    }
+                } else {
+                    results.add(record.getIdentifier());
+                }
             }
-        } catch (SQLException ex) {
+        } catch (SQLException | IOException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
         } finally {
             if (session != null)
@@ -544,6 +571,7 @@ public class ConfigurationEngine {
      * Load a metadata for a provider.
      *
      *
+     * @param providerId
      * @param pool
      * @param name
      * @return
@@ -571,6 +599,7 @@ public class ConfigurationEngine {
         }
         return null;
     }
+
 
     /**
      * @param name

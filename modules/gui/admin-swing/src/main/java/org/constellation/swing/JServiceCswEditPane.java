@@ -77,6 +77,10 @@ public class JServiceCswEditPane extends JServiceEditionPane {
                 specificPane = new JCswFsEditPane(this.configuration);
                 specificPane.setSize(450, 86);
                 centerPane.add(BorderLayout.CENTER, specificPane);
+            } else if (this.configuration.getFormat().equals("internal")) {
+                specificPane = new JCswInternalEditPane(this.configuration);
+                specificPane.setSize(450, 86);
+                centerPane.add(BorderLayout.CENTER, specificPane);
             } else {
                 LOGGER.log(Level.WARNING, "Unexpected CSW format:{0}", this.configuration.getFormat());
             }
@@ -107,7 +111,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         ResourceBundle bundle = ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("sourceType")); // NOI18N
 
-        guiDataSourceCombo.setModel(new DefaultComboBoxModel(new String[] { "mdweb", "filesystem" }));
+        guiDataSourceCombo.setModel(new DefaultComboBoxModel(new String[] { "mdweb", "filesystem", "internal" }));
         guiDataSourceCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent evt) {
                 guiDataSourceComboItemStateChanged(evt);
@@ -194,6 +198,10 @@ public class JServiceCswEditPane extends JServiceEditionPane {
             centerPane.add(BorderLayout.CENTER, specificPane);
         } else if (guiDataSourceCombo.getSelectedItem().equals("filesystem")) {
             specificPane = new JCswFsEditPane(this.configuration);
+            specificPane.setSize(450, 86);
+            centerPane.add(BorderLayout.CENTER, specificPane);
+        } else if (guiDataSourceCombo.getSelectedItem().equals("internal")) {
+            specificPane = new JCswInternalEditPane(this.configuration);
             specificPane.setSize(450, 86);
             centerPane.add(BorderLayout.CENTER, specificPane);
         } else {

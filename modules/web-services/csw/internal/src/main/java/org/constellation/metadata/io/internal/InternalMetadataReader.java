@@ -142,21 +142,24 @@ public class InternalMetadataReader extends AbstractMetadataReader implements CS
     @Override
     public Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         final InputStream metadataStream = ConfigurationEngine.loadProviderMetadata(identifier);
-        final MetadataType metadataMode;
-        try {
-            metadataMode = getMetadataType(metadataStream);
-        } catch (IOException | XMLStreamException ex) {
-            throw new MetadataIoException(ex);
+        if (metadataStream != null) {
+            final MetadataType metadataMode;
+            try {
+                metadataMode = getMetadataType(metadataStream);
+            } catch (IOException | XMLStreamException ex) {
+                throw new MetadataIoException(ex);
+            }
+            final Node metadataNode = getNodeFromStream(metadataStream);
+
+            if (metadataMode ==  MetadataType.ISO_19115 && mode == MetadataType.DUBLINCORE) {
+                return translateISOtoDCNode(metadataNode, type, elementName);
+            } else if (mode == MetadataType.DUBLINCORE && metadataMode == MetadataType.DUBLINCORE) {
+                return  applyElementSetNode(metadataNode, type, elementName);
+            } else {
+               return metadataNode;
+            }
         }
-        final Node metadataNode = getNodeFromStream(metadataStream);
-            
-        if (metadataMode ==  MetadataType.ISO_19115 && mode == MetadataType.DUBLINCORE) {
-            return translateISOtoDCNode(metadataNode, type, elementName);
-        } else if (mode == MetadataType.DUBLINCORE && metadataMode == MetadataType.DUBLINCORE) {
-            return  applyElementSetNode(metadataNode, type, elementName);
-        } else {
-           return metadataNode;
-        }
+        return null;
     }
 
     private MetadataType getMetadataType(final InputStream metadataStream) throws IOException, XMLStreamException {
@@ -194,7 +197,7 @@ public class InternalMetadataReader extends AbstractMetadataReader implements CS
 
     @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
-        return ConfigurationEngine.getProviderIds().contains(identifier);
+        return ConfigurationEngine.providerHasMetadata(identifier);
     }
     
     private Node getNodeFromStream(final InputStream stream) throws MetadataIoException {
@@ -592,7 +595,7 @@ public class InternalMetadataReader extends AbstractMetadataReader implements CS
     @Override
     public List<Node> getAllEntries() throws MetadataIoException {
         final List<Node> result = new ArrayList<>();
-        final List<String> providerIds = ConfigurationEngine.getProviderIds();
+        final List<String> providerIds = ConfigurationEngine.getProviderIds(true);
         for (String providerID : providerIds) {
             final InputStream stream = ConfigurationEngine.loadProviderMetadata(providerID);
             result.add(getNodeFromStream(stream));
@@ -607,7 +610,7 @@ public class InternalMetadataReader extends AbstractMetadataReader implements CS
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
-        return ConfigurationEngine.getProviderIds();
+        return ConfigurationEngine.getProviderIds(true);
     }
 
     /**

@@ -26,6 +26,7 @@ public class JCswFsEditPane extends JServiceEditionPane {
 
     /**
      * Creates new form JCswFsEditPane
+     * @param configuration
      */
     public JCswFsEditPane(final Automatic configuration) {
         initComponents();

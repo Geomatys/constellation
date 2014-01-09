@@ -23,7 +23,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -117,6 +116,10 @@ public final class ProviderRecord implements Record {
 
     public InputStream getMetadata() throws IOException, SQLException {
         return session.readProviderMetadata(id);
+    }
+
+    public boolean hasMetadata() throws IOException, SQLException {
+        return session.hasProviderMetadata(id);
     }
 
     public void setMetadata(final StringReader metadata) throws IOException, SQLException {
