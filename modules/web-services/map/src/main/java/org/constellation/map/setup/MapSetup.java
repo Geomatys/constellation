@@ -41,6 +41,7 @@ import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.internal.SetupService;
 import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.lang.Setup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -79,27 +80,31 @@ public class MapSetup implements SetupService {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
 
-        //reset values, only allow pure java readers
-        for(String jn : ImageIO.getReaderFormatNames()){
-            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
-        }
+//        //reset values, only allow pure java readers
+//        for(String jn : ImageIO.getReaderFormatNames()){
+//            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+//        }
+//
+//        for(String jn : ImageIO.getReaderFormatNames()){
+//            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+//        }
+//
+//        //reset values, only allow pure java writers
+//        for(String jn : ImageIO.getWriterFormatNames()){
+//            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+//        }
+//
+//        for(String jn : ImageIO.getWriterFormatNames()){
+//            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+//        }
 
-        for(String jn : ImageIO.getReaderFormatNames()){
-            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
-        }
-
-        //reset values, only allow pure java writers
-        for(String jn : ImageIO.getWriterFormatNames()){
-            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
-        }
-
-        for(String jn : ImageIO.getWriterFormatNames()){
-            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
-        }
+        ImageIO.scanForPlugins();
+        Setup.initialize(null);
 
         initializeDefaultStyles();
 
-        initializeDefaultData();
+        initializeDefaultVectorData();
+        initializeDefaultRasterData();
     }
 
     /**
@@ -187,9 +192,9 @@ public class MapSetup implements SetupService {
     }
 
     /**
-     * Initialize default data for displaying generic features in data editors.
+     * Initialize default vector data for displaying generic features in data editors.
      */
-    private void initializeDefaultData() {
+    private void initializeDefaultVectorData() {
         final File dst = new File(ConfigDirectory.getDataDirectory(), "shapes");
         try {
             if (dst.exists()) {
@@ -241,6 +246,70 @@ public class MapSetup implements SetupService {
                 } catch (NoSuchIdentifierException ignore) { // should never happen
                 } catch (ProcessException ex) {
                     LOGGER.log(Level.WARNING, "An error occurred when creating default SHP provider.", ex);
+                    return;
+                }
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+        }
+    }
+
+    /**
+     * Initialize default raster data for displaying generic features in data editors.
+     */
+    private void initializeDefaultRasterData() {
+        final File dst = new File(ConfigDirectory.getDataDirectory(), "raster");
+        try {
+            if (dst.exists()) {
+                if (!dst.isDirectory() || (dst.isDirectory() && dst.listFiles().length == 0)) {
+                    final File src = FileUtilities.getDirectoryFromResource("org/constellation/map/setup/raster");
+                    FileUtilities.copy(src, dst);
+                }
+            } else {
+                dst.mkdir();
+                final File src = FileUtilities.getDirectoryFromResource("org/constellation/map/setup/raster");
+                FileUtilities.copy(src, dst);
+            }
+
+            final String coverageFileStr = "coverage-store";
+            final String tifProvName = "generic_world_tif";
+            LayerProvider tifProvider = LayerProviderProxy.getInstance().getProvider(tifProvName);
+            if (tifProvider == null) {
+                // Acquire TIFF provider service instance.
+                ProviderService tifService = null;
+                for (final ProviderService service : LayerProviderProxy.getInstance().getServices()) {
+                    if (service.getName().equals(coverageFileStr)) {
+                        tifService = service;
+                        break;
+                    }
+                }
+                if (tifService == null) {
+                    LOGGER.log(Level.WARNING, "TIFF provider service not found.");
+                    return;
+                }
+
+                final ParameterValueGroup config = tifService.getServiceDescriptor().createValue();
+                final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                getOrCreateValue(source, "id").setValue(tifProvName);
+                getOrCreateValue(source, "load_all").setValue(true);
+                getOrCreateValue(source, "providerType").setValue("raster");
+
+                final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                final ParameterValueGroup tifConfig = createGroup(choice, "FileCoverageStoreParameters");
+                final File dstTif = new File(dst, "cloudsgrey.tiff");
+                getOrCreateValue(tifConfig, "path").setValue(new URL("file:"+ dstTif.getAbsolutePath()));
+                getOrCreateValue(tifConfig, "namespace").setValue("no namespace");
+
+                // Create SHP Folder provider.
+                try {
+                    final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);
+                    final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                    inputs.parameter(CreateProviderDescriptor.PROVIDER_TYPE_NAME).setValue(coverageFileStr);
+                    inputs.parameter(CreateProviderDescriptor.SOURCE_NAME).setValue(source);
+                    desc.createProcess(inputs).call();
+                } catch (NoSuchIdentifierException ignore) { // should never happen
+                } catch (ProcessException ex) {
+                    LOGGER.log(Level.WARNING, "An error occurred when creating default TIFF provider.", ex);
                     return;
                 }
             }

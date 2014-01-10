@@ -35,6 +35,10 @@
                 layerRequestedName = 'CNTR_LB_2006';
                 layerProviderName = 'generic_shp';
             }
+            if ('${styleName}' == 'default-raster') {
+                layerRequestedName = 'cloudsgrey';
+                layerProviderName = 'generic_world_tif';
+            }
         }
 
         var layer = new OpenLayers.Layer.WMS('Test',
