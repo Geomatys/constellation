@@ -117,6 +117,8 @@ public class CstlEmbeddedService extends CommandLine {
 
     public Integer currentPort;
 
+    public boolean ready = false;
+    
     private URI uri;
     final URI uriSoap;
     final DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -250,6 +252,7 @@ public class CstlEmbeddedService extends CommandLine {
 
         final HttpServer threadSelector = buildThreadSelector();
 
+        ready = true;
         LOGGER.log(Level.INFO, "Started Grizzly application server for: {0}", uri);
         LOGGER.log(Level.INFO, "The service definition file can be found at: {0}application.wadl", uri);
 
@@ -282,7 +285,7 @@ public class CstlEmbeddedService extends CommandLine {
             LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
             LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
         }
-
+        ready = true;
 
         stayAlive();
         for (Endpoint ep : eps) {
@@ -317,6 +320,7 @@ public class CstlEmbeddedService extends CommandLine {
             LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
             LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
         }
+        ready = true;
 
         stayAlive();
         if (threadSelector != null) {

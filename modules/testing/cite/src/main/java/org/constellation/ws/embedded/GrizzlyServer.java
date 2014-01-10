@@ -106,12 +106,6 @@ public final class GrizzlyServer {
             return;
         }
 
-        /* Instanciates the Grizzly server, but not start it at this moment.
-         * The implementation waits for the data provider to be defined for
-         * starting the server.
-         */
-        grizzly = new GrizzlyThread();
-
         // Initialises the postgrid testing raster.
         CoverageSQLTestCase.init();
 
@@ -199,6 +193,8 @@ public final class GrizzlyServer {
         wfsConfig.getCustomParameters().put("shiroAccessible", "false");
         wfsConfig.getCustomParameters().put("multipleVersion", "false");
         wfsConfig.getCustomParameters().put("transactionSecurized", "false");
+        wfsConfig.getCustomParameters().put("transactionnal", "true");
+
         //wfsConfig.getCustomParameters().put("requestValidationActivated", "true");
         //wfsConfig.getCustomParameters().put("requestValidationSchema", "http://schemas.opengis.net/wfs/1.1.0/wfs.xsd");
 
@@ -381,16 +377,28 @@ public final class GrizzlyServer {
             Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
         }
 
+        LOGGER.info("Configuration context set");
+        
+        /* Instanciates the Grizzly server, but not start it at this moment.
+         * The implementation waits for the data provider to be defined for
+         * starting the server.
+         */
+        grizzly = new GrizzlyThread();
+        
         // Starting the grizzly server
         grizzly.start();
 
         // Waiting for grizzly server to be completely started
+        System.out.println("wait for services start ...");
         try {
-            Thread.sleep(3 * 1000);
+            while (!grizzly.isReady()) {
+                Thread.sleep(1000);
+            }
         } catch (InterruptedException ex) {
             // That case should not occur.
             throw new AssertionError(ex);
         }
+        System.out.println("all services should been started ...");
     }
 
     /**
@@ -498,6 +506,10 @@ public final class GrizzlyServer {
 
         public int getCurrentPort() {
             return cstlServer.currentPort;
+        }
+
+        public boolean isReady() {
+            return cstlServer.ready;
         }
 
         /**
