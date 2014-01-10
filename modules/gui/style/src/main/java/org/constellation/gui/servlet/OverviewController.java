@@ -17,32 +17,35 @@
 
 package org.constellation.gui.servlet;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.PortrayalContext;
 import org.constellation.gui.binding.Style;
+import org.constellation.gui.service.ConstellationService;
+import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.util.StyleUtilities;
-import org.geotoolkit.sld.MutableNamedLayer;
-import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification;
 import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.style.MutableStyle;
-import org.opengis.sld.StyledLayerDescriptor;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,29 +53,31 @@ import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.invoke.MethodHandles;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static org.constellation.gui.util.StyleFactories.SLDF;
 
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-public final class OverviewServlet extends HttpServlet {
+@Controller
+@RequestMapping("/overview")
+public final class OverviewController  {
+
+    @Autowired
+    public ConstellationService service;
 
     /**
      * Use for debugging purpose.
      */
-    private static final Logger LOGGER = Logging.getLogger(OverviewServlet.class.getName());
+    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * {@inheritDoc}
      */
-    @Override
+    @RequestMapping(method = RequestMethod.POST)
     public void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         render(req, resp);
     }
@@ -80,7 +85,7 @@ public final class OverviewServlet extends HttpServlet {
     /**
      * {@inheritDoc}
      */
-    @Override
+    @RequestMapping(method = RequestMethod.GET)
     public void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         render(req, resp);
     }
@@ -88,20 +93,20 @@ public final class OverviewServlet extends HttpServlet {
     public void render(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         // Get original request parameters.
         final String request = req.getParameter("REQUEST");
-        final String layers  = req.getParameter("LAYERS");
-        final String crs     = req.getParameter("CRS");
-        final String bbox    = req.getParameter("BBOX");
-        final String width   = req.getParameter("WIDTH");
-        final String height  = req.getParameter("HEIGHT");
-        final String format  = req.getParameter("FORMAT");
+        final String layers = req.getParameter("LAYERS");
+        final String crs = req.getParameter("CRS");
+        final String bbox = req.getParameter("BBOX");
+        final String width = req.getParameter("WIDTH");
+        final String height = req.getParameter("HEIGHT");
+        final String format = req.getParameter("FORMAT");
         final String sldBody = req.getParameter("SLD_BODY");
-        final String sldVersion  = req.getParameter("SLD_VERSION");
+        final String sldVersion = req.getParameter("SLD_VERSION");
 
         // Perform a portrayal.
         if ("Portray".equalsIgnoreCase(request)) {
-            final String method      = req.getParameter("METHOD");
-            final String providerId  = req.getParameter("PROVIDER");
-            final String[] coords    = bbox.split(",");
+            final String method = req.getParameter("METHOD");
+            final String providerId = req.getParameter("PROVIDER");
+            final String[] coords = bbox.split(",");
 
             // Handle style JSON body.
             String styleXml = null;
@@ -116,9 +121,9 @@ public final class OverviewServlet extends HttpServlet {
                     }
                     styleXml = writer.toString();
                 } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, "Invalid style JSON body.", ex);
+                    LOGGER.warn("Invalid style JSON body.", ex);
                 } catch (JAXBException ex) {
-                    LOGGER.log(Level.WARNING, "The style marshalling has failed.", ex);
+                    LOGGER.warn("The style marshalling has failed.", ex);
                 }
             }
 
@@ -127,7 +132,7 @@ public final class OverviewServlet extends HttpServlet {
             context.setProviderId(providerId);
             context.setDataName(layers);
             context.setProjection(crs);
-            context.setFormat(format);
+            context.setFormat("image/png");
             context.setStyleBody(styleXml);
             context.setSldVersion(sldVersion);
             context.setWidth(Integer.parseInt(width));
@@ -138,6 +143,13 @@ public final class OverviewServlet extends HttpServlet {
             context.setNorth(Double.parseDouble(coords[3]));
             context.setLonFirstOutput(true);
 
+
+
+            // set authentication on header
+            final String toEncode = service.getLogin()+":"+service.getPassword();
+            byte[] binaryPassword = toEncode.getBytes();
+            final String encodedAuthentication = Base64.encodeBase64String(binaryPassword);
+
             // Prepare request.
             final HttpPost httpPost = new HttpPost(method);
             final byte[] entity = StyleUtilities.writeJson(context).getBytes("UTF-8");
@@ -145,6 +157,7 @@ public final class OverviewServlet extends HttpServlet {
             httpPost.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
             httpPost.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
             httpPost.addHeader(HttpHeaders.CONTENT_ENCODING, "UTF-8");
+            httpPost.addHeader("Authorization", "Basic "+ encodedAuthentication);
 
             // Perform request.
             execute(httpPost, resp.getOutputStream());

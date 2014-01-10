@@ -22,25 +22,25 @@
     </context-param>
 
     <servlet>
-        <servlet-name>Overview Servlet</servlet-name>
-        <servlet-class>org.constellation.gui.servlet.OverviewServlet</servlet-class>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>0</load-on-startup>
     </servlet>
     
     <servlet>
-      <servlet-name>spring</servlet-name>
+      <servlet-name>constellation</servlet-name>
       <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
-      <servlet-name>spring</servlet-name>
+      <servlet-name>constellation</servlet-name>
       <url-pattern>/constellation/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>Overview Servlet</servlet-name>
-        <url-pattern>/overview/*</url-pattern>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/mvc/*</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>10</session-timeout>

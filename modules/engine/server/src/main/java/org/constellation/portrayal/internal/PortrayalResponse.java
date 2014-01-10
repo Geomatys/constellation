@@ -24,11 +24,14 @@ import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Contain image informations for the response.
  *
  * @author Johann Sorel (Geomatys)
  */
+@XmlRootElement
 public final class PortrayalResponse {
 
     private final CanvasDef canvasDef;
