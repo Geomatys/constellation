@@ -1,4 +1,6 @@
 #{param name=selected/}
+#{param name=portrayUrl/}
+
 <div class="alert alert-info">
     <h5>&{label.no.selected.data}</h5>
 
@@ -106,7 +108,9 @@
             $('#viewerData').modal("show");
             var layerName = $("#selected-item").data("name");
             var providerId = $("#selected-item").data("provider");
-            CSTL.dataViewer.createLayer(layerName, providerId);
+            var layerData = CSTL.dataViewer.createLayer(layerName, providerId, "${portrayUrl}");
+            var layerBackground = CSTL.dataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp", "${portrayUrl}");
+            CSTL.dataViewer.layers = [layerData, layerBackground];
             CSTL.dataViewer.initMap();
         });
 

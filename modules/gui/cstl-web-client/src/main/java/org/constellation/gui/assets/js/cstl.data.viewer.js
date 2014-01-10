@@ -16,27 +16,28 @@
 CSTL.dataViewer = {
     map : undefined,
 
-    layer : undefined,
+    layers : undefined,
 
     initMap : function(){
         CSTL.dataViewer.map = new OpenLayers.Map('dataMap', {
             controls: [new OpenLayers.Control.Navigation()],
             projection: new OpenLayers.Projection('EPSG:4326'),
             maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
-            fractionalZoom: true
+            fractionalZoom: true,
+            allOverlays:true
         });
-        CSTL.dataViewer.map.addLayer(CSTL.dataViewer.layer);
+        CSTL.dataViewer.map.addLayers(CSTL.dataViewer.layers);
         CSTL.dataViewer.map.zoomToMaxExtent();
         CSTL.dataViewer.map.updateSize();
 
     },
 
-    createLayer : function(layerName, providerId){
-        var layer = new OpenLayers.Layer.WMS('Test',
+    createLayer : function(layerName, providerId, portrayUrl){
+        var layer = new OpenLayers.Layer.WMS(layerName,
             '/cstl-web-client/mvc/overview',
             {
                 request:     'Portray',
-                method:      'http://localhost:8080/constellation/api/1/portrayal/portray',
+                method:      portrayUrl,
                 layers:      layerName,
                 provider:    providerId,
                 version:     '1.3.0',
@@ -52,6 +53,6 @@ CSTL.dataViewer = {
                 }
             }
         );
-        CSTL.dataViewer.layer = layer;
+        return layer;
     }
 }

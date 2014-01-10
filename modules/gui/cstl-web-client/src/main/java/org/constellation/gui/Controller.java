@@ -37,6 +37,7 @@ import org.constellation.dto.AddLayer;
 import org.constellation.dto.Contact;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.Service;
+import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.InstanceSummary;
 import org.constellation.gui.service.MapManager;
 import org.constellation.gui.service.ProviderManager;
@@ -84,6 +85,8 @@ public class Controller {
     protected MapManager mapManager;
     @Inject
     protected ProviderManager providerManager;
+    @Inject
+    private ConstellationService cstl;
     //    @Inject
     protected DataInformationContainer informationContainer;
     /**
@@ -179,6 +182,8 @@ public class Controller {
         parameters.put("nbPerPage", 10);
         parameters.put("selected", null);
         parameters.put("errorInformation", errorInformation);
+        String url = cstl.getUrlWithEndSlash() + "api/1/portrayal/portray";
+        parameters.put("portrayalUrl", url);
         return dataDashboard.ok(parameters).withMimeType("text/html");
     }
 
@@ -259,7 +264,6 @@ public class Controller {
         is.set_abstract(description);
         is.setType(type);
         servicesManager.buildServiceUrl(type, identifier, versionList, is);
-        System.out.println("test : "+ name);
         return success.with().service(is).versions(versionList).created(create).ok().withMimeType("text/html");
     }
 

@@ -152,6 +152,8 @@ public class MapController {
         final Map<String, Object> parameters = new HashMap<>(0);
         final DataBrief data = providerManager.getLayerSummary(layerAlias, providerId);
         parameters.put("selected", data);
+        String url = cstl.getUrlWithEndSlash() + "api/1/portrayal/portray";
+        parameters.put("portrayUrl", url);
         return layerSelected.ok(parameters).withMimeType("text/html");
     }
 

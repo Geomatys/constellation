@@ -10,6 +10,7 @@ import juzu.template.Template;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.FileBean;
+import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.ProviderManager;
 import org.constellation.gui.templates.folder_listing;
 
@@ -38,6 +39,8 @@ public class DataController {
 
     @Inject
     private ProviderManager providerManager;
+    @Inject
+    private ConstellationService cstl;
 
     @Ajax
     @Resource
@@ -74,7 +77,9 @@ public class DataController {
     public Response selectData(final String name, final String namespace, final String providerId) {
         final Map<String, Object> parameters = new HashMap<>(0);
         final DataBrief db = providerManager.getDataSummary(name, namespace, providerId);
+        String url = cstl.getUrlWithEndSlash() + "api/1/portrayal/portray";
         parameters.put("selected", db);
+        parameters.put("portrayUrl", url);
         return dataSelected.with(parameters).ok().withMimeType("text/html");
     }
 
