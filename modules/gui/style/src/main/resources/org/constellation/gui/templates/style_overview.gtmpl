@@ -1,8 +1,10 @@
 <div id="right">
     <div class="title-row">
         <span class="medium-title">&{edition.style.label.overview}: </span>
-        <% if (layerName == null) { %>
+        <% if (layerName != null) { %>
             <span>${layerName}</span>
+        <% } else { %>
+            <span>${styleName}</span>
         <% } %>
     </div>
     <div id="map"></div>
@@ -13,13 +15,35 @@
             maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
             fractionalZoom: true
         });
+
+        var layerProviderName = '${layerProvider}';
+        var layerRequestedName = '${layerName}';
+        if (layerRequestedName == '' || layerRequestedName == 'null') {
+            if ('${styleName}' == 'default-line') {
+                layerRequestedName = 'CNTR_BN_60M_2006';
+                layerProviderName = 'generic_shp';
+            }
+            if ('${styleName}' == 'default-point') {
+                layerRequestedName = 'CNTR_LB_2006';
+                layerProviderName = 'generic_shp';
+            }
+            if ('${styleName}' == 'default-polygon') {
+                layerRequestedName = 'CNTR_RG_60M_2006';
+                layerProviderName = 'generic_shp';
+            }
+            if ('${styleName}' == 'default-hybrid') {
+                layerRequestedName = 'CNTR_LB_2006';
+                layerProviderName = 'generic_shp';
+            }
+        }
+
         var layer = new OpenLayers.Layer.WMS('Test',
-            '/cstl-web-client/overview',
+            '/cstl-web-client/mvc/overview',
             {
                 request:     'Portray',
                 method:      '${portrayUrl}',
-                layers:      '${layerName}',
-                provider:    '${layerProvider}',
+                layers:      layerRequestedName,
+                provider:    layerProviderName,
                 version:     '1.3.0',
                 sld_version: '1.1.0'
             },

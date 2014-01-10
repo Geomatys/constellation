@@ -72,6 +72,13 @@ public class MapSetup implements SetupService {
 
         LOGGER.log(Level.INFO, "=== Activating Native Codec ===");
 
+        try {
+            // Try to load postgresql driver for further use
+            Class.forName("org.postgresql.ds.PGSimpleDataSource");
+        } catch (ClassNotFoundException ex) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+        }
+
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
@@ -101,6 +108,7 @@ public class MapSetup implements SetupService {
     private void initializeDefaultStyles() {
         // Create default SLD provider containing default styles.
         StyleProvider provider = StyleProviderProxy.getInstance().getProvider("sld");
+        final String sldPath = ConfigDirectory.getStyleDirectory().getPath();
         if (provider == null) {
             // Acquire SLD provider service instance.
             ProviderService sldService = null;
@@ -121,7 +129,7 @@ public class MapSetup implements SetupService {
             final ParameterValueGroup source = sourceDesc.createValue();
             source.parameter("id").setValue("sld");
             source.parameter("providerType").setValue("sld");
-            source.groups("sldFolder").get(0).parameter("path").setValue(ConfigDirectory.getStyleDirectory().getPath());
+            source.groups("sldFolder").get(0).parameter("path").setValue(sldPath);
 
             // Create SLD provider.
             try {
@@ -146,26 +154,31 @@ public class MapSetup implements SetupService {
             if (provider.get("default-point") == null) {
                 final MutableStyle style = sf.style(DEFAULT_POINT_SYMBOLIZER);
                 style.setName("default-point");
+                style.featureTypeStyles().get(0).rules().get(0).setName("default-point");
                 StyleProviderConfig.createStyle("sld", style);
             }
             if (provider.get("default-line") == null) {
                 final MutableStyle style = sf.style(DEFAULT_LINE_SYMBOLIZER);
                 style.setName("default-line");
+                style.featureTypeStyles().get(0).rules().get(0).setName("default-line");
                 StyleProviderConfig.createStyle("sld", style);
             }
             if (provider.get("default-polygon") == null) {
                 final MutableStyle style = sf.style(DEFAULT_POLYGON_SYMBOLIZER);
                 style.setName("default-polygon");
+                style.featureTypeStyles().get(0).rules().get(0).setName("default-polygon");
                 StyleProviderConfig.createStyle("sld", style);
             }
             if (provider.get("default-raster") == null) {
                 final MutableStyle style = sf.style(DEFAULT_RASTER_SYMBOLIZER);
                 style.setName("default-raster");
+                style.featureTypeStyles().get(0).rules().get(0).setName("default-raster");
                 StyleProviderConfig.createStyle("sld", style);
             }
             if (provider.get("default-hybrid") == null) {
                 final MutableStyle style = sf.style(new Symbolizer[]{DEFAULT_POINT_SYMBOLIZER, DEFAULT_RASTER_SYMBOLIZER});
                 style.setName("default-hybrid");
+                style.featureTypeStyles().get(0).rules().get(0).setName("default-hybrid");
                 StyleProviderConfig.createStyle("sld", style);
             }
         } catch (ConfigurationException ex) {

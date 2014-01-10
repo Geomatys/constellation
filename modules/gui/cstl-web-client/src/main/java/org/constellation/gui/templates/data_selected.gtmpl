@@ -103,7 +103,7 @@
         });
 
         $("#showData").on("click", function(){
-            $('#viewerData').modal("show")
+            $('#viewerData').modal("show");
             var layerName = $("#selected-item").data("name");
             var providerId = $("#selected-item").data("provider");
             CSTL.dataViewer.createLayer(layerName, providerId);
