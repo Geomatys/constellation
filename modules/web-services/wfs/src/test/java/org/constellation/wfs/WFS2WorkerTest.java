@@ -167,6 +167,7 @@ public class WFS2WorkerTest {
         final LayerContext config = new LayerContext(layers);
         config.getCustomParameters().put("shiroAccessible", "false");
         config.getCustomParameters().put("transactionSecurized", "false");
+        config.getCustomParameters().put("transactionnal", "true");
 
         ConfigurationEngine.storeConfiguration("WFS", "default", config);
         ConfigurationEngine.storeConfiguration("WFS", "test", config);
@@ -178,6 +179,7 @@ public class WFS2WorkerTest {
         final LayerContext config2 = new LayerContext(layers2);
         config2.getCustomParameters().put("shiroAccessible", "false");
         config2.getCustomParameters().put("transactionSecurized", "false");
+        config2.getCustomParameters().put("transactionnal", "true");
 
         ConfigurationEngine.storeConfiguration("WFS", "test1", config2);
 

@@ -89,6 +89,7 @@ public class WFSServiceTest {
         final LayerContext config = new LayerContext(layers);
         config.getCustomParameters().put("shiroAccessible", "false");
         config.getCustomParameters().put("transactionSecurized", "false");
+        config.getCustomParameters().put("transactionnal", "true");
 
         ConfigurationEngine.storeConfiguration("WFS", "default", config);
         

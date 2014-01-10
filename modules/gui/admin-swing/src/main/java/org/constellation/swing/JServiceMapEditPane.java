@@ -62,7 +62,8 @@ public class JServiceMapEditPane extends JServiceEditionPane {
         this.serviceType = serviceType;
         this.configuration = (configuration instanceof LayerContext) ? (LayerContext) configuration : null;
         initComponents();
-        
+
+        transactionnalBox.setVisible(serviceType.equals("WFS"));
         guiLayerTable.setDefaultRenderer(LayerRowModel.EditLayer.class, new ActionCell.Renderer(ICON_EDIT));
         guiLayerTable.setDefaultEditor(LayerRowModel.EditLayer.class, new ActionCell.Editor(ICON_EDIT) {
             @Override
@@ -219,6 +220,10 @@ public class JServiceMapEditPane extends JServiceEditionPane {
         
         //update configuration layers
         configuration.setLayers(sources);
+
+        if (serviceType.equals("WFS")) {
+            configuration.getCustomParameters().put("transactionnal", Boolean.toString(transactionnalBox.isSelected()));
+        }
     }
     
     /**
@@ -259,6 +264,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
         guiLoadLabel = new javax.swing.JLabel();
         guiLayerToolbar = new javax.swing.JToolBar();
         guiAddLayer = new javax.swing.JButton();
+        transactionnalBox = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         guiLayerTable = new org.netbeans.swing.outline.Outline();
 
@@ -287,6 +293,11 @@ public class JServiceMapEditPane extends JServiceEditionPane {
         });
         guiLayerToolbar.add(guiAddLayer);
 
+        transactionnalBox.setText(org.openide.util.NbBundle.getMessage(JProviderMetadataPane.class, "transactionnal")); // NOI18N
+        transactionnalBox.setFocusable(false);
+        transactionnalBox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        guiLayerToolbar.add(transactionnalBox);
+
         jPanel1.add(guiLayerToolbar, java.awt.BorderLayout.CENTER);
 
         add(jPanel1, java.awt.BorderLayout.NORTH);
@@ -313,6 +324,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
     private javax.swing.JLabel guiLoadLabel;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JCheckBox transactionnalBox;
     // End of variables declaration//GEN-END:variables
 
     /**

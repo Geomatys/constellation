@@ -74,6 +74,15 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="guiAddLayerActionPerformed"/>
               </Events>
             </Component>
+            <Component class="javax.swing.JCheckBox" name="transactionnalBox">
+              <Properties>
+                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="org/constellation/swing/Bundle.properties" key="transactionnal" replaceFormat="org.openide.util.NbBundle.getMessage(JProviderMetadataPane.class, &quot;{key}&quot;)"/>
+                </Property>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>

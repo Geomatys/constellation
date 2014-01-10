@@ -87,6 +87,7 @@ import org.geotoolkit.ogc.xml.XMLFilter;
 import org.geotoolkit.ogc.xml.XMLLiteral;
 import org.geotoolkit.ogc.xml.v200.BBOXType;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesBase;
+import org.geotoolkit.ows.xml.AbstractDomain;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
@@ -172,6 +173,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     private List<StoredQueryDescription> storedQueries = new ArrayList<>();
+
+    private final boolean isTransactionnal;
     
     public DefaultWFSWorker(final String id) {
         super(id, ServiceDef.Specification.WFS);
@@ -190,6 +193,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
         } else {
             setSupportedVersion(ServiceDef.WFS_2_0_0, ServiceDef.WFS_1_1_0);
+        }
+        final String isTransactionnalProp = getProperty("transactionnal");
+        if (isTransactionnalProp != null) {
+            isTransactionnal = Boolean.parseBoolean(isTransactionnalProp);
+        } else {
+            isTransactionnal = false;
         }
 
         // loading stored queries
@@ -385,6 +394,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             om = OPERATIONS_METADATA_V110.clone();
         }
         om.updateURL(getServiceUrl());
+
+        if (!isTransactionnal) {
+            om.removeOperation("Transaction");
+            final AbstractDomain cst = om.getConstraint("ImplementsTransactionalWFS");
+            if (cst != null) {
+                cst.setDefaultValue("FALSE");
+            }
+        }
             
         final AbstractServiceProvider sp       = inCapabilities.getServiceProvider();
         final AbstractServiceIdentification si = inCapabilities.getServiceIdentification();
@@ -945,8 +962,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public TransactionResponse transaction(final Transaction request) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
         final long startTime = System.currentTimeMillis();
+        if (!isTransactionnal) {
+            throw new CstlServiceException("This method is not supported by this mode of WFS", OPERATION_NOT_SUPPORTED, "Request");
+        }
         if (isTransactionSecurized() && !SecurityManagerHolder.getInstance().isAuthenticated()) {
-            throw new UnauthorizedException("You must be authentified to perform an registerSensor request.");
+            throw new UnauthorizedException("You must be authentified to perform an transaction request.");
         }
         verifyBaseRequest(request, true, false);
 
