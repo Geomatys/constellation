@@ -81,6 +81,7 @@ import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.metadata.iso.spatial.DefaultGeometricObjects;
 import org.apache.sis.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
 import org.apache.sis.referencing.AbstractIdentifiedObject;
+import org.apache.sis.referencing.NamedIdentifier;
 import org.apache.sis.referencing.crs.DefaultVerticalCRS;
 import org.apache.sis.referencing.cs.DefaultCoordinateSystemAxis;
 import org.apache.sis.referencing.cs.DefaultVerticalCS;
@@ -479,7 +480,7 @@ public class MetadataUnmarshallTest {
         }
 
         // vertical datum
-        ImmutableIdentifier datumID = new ImmutableIdentifier(null, null, "D28");
+        NamedIdentifier datumID = new NamedIdentifier(null, "D28");
 
         Map<String, Object> prop = new HashMap<>();
         prop.put(DefaultVerticalDatum.NAME_KEY, datumID);
@@ -490,18 +491,18 @@ public class MetadataUnmarshallTest {
         HashMap<String, Object> propCoo = new HashMap<>();
 
 
-        ImmutableIdentifier m = new ImmutableIdentifier(null, null, "meters");
+        NamedIdentifier m = new NamedIdentifier(null,  "meters");
         propCoo.put(DefaultCoordinateSystemAxis.NAME_KEY, m);
 //        propCoo.put(DefaultCoordinateSystemAxis.ALIAS_KEY, "");
         DefaultCoordinateSystemAxis axis = new DefaultCoordinateSystemAxis(propCoo, "meters", AxisDirection.DOWN, Unit.valueOf("m"));
 
         HashMap<String,Object> csProp = new HashMap<>();
-        ImmutableIdentifier i = new ImmutableIdentifier(null, null, "meters");
+        NamedIdentifier i = new NamedIdentifier(null, "meters");
         csProp.put(DefaultVerticalCRS.NAME_KEY, i);
         DefaultVerticalCS cs = new DefaultVerticalCS(csProp, axis);
 
         prop = new HashMap<>();
-        ImmutableIdentifier idVert = new ImmutableIdentifier(null, null, "idvertCRS");
+        NamedIdentifier idVert = new NamedIdentifier(null, "idvertCRS");
         prop.put(DefaultVerticalCRS.NAME_KEY, idVert);
         prop.put(DefaultVerticalCRS.SCOPE_KEY, null);
         //prop.put(DefaultVerticalCRS.ALIAS_KEY, DefaultCoordinateSystemAxis.UNDEFINED.getAlias());

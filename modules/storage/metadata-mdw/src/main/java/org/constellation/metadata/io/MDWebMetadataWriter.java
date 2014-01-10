@@ -62,6 +62,7 @@ import org.apache.sis.xml.IdentifierSpace;
 import org.apache.sis.xml.XLink;
 import org.apache.sis.xml.XLink.Type;
 import org.apache.sis.internal.jaxb.LegacyNamespaces;
+import org.apache.sis.referencing.NamedIdentifier;
 import org.apache.sis.xml.XML;
 
 // MDWeb dependencies
@@ -887,6 +888,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             // special case for Xlink.Type enum
             if (object.getClass().equals(Type.class)) {
                 return PrimitiveType.STRING;
+            }
+
+            // special case for NamedIdentifier
+            if (object.getClass().equals(NamedIdentifier.class)) {
+                return mdWriter.getClasse("RS_Identifier", Standard.ISO_19115);
             }
 
             //special case for Proxy: we extract the GeoAPI interface, then we get the UML annotation for className
