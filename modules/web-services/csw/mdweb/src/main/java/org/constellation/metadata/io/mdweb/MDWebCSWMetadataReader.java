@@ -32,9 +32,9 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
 
 import static org.constellation.metadata.CSWQueryable.*;
-import org.constellation.metadata.index.XpathUtils;
 import org.constellation.metadata.io.ElementSetType;
 import org.constellation.metadata.io.MetadataType;
+import org.constellation.util.XpathUtils;
 
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.Settable;
@@ -208,11 +208,6 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         return responseList;
     }
 
-    @Override
-    public Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        return getMetadata(identifier, mode, type, elementName);
-    }
-    
     /**
      * Return a metadata object from the specified identifier.
      * if is not already in cache it read it from the MDWeb database.

@@ -76,6 +76,14 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-utility-pending</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-temporal</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      </dependency>
     <!-- Test dependencies -->
     <dependency>
      <groupId>org.geotoolkit.pending</groupId>
@@ -92,10 +100,6 @@
       <artifactId>geotk-provided</artifactId>
       <scope>provided</scope>
     </dependency>
-      <dependency>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
-      </dependency>
   </dependencies>
 
 </project>

@@ -41,12 +41,13 @@ import org.apache.lucene.document.Field;
 // constellation dependencies
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.metadata.index.AbstractCSWIndexer;
-import org.constellation.metadata.index.XpathUtils;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataType;
 import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
+import org.constellation.util.Util;
+import org.constellation.util.XpathUtils;
 
 // geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
@@ -396,8 +397,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             final Position pos = (Position) obj;
             final Date d = pos.getDate();
             if (d != null) {
-                synchronized(LUCENE_DATE_FORMAT) {
-                    result.add(LUCENE_DATE_FORMAT.format(d));
+                synchronized(Util.LUCENE_DATE_FORMAT) {
+                    result.add(Util.LUCENE_DATE_FORMAT.format(d));
                 }
             } else {
                result.add(NULL_VALUE);
@@ -406,15 +407,15 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         } else if (obj instanceof Instant) {
             final Instant inst = (Instant)obj;
             if (inst.getPosition() != null && inst.getPosition().getDate() != null) {
-                synchronized(LUCENE_DATE_FORMAT) {
-                    result.add( LUCENE_DATE_FORMAT.format(inst.getPosition().getDate()));
+                synchronized(Util.LUCENE_DATE_FORMAT) {
+                    result.add(Util.LUCENE_DATE_FORMAT.format(inst.getPosition().getDate()));
                 }
             } else {
                 result.add(NULL_VALUE);
             }
         } else if (obj instanceof Date) {
-            synchronized (LUCENE_DATE_FORMAT){
-                result.add(LUCENE_DATE_FORMAT.format((Date)obj));
+            synchronized (Util.LUCENE_DATE_FORMAT){
+                result.add(Util.LUCENE_DATE_FORMAT.format((Date)obj));
             }
 
         } else {

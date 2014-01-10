@@ -54,9 +54,6 @@ public interface CSWMetadataReader extends MetadataReader {
      */
     Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
-    @Deprecated
-    Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
-
     /**
      * @return the list of QName for additional queryable element.
      */

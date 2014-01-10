@@ -56,8 +56,6 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
     protected static final String NULL_VALUE = "null";
 
-    protected static final DateFormat LUCENE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
-
     private final Map<String, List<String>> additionalQueryable;
 
     protected static final FieldType ftna = new FieldType();

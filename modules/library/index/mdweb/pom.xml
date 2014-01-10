@@ -61,6 +61,11 @@
       <artifactId>cstl-xml-configuration</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- MDWeb Metamodel dependencies -->
     <dependency>
       <groupId>org.mdweb.metamodel</groupId>
@@ -72,12 +77,6 @@
        <artifactId>cstl-test-data</artifactId>
        <version>${project.version}</version>
        <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-base</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mdweb.metamodel</groupId>

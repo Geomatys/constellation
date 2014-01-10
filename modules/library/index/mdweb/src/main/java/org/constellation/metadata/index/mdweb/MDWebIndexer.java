@@ -41,7 +41,8 @@ import org.constellation.generic.database.BDD;
 import org.constellation.metadata.index.AbstractCSWIndexer;
 
 import static org.constellation.metadata.CSWQueryable.*;
-import org.constellation.metadata.index.XpathUtils;
+import org.constellation.util.Util;
+import org.constellation.util.XpathUtils;
 
 // geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
@@ -450,8 +451,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
     private String toLuceneDateSyntax(String value) {
         if (value != null) {
             final Date d = TemporalUtilities.parseDateSafe(value, true);
-            synchronized (LUCENE_DATE_FORMAT) {
-                value = LUCENE_DATE_FORMAT.format(d);
+            synchronized (Util.LUCENE_DATE_FORMAT) {
+                value = Util.LUCENE_DATE_FORMAT.format(d);
             }
         }
         return value;

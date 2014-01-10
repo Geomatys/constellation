@@ -896,7 +896,7 @@ public class CSWworker extends AbstractWorker {
             final List<Object> records                 = new ArrayList<>();
             try {
                 for (int i = startPos -1; i < max; i++) {
-                    final Object obj = mdReader.getOriginalMetadata(results[i], mode, cstlSet(set), elementName);
+                    final Object obj = mdReader.getMetadata(results[i], mode, cstlSet(set), elementName);
                     if (obj == null && (max + 1) < nbResults) {
                         max++;
 
@@ -1075,7 +1075,7 @@ public class CSWworker extends AbstractWorker {
 
             //we get the metadata object
             try {
-                final Object o = mdReader.getOriginalMetadata(id, mode, cstlSet(set), null);
+                final Object o = mdReader.getMetadata(id, mode, cstlSet(set), null);
                 if (o != null) {
                     if (!matchExpectedType(o, outputSchema)) {
                         LOGGER.log(Level.WARNING, "The record {0} does not correspound to {1} object.", new Object[]{id, outputSchema});

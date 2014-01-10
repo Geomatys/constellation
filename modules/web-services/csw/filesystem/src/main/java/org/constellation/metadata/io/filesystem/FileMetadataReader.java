@@ -40,7 +40,6 @@ import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataType;
 import org.constellation.util.NodeUtilities;
-import org.constellation.metadata.index.generic.NodeIndexer;
 import org.constellation.metadata.io.DomMetadataReader;
 
 import static org.constellation.metadata.CSWQueryable.*;
@@ -128,11 +127,6 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
      */
     @Override
     public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        return getOriginalMetadata(identifier, mode, type, elementName);
-    }
-
-    @Override
-    public Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
         final MetadataType metadataMode;
         try {
@@ -412,7 +406,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
             if (!metadataFile.isDirectory()) {
                 
                 final Node metadata = getNodeFromFile(metadataFile);
-                final List<Object> value = NodeIndexer.extractValues(metadata, paths);
+                final List<Object> value = NodeUtilities.extractValues(metadata, paths);
                 if (value != null && !value.equals(Arrays.asList("null"))) {
                     for (Object obj : value){
                         result.add(obj.toString());

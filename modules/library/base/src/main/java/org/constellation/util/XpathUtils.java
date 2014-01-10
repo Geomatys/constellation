@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.index;
+package org.constellation.util;
 
 import java.util.ArrayList;
 import java.util.List;

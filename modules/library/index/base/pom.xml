@@ -55,6 +55,13 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-spatial-lucene</artifactId>
     </dependency>
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-base</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>

@@ -39,7 +39,6 @@ import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataType;
 import org.constellation.util.NodeUtilities;
-import org.constellation.metadata.index.generic.NodeIndexer;
 import org.constellation.metadata.io.DomMetadataReader;
 
 import static org.constellation.metadata.CSWQueryable.*;
@@ -116,11 +115,6 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
      */
     @Override
     public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        return getOriginalMetadata(identifier, mode, type, elementName);
-    }
-
-    @Override
-    public Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         final InputStream metadataStream = ConfigurationEngine.loadProviderMetadata(identifier);
         if (metadataStream != null) {
             final MetadataType metadataMode;
@@ -392,7 +386,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
         final List<String> result = new ArrayList<>();
         final List<Node> nodes = getAllEntries();
         for (Node metadata : nodes) {
-            final List<Object> value = NodeIndexer.extractValues(metadata, paths);
+            final List<Object> value = NodeUtilities.extractValues(metadata, paths);
             if (value != null && !value.equals(Arrays.asList("null"))) {
                 for (Object obj : value){
                     result.add(obj.toString());

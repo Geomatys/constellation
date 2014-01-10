@@ -172,14 +172,6 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * {@inheritDoc}
      */
     @Override
-    public Node getOriginalMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        return getMetadata(identifier, mode, type, elementName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Node getMetadata(final String identifier, final MetadataType mode) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }

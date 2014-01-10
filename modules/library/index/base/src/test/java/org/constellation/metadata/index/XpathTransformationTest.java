@@ -23,6 +23,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import static org.constellation.metadata.CSWQueryable.*;
+import org.constellation.util.XpathUtils;
 
 /**
  *

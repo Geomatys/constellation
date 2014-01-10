@@ -38,6 +38,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.constellation.metadata.CSWQueryable;
+import org.constellation.util.NodeUtilities;
 
 // geotoolkit dependencies
 import org.geotoolkit.factory.FactoryFinder;
@@ -56,7 +57,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 //Junit dependencies
 import org.junit.*;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.metadata.citation.DateType;
 import static org.junit.Assert.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -966,20 +966,20 @@ public class GenericNodeindexTest {
     @Order(order = 9)
     public void extractValuesTest() throws Exception {
         Node n = getOriginalMetadata("org/constellation/xml/metadata/meta7.xml");
-        List<Object> result = NodeIndexer.extractValues(n, CSWQueryable.ISO_QUERYABLE.get("CreationDate"));
+        List<Object> result = NodeUtilities.extractValues(n, CSWQueryable.ISO_QUERYABLE.get("CreationDate"));
         assertEquals(Arrays.asList("20060101000000"), result);
 
         n = getOriginalMetadata("org/constellation/xml/metadata/meta3.xml");
-        result = NodeIndexer.extractValues(n, CSWQueryable.ISO_QUERYABLE.get("CreationDate"));
+        result = NodeUtilities.extractValues(n, CSWQueryable.ISO_QUERYABLE.get("CreationDate"));
         assertEquals(Arrays.asList("null"), result);
 
         n = getOriginalMetadata("org/constellation/xml/metadata/meta1.xml");
 
-        result = NodeIndexer.extractValues(n, CSWQueryable.ISO_QUERYABLE.get("TempExtent_begin"));
+        result = NodeUtilities.extractValues(n, CSWQueryable.ISO_QUERYABLE.get("TempExtent_begin"));
         assertEquals(Arrays.asList("19900605000000"), result);
 
 
-        result = NodeIndexer.extractValues(n, CSWQueryable.ISO_QUERYABLE.get("TempExtent_end"));
+        result = NodeUtilities.extractValues(n, CSWQueryable.ISO_QUERYABLE.get("TempExtent_end"));
         assertEquals(Arrays.asList("19900702000000"), result);
 
     }
@@ -989,7 +989,7 @@ public class GenericNodeindexTest {
     public void extractValuesTest2() throws Exception {
 
         Node n = getOriginalMetadata("org/constellation/xml/metadata/meta8.xml");
-        List<Object> result = NodeIndexer.extractValues(n, CSWQueryable.DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"));
+        List<Object> result = NodeUtilities.extractValues(n, CSWQueryable.DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"));
         assertEquals(Arrays.asList("60.042"), result);
 
 

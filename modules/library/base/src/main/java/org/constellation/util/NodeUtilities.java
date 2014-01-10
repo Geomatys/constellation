@@ -17,9 +17,18 @@
 
 package org.constellation.util;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.geotoolkit.temporal.object.TemporalUtilities;
+
+import org.apache.sis.util.logging.Logging;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,6 +39,10 @@ import org.w3c.dom.NodeList;
  * @author Guilhem Legal (Geomatys)
  */
 public class NodeUtilities {
+
+    private static final String NULL_VALUE = "null";
+
+    private static final Logger LOGGER = Logging.getLogger(NodeUtilities.class);
 
     public static List<Node> getNodes(final String propertyName, final List<Node> nodes, final int ordinal, final boolean create) {
         final List<Node> result = new ArrayList<>();
@@ -210,5 +223,166 @@ public class NodeUtilities {
             nodes.add(n);
         }
         return nodes;
+    }
+
+    /**
+     * Extract the String values denoted by the specified paths
+     * and return the values as a String values1,values2,....
+     * if there is no values corresponding to the paths the method return "null" (the string)
+     *
+     * @param metadata
+     * @param paths
+     * @return
+     */
+    public static List<Object> extractValues(final Node metadata, final List<String> paths) {
+        final List<Object> response  = new ArrayList<>();
+
+        if (paths != null) {
+            for (String fullPathID: paths) {
+
+               // remove Standard
+               final String pathPrefix = fullPathID.substring(1, fullPathID.indexOf(':'));
+               fullPathID = fullPathID.substring(fullPathID.indexOf(':') + 1);
+               final String pathType =  fullPathID.substring(0, fullPathID.indexOf('/'));
+               if (!matchType(metadata, pathType, pathPrefix)) {
+                   continue;
+               }
+                String pathID;
+                String conditionalPath  = null;
+                String conditionalValue = null;
+
+                // if the path ID contains a # we have a conditional value next to the searched value.
+                final int separator = fullPathID.indexOf('#');
+                if (separator != -1) {
+                    pathID               = fullPathID.substring(0, separator);
+                    conditionalPath      = pathID + '/' + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
+                    conditionalValue     = fullPathID.substring(fullPathID.indexOf('=') + 1);
+                    int nextSeparator    = conditionalValue.indexOf('/');
+                    if (nextSeparator == -1) {
+                        throw new IllegalArgumentException("A conditionnal path must be in the form ...start_path#conditional_path=value/endPath");
+                    } else {
+                        pathID = pathID + conditionalValue.substring(nextSeparator);
+                        conditionalValue = conditionalValue.substring(0, nextSeparator);
+                    }
+                } else {
+                    pathID = fullPathID;
+                }
+
+                int ordinal = -1;
+                if (pathID.endsWith("]") && pathID.indexOf('[') != -1) {
+                    try {
+                        ordinal = Integer.parseInt(pathID.substring(pathID.lastIndexOf('[') + 1, pathID.length() - 1));
+                    } catch (NumberFormatException ex) {
+                        LOGGER.warning("Unable to parse last path ordinal");
+                    }
+                }
+                final List<Node> nodes;
+                if (conditionalPath == null) {
+                    nodes = getNodeFromPath(metadata, pathID);
+                } else {
+                    nodes  = getNodeFromConditionalPath(pathID, conditionalPath, conditionalValue, metadata);
+                }
+                final List<Object> value = getStringValue(nodes, ordinal);
+                if (!value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE))) {
+                    response.addAll(value);
+                }
+            }
+        }
+        if (response.isEmpty()) {
+            response.add(NULL_VALUE);
+        }
+        return response;
+    }
+
+    /**
+     * Return a String value from the specified Object.
+     * Let the number object as Number
+     *
+     * @param obj
+     * @return
+     */
+    private static List<Object> getStringValue(final List<Node> nodes, final int ordinal) {
+        final List<Object> result = new ArrayList<>();
+        if (nodes != null && !nodes.isEmpty()) {
+            for (Node n : nodes) {
+                final String s = n.getTextContent();
+                final String typeName = n.getLocalName();
+                if (typeName == null) {
+                    result.add(s);
+                } else if (typeName.equals("Real") || typeName.equals("Decimal")) {
+                    try {
+                        result.add(Double.parseDouble(s));
+                    } catch (NumberFormatException ex) {
+                        LOGGER.log(Level.WARNING, "Unable to parse the real value:{0}", s);
+                    }
+                } else if (typeName.equals("Integer")) {
+                    try {
+                        result.add(Integer.parseInt(s));
+                    } catch (NumberFormatException ex) {
+                        LOGGER.log(Level.WARNING, "Unable to parse the integer value:{0}", s);
+                    }
+                } else if (typeName.equals("Date") || typeName.equals("DateTime") ||
+                           typeName.equals("position") || typeName.equals("beginPosition") ||
+                           typeName.equals("endPosition")) {
+                    try {
+                        final Date d = TemporalUtilities.parseDate(s, true);
+                        synchronized (Util.LUCENE_DATE_FORMAT) {
+                            result.add(Util.LUCENE_DATE_FORMAT.format(d));
+                        }
+                    } catch (ParseException ex) {
+                        LOGGER.log(Level.WARNING, "Unable to parse the date value:{0}", s);
+                    }
+                } else if (typeName.endsWith("Corner")) {
+                    if (ordinal != -1) {
+                        final String[] parts = s.split(" ");
+                        if (ordinal < parts.length) {
+                            result.add(parts[ordinal]);
+                        }
+                    } else {
+                        result.add(s);
+                    }
+                } else if (s != null) {
+                    result.add(s);
+                }
+            }
+        }
+        if (result.isEmpty()) {
+            result.add(NULL_VALUE);
+        }
+
+        /*if (obj instanceof Position) {
+            final Position pos = (Position) obj;
+            final Date d = pos.getDate();
+            if (d != null) {
+                synchronized(LUCENE_DATE_FORMAT) {
+                    result.add(LUCENE_DATE_FORMAT.format(d));
+                }
+            } else {
+               result.add(NULL_VALUE);
+            }
+
+        } else if (obj instanceof Instant) {
+            final Instant inst = (Instant)obj;
+            if (inst.getPosition() != null && inst.getPosition().getDate() != null) {
+                synchronized(LUCENE_DATE_FORMAT) {
+                    result.add( LUCENE_DATE_FORMAT.format(inst.getPosition().getDate()));
+                }
+            } else {
+                result.add(NULL_VALUE);
+            }
+        } else if (obj instanceof Date) {
+            synchronized (LUCENE_DATE_FORMAT){
+                result.add(LUCENE_DATE_FORMAT.format((Date)obj));
+            }
+
+        } else {
+            throw new IllegalArgumentException("this type is unexpected: " + obj.getClass().getSimpleName());
+        }*/
+        return result;
+    }
+
+    private static boolean matchType(final Node n, final String type, final String prefix) {
+        final String namespace = XpathUtils.getNamespaceFromPrefix(prefix);
+        return (type.equals(n.getLocalName()) || type.equals("*")) && namespace.equals(n.getNamespaceURI());
     }
 }
