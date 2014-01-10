@@ -19,15 +19,12 @@
 package org.constellation.metadata;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.admin.dao.Session;
 import org.constellation.generic.database.Automatic;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
@@ -229,18 +226,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         Object meta = u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
         pool.recycle(u);
 
-        // TODO use configurationEngine
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            session.writeProvider(identifier, ProviderRecord.ProviderType.LAYER, service.getName(), source, null);
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-
+        ConfigurationEngine.writeProvider(identifier, ProviderRecord.ProviderType.LAYER, service.getName(), source);
         ConfigurationEngine.saveMetaData(meta, identifier, pool);
 
     }

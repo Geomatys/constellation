@@ -48,6 +48,7 @@ import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
+import org.constellation.admin.dao.TaskRecord;
 import org.constellation.admin.dao.UserRecord;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
@@ -60,9 +61,12 @@ import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.security.NoSecurityManagerException;
 import org.constellation.security.SecurityManager;
 import org.constellation.util.Util;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -567,6 +571,78 @@ public class ConfigurationEngine {
         return results;
     }
 
+    public static List<ProviderRecord> getProviders(final String serviceName) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readProviders(serviceName);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return new ArrayList<ProviderRecord>();
+    }
+
+    public static ProviderRecord getProvider(final String providerID) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readProvider(providerID);
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
+    }
+
+    public static void deleteProvider(final String providerID) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            session.deleteProvider(providerID);
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    public static ProviderRecord writeProvider(final String identifier, final ProviderRecord.ProviderType type, final String serviceName, final GeneralParameterValue config) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+
+            final UserRecord userRecord;
+            String login = null;
+            try {
+                login = securityManager.getCurrentUserLogin();
+            } catch (NoSecurityManagerException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+            }
+
+            if (login != null) {
+                userRecord = session.readUser(login);
+            } else {
+                userRecord = session.readUser("admin");
+            }
+            return session.writeProvider(identifier, type, serviceName, config, userRecord);
+
+        } catch (SQLException | IOException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while writing provider in database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
+    }
+
     /**
      * Load a metadata for a provider.
      *
@@ -608,11 +684,50 @@ public class ConfigurationEngine {
      */
 
     public static DataBrief getData(QName name, String providerId) {
-        if (JPA)
+        if (JPA) {
             return configurationService.getData(name, providerId);
-
+        }
         return _getData(name, providerId);
+    }
 
+    public static void deleteData(final QName name, final String providerId) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            session.deleteData(name, providerId);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    public static DataRecord writeData(final QName name, final ProviderRecord provider, final DataRecord.DataType type) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final UserRecord userRecord;
+            String login = null;
+            try {
+                login = securityManager.getCurrentUserLogin();
+            } catch (NoSecurityManagerException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+            }
+
+            if (login != null) {
+                userRecord = session.readUser(login);
+            } else {
+                userRecord = session.readUser("admin");
+            }
+            return session.writeData(name,provider, type, userRecord);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
     }
 
     private static DataBrief _getData(QName name, String providerId) {
@@ -623,6 +738,20 @@ public class ConfigurationEngine {
             if (record != null) {
                 return _getDataBrief(session, record);
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to read data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
+    }
+
+    public static DataRecord getDataRecord(QName name, String providerId) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readData(name, providerId);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error when try to read data", e);
         } finally {
@@ -729,4 +858,176 @@ public class ConfigurationEngine {
         return null;
     }
 
+    public static void deleteLayer(final String identifier, final ServiceDef.Specification specification, final QName name) {
+        Session session = null;
+
+        try {
+            session = EmbeddedDatabase.createSession();
+            ServiceRecord service = session.readService(identifier, specification);
+            session.deleteLayer(name, service);
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    public static List<StyleRecord> getStyleForData(final DataRecord record) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readStyles(record);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to read data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
+    }
+
+    public static StyleRecord getStyle(final String name, final String providerId) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readStyle(name, providerId);
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return null;
+    }
+
+    public static StyleRecord writeStyle(final String name, final ProviderRecord provider, final StyleRecord.StyleType type, final MutableStyle body) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final UserRecord userRecord;
+            String login = null;
+            try {
+                login = securityManager.getCurrentUserLogin();
+            } catch (NoSecurityManagerException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+            }
+
+            if (login != null) {
+                userRecord = session.readUser(login);
+            } else {
+                userRecord = session.readUser("admin");
+            }
+            return session.writeStyle(name, provider, type, body, userRecord);
+        } catch (SQLException | IOException e) {
+            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
+    }
+
+    public static void writeStyleForData(final StyleRecord style, final DataRecord record) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            session.writeStyledData(style, record);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to read data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    public static void deleteStyleForData(final StyleRecord style, final DataRecord record) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            session.deleteStyledData(style, record);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to read data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    public static void deleteStyle(final String name, final String providerId) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            session.deleteStyle(name, providerId);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    public static void writeCRSData(final QName name, final String providerId, final String layer) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final DataRecord record = session.readData(name, providerId);
+            session.writeCRSData(record, layer);
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    public static TaskRecord getTask(final String uuidTask) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readTask(uuidTask);
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return null;
+    }
+
+    public static UserRecord getUser(final String login) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readUser(login);
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return null;
+    }
+
+    public static void writeTask(final String identifier, final String type, final String owner) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            session.writeTask(identifier, type, owner);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to read data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
 }

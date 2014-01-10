@@ -22,13 +22,11 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
+import java.io.FileNotFoundException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.dao.LayerRecord;
-import org.constellation.admin.dao.ServiceRecord;
-import org.constellation.admin.dao.Session;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
@@ -40,7 +38,6 @@ import org.constellation.dto.AddLayer;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PropertyDescription;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.provider.LayerProvider;
@@ -55,13 +52,6 @@ import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -192,14 +182,8 @@ public class MapConfigurer extends OGCConfigurer {
     }
 
     public void removeLayer(final String serviceId, final QName layerid) throws JAXBException {
-        Session session = null;
-
         try {
-            session = EmbeddedDatabase.createSession();
-            final ServiceRecord service = session.readService(serviceId, specification);
-            final InputStream config =  service.getConfig();
-            final Unmarshaller unmarshall = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-            final LayerContext layerContext = (LayerContext) unmarshall.unmarshal(config);
+            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(specification.name(), serviceId);
             final List<Source> sources = layerContext.getLayers();
             QName name = null;
             boolean found = false;
@@ -220,19 +204,12 @@ public class MapConfigurer extends OGCConfigurer {
             }
 
             if(found){
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                final StringWriter writer = new StringWriter();
-                marshaller.marshal(layerContext, writer);
-                final StringReader reader = new StringReader(writer.toString());
-                service.setConfig(reader);
-
-                session.deleteLayer(name, service);
+                ConfigurationEngine.storeConfiguration(specification.name(), serviceId, layerContext);
+                ConfigurationEngine.deleteLayer(serviceId, specification, name);
             }
 
-        } catch (SQLException e) {
+        } catch (FileNotFoundException e) {
             LOGGER.log(Level.WARNING, "", e);
-        } finally {
-            if(session!=null) session.close();
         }
     }
 }

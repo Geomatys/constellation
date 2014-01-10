@@ -19,9 +19,7 @@ package org.constellation.map.configuration;
 
 import org.apache.sis.util.Static;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
@@ -61,6 +59,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.constellation.admin.ConfigurationEngine;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -214,10 +213,8 @@ public final class StyleProviderConfig extends Static {
         final StyleReport report = new StyleReport();
 
         // Extract information from the administration database.
-        Session session = null;
         try {
-            session = EmbeddedDatabase.createSession();
-            final StyleRecord record = session.readStyle(styleId, providerId);
+            final StyleRecord record = ConfigurationEngine.getStyle(styleId, providerId);
             if (record != null) {
                 report.setBrief(getBriefFromRecord(record, locale));
                 report.setDescription(record.getDescription(locale));
@@ -231,8 +228,6 @@ public final class StyleProviderConfig extends Static {
             }
         } catch (SQLException ex) {
             throw new ConfigurationException("An error occurred while reading data list for style named \"" + styleId + "\".", ex);
-        } finally {
-            if (session != null) session.close();
         }
 
         // Extract additional information from the style body.
@@ -330,25 +325,17 @@ public final class StyleProviderConfig extends Static {
         ensureNonNull("dataId",       dataId);
         ensureExistingStyle(styleProvider, styleId);
 
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final StyleRecord style = session.readStyle(styleId, styleProvider);
-            if (style == null) {
-                throw new ConfigurationException("Style named \"" + styleId + "\" from provider with id \"" + styleProvider + "\" can't be found from database.");
-            }
-            final DataRecord data = session.readData(dataId, dataProvider);
-            if (data == null) {
-                throw new ConfigurationException("Data named \"" + dataId + "\" from provider with id \"" + dataProvider + "\" can't be found from database.");
-            }
-            final List<StyleRecord> sylesList = session.readStyles(data);
-            if(!sylesList.contains(style)){
-                session.writeStyledData(style, data);
-            }
-        } catch (SQLException ex) {
-            throw new ConfigurationException("An error occurred while trying to link the style named \"" + styleId + "\" to data named \"" + dataId + "\".", ex);
-        } finally {
-            if (session != null) session.close();
+        final StyleRecord style = ConfigurationEngine.getStyle(styleId, styleProvider);
+        if (style == null) {
+            throw new ConfigurationException("Style named \"" + styleId + "\" from provider with id \"" + styleProvider + "\" can't be found from database.");
+        }
+        final DataRecord data = ConfigurationEngine.getDataRecord(dataId, dataProvider);
+        if (data == null) {
+            throw new ConfigurationException("Data named \"" + dataId + "\" from provider with id \"" + dataProvider + "\" can't be found from database.");
+        }
+        final List<StyleRecord> sylesList = ConfigurationEngine.getStyleForData(data);
+        if(!sylesList.contains(style)){
+            ConfigurationEngine.writeStyleForData(style, data);
         }
     }
 
@@ -367,23 +354,15 @@ public final class StyleProviderConfig extends Static {
         ensureNonNull("dataId",       dataId);
         ensureExistingStyle(styleProvider, styleId);
 
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final StyleRecord style = session.readStyle(styleId, styleProvider);
-            if (style == null) {
-                throw new ConfigurationException("Style named \"" + styleId + "\" from provider with id \"" + styleProvider + "\" can't be found from database.");
-            }
-            final DataRecord data = session.readData(dataId, dataProvider);
-            if (data == null) {
-                throw new ConfigurationException("Data named \"" + dataId + "\" from provider with id \"" + dataProvider + "\" can't be found from database.");
-            }
-            session.deleteStyledData(style, data);
-        } catch (SQLException ex) {
-            throw new ConfigurationException("An error occurred while trying to unlink the style named \"" + styleId + "\" from data named \"" + dataId + "\".", ex);
-        } finally {
-            if (session != null) session.close();
+        final StyleRecord style = ConfigurationEngine.getStyle(styleId, styleProvider);
+        if (style == null) {
+            throw new ConfigurationException("Style named \"" + styleId + "\" from provider with id \"" + styleProvider + "\" can't be found from database.");
         }
+        final DataRecord data = ConfigurationEngine.getDataRecord(dataId, dataProvider);
+        if (data == null) {
+            throw new ConfigurationException("Data named \"" + dataId + "\" from provider with id \"" + dataProvider + "\" can't be found from database.");
+        }
+        ConfigurationEngine.deleteStyleForData(style, data);
     }
 
     /**

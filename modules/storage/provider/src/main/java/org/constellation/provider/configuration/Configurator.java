@@ -21,21 +21,16 @@ import org.apache.commons.io.IOUtils;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.ProviderRecord.ProviderType;
-import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.StyleRecord.StyleType;
-import org.constellation.admin.dao.UserRecord;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
-import org.constellation.security.NoSecurityManagerException;
-import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.CoverageReference;
@@ -92,25 +87,10 @@ public interface Configurator {
 
 
             // Update administration database.
-            Session session = null;
             try {
-                session = EmbeddedDatabase.createSession();
-                final UserRecord userRecord;
-                String login = null;
-                try {
-                    login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
-                } catch (NoSecurityManagerException ex) {
-                    LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
-                }
-
-                if (login != null) {
-                    userRecord = session.readUser(login);
-                } else {
-                    userRecord = session.readUser("admin");
-                }
 
                 // look for deleted providers
-                final List<ProviderRecord> records = session.readProviders(serviceName);
+                final List<ProviderRecord> records = ConfigurationEngine.getProviders(serviceName);
                 for (ProviderRecord record : records) {
                     boolean remove = true;
                     for (Provider provider : providers) {
@@ -120,7 +100,7 @@ public interface Configurator {
                         }
                     }
                     if (remove) {
-                        session.deleteProvider(record.getIdentifier());
+                        ConfigurationEngine.deleteProvider(record.getIdentifier());
                     }
                 }
 
@@ -129,9 +109,9 @@ public interface Configurator {
                     params.values().add(provider.getSource());
 
                     final ProviderType type = provider.getProviderType();
-                    ProviderRecord pr = session.readProvider(provider.getId());
+                    ProviderRecord pr = ConfigurationEngine.getProvider(provider.getId());
                     if (pr == null) {
-                        pr = session.writeProvider(provider.getId(), type, serviceName, provider.getSource(), userRecord);
+                        pr = ConfigurationEngine.writeProvider(provider.getId(), type, serviceName, provider.getSource());
                     } else {
                         // update
                         pr.setConfig(provider.getSource());
@@ -155,7 +135,7 @@ public interface Configurator {
                                 }
                             }
                             if (!found) {
-                                session.deleteData(data.getCompleteName(), provider.getId());
+                                ConfigurationEngine.deleteData(data.getCompleteName(), provider.getId());
                             }
                         }
 
@@ -172,7 +152,7 @@ public interface Configurator {
                                 }
                             }
                             if (!found) {
-                                DataRecord record = session.writeData(name, pr, provider.getDataType(), userRecord);
+                                DataRecord record = ConfigurationEngine.writeData(name, pr, provider.getDataType());
                                 final InputStream currentMetadata = metadata.get(record.getName());
                                 if (currentMetadata != null) {
                                     StringWriter writer = new StringWriter();
@@ -223,7 +203,7 @@ public interface Configurator {
                         // Remove no longer existing style.
                         for (final StyleRecord style : styles) {
                             if (provider.get(style.getName()) == null) {
-                                session.deleteStyle(style.getName(), provider.getId());
+                                ConfigurationEngine.deleteStyle(style.getName(), provider.getId());
                             }
                         }
 
@@ -237,15 +217,13 @@ public interface Configurator {
                                 }
                             }
                             if (!found) {
-                                session.writeStyle((String) key, pr, StyleType.VECTOR, (MutableStyle) provider.get(key), userRecord);
+                                ConfigurationEngine.writeStyle((String) key, pr, StyleType.VECTOR, (MutableStyle) provider.get(key));
                             }
                         }
                     }
                 }
             } catch (IOException | SQLException ex) {
                 LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
-            } finally {
-                if (session != null) session.close();
             }
         }
     }

@@ -1,9 +1,6 @@
 package org.constellation.coverage;
 
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.TaskRecord;
-import org.constellation.admin.dao.UserRecord;
 import org.constellation.provider.LayerProviderProxy;
 import org.geotoolkit.parameter.ParameterGroup;
 import org.geotoolkit.process.ProcessEvent;
@@ -19,6 +16,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.admin.ConfigurationEngine;
 
 /**
  * Listener for Pyramidal process loaded via {@link PyramidCoverageHelper}
@@ -46,18 +44,8 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     @Override
     public void started(final ProcessEvent processEvent) {
         //Create task on database (state : pending)
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final UserRecord user = session.readUser(login);
-
-            uuidTask = UUID.randomUUID().toString();
-            session.writeTask(uuidTask, "pyramid", user.getLogin());
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Unable to save task", e);
-        } finally {
-            if (session != null) session.close();
-        }
+        uuidTask = UUID.randomUUID().toString();
+        ConfigurationEngine.writeTask(uuidTask, "pyramid", login);
     }
 
     @Override
@@ -77,20 +65,15 @@ public class PyramidCoverageProcessListener implements ProcessListener {
 
     @Override
     public void completed(final ProcessEvent processEvent) {
-        Session session = null;
         try {
-            session = EmbeddedDatabase.createSession();
-
             //Update state (pass to completed) on database
-            final TaskRecord pyramidTask = session.readTask(uuidTask);
+            final TaskRecord pyramidTask = ConfigurationEngine.getTask(uuidTask);
             pyramidTask.setState(TaskRecord.TaskState.SUCCEED);
 
             //update provider
             updateProvider();
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Unable to save task", e);
-        } finally {
-            if (session != null) session.close();
         }
     }
 
@@ -122,15 +105,11 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     @Override
     public void failed(final ProcessEvent processEvent) {
         //Update state (pass to completed) on database
-        Session session = null;
         try {
-            session = EmbeddedDatabase.createSession();
-            final TaskRecord pyramidTask = session.readTask(uuidTask);
+            final TaskRecord pyramidTask = ConfigurationEngine.getTask(uuidTask);
             pyramidTask.setState(TaskRecord.TaskState.FAILED);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Unable to save task", e);
-        } finally {
-            if (session != null) session.close();
         }
     }
 }
