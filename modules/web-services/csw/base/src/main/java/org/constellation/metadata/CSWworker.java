@@ -896,7 +896,7 @@ public class CSWworker extends AbstractWorker {
             final List<Object> records                 = new ArrayList<>();
             try {
                 for (int i = startPos -1; i < max; i++) {
-                    final Object obj = mdReader.getOriginalMetadata(results[i], mode, set, elementName);
+                    final Object obj = mdReader.getOriginalMetadata(results[i], mode, cstlSet(set), elementName);
                     if (obj == null && (max + 1) < nbResults) {
                         max++;
 
@@ -934,6 +934,13 @@ public class CSWworker extends AbstractWorker {
         GetRecordsResponse response = CswXmlFactory.createGetRecordsResponse(request.getVersion().toString(), id, System.currentTimeMillis(), searchResults);
         LOGGER.log(logLevel, "GetRecords request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
+    }
+
+    private org.constellation.metadata.io.ElementSetType cstlSet(final ElementSetType set) {
+        if (set != null) {
+            return org.constellation.metadata.io.ElementSetType.fromValue(set.value());
+        }
+        return null;
     }
 
     /**
@@ -1068,7 +1075,7 @@ public class CSWworker extends AbstractWorker {
 
             //we get the metadata object
             try {
-                final Object o = mdReader.getOriginalMetadata(id, mode, set, null);
+                final Object o = mdReader.getOriginalMetadata(id, mode, cstlSet(set), null);
                 if (o != null) {
                     if (!matchExpectedType(o, outputSchema)) {
                         LOGGER.log(Level.WARNING, "The record {0} does not correspound to {1} object.", new Object[]{id, outputSchema});

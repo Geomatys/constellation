@@ -35,9 +35,9 @@ import org.constellation.metadata.io.MetadataIoException;
 
 // Geotoolkit dependencies
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.metadata.io.ElementSetType;
 import org.constellation.metadata.io.MetadataType;
 import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSetType;
 import org.w3c.dom.Node;
 
 /**

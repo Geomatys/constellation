@@ -1,0 +1,228 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2014, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package org.constellation.metadata.io;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import org.apache.sis.xml.Namespaces;
+import static org.constellation.metadata.io.AbstractMetadataReader.LOGGER;
+import org.constellation.util.NodeUtilities;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+/**
+ *
+ * @author Guilhem Legal (Geomatys)
+ */
+public abstract class DomMetadataReader extends AbstractMetadataReader {
+
+    /**
+     * A date formatter used to display the Date object for Dublin core translation.
+     */
+    private static final DateFormat FORMATTER;
+    static {
+        FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        FORMATTER.setTimeZone(TimeZone.getTimeZone("GMT+2"));
+    }
+
+    public DomMetadataReader(final boolean isCacheEnabled, final boolean isThreadEnabled) {
+        super(isCacheEnabled, isThreadEnabled);
+    }
+
+    protected MetadataType getMetadataType(final InputStream metadataStream) throws IOException, XMLStreamException {
+        final XMLInputFactory xif = XMLInputFactory.newFactory();
+        final String rootName;
+
+        metadataStream.mark(0);
+        XMLStreamReader xsr = xif.createXMLStreamReader(metadataStream);
+        xsr.nextTag();
+        rootName = xsr.getLocalName();
+        xsr.close();
+        metadataStream.reset();
+
+        switch (rootName) {
+            case "MD_Metadata":
+            case "MI_Metadata":
+                return MetadataType.ISO_19115;
+            case "Record":
+                return MetadataType.DUBLINCORE;
+            case "SensorML":
+                return MetadataType.SENSORML;
+            case "RegistryObject":
+            case "AdhocQuery":
+            case "Association":
+            case "RegistryPackage":
+            case "Registry":
+            case "ExtrinsicObject":
+            case "RegistryEntry":
+                return MetadataType.EBRIM;
+            default:
+                return MetadataType.NATIVE;
+        }
+        // TODO complete other metadata type
+    }
+
+    protected Node getNodeFromFile(final File metadataFile) throws MetadataIoException {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            Document document = docBuilder.parse(metadataFile);
+            return document.getDocumentElement();
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            throw new MetadataIoException("The metadata file : " + metadataFile.getName() + ".xml can not be read", ex, NO_APPLICABLE_CODE);
+        }
+    }
+
+    protected Node getNodeFromStream(final InputStream stream) throws MetadataIoException {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            Document document = docBuilder.parse(stream);
+            return document.getDocumentElement();
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            throw new MetadataIoException("unable to parse the metadata", ex, NO_APPLICABLE_CODE);
+        }
+    }
+
+    protected String formatDate(final String modValue) {
+        try {
+            final Date d = TemporalUtilities.parseDate(modValue);
+            String dateValue;
+            synchronized (FORMATTER) {
+                dateValue = FORMATTER.format(d);
+            }
+            dateValue = dateValue.substring(0, dateValue.length() - 2);
+            dateValue = dateValue + ":00";
+            return dateValue;
+        } catch (ParseException ex) {
+            LOGGER.log(Level.WARNING, "unable to parse date: {0}", modValue);
+        }
+        return null;
+    }
+
+    /**
+     * Apply the elementSet (Brief, Summary or full) or the custom elementSetName on the specified record.
+     *
+     * @param record A dublinCore record.
+     * @param type The ElementSetType to apply on this record.
+     * @param elementName A list of QName corresponding to the requested attribute. this parameter is ignored if type is not null.
+     *
+     * @return A record object.
+     * @throws MetadataIoException If the type and the element name are null.
+     */
+    protected Node applyElementSetNode(final Node record, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
+        final DocumentBuilder docBuilder;
+        try {
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            docBuilder = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            throw new MetadataIoException(ex);
+        }
+        final Document document = docBuilder.newDocument();
+        if (type != null) {
+            if (type.equals(ElementSetType.SUMMARY)) {
+                final Element sumRoot = document.createElementNS(Namespaces.CSW, "SummaryRecord");
+                final List<String> identifierValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:identifier");
+                final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues, true);
+                NodeUtilities.appendChilds(sumRoot, identifiers);
+                final List<String> titleValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:title");
+                final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues, true);
+                NodeUtilities.appendChilds(sumRoot, titles);
+                final List<String> typeValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:type");
+                final List<Node> types = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", typeValues, false);
+                NodeUtilities.appendChilds(sumRoot, types);
+                final List<String> subValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:subject");
+                final List<Node> subjects = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "subject", subValues, false);
+                NodeUtilities.appendChilds(sumRoot, subjects);
+                final List<String> formValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:format");
+                final List<Node> formats = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "format", formValues, false);
+                NodeUtilities.appendChilds(sumRoot, formats);
+                final List<String> modValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:modified");
+                final List<Node> modifieds = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "modified", modValues, false);
+                NodeUtilities.appendChilds(sumRoot, modifieds);
+                final List<String> absValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:abstract");
+                final List<Node> abstracts = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "abstract", absValues, false);
+                NodeUtilities.appendChilds(sumRoot, abstracts);
+                final List<Node> origBboxes = NodeUtilities.getNodeFromPath(record, "/ows:BoundingBox");
+                for (Node origBbox : origBboxes) {
+                    Node n = document.importNode(origBbox, true);
+                    NodeUtilities.appendChilds(sumRoot, Arrays.asList(n));
+                }
+                return sumRoot;
+            } else if (type.equals(ElementSetType.BRIEF)) {
+                final Element briefRoot = document.createElementNS(Namespaces.CSW, "BriefRecord");
+                final List<String> identifierValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:identifier");
+                final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues, true);
+                NodeUtilities.appendChilds(briefRoot, identifiers);
+                final List<String> titleValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:title");
+                final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues, true);
+                NodeUtilities.appendChilds(briefRoot, titles);
+                final List<String> typeValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:type");
+                final List<Node> types = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", typeValues, false);
+                NodeUtilities.appendChilds(briefRoot, types);
+                final List<Node> origBboxes = NodeUtilities.getNodeFromPath(record, "/csw:Record/ows:BoundingBox");
+                for (Node origBbox : origBboxes) {
+                    Node n = document.importNode(origBbox, true);
+                    NodeUtilities.appendChilds(briefRoot, Arrays.asList(n));
+                }
+                return briefRoot;
+            } else {
+                return record;
+            }
+        } else if (elementName != null) {
+            final Element recRoot = document.createElementNS(Namespaces.CSW, "Record");
+            for (QName qn : elementName) {
+                if (qn != null) {
+                    final List<Node> origs = NodeUtilities.getNodeFromPath(record, "/dc:" + qn.getLocalPart());
+                    for (Node orig : origs) {
+                        Node n = document.importNode(orig, true);
+                        NodeUtilities.appendChilds(recRoot, Arrays.asList(n));
+                    }
+                } else {
+                    LOGGER.warning("An elementName was null.");
+                }
+            }
+            return recRoot;
+        } else {
+            throw new MetadataIoException("No ElementSet or Element name specified");
+        }
+    }
+
+}

@@ -33,10 +33,10 @@ import org.constellation.util.ReflectionUtilities;
 
 import static org.constellation.metadata.CSWQueryable.*;
 import org.constellation.metadata.index.XpathUtils;
+import org.constellation.metadata.io.ElementSetType;
 import org.constellation.metadata.io.MetadataType;
 
 import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.Settable;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;

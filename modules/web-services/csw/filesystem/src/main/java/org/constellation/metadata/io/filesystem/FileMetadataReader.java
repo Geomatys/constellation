@@ -16,40 +16,32 @@
  */
 package org.constellation.metadata.io.filesystem;
 
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
-import java.util.logging.Level;
 
 // XML dependencies
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataType;
 import org.constellation.util.NodeUtilities;
 import org.constellation.metadata.index.generic.NodeIndexer;
+import org.constellation.metadata.io.DomMetadataReader;
 
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
@@ -57,10 +49,8 @@ import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
-import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -70,11 +60,11 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // Apache SIS dependencies
 import org.apache.sis.xml.Namespaces;
+import org.constellation.metadata.io.ElementSetType;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  * A CSW Metadata Reader. This reader does not require a database.
@@ -84,18 +74,7 @@ import org.xml.sax.SAXException;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileMetadataReader extends AbstractMetadataReader implements CSWMetadataReader {
-
-    private static final String METAFILE_MSG = "The metadata file : ";
-    
-    /**
-     * A date formatter used to display the Date object for Dublin core translation.
-     */
-    private static final DateFormat FORMATTER;
-    static {
-        FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        FORMATTER.setTimeZone(TimeZone.getTimeZone("GMT+2"));
-    }
+public class FileMetadataReader extends DomMetadataReader implements CSWMetadataReader {
 
     /**
      * The directory containing the data XML files.
@@ -157,7 +136,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
         final MetadataType metadataMode;
         try {
-            metadataMode = getMetadataType(metadataFile);
+            metadataMode = getMetadataType(new FileInputStream(metadataFile));
         } catch (IOException | XMLStreamException ex) {
             throw new MetadataIoException(ex);
         }
@@ -172,144 +151,12 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         }
     }
 
-    private MetadataType getMetadataType(final File metadataFile) throws IOException, XMLStreamException {
-        final XMLInputFactory xif = XMLInputFactory.newFactory();
-        final String rootName;
-        try (FileInputStream fos = new FileInputStream(metadataFile)) {
-            XMLStreamReader xsr = xif.createXMLStreamReader(fos, "UTF-8");
-            xsr.nextTag();
-            rootName = xsr.getLocalName();
-            xsr.close();
-        }
-        switch (rootName) {
-            case "MD_Metadata":
-            case "MI_Metadata":
-                return MetadataType.ISO_19115;
-            case "Record":
-                return MetadataType.DUBLINCORE;
-            case "SensorML":
-                return MetadataType.SENSORML;
-            case "RegistryObject":
-            case "AdhocQuery":
-            case "Association":
-            case "RegistryPackage":
-            case "Registry":
-            case "ExtrinsicObject":
-            case "RegistryEntry":
-                return MetadataType.EBRIM;
-            default:
-                return MetadataType.NATIVE;
-        }
-        // TODO complete other metadata type
-    }
-
     @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
         return metadataFile != null && metadataFile.exists();
     }
     
-    private Node getNodeFromFile(final File metadataFile) throws MetadataIoException {
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-            Document document = docBuilder.parse(metadataFile);
-            return document.getDocumentElement();
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
-            throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + ".xml can not be read", ex, NO_APPLICABLE_CODE);
-        }
-    }
-
-    /**
-     * Apply the elementSet (Brief, Summary or full) or the custom elementSetName on the specified record.
-     *
-     * @param record A dublinCore record.
-     * @param type The ElementSetType to apply on this record.
-     * @param elementName A list of QName corresponding to the requested attribute. this parameter is ignored if type is not null.
-     *
-     * @return A record object.
-     * @throws MetadataIoException If the type and the element name are null.
-     */
-    private Node applyElementSetNode(final Node record, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        final DocumentBuilder docBuilder;
-        try {
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            docBuilder = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException ex) {
-            throw new MetadataIoException(ex);
-        }
-        final Document document = docBuilder.newDocument();
-        if (type != null) {
-            if (type.equals(ElementSetType.SUMMARY)) {
-                final Element sumRoot = document.createElementNS(Namespaces.CSW, "SummaryRecord");
-                final List<String> identifierValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:identifier");
-                final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues, true);
-                NodeUtilities.appendChilds(sumRoot, identifiers);
-                final List<String> titleValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:title");
-                final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues, true);
-                NodeUtilities.appendChilds(sumRoot, titles);
-                final List<String> typeValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:type");
-                final List<Node> types = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", typeValues, false);
-                NodeUtilities.appendChilds(sumRoot, types);
-                final List<String> subValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:subject");
-                final List<Node> subjects = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "subject", subValues, false);
-                NodeUtilities.appendChilds(sumRoot, subjects);
-                final List<String> formValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:format");
-                final List<Node> formats = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "format", formValues, false);
-                NodeUtilities.appendChilds(sumRoot, formats);
-                final List<String> modValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:modified");
-                final List<Node> modifieds = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "modified", modValues, false);
-                NodeUtilities.appendChilds(sumRoot, modifieds);
-                final List<String> absValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:abstract");
-                final List<Node> abstracts = NodeUtilities.buildNodes(document, "http://purl.org/dc/terms/", "abstract", absValues, false);
-                NodeUtilities.appendChilds(sumRoot, abstracts);
-                final List<Node> origBboxes = NodeUtilities.getNodeFromPath(record, "/ows:BoundingBox");
-                for (Node origBbox : origBboxes) {
-                    Node n = document.importNode(origBbox, true);
-                    NodeUtilities.appendChilds(sumRoot, Arrays.asList(n));
-                }
-                return sumRoot;
-            } else if (type.equals(ElementSetType.BRIEF)) {
-                final Element briefRoot = document.createElementNS(Namespaces.CSW, "BriefRecord");
-                final List<String> identifierValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:identifier");
-                final List<Node> identifiers = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "identifier", identifierValues, true);
-                NodeUtilities.appendChilds(briefRoot, identifiers);
-                final List<String> titleValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:title");
-                final List<Node> titles = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "title", titleValues, true);
-                NodeUtilities.appendChilds(briefRoot, titles);
-                final List<String> typeValues = NodeUtilities.getValuesFromPath(record, "/csw:Record/dc:type");
-                final List<Node> types = NodeUtilities.buildNodes(document, "http://purl.org/dc/elements/1.1/", "type", typeValues, false);
-                NodeUtilities.appendChilds(briefRoot, types);
-                final List<Node> origBboxes = NodeUtilities.getNodeFromPath(record, "/csw:Record/ows:BoundingBox");
-                for (Node origBbox : origBboxes) {
-                    Node n = document.importNode(origBbox, true);
-                    NodeUtilities.appendChilds(briefRoot, Arrays.asList(n));
-                }
-                return briefRoot;
-            } else {
-                return record;
-            }
-        } else if (elementName != null) {
-            final Element recRoot = document.createElementNS(Namespaces.CSW, "Record");
-            for (QName qn : elementName) {
-                if (qn != null) {
-                    final List<Node> origs = NodeUtilities.getNodeFromPath(record, "/dc:" + qn.getLocalPart());
-                    for (Node orig : origs) {
-                        Node n = document.importNode(orig, true);
-                        NodeUtilities.appendChilds(recRoot, Arrays.asList(n));
-                    }
-                } else {
-                    LOGGER.warning("An elementName was null.");
-                }
-            }
-            return recRoot;
-        } else {
-            throw new MetadataIoException("No ElementSet or Element name specified");
-        }
-    }
-
     private String getIdentifier(final Node metadata) throws MetadataIoException  {
         final List<String> identifierValues = NodeUtilities.getValuesFromPaths(metadata, DUBLIN_CORE_QUERYABLE.get("Identifier"));
         if (!identifierValues.isEmpty()) {
@@ -517,22 +364,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return null;
     }
 
-    private String formatDate(final String modValue) {
-        try {
-            final Date d = TemporalUtilities.parseDate(modValue);
-            String dateValue;
-            synchronized (FORMATTER) {
-                dateValue = FORMATTER.format(d);
-            }
-            dateValue = dateValue.substring(0, dateValue.length() - 2);
-            dateValue = dateValue + ":00";
-            return dateValue;
-        } catch (ParseException ex) {
-            LOGGER.log(Level.WARNING, "unable to parse date: {0}", modValue);
-        }
-        return null;
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -664,7 +495,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 } else if (f.isDirectory()){
                     results.addAll(getAllIdentifiers(f));
                 } else {
-                    throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
+                    throw new MetadataIoException("The metadata file : " + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
                 }
             }
         }

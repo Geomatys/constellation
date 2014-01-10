@@ -24,7 +24,6 @@ import javax.xml.namespace.QName;
 
 // geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSetType;
 import org.w3c.dom.Node;
 
 /**

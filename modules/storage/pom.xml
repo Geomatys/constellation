@@ -97,6 +97,7 @@
             <modules>
                 <module>metadata</module>
                 <module>metadata-mdw</module>
+                <module>metadata-dom</module>
                 <module>generic</module>
                 <module>observation</module>
                 <module>om2</module>
@@ -156,6 +157,7 @@
             <modules>
                 <module>metadata</module>
                 <module>metadata-mdw</module>
+                <module>metadata-dom</module>
                 <module>generic</module>
             </modules>
         </profile>
@@ -164,6 +166,7 @@
             <modules>
                 <module>metadata</module>
                 <module>metadata-mdw</module>
+                <module>metadata-dom</module>
                 <module>generic</module>
                 <module>observation</module>
                 <module>om2</module>
