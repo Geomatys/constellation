@@ -228,7 +228,7 @@ CSTL.STYLE.SymbolEdition['polygon'] = {
             // Apply form values.
             this.symbol.stroke = CSTL.STYLE.SymbolEdition.readFormStroke(this.$panel);
             this.symbol.fill   = CSTL.STYLE.SymbolEdition.readFormFill(this.$panel);
-            
+
             // Update parent rule.
             if (this.symbolIndex != null) {
                 rule.symbolizers[this.symbolIndex] = this.symbol;
@@ -438,7 +438,7 @@ CSTL.STYLE.SymbolEdition['raster'] = {
             this.$panel.find("[name='channel.red.name']").val(this.symbol.channelSelection.rgbChannels[0].name);
             this.$panel.find("[name='channel.green.name']").val(this.symbol.channelSelection.rgbChannels[1].name);
             this.$panel.find("[name='channel.blue.name']").val(this.symbol.channelSelection.rgbChannels[2].name);
-        } else if(this.symbol.channelSelection.greyChannel) {
+        } else if(this.symbol.channelSelection && this.symbol.channelSelection.greyChannel) {
             this.showGreySelection();
             this.$panel.find("[name='select.channel']").val("grey");
             this.$panel.find("[name='channel.grey.name']").val(this.symbol.channelSelection.greyChannel.name);
