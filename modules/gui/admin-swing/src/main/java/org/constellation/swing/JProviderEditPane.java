@@ -111,7 +111,11 @@ public class JProviderEditPane extends javax.swing.JPanel {
             guiParameters.setViewportView(guiParameterEditor);
         }
 
+        final String providerType = sourceParam.parameter("providerType").stringValue();
+
         guiIdentifier.setText(providerReport.getId());
+        guiCategory.setSelectedItem(providerType);
+        
         final boolean styleType = "sld".equals(serviceType);
         guiAdd.setVisible(styleType);
 
@@ -313,6 +317,8 @@ public class JProviderEditPane extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         guiData = new org.jdesktop.swingx.JXTable();
         metadataButton = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        guiCategory = new javax.swing.JComboBox();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("id")); // NOI18N
@@ -394,7 +400,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
                     .addComponent(jLabel2)
                     .addComponent(guiAdd))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE))
         );
 
         jSplitPane1.setRightComponent(jPanel2);
@@ -405,6 +411,10 @@ public class JProviderEditPane extends javax.swing.JPanel {
                 metadataButtonActionPerformed(evt);
             }
         });
+
+        jLabel4.setText(org.openide.util.NbBundle.getMessage(JProviderEditPane.class, "providerCategory")); // NOI18N
+
+        guiCategory.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "vector", "raster" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -421,9 +431,13 @@ public class JProviderEditPane extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(guiSave))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(guiIdentifier)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(guiCategory, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(guiIdentifier))))
                 .addContainerGap())
         );
 
@@ -436,8 +450,12 @@ public class JProviderEditPane extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(guiIdentifier, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(guiCategory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(guiDelete)
@@ -456,6 +474,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
         final ParameterValueGroup params = sourceParam;
         params.parameter("id").setValue(id);
+        params.parameter("providerType").setValue(guiCategory.getSelectedItem());
 
         if(subdataDesc == null){
             Parameters.copy(config, dataParam);
@@ -513,6 +532,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton guiAdd;
+    private javax.swing.JComboBox guiCategory;
     private org.jdesktop.swingx.JXTable guiData;
     private javax.swing.JButton guiDelete;
     private javax.swing.JTextField guiIdentifier;
@@ -521,6 +541,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;

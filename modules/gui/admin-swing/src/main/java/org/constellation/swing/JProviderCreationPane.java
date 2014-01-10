@@ -78,6 +78,7 @@ public class JProviderCreationPane extends javax.swing.JPanel {
         final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
         ParameterValueGroup sources = sourceDesc.createValue();
         sources.parameter("id").setValue(guiId.getText().trim());
+        sources.parameter("providerType").setValue(guiCategory.getSelectedItem());
 
         final ParameterValueGroup params;
         if(guiSubType.isEnabled()){
@@ -115,6 +116,8 @@ public class JProviderCreationPane extends javax.swing.JPanel {
         guiLblId = new javax.swing.JLabel();
         guiId = new javax.swing.JTextField();
         guiParameters = new javax.swing.JScrollPane();
+        jLabel1 = new javax.swing.JLabel();
+        guiCategory = new javax.swing.JComboBox();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         guiLblType.setText(bundle.getString("type")); // NOI18N
@@ -135,6 +138,10 @@ public class JProviderCreationPane extends javax.swing.JPanel {
 
         guiLblId.setText(bundle.getString("id")); // NOI18N
 
+        jLabel1.setText(org.openide.util.NbBundle.getMessage(JProviderCreationPane.class, "providerCategory")); // NOI18N
+
+        guiCategory.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "vector", "raster" }));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -144,21 +151,21 @@ public class JProviderCreationPane extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(guiParameters)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(guiLblType)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(guiLblId)
+                            .addComponent(guiLblType)
+                            .addComponent(guiLblSubType)
+                            .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(guiType, 0, 321, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(guiLblSubType)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(guiSubType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(guiLblId)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(guiId)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(guiSubType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(guiType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(guiId)
+                            .addComponent(guiCategory, 0, 317, Short.MAX_VALUE))))
                 .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {guiLblSubType, guiLblType});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {guiLblId, guiLblSubType, guiLblType, jLabel1});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -175,8 +182,12 @@ public class JProviderCreationPane extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(guiLblSubType)
                     .addComponent(guiSubType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(guiParameters, javax.swing.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(guiCategory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(guiParameters, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -216,6 +227,7 @@ public class JProviderCreationPane extends javax.swing.JPanel {
     }//GEN-LAST:event_guiSubTypeItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox guiCategory;
     private javax.swing.JTextField guiId;
     private javax.swing.JLabel guiLblId;
     private javax.swing.JLabel guiLblSubType;
@@ -223,6 +235,7 @@ public class JProviderCreationPane extends javax.swing.JPanel {
     private javax.swing.JScrollPane guiParameters;
     private javax.swing.JComboBox guiSubType;
     private javax.swing.JComboBox guiType;
+    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 
     /**
