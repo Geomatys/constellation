@@ -134,7 +134,7 @@ public final class ProvidersAPI {
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException           on HTTP communication error or response entity parsing error
      */
-    public void linkStyleToData(final String styleProvider, final String styleName, final String dataProvider, final String dataName) throws HttpResponseException, IOException {
+    public void linkStyleToData(final String styleProvider, final String styleName, final String dataProvider, final String dataName, final String namespace) throws HttpResponseException, IOException {
         ensureNonNull("styleProvider", styleProvider);
         ensureNonNull("styleName", styleName);
         ensureNonNull("dataProvider", dataProvider);
@@ -142,6 +142,7 @@ public final class ProvidersAPI {
 
         final ParameterValues values = new ParameterValues();
         values.getValues().put("dataProvider", dataProvider);
+        values.getValues().put("dataNamespace", namespace);
         values.getValues().put("dataId", dataName);
 
         final String path = "SP/" + styleProvider + "/style/" + styleName + "/linkData";
@@ -158,7 +159,7 @@ public final class ProvidersAPI {
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException           on HTTP communication error or response entity parsing error
      */
-    public void unlinkStyleFromData(final String styleProvider, final String styleName, final String dataProvider, final String dataName) throws HttpResponseException, IOException {
+    public void unlinkStyleFromData(final String styleProvider, final String styleName, final String dataProvider, final String dataName, final String namespace) throws IOException {
         ensureNonNull("styleProvider", styleProvider);
         ensureNonNull("styleName", styleName);
         ensureNonNull("dataProvider", dataProvider);
@@ -166,6 +167,7 @@ public final class ProvidersAPI {
 
         final ParameterValues values = new ParameterValues();
         values.getValues().put("dataProvider", dataProvider);
+        values.getValues().put("dataNamespace", namespace);
         values.getValues().put("dataId", dataName);
 
         final String path = "SP/" + styleProvider + "/style/" + styleName + "/unlinkData";

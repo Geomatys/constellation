@@ -324,9 +324,9 @@ public final class StyleController {
     @Ajax
     @Resource
     @Route("style/linkData")
-    public Response linkStyleToData(final String styleProvider, final String styleName, final String dataProvider, final String dataName) {
+    public Response linkStyleToData(final String styleProvider, final String styleName, final String dataProvider, final String dataName, final String namespace) {
         try {
-            cstl.openClient().providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName);
+            cstl.openClient().providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName, namespace);
             return Response.ok();
         } catch (IOException ex) {
             return Response.error(ex.getLocalizedMessage());
@@ -336,9 +336,9 @@ public final class StyleController {
     @Ajax
     @Resource
     @Route("style/unlinkData")
-    public Response unlinkStyleFromData(final String styleProvider, final String styleName, final String dataProvider, final String dataName) {
+    public Response unlinkStyleFromData(final String styleProvider, final String styleName, final String dataProvider, final String dataName, final String namespace) {
         try {
-            cstl.openClient().providers.unlinkStyleFromData(styleProvider, styleName, dataProvider, dataName);
+            cstl.openClient().providers.unlinkStyleFromData(styleProvider, styleName, dataProvider, dataName, namespace);
             return Response.ok();
         } catch (IOException ex) {
             return Response.error(ex.getLocalizedMessage());

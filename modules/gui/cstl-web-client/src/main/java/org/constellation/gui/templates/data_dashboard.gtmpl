@@ -122,8 +122,8 @@
     </div>
 </div>
 <script type="text/javascript">
-        function validateData(styleProvider, styleName, dataProvider, dataName){
-            return CSTL.Providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName);
+        function validateData(styleProvider, styleName, dataProvider, dataName, namespace){
+            return CSTL.Providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName, namespace);
         }
 
         var styleFlow = CSTL.LinkWorkflow.init('StyleController.styleList()', validateData, CSTL.LinkWorkflow.styleTemplate);

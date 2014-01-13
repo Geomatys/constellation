@@ -114,8 +114,8 @@
     </div>
 </div>
 <script type="text/javascript">
-    function validateData(dataProvider, dataName, styleProvider, styleName){
-        return CSTL.Providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName);
+    function validateData(dataProvider, dataName, styleProvider, styleName, namespace){
+        return CSTL.Providers.linkStyleToData(styleProvider, styleName, dataProvider, dataName, namespace);
     }
 
     var dataFlow = CSTL.LinkWorkflow.init('Controller.getAvailableData()', validateData, CSTL.LinkWorkflow.dataTemplate);

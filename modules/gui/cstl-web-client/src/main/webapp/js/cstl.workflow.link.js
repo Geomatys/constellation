@@ -53,6 +53,7 @@ CSTL.LinkWorkflow = {
 
     selectedName:     null,
     selectedProvider: null,
+    selectedNamepsace: null,
     linkedList:      null,
 
 
@@ -74,9 +75,10 @@ CSTL.LinkWorkflow = {
         return this;
     },
 
-    setSelected: function(selectedName, selectedProvider) {
+    setSelected: function(selectedName, selectedProvider, selectedNamespace) {
         this.selectedName     = selectedName;
         this.selectedProvider = selectedProvider;
+        this.selectedNamepsace = selectedNamespace;
         this.$linkedList   = $('#linkedList');
     },
 
@@ -111,9 +113,9 @@ CSTL.LinkWorkflow = {
         this.$modal.modal('toggle')
     },
 
-    unlink: function(selectedName, selectedProvider, unLinkFunc) {
+    unlink: function(selectedName, selectedProvider, unLinkFunc, namespace) {
         // Break association.
-        unLinkFunc(selectedProvider, selectedName, this.selectedProvider, this.selectedName).
+        unLinkFunc(selectedProvider, selectedName, this.selectedProvider, this.selectedName, namespace).
             // Update linked list.
             success($.proxy(function(){
                 this.$linkedList.find('[data-provider="' + selectedProvider + '"]').
@@ -131,7 +133,7 @@ CSTL.LinkWorkflow = {
         }
 
         // Apply association.
-        validateFunc(this.$selected.data('provider'), this.$selected.data('name'), this.selectedProvider, this.selectedName).
+        validateFunc(this.$selected.data('provider'), this.$selected.data('name'), this.selectedProvider, this.selectedName, this.selectedNamepsace).
             // Update linked list.
             success($.proxy(function(){
                 if (this.$linkedList.children().length === 0) {

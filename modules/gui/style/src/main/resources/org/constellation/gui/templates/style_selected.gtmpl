@@ -34,7 +34,7 @@
                 <%} else {%>
                     <%for (def data : selected.targetData) {%>
                         <div class="data" data-name="${data.name}" data-provider="${data.provider}">
-                            <button type="button" onclick="dataFlow.unlink('${data.name}','${data.provider}', styleUnlink);" class="btn btn-small"><i class="icon-minus"></i></button>
+                            <button type="button" onclick="dataFlow.unlink('${data.name}','${data.provider}', '${data.namespace}', styleUnlink);" class="btn btn-small"><i class="icon-minus"></i></button>
                             ${data.name}
                         </div>
                     <%}%>
@@ -52,8 +52,8 @@
             </div>
         </div>
         <script type="text/javascript">
-            function styleUnlink(dataProvider, dataName, styleProvider, styleName){
-                return CSTL.Providers.unlinkStyleFromData(styleProvider,styleName,dataProvider,dataName);
+            function styleUnlink(dataProvider, dataName, styleProvider, styleName, namespace){
+                return CSTL.Providers.unlinkStyleFromData(styleProvider,styleName,dataProvider,dataName, namespace);
             }
 
             dataFlow.setSelected('${selected.brief.name}','${selected.brief.provider}');

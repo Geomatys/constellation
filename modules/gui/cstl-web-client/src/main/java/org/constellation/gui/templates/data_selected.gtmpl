@@ -7,7 +7,7 @@
     <p>&{msg.no.selected.data}</p>
 </div>
 <% if (selected != null) { %>
-<div class="selected-item" id="selected-item" data-name="${selected.name}" data-provider="${selected.provider}">
+<div class="selected-item" id="selected-item" data-name="${selected.name}" data-provider="${selected.provider}" data-namespace="${selected.namespace}">
     <div class="block-header">
         <strong>${selected.name}</strong><i class="icon-chevron-up pull-right"></i>
     </div>
@@ -115,14 +115,15 @@
         });
 
         function dataUnlink(styleProvider, styleName, dataProvider, dataName){
-            return CSTL.Providers.unlinkStyleFromData(styleProvider,styleName,dataProvider,dataName);
+            var namespace = $("#selected-item").data("namespace");
+            return CSTL.Providers.unlinkStyleFromData(styleProvider,styleName,dataProvider,dataName, namespace);
         }
 
         function serviceUnlink(){
             return true;
         }
 
-        styleFlow.setSelected('${selected.name}','${selected.provider}');
+        styleFlow.setSelected('${selected.name}','${selected.provider}', '${selected.namespace}');
     </script>
 </div>
 <% } %>
