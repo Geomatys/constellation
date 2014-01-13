@@ -17,6 +17,8 @@
 
 package org.constellation.admin.dao;
 
+import org.constellation.admin.EmbeddedDatabase;
+
 import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,9 +30,9 @@ import java.util.Locale;
  * @version 0.9
  * @since 0.9
  */
-public final class LayerRecord implements Record {
+public final class LayerRecord extends Record {
 
-    private final Session session;
+    private Session session;
 
     final int id;
     private String name;
@@ -71,12 +73,19 @@ public final class LayerRecord implements Record {
                 rs.getString(10));
     }
 
+    public void ensureConnectionNotClosed() throws SQLException {
+        if (session.isClosed()) {
+            session = EmbeddedDatabase.createSession();
+        }
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(final String name) throws SQLException  {
         this.name = name;
+        ensureConnectionNotClosed();
         session.updateLayer(id, name, namespace, alias, service, data, owner);
     }
 
@@ -86,6 +95,7 @@ public final class LayerRecord implements Record {
 
     public void setNamespace(final String namespace) throws SQLException  {
         this.namespace = namespace;
+        ensureConnectionNotClosed();
         session.updateLayer(id, name, namespace, alias, service, data, owner);
     }
 
@@ -95,15 +105,18 @@ public final class LayerRecord implements Record {
 
     public void setAlias(final String alias) throws SQLException {
         this.alias = alias;
+        ensureConnectionNotClosed();
         session.updateLayer(id, name, namespace, alias, service, data, owner);
     }
 
     public ServiceRecord getService() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readService(service);
     }
 
     public void setService(final ServiceRecord service) throws SQLException {
         this.service = service.id;
+        ensureConnectionNotClosed();
         session.updateLayer(id, name, namespace, alias, service.id, data, owner);
     }
 
@@ -112,35 +125,43 @@ public final class LayerRecord implements Record {
     }
 
     public DataRecord getData() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readData(data);
     }
 
     public void setData(final DataRecord data) throws SQLException {
         this.data = data.id;
+        ensureConnectionNotClosed();
         session.updateLayer(id, name, namespace, alias, service, data.id, owner);
     }
 
     public String getTitle(final Locale locale) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readI18n(title, locale);
     }
 
     public void setTitle(final Locale locale, final String value) throws SQLException {
+        ensureConnectionNotClosed();
         session.updateI18n(title, locale, value);
     }
 
     public String getDescription(final Locale locale) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readI18n(description, locale);
     }
 
     public void setDescription(final Locale locale, final String value) throws SQLException {
+        ensureConnectionNotClosed();
         session.updateI18n(description, locale, value);
     }
 
     public Object getConfig() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readLayerConfig(id);
     }
 
     public void setConfig(final StringReader config) throws SQLException {
+        ensureConnectionNotClosed();
         session.updateLayerConfig(id, config);
     }
 
@@ -149,11 +170,13 @@ public final class LayerRecord implements Record {
     }
 
     public UserRecord getOwner() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readUser(owner);
     }
 
     public void setOwner(final UserRecord owner) throws SQLException {
         this.owner = owner.getLogin();
+        ensureConnectionNotClosed();
         session.updateLayer(id, name, namespace, alias, service, data, owner.getLogin());
     }
 }

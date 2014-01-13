@@ -17,6 +17,8 @@
 
 package org.constellation.admin.dao;
 
+import org.constellation.admin.EmbeddedDatabase;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -27,7 +29,7 @@ import java.util.Locale;
  * @version 0.9
  * @since 0.9
  */
-public final class TaskRecord implements Record {
+public final class TaskRecord extends Record {
 
     public static enum TaskState {
         PENDING,
@@ -35,7 +37,7 @@ public final class TaskRecord implements Record {
         FAILED
     }
 
-    private final Session session;
+    private Session session;
 
     private final String identifier;
     private TaskState state;
@@ -69,6 +71,15 @@ public final class TaskRecord implements Record {
                 rs.getString(8));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void ensureConnectionNotClosed() throws SQLException {
+        if (session.isClosed()) {
+            session = EmbeddedDatabase.createSession();
+        }
+    }
+
     public String getIdentifier() {
         return identifier;
     }
@@ -83,6 +94,7 @@ public final class TaskRecord implements Record {
 
     public void setState(final TaskState state) throws SQLException {
         this.state = state;
+        ensureConnectionNotClosed();
         session.updateTask(identifier, state);
     }
 
@@ -99,22 +111,27 @@ public final class TaskRecord implements Record {
     }
 
     public UserRecord getOwner() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readUser(owner);
     }
 
     public String getTitle(final Locale locale) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readI18n(title, locale);
     }
 
     public void setTitle(final Locale locale, final String value) throws SQLException {
+        ensureConnectionNotClosed();
         session.updateI18n(title, locale, value);
     }
 
     public String getDescription(final Locale locale) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readI18n(description, locale);
     }
 
     public void setDescription(final Locale locale, final String value) throws SQLException {
+        ensureConnectionNotClosed();
         session.updateI18n(description, locale, value);
     }
 }

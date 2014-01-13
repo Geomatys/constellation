@@ -81,7 +81,7 @@ public interface Configurator {
         }
 
         @Override
-        public void saveConfiguration(final ProviderService service, final List<Provider> providers) {
+        public synchronized void saveConfiguration(final ProviderService service, final List<Provider> providers) {
             final ParameterValueGroup params = service.getServiceDescriptor().createValue();
             final String serviceName = service.getName();
 

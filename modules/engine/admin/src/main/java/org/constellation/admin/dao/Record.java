@@ -17,9 +17,18 @@
 
 package org.constellation.admin.dao;
 
+import java.sql.SQLException;
+
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-public interface Record {}
+public abstract class Record {
+    /**
+     * Ensure that the sql connection was not closed previously. Reopen it.
+     *
+     * @throws SQLException
+     */
+    protected abstract void ensureConnectionNotClosed() throws SQLException;
+}

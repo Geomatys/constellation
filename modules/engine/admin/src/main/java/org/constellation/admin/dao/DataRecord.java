@@ -17,6 +17,8 @@
 
 package org.constellation.admin.dao;
 
+import org.constellation.admin.EmbeddedDatabase;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -32,7 +34,7 @@ import javax.xml.namespace.QName;
  * @version 0.9
  * @since 0.9
  */
-public final class DataRecord implements Record {
+public final class DataRecord extends Record {
 
     public static enum DataType {
         VECTOR,
@@ -40,7 +42,7 @@ public final class DataRecord implements Record {
         SENSOR
     }
 
-    private final Session session;
+    private Session session;
 
     final int id;
     private String name;
@@ -78,16 +80,26 @@ public final class DataRecord implements Record {
                 rs.getString(9));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void ensureConnectionNotClosed() throws SQLException {
+        if (session.isClosed()) {
+            session = EmbeddedDatabase.createSession();
+        }
+    }
+
     public QName getCompleteName() {
         return new QName(namespace, name);
     }
-    
+
     public String getName() {
         return name;
     }
 
     public void setName(final String name) throws SQLException {
         this.name = name;
+        ensureConnectionNotClosed();
         session.updateData(id, name, namespace, provider, type, owner);
     }
 
@@ -97,15 +109,18 @@ public final class DataRecord implements Record {
 
     public void setNamespace(final String namespace) throws SQLException {
         this.namespace = namespace;
+        ensureConnectionNotClosed();
         session.updateData(id, name, namespace, provider, type, owner);
     }
 
     public ProviderRecord getProvider() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readProvider(provider);
     }
 
     public void setProvider(final ProviderRecord provider) throws SQLException {
         this.provider = provider.id;
+        ensureConnectionNotClosed();
         session.updateData(id, name, namespace, provider.id, type, owner);
     }
 
@@ -115,6 +130,7 @@ public final class DataRecord implements Record {
 
     public void setType(final DataType type) throws SQLException {
         this.type = type;
+        ensureConnectionNotClosed();
         session.updateData(id, name, namespace, provider, type, owner);
     }
 
@@ -123,10 +139,12 @@ public final class DataRecord implements Record {
     }
 
     public String getTitle(final Locale locale) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readI18n(title, locale);
     }
 
     public void setTitle(final Locale locale, final String value) throws SQLException {
+        ensureConnectionNotClosed();
         final String title = session.readI18n(this.title, locale);
         if(title !=null){
             session.updateI18n(this.title, locale, value);
@@ -137,10 +155,12 @@ public final class DataRecord implements Record {
     }
 
     public String getDescription(final Locale locale) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readI18n(description, locale);
     }
 
     public void setDescription(final Locale locale, final String value) throws SQLException {
+        ensureConnectionNotClosed();
         final String title = session.readI18n(this.description, locale);
         if(title !=null){
             session.updateI18n(this.description, locale, value);
@@ -155,27 +175,33 @@ public final class DataRecord implements Record {
     }
 
     public UserRecord getOwner() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readUser(owner);
     }
 
     public void setOwner(final UserRecord owner) throws SQLException {
         this.owner = owner.getLogin();
+        ensureConnectionNotClosed();
         session.updateData(id, name, namespace, provider, type, owner.getLogin());
     }
 
     public List<StyleRecord> getLinkedStyles() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readStyles(this);
     }
 
     public void linkToStyle(final StyleRecord style) throws SQLException {
+        ensureConnectionNotClosed();
         session.writeStyledData(style, this);
     }
 
     public InputStream getMetadata() throws IOException, SQLException {
+        ensureConnectionNotClosed();
         return session.readDataMetadata(id);
     }
 
     public void setMetadata(final StringReader metadata) throws IOException, SQLException {
+        ensureConnectionNotClosed();
         session.updateDataMetadata(id, metadata);
     }
 }

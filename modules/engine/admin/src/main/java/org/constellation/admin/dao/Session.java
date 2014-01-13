@@ -227,6 +227,14 @@ public final class Session implements Closeable {
         }
     }
 
+    public boolean isClosed() {
+        try {
+            return connect.isClosed();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while closing database connection.", ex);
+        }
+        return false;
+    }
 
     /**************************************************************************
      *                              schema queries                            *

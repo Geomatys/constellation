@@ -19,6 +19,7 @@ package org.constellation.admin.dao;
 
 import java.io.InputStream;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.EmbeddedDatabase;
 
 import java.io.StringReader;
 import java.sql.ResultSet;
@@ -31,9 +32,9 @@ import java.util.Locale;
  * @version 0.9
  * @since 0.9
  */
-public final class ServiceRecord implements Record {
+public final class ServiceRecord extends Record {
 
-    private final Session session;
+    private Session session;
 
     final int id;
     private String identifier;
@@ -65,12 +66,22 @@ public final class ServiceRecord implements Record {
                 rs.getString(7));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void ensureConnectionNotClosed() throws SQLException {
+        if (session.isClosed()) {
+            session = EmbeddedDatabase.createSession();
+        }
+    }
+
     public String getIdentifier() {
         return identifier;
     }
 
     public void setIdentifier(final String identifier) throws SQLException {
         this.identifier = identifier;
+        ensureConnectionNotClosed();
         session.updateService(id, identifier, type, owner);
     }
 
@@ -80,6 +91,7 @@ public final class ServiceRecord implements Record {
 
     public void setType(final Specification type) throws SQLException {
         this.type = type;
+        ensureConnectionNotClosed();
         session.updateService(id, identifier, type, owner);
     }
 
@@ -88,34 +100,42 @@ public final class ServiceRecord implements Record {
     }
 
     public String getTitle(final Locale locale) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readI18n(title, locale);
     }
 
     public void setTitle(final Locale locale, final String value) throws SQLException {
+        ensureConnectionNotClosed();
         session.updateI18n(title, locale, value);
     }
 
     public String getDescription(final Locale locale) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readI18n(description, locale);
     }
 
     public void setDescription(final Locale locale, final String value) throws SQLException {
+        ensureConnectionNotClosed();
         session.updateI18n(description, locale, value);
     }
 
     public InputStream getConfig() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readServiceConfig(id);
     }
 
     public void setConfig(final StringReader config) throws SQLException {
+        ensureConnectionNotClosed();
         session.updateServiceConfig(id, config);
     }
 
     public InputStream getExtraFile(final String fileName) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readExtraServiceConfig(id, fileName);
     }
 
     public void setExtraFile(final String fileName, final StringReader config) throws SQLException {
+        ensureConnectionNotClosed();
         final InputStream is = session.readExtraServiceConfig(id, fileName);
         if (is == null) {
             session.writeServiceExtraConfig(identifier, type, config, fileName);
@@ -125,10 +145,12 @@ public final class ServiceRecord implements Record {
     }
 
     public InputStream getMetadata(final String lang) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readServiceMetadata(id, lang);
     }
 
     public void setMetadata(final String lang, final StringReader metadata) throws SQLException {
+        ensureConnectionNotClosed();
         final InputStream is = session.readServiceMetadata(id, lang);
         if (is == null) {
             session.writeServiceMetadata(identifier, type, metadata, lang);
@@ -142,11 +164,13 @@ public final class ServiceRecord implements Record {
     }
 
     public UserRecord getOwner() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readUser(owner);
     }
 
     public void setOwner(final UserRecord owner) throws SQLException {
         this.owner = owner.getLogin();
+        ensureConnectionNotClosed();
         session.updateService(id, identifier, type, owner.getLogin());
     }
 }

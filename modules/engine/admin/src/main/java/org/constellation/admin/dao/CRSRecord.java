@@ -1,6 +1,8 @@
 package org.constellation.admin.dao;
 
-public class CRSRecord implements Record{
+import java.sql.SQLException;
+
+public class CRSRecord extends Record{
 
     private String dataid;
 
@@ -21,4 +23,10 @@ public class CRSRecord implements Record{
     public void setDataid(final String dataid) {
         this.dataid = dataid;
     }
+
+    /**
+     * Do nothing in this implementation.
+     */
+    @Override
+    protected void ensureConnectionNotClosed() throws SQLException {}
 }

@@ -17,6 +17,7 @@
 
 package org.constellation.admin.dao;
 
+import org.constellation.admin.EmbeddedDatabase;
 import org.geotoolkit.style.MutableStyle;
 
 import java.io.IOException;
@@ -32,14 +33,14 @@ import java.util.Locale;
  * @version 0.9
  * @since 0.9
  */
-public final class StyleRecord implements Record {
+public final class StyleRecord extends Record {
 
     public static enum StyleType {
         VECTOR,
         COVERAGE
     }
 
-    private final Session session;
+    private Session session;
 
     final int id;
     private String name;
@@ -73,21 +74,33 @@ public final class StyleRecord implements Record {
                 rs.getString(8));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void ensureConnectionNotClosed() throws SQLException {
+        if (session.isClosed()) {
+            session = EmbeddedDatabase.createSession();
+        }
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(final String name) throws SQLException {
         this.name = name;
+        ensureConnectionNotClosed();
         session.updateStyle(id, name, provider, type, owner);
     }
 
     public ProviderRecord getProvider() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readProvider(provider);
     }
 
     public void setProvider(final ProviderRecord provider) throws SQLException {
         this.provider = provider.id;
+        ensureConnectionNotClosed();
         session.updateStyle(id, name, provider.id, type, owner);
     }
 
@@ -97,6 +110,7 @@ public final class StyleRecord implements Record {
 
     public void setType(final StyleType type) throws SQLException {
         this.type = type;
+        ensureConnectionNotClosed();
         session.updateStyle(id, name, provider, type, owner);
     }
 
@@ -105,26 +119,32 @@ public final class StyleRecord implements Record {
     }
 
     public String getTitle(final Locale locale) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readI18n(title, locale);
     }
 
     public void setTitle(final Locale locale, final String value) throws SQLException {
+        ensureConnectionNotClosed();
         session.updateI18n(title, locale, value);
     }
 
     public String getDescription(final Locale locale) throws SQLException {
+        ensureConnectionNotClosed();
         return session.readI18n(description, locale);
     }
 
     public void setDescription(final Locale locale, final String value) throws SQLException {
+        ensureConnectionNotClosed();
         session.updateI18n(description, locale, value);
     }
 
     public InputStream getBody() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readStyleBody(id);
     }
 
     public void setBody(final MutableStyle style) throws SQLException, IOException {
+        ensureConnectionNotClosed();
         session.updateStyleBody(id, style);
     }
 
@@ -133,19 +153,23 @@ public final class StyleRecord implements Record {
     }
 
     public UserRecord getOwner() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readUser(owner);
     }
 
     public void setOwner(final UserRecord owner) throws SQLException {
         this.owner = owner.getLogin();
+        ensureConnectionNotClosed();
         session.updateStyle(id, name, provider, type, owner.getLogin());
     }
 
     public List<DataRecord> getLinkedData() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readData(this);
     }
 
     public void linkToData(final DataRecord data) throws SQLException {
+        ensureConnectionNotClosed();
         session.writeStyledData(this, data);
     }
 

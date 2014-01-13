@@ -17,6 +17,7 @@
 
 package org.constellation.admin.dao;
 
+import org.constellation.admin.EmbeddedDatabase;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -33,14 +34,14 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * @version 0.9
  * @since 0.9
  */
-public final class ProviderRecord implements Record {
+public final class ProviderRecord extends Record {
 
     public static enum ProviderType {
         LAYER,
         STYLE
     }
 
-    private final Session session;
+    private Session session;
 
     final int id;
     private String identifier;
@@ -66,12 +67,22 @@ public final class ProviderRecord implements Record {
                 rs.getString(5));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void ensureConnectionNotClosed() throws SQLException {
+        if (session.isClosed()) {
+            session = EmbeddedDatabase.createSession();
+        }
+    }
+
     public String getIdentifier() {
         return identifier;
     }
 
     public void setIdentifier(final String identifier) throws SQLException {
         this.identifier = identifier;
+        ensureConnectionNotClosed();
         session.updateProvider(id, identifier, type, impl, owner);
     }
 
@@ -81,6 +92,7 @@ public final class ProviderRecord implements Record {
 
     public void setType(final ProviderType type) throws SQLException {
         this.type = type;
+        ensureConnectionNotClosed();
         session.updateProvider(id, identifier, type, impl, owner);
     }
 
@@ -90,14 +102,17 @@ public final class ProviderRecord implements Record {
 
     public void setImpl(final String impl) throws SQLException {
         this.impl = impl;
+        ensureConnectionNotClosed();
         session.updateProvider(id, identifier, type, impl, owner);
     }
 
     public GeneralParameterValue getConfig(final GeneralParameterDescriptor descriptor) throws SQLException, IOException {
+        ensureConnectionNotClosed();
         return session.readProviderConfig(id, descriptor);
     }
 
     public void setConfig(final ParameterValueGroup config) throws SQLException, IOException {
+        ensureConnectionNotClosed();
         session.updateProviderConfig(id, config);
     }
 
@@ -106,31 +121,38 @@ public final class ProviderRecord implements Record {
     }
 
     public UserRecord getOwner() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readUser(owner);
     }
 
     public void setOwner(final UserRecord owner) throws SQLException {
         this.owner = owner.getLogin();
+        ensureConnectionNotClosed();
         session.updateProvider(id, identifier, type, impl, owner.getLogin());
     }
 
     public InputStream getMetadata() throws IOException, SQLException {
+        ensureConnectionNotClosed();
         return session.readProviderMetadata(id);
     }
 
     public boolean hasMetadata() throws IOException, SQLException {
+        ensureConnectionNotClosed();
         return session.hasProviderMetadata(id);
     }
 
     public void setMetadata(final StringReader metadata) throws IOException, SQLException {
+        ensureConnectionNotClosed();
         session.updateProviderMetadata(id, metadata);
     }
 
     public List<StyleRecord> getStyles() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readStyles(this);
     }
 
     public List<DataRecord> getData() throws SQLException {
+        ensureConnectionNotClosed();
         return session.readData(this);
     }
 

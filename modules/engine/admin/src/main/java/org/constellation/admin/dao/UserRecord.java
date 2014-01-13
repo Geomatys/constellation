@@ -18,6 +18,7 @@
 package org.constellation.admin.dao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.constellation.admin.EmbeddedDatabase;
 import org.geotoolkit.util.StringUtilities;
 import org.mdweb.model.auth.MDwebRole;
 
@@ -32,9 +33,9 @@ import java.util.List;
  * @version 0.9
  * @since 0.9
  */
-public final class UserRecord implements Record {
+public final class UserRecord extends Record {
 
-    private final Session session;
+    private Session session;
 
     private final String login;
     private String password;
@@ -63,6 +64,15 @@ public final class UserRecord implements Record {
                 Arrays.asList(StringUtils.split(rs.getString(4), ',')));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void ensureConnectionNotClosed() throws SQLException {
+        if (session.isClosed()) {
+            session = EmbeddedDatabase.createSession();
+        }
+    }
+
     public String getLogin() {
         return login;
     }
@@ -73,6 +83,7 @@ public final class UserRecord implements Record {
 
     public void setPassword(final String password) throws SQLException {
         this.password = StringUtilities.MD5encode(password);
+        ensureConnectionNotClosed();
         session.updateUser(login, this.password, name, roles);
     }
 
@@ -82,6 +93,7 @@ public final class UserRecord implements Record {
 
     public void setName(final String name) throws SQLException {
         this.name = name;
+        ensureConnectionNotClosed();
         session.updateUser(login, password, name, roles);
     }
 
@@ -91,6 +103,7 @@ public final class UserRecord implements Record {
 
     public void setRoles(final List<String> roles) throws SQLException {
         this.roles = roles;
+        ensureConnectionNotClosed();
         session.updateUser(login, password, name, roles);
     }
 
