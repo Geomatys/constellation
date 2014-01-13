@@ -112,8 +112,8 @@ public class MapConfigurer extends OGCConfigurer {
                 styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-raster");
             }
         } catch (CstlServiceException ex) {
-            LOGGER.log(Level.INFO, "Error when trying to find an appropriate default style. Fallback to an hybrid style.");
-            styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-hybrid");
+            LOGGER.log(Level.INFO, "Error when trying to find an appropriate default style. Fallback to a raster style.");
+            styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-raster");
         }
 
         // Declare the style as "applicable" for the layer data.

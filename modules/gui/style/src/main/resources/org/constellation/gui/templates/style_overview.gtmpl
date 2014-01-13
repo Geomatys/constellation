@@ -31,10 +31,6 @@
                 layerRequestedName = 'CNTR_RG_60M_2006';
                 layerProviderName = 'generic_shp';
             }
-            if ('${styleName}' == 'default-hybrid') {
-                layerRequestedName = 'CNTR_LB_2006';
-                layerProviderName = 'generic_shp';
-            }
             if ('${styleName}' == 'default-raster') {
                 layerRequestedName = 'cloudsgrey';
                 layerProviderName = 'generic_world_tif';

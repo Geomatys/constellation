@@ -180,12 +180,6 @@ public class MapSetup implements SetupService {
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-raster");
                 StyleProviderConfig.createStyle("sld", style);
             }
-            if (provider.get("default-hybrid") == null) {
-                final MutableStyle style = sf.style(new Symbolizer[]{DEFAULT_POINT_SYMBOLIZER, DEFAULT_RASTER_SYMBOLIZER});
-                style.setName("default-hybrid");
-                style.featureTypeStyles().get(0).rules().get(0).setName("default-hybrid");
-                StyleProviderConfig.createStyle("sld", style);
-            }
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, "An error occurred when creating default styles for default SLD provider.", ex);
         }
