@@ -105,7 +105,6 @@ public class MapController {
      *
      * @param serviceId   the service identifier
      * @param serviceType the service type
-     * @param selected    the selected layer name (optional)
      * @return the view {@link juzu.Response}
      * @throws IOException on communication error with Constellation server
      */
@@ -117,7 +116,11 @@ public class MapController {
         final LayerList layerList = mapManager.getLayers(serviceId, Specification.fromShortName(serviceType));
 
         // Build service capabilities URL.
-        String capabilitiesUrl = cstl.getUrl() + "WS/" + serviceType + "/" + serviceId + "?REQUEST=GetCapabilities&SERVICE=" + serviceType;
+        String capabilitiesUrl = cstl.getUrl().toString();
+        if (!capabilitiesUrl.endsWith("/")) {
+            capabilitiesUrl += "/";
+        }
+        capabilitiesUrl += "WS/" + serviceType + "/" + serviceId + "?REQUEST=GetCapabilities&SERVICE=" + serviceType;
         if (metadata.getVersions()!=null && metadata.getVersions().size() == 1) {
             capabilitiesUrl += "&VERSION=" + metadata.getVersions().get(0);
         }
