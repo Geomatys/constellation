@@ -16,12 +16,12 @@
  */
 package org.constellation.metadata.io.filesystem;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,21 +128,24 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
     @Override
     public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
-        final MetadataType metadataMode;
-        try {
-            metadataMode = getMetadataType(new FileInputStream(metadataFile));
-        } catch (IOException | XMLStreamException ex) {
-            throw new MetadataIoException(ex);
+        if (metadataFile != null) {
+            final MetadataType metadataMode;
+            try {
+                metadataMode = getMetadataType(new BufferedInputStream(new FileInputStream(metadataFile)));
+            } catch (IOException | XMLStreamException ex) {
+                throw new MetadataIoException(ex);
+            }
+            final Node metadataNode = getNodeFromFile(metadataFile);
+
+            if (metadataMode ==  MetadataType.ISO_19115 && mode == MetadataType.DUBLINCORE) {
+                return translateISOtoDCNode(metadataNode, type, elementName);
+            } else if (mode == MetadataType.DUBLINCORE && metadataMode == MetadataType.DUBLINCORE) {
+                return  applyElementSetNode(metadataNode, type, elementName);
+            } else {
+               return metadataNode;
+            }
         }
-        final Node metadataNode = getNodeFromFile(metadataFile);
-            
-        if (metadataMode ==  MetadataType.ISO_19115 && mode == MetadataType.DUBLINCORE) {
-            return translateISOtoDCNode(metadataNode, type, elementName);
-        } else if (mode == MetadataType.DUBLINCORE && metadataMode == MetadataType.DUBLINCORE) {
-            return  applyElementSetNode(metadataNode, type, elementName);
-        } else {
-           return metadataNode;
-        }
+        return null;
     }
 
     @Override
@@ -379,45 +382,16 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
             }
 
             if (!paths.isEmpty()) {
-                final List<String> values         = getAllValuesFromPaths(paths, dataDirectory);
+                final List<String> values         = getAllValuesFromPaths(paths);
                 final ListOfValuesType listValues = new ListOfValuesType(values);
                 final DomainValuesType value      = new DomainValuesType(null, token, listValues, METADATA_QNAME);
                 responseList.add(value);
-
             } else {
                 throw new MetadataIoException("The property " + token + " is not queryable for now",
                         INVALID_PARAMETER_VALUE, "propertyName");
             }
-            
         }
         return responseList;
-    }
-
-    /**
-     * Return all the String values corresponding to the specified list of path through the metadata.
-     * 
-     * @param paths
-     * @return
-     * @throws MetadataIoException
-     */
-    private List<String> getAllValuesFromPaths(final List<String> paths, final File directory) throws MetadataIoException {
-        final List<String> result = new ArrayList<>();
-        for (File metadataFile : directory.listFiles()) {
-            if (!metadataFile.isDirectory()) {
-                
-                final Node metadata = getNodeFromFile(metadataFile);
-                final List<Object> value = NodeUtilities.extractValues(metadata, paths);
-                if (value != null && !value.equals(Arrays.asList("null"))) {
-                    for (Object obj : value){
-                        result.add(obj.toString());
-                    }
-                }
-            } else {
-                result.addAll(getAllValuesFromPaths(paths, metadataFile));
-            }
-        }
-        Collections.sort(result);
-        return result;
     }
 
     /**

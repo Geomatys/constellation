@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -225,4 +227,29 @@ public abstract class DomMetadataReader extends AbstractMetadataReader {
         }
     }
 
+    /**
+     * Return all the String values corresponding to the specified list of path through the metadata.
+     *
+     * @param paths
+     * @return
+     * @throws MetadataIoException
+     */
+    protected List<String> getAllValuesFromPaths(final List<String> paths) throws MetadataIoException {
+        final List<String> result = new ArrayList<>();
+        final List<String> ids    = getAllIdentifiers();
+        for (String metadataID : ids) {
+            final Node metadata = getMetadata(metadataID, MetadataType.ISO_19115);
+            final List<Object> value = NodeUtilities.extractValues(metadata, paths);
+            if (value != null && !value.equals(Arrays.asList("null"))) {
+                for (Object obj : value){
+                    result.add(obj.toString());
+                }
+            }
+        }
+        Collections.sort(result);
+        return result;
+    }
+
+    @Override
+     public abstract List<Node> getAllEntries() throws MetadataIoException;
 }

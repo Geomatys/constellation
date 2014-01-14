@@ -147,8 +147,10 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
 
     /**
      * Build a new catalogue harvester with the write part.
+     * 
+     * @param metadataWriter a writer to the metadata datasource.
      */
-    public DefaultCatalogueHarvester(MetadataWriter metadataWriter) {
+    public DefaultCatalogueHarvester(final MetadataWriter metadataWriter) {
        super(metadataWriter);
         initializeRequest();
     }

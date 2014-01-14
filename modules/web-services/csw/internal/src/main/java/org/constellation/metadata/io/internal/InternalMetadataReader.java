@@ -376,28 +376,6 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
     }
 
     /**
-     * Return all the String values corresponding to the specified list of path through the metadata.
-     * 
-     * @param paths
-     * @return
-     * @throws MetadataIoException
-     */
-    private List<String> getAllValuesFromPaths(final List<String> paths) throws MetadataIoException {
-        final List<String> result = new ArrayList<>();
-        final List<Node> nodes = getAllEntries();
-        for (Node metadata : nodes) {
-            final List<Object> value = NodeUtilities.extractValues(metadata, paths);
-            if (value != null && !value.equals(Arrays.asList("null"))) {
-                for (Object obj : value){
-                    result.add(obj.toString());
-                }
-            }
-        }
-        Collections.sort(result);
-        return result;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
