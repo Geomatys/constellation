@@ -63,11 +63,14 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
     protected static MarshallerPool pool;
 
+    public static void initServer(final String[] resourcePackages, final Map<String, Object> soapServices) {
+        initServer(resourcePackages, soapServices, null);
+    }
     /**
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
      * and defines a PostGrid data provider.
      */
-    public static void initServer(final String[] resourcePackages, final Map<String, Object> soapServices) {
+    public static void initServer(final String[] resourcePackages, final Map<String, Object> soapServices, final String uriSuffix) {
         // Protective test in order not to launch a new instance of the grizzly server for
         // each sub classes.
         if (grizzly != null) {
@@ -78,7 +81,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
          * The implementation waits for the data provider to be defined for
          * starting the server.
          */
-        grizzly = new GrizzlyThread(resourcePackages, soapServices);
+        grizzly = new GrizzlyThread(resourcePackages, soapServices, uriSuffix);
 
         // Starting the grizzly server
         grizzly.start();
@@ -105,10 +108,16 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         while (ex) {
             Thread.sleep(1 * 1000);
             final URL u;
-            if (grizzly != null && grizzly.getCurrentPort() != null) {
-                u = new URL("http://localhost:" + grizzly.getCurrentPort()  + "/configuration?request=access");
+            final String suffix;
+            if (grizzly.getUriSuffix() != null) {
+                suffix = "/" + grizzly.getUriSuffix();
             } else {
-                u = new URL("http://localhost:9090/configuration?request=access");
+                suffix = "";
+            }
+            if (grizzly != null && grizzly.getCurrentPort() != null) {
+                u = new URL("http://localhost:" + grizzly.getCurrentPort() + suffix + "/configuration?request=access");
+            } else {
+                u = new URL("http://localhost:9090"+ suffix +"/configuration?request=access");
             }
             ex = false;
             URLConnection conec = u.openConnection();
@@ -117,7 +126,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             } catch (IOException e) {
                 ex = true;
             }
-            if (cpt == 30) {
+            if (cpt == 40) {
                 throw new Exception("The grizzly server never start");
             }
             cpt++;
@@ -133,16 +142,23 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         private final Map<String, Object> soapServices;
 
         public GrizzlyThread(final String[] resourcePackages, final Map<String, Object> soapServices) {
+            this(resourcePackages, soapServices, null);
+        }
+        public GrizzlyThread(final String[] resourcePackages, final Map<String, Object> soapServices, final String uriSuffix) {
             this.soapServices = soapServices;
             if (resourcePackages != null) {
-                cstlServer = new CstlEmbeddedService(new String[]{}, resourcePackages);
+                cstlServer = new CstlEmbeddedService(new String[]{}, resourcePackages, uriSuffix);
             } else {
-                cstlServer = new CstlEmbeddedService(new String[]{});
+                cstlServer = new CstlEmbeddedService(new String[]{}, uriSuffix);
             }
         }
 
         public Integer getCurrentPort() {
             return cstlServer.currentPort;
+        }
+
+        public String getUriSuffix() {
+            return cstlServer.uriSuffix;
         }
 
         /**
@@ -293,7 +309,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
     protected static void postRequestObject(URLConnection conec, Object request) throws IOException, JAXBException {
         conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
+        conec.setRequestProperty("Content-Type", "application/xml");
         final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
         final StringWriter sw = new StringWriter();
         Marshaller marshaller = pool.acquireMarshaller();

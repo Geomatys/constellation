@@ -120,6 +120,7 @@ public class CstlEmbeddedService extends CommandLine {
     public boolean ready = false;
     
     private URI uri;
+    public String uriSuffix;
     final URI uriSoap;
     final DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     /* ***********************************************************************
@@ -154,6 +155,10 @@ public class CstlEmbeddedService extends CommandLine {
     /* ***********************************************************************
      *   CONCRETE CLASSES MUST HAVE: (see above)
      * ********************************************************************** */
+
+    public CstlEmbeddedService(final String[] args) {
+        this(args, (String)null);
+    }
     /**
      * Constructor which passes the arguments for processing to the
      * CommandLine parent and sets the URI.
@@ -161,8 +166,9 @@ public class CstlEmbeddedService extends CommandLine {
      * <p>
      * Extending classes using the REST facade should
      */
-    public CstlEmbeddedService(final String[] args) {
+    public CstlEmbeddedService(final String[] args, String uriSuffix) {
         this(args, new String[] {
+            "org.constellation.rest.api",
             "org.constellation.map.ws.rs",
             "org.constellation.coverage.ws.rs",
             "org.constellation.wfs.ws.rs",
@@ -173,7 +179,7 @@ public class CstlEmbeddedService extends CommandLine {
             "org.constellation.metadata.ws.rs",
             "org.constellation.metadata.ws.rs.provider",
             "org.constellation.ws.rs.provider"
-        });
+        }, uriSuffix);
     }
 
     public CstlEmbeddedService(final int port, final String[] args, final String[] providerPackages) {
@@ -183,6 +189,9 @@ public class CstlEmbeddedService extends CommandLine {
         this.uri =  UriBuilder.fromUri(base).port(port).build();
     }
 
+    public CstlEmbeddedService(final String[] args, final String[] providerPackages) {
+        this(args, providerPackages, null);
+    }
     /**
      * Constructor which passes the arguments for processing to the
      * CommandLine parent and sets the URI.
@@ -191,8 +200,9 @@ public class CstlEmbeddedService extends CommandLine {
      *
      * @param args The command line arguments.
      * @param providerPackages The packages for providers to start.
+     * @param uriSuffix
      */
-    public CstlEmbeddedService(final String[] args, final String[] providerPackages) {
+    public CstlEmbeddedService(final String[] args, final String[] providerPackages, final String uriSuffix) {
         super(null, args);
 
         final StringBuilder sb = new StringBuilder();
@@ -206,7 +216,14 @@ public class CstlEmbeddedService extends CommandLine {
         }
         grizzlyWebContainerProperties.put(ServerProperties.PROVIDER_PACKAGES, sb.toString());
 
-        final String base = "http://" + host + "/";
+        this.uriSuffix = uriSuffix;
+        
+        final String base;
+        if (uriSuffix == null) {
+            base = "http://" + host + "/";
+        } else {
+            base = "http://" + host + "/" + uriSuffix + "/";
+        }
         uri = UriBuilder.fromUri(base).port(port).build();
         uriSoap = UriBuilder.fromUri(base).port(portsoap).build();
 

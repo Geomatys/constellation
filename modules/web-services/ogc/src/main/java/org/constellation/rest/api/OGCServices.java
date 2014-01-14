@@ -17,6 +17,7 @@
 
 package org.constellation.rest.api;
 
+import java.io.InputStream;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.InstanceReport;
@@ -36,6 +37,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.Unmarshaller;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import static org.constellation.utils.RESTfulUtilities.created;
 import static org.constellation.utils.RESTfulUtilities.ok;
@@ -144,7 +147,10 @@ public final class OGCServices {
      */
     @POST
     @Path("{id}/config")
-    public Response setConfiguration(final @PathParam("spec") String spec, final @PathParam("id") String id, final Object config) throws Exception {
+    public Response setConfiguration(final @PathParam("spec") String spec, final @PathParam("id") String id, final InputStream is) throws Exception {
+        final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+        final Object config = um.unmarshal(is);
+        GenericDatabaseMarshallerPool.getInstance().recycle(um);
         getConfigurer(spec).setInstanceConfiguration(id, config);
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" configuration successfully updated."));
     }
