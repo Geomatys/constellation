@@ -326,6 +326,12 @@ public class Controller {
     public Response getAvailableData(List<String> dataTypes, final String start, final String count, final String orderBy,
                                      final String direction, final String filter) {
 
+        for (int i = 0; i < dataTypes.size(); i++) {
+            String current = dataTypes.get(i);
+            if(current.equalsIgnoreCase("coverage")){
+                dataTypes.set(i, "raster");
+            }
+        }
         final List<LayerData> list = providerManager.getDataListing(dataTypes);
 
         // Search layers by name.

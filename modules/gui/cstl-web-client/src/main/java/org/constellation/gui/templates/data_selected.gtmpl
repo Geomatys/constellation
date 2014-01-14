@@ -7,7 +7,7 @@
     <p>&{msg.no.selected.data}</p>
 </div>
 <% if (selected != null) { %>
-<div class="selected-item" id="selected-item" data-name="${selected.name}" data-provider="${selected.provider}" data-namespace="${selected.namespace}">
+<div class="selected-item" id="selected-item" data-name="${selected.name}" data-provider="${selected.provider}" data-namespace="${selected.namespace}" data-type="${selected.type}">
     <div class="block-header">
         <strong>${selected.name}</strong><i class="icon-chevron-up pull-right"></i>
     </div>

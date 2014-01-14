@@ -706,8 +706,9 @@
       <artifactId>commons-collections</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.ettrema</groupId>

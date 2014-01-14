@@ -17,7 +17,7 @@
 
 package org.constellation.gui.service;
 import org.constellation.dto.DataDescription;
-import org.constellation.dto.StyleListBean;
+import org.constellation.dto.StyleListBrief;
 import org.constellation.gui.binding.Style;
 import org.geotoolkit.style.MutableStyle;
 
@@ -118,8 +118,9 @@ public final class StyleService {
     /**
      *
      * @return
+     * @param category
      */
-    public StyleListBean getStyleList() throws IOException {
-        return cstl.openClient().providers.getStyles();
+    public StyleListBrief getStyleList(final String category) throws IOException {
+        return cstl.openClient().providers.getStyles(category);
     }
 }

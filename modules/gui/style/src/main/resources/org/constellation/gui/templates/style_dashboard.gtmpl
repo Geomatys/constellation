@@ -22,10 +22,10 @@
             <ul class="nav nav-list">
                 <li class="nav-header">&{label.categories}</li>
                 <li class="divider"></li>
-                <li class="<%if(category == null){%>active<%}%>"><a href="@{StyleController.dashboard()}">&{label.all_fem}</a></li>
+                <li class="<%if("all".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='all')}">&{label.all_fem}</a></li>
                 <li class="divider"></li>
                 <li class="<%if("vector".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='vector')}">&{label.vector}</a></li>
-                <li class="<%if("raster".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='raster')}">&{label.raster}</a></li>
+                <li class="<%if("coverage".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='coverage')}">&{label.raster}</a></li>
                 <li class="<%if("sensor".equalsIgnoreCase(category)){%>active<%}%>"><a href="@{StyleController.dashboard(category='sensor')}">&{label.sensor}</a></li>
             </ul>
         </div>

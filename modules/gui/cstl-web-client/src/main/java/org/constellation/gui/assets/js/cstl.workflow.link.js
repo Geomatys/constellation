@@ -53,7 +53,7 @@ CSTL.LinkWorkflow = {
 
     selectedName:     null,
     selectedProvider: null,
-    selectedNamepsace: null,
+    selectedNamespace: null,
     linkedList:      null,
 
 
@@ -78,7 +78,7 @@ CSTL.LinkWorkflow = {
     setSelected: function(selectedName, selectedProvider, selectedNamespace) {
         this.selectedName     = selectedName;
         this.selectedProvider = selectedProvider;
-        this.selectedNamepsace = selectedNamespace;
+        this.selectedNamespace = selectedNamespace;
         this.$linkedList   = $('#linkedList');
     },
 
@@ -132,8 +132,12 @@ CSTL.LinkWorkflow = {
             return;
         }
 
+        var namespace = this.selectedNamespace;
+        if(this.selectedNamespace===undefined){
+            namespace=this.$selected.data('namespace');
+        }
         // Apply association.
-        validateFunc(this.$selected.data('provider'), this.$selected.data('name'), this.selectedProvider, this.selectedName, this.selectedNamepsace).
+        validateFunc(this.$selected.data('provider'), this.$selected.data('name'), this.selectedProvider, this.selectedName, namespace).
             // Update linked list.
             success($.proxy(function(){
                 if (this.$linkedList.children().length === 0) {

@@ -18,6 +18,7 @@
 package org.constellation.gui.util;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.StyleBean;
 
 import java.util.Comparator;
@@ -29,7 +30,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @version 0.9
  * @since 0.9
  */
-public class StyleBeanComparator implements Comparator<StyleBean> {
+public class StyleBeanComparator implements Comparator<StyleBrief> {
 
     private final Criteria criteria;
     private final Mode mode;
@@ -84,7 +85,7 @@ public class StyleBeanComparator implements Comparator<StyleBean> {
     }
 
     @Override
-    public int compare(final StyleBean l1, final StyleBean l2) {
+    public int compare(final StyleBrief l1, final StyleBrief l2) {
         final int result;
         switch (criteria) {
             case NAME:
@@ -104,21 +105,19 @@ public class StyleBeanComparator implements Comparator<StyleBean> {
         return Mode.ASCENDING.equals(mode) ? -result : result;
     }
 
-    private int compareName(final StyleBean s1, final StyleBean s2) {
+    private int compareName(final StyleBrief s1, final StyleBrief s2) {
         return ObjectUtils.compare(s1.getName(), s2.getName());
     }
 
-    private int compareDate(final StyleBean s1, final StyleBean s2) {
+    private int compareDate(final StyleBrief s1, final StyleBrief s2) {
         return -ObjectUtils.compare(s1.getDate(), s2.getDate(), true);
     }
 
-    private int compareOwner(final StyleBean s1, final StyleBean s2) {
-        // TODO: implement owner sort
-        return 0;
+    private int compareOwner(final StyleBrief s1, final StyleBrief s2) {
+        return s1.getOwner().compareTo(s2.getOwner());
     }
 
-    private int compareDataType(final StyleBean s1, final StyleBean s2) {
-        // TODO: implement owner sort
-        return 0;
+    private int compareDataType(final StyleBrief s1, final StyleBrief s2) {
+        return s1.getType().compareTo(s2.getType());
     }
 }

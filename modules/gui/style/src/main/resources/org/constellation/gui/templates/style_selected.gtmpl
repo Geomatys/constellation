@@ -4,7 +4,7 @@
     <p>&{msg.no.selected.style}</p>
 </div>
 <%if(selected != null){%>
-    <div class="selected-item" data-name="${selected.brief.name}" data-provider="${selected.brief.provider}">
+    <div class="selected-item" id="selected-item" data-name="${selected.brief.name}" data-provider="${selected.brief.provider}" data-type="${selected.brief.type}">
         <div class="block-header">
             <strong>${selected.brief.name}</strong><i class="icon-chevron-up pull-right"></i>
         </div>
@@ -34,7 +34,7 @@
                 <%} else {%>
                     <%for (def data : selected.targetData) {%>
                         <div class="data" data-name="${data.name}" data-provider="${data.provider}">
-                            <button type="button" onclick="dataFlow.unlink('${data.name}','${data.provider}', '${data.namespace}', styleUnlink);" class="btn btn-small"><i class="icon-minus"></i></button>
+                            <button type="button" onclick="dataFlow.unlink('${data.name}','${data.provider}', styleUnlink, '${data.namespace}');" class="btn btn-small"><i class="icon-minus"></i></button>
                             ${data.name}
                         </div>
                     <%}%>

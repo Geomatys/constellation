@@ -26,7 +26,7 @@ import org.constellation.dto.FileListBean;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
-import org.constellation.dto.StyleListBean;
+import org.constellation.dto.StyleListBrief;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -72,9 +72,12 @@ public final class ProvidersAPI {
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException           on HTTP communication error or response entity parsing error
      */
-    public StyleListBean getStyles() throws HttpResponseException, IOException {
-        final String path = "SP/all/style/available";
-        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
+    public StyleListBrief getStyles(final String category) throws HttpResponseException, IOException {
+        String path = "SP/all/style/available";
+        if(category != null && !category.isEmpty()){
+            path += "/"+category;
+        }
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBrief.class);
     }
 
     /**
@@ -85,11 +88,13 @@ public final class ProvidersAPI {
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException           on HTTP communication error or response entity parsing error
      */
-    public StyleListBean getStyles(final String providerId) throws HttpResponseException, IOException {
+    public StyleListBrief getStyles(final String providerId, final String category) throws HttpResponseException, IOException {
         ensureNonNull("providerId", providerId);
-
-        final String path = "SP/" + providerId + "/style/available";
-        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBean.class);
+        String path = "SP/" + providerId + "/style/available";
+        if(category != null && !category.isEmpty()){
+            path += "/"+category;
+        }
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(StyleListBrief.class);
     }
 
     /**

@@ -42,7 +42,7 @@
 <%} else {%>
     <div class="item-list">
         <% for (def style : styles){%>
-            <div class="item style" data-name="${style.name}" data-provider="${style.providerId}">
+            <div class="item style" data-name="${style.name}" data-provider="${style.provider}">
                 <div class="top">
                     <span class="item-title">${style.name}</span>
                 </div>
@@ -51,10 +51,10 @@
                         <i class="icon-calendar"></i>${style.date}
                     </div>
                     <div class="block">
-                        <i class="icon-user"></i>Admin
+                        <i class="icon-user"></i>${style.owner}
                     </div>
                     <div class="block">
-                        <i class="icon-folder-close-alt"></i>Vector
+                        <i class="icon-folder-close-alt"></i>${style.type}
                     </div>
                 </div>
             </div>

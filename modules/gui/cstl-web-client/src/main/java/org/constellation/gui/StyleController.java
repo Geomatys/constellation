@@ -27,12 +27,13 @@ import juzu.View;
 import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.StyleBean;
-import org.constellation.dto.StyleListBean;
+import org.constellation.dto.StyleListBrief;
 import org.constellation.gui.binding.ColorMap;
 import org.constellation.gui.binding.Interpolate;
 import org.constellation.gui.binding.InterpolationPoint;
@@ -105,12 +106,15 @@ public final class StyleController {
      */
     @View
     @Route("style/dashboard")
-    public Response dashboard(final String category) throws IOException {
-        final StyleListBean listBean = service.getStyleList();
+    public Response dashboard(String category) throws IOException {
+        category = (category==null)?"all":category;
+        category = (category.equalsIgnoreCase("raster"))?"coverage":category;
+
+        final StyleListBrief listBean = service.getStyleList(category);
         final int nbResults = listBean.getStyles().size();
 
         // Truncate the list.
-        final List<StyleBean> styles;
+        final List<StyleBrief> styles;
         if (!listBean.getStyles().isEmpty()) {
             final int endIndex = Math.min(listBean.getStyles().size(), 10);
             styles = listBean.getStyles().subList(0, endIndex);
@@ -282,13 +286,13 @@ public final class StyleController {
     @Ajax
     @Resource
     @Route("style/filter")
-    public Response styleList(final String start, final String count, final String filter, final String orderBy, final String direction) throws IOException {
-        final StyleListBean listBean = service.getStyleList();
+    public Response styleList(final String start, final String count, final String filter, final String orderBy, final String direction, final String dataTypes) throws IOException {
+        final StyleListBrief listBean = service.getStyleList(dataTypes);
 
         // Search style by name.
         if (!isBlank(filter)) {
-            final List<StyleBean> toRemove = new ArrayList<>();
-            for (final StyleBean bean : listBean.getStyles()) {
+            final List<StyleBrief> toRemove = new ArrayList<>();
+            for (final StyleBrief bean : listBean.getStyles()) {
                 if (!containsIgnoreCase(bean.getName(), filter)) {
                     toRemove.add(bean);
                 }
@@ -303,7 +307,7 @@ public final class StyleController {
         }
 
         // Truncate the list.
-        final List<StyleBean> styles;
+        final List<StyleBrief> styles;
         final int intStart = Integer.parseInt(start);
         final int intCount = Integer.parseInt(count);
         if (!listBean.getStyles().isEmpty() && intStart < listBean.getStyles().size()) {
@@ -336,8 +340,9 @@ public final class StyleController {
     @Ajax
     @Resource
     @Route("style/unlinkData")
-    public Response unlinkStyleFromData(final String styleProvider, final String styleName, final String dataProvider, final String dataName, final String namespace) {
+    public Response unlinkStyleFromData(final String styleProvider, final String styleName, final String dataProvider, final String dataName, String namespace) {
         try {
+            namespace = (namespace!=null &&namespace.equalsIgnoreCase("null"))? "":namespace;
             cstl.openClient().providers.unlinkStyleFromData(styleProvider, styleName, dataProvider, dataName, namespace);
             return Response.ok();
         } catch (IOException ex) {

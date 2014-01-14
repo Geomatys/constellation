@@ -28,7 +28,7 @@ import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.dto.Service;
-import org.constellation.dto.StyleListBean;
+import org.constellation.dto.StyleListBrief;
 
 /**
  * Juzu service to call constellation services server side
@@ -196,9 +196,9 @@ public class  ServicesManager {
         instanceSum.setLogsURL(logsURL);
     }
 
-    public StyleListBean getStyleList() {
+    public StyleListBrief getStyleList() {
         try {
-            return cstl.openClient().providers.getStyles();
+            return cstl.openClient().providers.getStyles("");
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error on message receive", e);
         }

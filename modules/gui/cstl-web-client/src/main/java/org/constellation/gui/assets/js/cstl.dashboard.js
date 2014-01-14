@@ -165,13 +165,23 @@ Dashboard.prototype.loadItems = function() {
         sortDirection = $active.hasClass('ascending') ? 'ascending' : 'descending'
     }
 
+    var type = $("#selected-item").data("type");
+
+    var dataTypes;
+    if(type!=undefined){
+        dataTypes = [type.toLowerCase()];
+    }else{
+        dataTypes = ["raster", "vector"];
+    }
+
     // Prepare parameters.
     var parameters = {
         filter:    this.$filterInput.val(),
         orderBy:   sortCriteria,
         direction: sortDirection,
         count:     this.nbItems,
-        start:     this.startIndex
+        start:     this.startIndex,
+        dataTypes: dataTypes
     };
     for (var key in this.params) {
         if (typeof this.params[key] === 'function') {

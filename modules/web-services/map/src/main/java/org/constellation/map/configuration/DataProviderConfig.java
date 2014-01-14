@@ -42,6 +42,7 @@ public class DataProviderConfig extends Static {
     public static DataBrief getBriefFromRecord(final DataRecord record, final Locale locale) throws SQLException {
         final DataBrief brief = new DataBrief();
         brief.setName(record.getName());
+        brief.setNamespace(record.getNamespace());
         brief.setProvider(record.getProvider().getIdentifier());
         brief.setTitle(record.getTitle(locale));
         brief.setDate(record.getDate());

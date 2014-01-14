@@ -1,5 +1,7 @@
 package org.constellation.dto;
 
+import org.constellation.configuration.StyleBrief;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,23 +11,23 @@ import java.util.List;
  * @author Fabien Bernard (Geomatys)
  */
 @XmlRootElement
-public class StyleListBean {
+public class StyleListBrief {
 
-    private List<StyleBean> styles;
+    private List<StyleBrief> styles;
 
-    public StyleListBean() {
+    public StyleListBrief() {
         this.styles = new ArrayList<>();
     }
 
-    public StyleListBean(final List<StyleBean> styles) {
+    public StyleListBrief(final List<StyleBrief> styles) {
         this.styles = styles;
     }
 
-    public List<StyleBean> getStyles() {
+    public List<StyleBrief> getStyles() {
         return styles;
     }
 
-    public void setStyles(final List<StyleBean> styles) {
+    public void setStyles(final List<StyleBrief> styles) {
         this.styles = styles;
     }
 }

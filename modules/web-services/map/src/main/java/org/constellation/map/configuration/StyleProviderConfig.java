@@ -19,8 +19,10 @@ package org.constellation.map.configuration;
 
 import org.apache.sis.util.Static;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.StyleRecord;
+import org.constellation.admin.dao.StyleRecord.StyleType;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
@@ -48,18 +50,15 @@ import org.opengis.style.Symbolizer;
 import org.opengis.style.TextSymbolizer;
 import org.opengis.util.NoSuchIdentifierException;
 
-import java.io.File;
+import javax.xml.namespace.QName;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.constellation.admin.ConfigurationEngine;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -137,14 +136,14 @@ public final class StyleProviderConfig extends Static {
      *
      * @return a {@link List} of {@link StyleBean} instances
      */
-    public static List<StyleBean> getAvailableStyles() {
-        final List<StyleBean> beans = new ArrayList<>();
+    public static List<StyleBrief> getAvailableStyles(final String category) {
+        final List<StyleBrief> beans = new ArrayList<>();
         for (final StyleProvider provider : StyleProviderProxy.getInstance().getProviders()) {
             if ("GO2".equals(provider.getId())) {
                 continue; // skip "GO2" provider
             }
             try {
-                beans.addAll(getAvailableStyles(provider.getId()));
+                beans.addAll(getAvailableStyles(provider.getId(), category));
             } catch (TargetNotFoundException ignore) { // couldn't happen
             }
         }
@@ -158,22 +157,22 @@ public final class StyleProviderConfig extends Static {
      * @throws TargetNotFoundException if the style provider does not exist
      * @return a {@link List} of {@link StyleBean} instances
      */
-    public static List<StyleBean> getAvailableStyles(final String providerId) throws TargetNotFoundException {
+    public static List<StyleBrief> getAvailableStyles(final String providerId, final String category) throws TargetNotFoundException {
         ensureExistingProvider(providerId);
         final StyleProvider provider = StyleProviderProxy.getInstance().getProvider(providerId);
-        final String folder = provider.getSource().groups("sldFolder").get(0).parameter("path").stringValue();
-
-        final List<StyleBean> beans = new ArrayList<>();
+        final List<StyleBrief> beans = new ArrayList<>();
         for (final String key : provider.getKeys()) {
-            final StyleBean bean = new StyleBean();
-            bean.setName(key);
-            bean.setProviderId(providerId);
-            if (new File(folder, key + ".xml").exists()) {
-                bean.setDate(new Date(new File(folder, key + ".xml").lastModified()));
-            } else if (new File(folder, key + ".sld").exists()) {
-                bean.setDate(new Date(new File(folder, key + ".sld").lastModified()));
+            StyleRecord record = ConfigurationEngine.getStyle(key, providerId);
+            StyleType typeSearched = StyleType.valueOf(category.toUpperCase());
+            if(typeSearched.equals(StyleType.ALL) || record.getType().equals(typeSearched)){
+                final StyleBrief bean = new StyleBrief();
+                bean.setName(key);
+                bean.setProvider(providerId);
+                bean.setType(record.getType().name());
+                bean.setOwner(record.getOwnerLogin());
+                bean.setDate(record.getDate());
+                beans.add(bean);
             }
-            beans.add(bean);
         }
         return beans;
     }

@@ -38,9 +38,13 @@ import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.style.MutableFeatureTypeStyle;
+import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.style.RasterSymbolizer;
+import org.opengis.style.Symbolizer;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBException;
@@ -216,8 +220,23 @@ public interface Configurator {
                                     break;
                                 }
                             }
+
                             if (!found) {
-                                ConfigurationEngine.writeStyle((String) key, pr, StyleType.VECTOR, (MutableStyle) provider.get(key));
+                                StyleType styleType = StyleType.VECTOR;
+
+                                MutableStyle style = (MutableStyle) provider.get(key);
+                                fts:
+                                for (MutableFeatureTypeStyle mutableFeatureTypeStyle : style.featureTypeStyles()) {
+                                    for (MutableRule mutableRule : mutableFeatureTypeStyle.rules()) {
+                                        for (Symbolizer symbolizer : mutableRule.symbolizers()) {
+                                            if(symbolizer instanceof RasterSymbolizer){
+                                                styleType = StyleType.COVERAGE;
+                                                break fts;
+                                            }
+                                        }
+                                    }
+                                }
+                                ConfigurationEngine.writeStyle((String) key, pr, styleType, style);
                             }
                         }
                     }

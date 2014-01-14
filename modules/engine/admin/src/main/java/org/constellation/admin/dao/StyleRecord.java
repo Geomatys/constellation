@@ -36,8 +36,10 @@ import java.util.Locale;
 public final class StyleRecord extends Record {
 
     public static enum StyleType {
+        ALL,
         VECTOR,
-        COVERAGE
+        COVERAGE,
+        SENSOR
     }
 
     private Session session;
