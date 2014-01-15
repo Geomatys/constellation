@@ -184,6 +184,7 @@ function filter(type, tabSelected){
         $services.show();
     }
     else{
+        var nbDispServ = $services.length;
         for (var i = 0; i < $services.length; i++) {
             var $currentService = $services.eq(i);
             var currentServiceId = $currentService.attr("id");
@@ -191,10 +192,16 @@ function filter(type, tabSelected){
             if(type != ''){
                 if(currentServiceType != type){
                     $currentService.hide();
+                    nbDispServ--;
                 }else{
                     $currentService.show();
                 }
             }
+        }
+        if (nbDispServ == 0) {
+            $('#noservice').removeClass('hide');
+        } else {
+            $('#noservice').addClass('hide');
         }
     }
     $(tabSelected).parent().parent().children().removeClass('active')

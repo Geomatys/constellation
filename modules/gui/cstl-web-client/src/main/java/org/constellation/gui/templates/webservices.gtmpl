@@ -1,6 +1,8 @@
 #{decorate path=menu.gtmpl/}
 
 #{param name=services/}
+
+
 <div class="row" style="margin-bottom: 20px; margin-top: 20px;">
     <div class="span2">
         <a href="@{index()}"><img src="images/constellation.png"/></a>
@@ -19,6 +21,7 @@
                 <li><a href="create/wfs" id="wfschoice">&{webservicepage.button.dropdown.wfs.label}</a></li>
                 <li><a href="create/wcs" id="wcschoice">&{webservicepage.button.dropdown.wcs.label}</a></li>
                 <li><a href="create/wps" id="wpschoice">&{webservicepage.button.dropdown.wps.label}</a></li>
+                <li><a href="create/csw" id="cswchoice">&{webservicepage.button.dropdown.csw.label}</a></li>
             </ul>
         </div>
     </div>
@@ -42,46 +45,55 @@
         </div>
     </div>
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;" id="main">
-        <% for (def service : services) {%>
-          <div class="span6" id="${service.type}-${service.identifier}">
-            <a href="edit/${service.type}/${service.identifier}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
-            <div class="well <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${service.type}-${service.identifier}">
-                <div class="row">
-                    <div class="pull-right">
-                        <div class="btn-group">
-                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                                <i class="icon-wrench"></i>
-                                <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="edit/${service.type}/${service.identifier}">&{service.menu.edit.label}</a></li>
-                                <li><a href="#" data-action="open-logs" data-logs="${service.logsURL}?l=1000">&{service.menu.log.label}</a></li>
-                                <li><a href="#" data-action="open-service-url" data-capabilities="${service.capabilitiesUrl}">&{service.menu.url.label}</a></li>
-                                <li><a href="#" data-action="delete-service" data-service-type="${service.type}" data-service-id="${service.identifier}">&{service.menu.delete.label}</a></li>
-                                <li><a href="#" data-action="open-capabilities" data-capabilities="${service.capabilitiesUrl}">&{service.menu.getcapabilities.label}</a></li>
-                                <li class="<%if(service.status.toString()!="WORKING"){%>disabled<%}%>" ><a href="#" data-action="show-service">&{service.menu.show.label}</a></li>
-                            </ul>
+        <div id="noservice" class="hide span4">
+            <h4>&{service.noservice.label}</h4>
+        </div>
+        <% if (services == null || services.isEmpty()) {%>
+            <script type="text/javascript">
+                $('#noservice').removeClass('hide');
+            </script>
+        <% } else {
+               for (def service : services) {%>
+                  <div class="span6" id="${service.type}-${service.identifier}">
+                    <a href="edit/${service.type}/${service.identifier}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
+                    <div class="well <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${service.type}-${service.identifier}">
+                        <div class="row">
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                        <i class="icon-wrench"></i>
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="edit/${service.type}/${service.identifier}">&{service.menu.edit.label}</a></li>
+                                        <li><a href="#" data-action="open-logs" data-logs="${service.logsURL}?l=1000">&{service.menu.log.label}</a></li>
+                                        <li><a href="#" data-action="open-service-url" data-capabilities="${service.capabilitiesUrl}">&{service.menu.url.label}</a></li>
+                                        <li><a href="#" data-action="delete-service" data-service-type="${service.type}" data-service-id="${service.identifier}">&{service.menu.delete.label}</a></li>
+                                        <li><a href="#" data-action="open-capabilities" data-capabilities="${service.capabilitiesUrl}">&{service.menu.getcapabilities.label}</a></li>
+                                        <li class="<%if(service.status.toString()!="WORKING"){%>disabled<%}%>" ><a href="#" data-action="show-service">&{service.menu.show.label}</a></li>
+                                    </ul>
+                                </div>
+                                <a class="btn btn-info" href="#" data-action="restart-service" data-service-type="${service.type}" data-service-id="${service.identifier}">
+                                    <i class="icon-refresh"></i>
+                                </a>
+                                <a class="btn <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" href="#" data-state="${service.type}-${service.identifier}" data-action="toggle-service" data-service-type="${service.type}" data-service-id="${service.identifier}">
+                                    <i class="icon-play"></i>
+                                    <i class="icon-stop"></i>
+                                </a>
+                            </div>
                         </div>
-                        <a class="btn btn-info" href="#" data-action="restart-service" data-service-type="${service.type}" data-service-id="${service.identifier}">
-                            <i class="icon-refresh"></i>
-                        </a>
-                        <a class="btn <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" href="#" data-state="${service.type}-${service.identifier}" data-action="toggle-service" data-service-type="${service.type}" data-service-id="${service.identifier}">
-                            <i class="icon-play"></i>
-                            <i class="icon-stop"></i>
-                        </a>
+                        <div class="row">
+                            <div class="span4">
+                                <p><strong>&{service.abstract.label}</strong></p>
+                                <p>${service._abstract}</p>
+                                <p><strong>&{service.data.label}</strong></p>
+                                <p>${service.layersNumber}</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="span4">
-                        <p><strong>&{service.abstract.label}</strong></p>
-                        <p>${service._abstract}</p>
-                        <p><strong>&{service.data.label}</strong></p>
-                        <p>${service.layersNumber}</p>
-                    </div>
-                </div>
-            </div>
-          </div>
-        <%}%>
+                  </div>
+             <%}
+           }%>
     </div>
 </div>
 <div class="modal hide fade" id="url-modal">
