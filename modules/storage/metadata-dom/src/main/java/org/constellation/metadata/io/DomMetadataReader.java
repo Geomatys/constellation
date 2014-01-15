@@ -65,16 +65,20 @@ public abstract class DomMetadataReader extends AbstractMetadataReader {
         super(isCacheEnabled, isThreadEnabled);
     }
 
-    protected MetadataType getMetadataType(final InputStream metadataStream) throws IOException, XMLStreamException {
+    protected MetadataType getMetadataType(final InputStream metadataStream, final boolean reset) throws IOException, XMLStreamException {
         final XMLInputFactory xif = XMLInputFactory.newFactory();
         final String rootName;
 
-        metadataStream.mark(0);
+        if (reset){
+            metadataStream.mark(0);
+        }
         XMLStreamReader xsr = xif.createXMLStreamReader(metadataStream);
         xsr.nextTag();
         rootName = xsr.getLocalName();
         xsr.close();
-        metadataStream.reset();
+        if (reset) {
+            metadataStream.reset();
+        }
 
         switch (rootName) {
             case "MD_Metadata":

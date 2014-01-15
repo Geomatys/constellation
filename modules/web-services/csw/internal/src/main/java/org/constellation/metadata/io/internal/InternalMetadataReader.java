@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +118,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
         if (metadataStream != null) {
             final MetadataType metadataMode;
             try {
-                metadataMode = getMetadataType(metadataStream);
+                metadataMode = getMetadataType(metadataStream, true);
             } catch (IOException | XMLStreamException ex) {
                 throw new MetadataIoException(ex);
             }

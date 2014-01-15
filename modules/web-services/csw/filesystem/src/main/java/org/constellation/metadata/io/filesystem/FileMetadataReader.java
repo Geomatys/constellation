@@ -131,7 +131,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
         if (metadataFile != null) {
             final MetadataType metadataMode;
             try {
-                metadataMode = getMetadataType(new BufferedInputStream(new FileInputStream(metadataFile)));
+                metadataMode = getMetadataType(new FileInputStream(metadataFile), false);
             } catch (IOException | XMLStreamException ex) {
                 throw new MetadataIoException(ex);
             }
