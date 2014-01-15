@@ -10,7 +10,7 @@
     <label class="control-label">&{create.description.version.title}</label>
     <div id="versionsCheck" class="controls">
         <label class="checkbox inline" for="v100">
-            <input type="checkbox" value="1.0.0" id="v100" name="v100" checked="yes"> 1.0.0
+            <input type="checkbox" value="1.0.0" id="v100" name="v100" checked="checked"> 1.0.0
         </label>
         <label class="checkbox inline" for="v110">
             <input type="checkbox" value="1.1.0" id="v110" name="v110"> 1.1.0

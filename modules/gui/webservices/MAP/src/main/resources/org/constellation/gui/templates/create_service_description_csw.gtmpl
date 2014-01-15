@@ -13,7 +13,7 @@
             <input type="checkbox" value="2.0.0" id="v200" name="v200"> 2.0.0
         </label>
         <label class="checkbox inline" for="v202">
-            <input type="checkbox" value="2.0.2" id="v202" name="v202" checked="yes"> 2.0.2
+            <input type="checkbox" value="2.0.2" id="v202" name="v202" checked="checked"> 2.0.2
         </label>
     </div>
 </div>
