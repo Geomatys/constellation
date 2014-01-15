@@ -17,6 +17,8 @@
 
 package org.constellation.gui.binding;
 
+import java.awt.*;
+
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.gui.util.StyleFactories.SF;
 import static org.constellation.gui.util.StyleUtilities.literal;
@@ -37,7 +39,8 @@ public final class Fill implements StyleElement<org.opengis.style.Fill> {
 
     public Fill(final org.opengis.style.Fill fill) {
         ensureNonNull("fill", fill);
-        color   = fill.getColor().toString();
+        final Color col = fill.getColor().evaluate(null, Color.class);
+        color = String.format("#%02x%02x%02x", col.getRed(), col.getGreen(), col.getBlue());
         opacity = Double.parseDouble(fill.getOpacity().toString());
     }
 
