@@ -16,7 +16,7 @@
 <div class="row" style="height:30px;">
     <div class="navbar">
         <div class="navbar-inner">
-            <a class="brand" href="#">Choose data source</a>
+            <a class="brand" href="#">&{service.config.source.choose}</a>
         </div>
     </div>
 </div>
@@ -24,13 +24,13 @@
 <div class="row" style="background-color:white; padding-top:30px; padding-bottom:10px;padding-top: 10px;">
     <div class="span4 offset2">
         <div class="control-group">
-            <label class="control-label" for="source">Source</label>
+            <label class="control-label" for="source">&{service.config.source}</label>
 
             <div class="controls">
                 <select name="database.source" id="source" onchange="showRequestedForm();" required>
-                    <option value="0" selected>Internal</option>
-                    <option value="1">Database</option>
-                    <option value="2">File system</option>
+                    <option value="0" selected>&{service.config.source.internal}</option>
+                    <option value="1">&{service.config.source.database}</option>
+                    <option value="2">&{service.config.source.file}</option>
                 </select>
             </div>
         </div>
@@ -41,7 +41,7 @@
 <form id="internform" class="form-horizontal" action="@{CswController.configService(name = name,description = description,identifier = identifier,type = serviceType,versionList = versions)}" method="post">
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <div class="span2 well">
-            <p>Internal (SGBDR)</p>
+            <p>&{service.config.source.internal.title}</p>
         </div>
 
         <!-- button part to manage pagination -->
@@ -59,41 +59,41 @@
 <form id="databaseform" class="form-horizontal hide" action="@{CswController.configService(name = name,description = description,identifier = identifier,type = serviceType,versionList = versions)}" method="post">
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <div class="span2 well">
-            <p>Database (SGBDR)</p>
+            <p>&{service.config.source.database.title}</p>
         </div>
 
         <div class="span6">
             <fieldset>
                 <div class="control-group">
-                    <label class="control-label" for="type">Database type</label>
+                    <label class="control-label" for="type">&{service.config.source.database.type}</label>
                     <div class="controls">
-                        <input type="text" name="database.type" id="type" value="PostgreSQL" required/>
+                        <input type="text" name="database.type" id="type" required/>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    <label class="control-label" for="url">Database URL</label>
+                    <label class="control-label" for="url">&{service.config.source.database.url}</label>
                     <div class="controls">
                         <input type="text" name="database.url" id="url" required/>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    <label class="control-label" for="username">User name</label>
+                    <label class="control-label" for="username">&{service.config.source.database.username}</label>
                     <div class="controls">
                         <input type="text" name="database.username" id="username" required/>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    <label class="control-label" for="password">Password</label>
+                    <label class="control-label" for="password">&{service.config.source.database.password}</label>
                     <div class="controls">
                         <input type="text" name="database.password" id="password" required/>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    <label class="control-label" for="shared">Shared connection</label>
+                    <label class="control-label" for="shared">&{service.config.source.database.shared}</label>
                     <div class="controls">
                         <input type="checkbox" name="database.shareconnec" id="shared"/>
                     </div>
@@ -116,13 +116,13 @@
 <form id="fileform" class="form-horizontal hide" action="@{CswController.configService(name = name,description = description,identifier = identifier,type = serviceType,versionList = versions)}" method="post">
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
         <div class="span2 well">
-            <p>File system</p>
+            <p>&{service.config.source.file.title}</p>
         </div>
 
         <div class="span6">
             <fieldset>
                 <div class="control-group">
-                    <label class="control-label" for="path">Folder path</label>
+                    <label class="control-label" for="path">&{service.config.source.file.path}</label>
                     <div class="controls">
                         <input type="text" name="file.path" id="path" required/>
                     </div>
