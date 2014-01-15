@@ -181,6 +181,11 @@ function filter(type, tabSelected){
     var $services = $("#main > .span6");
 
     if(type==''){
+        if ($services.length == 0)  {
+            $('#noservice').removeClass('hide');
+        } else {
+            $('#noservice').addClass('hide');
+        }
         $services.show();
     }
     else{
