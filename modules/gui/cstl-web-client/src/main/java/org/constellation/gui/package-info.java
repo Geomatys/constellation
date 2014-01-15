@@ -26,6 +26,8 @@
         @Alias(of = "/org/constellation/gui/templates/layer_listings.gtmpl",                    as = "layer_listings.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/description.gtmpl",                       as = "description.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/metadata.gtmpl",                          as = "metadata.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/csw_service.gtmpl",                       as = "csw_service.gtmpl"),
+        @Alias(of = "/org/constellation/gui/templates/metadata_dashboard.gtmpl",                as = "metadata_dashboard.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/map_service.gtmpl",                       as = "map_service.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/create_service_description.gtmpl",        as = "create_service_description.gtmpl"),
         @Alias(of = "/org/constellation/gui/templates/create_service_description_csw.gtmpl",    as = "create_service_description_csw.gtmpl"),

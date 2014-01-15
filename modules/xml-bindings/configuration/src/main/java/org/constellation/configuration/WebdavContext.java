@@ -28,37 +28,37 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name="WebdavContext")
-public class WebdavContext {
-    
+public class WebdavContext extends AbstractConfigurationObject {
+
     private String rootFile;
-    
+
     private Long maxAgeSeconds;
-    
+
     private boolean digestAllowed = true;
-    
+
     private String ssoPrefix;
-    
+
     private boolean hideDotFile = true;
-    
+
     private String contextPath = "webdav";
-    
+
     @XmlTransient
     private String id;
-    
+
     private String defaultPage;
 
     public WebdavContext() {
-        
+
     }
-    
+
     public WebdavContext(final String rootPath) {
         this.rootFile = rootPath;
     }
-    
+
     public WebdavContext(final File rootFile) {
         this.rootFile = rootFile.getPath();
     }
-    
+
     /**
      * @return the rootFile
      */

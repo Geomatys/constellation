@@ -1,0 +1,46 @@
+#{decorate path=menu.gtmpl/}
+
+#{param name=service/}
+#{param name=instance/}
+#{param name=capabilitiesUrl/}
+
+<div class="logo-wrapper">
+    <a href="@{index()}"><img src="../../images/constellation.png"></a>
+</div>
+
+<div class="frame">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <a class="brand" href="#">${service.name}</a>
+            <form class="navbar-form">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-small" data-action="open-capabilities" data-capabilities="${capabilitiesUrl}">&{service.description.getcapabilities.button}</button>
+                    <button type="button" class="btn btn-small" data-action="open-logs">&{service.description.logs.button}</button>
+                    <button type="button" class="btn btn-small btn-info" data-action="restart-service" data-service-type="${instance.type}" data-service-id="${service.identifier}">&{service.description.reload.button}</button>
+                    <button type="button" class="btn btn-small <%if(instance.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${instance.type}-${service.identifier}" data-action="toggle-service" data-service-type="${instance.type}" data-service-id="${service.identifier}">
+                        <span class="label-start">&{service.description.start.button}</span>
+                        <span class="label-stop">&{service.description.stop.button}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="frame-inner">
+        <ul class="nav nav-tabs">
+            <li><a href="#description" data-toggle="tab">&{service.description.tab.description.title}</a> </li>
+            <li><a href="#metadata" data-toggle="tab">&{service.description.tab.metadata.title}</a> </li>
+            <li class="active"><a href="#data" data-toggle="tab">&{service.description.tab.metadata.data.title}</a> </li>
+        </ul>
+        <div class="tab-content">
+            <div id="description" class="tab-pane">
+                #{include path=description.gtmpl/}
+            </div>
+            <div id="metadata" class="tab-pane">
+                #{include path=metadata.gtmpl/}
+            </div>
+            <div id="data" class="tab-pane active">
+                #{include path=metadata_dashboard.gtmpl/}
+            </div>
+        </div>
+    </div>
+</div>

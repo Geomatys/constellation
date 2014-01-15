@@ -22,7 +22,7 @@
             <label class="control-label" for="keywords">keywords</label>
 
             <div class="controls">
-                <input type="text" name="keywords" id="keywords" required/>
+                <input type="text" name="keywords" id="keywords"/>
             </div>
         </div>
 
@@ -95,7 +95,7 @@
 
             <div class="controls">
                 <select name="metadataToSave.localeData" id="localeData" required>
-                    <% for (def locale : locales.keySet()) { 
+                    <% for (def locale : locales.keySet()) {
                     	if(locale==userLocale){%>
 		                    <option value="${locale}" selected/>${locales.get(locale)}</option>
                    		<%}else{%>

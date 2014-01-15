@@ -30,6 +30,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
 import java.util.Objects;
 import org.apache.sis.util.logging.Logging;
@@ -40,7 +42,7 @@ import org.apache.sis.util.logging.Logging;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "automatic")
-public class Automatic {
+public class Automatic extends AbstractConfigurationObject {
 
     @XmlTransient
     public static final int DEFAULT     = 0;
@@ -192,7 +194,7 @@ public class Automatic {
      * this object contains the SQL request to filter the observations.
      */
     private Query filterQueries;
-    
+
     /**
      * Constructor used by JAXB
      */

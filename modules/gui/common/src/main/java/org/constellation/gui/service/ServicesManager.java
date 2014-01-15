@@ -25,10 +25,12 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBrief;
+import org.constellation.generic.database.Automatic;
 
 /**
  * Juzu service to call constellation services server side
@@ -94,6 +96,30 @@ public class  ServicesManager {
      */
     public Instance getInstance(final String serviceId, final Specification serviceType) throws IOException {
         return cstl.openClient().services.getInstance(serviceType, serviceId);
+    }
+
+    /**
+     * Gets and returns a service configuration.
+     *
+     * @param serviceId   the service identifier
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @return the service configuration.
+     * @throws IOException if the operation has failed
+     */
+    public Object getInstanceConfiguration(final String serviceId, final Specification serviceType) throws IOException {
+        return cstl.openClient().services.getInstanceConfiguration(serviceType, serviceId);
+    }
+
+    /**
+     * Gets and returns a service configuration.
+     *
+     * @param serviceId   the service identifier
+     * @param serviceType the service type (WMS, CSW, WPS...)
+     * @param config      the service configuration object
+     * @throws IOException if the operation has failed
+     */
+    public void setInstanceConfiguration(final String serviceId, final Specification serviceType, final AbstractConfigurationObject config) throws IOException {
+        cstl.openClient().services.setInstanceConfiguration(serviceType, serviceId, config);
     }
 
     /**

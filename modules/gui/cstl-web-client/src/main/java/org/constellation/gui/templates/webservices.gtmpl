@@ -55,7 +55,11 @@
         <% } else {
                for (def service : services) {%>
                   <div class="span6" id="${service.type}-${service.identifier}">
-                    <a href="edit/${service.type}/${service.identifier}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
+                    <% if (service.type.equals("csw")) {%>
+                        <a href="editcsw/${service.type}/${service.identifier}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
+                    <% } else {%>
+                        <a href="edit/${service.type}/${service.identifier}"><h3 class="text-info">${service.name} (${service.type})</h3></a>
+                    <% }%>
                     <div class="well <%if(service.status.toString()=="WORKING"){%>started<%}else{%>stopped<%}%>" data-state="${service.type}-${service.identifier}">
                         <div class="row">
                             <div class="pull-right">

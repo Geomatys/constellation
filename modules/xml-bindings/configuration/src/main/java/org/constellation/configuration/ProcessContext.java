@@ -27,14 +27,14 @@ import org.geotoolkit.gui.swing.tree.Trees;
 
 /**
  * Configuration for a WPS service.
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  * @author Quentin Boileau (Geomatys)
  * @since 0.9
  */
 @XmlRootElement(name="ProcessContext")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ProcessContext {
+public class ProcessContext extends AbstractConfigurationObject {
 
     private Processes processes;
 
@@ -57,7 +57,7 @@ public class ProcessContext {
      * Instance name of the WMS service linked to current WPS.
      */
     private String wmsInstanceName;
-    
+
     private final Map<String, String> customParameters = new HashMap<>();
 
     public ProcessContext() {
@@ -76,7 +76,7 @@ public class ProcessContext {
     public Processes getProcesses() {
         return processes;
     }
-    
+
     /**
      * @return the layers
      */
@@ -126,7 +126,7 @@ public class ProcessContext {
     public void setSupportedLanguages(Languages supportedLanguages) {
         this.supportedLanguages = supportedLanguages;
     }
-    
+
     /**
      * @return the webdavDirectory
      */
@@ -169,7 +169,7 @@ public class ProcessContext {
     public void setFileCoverageProviderId(String fileCoverageProviderId) {
         this.fileCoverageProviderId = fileCoverageProviderId;
     }
-    
+
     /**
      * @return the customParameters
      */

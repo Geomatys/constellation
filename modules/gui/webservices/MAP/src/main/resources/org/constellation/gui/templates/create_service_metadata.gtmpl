@@ -167,7 +167,13 @@
             </br>
                 <a href="@{webservices()}">&{create.cancel.label}</a>
                 <button class="btn btn-primary" onclick="goToDescription();" type="button">&{create.previous.label}</button>
-                <button class="btn btn-primary" type="submit" id="buttonSubmit">&{create.save.label}</button>
+                <button class="btn btn-primary" type="submit" id="buttonSubmit">
+                    <% if (serviceType.equalsIgnoreCase("csw")) { %>
+                    &{create.next.label}
+                    <% } else { %>
+                    &{create.save.label}
+                    <% } %>
+                </button>
             </div>
         </div>
     </div>

@@ -91,6 +91,11 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.gui</groupId>
+      <artifactId>CSW</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.gui</groupId>
       <artifactId>style</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -107,7 +112,7 @@
     	<groupId>commons-codec</groupId>
     	<artifactId>commons-codec</artifactId>
     	</dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>

@@ -98,7 +98,11 @@
 
             <!-- Button to add data on service -->
             <div class="offset1 span4">
-                <a class="btn btn-large" href="edit/${service.type}/${service.identifier}"><i class="icon-plus-sign"></i> &{service.create.end.addlayers.label}</a>
+                <% if (service.type.equals("csw")) {%>
+                    <a class="btn btn-large" href="editcsw/${service.type}/${service.identifier}"><i class="icon-plus-sign"></i> &{service.create.end.addmetadata.label}</a>
+                <% } else {%>
+                    <a class="btn btn-large" href="edit/${service.type}/${service.identifier}"><i class="icon-plus-sign"></i> &{service.create.end.addlayers.label}</a>
+                <% }%>
             </div>
         <%}else{%>
             <!-- alert part -->

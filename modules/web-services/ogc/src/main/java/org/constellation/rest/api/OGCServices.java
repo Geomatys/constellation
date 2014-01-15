@@ -17,14 +17,15 @@
 
 package org.constellation.rest.api;
 
-import java.io.InputStream;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ogc.configuration.OGCConfigurer;
 
 import javax.ws.rs.Consumes;
@@ -38,7 +39,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+
+import java.io.InputStream;
 
 import static org.constellation.utils.RESTfulUtilities.created;
 import static org.constellation.utils.RESTfulUtilities.ok;

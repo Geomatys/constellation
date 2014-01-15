@@ -18,14 +18,17 @@
 package org.constellation.admin.service;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.LayerList;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.configuration.SOSConfiguration;
 import org.constellation.dto.AddLayer;
-import org.constellation.dto.DataInformation;
 import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.generic.database.Automatic;
 
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
@@ -74,7 +77,7 @@ public final class ServicesAPI {
 
         GenericType<JAXBElement<Instance>> planetType = new GenericType<JAXBElement<Instance>>() {
         };
-        
+
         final String path = "api/1/OGC/" + serviceType + "/" + identifier;
         return client.target().path(path).request().accept(MediaType.APPLICATION_XML_TYPE).get(planetType).getValue();
     }
@@ -109,6 +112,55 @@ public final class ServicesAPI {
 
         final String path = "OGC/" + serviceType;
         client.put(path, MediaType.APPLICATION_XML_TYPE, metadata).ensure2xxStatus();
+    }
+
+    /**
+     * Queries a service instance configuration.
+     *
+     * @param serviceType the service type
+     * @param identifier  the service identifier
+     * @return the instance configuration for this service.
+     * @throws HttpResponseException if the response does not have a {@code 2xx} status code
+     * @throws java.io.IOException on HTTP communication error or response entity parsing error
+     */
+    public Object getInstanceConfiguration(final Specification serviceType, final String identifier) throws HttpResponseException, IOException {
+        ensureNonNull("serviceType", serviceType);
+        ensureNonNull("identifier",  identifier);
+
+        final String path = "OGC/" + serviceType + "/" + identifier + "/config";
+        final Class classBinding;
+        if (Specification.CSW.equals(serviceType)) {
+            classBinding = Automatic.class;
+        } else if (Specification.WMS.equals(serviceType) || Specification.WMTS.equals(serviceType) ||
+                   Specification.WFS.equals(serviceType) || Specification.WCS.equals(serviceType)) {
+            classBinding = LayerContext.class;
+        } else if (Specification.WPS.equals(serviceType)) {
+            classBinding = ProcessContext.class;
+        } else if (Specification.SOS.equals(serviceType)) {
+            classBinding = SOSConfiguration.class;
+        } else {
+            throw new IOException("Invalid specification chosen to get instance configuration "+ serviceType);
+        }
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(classBinding);
+    }
+
+    /**
+     * Sets the service configuration..
+     *
+     * @param serviceType the service type
+     * @param identifier  the service identifier
+     * @param config configuration object for the service
+     *
+     * @throws HttpResponseException if the response does not have a {@code 2xx} status code
+     * @throws java.io.IOException on HTTP communication error or response entity parsing error
+     */
+    public void setInstanceConfiguration(final Specification serviceType, final String identifier, final AbstractConfigurationObject config) throws HttpResponseException, IOException {
+        ensureNonNull("serviceType", serviceType);
+        ensureNonNull("identifier",  identifier);
+        ensureNonNull("config",  config);
+
+        final String path = "OGC/" + serviceType + "/" + identifier + "/config";
+        client.post(path, MediaType.APPLICATION_XML_TYPE, config).ensure2xxStatus();
     }
 
     /**

@@ -1,0 +1,161 @@
+#{decorate path=menu.gtmpl/}
+
+#{param name=name/}
+#{param name=description/}
+#{param name=identifier/}
+#{param name=serviceType/}
+#{param name=versions/}
+
+<!-- Header -->
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="span2">
+        <a href="@{index()}"><img src="../images/constellation.png"/></a>
+    </div>
+</div>
+
+<div class="row" style="height:30px;">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <a class="brand" href="#">Choose data source</a>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="background-color:white; padding-top:30px; padding-bottom:10px;padding-top: 10px;">
+    <div class="span4 offset2">
+        <div class="control-group">
+            <label class="control-label" for="source">Source</label>
+
+            <div class="controls">
+                <select name="database.source" id="source" onchange="showRequestedForm();" required>
+                    <option value="0" selected>Internal</option>
+                    <option value="1">Database</option>
+                    <option value="2">File system</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Internal form -->
+<form id="internform" class="form-horizontal" action="@{CswController.configService(name = name,description = description,identifier = identifier,type = serviceType,versionList = versions)}" method="post">
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+        <div class="span2 well">
+            <p>Internal (SGBDR)</p>
+        </div>
+
+        <!-- button part to manage pagination -->
+        <div class="row">
+            <div class="span2 offset10">
+            </br>
+                <a href="@{webservices()}">&{create.cancel.label}</a>
+                <button class="btn btn-primary" type="submit" id="buttonSubmit">&{create.save.label}</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Database form -->
+<form id="databaseform" class="form-horizontal hide" action="@{CswController.configService(name = name,description = description,identifier = identifier,type = serviceType,versionList = versions)}" method="post">
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+        <div class="span2 well">
+            <p>Database (SGBDR)</p>
+        </div>
+
+        <div class="span6">
+            <fieldset>
+                <div class="control-group">
+                    <label class="control-label" for="type">Database type</label>
+                    <div class="controls">
+                        <input type="text" name="database.type" id="type" value="PostgreSQL" required/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="url">Database URL</label>
+                    <div class="controls">
+                        <input type="text" name="database.url" id="url" required/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="username">User name</label>
+                    <div class="controls">
+                        <input type="text" name="database.username" id="username" required/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="password">Password</label>
+                    <div class="controls">
+                        <input type="text" name="database.password" id="password" required/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="shared">Shared connection</label>
+                    <div class="controls">
+                        <input type="checkbox" name="database.shareconnec" id="shared"/>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <!-- button part to manage pagination -->
+        <div class="row">
+            <div class="span2 offset10">
+            </br>
+                <a href="@{webservices()}">&{create.cancel.label}</a>
+                <button class="btn btn-primary" type="submit" id="buttonSubmit">&{create.save.label}</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- File system form -->
+<form id="fileform" class="form-horizontal hide" action="@{CswController.configService(name = name,description = description,identifier = identifier,type = serviceType,versionList = versions)}" method="post">
+    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;">
+        <div class="span2 well">
+            <p>File system</p>
+        </div>
+
+        <div class="span6">
+            <fieldset>
+                <div class="control-group">
+                    <label class="control-label" for="path">Folder path</label>
+                    <div class="controls">
+                        <input type="text" name="file.path" id="path" required/>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <!-- button part to manage pagination -->
+        <div class="row">
+            <div class="span2 offset10">
+            </br>
+                <a href="@{webservices()}">&{create.cancel.label}</a>
+                <button class="btn btn-primary" type="submit" id="buttonSubmit">&{create.save.label}</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+    function showRequestedForm() {
+        var sel = jQuery('select#source option:selected').val();
+        if (sel == 0) {
+            jQuery('#internform').removeClass('hide');
+            jQuery('#databaseform').addClass('hide');
+            jQuery('#fileform').addClass('hide');
+        } else if (sel == 1) {
+            jQuery('#internform').addClass('hide');
+            jQuery('#databaseform').removeClass('hide');
+            jQuery('#fileform').addClass('hide');
+        } else {
+            jQuery('#internform').addClass('hide');
+            jQuery('#databaseform').addClass('hide');
+            jQuery('#fileform').removeClass('hide');
+        }
+    }
+</script>

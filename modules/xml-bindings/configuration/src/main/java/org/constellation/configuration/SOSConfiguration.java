@@ -32,15 +32,15 @@ import org.apache.sis.util.logging.Logging;
 
 /**
  * A XML binding object for SOS configuration.
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "SOSConfiguration")
-public class SOSConfiguration {
+public class SOSConfiguration extends AbstractConfigurationObject {
 
     private static final Logger LOGGER = Logging.getLogger(SOSConfiguration.class);
-    
+
     /**
      * Informations about SensorML Datasource.
      */
@@ -80,7 +80,7 @@ public class SOSConfiguration {
     private List<Automatic> extensions;
 
     private HashMap<String, String> parameters = new HashMap<String, String>();
-    
+
     /**
      * prefix for observations id (example: urn:ogc:object:observation:orgName:)
      * @deprecated move to parameters map
@@ -160,14 +160,14 @@ public class SOSConfiguration {
      */
     @Deprecated
     private boolean keepCapabilities = false;
-    
+
     private String logLevel;
 
     /**
      * Empty constructor used by JAXB.
      */
     public SOSConfiguration() {
-        
+
     }
 
     /**
@@ -280,7 +280,7 @@ public class SOSConfiguration {
     public void setLogLevel(String logLevel) {
         this.logLevel = logLevel;
     }
-    
+
     /**
      * @return the observationIdBase
      */
@@ -404,7 +404,7 @@ public class SOSConfiguration {
         }
         return 0;
     }
-    
+
     @Deprecated
     public String getProfileValue() {
         return profile;

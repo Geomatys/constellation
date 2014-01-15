@@ -36,11 +36,11 @@ import java.util.Objects;
  */
 @XmlRootElement(name="LayerContext")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class    LayerContext {
+public class LayerContext extends AbstractConfigurationObject {
 
     @XmlAttribute
     private DataSourceType implementation;
-            
+
     private Layers layers;
 
     private String security;
@@ -110,7 +110,7 @@ public class    LayerContext {
         }
         return providerIds;
     }
-    
+
     /**
      * @return the layers
      */
@@ -159,7 +159,7 @@ public class    LayerContext {
     public Map<String, String> getCustomParameters() {
         return customParameters;
     }
-    
+
     /**
      * @return the implementation
      */

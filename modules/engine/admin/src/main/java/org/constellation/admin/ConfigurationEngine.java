@@ -79,8 +79,8 @@ public class ConfigurationEngine {
 
     private final static boolean JPA = Boolean.getBoolean("cstlJPA");
 
-    private static SecurityManager securityManager; 
-    
+    private static SecurityManager securityManager;
+
     private static ConfigurationService configurationService;
 
     private static String userTest = null;
@@ -88,8 +88,8 @@ public class ConfigurationEngine {
     public static void setConfigurationService(ConfigurationService configurationService) {
         ConfigurationEngine.configurationService = configurationService;
     }
-    
-    
+
+
     public static void setSecurityManager(SecurityManager securityManager) {
         ConfigurationEngine.securityManager = securityManager;
     }
@@ -99,7 +99,7 @@ public class ConfigurationEngine {
 
         if(JPA)
             return configurationService.getProviderConfiguration(serviceName, desc);
-        
+
         final ParameterValueGroup params = desc.createValue();
         Session session = null;
         try {
@@ -137,8 +137,8 @@ public class ConfigurationEngine {
             final MarshallerPool pool) throws JAXBException, FileNotFoundException {
         if (JPA)
             return configurationService.getConfiguration(serviceType, serviceID, fileName, pool);
-   
-        
+
+
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -244,7 +244,7 @@ public class ConfigurationEngine {
     public static List<String> getServiceConfigurationIds(final String serviceType) {
         if(JPA)
             return configurationService.getServiceIdentifiersByServiceType(ServiceDef.Specification.fromShortName(serviceType).name());
-        
+
         final List<String> results = new ArrayList<>();
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
@@ -267,7 +267,7 @@ public class ConfigurationEngine {
     public static boolean serviceConfigurationExist(final String serviceType, final String identifier) {
         if(JPA)
             return configurationService.isServiceConfigurationExist(ServiceDef.Specification.fromShortName(serviceType).name(), identifier);
-        
+
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
         try {
@@ -287,7 +287,7 @@ public class ConfigurationEngine {
         if (JPA)
             return configurationService.deleteService(identifier, ServiceDef.Specification.fromShortName(serviceType)
                     .name());
-     
+
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
         try {
@@ -295,6 +295,10 @@ public class ConfigurationEngine {
             // look fr existence
             final ServiceRecord serv = session.readService(identifier, spec);
             if (serv != null) {
+                final File instanceDir = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
+                if (instanceDir.isDirectory()) {
+                    FileUtilities.deleteDirectory(instanceDir);
+                }
                 session.deleteService(identifier, spec);
                 return true;
             }
@@ -363,7 +367,7 @@ public class ConfigurationEngine {
         }
         if(JPA)
             return configurationService.readServiceMetadata(identifier, ServiceDef.Specification.fromShortName(serviceType).name(), language);
-        
+
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -447,7 +451,7 @@ public class ConfigurationEngine {
 
     /**
      * Save metadata on specific folder
-     * 
+     *
      * @param fileMetadata
      * @param dataName
      * @param pool
@@ -480,7 +484,7 @@ public class ConfigurationEngine {
 
     /**
      * Load a metadata for a provider.
-     * 
+     *
      * @param providerId
      * @param pool
      * @return
@@ -789,7 +793,7 @@ public class ConfigurationEngine {
     /**
      * create a {@link org.constellation.configuration.DataBrief} with style
      * link and service link.
-     * 
+     *
      * @param session
      *            current {@link org.constellation.admin.dao.Session} used
      * @param record

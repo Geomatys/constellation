@@ -237,7 +237,11 @@ public class Controller {
         //call service
         try {
             servicesManager.createServices(createdService, Specification.fromShortName(serviceType));
+            if (serviceType.equalsIgnoreCase("csw")) {
+                return CswController_.chooseSource(createdService.getName(), createdService.getDescription(), createdService.getIdentifier(), serviceType, versionsList);
+            } else {
                 return Controller_.succeeded(createdService.getName(), createdService.getDescription(), createdService.getIdentifier(), serviceType, versionsList, "true");
+            }
         } catch (IOException ex) {
             return Controller_.succeeded(createdService.getName(), createdService.getDescription(), createdService.getIdentifier(), serviceType, versionsList, "false");
         }
