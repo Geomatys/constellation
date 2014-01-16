@@ -69,7 +69,11 @@
                                         <span class="caret"></span>
                                     </a>
                                     <ul class="dropdown-menu">
+                                        <% if (service.type.equals("csw")) {%>
+                                        <li><a href="editcsw/${service.type}/${service.identifier}">&{service.menu.edit.label}</a></li>
+                                        <% } else {%>
                                         <li><a href="edit/${service.type}/${service.identifier}">&{service.menu.edit.label}</a></li>
+                                        <% }%>
                                         <li><a href="#" data-action="open-logs" data-logs="${service.logsURL}?l=1000">&{service.menu.log.label}</a></li>
                                         <li><a href="#" data-action="open-service-url" data-capabilities="${service.capabilitiesUrl}">&{service.menu.url.label}</a></li>
                                         <li><a href="#" data-action="delete-service" data-service-type="${service.type}" data-service-id="${service.identifier}">&{service.menu.delete.label}</a></li>
