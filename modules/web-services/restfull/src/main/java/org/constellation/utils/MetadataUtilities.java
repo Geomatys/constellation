@@ -151,7 +151,13 @@ public final class MetadataUtilities {
      */
     public static DataInformation getRasterDataInformation(final GridCoverageReader coverageReader, final DefaultMetadata metadata, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
 
-        CoordinateReferenceSystem cRs = coverageReader.getGridGeometry(0).getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem cRs;
+        try {
+            cRs = coverageReader.getGridGeometry(0).getCoordinateReferenceSystem();
+        } catch (IllegalArgumentException ex) {
+            LOGGER.log(Level.INFO, "Invalid coverage information", ex);
+            return new DataInformation("error-data-import-no-geographic");
+        }
 
         if (!(cRs instanceof ImageCRS)) {
 

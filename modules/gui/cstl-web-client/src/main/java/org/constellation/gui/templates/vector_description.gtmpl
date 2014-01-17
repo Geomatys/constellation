@@ -30,7 +30,7 @@
         <div class="span12">
             <ul class="nav nav-tabs">
                 <% if(metadataUploaded.equalsIgnoreCase("false") && creationMode.equalsIgnoreCase("true")){%>
-                    <li id="requiredISO19115Tab"><a href="#requiredISO19115" data-toggle="tab">Missing metadata</a></li>
+                    <li id="requiredISO19115Tab"><a href="#requiredISO19115" data-toggle="tab">&{data.information.tab.missing.title}</a></li>
                 <%}%>
                 <% if(datainformation.crs != null) {%>
                     <li id="crsTab"><a href="#crs" data-toggle="tab">CRS</a></li>
@@ -60,7 +60,7 @@
                 <% if(creationMode.equalsIgnoreCase("true")){%>
                     <button type="submit" class="btn btn-info pull-right" id="providerCreation"/>&{label.finish}</button>
                 <% } else { %>
-                    <button type="button" class="btn btn-info pull-right" id="goTo" onclick="document.location.assign('${returnURL}')"/>Return</button>
+                    <button type="button" class="btn btn-info pull-right" id="goTo" onclick="document.location.assign('${returnURL}')"/>&{label.return}</button>
                 <% } %>
             </form>
         </div>

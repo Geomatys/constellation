@@ -1,7 +1,7 @@
 <div class="row">
     <div class="span6">
         <div class="control-group">
-            <label class="control-label" for="title">Title</label>
+            <label class="control-label" for="title">&{md.iso.title}</label>
 
             <div class="controls">
                 <input type="text" name="metadataToSave.title" id="title" required/>
@@ -9,7 +9,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="abstract">Abstract</label>
+            <label class="control-label" for="abstract">&{md.iso.abstract}</label>
 
             <div class="controls">
                 <textarea name="metadataToSave.anAbstract" id="abstract" rows="5" class="span4" required></textarea>
@@ -19,7 +19,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="keywords">keywords</label>
+            <label class="control-label" for="keywords">&{md.iso.keywords}</label>
 
             <div class="controls">
                 <input type="text" name="keywords" id="keywords"/>
@@ -27,7 +27,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="username">User name</label>
+            <label class="control-label" for="username">&{md.iso.username}</label>
 
             <div class="controls">
                 <input type="text" name="metadataToSave.username" id="username" required
@@ -36,7 +36,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="organisationName">Organisation name</label>
+            <label class="control-label" for="organisationName">&{md.iso.organization}</label>
 
             <div class="controls">
                 <input type="text" name="metadataToSave.organisationName" id="organisationName" required/>
@@ -44,7 +44,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="roleCode">Role</label>
+            <label class="control-label" for="roleCode">&{md.iso.role}</label>
 
             <div class="controls">
                 <select name="metadataToSave.role" id="roleCode" required>
@@ -59,7 +59,7 @@
 
     <div class="span6">
         <div class="control-group">
-            <label class="control-label" for="topicCategory">Topic category</label>
+            <label class="control-label" for="topicCategory">&{md.iso.topic.category}</label>
 
             <div class="controls">
                 <select name="metadataToSave.topicCategory" id="topicCategory" required>
@@ -71,7 +71,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="date">Data date</label>
+            <label class="control-label" for="date">&{md.iso.data.date}</label>
 
             <div class="controls">
                 <input type="text" name="date" id="date" required/>
@@ -79,7 +79,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="dateType">Date type</label>
+            <label class="control-label" for="dateType">&{md.iso.date.type}</label>
 
             <div class="controls">
                 <select name="metadataToSave.dateType" id="dateType" required>
@@ -91,7 +91,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="localeData">Locale data</label>
+            <label class="control-label" for="localeData">&{md.iso.locale.data}</label>
 
             <div class="controls">
                 <select name="metadataToSave.localeData" id="localeData" required>

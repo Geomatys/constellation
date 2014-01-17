@@ -57,8 +57,13 @@ public class MetadataFeeder {
     public void feed(final DataMetadata feeded) {
         addDateStamp(new Date());
 
+        final Locale metadataLocale;
         String[] localeAndCountry = feeded.getLocaleMetadata().split("_");
-        final Locale metadataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
+        if (localeAndCountry.length == 2) {
+            metadataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
+        }else{
+            metadataLocale = new Locale(localeAndCountry[0]);
+        }
         addMetadataLocale(metadataLocale);
 
         addTitle(feeded.getTitle());
