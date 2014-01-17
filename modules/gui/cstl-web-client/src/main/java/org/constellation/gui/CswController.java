@@ -28,9 +28,11 @@ import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.ServicesManager;
+import org.opengis.metadata.Metadata;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,6 +122,8 @@ public class CswController {
     public Response dashboard(final String serviceId, final String serviceType) throws IOException {
         final Service metadata = servicesManager.getMetadata(serviceId, ServiceDef.Specification.fromShortName(serviceType));
         final Instance instance   = servicesManager.getInstance(serviceId, ServiceDef.Specification.fromShortName(serviceType));
+        // TODO: get metadata list
+        final List<Metadata> mdList = new ArrayList<>();
 
         // Build service capabilities URL.
         String capabilitiesUrl = cstl.getUrl().toString();
@@ -135,6 +139,8 @@ public class CswController {
         final Map<String, Object> parameters = new HashMap<>(0);
         parameters.put("service",         metadata);
         parameters.put("instance",        instance);
+        parameters.put("mdList",          mdList);
+        parameters.put("nbResults",       0);
         parameters.put("startIndex",      0);
         parameters.put("nbPerPage",       10);
         parameters.put("capabilitiesUrl", capabilitiesUrl);

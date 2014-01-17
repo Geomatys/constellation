@@ -1,5 +1,6 @@
 #{decorate path=menu.gtmpl/}
 
+#{param name=mdList/}
 #{param name=service/}
 #{param name=instance/}
 #{param name=capabilitiesUrl/}

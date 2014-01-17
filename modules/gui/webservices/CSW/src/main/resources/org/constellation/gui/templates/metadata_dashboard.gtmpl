@@ -1,3 +1,41 @@
-<div id="cswDashboard" class="row-fluid dashboard">
-
+<div id="mdDashboard" class="row-fluid dashboard">
+    <div id="mdList" class="pull-left" style="width:65%;">
+        <div style="padding: 0 10px;">
+            <h4>&{md.listing.title}</h4>
+            <div class="navbar sort-navbar">
+                <div class="navbar-inner" style="border: 1px solid #e3e3e3;">
+                    <ul class="nav">
+                        <li><a href="#" data-order-by="title">&{label.title}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="date" class="descending">&{label.date}<i class="icon-caret-up"></i><i class="icon-caret-down"></i> </a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="owner">&{label.owner}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="type">&{label.type}<i class="icon-caret-up"></i><i class="icon-caret-down"></i></a></li>
+                        <li class="divider-vertical"></li>
+                    </ul>
+                    <button type="button" data-role="reset" class="btn btn-small btn-info"><i class="icon-remove icon-white"></i></button>
+                    <div class="pull-right">
+                        <div style="position:relative;">
+                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                            <input type="text" data-role="search" class="search-query" placeholder="&{label.search}..." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div data-role="list">
+                #{include path=md.gtmpl/}
+            </div>
+        </div>
+    </div>
+    <div class="pull-left" style="width:35%;">
+        <div style="padding: 0 10px;">
+            <div class="row-fluid">
+                <a href="#addModal" style="margin-bottom:10px;" role="button" class="btn btn-info btn-large btn-block" data-toggle="modal" onmousedown="CSTL.AddLayerWorkflow.start();">&{layer.listing.data.add.button.label}</a>
+            </div>
+            <div id="selection" data-role="selected">
+                #{include path=layer_selected.gtmpl/}
+            </div>
+        </div>
+    </div>
 </div>
