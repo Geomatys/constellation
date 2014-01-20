@@ -38,6 +38,7 @@ import org.apache.sis.util.logging.Logging;
 
 //cstl dependencies
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.BriefNode;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
@@ -59,6 +60,7 @@ import org.geotoolkit.lucene.index.IndexDirectoryFilter;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
@@ -68,7 +70,7 @@ import org.xml.sax.SAXException;
 public class CSWConfigurationManager {
 
     private static final Logger LOGGER = Logging.getLogger(CSWConfigurationManager.class);
-    
+
     /**
      * A flag indicating if an indexation is going on.
      */
@@ -165,7 +167,7 @@ public class CSWConfigurationManager {
             suffix = suffix + " id:" + id;
         }
         LOGGER.log(Level.INFO, "refresh index requested{0}", suffix);
-        
+
         final List<File> cswInstanceDirectories = new ArrayList<>();
         if ("all".equals(id)) {
             cswInstanceDirectories.addAll(ConfigDirectory.getInstanceDirectories("CSW"));
@@ -175,7 +177,7 @@ public class CSWConfigurationManager {
                 cswInstanceDirectories.add(instanceDir);
             }
         }
-        
+
         if (!asynchrone) {
             synchroneIndexRefresh(cswInstanceDirectories);
         } else {
@@ -191,7 +193,7 @@ public class CSWConfigurationManager {
      *
      * @param id identifier of the CSW service.
      * @param identifierList list of metadata identifier to add into the index.
-     * 
+     *
      * @return
      * @throws ConfigurationException
      */
@@ -346,6 +348,33 @@ public class CSWConfigurationManager {
         }
     }
 
+    public List<BriefNode> getMetadataList(final String id, final int count, final int startIndex) throws ConfigurationException {
+        final CSWMetadataReader reader = getReader(id);
+        try {
+            final List<BriefNode> results = new ArrayList<>();
+            final List<String> ids = reader.getAllIdentifiers();
+            if (startIndex >= ids.size()) {
+                return results;
+            }
+
+            for (int i = startIndex; i<ids.size() && i<startIndex + count; i++) {
+                results.add(new BriefNode(reader.getMetadata(ids.get(i), MetadataType.ISO_19115)));
+            }
+            return results;
+        } catch (MetadataIoException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+
+    public Node getMetadata(final String id, final String metadataName) throws ConfigurationException {
+        final CSWMetadataReader reader = getReader(id);
+        try {
+            return reader.getMetadata(metadataName, MetadataType.ISO_19115);
+        } catch (MetadataIoException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+
     public AcknowlegementType deleteMetadata(final String id, final String metadataName) throws ConfigurationException {
         final AbstractIndexer indexer = getIndexer(id, null);
         try {
@@ -409,7 +438,7 @@ public class CSWConfigurationManager {
 
     /**
      * Refresh the map of configuration object.
-     * 
+     *
      * @param id identifier of the CSW service.
      * @return
      * @throws ConfigurationException
@@ -422,7 +451,7 @@ public class CSWConfigurationManager {
                 final Automatic config = (Automatic) ConfigurationEngine.getConfiguration("CSW", id);
                 config.setConfigurationDirectory(instanceDirectory);
                 return config;
-                
+
             } catch (JAXBException ex) {
                 throw new ConfigurationException("JAXBexception while getting the CSW configuration for:" + id, ex.getMessage());
             } catch (IllegalArgumentException ex) {

@@ -22,7 +22,7 @@
   <bean class="java.lang.String" id="cstlPassword">
     <constructor-arg type="java.lang.String" value="admin" />
   </bean>
-  
+
   <!-- Main service bean used to communicate with the Constellation server -->
   <bean class="org.constellation.gui.service.ConstellationService" id="constellationService" scope="singleton">
     <property name="url" ref="cstlUrl" />
@@ -35,6 +35,8 @@
   <bean class="org.constellation.gui.service.ServicesManager" id="servicesManager" scope="singleton">
   </bean>
   <bean class="org.constellation.gui.service.MapManager" id="mapManager" scope="singleton">
+  </bean>
+  <bean class="org.constellation.gui.service.CswManager" id="cswManager" scope="singleton">
   </bean>
   <bean class="org.constellation.gui.service.ProviderManager" id="providerManager" scope="singleton">
   </bean>

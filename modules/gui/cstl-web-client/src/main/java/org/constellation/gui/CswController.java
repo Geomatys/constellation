@@ -23,16 +23,16 @@ import juzu.Route;
 import juzu.View;
 import juzu.template.Template;
 import org.constellation.ServiceDef;
+import org.constellation.configuration.BriefNodeList;
 import org.constellation.configuration.Instance;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.gui.service.ConstellationService;
+import org.constellation.gui.service.CswManager;
 import org.constellation.gui.service.ServicesManager;
-import org.opengis.metadata.Metadata;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +60,12 @@ public class CswController {
      */
     @Inject
     protected ServicesManager servicesManager;
+
+    /**
+     * Manager used to call constellation server side.
+     */
+    @Inject
+    protected CswManager cswManager;
 
     @Inject
     @Path("csw_service.gtmpl")
@@ -121,9 +127,8 @@ public class CswController {
     @Route("editcsw/{serviceType}/{serviceId}")
     public Response dashboard(final String serviceId, final String serviceType) throws IOException {
         final Service metadata = servicesManager.getMetadata(serviceId, ServiceDef.Specification.fromShortName(serviceType));
-        final Instance instance   = servicesManager.getInstance(serviceId, ServiceDef.Specification.fromShortName(serviceType));
-        // TODO: get metadata list
-        final List<Metadata> mdList = new ArrayList<>();
+        final Instance instance = servicesManager.getInstance(serviceId, ServiceDef.Specification.fromShortName(serviceType));
+        final BriefNodeList mdList = cswManager.getMetadataList(serviceId, 10, 0);
 
         // Build service capabilities URL.
         String capabilitiesUrl = cstl.getUrl().toString();
@@ -140,7 +145,7 @@ public class CswController {
         parameters.put("service",         metadata);
         parameters.put("instance",        instance);
         parameters.put("mdList",          mdList);
-        parameters.put("nbResults",       0);
+        parameters.put("nbResults",       mdList.size());
         parameters.put("startIndex",      0);
         parameters.put("nbPerPage",       10);
         parameters.put("capabilitiesUrl", capabilitiesUrl);

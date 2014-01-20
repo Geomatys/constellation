@@ -42,21 +42,19 @@
     </div>
 <%} else {%>
     <div class="item-list">
-        <% for (def md : mdList) { %>
-        <div class="item ${md.getTitle().toLowerCase()}" data-alias="${md.getTitle()}" data-name="${md.getName()}">
+        <% for (def md : mdList.getList()) {%>
+        <div class="item ${md.title}" data-alias="${md.title}" data-name="${md.title}">
             <div class="top">
-                <span class="item-title">${md.getTitle()}</span>
-                <span class="pull-right text-right">Type</span>
+                <span class="item-title">${md.title}</span>
+                <span class="pull-right text-right">&{md.listing.metadata.type}</span>
             </div>
             <div class="bottom">
                 <div class="block">
-                    <i class="icon-calendar"></i>${md.getCreationDate()}
+                    <i class="icon-calendar"></i>${md.createDate}
                 </div>
                 <div class="block">
                     <i class="icon-user"></i>
-                    <% if (md.owner != null && md.owner != '') { %>
-                    ${md.owner}<% } else { %>&{label.unknown}
-                    <% } %>
+                    ${md.creator}
                 </div>
             </div>
         </div>

@@ -18,6 +18,7 @@
 package org.constellation.rest.api;
 
 import java.io.File;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -30,15 +31,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.BriefNode;
+import org.constellation.configuration.BriefNodeList;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.dto.ParameterValues;
 import org.constellation.metadata.configuration.CSWConfigurer;
+import org.w3c.dom.Node;
+
 import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
 @Path("/1/CSW")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -85,16 +91,23 @@ public class CSWServices {
         return ok(getConfigurer().importRecords(id, record, fileName));
     }
 
+    @GET
+    @Path("{id}/records/{count: \\w+}-{startIndex: \\w+}")
+    public Response getMetadataList(final @PathParam("id") String id, final @PathParam("count") int count, final @PathParam("startIndex") int startIndex) throws Exception {
+        final List<BriefNode> nodes = getConfigurer().getMetadataList(id, count, startIndex);
+        return ok(new BriefNodeList(nodes));
+    }
+
     @DELETE
-    @Path("{id}/records/{metaID}")
+    @Path("{id}/record/{metaID}")
     public Response removeMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().removeRecords(id, metaID));
     }
 
     @GET
-    @Path("{id}/records/{metaID}")
-    public Response metadataExist(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
-        return ok(getConfigurer().metadataExist(id, metaID));
+    @Path("{id}/record/{metaID}")
+    public Response getMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
+        return ok(getConfigurer().getMetadata(id, metaID));
     }
 
     @GET

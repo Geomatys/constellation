@@ -78,6 +78,10 @@ public final class ConstellationClient {
      */
     public final ProvidersAPI providers;
 
+    /**
+     * API methods related to csw administration.
+     */
+    public final CswAPI csw;
 
     /**
      * Creates a new client instance ready to communicate with the Constellation server.
@@ -109,6 +113,7 @@ public final class ConstellationClient {
         this.version    = version;
         this.services   = new ServicesAPI(this);
         this.providers  = new ProvidersAPI(this);
+        this.csw        = new CswAPI(this);
     }
 
     public String getUrl() {
@@ -152,10 +157,6 @@ public final class ConstellationClient {
         this.client.property(ClientProperties.CONNECT_TIMEOUT, timeout);
         return this;
     }
-    
-    
-    
-    
 
     /**
      * Submits a HTTP GET request and returns the response.
@@ -225,7 +226,7 @@ public final class ConstellationClient {
 
     /**
      * Submits a HTTP DELETE request and returns the response.
-     * 
+     *
      * @param path the request path
      * @param type the submitted/expected media type
      * @param paramName parameter send name
@@ -304,7 +305,7 @@ public final class ConstellationClient {
         /**
          * Ensures that the response has a "success" status code {@code 2xx}.
          *
-         * @throws HttpResponseException if the response does not have a {@code 2xx} status code 
+         * @throws HttpResponseException if the response does not have a {@code 2xx} status code
          * @throws IOException if the response entity parsing has failed
          */
         public void ensure2xxStatus() throws HttpResponseException, IOException  {

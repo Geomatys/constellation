@@ -18,14 +18,17 @@
 package org.constellation.metadata.configuration;
 
 import java.io.File;
+import java.util.List;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.BriefNode;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.ogc.configuration.OGCConfigurer;
+import org.w3c.dom.Node;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for CSW service.
@@ -82,6 +85,14 @@ public class CSWConfigurer extends OGCConfigurer {
 
     public AcknowlegementType metadataExist(final String id, final String identifier) throws ConfigurationException {
         return CSWConfigurationManager.getInstance().metadataExist(id, identifier);
+    }
+
+    public List<BriefNode> getMetadataList(final String id, final int count, final int startIndex) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().getMetadataList(id, count, startIndex);
+    }
+
+    public Node getMetadata(final String id, final String identifier) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().getMetadata(id, identifier);
     }
 
     public StringList getAvailableCSWDataSourceType() {
