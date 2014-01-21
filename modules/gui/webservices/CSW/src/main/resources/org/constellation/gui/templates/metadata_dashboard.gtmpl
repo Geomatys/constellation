@@ -30,12 +30,12 @@
     </div>
     <div class="pull-left" style="width:35%;">
         <div style="padding: 0 10px;">
-            <div class="row-fluid">
-                <a href="#addModal" style="margin-bottom:10px;" role="button" class="btn btn-info btn-large btn-block" data-toggle="modal" onmousedown="CSTL.AddLayerWorkflow.start();">&{layer.listing.data.add.button.label}</a>
-            </div>
             <div id="selection" data-role="selected">
-                #{include path=layer_selected.gtmpl/}
+                #{include path=md_selected.gtmpl/}
             </div>
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    CSTL.MetadataDashboard.init('${service.name}');
+</script>

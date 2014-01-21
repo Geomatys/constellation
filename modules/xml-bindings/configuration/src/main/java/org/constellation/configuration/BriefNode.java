@@ -20,6 +20,8 @@ public class BriefNode {
     @XmlTransient
     private Node node;
 
+    private String identifier;
+
     private String title;
 
     private String createDate;
@@ -32,6 +34,12 @@ public class BriefNode {
 
     public BriefNode(final Node node) {
         this.node = node;
+
+        final List<String> identifiers = NodeUtilities.getValuesFromPath(node, "/gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString");
+        if (!identifiers.isEmpty()) {
+            identifier = identifiers.get(0);
+        }
+
         final List<String> titles = NodeUtilities.getValuesFromPath(node, "/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
         if (!titles.isEmpty()) {
             title = titles.get(0);
@@ -57,6 +65,14 @@ public class BriefNode {
 
     public void setNode(Node node) {
         this.node = node;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     public String getTitle() {

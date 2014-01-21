@@ -18,11 +18,14 @@ package org.constellation.gui;
 
 import juzu.Action;
 import juzu.Path;
+import juzu.Resource;
 import juzu.Response;
 import juzu.Route;
 import juzu.View;
+import juzu.plugin.ajax.Ajax;
 import juzu.template.Template;
 import org.constellation.ServiceDef;
+import org.constellation.configuration.BriefNode;
 import org.constellation.configuration.BriefNodeList;
 import org.constellation.configuration.Instance;
 import org.constellation.dto.Service;
@@ -30,6 +33,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.CswManager;
 import org.constellation.gui.service.ServicesManager;
+import org.w3c.dom.Node;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -70,6 +74,14 @@ public class CswController {
     @Inject
     @Path("csw_service.gtmpl")
     Template serviceDescription;
+
+    @Inject
+    @Path("md.gtmpl")
+    Template list;
+
+    @Inject
+    @Path("md_selected.gtmpl")
+    Template selected;
 
     /**
      * View after service creation
@@ -151,5 +163,33 @@ public class CswController {
         parameters.put("capabilitiesUrl", capabilitiesUrl);
         parameters.put("selected",        null);
         return serviceDescription.ok(parameters).withMimeType("text/html");
+    }
+
+    @Ajax
+    @Resource
+    @Route("metadata/select")
+    public Response selectMetadata(final String serviceId, final String metadataId) throws IOException {
+        final Node mdNode = cswManager.getMetadata(serviceId, metadataId);
+
+        // Go to view with appropriate parameters.
+        final Map<String, Object> parameters = new HashMap<>(0);
+        parameters.put("selected", new BriefNode(mdNode));
+        return selected.ok(parameters).withMimeType("text/html");
+    }
+
+    @Ajax
+    @Resource
+    @Route("metadata/filter")
+    public Response metadataList(final String serviceId, final String start, final String count, final String filter, final String orderBy, final String direction, final String dataTypes) throws IOException {
+        final int intStart = Integer.parseInt(start);
+        final int intCount = Integer.parseInt(count);
+
+        final BriefNodeList mdList = cswManager.getMetadataList(serviceId, intCount, intStart);
+        final Map<String, Object> parameters = new HashMap<>(0);
+        parameters.put("mdList",     mdList);
+        parameters.put("nbResults",  mdList.size());
+        parameters.put("startIndex", intStart);
+        parameters.put("nbPerPage",  intCount);
+        return list.ok(parameters).withMimeType("text/html");
     }
 }

@@ -41,8 +41,8 @@
       <filter-name>MDCFilter</filter-name>
       <url-pattern>/WS/*</url-pattern>
     </filter-mapping>
-    
-  
+
+
 
     <!-- Filter to allow AJAX cross-origin requests -->
     <filter>
@@ -79,6 +79,7 @@
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>org.constellation.rest.api;
                          org.constellation.ws.rest;
+                         org.constellation.metadata.ws.rs.provider;
                          org.constellation.ws.rs.provider</param-value>
         </init-param>
         <init-param>
@@ -127,8 +128,8 @@
     <servlet-mapping>
         <servlet-name>milton</servlet-name>
         <url-pattern>/webdav/*</url-pattern>
-    </servlet-mapping> 
-    
+    </servlet-mapping>
+
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>

@@ -1,0 +1,11 @@
+#{param name=selected/}
+
+<% if (selected == null) { %>
+<div class="alert alert-info">
+    <h5>&{label.no.selected.metadata}</h5>
+    <p>&{msg.no.selected.metadata}</p>
+</div>
+<% } else { %>
+<div class="selected-item" id="selected-item" data-name="${selected.title}" data-identifier="${selected.identifier}">
+</div>
+<% } %>

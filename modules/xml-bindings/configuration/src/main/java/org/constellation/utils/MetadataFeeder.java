@@ -70,8 +70,7 @@ public class MetadataFeeder {
         addAbstract(feeded.getAnAbstract());
         addContact(feeded.getUsername(), feeded.getOrganisationName(), feeded.getRole());
 
-        String uuid = UUID.randomUUID().toString();
-        addFileIdentifier(uuid);
+        addFileIdentifier(feeded.getDataName());
 
         localeAndCountry = feeded.getLocaleData().split("_");
         Locale dataLocale;

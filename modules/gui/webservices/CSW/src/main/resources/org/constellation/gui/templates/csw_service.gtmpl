@@ -45,3 +45,16 @@
         </div>
     </div>
 </div>
+
+<div class="modal hide fade" id="getcapabilities-modal" style="left:40%; width:910px">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>GetCapabilities</h3>
+    </div>
+    <div class="modal-body">
+        <pre id="capabilities-modal-pre" style="background-color: #f8f8ff"><code class="xml"></code></pre>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    </div>
+</div>
