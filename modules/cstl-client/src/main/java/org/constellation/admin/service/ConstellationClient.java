@@ -32,11 +32,13 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AcknowlegementType;
+import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.client.filter.HttpBasicAuthFilter;
@@ -105,7 +107,8 @@ public final class ConstellationClient {
         ensureNonNull("version", version);
 
         // Initialize Jersey client.
-        this.client = ClientBuilder.newClient();
+        final Configuration config = new ClientConfig(NodeReader.class);
+        this.client = ClientBuilder.newClient(config);
         connectTimeout(5000);
         readTimeout(20000);
 

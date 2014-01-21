@@ -62,17 +62,17 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         instDirectory.mkdir();
 
         //we write the data files
-        writeDataFile("meta1.xml",         "42292_5p_19900609195600");
-        writeDataFile("meta2.xml",         "42292_9s_19900610041000");
-        writeDataFile("meta3.xml",         "39727_22_19750113062500");
-        writeDataFile("meta4.xml",         "11325_158_19640418141800");
-        writeDataFile("meta5.xml",         "40510_145_19930221211500");
-        writeDataFile("meta-19119.xml",    "mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
-        writeDataFile("imageMetadata.xml", "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-        writeDataFile("ebrim1.xml",        "000068C3-3B49-C671-89CF-10A39BB1B652");
-        writeDataFile("ebrim2.xml",        "urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
-        writeDataFile("ebrim3.xml",        "urn:motiive:csw-ebrim");
-        writeDataFile("meta13.xml",        "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
+        writeProvider("meta1.xml",         "42292_5p_19900609195600");
+        writeProvider("meta2.xml",         "42292_9s_19900610041000");
+        writeProvider("meta3.xml",         "39727_22_19750113062500");
+        writeProvider("meta4.xml",         "11325_158_19640418141800");
+        writeProvider("meta5.xml",         "40510_145_19930221211500");
+        writeProvider("meta-19119.xml",    "mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
+        writeProvider("imageMetadata.xml", "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        writeProvider("ebrim1.xml",        "000068C3-3B49-C671-89CF-10A39BB1B652");
+        writeProvider("ebrim2.xml",        "urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
+        writeProvider("ebrim3.xml",        "urn:motiive:csw-ebrim");
+        writeProvider("meta13.xml",        "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
 
         //we write the configuration file
         final String nulll = null;
@@ -205,7 +205,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         super.DescribeRecordTest();
     }
 
-    public static void writeDataFile(String resourceName, String identifier) throws Exception {
+    public static void writeProvider(String resourceName, String identifier) throws Exception {
 
         final LayerProviderService service = LayerProviderProxy.getInstance().getService("coverage-sql");
         final ParameterValueGroup config = service.getServiceDescriptor().createValue();
