@@ -147,7 +147,7 @@ public class CswController {
         if (!capabilitiesUrl.endsWith("/")) {
             capabilitiesUrl += "/";
         }
-        capabilitiesUrl += "WS/" + serviceType + "/" + serviceId + "?REQUEST=GetCapabilities&SERVICE=" + serviceType;
+        capabilitiesUrl += "WS/" + serviceType + "/" + serviceId + "?REQUEST=GetCapabilities&SERVICE=" + serviceType.toUpperCase();
         if (metadata.getVersions()!=null && metadata.getVersions().size() == 1) {
             capabilitiesUrl += "&VERSION=" + metadata.getVersions().get(0);
         }

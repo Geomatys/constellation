@@ -43,7 +43,7 @@
 <%} else {%>
     <div class="item-list">
         <% for (def md : mdList.getList()) {%>
-        <div class="item" data-alias="${md.title}" data-name="${md.title}" data-service="${service.name}" data-metadata="${md.identifier}">
+        <div class="item raster" data-alias="${md.title}" data-name="${md.title}" data-service="${service.name}" data-metadata="${md.identifier}">
             <div class="top">
                 <span class="item-title">${md.title}</span>
                 <span class="pull-right text-right">&{md.listing.metadata.type}</span>

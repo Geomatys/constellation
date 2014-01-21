@@ -7,5 +7,44 @@
 </div>
 <% } else { %>
 <div class="selected-item" id="selected-item" data-name="${selected.title}" data-identifier="${selected.identifier}">
+    <div class="block-header">
+        <strong>${selected.title}</strong><i class="icon-chevron-up pull-right"></i>
+    </div>
+
+    <div class="block-content">
+        <h6>&{label.owner}</h6>
+        <span>
+            <% if (selected.creator != null && selected.creator != '') { %>
+            ${selected.creator}<% } else { %>&{label.unknown}
+            <% } %>
+        </span>
+
+        <div class="separator"></div>
+        <h6>&{label.date}</h6>
+        <span>${selected.createDate}</span>
+
+        <div class="separator"></div>
+        <h6>&{label.type}</h6>
+        <span>&{md.listing.metadata.type}</span>
+    </div>
+
+    <div class="block-action">
+        <div class="row-fluid" style="padding-bottom: 5px">
+            <button type="button" id="editMd" class="btn btn-info span6">
+                <i class="icon-edit-alt"></i> &{md.listing.selected.edit.button}
+            </button>
+            <button type="button" id="duplicateMd" class="btn btn-warning span6">
+                <i class="icon-file-alt"></i> &{md.listing.selected.duplicate.button}
+            </button>
+        </div>
+        <div class="row-fluid">
+            <button type="button" id="exportMd" class="btn btn-success span6">
+                <i class="icon-download-alt"></i> &{md.listing.selected.export.button}
+            </button>
+            <button type="button" id="deleteMd" class="btn btn-danger span6">
+                <i class="icon-trash"></i> &{md.listing.selected.delete.button}
+            </button>
+        </div>
+    </div>
 </div>
 <% } %>
