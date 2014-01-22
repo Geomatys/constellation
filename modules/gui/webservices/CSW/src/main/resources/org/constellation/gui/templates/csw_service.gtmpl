@@ -42,6 +42,16 @@
             <div id="data" class="tab-pane active">
                 #{include path=metadata_dashboard.gtmpl/}
             </div>
+
+            <form action="@{CswController.deleteMetadata()}" id="deleteMdForm">
+                <input type="hidden" name="serviceId" value="${service.identifier}"/>
+                <input type="hidden" name="metadataId" id="deleteMetadataId"/>
+            </form>
+
+            <form action="@{CswController.editMetadata()}" id="editMdForm">
+                <input type="hidden" name="serviceId" value="${service.identifier}"/>
+                <input type="hidden" name="metadataId" id="editMetadataId"/>
+            </form>
         </div>
     </div>
 </div>

@@ -108,7 +108,13 @@
             $('#viewerData').modal("show");
             var layerName = $("#selected-item").data("name");
             var providerId = $("#selected-item").data("provider");
-            var layerData = CSTL.dataViewer.createLayer(layerName, providerId, "${portrayUrl}");
+            var providerType = $("#selected-item").data("type");
+            var layerData;
+            if (providerType === "COVERAGE") {
+                layerData = CSTL.Netcdf.createLayer(layerName, providerId);
+            } else {
+                layerData = CSTL.dataViewer.createLayer(layerName, providerId, "${portrayUrl}");
+            }
             var layerBackground = CSTL.dataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp", "${portrayUrl}");
             CSTL.dataViewer.layers = [layerData, layerBackground];
             CSTL.dataViewer.initMap();

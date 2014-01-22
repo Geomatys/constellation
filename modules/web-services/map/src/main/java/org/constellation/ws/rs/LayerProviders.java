@@ -19,6 +19,8 @@ package org.constellation.ws.rs;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.sis.geometry.Envelope2D;
+import org.apache.sis.geometry.GeneralEnvelope;
+import org.apache.sis.referencing.crs.DefaultGeographicCRS;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.Static;
 import org.constellation.dto.BandDescription;
@@ -221,13 +223,28 @@ public final class LayerProviders extends Static {
     }
 
 
-    public static PortrayalResponse portrayBand(final String providerId, final String layerName, final int width, final int height)
+    public static PortrayalResponse portrayBand(final String providerId, final String layerName, final String crsCode,
+                                                final String bbox, final int width, final int height)
             throws CstlServiceException {
         try {
             final LayerDetails layer = getLayer(providerId, layerName);
 
             // Envelope
-            final Envelope envelope = layer.getEnvelope();
+            //final Envelope envelope = layer.getEnvelope();
+            final CoordinateReferenceSystem crs;
+            try {
+                if ("EPSG:4326".equals(crsCode)) {
+                    crs = CRS.decode("CRS:84");
+                } else {
+                    crs = CRS.decode(crsCode);
+                }
+            } catch (FactoryException e) {
+                throw new CstlServiceException(e);
+            }
+            final GeneralEnvelope envelope = new GeneralEnvelope(crs);
+            final String[] bboxSplit = bbox.split(",");
+            envelope.setRange(0, Double.valueOf(bboxSplit[0]), Double.valueOf(bboxSplit[2]));
+            envelope.setRange(1, Double.valueOf(bboxSplit[1]), Double.valueOf(bboxSplit[3]));
 
             // Dimension
             final Dimension dimension = new Dimension(width, height);

@@ -19,6 +19,9 @@ CSTL.dataViewer = {
     layers : undefined,
 
     initMap : function(){
+        if (CSTL.dataViewer.map) {
+            CSTL.dataViewer.map.destroy();
+        }
         CSTL.dataViewer.map = new OpenLayers.Map('dataMap', {
             controls: [new OpenLayers.Control.Navigation()],
             projection: new OpenLayers.Projection('EPSG:4326'),

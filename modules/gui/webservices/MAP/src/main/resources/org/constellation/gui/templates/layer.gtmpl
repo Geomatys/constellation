@@ -42,7 +42,7 @@
 <%} else {%>
     <div class="item-list">
         <% for (def layer : layers) { %>
-        <div class="item ${layer.providerType.toLowerCase()}" data-alias="${layer.alias}" data-name="${layer.name}" data-provider="${layer.providerID}">
+        <div class="item ${layer.providerType.toLowerCase()}" data-alias="${layer.alias}" data-name="${layer.name}" data-provider="${layer.providerID}" data-type="${layer.providerType}">
             <div class="top">
                 <span class="item-title">${layer.alias}</span>
                 <span class="pull-right text-right">${layer.providerType}</span>

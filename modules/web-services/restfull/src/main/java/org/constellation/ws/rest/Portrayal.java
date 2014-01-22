@@ -56,9 +56,10 @@ public final class Portrayal {
 
     @GET
     @Path("/portray")
-    public Response portray2(@QueryParam("PROVIDER") final String providerId, @QueryParam("LAYERS") final String bandId, @QueryParam("WIDTH") final int width, @QueryParam("HEIGHT") final int height) {
+    public Response portray2(@QueryParam("PROVIDER") final String providerId, @QueryParam("LAYERS") final String bandId, @QueryParam("BBOX") final String bbox,
+                             @QueryParam("SRS") final String crs, @QueryParam("WIDTH") final int width, @QueryParam("HEIGHT") final int height) {
         try {
-            return Response.ok(LayerProviders.portrayBand(providerId, bandId, width, height)).build();
+            return Response.ok(LayerProviders.portrayBand(providerId, bandId, crs, bbox, width, height)).build();
         } catch (CstlServiceException ex) {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }

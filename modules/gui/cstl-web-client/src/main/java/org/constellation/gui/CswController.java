@@ -83,6 +83,10 @@ public class CswController {
     @Path("md_selected.gtmpl")
     Template selected;
 
+    @Inject
+    @Path("required_iso19115.gtmpl")
+    Template iso19115;
+
     /**
      * View after service creation
      *
@@ -191,5 +195,21 @@ public class CswController {
         parameters.put("startIndex", intStart);
         parameters.put("nbPerPage",  intCount);
         return list.ok(parameters).withMimeType("text/html");
+    }
+
+    @Action
+    @Route("delete/metadata")
+    public Response deleteMetadata(final String serviceId, final String metadataId) throws IOException {
+        cswManager.deleteMetadata(serviceId, metadataId);
+        return CswController_.dashboard(serviceId, metadataId);
+    }
+
+    @Action
+    @Route("edit/metadata")
+    public Response editMetadata(final String serviceId, final String metadataId) throws IOException {
+        final Map<String, Object> parameters = new HashMap<>(0);
+        parameters.put("serviceId", serviceId);
+        parameters.put("metadataId", metadataId);
+        return iso19115.ok(parameters).withMimeType("text/html");
     }
 }
