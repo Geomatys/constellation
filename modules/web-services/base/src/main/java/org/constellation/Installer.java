@@ -51,10 +51,10 @@ public final class Installer implements ServletContextListener{
             try {
                 Class.forName("javax.media.jai.JAI");
             } catch (ClassNotFoundException ex) {
-                LOGGER.log(Level.SEVERE, "JAI librairies are not in the classpath. Please install it.\n "
+                LOGGER.log(Level.SEVERE, "JAI libraries are not in the classpath. Please install it.\n "
                         + ex.getLocalizedMessage(), ex);
             }
-            LOGGER.log(Level.INFO, "=== GeotoolKit sucessfully started ===");
+            LOGGER.log(Level.INFO, "=== GeotoolKit successfully started ===");
         } catch(Exception ex) {
             LOGGER.log(Level.WARNING, "=== GeotoolKit failed to start ===\n"+ex.getLocalizedMessage(), ex);
         }
@@ -68,7 +68,7 @@ public final class Installer implements ServletContextListener{
             Setup.shutdown();
             //wait for threads to die
             wait(2000);
-            LOGGER.log(Level.INFO, "=== GeotoolKit sucessfully stopped ===");
+            LOGGER.log(Level.INFO, "=== GeotoolKit successfully stopped ===");
         }catch(Exception ex){
             LOGGER.log(Level.WARNING, "=== GeotoolKit failed to stop ===\n"+ex.getLocalizedMessage(), ex);
         }

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.inject.Inject;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.Instance;
@@ -41,7 +42,7 @@ import org.constellation.generic.database.Automatic;
  */
 public class  ServicesManager {
 
-    private static final Logger LOGGER = Logger.getLogger(ServicesManager.class.getName());
+    private static final Logger LOGGER = Logging.getLogger(ServicesManager.class);
 
     /**
      * Constellation manager used to communicate with the Constellation server.

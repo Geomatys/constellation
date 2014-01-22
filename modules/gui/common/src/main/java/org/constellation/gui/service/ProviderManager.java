@@ -17,6 +17,7 @@
 
 package org.constellation.gui.service;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.DataBrief;
@@ -54,7 +55,7 @@ import java.util.logging.Logger;
  */
 public class ProviderManager {
 
-    private static final Logger LOGGER = Logger.getLogger(ProviderManager.class.getName());
+    private static final Logger LOGGER = Logging.getLogger(ProviderManager.class);
     /**
      * Constellation manager used to communicate with the Constellation server.
      */

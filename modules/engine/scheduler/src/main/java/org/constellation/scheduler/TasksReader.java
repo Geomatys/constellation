@@ -22,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.sis.util.logging.Logging;
 import org.opengis.util.NoSuchIdentifierException;
 import org.quartz.SimpleTrigger;
 
@@ -88,7 +90,7 @@ public class TasksReader extends StaxStreamReader{
                     t = readTask();
                 } catch (NoSuchIdentifierException ex) {
                     t = null;
-                    Logger.getLogger(TasksReader.class.getName()).log(Level.WARNING, ex.getMessage());
+                    Logging.getLogger(TasksReader.class).log(Level.WARNING, ex.getMessage());
                 }
                 if(t != null){
                     tasks.add(t);

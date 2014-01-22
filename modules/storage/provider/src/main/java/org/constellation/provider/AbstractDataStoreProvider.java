@@ -29,6 +29,7 @@ import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.feature.DefaultName;
 
+import org.geotoolkit.parameter.Parameters;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -145,14 +146,17 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
             //use an empty datastore
             candidate = new MemoryFeatureStore();
         }
-        final String namespace;
-        ParameterValue paramns = candidate.getConfiguration().parameter(AbstractFeatureStoreFactory.NAMESPACE.getName().getCode());
-        if (paramns == null || paramns.getValue() == null) {
-            namespace = null;
-        } else if("no namespace".equalsIgnoreCase(String.valueOf(paramns.getValue()))){
-            namespace = null;
+
+        String namespace;
+        final ParameterValueGroup config = candidate.getConfiguration();
+        if (config != null) {
+            namespace = Parameters.value(AbstractFeatureStoreFactory.NAMESPACE, config);
         } else {
-            namespace = paramns.stringValue();
+            namespace = null;
+        }
+
+        if ("no namespace".equalsIgnoreCase(namespace)) {
+            namespace = null;
         }
         store = new ExtendedFeatureStore(candidate);
 
