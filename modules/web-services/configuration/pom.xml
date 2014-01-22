@@ -95,6 +95,13 @@
       <artifactId>cstl-lib-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+      <!-- Needed for configuration loading from file. -->
+      <dependency>
+          <groupId>org.constellation.storage</groupId>
+          <artifactId>cstl-store-provider</artifactId>
+          <version>${project.version}</version>
+      </dependency>
   </dependencies>
 
 </project>
