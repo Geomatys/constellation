@@ -209,9 +209,9 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor implements GetF
                 for (Feature feature : record) {
                     response.append("       <tr class=\"trValue\">\n");
                     for (final Iterator it = feature.getProperties().iterator(); it.hasNext();) {
-                        response.append("           <td>")
-                                .append(((Property)it.next()).getValue().toString())
-                                .append("           </td>\n");
+                        response.append("           <td>");
+                        response.append(((Property)it.next()).getValue());
+                        response.append("           </td>\n");
                     }
                     response.append("       </tr>\n");
                 }
