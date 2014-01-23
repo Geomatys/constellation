@@ -154,7 +154,7 @@ public final class MetadataUtilities {
         final CoordinateReferenceSystem cRs;
         try {
             cRs = coverageReader.getGridGeometry(0).getCoordinateReferenceSystem();
-        } catch (IllegalArgumentException ex) {
+        } catch (Exception ex) {
             LOGGER.log(Level.INFO, "Invalid coverage information", ex);
             return new DataInformation("error-data-import-no-geographic");
         }
