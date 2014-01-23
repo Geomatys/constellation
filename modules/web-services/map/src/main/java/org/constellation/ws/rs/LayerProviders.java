@@ -255,7 +255,7 @@ public final class LayerProviders extends Static {
 
 
             // Style.
-            double average = min + ((max - min) / 2);
+            double average = (max + min) / 2;
             final List<InterpolationPoint> values = new ArrayList<>();
             values.add(SF.interpolationPoint(Float.NaN, SF.literal(new Color(0, 0, 0, 0))));
             values.add(SF.interpolationPoint(min, SF.literal(new Color(0, 0, 255, 255))));
@@ -266,7 +266,7 @@ public final class LayerProviders extends Static {
             final Function function = SF.interpolateFunction(
                     lookup, values, Method.COLOR, Mode.LINEAR, fallback);
 
-            final ChannelSelection selection = SF.channelSelection(SF.selectedChannelType(layer.getName().toString(), (ContrastEnhancement) null));
+            final ChannelSelection selection = SF.channelSelection(SF.selectedChannelType("0", (ContrastEnhancement) null));
             final Expression opacity = LITERAL_ONE_FLOAT;
             final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
             final ColorMap colorMap = SF.colorMap(function);
