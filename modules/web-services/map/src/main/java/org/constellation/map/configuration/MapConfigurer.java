@@ -90,7 +90,7 @@ public class MapConfigurer extends OGCConfigurer {
 
         final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(addLayerData.getProviderId());
         final String namespace = ProviderParameters.getNamespace(provider);
-        final String layerId = namespace != null ? "{" + namespace + "}" + addLayerData.getLayerId() : addLayerData.getLayerId();
+        final String layerId = (namespace != null && !namespace.isEmpty()) ? "{" + namespace + "}" + addLayerData.getLayerId() : addLayerData.getLayerId();
 
         // Set layer provider reference.
         final DataReference layerProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, addLayerData.getProviderId(), layerId);

@@ -134,6 +134,7 @@ public class ProviderManager {
                         fileCoverageStoreParameters.parameter("identifier").setValue("coverage-file");
                         fileCoverageStoreParameters.parameter("path").setValue(fileUrl);
                         fileCoverageStoreParameters.parameter("type").setValue("AUTO");
+                        fileCoverageStoreParameters.parameter("namespace").setValue("no namespace");
                         break;
                     case "pgraster":
                         ParameterValueGroup postGresParametersFolder = sources.groups("choice").get(0).addGroup("PGRasterParameters");
