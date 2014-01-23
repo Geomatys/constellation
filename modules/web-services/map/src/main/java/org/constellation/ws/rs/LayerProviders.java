@@ -258,9 +258,9 @@ public final class LayerProviders extends Static {
             double average = (max + min) / 2;
             final List<InterpolationPoint> values = new ArrayList<>();
             values.add(SF.interpolationPoint(Float.NaN, SF.literal(new Color(0, 0, 0, 0))));
-            values.add(SF.interpolationPoint(min, SF.literal(new Color(0, 0, 255, 255))));
-            values.add(SF.interpolationPoint(average, SF.literal(new Color(0, 255, 0, 255))));
-            values.add(SF.interpolationPoint(max, SF.literal(new Color(255, 0, 0, 255))));
+            values.add(SF.interpolationPoint(min, SF.literal(new Color(0, 54, 204, 255))));
+            values.add(SF.interpolationPoint(average, SF.literal(new Color(255, 254, 162, 255))));
+            values.add(SF.interpolationPoint(max, SF.literal(new Color(199, 8, 30, 255))));
             final Expression lookup = DEFAULT_CATEGORIZE_LOOKUP;
             final Literal fallback = DEFAULT_FALLBACK;
             final Function function = SF.interpolateFunction(
@@ -270,7 +270,7 @@ public final class LayerProviders extends Static {
             final Expression opacity = LITERAL_ONE_FLOAT;
             final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
             final ColorMap colorMap = SF.colorMap(function);
-            final ContrastEnhancement enchance = SF.contrastEnhancement(LITERAL_ONE_FLOAT, ContrastMethod.NONE);
+            final ContrastEnhancement enhance = SF.contrastEnhancement(LITERAL_ONE_FLOAT, ContrastMethod.NONE);
             final ShadedRelief relief = SF.shadedRelief(LITERAL_ONE_FLOAT);
             final Symbolizer outline = null;
             final Unit uom = NonSI.PIXEL;
@@ -279,7 +279,7 @@ public final class LayerProviders extends Static {
             final Description desc = DEFAULT_DESCRIPTION;
 
             final RasterSymbolizer symbol = SF.rasterSymbolizer(
-                    name, geom, desc, uom, opacity, selection, overlap, colorMap, enchance, relief, outline);
+                    name, geom, desc, uom, opacity, selection, overlap, colorMap, enhance, relief, outline);
             final MutableStyle style = SF.style(symbol);
 
             style.setDefaultSpecification(symbol);
