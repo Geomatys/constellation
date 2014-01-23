@@ -19,4 +19,5 @@ modules/testing/cite/engine/components/*
 \.idea$
 syntax: glob
 modules/cstl-admin/node_modules
+modules/cstl-admin/src/main/webapp/dist
 modules/cstl-admin/.tmp

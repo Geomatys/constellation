@@ -1,5 +1,15 @@
 'use strict';
 
+
+function findWebappContext(){
+    var path = window.location.pathname;
+    if(path == '/')
+        return "/";
+    
+    return path.substring(0, path.indexOf("/", 1));
+}
+
+
 /* App Module */
 
 var cstlAdminApp = angular.module('cstlAdminApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate']);
@@ -71,7 +81,7 @@ cstlAdminApp
 
             // Initialize angular-translate
             $translateProvider.useStaticFilesLoader({
-                prefix: '/cstl-admin/i18n/',
+                prefix: findWebappContext() + '/i18n/',
                 suffix: '.json'
             });
 

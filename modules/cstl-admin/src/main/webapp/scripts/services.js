@@ -2,7 +2,10 @@
 
 /* Services */
 
-var context = "/cstl-admin";
+
+
+
+var context = findWebappContext();
 
 cstlAdminApp.factory('Account', ['$resource',
     function ($resource) {
@@ -71,6 +74,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
                     if(param.success){
                         param.success(data, status, headers, config);
                     }
+                    $http.defaults.headers.common.Authorization = 'Basic YWRtaW46YWRtaW4=';
                 }).error(function (data, status, headers, config) {
                     console.log("auth error");
                     $rootScope.authenticationError = true;
