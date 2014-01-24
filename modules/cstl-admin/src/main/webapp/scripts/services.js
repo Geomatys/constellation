@@ -61,6 +61,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
                 $http.get(context + '/app/rest/authenticate')
                     .success(function (data, status, headers, config) {
                         $rootScope.$broadcast('event:auth-authConfirmed');
+                        $http.defaults.headers.common.Authorization = 'Basic YWRtaW46YWRtaW4=';
                     });
             },
             login: function (param) {
