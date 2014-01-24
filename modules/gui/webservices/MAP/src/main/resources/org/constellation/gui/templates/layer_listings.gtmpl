@@ -33,7 +33,7 @@
             <div class="row-fluid">
                 <a href="#addModal" style="margin-bottom:10px;" role="button" class="btn btn-info btn-large btn-block" data-toggle="modal" onmousedown="CSTL.AddLayerWorkflow.start();">&{layer.listing.data.add.button.label}</a>
             </div>
-            <div id="selection" data-role="selected">
+            <div id="selection" data-role="selected" data-instance="${service.identifier}">
                 #{include path=layer_selected.gtmpl/}
             </div>
         </div>

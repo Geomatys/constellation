@@ -110,8 +110,8 @@
         $("#showData").on("click", function(){
             $('#viewerData').modal("show")
             var layerName = $("#selected-item").data("name");
-            var providerId = $("#selected-item").data("provider");
-            var layerData = CSTL.dataViewer.createLayer(layerName, providerId, "${portrayUrl}");
+            var instanceName = $("#selection").data("instance");
+            var layerData = CSTL.dataViewer.createLayerWMS(layerName, instanceName);
             var layerBackground = CSTL.dataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp", "${portrayUrl}");
             CSTL.dataViewer.layers = [layerData, layerBackground];
             CSTL.dataViewer.initMap();

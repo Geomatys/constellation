@@ -22,7 +22,11 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
+
+import java.awt.*;
 import java.io.FileNotFoundException;
+
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
@@ -35,27 +39,62 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
+import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PropertyDescription;
 import org.constellation.ogc.configuration.OGCConfigurer;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.StyleProvider;
+import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
 import org.constellation.ws.rs.MapUtilities;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.style.function.InterpolationPoint;
+import org.geotoolkit.style.function.Method;
+import org.geotoolkit.style.function.Mode;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.style.ChannelSelection;
+import org.opengis.style.ColorMap;
+import org.opengis.style.ContrastEnhancement;
+import org.opengis.style.ContrastMethod;
+import org.opengis.style.Description;
+import org.opengis.style.OverlapBehavior;
+import org.opengis.style.RasterSymbolizer;
+import org.opengis.style.ShadedRelief;
+import org.opengis.style.Symbolizer;
 
+import javax.measure.unit.NonSI;
+import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+
+import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
+import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} base for "map" services.
@@ -109,9 +148,9 @@ public class MapConfigurer extends OGCConfigurer {
                     styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-point");
                 }
             } else {
-                styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-raster");
+                styleProviderReference = generateDefaultStyleProviderReference((CoverageDataDescription)dataDescription, addLayerData.getLayerId());
             }
-        } catch (CstlServiceException ex) {
+        } catch (IOException | DataStoreException | CstlServiceException ex) {
             LOGGER.log(Level.INFO, "Error when trying to find an appropriate default style. Fallback to a raster style.");
             styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-raster");
         }
@@ -143,6 +182,52 @@ public class MapConfigurer extends OGCConfigurer {
         } catch (ProcessException ex) {
             throw new ConfigProcessException("Process to add a layer has reported an error.", ex);
         }
+    }
+
+    private DataReference generateDefaultStyleProviderReference(final CoverageDataDescription covDesc, final String layerName) throws IOException, DataStoreException, CstlServiceException {
+        double min = covDesc.getBands().get(0).getMinValue();
+        double max = covDesc.getBands().get(0).getMaxValue();
+
+        // Style.
+        final MutableStyleFactory SF = (MutableStyleFactory) FactoryFinder.getStyleFactory(
+                new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
+
+        double average = (max + min) / 2;
+        final List<InterpolationPoint> values = new ArrayList<>();
+        values.add(SF.interpolationPoint(Float.NaN, SF.literal(new Color(0, 0, 0, 0))));
+        values.add(SF.interpolationPoint(min, SF.literal(new Color(0, 54, 204, 255))));
+        values.add(SF.interpolationPoint(average, SF.literal(new Color(255, 254, 162, 255))));
+        values.add(SF.interpolationPoint(max, SF.literal(new Color(199, 8, 30, 255))));
+        final Expression lookup = DEFAULT_CATEGORIZE_LOOKUP;
+        final Literal fallback = DEFAULT_FALLBACK;
+        final Function function = SF.interpolateFunction(
+                lookup, values, Method.COLOR, Mode.LINEAR, fallback);
+
+        final ChannelSelection selection = SF.channelSelection(SF.selectedChannelType("0", (ContrastEnhancement) null));
+        final Expression opacity = LITERAL_ONE_FLOAT;
+        final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
+        final ColorMap colorMap = SF.colorMap(function);
+        final ContrastEnhancement enhance = SF.contrastEnhancement(LITERAL_ONE_FLOAT, ContrastMethod.NONE);
+        final ShadedRelief relief = SF.shadedRelief(LITERAL_ONE_FLOAT);
+        final Symbolizer outline = null;
+        final Unit uom = NonSI.PIXEL;
+        final String geom = DEFAULT_GEOM;
+        final String symbName = "raster symbol name";
+        final Description desc = DEFAULT_DESCRIPTION;
+
+        final RasterSymbolizer symbol = SF.rasterSymbolizer(
+                symbName, geom, desc, uom, opacity, selection, overlap, colorMap, enhance, relief, outline);
+        final MutableStyle style = SF.style(symbol);
+
+        style.setDefaultSpecification(symbol);
+
+
+        final StyleProvider provider = StyleProviderProxy.getInstance().getProvider("sld");
+        // Add style into provider.
+        final String styleName = "default_"+ layerName;
+        provider.set(styleName, style);
+
+        return DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", styleName);
     }
 
     /**
