@@ -66,7 +66,8 @@ CSTL.dataViewer = {
                 request:     'GetMap',
                 layers:      layerName,
                 version:     '1.3.0',
-                sld_version: '1.1.0'
+                sld_version: '1.1.0',
+                format:      'image/png'
             },
             {
                 ratio: 1,
