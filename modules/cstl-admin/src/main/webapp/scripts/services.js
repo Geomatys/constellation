@@ -7,6 +7,8 @@
 
 var context = findWebappContext();
 
+var cstlContext = context=="/cstl-admin"?"constellation/":"";
+
 cstlAdminApp.factory('Account', ['$resource',
     function ($resource) {
         return $resource('app/rest/account', {}, {
@@ -43,11 +45,11 @@ cstlAdminApp.factory('LogsService', ['$resource',
 
 cstlAdminApp.factory('webService', ['$resource',
                                      function ($resource) {
-                                         return $resource('constellation/api/1/admin/instances', {}, {
+                                         return $resource(cstlContext+'api/1/admin/instances', {}, {
                                              'listAll': { method: 'GET', isArray: false},
-                                             'get':  { method: 'GET', url: 'constellation/api/1/OGC/:type/:id'},
-                                             'metadata':  { method: 'GET', url: 'constellation/api/1/OGC/:type/:id/metadata'},
-                                             'config':  { method: 'GET', url: 'constellation/api/1/OGC/:type/:id/config'},
+                                             'get':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id'},
+                                             'metadata':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
+                                             'config':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config'},
                                              
                                          });
                                      }]);
