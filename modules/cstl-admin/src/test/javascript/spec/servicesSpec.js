@@ -14,7 +14,7 @@ describe('Services Tests ', function () {
             httpBackend = $httpBackend;
             authServiceSpied = authService;
             //Request on app init
-            httpBackend.expectGET('/cstl-admin/i18n/en.json').respond(200, '');
+            httpBackend.expectGET('/i18n/en.json').respond(200, '');
 
         }));
         //make sure no expectations were missed in your tests.
@@ -29,7 +29,7 @@ describe('Services Tests ', function () {
             //set up some data for the http call to return and test later.
             var returnData = { result: 'ok' };
             //expectGET to make sure this is called once.
-            httpBackend.expectGET('/cstl-admin/app/logout').respond(returnData);
+            httpBackend.expectGET('/app/logout').respond(returnData);
 
             //Set spy
             spyOn(authServiceSpied, 'loginCancelled');
