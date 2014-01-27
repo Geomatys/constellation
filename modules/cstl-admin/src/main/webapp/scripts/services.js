@@ -50,9 +50,16 @@ cstlAdminApp.factory('webService', ['$resource',
                                              'get':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id'},
                                              'metadata':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
                                              'config':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config'}
-                                             
+
                                          });
                                      }]);
+
+cstlAdminApp.factory('dataListing', ['$resource',
+    function ($resource) {
+        return $resource(cstlContext+'api/1/data/list/:filter', {}, {
+            'listAll': { method: 'GET', isArray: true}
+        });
+    }]);
 
 cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService',
     function ($rootScope, $http, authService) {

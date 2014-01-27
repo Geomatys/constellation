@@ -9,3 +9,13 @@
     background-color: red;
 }
 
+.logo-wrapper {
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.logo-wrapper img {
+    height: 68px;
+    max-height: 68px;
+}
+

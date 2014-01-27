@@ -119,12 +119,17 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 
+cstlAdminApp.controller('DataController', ['$scope', 'dataListing',
+    function ($scope, dataListing) {
+        $scope.dataList = dataListing.listAll();
+    }]);
+
+cstlAdminApp.controller('WebServiceController', ['$scope', 'webService',
     function ($scope, webService) {
        $scope.services = webService.listAll();
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService',
                                                  function ($scope, $routeParams , webService) {
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
     $scope.metadata = webService.metadata({type: $routeParams.type, id:$routeParams.id});

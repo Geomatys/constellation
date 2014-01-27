@@ -5,6 +5,7 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.dao.DataRecord;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.NotRunningServiceException;
@@ -60,7 +61,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -344,6 +347,36 @@ public class Data {
         final QName fullName = new QName(namespace, name);
         final DataBrief db = ConfigurationEngine.getData(fullName, providerId);
         return Response.ok(db).build();
+    }
+
+    @GET
+    @Path("list")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getDataList() {
+        return getDataList(null);
+    }
+
+    @GET
+    @Path("list/{type}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getDataList(@PathParam("type") String type) {
+        final List<DataBrief> briefs = new ArrayList<>();
+
+        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        for (final LayerProvider p : providers) {
+            if (type != null && !p.getDataType().equals(DataRecord.DataType.valueOf(type))) {
+                continue;
+            }
+            for(Name n : p.getKeys()){
+                final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
+                final DataBrief db = ConfigurationEngine.getData(name, p.getId());
+                briefs.add(db);
+            }
+        }
+
+        return Response.ok(briefs).build();
     }
 
     @GET

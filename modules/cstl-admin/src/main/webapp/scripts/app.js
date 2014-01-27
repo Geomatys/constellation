@@ -5,7 +5,7 @@ function findWebappContext(){
     var path = window.location.pathname;
     if(path == '/')
         return "/";
-    
+
     return path.substring(0, path.indexOf("/", 1));
 }
 
@@ -73,6 +73,10 @@ cstlAdminApp
                 .when('/webservice/:type/:id', {
                     templateUrl: 'views/webservice/edit.html',
                     controller: 'WebServiceEditController'
+                })
+                .when('/data', {
+                    templateUrl: 'views/data.html',
+                    controller: 'DataController'
                 })
                 .otherwise({
                     templateUrl: 'views/main.html',
