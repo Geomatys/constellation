@@ -1,6 +1,6 @@
 <div class="logo-wrapper row">
     <div class="col-sm-2">
-        <img src="images/constellation.png">
+        <a href="#"><img src="images/constellation.png"></a>
     </div>
     <!-- Menu to create services -->
     <div class="col-sm-3 col-sm-offset-6 pull-right">
@@ -64,13 +64,13 @@
             <div class="pull-left" style="width: 60%;">
                 <div id="list" data-role="list">
                     <div class="item-list">
-                        <li class="item" ng-repeat="service in dataList">
+                        <div class="item" ng-repeat="service in dataList" ng-class="service.Type | lowercase">
                             <div class="top">
                                 <span class="item-title">{{service.Name}}</span>
                             </div>
                             <div class="bottom">
                                 <div class="block">
-                                    <i class="icon-calendar"></i>{{service.Date}}
+                                    <i class="icon-calendar"></i>{{service.Date | date:'yyyy-MM-dd HH:mm:ss'}}
                                 </div>
                                 <div class="block">
                                     <i class="icon-user"></i>{{service.Owner}}
@@ -79,8 +79,8 @@
                                     <i class="icon-folder-close-alt"></i>{{service.Type}}
                                 </div>
                             </div>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="pull-left" style="width: 40%;">

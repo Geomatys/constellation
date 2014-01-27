@@ -19,3 +19,177 @@
     max-height: 68px;
 }
 
+/*
+ * Sort and filter.
+ */
+.sort-navbar {
+    margin-bottom: 15px;
+}
+
+.sort-navbar .navbar-inner {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    padding-left: 0;
+    background-image: none;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #e3e3e3;
+}
+.sort-navbar .navbar-inner li a {
+    padding: 10px 18px;
+}
+.sort-navbar .navbar-inner li a .icon-caret-up, .sort-navbar .navbar-inner li a .icon-caret-down {
+    display: none;
+}
+.sort-navbar .navbar-inner li a .ascending .icon-caret-up, .sort-navbar .navbar-inner li a .descending .icon-caret-down {
+    display: inline-block;
+}
+.sort-navbar .navbar-inner li.divider-vertical {
+    border-left: 1px solid #e3e3e3;
+}
+.sort-navbar .navbar-inner .divider-vertical {
+    margin: 0;
+}
+.sort-navbar .navbar-inner .btn {
+    margin-top: 7px;
+}
+.sort-navbar .navbar-inner input[type=text] {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.sort-navbar .navbar-inner .ajax-loader {
+    display: none;
+    height: 30px;
+    width: 30px;
+    margin-right: 5px;
+    margin-top: 5px;
+    background: transparent url('../images/loader.gif') center center no-repeat;
+}
+
+
+/*
+ * Pagination.
+ */
+.pagination-wrapper {
+    height: 30px;
+    margin-bottom: 10px;
+}
+.pagination-wrapper .nb-results {
+    line-height: 30px;
+}
+.pagination-wrapper select.nb-per-page {
+    width: 65px;
+}
+.pagination-wrapper .pagination {
+    margin: 0 5px 0 0;
+}
+
+/*
+ * Dashboard item list.
+ */
+.item-list .item.coverage {
+    background: transparent url('../images/raster.png') right center no-repeat;
+}
+.item-list .item.coverage.selected {
+    background: transparent url('../images/raster-selected.png') right center no-repeat;
+}
+.item-list .item.vector {
+    background: transparent url('../images/vector.png') right center no-repeat;
+}
+.item-list .item.vector.selected {
+    background: transparent url('../images/vector-selected.png') right center no-repeat;
+}
+.item-list .item.sensor {
+    background: transparent url('../images/sensor.png') right center no-repeat;
+}
+.item-list .item.sensor.selected {
+    background: transparent url('../images/sensor-selected.png') right center no-repeat;
+}
+.item-list .item.pyramid {
+    background: transparent url('../images/pyramid.png') right center no-repeat;
+}
+.item-list .item.pyramid.selected {
+    background: transparent url('../images/pyramid-selected.png') right center no-repeat;
+}
+.item-list .item.style {
+    background: transparent url('../images/style.png') right center no-repeat;
+}
+.item-list .item.style.selected{
+    background: transparent url('../images/style-selected.png') right center no-repeat;
+}
+
+.item-list .item {
+    border: 1px solid white;
+    opacity: 0.8;
+    filter: ~"alpha(opacity=80)";
+    text-shadow: 0 1px 1px white;
+    margin-bottom: 10px;
+    height: 68px;
+    max-height: 68px;
+    cursor: pointer;
+}
+
+.item-list .item .top {
+    border-bottom: 1px solid #f5f5f5;
+    padding: 0 10px;
+}
+
+.item-list .item .top .item-title, .item-list .item .top .text-right {
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 35px;
+}
+
+.item-list .item .top .text-right {
+    float: right;
+    text-transform: uppercase;
+}
+
+.item-list .item .bottom {
+    line-height: 32px;
+}
+
+.item-list .item .bottom .block {
+    border-right: 1px solid #f5f5f5;
+    float: left;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+.item-list .item .bottom .block:last-child {
+    border: none;
+}
+.item-list .item .bottom i[class^="icon-"], .item-list .item .bottom i[class*=" icon-"] {
+    font-size: 14px;
+    margin-right: 8px;
+}
+
+.item-list .item.selected {
+    text-shadow: 0 1px 1px black;
+}
+.item-list .item.selected .top {
+    border-bottom: 1px solid #bbb;
+}
+.item-list .item.selected .top .item-title {
+    color: #f5f5f5;
+}
+.item-list .item.selected .top .text-right {
+    color: #2f96b4;
+}
+
+.item-list .item.selected .bottom .block {
+    color: #eee;
+    border-color: #bbb;
+}
+
+.item-list .item:hover {
+    opacity: 1;
+    filter: ~"alpha(opacity=100)";
+}
+
+.item-list .item.disabled, .item-list .item.disabled:hover {
+    opacity: 0.5;
+    filter: ~"alpha(opacity=50)";
+}
+
+
