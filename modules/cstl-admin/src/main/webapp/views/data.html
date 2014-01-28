@@ -63,8 +63,19 @@
             <div class="dash-inner row">
                 <div class="pull-left" style="width: 60%;">
                     <div id="list" data-role="list">
+                        <div class="pagination-wrapper">
+                            <span class="nb-results pull-left"><strong>${nbResults}</strong> &{label.results}</span>
+                            <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:count}" on-select-page="displayPage(page)"></div>
+                        </div>
                         <div class="item-list">
-                            <div class="item" ng-repeat="service in dataList | filter:{Type:filtertype,$:filtertext} | orderBy:ordertype:orderreverse" ng-class="service.Type | lowercase">
+                            <div class="item" ng-repeat="service in dataList" ng-class="service.Type | lowercase">
                                 <div class="top">
                                     <span class="item-title">{{service.Name}}</span>
                                 </div>

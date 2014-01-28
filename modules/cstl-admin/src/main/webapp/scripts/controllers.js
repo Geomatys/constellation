@@ -119,12 +119,44 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('DataController', ['$scope', 'dataListing',
-    function ($scope, dataListing) {
-        $scope.dataList = dataListing.listAll();
+cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing',
+    function ($scope, $filter, dataListing) {
+
+        $scope.displayPage = function(page) {
+            var array = $filter('filter')(fullList, {'Type':$scope.filtertype, '$': $scope.filtertext});
+            array = $filter('orderBy')(array, $scope.ordertype, $scope.orderreverse);
+            var start = (page - 1) * $scope.nbbypage;
+
+            $scope.currentpage = page;
+            $scope.count = array.length;
+            $scope.dataList = array.splice(start, $scope.nbbypage);
+        };
+
+        $scope.dataList = [];
+        var fullList = dataListing.listAll({}, function() {
+            $scope.displayPage(1);
+        });
+
+        $scope.filtertext = "";
         $scope.filtertype = "VECTOR";
         $scope.ordertype = "Name";
         $scope.orderreverse = false;
+        $scope.count = 0;
+        $scope.nbbypage = 10;
+        $scope.currentpage = 1;
+
+        $scope.$watch('filtertext', function() {
+            $scope.displayPage(1);
+        });
+        $scope.$watch('filtertype', function() {
+            $scope.displayPage(1);
+        });
+        $scope.$watch('ordertype', function() {
+            $scope.displayPage($scope.currentpage);
+        });
+        $scope.$watch('orderreverse', function() {
+            $scope.displayPage($scope.currentpage);
+        });
     }]);
 
 cstlAdminApp.controller('WebServiceController', ['$scope', 'webService',
