@@ -21,11 +21,10 @@
     <div class="col-sm-3">
         <div class="well nav-frame">
             <ul id="dataTypesNav" class="nav nav-list">
-                <li class="active"><a href="#" data-type="vector" translate="label.vector">Vecteur</a></li>
-                <li><a href="#" data-type="raster" translate="label.raster">Raster</a></li>
-                <li><a href="#" data-type="sensor" translate="label.sensor">Capteur</a></li>
-                <li><a href="#" data-type="virtual" translate="label.data.virtual.sensor">Capteurs virtuels</a>
-                </li>
+                <li ng-class="{active:filtertype=='VECTOR'}" ng-click="filtertype='VECTOR'"><a translate="label.vector">Vecteur</a></li>
+                <li ng-class="{active:filtertype=='COVERAGE'}" ng-click="filtertype='COVERAGE'"><a translate="label.raster">Raster</a></li>
+                <li ng-class="{active:filtertype=='SENSOR'}" ng-click="filtertype='SENSOR'"><a translate="label.sensor">Capteur</a></li>
+                <li ng-class="{active:filtertype=='VIRTUAL_SENSOR'}" ng-click="filtertype='VIRTUAL_SENSOR'"><a translate="label.data.virtual.sensor">Capteurs virtuels</a></li>
             </ul>
         </div>
     </div>
@@ -56,7 +55,7 @@
                     <div class="pull-right">
                         <div style="position:relative;">
                             <div class="ajax-loader" style="right:0;position:absolute;"></div>
-                            <input type="text" data-role="search" class="search-query" placeholder="..." />
+                            <input id="searchbox" type="text" ng-model="filtertext" class="search-query form-control" placeholder="..." />
                         </div>
                     </div>
                 </div>
@@ -65,7 +64,7 @@
                 <div class="pull-left" style="width: 60%;">
                     <div id="list" data-role="list">
                         <div class="item-list">
-                            <div class="item" ng-repeat="service in dataList" ng-class="service.Type | lowercase">
+                            <div class="item" ng-repeat="service in dataList | filter:{Type:filtertype,$:filtertext}" ng-class="service.Type | lowercase">
                                 <div class="top">
                                     <span class="item-title">{{service.Name}}</span>
                                 </div>

@@ -122,6 +122,7 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
 cstlAdminApp.controller('DataController', ['$scope', 'dataListing',
     function ($scope, dataListing) {
         $scope.dataList = dataListing.listAll();
+        $scope.filtertype = "VECTOR";
     }]);
 
 cstlAdminApp.controller('WebServiceController', ['$scope', 'webService',
