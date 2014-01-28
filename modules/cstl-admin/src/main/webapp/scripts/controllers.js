@@ -128,7 +128,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing',
             var start = (page - 1) * $scope.nbbypage;
 
             $scope.currentpage = page;
-            $scope.count = array.length;
+            $scope.countdata = array.length;
             $scope.dataList = array.splice(start, $scope.nbbypage);
         };
 
@@ -141,10 +141,13 @@ cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing',
         $scope.filtertype = "VECTOR";
         $scope.ordertype = "Name";
         $scope.orderreverse = false;
-        $scope.count = 0;
+        $scope.countdata = 0;
         $scope.nbbypage = 10;
         $scope.currentpage = 1;
 
+        $scope.$watch('nbbypage', function() {
+            $scope.displayPage(1);
+        });
         $scope.$watch('filtertext', function() {
             $scope.displayPage(1);
         });
