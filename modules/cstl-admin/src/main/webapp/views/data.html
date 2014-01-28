@@ -1,10 +1,10 @@
 <div class="logo-wrapper row">
-    <div class="col-sm-2">
+    <div class="col-sm-3">
         <a href="#"><img src="images/constellation.png"></a>
     </div>
     <!-- Menu to create services -->
-    <div class="col-sm-3 col-sm-offset-6 pull-right">
-        <div class="dropdown">
+    <div class="col-sm-3 col-sm-offset-6">
+        <div class="dropdown pull-right">
             <a data-toggle="dropdown" class="btn btn-info btn-lg dropdown-toggle" style="margin-top:8px;padding:15px 19px;">
                 <span class="icon-plus icon-white" style="margin-right:5px;" translate="label.add.data">Ajouter une donnée</span>
             </a>
@@ -29,63 +29,65 @@
             </ul>
         </div>
     </div>
-    <div class="col-sm-9 frame dashboard">
-        <div class="navbar">
-            <div class="navbar-inner">
-                <a id="dataDashboardTitle" class="brand" href="#" translate="label.data.vector">Données vectorielles</a>
+    <div class="col-sm-9">
+        <div class="frame dashboard">
+            <div class="navbar title">
+                <div class="navbar-inner">
+                    <a id="dataDashboardTitle" class="brand" href="#" translate="label.data.vector">Données vectorielles</a>
+                </div>
             </div>
-        </div>
-        <div class="navbar sort-navbar">
-            <div class="navbar-inner">
-                <ul class="nav">
-                    <li><a href="#" data-order-by="title" translate="label.title">
-                        Titre<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                    </a></li>
-                    <li class="divider-vertical"></li>
-                    <li><a href="#" data-order-by="date" translate="label.date">
-                        Date<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                    </a></li>
-                    <li class="divider-vertical"></li>
-                    <li><a href="#" data-order-by="owner" translate="label.owner">
-                        Propriétaire<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                    </a></li>
-                    <li class="divider-vertical"></li>
-                </ul>
-                <button type="button" data-role="reset" class="btn btn-sm btn-info"><i class="icon-remove icon-white"></i></button>
-                <div class="pull-right">
-                    <div style="position:relative;">
-                        <div class="ajax-loader" style="right:0;position:absolute;"></div>
-                        <input type="text" data-role="search" class="search-query" placeholder="..." />
+            <div class="navbar sort-navbar">
+                <div class="navbar-inner">
+                    <ul class="nav">
+                        <li><a href="#" data-order-by="title" translate="label.title">
+                            Titre<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                        </a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="date" translate="label.date">
+                            Date<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                        </a></li>
+                        <li class="divider-vertical"></li>
+                        <li><a href="#" data-order-by="owner" translate="label.owner">
+                            Propriétaire<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                        </a></li>
+                        <li class="divider-vertical"></li>
+                    </ul>
+                    <button type="button" data-role="reset" class="btn btn-xs btn-info"><i class="icon-remove icon-white"></i></button>
+                    <div class="pull-right">
+                        <div style="position:relative;">
+                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                            <input type="text" data-role="search" class="search-query" placeholder="..." />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row dash-inner">
-            <div class="pull-left" style="width: 60%;">
-                <div id="list" data-role="list">
-                    <div class="item-list">
-                        <div class="item" ng-repeat="service in dataList" ng-class="service.Type | lowercase">
-                            <div class="top">
-                                <span class="item-title">{{service.Name}}</span>
-                            </div>
-                            <div class="bottom">
-                                <div class="block">
-                                    <i class="icon-calendar"></i>{{service.Date | date:'yyyy-MM-dd HH:mm:ss'}}
+            <div class="dash-inner row">
+                <div class="pull-left" style="width: 60%;">
+                    <div id="list" data-role="list">
+                        <div class="item-list">
+                            <div class="item" ng-repeat="service in dataList" ng-class="service.Type | lowercase">
+                                <div class="top">
+                                    <span class="item-title">{{service.Name}}</span>
                                 </div>
-                                <div class="block">
-                                    <i class="icon-user"></i>{{service.Owner}}
-                                </div>
-                                <div class="block">
-                                    <i class="icon-folder-close-alt"></i>{{service.Type}}
+                                <div class="bottom">
+                                    <div class="block">
+                                        <i class="icon-calendar"></i>{{service.Date | date:'yyyy-MM-dd HH:mm:ss'}}
+                                    </div>
+                                    <div class="block">
+                                        <i class="icon-user"></i>{{service.Owner}}
+                                    </div>
+                                    <div class="block">
+                                        <i class="icon-folder-close-alt"></i>{{service.Type}}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="pull-left" style="width: 40%;">
-                <div id="selection" data-role="selected">
+                <div class="pull-left" style="width: 40%;">
+                    <div id="selection" data-role="selected">
 
+                    </div>
                 </div>
             </div>
         </div>
