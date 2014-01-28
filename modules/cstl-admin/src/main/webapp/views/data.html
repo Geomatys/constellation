@@ -38,20 +38,20 @@
             <div class="navbar sort-navbar">
                 <div class="navbar-inner">
                     <ul class="nav">
-                        <li><a href="#" data-order-by="title" translate="label.title">
+                        <li ng-click="ordertype='Name';orderreverse=false"><a translate="label.title">
                             Titre<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                         </a></li>
                         <li class="divider-vertical"></li>
-                        <li><a href="#" data-order-by="date" translate="label.date">
+                        <li ng-click="ordertype='Date';orderreverse=true"><a translate="label.date">
                             Date<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                         </a></li>
                         <li class="divider-vertical"></li>
-                        <li><a href="#" data-order-by="owner" translate="label.owner">
+                        <li ng-click="ordertype='Owner';orderreverse=false"><a translate="label.owner">
                             Propriétaire<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                         </a></li>
                         <li class="divider-vertical"></li>
                     </ul>
-                    <button type="button" data-role="reset" class="btn btn-xs btn-info"><i class="icon-remove icon-white"></i></button>
+                    <button type="button" ng-click="ordertype='Name';orderreverse=false" class="btn btn-xs btn-info"><i class="icon-remove icon-white"></i></button>
                     <div class="pull-right">
                         <div style="position:relative;">
                             <div class="ajax-loader" style="right:0;position:absolute;"></div>
@@ -64,7 +64,7 @@
                 <div class="pull-left" style="width: 60%;">
                     <div id="list" data-role="list">
                         <div class="item-list">
-                            <div class="item" ng-repeat="service in dataList | filter:{Type:filtertype,$:filtertext}" ng-class="service.Type | lowercase">
+                            <div class="item" ng-repeat="service in dataList | filter:{Type:filtertype,$:filtertext} | orderBy:ordertype:orderreverse" ng-class="service.Type | lowercase">
                                 <div class="top">
                                     <span class="item-title">{{service.Name}}</span>
                                 </div>

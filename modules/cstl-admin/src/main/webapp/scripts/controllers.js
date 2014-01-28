@@ -123,6 +123,8 @@ cstlAdminApp.controller('DataController', ['$scope', 'dataListing',
     function ($scope, dataListing) {
         $scope.dataList = dataListing.listAll();
         $scope.filtertype = "VECTOR";
+        $scope.ordertype = "Name";
+        $scope.orderreverse = false;
     }]);
 
 cstlAdminApp.controller('WebServiceController', ['$scope', 'webService',
