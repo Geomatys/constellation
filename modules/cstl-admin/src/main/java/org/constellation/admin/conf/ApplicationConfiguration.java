@@ -26,6 +26,15 @@ public class ApplicationConfiguration {
 
     @Inject
     private Environment env;
+    
+    @Bean
+    public CstlConfig getCstlConfig() {
+        CstlConfig conf = new CstlConfig();
+        conf.setUrl(env.getProperty("cstl.url", "http://localhost:8180/constellation/"));
+        conf.setLogin(env.getProperty("cstl.login", "admin"));
+        conf.setPassword(env.getProperty("cstl.password", "admin"));
+        return conf;
+    }
 
     /**
      * Initializes cstl-admin.
