@@ -11,8 +11,6 @@
             <ul class="dropdown-menu">
                 <li><a href="data/addlocal" id="uploadchoice" data-toggle="modal" data-target="#localFileModal" translate="label.file.local">Fichier local</a></li>
                 <li><a href="data/addserver" id="filesystemchoice" onclick="CSTL.DataDashboard.showServerFileModal();" translate="label.file.server">Fichier serveur</a></li>
-                <li><a href="data/addurl" id="urlchoice" data-toggle="modal" data-target="#urlModal">URL</a></li>
-                <li><a href="data/adddb" id="databasechoice" data-toggle="modal" data-target="#databaseModal" translate="label.database">Base de données</a></li>
             </ul>
         </div>
     </div>
@@ -75,7 +73,7 @@
                             <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
                         </div>
                         <div class="item-list">
-                            <div class="item" ng-repeat="service in dataList" ng-class="service.Type | lowercase">
+                            <div class="item {{service.Type | lowercase}}" ng-repeat="service in dataList" ng-class="{selected:service==selected}" ng-click="select(service)">
                                 <div class="top">
                                     <span class="item-title">{{service.Name}}</span>
                                 </div>
@@ -95,8 +93,49 @@
                     </div>
                 </div>
                 <div class="pull-left" style="width: 40%;">
-                    <div id="selection" data-role="selected">
+                    <div id="selection">
+                        <div class="alert alert-info">
+                            <h4 translate="label.no.selected.data">No selected data</h4>
 
+                            <p translate="msg.no.selected.data">Click on a data to display more information</p>
+                        </div>
+                        <div class="selected-item" id="selected-item">
+                            <div class="block-header">
+                                <strong>{{selected.Name}}</strong><i class="icon-chevron-up pull-right"></i>
+                            </div>
+                            <div class="block-content">
+                                <h6 translate="label.owner">Owner</h6>
+                                <span>{{selected.Owner}}</span>
+
+                                <div class="separator"></div>
+                                <h6 translate="label.date">Date</h6>
+                                <span>{{selected.Date | date:'yyyy-MM-dd HH:mm:ss'}}</span>
+
+                                <div class="separator"></div>
+                                <h6 translate="label.type">Type</h6>
+                                <span>{{selected.Type}}</span>
+
+                                <div class="separator"></div>
+                            </div>
+                            <div class="block-action">
+                                <div class="row" style="padding-bottom: 5px">
+                                    <button type="button" class="btn btn-info col-sm-6">
+                                        <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
+                                    </button>
+                                    <button type="button" id="seeMetadata" class="btn btn-warning col-sm-6">
+                                        <i class="icon-file-alt"></i> <span translate="layer.listing.selected.metadata.button">Metadata</span>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <button id="showData" class="btn btn-success col-sm-6" type="button">
+                                        <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">Layers</span>
+                                    </button>
+                                    <button type="button" id="deleteLayer" class="btn btn-danger col-sm-6">
+                                        <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

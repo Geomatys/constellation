@@ -130,6 +130,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing',
             $scope.currentpage = page;
             $scope.countdata = array.length;
             $scope.dataList = array.splice(start, $scope.nbbypage);
+            $scope.selected = null;
         };
 
         $scope.dataList = [];
@@ -144,6 +145,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing',
         $scope.countdata = 0;
         $scope.nbbypage = 10;
         $scope.currentpage = 1;
+        $scope.selected = null;
+
+        $scope.select = function(item) {
+            $scope.selected = item;
+        };
 
         $scope.$watch('nbbypage', function() {
             $scope.displayPage(1);
