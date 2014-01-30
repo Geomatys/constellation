@@ -87,7 +87,7 @@ public final class StyleProviders {
     @GET
     @Path("all/style/available")
     public Response getAvailableStyles() throws Exception {
-        return ok(new StyleListBrief(StyleProviderConfig.getAvailableStyles("")));
+        return ok(new StyleListBrief(StyleProviderConfig.getAvailableStyles("ALL")));
     }
 
     /**

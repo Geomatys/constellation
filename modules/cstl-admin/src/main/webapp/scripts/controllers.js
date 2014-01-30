@@ -119,52 +119,13 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing', 'style',
-    function ($scope, $filter, dataListing, style) {
-        // Dashboard methods
-        $scope.displayPage = function(page) {
-            var array = $filter('filter')(fullList, {'Type':$scope.filtertype, '$': $scope.filtertext});
-            array = $filter('orderBy')(array, $scope.ordertype, $scope.orderreverse);
-            var start = (page - 1) * $scope.nbbypage;
+cstlAdminApp.controller('DataController', ['$scope', '$dashboard', 'dataListing', 'style', '$modal',
+    function ($scope, $dashboard, dataListing, style, $modal) {
 
-            $scope.currentpage = page;
-            $scope.countdata = array.length;
-            $scope.dataList = array.splice(start, $scope.nbbypage);
-            $scope.selected = null;
-        };
-
-        $scope.dataList = [];
-        var fullList = dataListing.listAll({}, function() {
-            $scope.displayPage(1);
-        });
-
-        $scope.filtertext = "";
         $scope.filtertype = "VECTOR";
-        $scope.ordertype = "Name";
-        $scope.orderreverse = false;
-        $scope.countdata = 0;
-        $scope.nbbypage = 10;
-        $scope.currentpage = 1;
-        $scope.selected = null;
 
-        $scope.select = function(item) {
-            $scope.selected = item;
-        };
-
-        $scope.$watch('nbbypage', function() {
-            $scope.displayPage(1);
-        });
-        $scope.$watch('filtertext', function() {
-            $scope.displayPage(1);
-        });
-        $scope.$watch('filtertype', function() {
-            $scope.displayPage(1);
-        });
-        $scope.$watch('ordertype', function() {
-            $scope.displayPage($scope.currentpage);
-        });
-        $scope.$watch('orderreverse', function() {
-            $scope.displayPage($scope.currentpage);
+        dataListing.listAll({}, function(response) {
+            $dashboard($scope, response);
         });
 
         // Map methods
@@ -179,12 +140,52 @@ cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing', '
         };
 
         // Style methods
-        $scope.deleteStyle = function(providerName, styleName) {
-            style.delete({provider: providerName, name: styleName});
+        $scope.showStyleList = function() {
+            var modal = $modal.open({
+                templateUrl: 'views/modalStyleChoose.html',
+                controller: 'StyleModalController',
+                resolve: {
+                    exclude: function() { return $scope.selected.TargetStyle }
+                }
+            });
+
+            modal.result.then(function(item) {
+                if (item) {
+                    style.link({
+                        provider: item.Provider,
+                        name: item.Name
+                    }, {
+                        values: {
+                            dataProvider: $scope.selected.Provider,
+                            dataNamespace: "", dataId: $scope.selected.Name
+                        }
+                    }, function() {
+                        $scope.selected.TargetStyle.push(item);
+                    });
+                }
+            });
         };
 
         $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
             style.unlink({provider: providerName, name: styleName}, {values: {dataProvider: dataProvider, dataNamespace: "", dataId: dataId}});
+        };
+    }]);
+
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude',
+    function ($scope, $dashboard, $modalInstance, style, exclude) {
+        $scope.exclude = exclude;
+        $scope.filtertype = "";
+
+        style.listAll({}, function(response) {
+            $dashboard($scope, response.styles);
+        });
+
+        $scope.ok = function() {
+            $modalInstance.close($scope.selected);
+        };
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
         };
     }]);
 

@@ -64,8 +64,9 @@ cstlAdminApp.factory('dataListing', ['$resource',
 cstlAdminApp.factory('style', ['$resource',
     function ($resource) {
         return $resource(cstlContext+'api/1/SP/all/style/available', {}, {
-            'listAll': { method: 'GET',    isArray: true},
+            'listAll': { method: 'GET' },
             'delete':  { method: 'DELETE', url: cstlContext+'api/1/SP/:provider/style/:name'},
+            'link':    { method: 'POST',   url: cstlContext+'api/1/SP/:provider/style/:name/linkData'},
             'unlink':  { method: 'POST',   url: cstlContext+'api/1/SP/:provider/style/:name/unlinkData'}
         });
     }]);
@@ -174,5 +175,68 @@ cstlAdminApp.directive('pageSwitcher', function() {
                 '<li ng-repeat="index in indexes" ng-class="{active: index == page}"><a ng-click="selectPage(index)">{{index}}</a></li>' +
                 '<li><a ng-click="selectPage(page + 1)">&raquo;</a></li>' +
                 '</ul>'
+    };
+});
+
+cstlAdminApp.service('$dashboard', function($filter) {
+    return function($scope, fullList) {
+
+        $scope.dataList = $scope.dataList || [];
+        $scope.filtertext = $scope.filtertext || "";
+        $scope.filtertype = $scope.filtertype || "VECTOR";
+        $scope.ordertype = $scope.ordertype || "Name";
+        $scope.orderreverse = $scope.orderreverse || false;
+        $scope.countdata = $scope.countdata || 0;
+        $scope.nbbypage = $scope.nbbypage || 10;
+        $scope.currentpage = $scope.currentpage || 1;
+        $scope.selected = $scope.selected || null;
+        $scope.exclude = $scope.exclude || [];
+
+        // Dashboard methods
+        $scope.displayPage = function(page) {
+            var array = $filter('filter')(fullList, {'Type':$scope.filtertype, '$': $scope.filtertext});
+            array = $filter('orderBy')(array, $scope.ordertype, $scope.orderreverse);
+
+            var list = [];
+            for (var i = 0; i < array.length; i++) {
+                var found = false;
+                for (var j = 0; j < $scope.exclude.length; j++) {
+                    if (angular.equals($scope.exclude[j], array[i])) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    list.push(array[i]);
+                }
+            }
+
+            var start = (page - 1) * $scope.nbbypage;
+
+            $scope.currentpage = page;
+            $scope.countdata = list.length;
+            $scope.dataList = list.splice(start, $scope.nbbypage);
+            $scope.selected = null;
+        };
+
+        $scope.select = function(item) {
+            $scope.selected = item;
+        };
+
+        $scope.$watch('nbbypage', function() {
+            $scope.displayPage(1);
+        });
+        $scope.$watch('filtertext', function() {
+            $scope.displayPage(1);
+        });
+        $scope.$watch('filtertype', function() {
+            $scope.displayPage(1);
+        });
+        $scope.$watch('ordertype', function() {
+            $scope.displayPage($scope.currentpage);
+        });
+        $scope.$watch('orderreverse', function() {
+            $scope.displayPage($scope.currentpage);
+        });
     };
 });

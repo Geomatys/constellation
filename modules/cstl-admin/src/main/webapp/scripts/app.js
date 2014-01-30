@@ -12,7 +12,7 @@ function findWebappContext(){
 
 /* App Module */
 
-var cstlAdminApp = angular.module('cstlAdminApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate']);
+var cstlAdminApp = angular.module('cstlAdminApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate', 'uiModal']);
 
 cstlAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider',

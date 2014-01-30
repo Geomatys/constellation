@@ -371,3 +371,7 @@ body {
 #viewerData .modal-dialog {
     width: 800px;
 }
+
+.modal.in {
+    display: block;
+}
