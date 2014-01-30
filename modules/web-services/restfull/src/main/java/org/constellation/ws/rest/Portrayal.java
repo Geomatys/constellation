@@ -42,24 +42,33 @@ import javax.ws.rs.core.Response;
 public final class Portrayal {
 
     /**
-     * @see LayerProviders#portray(PortrayalContext);
+     * @see LayerProviders#portray(String, String, String, String, int, int, String, String)
+     */
+    @GET
+    @Path("/portray")
+    public Response portray(@QueryParam("PROVIDER") final String providerId,
+                            @QueryParam("LAYERS") final String dataName,
+                            @QueryParam("BBOX") final String bbox,
+                            @QueryParam("CRS") final String crs,
+                            @QueryParam("WIDTH") final int width,
+                            @QueryParam("HEIGHT") final int height,
+                            @QueryParam("SLD_BODY") final String sldBody,
+                            @QueryParam("SLD_VERSION") final String sldVersion) {
+        try {
+            return Response.ok(LayerProviders.portray(providerId, dataName, crs, bbox, width, height, sldBody, sldVersion)).build();
+        } catch (CstlServiceException ex) {
+            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+        }
+    }
+
+    /**
+     * @see LayerProviders#portray(PortrayalContext)
      */
     @POST
     @Path("/portray")
     public Response portray(final PortrayalContext context) {
         try {
             return Response.ok(LayerProviders.portray(context)).build();
-        } catch (CstlServiceException ex) {
-            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
-        }
-    }
-
-    @GET
-    @Path("/portray")
-    public Response portray2(@QueryParam("PROVIDER") final String providerId, @QueryParam("LAYERS") final String bandId, @QueryParam("BBOX") final String bbox,
-                             @QueryParam("SRS") final String crs, @QueryParam("WIDTH") final int width, @QueryParam("HEIGHT") final int height) {
-        try {
-            return Response.ok(LayerProviders.portrayBand(providerId, bandId, crs, bbox, width, height)).build();
         } catch (CstlServiceException ex) {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }

@@ -35,12 +35,10 @@ DataViewer = {
 
     },
 
-    createLayer : function(layerName, providerId, portrayUrl){
+    createLayer : function(layerName, providerId){
         var layer = new OpenLayers.Layer.WMS(layerName,
             '/cstl-admin/mvc/overview',
             {
-                request:     'Portray',
-                method:      portrayUrl,
                 layers:      layerName,
                 provider:    providerId,
                 version:     '1.3.0',
@@ -51,10 +49,7 @@ DataViewer = {
                 ratio: 1,
                 isBaseLayer: true,
                 singleTile: true,
-                transitionEffect: 'resize',
-                tileOptions: {
-                    maxGetUrlLength: 2048
-                }
+                transitionEffect: 'resize'
             }
         );
         return layer;

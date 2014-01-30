@@ -9,7 +9,9 @@ import java.io.Serializable;
  * @since 0.9
  */
 @XmlRootElement
-public class PortrayalContext implements Serializable {
+public final class PortrayalContext implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String providerId;
     private String dataName;

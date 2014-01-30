@@ -164,147 +164,6 @@ public final class LayerProviders extends Static {
     }
 
     /**
-     * Produces a {@link PortrayalResponse} from the specified {@link PortrayalContext}.
-     * <p/>
-     * This method allow to perform data rendering without WMS layer.
-     *
-     * @param context the context for portraying
-     * @return the {@link PortrayalResponse} instance
-     * @throws CstlServiceException if the portrayal process has failed for any reason
-     */
-    public static PortrayalResponse portray(final PortrayalContext context) throws CstlServiceException {
-        ensureNonNull("context", context);
-
-        try {
-            // Envelope.
-            final Envelope envelope = new Envelope2D(
-                    CRS.decode(context.getProjection()),
-                    context.getWest(),
-                    context.getSouth(),
-                    context.getEast() - context.getWest(),
-                    context.getNorth() - context.getSouth());
-
-            // Dimension.
-            final Dimension dimension = new Dimension(context.getWidth(), context.getHeight());
-
-            // Style.
-            final MutableStyle style;
-            if (context.getStyleBody() != null) {
-                final StringReader reader = new StringReader(context.getStyleBody());
-                if ("1.1.0".equals(context.getSldVersion())) {
-                    style = new StyleXmlIO().readStyle(reader, Specification.SymbologyEncoding.V_1_1_0);
-                } else {
-                    style = new StyleXmlIO().readStyle(reader, Specification.SymbologyEncoding.SLD_1_0_0);
-                }
-            } else {
-                style = null;
-            }
-
-            // Map context.
-            final MapContext mapContext = MapBuilder.createContext();
-            final LayerDetails layerDetails = getLayer(context.getProviderId(), context.getDataName());
-            final MapItem mapItem = layerDetails.getMapLayer(style, null);
-            mapContext.items().add(mapItem);
-
-            // Inputs.
-            final SceneDef sceneDef = new SceneDef(mapContext, DEFAULT_HINTS);
-            final CanvasDef canvasDef = new CanvasDef(dimension, null);
-            final ViewDef viewDef = new ViewDef(envelope, 0, DEFAULT_MONITOR);
-            final OutputDef outputDef = new OutputDef(context.getFormat(), new Object());
-            if (context.isLonFirstOutput()) {
-                viewDef.setLongitudeFirst();
-            }
-
-            // Portray.
-            return new PortrayalResponse(canvasDef, sceneDef, viewDef, outputDef);
-        } catch (FactoryException | JAXBException | PortrayalException | TransformException ex) {
-            throw new CstlServiceException(ex.getLocalizedMessage());
-        }
-    }
-
-
-    public static PortrayalResponse portrayBand(final String providerId, final String layerName, final String crsCode,
-                                                final String bbox, final int width, final int height)
-            throws CstlServiceException {
-        try {
-            final LayerDetails layer = getLayer(providerId, layerName);
-
-            // Envelope
-            //final Envelope envelope = layer.getEnvelope();
-            final CoordinateReferenceSystem crs;
-            try {
-                if ("EPSG:4326".equals(crsCode)) {
-                    crs = CRS.decode("CRS:84");
-                } else {
-                    crs = CRS.decode(crsCode);
-                }
-            } catch (FactoryException e) {
-                throw new CstlServiceException(e);
-            }
-            final GeneralEnvelope envelope = new GeneralEnvelope(crs);
-            final String[] bboxSplit = bbox.split(",");
-            envelope.setRange(0, Double.valueOf(bboxSplit[0]), Double.valueOf(bboxSplit[2]));
-            envelope.setRange(1, Double.valueOf(bboxSplit[1]), Double.valueOf(bboxSplit[3]));
-
-            // Dimension
-            final Dimension dimension = new Dimension(width, height);
-
-            final CoverageDataDescription coverage = getCoverageDataDescription(layer);
-            double min = coverage.getBands().get(0).getMinValue();
-            double max = coverage.getBands().get(0).getMaxValue();
-
-
-            // Style.
-            double average = (max + min) / 2;
-            final List<InterpolationPoint> values = new ArrayList<>();
-            values.add(SF.interpolationPoint(Float.NaN, SF.literal(new Color(0, 0, 0, 0))));
-            values.add(SF.interpolationPoint(min, SF.literal(new Color(0, 54, 204, 255))));
-            values.add(SF.interpolationPoint(average, SF.literal(new Color(255, 254, 162, 255))));
-            values.add(SF.interpolationPoint(max, SF.literal(new Color(199, 8, 30, 255))));
-            final Expression lookup = DEFAULT_CATEGORIZE_LOOKUP;
-            final Literal fallback = DEFAULT_FALLBACK;
-            final Function function = SF.interpolateFunction(
-                    lookup, values, Method.COLOR, Mode.LINEAR, fallback);
-
-            final ChannelSelection selection = SF.channelSelection(SF.selectedChannelType("0", (ContrastEnhancement) null));
-            final Expression opacity = LITERAL_ONE_FLOAT;
-            final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
-            final ColorMap colorMap = SF.colorMap(function);
-            final ContrastEnhancement enhance = SF.contrastEnhancement(LITERAL_ONE_FLOAT, ContrastMethod.NONE);
-            final ShadedRelief relief = SF.shadedRelief(LITERAL_ONE_FLOAT);
-            final Symbolizer outline = null;
-            final Unit uom = NonSI.PIXEL;
-            final String geom = DEFAULT_GEOM;
-            final String name = "raster symbol name";
-            final Description desc = DEFAULT_DESCRIPTION;
-
-            final RasterSymbolizer symbol = SF.rasterSymbolizer(
-                    name, geom, desc, uom, opacity, selection, overlap, colorMap, enhance, relief, outline);
-            final MutableStyle style = SF.style(symbol);
-
-            style.setDefaultSpecification(symbol);
-
-
-            // Map context.ti
-            final MapContext mapContext = MapBuilder.createContext();
-            final LayerDetails layerDetails = getLayer(providerId, layerName);
-            final MapItem mapItem = layerDetails.getMapLayer(style, null);
-            mapContext.items().add(mapItem);
-
-            // Inputs.
-            final SceneDef sceneDef = new SceneDef(mapContext, DEFAULT_HINTS);
-            final CanvasDef canvasDef = new CanvasDef(dimension, null);
-            final ViewDef viewDef = new ViewDef(envelope, 0, DEFAULT_MONITOR);
-            final OutputDef outputDef = new OutputDef("image/png", new Object());
-
-            // Portray.
-            return new PortrayalResponse(canvasDef, sceneDef, viewDef, outputDef);
-        } catch (PortrayalException | DataStoreException | IOException ex) {
-            throw new CstlServiceException(ex.getLocalizedMessage());
-        }
-    }
-
-    /**
      * Returns all the values of a layer feature collection filtered on the specified
      * property.
      *
@@ -381,6 +240,101 @@ public final class LayerProviders extends Static {
 
         // Not a coverage layer.
         throw new CstlServiceException("The layer named \"" + layerName + "\" for provider with id \"" + providerId + "\" is not a coverage layer.");
+    }
+
+    /**
+     * Produces a {@link PortrayalResponse} from the specified {@link PortrayalContext}.
+     * <p/>
+     * This method allows to perform data rendering without WMS layer.
+     *
+     * @param context the portrayal context
+     * @return a {@link PortrayalResponse} instance
+     * @throws CstlServiceException if the {@link PortrayalResponse} can't be produced for
+     * any reason
+     */
+    public static PortrayalResponse portray(final PortrayalContext context) throws CstlServiceException {
+        return portray(context.getDataName(),
+                context.getProviderId(),
+                context.getProjection(),
+                context.getWest() + "," + context.getSouth() + "," + context.getEast() + "," + context.getNorth(),
+                context.getWidth(),
+                context.getHeight(),
+                context.getStyleBody(),
+                context.getSldVersion());    
+    }
+
+    /**
+     * Produces a {@link PortlResponse} from the specified parameters.
+     * <p/>
+     * This method allows to perform data rendering without WMS layer.
+     *
+     * @param providerId the layer provider id
+     * @param layerName  the layer name
+     * @param crsCode    the projection code
+     * @param bbox       the bounding box
+     * @param width      the image width
+     * @param height     the image height
+     * @param sldBody    the style to apply
+     * @param sldVersion the style version
+     * @return a {@link PortrayalResponse} instance
+     * @throws CstlServiceException if the {@link PortrayalResponse} can't be produced for
+     * any reason
+     */
+    public static PortrayalResponse portray(final String providerId, final String layerName, final String crsCode,
+                                            final String bbox, final int width, final int height, final String sldBody,
+                                            final String sldVersion) throws CstlServiceException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("layerName", layerName);
+
+        // Get the layer (throws exception if doesn't exist).
+        final LayerDetails layer = getLayer(providerId, layerName);
+
+        try {
+            // Envelope.
+            final String[] bboxSplit = bbox.split(",");
+            final GeneralEnvelope envelope = new GeneralEnvelope(CRS.decode(crsCode));
+            envelope.setRange(0, Double.valueOf(bboxSplit[0]), Double.valueOf(bboxSplit[2]));
+            envelope.setRange(1, Double.valueOf(bboxSplit[1]), Double.valueOf(bboxSplit[3]));
+
+            // Dimension.
+            final Dimension dimension = new Dimension(width, height);
+
+            // Style.
+            final MutableStyle style;
+            if (sldBody != null) {
+                // Use specified style.
+                final StringReader reader = new StringReader(sldBody);
+                if ("1.1.0".equals(sldVersion)) {
+                    style = new StyleXmlIO().readStyle(reader, Specification.SymbologyEncoding.V_1_1_0);
+                } else {
+                    style = new StyleXmlIO().readStyle(reader, Specification.SymbologyEncoding.SLD_1_0_0);
+                }
+            } else {
+                // Fallback to a default/auto-generated style.
+                if (layer instanceof FeatureLayerDetails) {
+                    style = null; // Let portrayal process apply is own style.
+                } else {
+                    style = generateCoverageStyle(layer);
+                }
+            }
+
+            // Map context.
+            final MapContext mapContext = MapBuilder.createContext();
+            final MapItem mapItem = layer.getMapLayer(style, null);
+            mapContext.items().add(mapItem);
+
+            // Inputs.
+            final SceneDef sceneDef = new SceneDef(mapContext, DEFAULT_HINTS);
+            final CanvasDef canvasDef = new CanvasDef(dimension, null);
+            final ViewDef viewDef = new ViewDef(envelope, 0, DEFAULT_MONITOR);
+            final OutputDef outputDef = new OutputDef("image/png", new Object());
+
+            // Create response.
+            return new PortrayalResponse(canvasDef, sceneDef, viewDef, outputDef);
+
+        } catch (FactoryException | JAXBException | PortrayalException | DataStoreException | IOException ex) {
+            throw new CstlServiceException(ex.getLocalizedMessage());
+        }
     }
 
 
@@ -502,6 +456,54 @@ public final class LayerProviders extends Static {
         fillGeographicDescription(envelope, description);
 
         return description;
+    }
+
+    /**
+     * Analyzes a "coverage" layer first band values (statistics) to generate a
+     * {@link MutableStyle} instance.
+     *
+     * @param layer the layer to analyze
+     * @return a {@link MutableStyle} instance
+     * @throws IOException if an error occurred while acquiring coverage statistics
+     * @throws DataStoreException if an error occurred while acquiring coverage statistics
+     */
+    private static MutableStyle generateCoverageStyle(final LayerDetails layer) throws DataStoreException, IOException {
+        // Acquire coverage data.
+        final GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
+        final RenderedImage ri = coverage.view(ViewType.GEOPHYSICS).getRenderedImage();
+
+        // Extract first band statistics.
+        final Map<String, Object> map = StatisticOp.analyze(ri);
+        double min = ((double[]) map.get("min"))[0];
+        double max = ((double[]) map.get("max"))[0];
+        double average = (max + min) / 2;
+
+        // Generate a color map from band statistics.
+        final List<InterpolationPoint> values = new ArrayList<>();
+        values.add(SF.interpolationPoint(Float.NaN, SF.literal(new Color(0, 0, 0, 0))));
+        values.add(SF.interpolationPoint(min, SF.literal(new Color(0, 54, 204, 255))));
+        values.add(SF.interpolationPoint(average, SF.literal(new Color(255, 254, 162, 255))));
+        values.add(SF.interpolationPoint(max, SF.literal(new Color(199, 8, 30, 255))));
+        final Function function = SF.interpolateFunction(DEFAULT_CATEGORIZE_LOOKUP, values, Method.COLOR, Mode.LINEAR, DEFAULT_FALLBACK);
+        final ColorMap colorMap = SF.colorMap(function);
+
+        // Select the first band.
+        final ChannelSelection selection = SF.channelSelection(SF.selectedChannelType("0", (ContrastEnhancement) null));
+
+        // Create final style.
+        final Expression opacity = LITERAL_ONE_FLOAT;
+        final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
+        final ContrastEnhancement enhance = SF.contrastEnhancement(LITERAL_ONE_FLOAT, ContrastMethod.NONE);
+        final ShadedRelief relief = SF.shadedRelief(LITERAL_ONE_FLOAT);
+        final Unit uom = NonSI.PIXEL;
+        final String geom = DEFAULT_GEOM;
+        final String name = "raster symbol name";
+        final Description desc = DEFAULT_DESCRIPTION;
+        final Symbolizer outline = null;
+        final RasterSymbolizer symbol = SF.rasterSymbolizer(name, geom, desc, uom, opacity, selection, overlap, colorMap, enhance, relief, outline);
+        final MutableStyle style = SF.style(symbol);
+        style.setDefaultSpecification(symbol);
+        return style;
     }
 
     /**
