@@ -166,6 +166,22 @@ cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing',
         $scope.$watch('orderreverse', function() {
             $scope.displayPage($scope.currentpage);
         });
+
+        $scope.showData = function() {
+            $('#viewerData').modal("show");
+            var layerName = $scope.selected.Name;
+            var providerId = $scope.selected.Provider;
+            var providerType = $scope.selected.Type;
+            var layerData;
+            if (providerType === "COVERAGE") {
+                layerData = Netcdf.createLayer(layerName, providerId);
+            } else {
+                layerData = DataViewer.createLayer(layerName, providerId, "api/1/portrayal/portray");
+            }
+            var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp", "api/1/portrayal/portray");
+            DataViewer.layers = [layerData, layerBackground];
+            DataViewer.initMap();
+        };
     }]);
 
 cstlAdminApp.controller('WebServiceController', ['$scope', 'webService',

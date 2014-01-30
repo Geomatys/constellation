@@ -1,11 +1,11 @@
-package org.constellation.admin.conf;
+package org.constellation.gui.admin.conf;
 
 public class CstlConfig {
 
     private String url;
-    
+
     private String login;
-    
+
     private String password;
 
     public String getUrl() {
@@ -31,5 +31,5 @@ public class CstlConfig {
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
 }

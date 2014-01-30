@@ -119,20 +119,45 @@
                             </div>
                             <div class="block-action">
                                 <div class="row" style="padding-bottom: 5px">
-                                    <button type="button" class="btn btn-info col-sm-6">
-                                        <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
-                                    </button>
-                                    <button type="button" id="seeMetadata" class="btn btn-warning col-sm-6">
-                                        <i class="icon-file-alt"></i> <span translate="layer.listing.selected.metadata.button">Metadata</span>
-                                    </button>
+                                    <div class="col-sm-6">
+                                        <button type="button" class="btn btn-info">
+                                            <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
+                                        </button>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <button type="button" id="seeMetadata" class="btn btn-warning">
+                                            <i class="icon-file-alt"></i> <span translate="layer.listing.selected.metadata.button">Metadata</span>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="row">
-                                    <button id="showData" class="btn btn-success col-sm-6" type="button">
-                                        <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">Layers</span>
-                                    </button>
-                                    <button type="button" id="deleteLayer" class="btn btn-danger col-sm-6">
-                                        <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
-                                    </button>
+                                    <div class="col-sm-6">
+                                        <button id="showData" class="btn btn-success" type="button" ng-click="showData()">
+                                            <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">Layers</span>
+                                        </button>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <button type="button" id="deleteLayer" class="btn btn-danger">
+                                            <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal -->
+                            <div id="viewerData" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                            <h4 class="modal-title" translate="edition.style.label.viewer">Edit</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div id="dataMap" style="height: 400px; width:740px"></div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

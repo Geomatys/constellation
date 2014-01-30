@@ -20,7 +20,7 @@
     <listener>
         <listener-class>org.constellation.admin.conf.WebConfigurer</listener-class>
     </listener>
-    
+
     <servlet>
     <servlet-name>constellation</servlet-name>
     <servlet-class>org.mitre.dsmiley.httpproxy.ProxyServlet</servlet-class>
@@ -33,10 +33,19 @@
       <param-value>true</param-value>
     </init-param>
 </servlet>
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
 <servlet-mapping>
   <servlet-name>constellation</servlet-name>
   <url-pattern>/constellation/*</url-pattern>
 </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/mvc/*</url-pattern>
+    </servlet-mapping>
 
     <error-page>
         <error-code>500</error-code>

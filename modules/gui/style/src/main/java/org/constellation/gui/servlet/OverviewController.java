@@ -33,6 +33,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.dto.PortrayalContext;
+import org.constellation.gui.admin.conf.CstlConfig;
 import org.constellation.gui.binding.Style;
 import org.constellation.gui.service.ConstellationService;
 import org.constellation.gui.service.ProviderManager;
@@ -65,9 +66,8 @@ import java.util.logging.Logger;
 @Controller
 @RequestMapping("/overview")
 public final class OverviewController  {
-
     @Autowired
-    public ConstellationService service;
+    private CstlConfig cstlConfig;
 
     /**
      * Use for debugging purpose.
@@ -85,7 +85,7 @@ public final class OverviewController  {
     /**
      * {@inheritDoc}
      */
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, produces = "image/png")
     public void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         render(req, resp);
     }
@@ -104,7 +104,7 @@ public final class OverviewController  {
 
         // Perform a portrayal.
         if ("Portray".equalsIgnoreCase(request)) {
-            final String method = req.getParameter("METHOD");
+            final String method = cstlConfig.getUrl() + req.getParameter("METHOD");
             final String providerId = req.getParameter("PROVIDER");
             final String[] coords = bbox.split(",");
 
@@ -146,7 +146,7 @@ public final class OverviewController  {
 
 
             // set authentication on header
-            final String toEncode = service.getLogin()+":"+service.getPassword();
+            final String toEncode = cstlConfig.getLogin()+":"+cstlConfig.getPassword();
             byte[] binaryPassword = toEncode.getBytes();
             final String encodedAuthentication = Base64.encodeBase64String(binaryPassword);
 
@@ -159,14 +159,14 @@ public final class OverviewController  {
             httpPost.addHeader(HttpHeaders.CONTENT_ENCODING, "UTF-8");
             httpPost.addHeader("Authorization", "Basic "+ encodedAuthentication);
 
+            resp.setContentType("image/png");
+            resp.addHeader(HttpHeaders.PRAGMA, "no-cache");
+            resp.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache,no-store");
+            resp.addHeader(HttpHeaders.EXPIRES, "0");
+
             // Perform request.
             execute(httpPost, resp.getOutputStream());
         }
-
-        resp.setContentType(format);
-        resp.addHeader(HttpHeaders.PRAGMA, "no-cache");
-        resp.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache,no-store");
-        resp.addHeader(HttpHeaders.EXPIRES, "0");
     }
 
     public static void execute(final HttpPost post, final OutputStream out) throws IOException {

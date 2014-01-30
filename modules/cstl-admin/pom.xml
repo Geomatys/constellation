@@ -214,7 +214,7 @@
       <artifactId>HikariCP</artifactId>
       <version>1.1.8</version>
     </dependency>
-    <!-- The HikariCP Java Agent is disabled by default, as it is experimental <dependency> <groupId>com.zaxxer</groupId> 
+    <!-- The HikariCP Java Agent is disabled by default, as it is experimental <dependency> <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP-agent</artifactId> <version>1.1.8</version> </dependency> -->
     <dependency>
       <groupId>commons-fileupload</groupId>
@@ -404,6 +404,11 @@
       <artifactId>smiley-http-proxy-servlet</artifactId>
       <version>1.4</version>
     </dependency>
+      <dependency>
+          <groupId>org.constellation.gui</groupId>
+          <artifactId>style</artifactId>
+          <version>${project.version}</version>
+      </dependency>
 
     <!-- Test dependencies -->
     <dependency>
