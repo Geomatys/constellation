@@ -122,8 +122,8 @@
                                     <i class="icon-plus"></i></button></h6>
 
                                 <div id="linkedList">
-                                    <span ng-hide="selected.TargetStyle" translate="label.no.association">No association</span>
-                                    <div ng-show="selected.TargetStyle" class="style" ng-repeat="style in selected.TargetStyle">
+                                    <span ng-hide="selected.TargetStyle.length > 0" translate="label.no.association">No association</span>
+                                    <div ng-hide="selected.TargetStyle.length == 0" class="style" ng-repeat="style in selected.TargetStyle">
                                         <button type="button" ng-click="unlinkStyle(style.Provider, style.Name, selected.Provider, selected.Name);"
                                                 class="btn btn-small"><i class="icon-minus"></i></button>
                                         {{style.Name}}

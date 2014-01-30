@@ -167,7 +167,21 @@ cstlAdminApp.controller('DataController', ['$scope', '$dashboard', 'dataListing'
         };
 
         $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
-            style.unlink({provider: providerName, name: styleName}, {values: {dataProvider: dataProvider, dataNamespace: "", dataId: dataId}});
+            var res = style.unlink({provider: providerName, name: styleName},
+                         {values: {dataProvider: dataProvider, dataNamespace: "", dataId: dataId}});
+            if (res) {
+                var index = -1;
+                for (var i=0; i < $scope.selected.TargetStyle.length; i++) {
+                    var item = $scope.selected.TargetStyle[i];
+                    if (item.Provider === providerName && item.Name === styleName) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index >= 0) {
+                    $scope.selected.TargetStyle.splice(index,1);
+                }
+            }
         };
     }]);
 
