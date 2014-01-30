@@ -39,15 +39,16 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
 <button class="btn btn-primary" id="service_metadata">service_metadata</button>
 <button class="btn btn-primary" id="task">task</button>
 <button class="btn btn-primary" id="user">user</button>
+<button class="btn btn-primary" id="styled_data">styled_data</button>
 </div>
         </div>
     <div class="row">
         <div class="col-md-12">
 result :
 <%if (request.getParameter("query")!=null && request.getParameter("query").length() > 0) {
-	
+
 	String query=request.getParameter("query");
-	
+
 	SQLExecuter sqlExecuter = null;
         try {
             sqlExecuter = EmbeddedDatabase.createSQLExecuter();
@@ -131,6 +132,10 @@ result :
         });
         $("#user").on("click", function(){
             $("#query").val('select * from "admin"."user"');
+            $("#sqlForm").submit();
+        });
+        $("#styled_data").on("click", function(){
+            $("#query").val('select * from "admin"."styled_data"');
             $("#sqlForm").submit();
         });
     })

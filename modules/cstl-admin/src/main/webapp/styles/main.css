@@ -261,7 +261,7 @@ body {
 }
 .dashboard .selected-item .block-action .col-sm-6 .btn {
     width: 100%;
-    padding: 6px;
+    padding: 4px 12px;
 }
 
 /*

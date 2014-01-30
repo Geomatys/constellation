@@ -116,6 +116,20 @@
                                 <span>{{selected.Type}}</span>
 
                                 <div class="separator"></div>
+                                <h6 translate="label.related.style">Related styles</h6>
+                                <button type="button" onclick="styleFlow.start();"
+                                        class="btn btn-sm pull-right">
+                                    <i class="icon-plus"></i></button></h6>
+
+                                <div id="linkedList">
+                                    <span ng-hide="selected.TargetStyle" translate="label.no.association">No association</span>
+                                    <div ng-show="selected.TargetStyle" class="style" ng-repeat="style in selected.TargetStyle">
+                                        <button type="button" ng-click="unlinkStyle('{{style.Name}}', '{{style.Provider}}', dataUnlink);"
+                                                class="btn btn-small"><i class="icon-minus"></i></button>
+                                        {{style.Name}}
+                                    </div>
+                                </div>
+                                <div class="separator"></div>
                             </div>
                             <div class="block-action">
                                 <div class="row" style="padding-bottom: 5px">

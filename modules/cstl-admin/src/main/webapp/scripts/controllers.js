@@ -119,9 +119,9 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing',
-    function ($scope, $filter, dataListing) {
-
+cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing', 'style',
+    function ($scope, $filter, dataListing, style) {
+        // Dashboard methods
         $scope.displayPage = function(page) {
             var array = $filter('filter')(fullList, {'Type':$scope.filtertype, '$': $scope.filtertext});
             array = $filter('orderBy')(array, $scope.ordertype, $scope.orderreverse);
@@ -167,6 +167,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing',
             $scope.displayPage($scope.currentpage);
         });
 
+        // Map methods
         $scope.showData = function() {
             $('#viewerData').modal("show");
             var layerName = $scope.selected.Name;
@@ -175,6 +176,15 @@ cstlAdminApp.controller('DataController', ['$scope', '$filter', 'dataListing',
             var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
             DataViewer.initMap();
+        };
+
+        // Style methods
+        $scope.deleteStyle = function(providerName, styleName) {
+            style.delete({provider: providerName, name: styleName});
+        };
+
+        $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
+            style.unlink({provider: providerName, name: styleName}, {values: {dataProvider: dataProvider, dataNamespace: "", dataId: dataId}});
         };
     }]);
 

@@ -61,6 +61,15 @@ cstlAdminApp.factory('dataListing', ['$resource',
         });
     }]);
 
+cstlAdminApp.factory('style', ['$resource',
+    function ($resource) {
+        return $resource(cstlContext+'api/1/SP/all/style/available', {}, {
+            'listAll': { method: 'GET',    isArray: true},
+            'delete':  { method: 'DELETE', url: cstlContext+'api/1/SP/:provider/style/:name'},
+            'unlink':  { method: 'POST',   url: cstlContext+'api/1/SP/:provider/style/:name/unlinkData'}
+        });
+    }]);
+
 cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService',
     function ($rootScope, $http, authService) {
         return {

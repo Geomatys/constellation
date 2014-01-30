@@ -24,7 +24,7 @@ DataViewer = {
         }
         DataViewer.map = new OpenLayers.Map('dataMap', {
             controls: [new OpenLayers.Control.Navigation()],
-            projection: new OpenLayers.Projection('EPSG:4326'),
+            projection: new OpenLayers.Projection('CRS:84'),
             maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
             fractionalZoom: true,
             allOverlays:true
@@ -37,7 +37,7 @@ DataViewer = {
 
     createLayer : function(layerName, providerId){
         var layer = new OpenLayers.Layer.WMS(layerName,
-            '/cstl-admin/mvc/overview',
+            '/cstl-admin/constellation/api/1/portrayal/portray',
             {
                 layers:      layerName,
                 provider:    providerId,
