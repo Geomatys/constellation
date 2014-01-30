@@ -94,6 +94,12 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-sld</artifactId>
     </dependency>
+
+      <!-- WMTS JAXB binding used for GetFeatureInfo -->
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-wmts</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-svg</artifactId>
