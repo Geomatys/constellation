@@ -183,6 +183,36 @@ cstlAdminApp.controller('DataController', ['$scope', '$dashboard', 'dataListing'
                 }
             }
         };
+
+        $scope.toggleUpDownSelected = function() {
+            var $header = $('#dataDashboard').find('.selected-item').find('.block-header');
+            $header.next().slideToggle(200);
+            $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
+        };
+
+        // Data loading
+        $scope.showLocalFilePopup = function() {
+            var modal = $modal.open({
+                templateUrl: 'views/modalLocalFile.html',
+                controller: 'LocalFileModalController'
+            });
+
+            modal.result.then(function(item) {
+                if (item) {
+                    style.link({
+                        provider: item.Provider,
+                        name: item.Name
+                    }, {
+                        values: {
+                            dataProvider: $scope.selected.Provider,
+                            dataNamespace: "", dataId: $scope.selected.Name
+                        }
+                    }, function() {
+                        $scope.selected.TargetStyle.push(item);
+                    });
+                }
+            });
+        };
     }]);
 
 cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude',
@@ -198,6 +228,16 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $modalInstance.close($scope.selected);
         };
 
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+    }]);
+
+cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance',
+    function ($scope, $dashboard, $modalInstance) {
+        $scope.next = function() {
+
+        };
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };

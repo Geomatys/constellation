@@ -1,10 +1,10 @@
-<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
-    <div class="col-sm-2">
-        <img src="images/constellation.png"/>
+<div class="logo-wrapper row">
+    <div class="col-sm-3">
+        <a href="#"><img src="images/constellation.png"></a>
     </div>
     <!-- Menu to create services -->
-    <div class="col-sm-3 offset6 pull-right">
-        <div class="dropdown">
+    <div class="col-sm-3 col-sm-offset-6">
+        <div class="dropdown pull-right">
             <a id="createservice" data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle">
                 <span class="icon-plus icon-white" style="margin-top: 0px;"></span>
                    Créer un nouveau service
@@ -40,7 +40,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;" id="main" ng-repeat="service in services.instance">
           <div class="span6" id="wms-test">
             <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}"><h3 class="text-info">{{service.name}} ({{service.type.toLocaleLowerCase()}})</h3></a>
@@ -80,7 +80,7 @@
                 </div>
             </div>
           </div>
-        
+
     </div>
 </div>
 <div class="modal hide fade" id="url-modal">

@@ -9,8 +9,8 @@
                 <span class="icon-plus icon-white" style="margin-right:5px;" translate="label.add.data">Ajouter une donnée</span>
             </a>
             <ul class="dropdown-menu">
-                <li><a href="data/addlocal" id="uploadchoice" data-toggle="modal" data-target="#localFileModal" translate="label.file.local">Fichier local</a></li>
-                <li><a href="data/addserver" id="filesystemchoice" onclick="CSTL.DataDashboard.showServerFileModal();" translate="label.file.server">Fichier serveur</a></li>
+                <li><a id="uploadchoice" ng-click="showLocalFilePopup()" translate="label.file.local">Fichier local</a></li>
+                <li><a id="filesystemchoice" onclick="CSTL.DataDashboard.showServerFileModal();" translate="label.file.server">Fichier serveur</a></li>
             </ul>
         </div>
     </div>
@@ -100,7 +100,7 @@
                             <p translate="msg.no.selected.data">Click on a data to display more information</p>
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
-                            <div class="block-header">
+                            <div class="block-header" ng-click="toggleUpDownSelected()">
                                 <strong>{{selected.Name}}</strong><i class="icon-chevron-up pull-right"></i>
                             </div>
                             <div class="block-content">
