@@ -1,73 +1,70 @@
 <form action="@{upload()}" enctype="multipart/form-data" method="post" class="form-horizontal">
-    <div class="modal-dialog">
+    <div class="modal-dialog" ng-init="init()">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" ng-click="close()">×</button>
-                <h4 class="modal-title">Fichier local</h4>
+                <h4 class="modal-title">Local file</h4>
             </div>
-        </div>
-        <div class="modal-body">
-            <div id="part1">
-                <!-- Upload part -->
-                <div class="fileupload fileupload-new" data-provides="fileupload">
-                    <label for="file">Donnée</label>
-                    <div class="input-append">
-                        <div class="uneditable-input span3">
-                            <i class="icon-file fileupload-exists"></i>
-                            <span class="fileupload-preview"></span>
+            <div class="modal-body">
+                <div id="part1">
+                    <!-- Upload part -->
+                    <span>Data</span>
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <div class="input-group">
+                            <div class="form-control uneditable-input" data-trigger="fileinput">
+                                <i class="glyphicon glyphicon-file fileinput-exists"></i>
+                                <span class="fileinput-filename"></span>
+                            </div>
+                            <span class="input-group-addon btn btn-default btn-file">
+                                <span class="fileinput-new">Select file</span>
+                                <span class="fileinput-exists">Change</span>
+                                <input type="file" id="file" name="file" ng-model="fileconfirmed" ng-change="verifyExtension()"></span>
+                            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
                         </div>
-                        <span class="btn btn-file">
-                            <span class="fileupload-new">&{layer.listing.data.upload.select.label}</span>
-                            <span class="fileupload-exists">&{layer.listing.data.upload.change.label}</span>
-                            <input type="file" name="file" id="file"/>
-                        </span>
-                        <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">&{layer.listing.data.upload.remove.label}</a>
+                    </div>
+                    <span>Metadata</span>
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <div class="input-group">
+                            <div class="form-control uneditable-input" data-trigger="fileinput">
+                                <i class="glyphicon glyphicon-file fileinput-exists"></i>
+                                <span class="fileinput-filename"></span>
+                            </div>
+                            <span class="input-group-addon btn btn-default btn-file">
+                                <span class="fileinput-new">Select file</span>
+                                <span class="fileinput-exists">Change</span>
+                                <input type="file" name="metadataFile"></span>
+                            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                        </div>
                     </div>
                 </div>
 
-                <div class="fileupload fileupload-new" data-provides="fileupload">
-                    <label for="metadataFile">Metadata</label>
-                    <div class="input-append">
-                        <div class="uneditable-input span3">
-                            <i class="icon-file fileupload-exists"></i>
-                            <span class="fileupload-preview"></span>
+                <div id="part2">
+                    <!-- Choose data type -->
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <label class="radio">
+                                <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="images/icon/vector.png" class="img-rounded" translate="layer.listing.data.upload.vector.label">
+                            </label>
                         </div>
-                        <span class="btn btn-file">
-                            <span class="fileupload-new">&{layer.listing.data.upload.select.label}</span>
-                            <span class="fileupload-exists">&{layer.listing.data.upload.change.label}</span>
-                            <input type="file" name="metadataFile" id="metadataFile"/>
-                        </span>
-                        <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">&{layer.listing.data.upload.remove.label}</a>
+                        <div class="col-sm-2">
+                            <label class="radio">
+                                <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="images/icon/raster.png" class="img-rounded" translate="layer.listing.data.upload.raster.label">
+                            </label>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="radio">
+                                <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded" translate="layer.listing.data.upload.sensor.label">
+                            </label>
+                        </div>
                     </div>
+                    <input type="hidden" value="@{dataDashboard()}" name="returnURL"/>
                 </div>
             </div>
-
-            <div id="part2">
-                <!-- Choose data type -->
-                <div class="row">
-                    <div class="span2">
-                        <label class="radio">
-                            <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="images/icon/vector.png" class="img-rounded"> &{layer.listing.data.upload.vector.label}
-                        </label>
-                    </div>
-                    <div class="span2">
-                        <label class="radio">
-                            <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="images/icon/raster.png" class="img-rounded"> &{layer.listing.data.upload.raster.label}
-                        </label>
-                    </div>
-                    <div class="span2">
-                        <label class="radio">
-                            <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded"> &{layer.listing.data.upload.sensor.label}
-                        </label>
-                    </div>
-                </div>
-                <input type="hidden" value="@{dataDashboard()}" name="returnURL"/>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="close()">Cancel</button>
+                <button type="button" id="nextButton" class="btn btn-primary" ng-click="next();">Next</button>
+                <button type="submit" id="submitButton" class="btn btn-primary">Finish</button>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" ng-click="close()">Cancel</button>
-            <button type="button" class="btn btn-primary" ng-click="next();">Next</button>
-            <button type="submit" class="btn btn-primary">Finish</button>
         </div>
     </div>
 </form>

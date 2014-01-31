@@ -235,12 +235,56 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
 cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance',
     function ($scope, $dashboard, $modalInstance) {
-        $scope.next = function() {
-
+        $scope.init = function() {
+            $("#part2").hide();
+            $("#submitButton").hide();
+            $("#nextButton").hide();
         };
+
+        $scope.next = function() {
+            $("#part1").hide();
+            $("#nextButton").hide();
+            $("#part2").show();
+            $("#submitButton").show();
+        };
+
+        $scope.submit = function() {
+            $modalInstance.close();
+        };
+
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
+
+        $scope.verifyExtension = function() {
+            var selectedFile = $("#file").val();
+            var lastPointIndex = selectedFile.lastIndexOf(".");
+            var extension = selectedFile.substring(lastPointIndex+1, selectedFile.length);
+            var simplevalue = new SimpleValue(extension);
+            $.ajax({
+                type  :   "POST",
+                url   :   cstlContext + "api/1/data/testextension/",
+                success : localFileSuccess,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(simplevalue)
+            });
+        };
+
+        function SimpleValue(extension) {
+            this.value = extension;
+        }
+
+        function localFileSuccess(data){
+            if(data.dataType!=""){
+                $("#part2 [value="+data.dataType+"]").prop("checked", true);
+                $("#nextButton").hide();
+                $("#submitButton").show();
+            } else {
+                $("#submitButton").hide();
+                $("#nextButton").show();
+            }
+        }
     }]);
 
 cstlAdminApp.controller('WebServiceController', ['$scope', 'webService',
