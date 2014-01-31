@@ -183,7 +183,7 @@ cstlAdminApp.service('$dashboard', function($filter) {
 
         $scope.dataList = $scope.dataList || [];
         $scope.filtertext = $scope.filtertext || "";
-        $scope.filtertype = $scope.filtertype || "VECTOR";
+        $scope.filtertype = $scope.filtertype || "";
         $scope.ordertype = $scope.ordertype || "Name";
         $scope.orderreverse = $scope.orderreverse || false;
         $scope.countdata = $scope.countdata || 0;

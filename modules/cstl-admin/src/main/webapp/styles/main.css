@@ -291,11 +291,17 @@ body {
 .dashboard .item-list .item.pyramid.selected {
     background: transparent url('../images/pyramid-selected.png') right center no-repeat;
 }
-.dashboard .item-list .item.style {
+.dashboard .item-list .item.style-coverage {
     background: transparent url('../images/style-raster.png') right center no-repeat;
 }
-.dashboard .item-list .item.style.selected{
+.dashboard .item-list .item.style-coverage.selected{
     background: transparent url('../images/style-raster-selected.png') right center no-repeat;
+}
+.dashboard .item-list .item.style-vector {
+    background: transparent url('../images/style-vector.png') right center no-repeat;
+}
+.dashboard .item-list .item.style-vector.selected{
+    background: transparent url('../images/style-vector-selected.png') right center no-repeat;
 }
 .dashboard .item-list .item {
     border: 1px solid white;
@@ -361,7 +367,7 @@ body {
     filter: ~"alpha(opacity=50)";
 }
 
-.dashboard #searchbox {
+.dashboard .searchbox {
     height: 30px;
     width: 170px;
 }
