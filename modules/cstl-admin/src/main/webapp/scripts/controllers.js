@@ -233,8 +233,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
     }]);
 
-cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance',
-    function ($scope, $dashboard, $modalInstance) {
+cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload',
+    function ($scope, $dashboard, $modalInstance, $ajaxUpload) {
         $scope.init = function() {
             $("#part2").hide();
             $("#submitButton").hide();
@@ -273,7 +273,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
 
         function SimpleValue(extension) {
             this.value = extension;
-        }
+        };
 
         function localFileSuccess(data){
             if(data.dataType!=""){
@@ -284,7 +284,21 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                 $("#submitButton").hide();
                 $("#nextButton").show();
             }
-        }
+        };
+
+        $scope.upload = function() {
+            $ajaxUpload(cstlContext + "api/1/data/upload", $('#uploadForm'), uploaded);
+        };
+
+        function uploaded(message) {
+            $scope.$apply(function() {
+                if (message.indexOf('success') !== -1) {
+                    // TODO success
+                } else {
+                    // TODO error
+                }
+            });
+        };
     }]);
 
 cstlAdminApp.controller('WebServiceController', ['$scope', 'webService',

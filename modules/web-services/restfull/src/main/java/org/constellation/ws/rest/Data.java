@@ -37,6 +37,9 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessListener;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.media.multipart.MultiPart;
 import org.opengis.feature.type.Name;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
@@ -46,6 +49,7 @@ import org.opengis.util.FactoryException;
 import org.opengis.util.InternationalString;
 import org.opengis.util.NoSuchIdentifierException;
 
+import javax.activation.FileDataSource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -58,6 +62,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import java.io.File;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -190,6 +195,28 @@ public class Data {
         }
         list.setList(listBean);
         return Response.status(200).entity(list).build();
+    }
+
+    /**
+     * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
+     *
+     * @return A {@link Response} with 200 code if upload work, 500 if not work.
+     */
+    @POST
+    @Path("upload")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response uploadFile(@FormDataParam("file") InputStream fileIs,
+                               @FormDataParam("file") FormDataContentDisposition fileDetail,
+                               @FormDataParam("metadatafile") InputStream mdFileIs,
+                               @FormDataParam("metadatafile") FormDataContentDisposition mdFileDetail) {
+
+        System.out.println(fileIs);
+        System.out.println(fileDetail.getFileName());
+        if (mdFileDetail != null) {
+            System.out.println(mdFileDetail.getFileName());
+        }
+
+        return Response.ok("success").header("X-Frame-Options", "SAMEORIGIN").build();
     }
 
     /**

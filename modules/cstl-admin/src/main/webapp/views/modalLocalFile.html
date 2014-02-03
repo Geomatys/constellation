@@ -1,4 +1,4 @@
-<form action="@{upload()}" enctype="multipart/form-data" method="post" class="form-horizontal">
+<form id="uploadForm" class="form-horizontal">
     <div class="modal-dialog" ng-init="init()">
         <div class="modal-content">
             <div class="modal-header">
@@ -19,7 +19,7 @@
                                 <span class="fileinput-new">Select file</span>
                                 <span class="fileinput-exists">Change</span>
                                 <input type="file" id="file" name="file" ng-model="fileconfirmed" ng-change="verifyExtension()"></span>
-                            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                            <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
                         </div>
                     </div>
                     <span>Metadata</span>
@@ -32,8 +32,8 @@
                             <span class="input-group-addon btn btn-default btn-file">
                                 <span class="fileinput-new">Select file</span>
                                 <span class="fileinput-exists">Change</span>
-                                <input type="file" name="metadataFile"></span>
-                            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                                <input type="file" name="metadatafile"></span>
+                            <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
                         </div>
                     </div>
                 </div>
@@ -57,13 +57,12 @@
                             </label>
                         </div>
                     </div>
-                    <input type="hidden" value="@{dataDashboard()}" name="returnURL"/>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" ng-click="close()">Cancel</button>
                 <button type="button" id="nextButton" class="btn btn-primary" ng-click="next();">Next</button>
-                <button type="submit" id="submitButton" class="btn btn-primary">Finish</button>
+                <button type="button" id="submitButton" class="btn btn-primary" ng-click="upload()">Finish</button>
             </div>
         </div>
     </div>
