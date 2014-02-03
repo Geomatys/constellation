@@ -49,7 +49,6 @@ import org.opengis.util.FactoryException;
 import org.opengis.util.InternationalString;
 import org.opengis.util.NoSuchIdentifierException;
 
-import javax.activation.FileDataSource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -62,13 +61,15 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -210,10 +211,15 @@ public class Data {
                                @FormDataParam("metadatafile") InputStream mdFileIs,
                                @FormDataParam("metadatafile") FormDataContentDisposition mdFileDetail) {
 
-        System.out.println(fileIs);
-        System.out.println(fileDetail.getFileName());
-        if (mdFileDetail != null) {
-            System.out.println(mdFileDetail.getFileName());
+        final File dataDirectory = ConfigDirectory.getDataDirectory();
+        try {
+            if (fileIs != null) {
+                final File newFile = new File(dataDirectory, fileDetail.getFileName());
+                Files.copy(fileIs, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            return Response.ok("fail").build();
         }
 
         return Response.ok("success").header("X-Frame-Options", "SAMEORIGIN").build();

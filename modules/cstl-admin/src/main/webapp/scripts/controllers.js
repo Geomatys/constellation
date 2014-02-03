@@ -233,8 +233,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
     }]);
 
-cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload',
-    function ($scope, $dashboard, $modalInstance, $ajaxUpload) {
+cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl',
+    function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl) {
         $scope.init = function() {
             $("#part2").hide();
             $("#submitButton").hide();
@@ -246,10 +246,6 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
             $("#nextButton").hide();
             $("#part2").show();
             $("#submitButton").show();
-        };
-
-        $scope.submit = function() {
-            $modalInstance.close();
         };
 
         $scope.close = function() {
@@ -293,11 +289,14 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         function uploaded(message) {
             $scope.$apply(function() {
                 if (message.indexOf('success') !== -1) {
+                    $growl('success','Success','Data successfully added');
                     // TODO success
                 } else {
+                    $growl('error','Error','Data import failed');
                     // TODO error
                 }
             });
+            $modalInstance.close();
         };
     }]);
 

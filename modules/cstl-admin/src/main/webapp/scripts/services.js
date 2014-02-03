@@ -240,3 +240,24 @@ cstlAdminApp.service('$dashboard', function($filter) {
         });
     };
 });
+
+cstlAdminApp.service('$growl', function() {
+    /**
+     * Displays a notification with the specified title and text.
+     *
+     * @param type  - {string} the notification type (info|error|success|warning)
+     * @param title - {string} the notification title
+     * @param msg   - {string} the notification message
+     */
+    return function(type, title, msg) {
+        if (type === 'info') {
+            $.growl({title: title, message: msg});
+        } else if (type === 'error') {
+            $.growl.error({title: title, message: msg});
+        } else if (type === 'success') {
+            $.growl.notice({title: title, message: msg});
+        } else if (type === 'warning') {
+            $.growl.warning({title: title, message: msg});
+        }
+    };
+});
