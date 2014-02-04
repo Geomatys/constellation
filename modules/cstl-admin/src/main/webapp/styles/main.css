@@ -2,6 +2,9 @@
     color: white;
     background-color: black;
 }
+.header .nav>li>a {
+    cursor: pointer;
+}
 
 body {
     background-color: #f2f2f2;
@@ -25,7 +28,9 @@ body {
 .dropdown-menu {
     z-index: 2000;
 }
-
+.dropdown-menu>li>a {
+    cursor: pointer;
+}
 .nav-frame {
     padding: 9px 0;
 }

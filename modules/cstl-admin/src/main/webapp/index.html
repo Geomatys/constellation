@@ -63,17 +63,14 @@
         <li><a href="#"> <span class="glyphicon glyphicon-home"></span>
             <span translate="global.menu.home">Accueil</span>
         </a></li>
-        <li><a ng-show="authenticated" href="#"> <span
+        <li><a ng-show="authenticated" href="#/webservice"> <span
                 class="glyphicon glyphicon-cloud"></span> <span
                 translate="global.menu.web-service">Services web</span>
         </a></li>
-        <li><a href="#"> <span class="glyphicon glyphicon-file"></span>
+        <li><a href="#/data"> <span class="glyphicon glyphicon-file"></span>
             <span translate="global.menu.data">Données</span>
         </a></li>
-        <li><a href="#"> <span class="glyphicon glyphicon-edit"></span>
-            <span translate="global.menu.map-composition">composition cartographique</span>
-        </a></li>
-        <li><a href="#"> <span class="glyphicon glyphicon-picture"></span>
+        <li><a href="#/viewer"> <span class="glyphicon glyphicon-picture"></span>
             <span translate="global.menu.viewer">visualiseur</span>
         </a></li>
         <li class="dropdown pointer"><a class="dropdown-toggle"
@@ -115,7 +112,7 @@
 
 
 
-<div class="container" style="padding-top: 40px; box-sizing: border-box" ng-view=""></div>
+<div class="container" style="box-sizing: border-box" ng-view=""></div>
 
 
 
