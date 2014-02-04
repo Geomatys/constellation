@@ -390,6 +390,10 @@ body {
     display: block;
 }
 
+#uploadForm .modal-dialog {
+    width: 800px;
+}
+
 /**
  * Growl
  */

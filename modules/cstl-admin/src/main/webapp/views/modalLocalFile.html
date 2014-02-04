@@ -58,9 +58,14 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="part3">
+                    <!-- Display coverage data -->
+                    <div id="dataPreviewMap" style="height: 400px; width:740px"></div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" ng-click="close()">Cancel</button>
+                <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()">Close</button>
                 <button type="button" id="nextButton" class="btn btn-primary" ng-click="next();">Next</button>
                 <button type="button" id="submitButton" class="btn btn-primary" ng-click="upload();">Finish</button>
             </div>

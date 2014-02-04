@@ -237,6 +237,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
     function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl, provider) {
         $scope.init = function() {
             $("#part2").hide();
+            $("#part3").hide();
             $("#submitButton").hide();
             $("#nextButton").hide();
         };
@@ -308,6 +309,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             }
                         });
                         $growl('success','Success','Shapefile data '+ fileName +' successfully added');
+                        $modalInstance.close();
                     } else if ($scope.uploadType === "raster") {
                         provider.create({
                             id: fileName
@@ -318,15 +320,28 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                                 path: message
                             }
                         });
-                        $growl('success','Success','Coverage data '+ fileName +' successfully added');
+                        displayCoverage(fileName);
                     } else {
                         $growl('warning','Warning','Not implemented choice');
+                        $modalInstance.close();
                     }
                 } else {
                     $growl('error','Error','Data import failed');
+                    $modalInstance.close();
                 }
             });
-            $modalInstance.close();
+        };
+
+        function displayCoverage(providerId) {
+            $("#part1").hide();
+            $("#part2").hide();
+            $("#part3").show();
+            $("#submitButton").hide();
+
+            var layerData = DataPreviewViewer.createLayer(providerId, providerId);
+            var layerBackground = DataPreviewViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+            DataPreviewViewer.layers = [layerData, layerBackground];
+            DataPreviewViewer.initMap();
         };
     }]);
 
