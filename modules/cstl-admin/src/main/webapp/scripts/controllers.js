@@ -233,8 +233,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
     }]);
 
-cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl',
-    function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl) {
+cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl', 'provider',
+    function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl, provider) {
         $scope.init = function() {
             $("#part2").hide();
             $("#submitButton").hide();
@@ -283,17 +283,30 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         };
 
         $scope.upload = function() {
-            $ajaxUpload(cstlContext + "api/1/data/upload", $('#uploadForm'), uploaded);
+            var form = $('#uploadForm');
+            $ajaxUpload(cstlContext + "api/1/data/upload", form, uploaded);
+            $scope.file = form.find('#file').val();
         };
 
         function uploaded(message) {
             $scope.$apply(function() {
-                if (message.indexOf('success') !== -1) {
+                if (message.indexOf('failed') === -1) {
+                    var fileName = message.substring(message.lastIndexOf("/")+1);
+                    if (fileName.indexOf(".") !== -1) {
+                        fileName = fileName.substring(0, fileName.lastIndexOf("."));
+                    }
+                    provider.create({
+                        id: fileName
+                    }, {
+                        type: "feature-store",
+                        subType: "shapefile",
+                        parameters: {
+                            path: message
+                        }
+                    });
                     $growl('success','Success','Data successfully added');
-                    // TODO success
                 } else {
                     $growl('error','Error','Data import failed');
-                    // TODO error
                 }
             });
             $modalInstance.close();

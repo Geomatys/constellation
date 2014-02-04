@@ -71,6 +71,15 @@ cstlAdminApp.factory('style', ['$resource',
         });
     }]);
 
+cstlAdminApp.factory('provider', ['$resource',
+    function ($resource) {
+        return $resource(cstlContext+'api/1/provider', {}, {
+            'create': {method: 'PUT', url: cstlContext+'api/1/provider/:id'},
+            'delete': {method: 'DELETE', url: cstlContext+'api/1/provider/:id'}
+        });
+    }]);
+
+
 cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService',
     function ($rootScope, $http, authService) {
         return {

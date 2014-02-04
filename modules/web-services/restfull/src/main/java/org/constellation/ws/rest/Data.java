@@ -9,6 +9,7 @@ import org.constellation.admin.dao.DataRecord;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.NotRunningServiceException;
+import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.CoverageMetadataBean;
@@ -37,6 +38,7 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessListener;
+import org.geotoolkit.util.FileUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
@@ -78,6 +80,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.CRC32;
 
 /**
  * Manage data sending
@@ -212,17 +215,23 @@ public class Data {
                                @FormDataParam("metadatafile") FormDataContentDisposition mdFileDetail) {
 
         final File dataDirectory = ConfigDirectory.getDataDirectory();
+        File newFile = new File(dataDirectory, fileDetail.getFileName());
         try {
             if (fileIs != null) {
-                final File newFile = new File(dataDirectory, fileDetail.getFileName());
                 Files.copy(fileIs, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                if (newFile.getName().endsWith(".zip")) {
+                    final String fileNameWithoutExt = newFile.getName().substring(0, newFile.getName().indexOf("."));
+                    final File zipDir = new File(dataDirectory, fileNameWithoutExt);
+                    FileUtilities.unzip(newFile, zipDir, new CRC32());
+                    newFile = zipDir;
+                }
             }
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            return Response.ok("fail").build();
+            return Response.status(500).entity("failed").build();
         }
 
-        return Response.ok("success").header("X-Frame-Options", "SAMEORIGIN").build();
+        return Response.ok(newFile.getAbsolutePath()).header("X-Frame-Options", "SAMEORIGIN").build();
     }
 
     /**
