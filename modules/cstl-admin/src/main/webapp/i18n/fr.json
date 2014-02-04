@@ -205,5 +205,42 @@
             "level": "Niveau"
         }
     },
-    "footer": "Ceci est votre pied de page"
+    "footer": "Ceci est votre pied de page",
+    "main": {
+        "menu": {
+            "ws" : {
+                "create" : {
+                    "title" : "Services web",
+                    "subtitle" : "Créer un service web",
+                    "detail" : "<p>Vous pouvez créer un nouveau service pour ensuite y ajouter des données.</p><p>Services gérés par Constellation :</p>"
+                }
+
+            },
+            "data" : {
+                "create" : {
+                    "title" : "Données",
+                    "subtitle" : "Ajouter une donnée",
+                    "detail" : "<p>Vous pouvez créer une nouvelle donnée.</p><p>Vous pourrez ensuite la publier dans un service web.</p>"
+                }
+            },
+            "map-composition" : {
+                "create" : {
+                    "title" : "Compositions cartographiques",
+                    "subtitle" : "Créer une composition",
+                    "detail" : "<p>Vous pouvez assembler plusieurs données, leur donner un style et ainsi créer vos propres compositions cartographiques.</p>"
+                }
+            },
+            "viewer" : {
+                "create" : {
+                    "title" : "Visualisation de couches",
+                    "subtitle" : "Visualiser les couches",
+                    "detail" : "<p>Vous pouvez visualiser les couches disponibles sur les différents services.</p>"
+                }
+            },
+            "stat" : {
+                "title" : "Statistiques du serveur",
+                "subtitle" : "Voir les statistiques"
+            }
+        }
+    }
 }

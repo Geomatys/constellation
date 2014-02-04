@@ -1,13 +1,13 @@
-<div class="logo-wrapper row">
-    <div class="col-sm-3">
-        <a href="#"><img src="images/constellation.png"></a>
+<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
+    <div class="col-sm-2">
+        <img src="images/constellation.png"/>
     </div>
     <!-- Menu to create services -->
-    <div class="col-sm-3 col-sm-offset-6">
-        <div class="dropdown pull-right">
+    <div class="col-sm-3 offset6 pull-right">
+        <div class="dropdown">
             <a id="createservice" data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle">
                 <span class="icon-plus icon-white" style="margin-top: 0px;"></span>
-                   Créer un nouveau service
+                Créer un nouveau service
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
@@ -42,13 +42,13 @@
     </div>
 
     <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;" id="main" ng-repeat="service in services.instance">
-          <div class="span6" id="wms-test">
+        <div class="col-sm-6" id="wms-test">
             <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}"><h3 class="text-info">{{service.name}} ({{service.type.toLocaleLowerCase()}})</h3></a>
             <div class="well started" data-state="wms-test">
                 <div class="row">
                     <div class="pull-right">
                         <div class="btn-group">
-                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                                 <i class="icon-wrench"></i>
                                 <span class="caret"></span>
                             </a>
@@ -61,10 +61,10 @@
                                 <li class="" ><a href="#" data-action="show-service">Visualiser</a></li>
                             </ul>
                         </div>
-                        <a class="btn btn-info" href="#" data-action="restart-service" data-service-type="wms" data-service-id="test">
+                        <a class="btn btn-default btn-info" href="#" data-action="restart-service" data-service-type="wms" data-service-id="test">
                             <i class="icon-refresh"></i>
                         </a>
-                        <a class="btn started" href="#" data-state="wms-test" data-action="toggle-service" data-service-type="wms" data-service-id="test">
+                        <a class="btn btn-default started" href="#" data-state="wms-test" data-action="toggle-service" data-service-type="wms" data-service-id="test">
                             <i class="icon-play"></i>
                             <i class="icon-stop"></i>
                         </a>
@@ -79,7 +79,7 @@
                     </div>
                 </div>
             </div>
-          </div>
+        </div>
 
     </div>
 </div>

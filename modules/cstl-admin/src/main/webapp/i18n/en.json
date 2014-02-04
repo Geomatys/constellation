@@ -4,6 +4,11 @@
         "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.",
         "menu": {
             "home": "Home",
+            "web-service": "Web Services ",
+            "data": "Data",
+            "style": "Styles",
+            "map-composition": "Map Editor",
+            "viewer":"Map Viewer",
             "account": {
                 "main": "Account",
                 "settings": "Settings",
@@ -198,5 +203,42 @@
             "level": "Level"
         }
     },
-    "footer": "This is your footer"
+    "footer": "This is your footer",
+    "main": {
+        "menu": {
+            "ws" : {
+                "create" : {
+                    "title" : "Web services",
+                    "subtitle" : "Create web service",
+                    "detail" : "<p>You can create a new service and after, add data on it.</p><p>Constellation managed services :</p>"
+                }
+
+            },
+            "data" : {
+                "create" : {
+                    "title" : "Data",
+                    "subtitle" : "Add data",
+                    "detail" : "<p>You can create a new data.</p><p>You can after publish it on a web service.</p>"
+                }
+            },
+            "map-composition" : {
+                "create" : {
+                    "title" : "Map context",
+                    "subtitle" : "Create map context",
+                    "detail" : "<p>You can assemble several data, give them styles and so create your own map context.</p>"
+                }
+            },
+            "viewer" : {
+                "create" : {
+                    "title" : "Geoviewer",
+                    "subtitle" : "Show layers",
+                    "detail" : "<p>You can show available layers on some services.</p>"
+                }
+            },
+            "stat" : {
+                "title" : "Server statistics",
+                "subtitle" : "Show statistics"
+            }
+        }
+    }
 }
