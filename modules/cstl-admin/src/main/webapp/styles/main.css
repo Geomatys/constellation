@@ -183,6 +183,9 @@ body {
     height: 30px;
     margin-bottom: 10px;
 }
+.dashboard .pagination-wrapper li>a {
+    cursor: pointer;
+}
 .dashboard .pagination-wrapper .nb-results {
     line-height: 30px;
 }

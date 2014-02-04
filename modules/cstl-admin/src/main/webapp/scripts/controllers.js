@@ -286,6 +286,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
             var form = $('#uploadForm');
             $ajaxUpload(cstlContext + "api/1/data/upload", form, uploaded);
             $scope.file = form.find('#file').val();
+            $scope.uploadType = form.find("input[name='dataType']:checked").val();
         };
 
         function uploaded(message) {
@@ -295,16 +296,32 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                     if (fileName.indexOf(".") !== -1) {
                         fileName = fileName.substring(0, fileName.lastIndexOf("."));
                     }
-                    provider.create({
-                        id: fileName
-                    }, {
-                        type: "feature-store",
-                        subType: "shapefile",
-                        parameters: {
-                            path: message
-                        }
-                    });
-                    $growl('success','Success','Data successfully added');
+
+                    if ($scope.uploadType === "vector") {
+                        provider.create({
+                            id: fileName
+                        }, {
+                            type: "feature-store",
+                            subType: "shapefile",
+                            parameters: {
+                                path: message
+                            }
+                        });
+                        $growl('success','Success','Shapefile data '+ fileName +' successfully added');
+                    } else if ($scope.uploadType === "raster") {
+                        provider.create({
+                            id: fileName
+                        }, {
+                            type: "coverage-store",
+                            subType: "coverage-file",
+                            parameters: {
+                                path: message
+                            }
+                        });
+                        $growl('success','Success','Coverage data '+ fileName +' successfully added');
+                    } else {
+                        $growl('warning','Warning','Not implemented choice');
+                    }
                 } else {
                     $growl('error','Error','Data import failed');
                 }

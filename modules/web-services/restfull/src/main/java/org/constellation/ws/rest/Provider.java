@@ -99,23 +99,23 @@ public final class Provider {
                         try {
                             final String shpPath = inParams.get("path");
                             final URL url = new URL("file:" + shpPath);
-                            final ParameterValueGroup shapeFileParametersFolder = sources.groups("choice").get(0).addGroup("ShapeFileParametersFolder");
-                            shapeFileParametersFolder.parameter("url").setValue(url);
-                            shapeFileParametersFolder.parameter("namespace").setValue("no namespace");
+                            final ParameterValueGroup shpFolderParams = sources.groups("choice").get(0).addGroup("ShapeFileParametersFolder");
+                            shpFolderParams.parameter("url").setValue(url);
+                            shpFolderParams.parameter("namespace").setValue("no namespace");
                         } catch (MalformedURLException e) {
-                            LOGGER.log(Level.WARNING, "", e);
+                            LOGGER.log(Level.WARNING, "unable to create url from path", e);
                         }
                         break;
                     default:
-                        final ParameterValueGroup postGresParametersFolder = sources.groups("choice").get(0).addGroup("PostgresParameters");
+                        final ParameterValueGroup pgParams = sources.groups("choice").get(0).addGroup("PostgresParameters");
                         final int port = Integer.parseInt(inParams.get("port"));
-                        postGresParametersFolder.parameter("identifier").setValue("postgresql");
-                        postGresParametersFolder.parameter("host").setValue(inParams.get("host"));
-                        postGresParametersFolder.parameter("port").setValue(port);
-                        postGresParametersFolder.parameter("user").setValue(inParams.get("user"));
-                        postGresParametersFolder.parameter("password").setValue(inParams.get("password"));
-                        postGresParametersFolder.parameter("database").setValue(inParams.get("database"));
-                        postGresParametersFolder.parameter("simple types").setValue(true);
+                        pgParams.parameter("identifier").setValue("postgresql");
+                        pgParams.parameter("host").setValue(inParams.get("host"));
+                        pgParams.parameter("port").setValue(port);
+                        pgParams.parameter("user").setValue(inParams.get("user"));
+                        pgParams.parameter("password").setValue(inParams.get("password"));
+                        pgParams.parameter("database").setValue(inParams.get("database"));
+                        pgParams.parameter("simple types").setValue(true);
                 }
                 break;
             case "coverage-store":
@@ -127,37 +127,37 @@ public final class Provider {
                             final String pyramidPath = inParams.get("path");
                             fileUrl = URI.create(pyramidPath).toURL();
                         } catch (MalformedURLException e) {
-                            LOGGER.log(Level.WARNING, "unnable to create url from path", e);
+                            LOGGER.log(Level.WARNING, "unable to create url from path", e);
                         }
-                        final ParameterValueGroup xmlCoverageStoreParameters = sources.groups("choice").get(0).addGroup("XMLCoverageStoreParameters");
-                        xmlCoverageStoreParameters.parameter("identifier").setValue("coverage-xml-pyramid");
-                        xmlCoverageStoreParameters.parameter("path").setValue(fileUrl);
-                        xmlCoverageStoreParameters.parameter("type").setValue("AUTO");
+                        final ParameterValueGroup xmlCovParams = sources.groups("choice").get(0).addGroup("XMLCoverageStoreParameters");
+                        xmlCovParams.parameter("identifier").setValue("coverage-xml-pyramid");
+                        xmlCovParams.parameter("path").setValue(fileUrl);
+                        xmlCovParams.parameter("type").setValue("AUTO");
                         break;
                     case "coverage-file":
                         try {
                             final String covPath = inParams.get("path");
                             fileUrl = URI.create("file:"+covPath).toURL();
                         } catch (MalformedURLException e) {
-                            LOGGER.log(Level.WARNING, "unnable to create url from path", e);
+                            LOGGER.log(Level.WARNING, "unable to create url from path", e);
                         }
 
-                        final ParameterValueGroup fileCoverageStoreParameters = sources.groups("choice").get(0).addGroup("FileCoverageStoreParameters");
-                        fileCoverageStoreParameters.parameter("identifier").setValue("coverage-file");
-                        fileCoverageStoreParameters.parameter("path").setValue(fileUrl);
-                        fileCoverageStoreParameters.parameter("type").setValue("AUTO");
-                        fileCoverageStoreParameters.parameter("namespace").setValue("no namespace");
+                        final ParameterValueGroup fileCovParams = sources.groups("choice").get(0).addGroup("FileCoverageStoreParameters");
+                        fileCovParams.parameter("identifier").setValue("coverage-file");
+                        fileCovParams.parameter("path").setValue(fileUrl);
+                        fileCovParams.parameter("type").setValue("AUTO");
+                        fileCovParams.parameter("namespace").setValue("no namespace");
                         break;
                     case "pgraster":
-                        final ParameterValueGroup postGresParametersFolder = sources.groups("choice").get(0).addGroup("PGRasterParameters");
+                        final ParameterValueGroup pgRasterParams = sources.groups("choice").get(0).addGroup("PGRasterParameters");
                         final int port = Integer.parseInt(inParams.get("port"));
-                        postGresParametersFolder.parameter("identifier").setValue("postgresql");
-                        postGresParametersFolder.parameter("host").setValue(inParams.get("host"));
-                        postGresParametersFolder.parameter("port").setValue(port);
-                        postGresParametersFolder.parameter("user").setValue(inParams.get("user"));
-                        postGresParametersFolder.parameter("password").setValue(inParams.get("password"));
-                        postGresParametersFolder.parameter("database").setValue(inParams.get("database"));
-                        postGresParametersFolder.parameter("simple types").setValue(true);
+                        pgRasterParams.parameter("identifier").setValue("postgresql");
+                        pgRasterParams.parameter("host").setValue(inParams.get("host"));
+                        pgRasterParams.parameter("port").setValue(port);
+                        pgRasterParams.parameter("user").setValue(inParams.get("user"));
+                        pgRasterParams.parameter("password").setValue(inParams.get("password"));
+                        pgRasterParams.parameter("database").setValue(inParams.get("database"));
+                        pgRasterParams.parameter("simple types").setValue(true);
                         break;
                     default:
                         LOGGER.log(Level.WARNING, "error on subtype definition");

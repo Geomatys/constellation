@@ -231,6 +231,7 @@ public class Data {
             return Response.status(500).entity("failed").build();
         }
 
+        // TODO: handle metadata uploaded
         return Response.ok(newFile.getAbsolutePath()).header("X-Frame-Options", "SAMEORIGIN").build();
     }
 
