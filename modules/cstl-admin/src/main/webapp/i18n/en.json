@@ -1,4 +1,467 @@
 {
+    "adddata": {
+        "popup": {
+           "datalist": {
+             "subtitle": {
+              "label": "Select data to import and click on continue."
+              }
+           },
+           "informations": {
+              "name": {
+                "label": "Alias"
+              },
+              "subtitle": {
+                "label": "Add alias on data."
+              }
+           },
+           "style" : {
+              "subtitle": {
+                "label": "Select data default style"
+              }
+           },
+           "title" : "Add data"
+        }
+    },
+    "confirm.delete.style": "Do you really want to delete this style?",
+    "create": {
+        "accessconstraint": {
+            "fees.label": "Fees",
+            "label": "Access constraints",
+            "layerlimit" : {
+                "label": "Layer limit number",
+                "tooltip": "Maximum layer value that client can include in GetMap."
+            },
+            "legend": "Service Access constraint",
+            "maxheight": {
+                "label": "Max height", 
+                "tooltip": "Maximum height value that a client can include in a GetMap."
+            },
+            "maxwidth": {
+                "label": "Max width", 
+                "tooltip": "Maximum width value that a client can include in GetMap."
+            }
+        },
+        "cancel.label": "Cancel",
+        "contact": {
+            "address": {
+                "city.label": "City",
+                "country.label": "Country",
+                "label": "Address",
+                "postcode.label": "Zip code",
+                "state.label": "State",
+                "email.label": "Email",
+                "fax.label": "Fax",
+                "firstname.label": "First name",
+                "lastname.label": "Last name"
+            },
+            "legend": "Contact information",
+            "name.label": "Name",
+            "organisation.label": "Organization",
+            "phone.label": "Phone",
+            "position.label": "Position"
+        },
+        "description": {
+            "protocol.title": "Protocol",
+            "service": {
+                "description.label": "Description",
+                "identifier.label": "Identifier",
+                "keywords.label": "keywords",
+                "legend": "Service Description",
+                "name.label": "Name"
+            },
+            "text": {
+                "csw": "CS-W (Catalogue Service for the Web) can serve dataset and service metadata.",
+                "sos": "SOS (Sensor Observation Service) can serve real-time sensor data.",
+                "wcs": "WCS (Web Coverage Service) can serve coverage data as raw data, to get pixel value",
+                "wfs": "A WFS (Web Feature Service) can serve spatially referenced data as textual or binary formats like GML, Shape, ...",
+                "wms": "A WMS (Web Mapping Service) can serve geographic data as georeferenced images.",
+                "wmts": "A WMTS (Web Mapping Tile Service) can serve map tiles of spatially referenced data using tile images with predefined content, extent, and resolution.",
+                "wps": "WPS (Web Processing Service) can serve geoprocessing logic as Web Services"
+            },
+            "title.label": {
+                "csw": "CSW",
+                "sos": "SOS",
+                "wcs": "WCS",
+                "wfs": "WFS",
+                "wms": "WMS",
+                "wmts": "WMTS",
+                "wps": "WPS"
+            },
+            "transactional": "Transactional",
+            "version.title": "Version",
+            "metadata": {
+              "subtitle": "Creating service:",
+              "title": "Service metadata"
+            },
+            "next.label": "Next",
+            "previous.label": "Previous",
+            "save.label": "Save",
+            "title.label": "Designing service"
+        }
+     },
+    "data": {
+        "information": {
+            "page.title": "Information about data",
+            "tab.title": "Picture information",
+            "tab.missing.title": "Missing metadata"
+        }
+    },
+
+    "edition.style": {
+        "label": {
+           "attribute": "Attribute",
+           "auto": {
+             "intervals": "By intervals",
+             "unique": "By unique values"
+            },
+            "cancel": "Cancel",
+            "channel": {
+                "blue": "Blue channel",
+                "green": "Green channel",
+                "grey": "Grey channel",
+                "red": "Red channel"
+            },
+            "channels": "Channels",
+            "circle": "Circle",
+            "color": "Color",
+            "continuous": "Continuous",
+            "cross": "Cross",
+            "dashed": "Dashed",
+            "delete": "Delete",
+            "delete.all": "Delete all",
+            "description": "Description",
+            "edit": "Edit",
+            "fill": "Fill",
+            "filters": "Filters",
+            "font": "Font",
+            "general": "General",
+            "grey.scale": "Grey scale",
+            "label": "Label",
+            "line": "Line",
+            "manual": "Manual",
+            "marker": "Marker",
+            "max.scale": "Max scale",
+            "min.scale": "Min scale",
+            "name": "Name",
+            "new.rules": "New rule(s)",
+            "new.symbolizer": "New symbolizer",
+            "opacity": "Opacity",
+            "overview": "Overview",
+            "point": "Point",
+            "polygon": "Polygon",
+            "raster": "Raster",
+            "rgb": "RGB",
+            "rotation": "Rotation",
+            "rules": "Rules",
+            "scale": "Scale",
+            "see.layer": "See the layer",
+            "size": "Size",
+            "square": "Square",
+            "star": "Star",
+            "stroke": "Stroke",
+            "style": "Style",
+            "style.name": "Style name",
+            "symbolizers": "Symbolizers",
+            "text": "Text",
+            "title": "Title",
+            "type": "Type",
+            "update": "Update",
+            "validate":" Validate",
+            "viewer": "Viewer",
+            "width": "Width"     
+           },
+        "placeholder": {
+            "name": "Type a name...",
+            "number": "Type a number...",
+            "value": "Type a value..."
+        }
+    },
+    "growl": {
+        "error": {
+           "data.import.no.geographic": "Picture doesn't contain geographic information.",
+           "service": {
+              "delete": "Unable to delete the service.",
+              "description": "Unable to update the service description.",
+              "metadata": "Unable to update the service description.",
+              "restart": "Unable to restart the service.",
+              "start": "Unable to start the service. The service may already be running.",
+              "stop": "Unable to stop the service. The service may not be running."
+            },
+            "style": {
+                "delete": "Unable to delete the style.",
+                "link.data": "Unable to associate the style to data.",
+                "unlink.data": "Unable to dissociate the style from data."
+            }
+        },
+        "success": {
+            "service": {
+              "delete": "Service successfully delete.",
+              "description": "Service description successfully updated.",
+              "metadata": "Service metadata successfully updated.",
+              "restart": "Service successfully restarted.",
+              "start": "Service successfully started.",
+              "stop": "Service successfully stopped."
+            },
+            "style": {
+                "delete": " Style successfully deleted.",
+                "link.data": "Style successfully associated to data.",
+                "unlink.data": "Style successfully dissociated from data."
+            }
+        }
+    },
+    "homepage": {
+        "data": {
+            "button.label": "Add data",
+            "summary": "<p>You can create a new data.</p><p>You can after publish it on a web service.</p>",
+            "title.label": "Data"
+            },
+        "geoviewer": {
+            "button.label": "Show layers",
+            "summary": "<p>You can show available layers on some services.</p>",
+            "title.label": "Geoviewe"
+        },
+        "mapcontext": {
+            "button.label": "Create map context",
+            "summary": "<p>You can assemble several data, give them styles and so create your own map context</p>",
+            "title.label": "Map context"
+        },
+        "stat": {
+            "button.label": "Show statistics",
+            "title.label": "Server statistics"
+        },
+        "title": "Welcome on Constellation!",
+        "webservices": {
+            "button.label": "Create web service",
+            "summary": "<p>You can create a new service and after, add data on it.</p><p>Constellation managed services : </p>",
+            "title.label": "Web services"
+        }
+
+    },
+    "label": {
+        "add": "Add",
+        "add.data": "Add data",
+        "add.style": "Add style",
+        "all_fem": "All",
+        "categories": "Categories",
+        "close": "Close",
+        "comparison": "Comparison",
+        "create.new.style": "Create new style",
+        "data.list": "Data list",
+        "data.processed": "Processed data",
+        "data.pyramidal": "Pyramidal data",
+        "data.raster": "Raster data",
+        "data.raw": "Raw data",
+        "data.sensor": "Sensor data",
+        "data.vector": "Vector data",
+        "data.virtual.sensor ": "Virtual sensors",
+        "database": "Database",
+        "date": "Date",
+        "delete": "Delete",
+        "description": "Description",
+        "edit": "Edit",
+        "error": "Error",
+        "file.local": "Local file",
+        "file.server": "Server file",
+        "finish": "Finish",
+        "import.style": "Import a style",
+        "list.style": "Style list",
+        "logical": "Logical",
+        "name": "Name",
+        "no.association": "No association.",
+        "no.available.data": "No available data.",
+        "no.available.layer": "No available layer.",
+        "no.available.style": "No available style.",
+        "no.description": "No description available.",
+        "no.selected.data": "No selected data.",
+        "no.selected.layer": "No selected layer.",
+        "no.selected.metadata": "No selected metadata.",
+        "no.selected.style": "No selected style.",
+        "owner": "Owner",
+        "raster": "Raster",
+        "related.data": "Related data",
+        "related.mapcontext": "Related map context",
+        "related.service": "Related service",
+        "related.style": "Related style",
+        "results": "result(s)",
+        "return": "Return",
+        "search": "Search",
+        "sensor": "Sensor",
+        "success": "Success",
+        "symbols":" Symbols",
+        "title": "Title",
+        "type": "Type",
+        "unknown": "Unknown",
+        "validate": "Validate",
+        "vector": "Vector"
+    },
+    "layer.listing": {
+        "data" :{
+            "add.button.label": "Add data",
+            "create.button.label": "Create data",
+            "upload": {
+                "button": "Upload file",
+                "change.label": "Change",
+                "close.button": "Close",
+                "continue.button": "Continue",
+                "name.label": "Name",
+                "raster.label": "Raster data",
+                "remove.label": "Remove",
+                "select.label": "Choose file",
+                "sensor.label": "Sensor data",
+                "title": "Upload data",
+                "vector.label": "Vector data"
+            }
+        },
+        "layer.label": "layers",
+        "numberbypage": {
+            "10.label": "10 layers",
+            "100.label": "100 layers",
+            "20.label": "20 layers"
+            },
+            "orderBy": {
+                "date": "Date",
+                "owner": "Owner",
+                "title": "Title"
+            },
+            "reduce.button.label": "Reduce or expand",
+            "selectall.button": "select all layers",
+            "selected": {
+                "data.button": "Show data",
+                "delete.button": "Delete layer",
+                "export.button": "Export",
+                "metadata.button": "See metadata"                
+            },
+            "title": "Layers list"      
+    },
+    "md": {
+        "iso": {
+            "abstract": "Abstract",
+            "data.date": "Data date",
+            "date.type": "Date type",
+            "keywords": "Keywords",
+            "locale.data": "Locale data",
+            "organization": "Organization",
+            "role": "Role",
+            "title": "Title",
+            "topic.category": "Topic category",
+            "username": "User name"            
+        },
+        "listing": {
+            "metadata.type": "METADATA",
+            "selected":{
+                "delete.button": "Delete",
+                "duplicate.button": "Duplicate",
+                "edit.button": "Edit",
+                "export.button": "Export"
+            },
+            "title": "Metadata list",
+            "no.available.md": "No available metadata"
+        }
+    },
+    "menu": {
+        "administration.label": "Administration",
+        "data.label": "Data",
+        "geoviewer.label": "Geoviewer",
+        "homepage.label": "Homepage",
+        "mapcontext.label": "Map context",
+        "style.label": "Styles",
+        "webservices.label": "Web services"
+        },
+    "metadata.information.tab.title": "Picture metadata",
+    "msg": {
+        "add": {
+          "data": {
+            "style.association": "Associate a style to the selected data",
+            "mapcontext.association": "Associate a mapcontext to the selected data.",
+            "service.association": "Associate a service to the selected data"
+            },
+           "style.association": "Associate a data to the selected style."
+          },
+          "delete.style.selected": "Permanently delete the selected style.",
+          "edit.style.selected": "Edit the selected style.",
+          "msg.no.selected": {
+            "data": "Click on a data to display more information.",
+            "layer": "Click on a layer to display more information.",
+            "metadata": "Click on a metadata to display more information.",
+            "style": "Click on a style to display more information."
+          }
+    },
+    "server": {
+        "choose.file": "Choose a file on the server",
+        "create.button": "Create",
+        "next.button": "Next"
+    },
+    "service":{
+        "abstract.label": "Service Description",
+        "config": {
+         "source": "Source",
+         "source.choose": "Choose source",
+         "source.database": "Database",
+         "source.database.title": "Database (SGBDR)",
+         "source.database.type": "Database type",
+         "source.database.url": "Database URL",
+         "source.database.username": "User name",
+         "source.database.password": "Password",
+         "source.database.shared": "Shared connection",
+         "source.file": "File system",
+         "source.file.title": "File system",
+         "source.file.path": "Folder path",
+         "source.internal": "Internal",
+         "source.internal.title": "Internal (SGBDR)"
+        },
+        "create.end": {
+           "addlayers.label": "Add layers on service",
+           "addmetadata.label": "View metadata on service",
+           "description.label": "Service description",
+           "error.alert.label": "Error. Your service isn't created.",
+           "error.title": "Service isn't created",
+           "success.alert.label": "Congratulations! Your service has been created successfully!",
+           "success.title": "service created successfully",
+           "type.label": "Type",
+           "version.label": "Version"
+        },
+        "data.label": "Published data on service",
+        "description": {
+           "getcapabilities.button": "GetCapabilities",
+           "logs.button": "Logs",
+           "reload.button": "Reload",
+           "start.button": "Start",
+           "stop.button": "Stop",
+           "tab.data.title": "Data",
+           "tab.metadata.data.title": "Managing metadata",
+           "tab.description.title": "Service description",
+           "tab.metadata.title": "Service metadata"
+        },
+        "menu": {
+           "delete.label": "Delete service",
+           "edit.label": "Edit",
+           "getcapabilities.label": "GetCapabilities",
+           "log.label": "Service log",
+           "show.label": "Show",
+           "url.label": "Service URL"
+        }
+    },
+     "style.listing.numberbypage": {
+        "10.label": "10 layers",
+        "100.label": "100 layers",
+        "20.label": "20 layers"
+     },
+     "webservicepage": {
+        "button": {
+            "create.label": "Create a new service",
+               "dropdown": {
+               "label": "Map (WMS)",
+               "csw.label": "Catalogs (CSW)",
+               "wcs.label": "Coverage (WCS)",
+               "wfs.label": "Features (WFS)",
+               "wms.label": "Maps (WMS)",
+               "wmts.label": "Tiles maps (WMTS)",
+               "wps.label": "Geoprocessing (WPS)"
+          }
+     },
+     "tab.all": "All",
+     "title": "Available services"
+    },
     "global": {
         "title": "JHipster",
         "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.",
