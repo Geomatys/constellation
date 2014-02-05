@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ProviderConfiguration;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.ws.CstlServiceException;
@@ -169,7 +170,13 @@ public final class Provider {
                 }
         }
 
-        LayerProviderProxy.getInstance().createProvider(providerService, sources);
+        final LayerProvider old = LayerProviderProxy.getInstance().getProvider(id);
+        if (old != null) {
+            // Provider already exists, update config
+            old.updateSource(sources);
+        } else {
+            LayerProviderProxy.getInstance().createProvider(providerService, sources);
+        }
         return Response.ok().build();
     }
 
