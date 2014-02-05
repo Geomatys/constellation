@@ -16,7 +16,6 @@
  */
 package org.constellation.map.featureinfo;
 
-import org.constellation.Cstl;
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.geotoolkit.display.SearchArea;
 import org.geotoolkit.display.canvas.RenderingContext;
@@ -26,10 +25,7 @@ import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
-import org.geotoolkit.display2d.service.CanvasDef;
-import org.geotoolkit.display2d.service.SceneDef;
-import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.display2d.service.VisitDef;
+import org.geotoolkit.display2d.service.*;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
@@ -126,7 +122,7 @@ public abstract class AbstractFeatureInfoFormat implements FeatureInfoFormat {
             }
         });
 
-        Cstl.getPortrayalService().visit(sDef, vDef, cDef, visitDef);
+        DefaultPortrayalService.visit(cDef, sDef, vDef, visitDef);
     }
 
     /**
