@@ -1,3 +1,4 @@
 org.constellation.map.featureinfo.HTMLFeatureInfoFormat
 org.constellation.map.featureinfo.CSVFeatureInfoFormat
 org.constellation.map.featureinfo.GMLFeatureInfoFormat
+org.constellation.map.featureinfo.AggregateFeatureInfoFormat
