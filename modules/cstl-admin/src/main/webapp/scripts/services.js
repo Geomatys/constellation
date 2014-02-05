@@ -58,7 +58,8 @@ cstlAdminApp.factory('dataListing', ['$resource',
     function ($resource) {
         return $resource(cstlContext+'api/1/data/list/:filter', {}, {
             'listAll':      {method: 'GET', isArray: true},
-            'listCoverage': {method: 'POST', url: cstlContext+'api/1/data/coverage/list/'}
+            'listCoverage': {method: 'POST', url: cstlContext+'api/1/data/coverage/list/'},
+            'pyramidData':  {method: 'POST', url: cstlContext+'api/1/data/pyramid/:id'}
         });
     }]);
 

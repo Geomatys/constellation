@@ -93,12 +93,13 @@ public class PyramidCoverageProcessListener implements ProcessListener {
         newSources.parameter("id").setValue(oldSource.parameter("id").getValue());
         newSources.parameter("providerType").setValue(oldSource.parameter("providerType").getValue());
         newSources.parameter("date").setValue(new Date());
-        
+
         ParameterValueGroup xmlCoverageStoreParameters = newSources.groups("choice").get(0).
                 addGroup("XMLCoverageStoreParameters");
         xmlCoverageStoreParameters.parameter("identifier").setValue("coverage-xml-pyramid");
         xmlCoverageStoreParameters.parameter("path").setValue(fileUrl);
         xmlCoverageStoreParameters.parameter("type").setValue("AUTO");
+        xmlCoverageStoreParameters.parameter("namespace").setValue("no namespace");
         LayerProviderProxy.getInstance().getProvider(identifier).updateSource(newSources);
     }
 

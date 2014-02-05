@@ -260,7 +260,7 @@ public final class LayerProviders extends Static {
                 context.getWidth(),
                 context.getHeight(),
                 context.getStyleBody(),
-                context.getSldVersion());    
+                context.getSldVersion());
     }
 
     /**

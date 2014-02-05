@@ -280,8 +280,10 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
             $scope.$apply(function() {
                 if (message.indexOf('failed') === -1) {
                     var fileName = message.substring(message.lastIndexOf("/")+1);
+                    var fileExtension;
                     if (fileName.indexOf(".") !== -1) {
                         fileName = fileName.substring(0, fileName.lastIndexOf("."));
+                        fileExtension = fileName.substring(fileName.lastIndexOf("."));
                     }
 
                     // Store the providerId for further calls
@@ -307,7 +309,16 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             parameters: {
                                 path: message
                             }
-                        }, function() { displayCoverage(fileName) });
+                        }, function() {
+                            if (!fileExtension || fileExtension !== ".nc") {
+                                dataListing.pyramidData({id: fileName}, {value: message}, function() {
+                                    $growl('success','Success','Coverage data '+ fileName +' successfully added');
+                                    $modalInstance.dismiss('close');
+                                });
+                            } else {
+                                displayNetCDF(fileName);
+                            }
+                        });
                     } else {
                         $growl('warning','Warning','Not implemented choice');
                         $modalInstance.close();
@@ -319,7 +330,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
             });
         };
 
-        function displayCoverage(providerId) {
+        function displayNetCDF(providerId) {
             $("#uploadForm").find(".modal-dialog").addClass("mapview");
             $("#part1").hide();
             $("#part2").hide();
