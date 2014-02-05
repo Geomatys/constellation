@@ -61,7 +61,16 @@
 
                 <div id="part3">
                     <!-- Display coverage data -->
-                    <div id="dataPreviewMap" style="height: 400px; width:740px"></div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <ul>
+                                <li ng-repeat="data in coveragesData.values">
+                                    <a ng-click="displayMap(data)">{{data}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div id="dataPreviewMap" class="col-sm-8" style="height:400px;width:650px;"></div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

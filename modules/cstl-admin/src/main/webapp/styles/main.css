@@ -390,8 +390,17 @@ body {
     display: block;
 }
 
-#uploadForm .modal-dialog {
-    width: 800px;
+/*
+ * Upload form
+ */
+#uploadForm .modal-dialog.mapview {
+    width: 1024px;
+}
+#uploadForm .modal-dialog ul {
+    list-style: none;
+}
+#uploadForm li>a {
+    cursor: pointer;
 }
 
 /**

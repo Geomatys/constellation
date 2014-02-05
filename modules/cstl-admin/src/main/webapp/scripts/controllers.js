@@ -196,22 +196,6 @@ cstlAdminApp.controller('DataController', ['$scope', '$dashboard', 'dataListing'
                 templateUrl: 'views/modalLocalFile.html',
                 controller: 'LocalFileModalController'
             });
-
-            modal.result.then(function(item) {
-                if (item) {
-                    style.link({
-                        provider: item.Provider,
-                        name: item.Name
-                    }, {
-                        values: {
-                            dataProvider: $scope.selected.Provider,
-                            dataNamespace: "", dataId: $scope.selected.Name
-                        }
-                    }, function() {
-                        $scope.selected.TargetStyle.push(item);
-                    });
-                }
-            });
         };
     }]);
 
@@ -233,8 +217,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
     }]);
 
-cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl', 'provider',
-    function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl, provider) {
+cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl', 'provider', 'dataListing',
+    function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl, provider, dataListing) {
         $scope.init = function() {
             $("#part2").hide();
             $("#part3").hide();
@@ -298,6 +282,8 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                         fileName = fileName.substring(0, fileName.lastIndexOf("."));
                     }
 
+                    // Store the providerId for further calls
+                    $scope.providerId = fileName;
                     if ($scope.uploadType === "vector") {
                         provider.create({
                             id: fileName
@@ -319,8 +305,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             parameters: {
                                 path: message
                             }
-                        });
-                        displayCoverage(fileName);
+                        }, function() { displayCoverage(fileName) });
                     } else {
                         $growl('warning','Warning','Not implemented choice');
                         $modalInstance.close();
@@ -333,12 +318,17 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         };
 
         function displayCoverage(providerId) {
+            $("#uploadForm").find(".modal-dialog").addClass("mapview");
             $("#part1").hide();
             $("#part2").hide();
             $("#part3").show();
             $("#submitButton").hide();
 
-            var layerData = DataPreviewViewer.createLayer(providerId, providerId);
+            $scope.coveragesData = dataListing.listCoverage({}, {value: providerId});
+        };
+
+        $scope.displayMap = function(layer) {
+            var layerData = DataPreviewViewer.createLayer(layer, $scope.providerId);
             var layerBackground = DataPreviewViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
             DataPreviewViewer.layers = [layerData, layerBackground];
             DataPreviewViewer.initMap();
