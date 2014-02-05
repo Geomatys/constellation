@@ -219,6 +219,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
 cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl', 'provider', 'dataListing',
     function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl, provider, dataListing) {
+        $scope.layer = '';
+
         $scope.init = function() {
             $("#part2").hide();
             $("#part3").hide();
@@ -328,6 +330,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         };
 
         $scope.displayMap = function(layer) {
+            $scope.layer = layer;
             var layerData = DataPreviewViewer.createLayer(layer, $scope.providerId);
             var layerBackground = DataPreviewViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
             DataPreviewViewer.layers = [layerData, layerBackground];
