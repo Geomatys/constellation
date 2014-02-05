@@ -326,10 +326,15 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
             $("#part3").show();
             $("#submitButton").hide();
 
-            $scope.coveragesData = dataListing.listCoverage({}, {value: providerId});
+            $scope.coveragesData = dataListing.listCoverage({}, {value: providerId}, function(response) {
+                for (var key in response.values) {
+                    $scope.displayLayer(response.values[key]);
+                    break;
+                }
+            });
         };
 
-        $scope.displayMap = function(layer) {
+        $scope.displayLayer = function(layer) {
             $scope.layer = layer;
             var layerData = DataPreviewViewer.createLayer(layer, $scope.providerId);
             var layerBackground = DataPreviewViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");

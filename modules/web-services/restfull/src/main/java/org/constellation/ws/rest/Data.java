@@ -71,6 +71,7 @@ import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -363,15 +364,18 @@ public class Data {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCoverageList(final SimpleValue value) {
-
-        CoverageStoreProvider provider = (CoverageStoreProvider) LayerProviderProxy.getInstance().getProvider(value.getValue());
-        Set<Name> nameSet = provider.getKeys();
+        final CoverageStoreProvider provider = (CoverageStoreProvider) LayerProviderProxy.getInstance().getProvider(value.getValue());
+        final Set<Name> nameSet = provider.getKeys();
+        final List<String> names = new ArrayList<>();
+        for (Name n : nameSet) {
+            names.add(n.getLocalPart());
+        }
+        Collections.sort(names);
 
         //Search on Metadata to found description
-        final HashMap<String, String> coveragesDescription = new HashMap<>(0);
-        for (Name name : nameSet) {
-            String exist = name.getLocalPart();
-            coveragesDescription.put(exist, exist);
+        final Map<String, String> coveragesDescription = new HashMap<>(0);
+        for (int i=0; i<names.size(); i++) {
+            coveragesDescription.put(String.valueOf(i), names.get(i));
         }
 
         //Send String Map via REST
