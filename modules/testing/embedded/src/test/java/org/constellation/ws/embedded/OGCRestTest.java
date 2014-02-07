@@ -103,34 +103,23 @@ public class OGCRestTest extends AbstractGrizzlyServer {
 
         assertNotNull(in);
 
-        URL url = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/api/1/OGC/CSW/default/config");
-        URLConnection conec = url.openConnection();
-
-        Object s = unmarshallResponse(url);
+        Object s = client.services.getInstanceConfiguration(ServiceDef.Specification.CSW, "default");
 
         assertTrue(s instanceof Automatic);
 
         Automatic auto = (Automatic) s;
 
-        auto.setFormat("DTC");
+        auto.setFormat("TEST");
 
-        url = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/api/1/OGC/CSW/default/config");
-        conec = url.openConnection();
+        client.services.setInstanceConfiguration(ServiceDef.Specification.CSW, "default", auto);
 
-        postRequestObject(conec, auto);
-        unmarshallResponse(conec);
-
-        url = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/api/1/OGC/CSW/default/config");
-
-        s = unmarshallResponse(url);
+        s = client.services.getInstanceConfiguration(ServiceDef.Specification.CSW, "default");;
 
         assertTrue(s instanceof Automatic);
 
         auto = (Automatic) s;
 
-        assertEquals("DTC", auto.getFormat());
-
-
+        assertEquals("TEST", auto.getFormat());
     }
 
     @Test

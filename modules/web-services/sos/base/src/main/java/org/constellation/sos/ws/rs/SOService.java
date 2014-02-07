@@ -667,7 +667,7 @@ public class SOService extends OGCWebService<SOSworker> {
             if (tempStr != null) {
                 temporalFilters.add(parseTemporalFilter(tempStr));
             }
-            return buildGetObservation(currentVersion, service, offering, observedProperties, procedures, foids, responseFormat, temporalFilters, spatialFilter);
+            return buildGetObservation(currentVersion, service, offering, observedProperties, procedures, foids, responseFormat, temporalFilters, spatialFilter, null, null, null, null);
         } else {
             throwUnsupportedGetMethod("GetObservation");
             return null;
