@@ -86,7 +86,7 @@ public class CSVFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
         //features
         for (final String layerName : features.keySet()) {
-            builder.append(layerName).append("\n");
+            builder.append('#').append(layerName).append("\n");
             final List<Feature> feat = features.get(layerName);
 
             if (feat.isEmpty()) {
@@ -138,7 +138,7 @@ public class CSVFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
         //coverages
         for (final String layerName : coverages.keySet()) {
-            builder.append(layerName).append("\n");
+            builder.append('#').append(layerName).append("\n");
             final List<String> covs = coverages.get(layerName);
 
             if (covs.isEmpty()) {
