@@ -203,6 +203,13 @@ cstlAdminApp.controller('DataController', ['$scope', '$dashboard', 'dataListing'
                 controller: 'LocalFileModalController'
             });
         };
+
+        $scope.showServerFilePopup = function() {
+            var modal = $modal.open({
+                templateUrl: 'views/modalServerFile.html',
+                controller: 'ServerFileModalController'
+            });
+        };
     }]);
 
 cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude',
@@ -358,6 +365,45 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
             DataPreviewViewer.layers = [layerData, layerBackground];
             DataPreviewViewer.initMap();
         };
+    }]);
+
+cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$modalInstance', '$growl', 'dataListing',
+    function ($scope, $dashboard, $modalInstance, $growl, dataListing) {
+        $scope.columns = [];
+        $scope.currentPath = '/';
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.load = function(path){
+            $scope.currentPath = path;
+            if (path === '/') {
+                path = "root";
+            }
+            $scope.columns.push(dataListing.dataFolder({}, path));
+        };
+
+        $scope.open = function(path, depth) {
+            if (depth < $scope.columns.length) {
+                $scope.columns.splice(depth + 1, $scope.columns.length - depth);
+            }
+            $scope.load(path);
+        };
+
+        $scope.select = function(item,depth) {
+            if (item.folder) {
+                $scope.open(item.subPath, depth);
+            } else {
+
+            }
+        };
+
+        $scope.startWith = function(path) {
+            return $scope.currentPath.indexOf(path) === 0;
+        };
+
+        $scope.load($scope.currentPath);
     }]);
 
 cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$modal',

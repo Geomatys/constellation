@@ -164,7 +164,6 @@ public class Data {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getDataFolder(String path) {
-        final FileListBean list = new FileListBean();
         final List<FileBean> listBean = new ArrayList<>(0);
         File[] children;
         final Set<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension().keySet();
@@ -199,8 +198,7 @@ public class Data {
                 }
             }
         }
-        list.setList(listBean);
-        return Response.status(200).entity(list).build();
+        return Response.status(200).entity(listBean).build();
     }
 
     /**
