@@ -139,6 +139,12 @@ cstlAdminApp.controller('DataController', ['$scope', '$dashboard', 'dataListing'
             DataViewer.initMap();
         };
 
+        $scope.deleteData = function() {
+            var layerName = $scope.selected.Name;
+            var providerId = $scope.selected.Provider;
+            dataListing.deleteData({providerid: providerId, dataid: layerName});
+        };
+
         // Style methods
         $scope.showStyleList = function() {
             var modal = $modal.open({

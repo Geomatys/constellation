@@ -52,6 +52,7 @@ import org.opengis.util.InternationalString;
 import org.opengis.util.NoSuchIdentifierException;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -424,6 +425,13 @@ public class Data {
         }
 
         return Response.ok(briefs).build();
+    }
+
+    @DELETE
+    @Path("{providerid}/{dataid}")
+    public Response deleteData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
+        ConfigurationEngine.deleteData(new QName("", dataid), providerid);
+        return Response.status(200).build();
     }
 
     @GET

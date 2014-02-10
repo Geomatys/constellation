@@ -59,7 +59,8 @@ cstlAdminApp.factory('dataListing', ['$resource',
         return $resource(cstlContext+'api/1/data/list/:filter', {}, {
             'listAll':      {method: 'GET', isArray: true},
             'listCoverage': {method: 'POST', url: cstlContext+'api/1/data/coverage/list/'},
-            'pyramidData':  {method: 'POST', url: cstlContext+'api/1/data/pyramid/:id'}
+            'pyramidData':  {method: 'POST', url: cstlContext+'api/1/data/pyramid/:id'},
+            'deleteData':   {method: 'DELETE', url: cstlContext+'api/1/data/:providerid/:dataid'}
         });
     }]);
 
