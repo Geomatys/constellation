@@ -360,6 +360,27 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         };
     }]);
 
+cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$modal',
+    function ($scope, $dashboard, style, $modal) {
+        $scope.filtertype = "";
+
+        style.listAll({}, function(response) {
+            $dashboard($scope, response.styles);
+        });
+
+        $scope.deleteStyle = function() {
+            var styleName = $scope.selected.Name;
+            var providerId = $scope.selected.Provider;
+            style.delete({providerid: providerId, name: styleName});
+        };
+
+        $scope.toggleUpDownSelected = function() {
+            var $header = $('#stylesDashboard').find('.selected-item').find('.block-header');
+            $header.next().slideToggle(200);
+            $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
+        };
+    }]);
+
 cstlAdminApp.controller('WebServiceController', ['$scope', 'webService',
     function ($scope, webService) {
        $scope.services = webService.listAll();

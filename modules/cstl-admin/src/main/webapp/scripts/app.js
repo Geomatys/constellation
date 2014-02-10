@@ -78,6 +78,10 @@ cstlAdminApp
                     templateUrl: 'views/data.html',
                     controller: 'DataController'
                 })
+                .when('/styles', {
+                    templateUrl: 'views/styles.html',
+                    controller: 'StylesController'
+                })
                 .otherwise({
                     templateUrl: 'views/main.html',
                     controller: 'MainController'

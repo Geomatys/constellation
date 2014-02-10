@@ -67,7 +67,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
 cstlAdminApp.factory('style', ['$resource',
     function ($resource) {
         return $resource(cstlContext+'api/1/SP/all/style/available', {}, {
-            'listAll': { method: 'GET' },
+            'listAll': { method: 'GET', isArray: false },
             'delete':  { method: 'DELETE', url: cstlContext+'api/1/SP/:provider/style/:name'},
             'link':    { method: 'POST',   url: cstlContext+'api/1/SP/:provider/style/:name/linkData'},
             'unlink':  { method: 'POST',   url: cstlContext+'api/1/SP/:provider/style/:name/unlinkData'}

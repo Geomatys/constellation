@@ -74,7 +74,7 @@ body {
 .dashboard .dash-inner.row {
     margin: 0;
 }
-#dataDashboard .dash-inner #list, #dataDashboard .dash-inner #selection {
+.dashboard .dash-inner #list, .dashboard .dash-inner #selection {
     padding: 0 10px;
 }
 .dashboard .navbar .brand {
